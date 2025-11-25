@@ -4,6 +4,93 @@
  */
 
 /* ==========================================================================
+   CSS Variables for Theme
+   ========================================================================== */
+
+:root {
+    --color-bg: #e1d4c2;
+    --color-text: #362017;
+    --color-primary: #212842;
+    --color-accent: #0a0a0a;
+    --color-bg-secondary: rgba(255, 255, 255, 0.5);
+    --color-border: rgba(54, 32, 23, 0.1);
+    --color-header-bg: rgba(225, 212, 194, 0.95);
+    /* Bubble ring color for light theme */
+    --bubble-ring: #212842;
+}
+
+[data-theme="dark"] {
+    --color-bg: #0a0a0a;
+    --color-text: #e1d4c2;
+    --color-primary: #e1d4c2;
+    --color-accent: #e1d4c2;
+    --color-bg-secondary: rgba(33, 40, 66, 0.3);
+    --color-border: rgba(225, 212, 194, 0.2);
+    --color-header-bg: rgba(10, 10, 10, 0.95);
+    /* Bubble ring color for dark theme */
+    --bubble-ring: #e1d4c2;
+}
+
+/* Apply theme colors to elements */
+body {
+    background-color: var(--color-bg) !important;
+    color: var(--color-text) !important;
+}
+
+header {
+    background-color: var(--color-header-bg) !important;
+    border-color: var(--color-border) !important;
+}
+
+.bg-beige {
+    background-color: var(--color-bg) !important;
+}
+
+.text-chocolate {
+    color: var(--color-text) !important;
+}
+
+.text-indigodeep {
+    color: var(--color-primary) !important;
+}
+
+.bg-indigodeep {
+    background-color: var(--color-primary) !important;
+}
+
+.bg-white\/50,
+.bg-white\/30 {
+    background-color: var(--color-bg-secondary) !important;
+}
+
+.border-chocolate\/10 {
+    border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .bg-indigodeep {
+    background-color: #212842 !important;
+}
+
+[data-theme="dark"] .text-white {
+    color: #e1d4c2 !important;
+}
+
+[data-theme="dark"] footer {
+    background-color: #212842 !important;
+}
+
+/* Fix CTA button visibility in dark mode */
+[data-theme="dark"] .bg-indigodeep a.bg-white {
+    background-color: #e1d4c2 !important;
+    color: #212842 !important;
+}
+
+[data-theme="dark"] .bg-indigodeep a.bg-white:hover {
+    background-color: #ffffff !important;
+    color: #212842 !important;
+}
+
+/* ==========================================================================
    Base Styles & Resets
    ========================================================================== */
 
@@ -18,6 +105,9 @@ html {
 
 body {
     min-height: 100vh;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* ==========================================================================
@@ -95,7 +185,7 @@ body {
    GSAP Animation Initial States
    ========================================================================== */
 
-[data-gsap="fade-up"] {
+.js [data-gsap="fade-up"] {
     opacity: 0;
     transform: translateY(30px);
 }
@@ -184,11 +274,117 @@ body {
 #chatbase-bubble-button {
     bottom: 24px !important;
     right: 24px !important;
+    width: 64px !important;
+    height: 64px !important;
+    /* Inverted background logic: light theme uses dark circle, dark theme uses light circle */
+    background-color: #212842 !important; /* light theme base (dark) */
+    border: 2px solid rgba(0,0,0,0.25) !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    /* Layer 1 (top): ring that covers image corners; Layer 2: Savonie image */
+    background-image: radial-gradient(circle at center, transparent 43%, var(--bubble-ring) 44%), url('../img/savonie-icon.jpg') !important;
+    background-repeat: no-repeat, no-repeat !important;
+    background-size: 100% 100%, 80% 80% !important; /* full-size ring + scaled icon */
+    background-position: center center, center center !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: background-color 0.3s ease, border-color 0.3s ease, filter 0.3s ease;
 }
 
 [dir="rtl"] #chatbase-bubble-button {
     right: auto !important;
     left: 24px !important;
+}
+
+/* Invert state (auto applied via JS when over dark region) */
+.chatbot-invert #chatbase-bubble-button,
+#chatbase-bubble-button.chatbot-invert {
+    /* Disable previous full-bubble inversion so the orangutan stays true-color */
+    filter: none !important;
+}
+
+/* Dark theme adjustment so icon ring matches */
+[data-theme="dark"] #chatbase-bubble-button {
+    background-color: #e1d4c2 !important; /* invert to light circle in dark mode */
+    border-color: rgba(225,212,194,0.35) !important;
+}
+
+/* Hide any default Chatbase icon layers so only our background shows */
+#chatbase-bubble-button img,
+#chatbase-bubble-button svg {
+    display: none !important;
+}
+
+/* Reduce chat window size by targeting the window container */
+#chatbase-bubble-window {
+    max-width: 600px !important;
+    max-height: 700px !important;
+    width: 400px !important;
+    height: 550px !important;
+    min-width: 320px !important;
+    min-height: 400px !important;
+    right: 24px !important;
+    bottom: 90px !important;
+    border-radius: 12px !important;
+    resize: none !important;
+    overflow: hidden !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+}
+
+/* Edge hover resize visual feedback */
+#chatbase-bubble-window.resize-hover-edge {
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.35), 0 0 0 6px rgba(255,255,255,0.08), 0 8px 32px rgba(0,0,0,0.45) !important;
+}
+
+#chatbase-bubble-window.resize-hover-corner {
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.45), 0 0 0 8px rgba(255,255,255,0.10), 0 8px 40px rgba(0,0,0,0.55) !important;
+}
+
+/* Overlay resize handles (explicit capture zones) */
+.chatbase-edge-handle, .chatbase-corner-handle {
+    position: absolute;
+    z-index: 2147483648; /* above iframe */
+    background: transparent; /* invisible by default */
+    pointer-events: auto;
+}
+.chatbase-edge-handle:hover, .chatbase-corner-handle:hover {
+    background: rgba(255,255,255,0.06);
+}
+.chatbase-edge-handle.top { top:0; left:0; height:28px; width:100%; cursor:ns-resize; }
+.chatbase-edge-handle.bottom { bottom:0; left:0; height:28px; width:100%; cursor:ns-resize; }
+.chatbase-edge-handle.left { left:0; top:0; width:28px; height:100%; cursor:ew-resize; }
+.chatbase-edge-handle.right { right:0; top:0; width:28px; height:100%; cursor:ew-resize; }
+.chatbase-corner-handle.tl { top:0; left:0; width:34px; height:34px; cursor:nwse-resize; }
+.chatbase-corner-handle.tr { top:0; right:0; width:34px; height:34px; cursor:nesw-resize; }
+.chatbase-corner-handle.bl { bottom:0; left:0; width:34px; height:34px; cursor:nesw-resize; }
+.chatbase-corner-handle.br { bottom:0; right:0; width:34px; height:34px; cursor:nwse-resize; }
+
+/* Chevron-down state when chat is open */
+#chatbase-bubble-button.chatbot-open {
+    /* Replace background with chevron-down arrow */
+    background-image: none !important;
+    background-color: var(--bubble-ring) !important;
+}
+
+#chatbase-bubble-button.chatbot-open::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    /* SVG chevron-down, color inverts by theme */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23e1d4c2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+[data-theme="dark"] #chatbase-bubble-button.chatbot-open::after {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23212842" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
 }
 
 /* ==========================================================================
@@ -208,6 +404,33 @@ textarea:focus,
 select:focus {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(33, 40, 66, 0.1);
+}
+
+/* Theme-aware input backgrounds */
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="file"],
+textarea,
+select {
+    background-color: var(--color-bg-secondary) !important;
+    color: var(--color-text) !important;
+}
+
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] input[type="email"],
+[data-theme="dark"] input[type="url"],
+[data-theme="dark"] input[type="file"],
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+    background-color: rgba(33, 40, 66, 0.4) !important;
+    border-color: rgba(225, 212, 194, 0.3) !important;
+    color: #e1d4c2 !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: rgba(225, 212, 194, 0.5) !important;
 }
 
 /* ==========================================================================
@@ -281,3 +504,205 @@ select:focus {
 @media (prefers-color-scheme: dark) {
     /* Dark mode styles can be added here in the future */
 }
+
+/* ==========================================================================
+   Dark Mode Toggle Button
+   ========================================================================== */
+
+.theme-toggle {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    background: var(--color-primary);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    border: 2px solid var(--color-border);
+}
+
+.theme-toggle-slider {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+[data-theme="dark"] .theme-toggle-slider {
+    transform: translateX(30px);
+    background: #ffeb3b;
+}
+
+.theme-icon-sun,
+.theme-icon-moon {
+    width: 14px;
+    height: 14px;
+    transition: opacity 0.3s ease;
+}
+
+.theme-icon-sun {
+    color: #fbbf24;
+}
+
+.theme-icon-moon {
+    color: #212842;
+    display: none;
+}
+
+[data-theme="dark"] .theme-icon-sun {
+    display: none;
+}
+
+[data-theme="dark"] .theme-icon-moon {
+    display: block;
+    color: #212842;
+}
+
+/* ==========================================================================
+   Draggable / Resizable Chat Component (Custom Replacement)
+   ========================================================================== */
+
+/* Hide original Chatbase bubble if present */
+#chatbase-bubble-button { display: none !important; }
+
+/* Bubble toggle button */
+#custom-chat-bubble {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: var(--bubble-ring);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2147483600;
+    border: 2px solid rgba(0,0,0,0.25);
+    background-image: radial-gradient(circle at center, transparent 44%, var(--bubble-ring) 45%), url('../img/savonie-icon.jpg');
+    background-size: 100% 100%, 78% 78%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+[data-theme="dark"] #custom-chat-bubble {
+    background-color: #e1d4c2;
+    border-color: rgba(225,212,194,0.35);
+}
+
+#custom-chat-bubble:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+}
+
+#custom-chat-bubble:active { transform: scale(0.94); }
+
+/* Panel container */
+.draggable-chat-panel {
+    position: fixed;
+    bottom: 90px; /* initial offset above bubble */
+    right: 24px;
+    width: 420px;
+    height: 560px;
+    max-width: 600px;
+    max-height: 700px;
+    min-width: 320px;
+    min-height: 400px;
+    background: var(--color-accent);
+    color: var(--color-text);
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    z-index: 2147483601;
+    transition: box-shadow 0.25s ease;
+}
+
+[data-theme="dark"] .draggable-chat-panel { background: #000; }
+
+.draggable-chat-panel.open { display: flex; }
+
+.draggable-chat-header {
+    flex: 0 0 46px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    background: var(--color-primary);
+    color: #e1d4c2;
+    cursor: move;
+    user-select: none;
+}
+
+[data-theme="dark"] .draggable-chat-header { background: #212842; }
+
+.draggable-chat-title {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .5px;
+}
+
+.draggable-chat-actions { display: flex; gap: 4px; }
+
+.draggable-chat-actions button {
+    background: transparent;
+    border: none;
+    color: #e1d4c2;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .18s ease, color .18s ease;
+}
+
+.draggable-chat-actions button:hover { background: rgba(255,255,255,0.14); }
+.draggable-chat-actions button:active { background: rgba(255,255,255,0.22); }
+
+.draggable-chat-content { flex: 1 1 auto; position: relative; }
+.draggable-chat-content iframe { width:100%; height:100%; border:0; display:block; }
+
+/* Corner resize handles (proportional) */
+.chat-corner-handle {
+    position: absolute;
+    width: 24px; height: 24px;
+    z-index: 2147483602;
+    background: rgba(255,255,255,0.08);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #e1d4c2;
+    cursor: nwse-resize;
+    opacity: 0;
+    transition: opacity .18s ease, background .18s ease;
+}
+
+.draggable-chat-panel.open .chat-corner-handle { opacity: .5; }
+.chat-corner-handle:hover { background: rgba(255,255,255,0.22); opacity: 1; }
+
+.chat-corner-handle.tl { top: 6px; left: 6px; cursor: nwse-resize; }
+.chat-corner-handle.tr { top: 6px; right: 6px; cursor: nesw-resize; }
+.chat-corner-handle.bl { bottom: 6px; left: 6px; cursor: nesw-resize; }
+.chat-corner-handle.br { bottom: 6px; right: 6px; cursor: nwse-resize; }
+
+/* Subtle outline when hovering panel edges (optional) */
+.draggable-chat-panel.resizing { box-shadow: 0 0 0 3px rgba(255,255,255,0.25), 0 10px 42px rgba(0,0,0,0.55); }
+
+/* Bubble hidden while panel open */
+.chat-open-hide-bubble { display: none !important; }
+

@@ -32,7 +32,7 @@
     </script>
     
     <!-- Custom Theme CSS -->
-    <link rel="stylesheet" href="/assets/css/theme.css">
+    <link rel="stylesheet" href="assets/css/theme.css">
     
     <!-- Google Analytics 4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-MCN4RXCY6Q"></script>
@@ -42,6 +42,7 @@
         gtag('js', new Date());
         gtag('config', 'G-MCN4RXCY6Q');
     </script>
+    <script>document.documentElement.classList.add('js');</script>
     
     <!-- Microsoft Clarity -->
     <script type="text/javascript">
@@ -49,7 +50,7 @@
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "uawk2g8xee");
+        })(window, document, "clarity", "script", "ubbdpwxnae");
     </script>
 </head>
 <body class="bg-beige text-chocolate font-sans antialiased">
@@ -60,23 +61,35 @@
     <!-- Navigation Header -->
     <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
         <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between">
-            <a href="/index.html" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Portfolio</a>
+            <a href="index.html" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Portfolio</a>
             
             <!-- Main Navigation -->
             <ul class="hidden md:flex items-center space-x-8">
-                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
-                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
-                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
-                <li><a href="/projects.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
-                <li><a href="/contact.html" class="text-sm font-medium text-white bg-indigodeep px-5 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+                <li><a href="overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
+                <li><a href="deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
+                <li><a href="about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
+                <li><a href="projects.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
+                <li><a href="contact.html" class="text-sm font-medium text-white bg-indigodeep px-5 py-2 rounded-full focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
             
             <!-- Language Switcher -->
             <div class="flex items-center space-x-3">
-                <a href="/contact.html" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">EN</a>
-                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
-                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
+                <a href="contact.html" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">EN</a>
+                <a href="es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
+                <a href="ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
             </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button id="theme-toggle" class="theme-toggle hidden md:block" aria-label="Toggle dark mode">
+                <div class="theme-toggle-slider">
+                    <svg class="theme-icon-sun" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg class="theme-icon-moon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </div>
+            </button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -89,11 +102,11 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
             <ul class="px-6 py-4 space-y-3">
-                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
-                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
-                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
-                <li><a href="/projects.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Projects</a></li>
-                <li><a href="/contact.html" class="block text-sm font-medium text-white bg-indigodeep px-5 py-2 rounded-full text-center focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+                <li><a href="overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
+                <li><a href="deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
+                <li><a href="about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
+                <li><a href="projects.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Projects</a></li>
+                <li><a href="contact.html" class="block text-sm font-medium text-white bg-indigodeep px-5 py-2 rounded-full text-center focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
         </div>
     </header>
@@ -123,7 +136,7 @@
                         <h2 class="text-2xl font-bold text-indigodeep mb-6">Send a Message</h2>
                         
                         <!-- Formspree Form -->
-                        <form action="https://formspree.io/f/mblbnwoy" method="POST" class="space-y-6">
+                        <form action="https://formspree.io/f/mblbnwoy" method="POST" enctype="multipart/form-data" class="space-y-6">
                             
                             <!-- Name Field -->
                             <div>
@@ -168,6 +181,20 @@
                                     <option value="other">Other</option>
                                 </select>
                             </div>
+
+                            <!-- Optional Link Field -->
+                            <div>
+                                <label for="link" class="block text-sm font-medium text-indigodeep mb-2">Relevant Link (optional)</label>
+                                <input 
+                                    type="url" 
+                                    id="link" 
+                                    name="link" 
+                                    inputmode="url"
+                                    placeholder="https://example.com/portfolio-or-brief"
+                                    class="w-full px-4 py-3 bg-white border border-chocolate/20 rounded-lg text-chocolate placeholder-chocolate/50 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:border-transparent transition-all"
+                                >
+                                <p class="text-xs mt-1" style="color: var(--color-text); opacity: 0.7;">Only full links starting with https:// or http:// are accepted.</p>
+                            </div>
                             
                             <!-- Message Field -->
                             <div>
@@ -182,6 +209,19 @@
                                 ></textarea>
                             </div>
                             
+                            <!-- Optional Attachment -->
+                            <div>
+                                <label for="attachment" class="block text-sm font-medium text-indigodeep mb-2">Attachment (optional)</label>
+                                <input
+                                    type="file"
+                                    id="attachment"
+                                    name="file"
+                                    accept=".csv,.doc,.docx,.pdf,.txt,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.svg,.webp"
+                                    class="w-full px-4 py-3 bg-white border border-chocolate/20 rounded-lg text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:border-transparent transition-all"
+                                >
+                                <p class="mt-2 text-xs" style="color: var(--color-text); opacity: 0.7;">Accepted: CSV, DOC, DOCX, PDF, TXT, XLS, XLSX, JPG, PNG, GIF, SVG, WEBP (max 5MB).</p>
+                            </div>
+
                             <!-- Submit Button -->
                             <div>
                                 <button 
@@ -190,11 +230,19 @@
                                 >
                                     Send Message
                                 </button>
+                                
+                                <!-- Alternate Email Contact -->
+                                <a 
+                                    href="mailto:hello@estivanayramia.com?subject=Website%20Inquiry"
+                                    class="mt-3 w-full inline-flex items-center justify-center border-2 border-indigodeep text-indigodeep font-medium px-8 py-4 rounded-full hover:bg-beige transition-all focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white"
+                                >
+                                    Email Me Instead
+                                </a>
                             </div>
                             
                             <!-- Privacy Note -->
-                            <p class="text-xs text-ink/60 leading-relaxed">
-                                By submitting this form, you agree to the <a href="/privacy.html" class="text-indigodeep underline hover:text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep rounded">Privacy Policy</a>. Your information will never be shared with third parties.
+                            <p class="text-xs leading-relaxed" style="color: var(--color-text); opacity: 0.7;">
+                                By submitting this form, you agree to the <a href="privacy.html" class="text-indigodeep underline hover:text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep rounded">Privacy Policy</a>. Your information will never be shared with third parties.
                             </p>
                         </form>
                     </div>
@@ -223,13 +271,13 @@
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
                         <h3 class="text-xl font-semibold text-indigodeep mb-4">Connect</h3>
                         <div class="space-y-3">
-                            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep rounded p-2 -ml-2">
+                            <a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep rounded p-2 -ml-2">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                                 </svg>
                                 <span>LinkedIn</span>
                             </a>
-                            <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep rounded p-2 -ml-2">
+                            <a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep rounded p-2 -ml-2">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                                 </svg>
@@ -282,10 +330,10 @@
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
-                        <li><a href="/deep-dive.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
-                        <li><a href="/projects.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
-                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                        <li><a href="overview.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="deep-dive.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="projects.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
+                        <li><a href="about.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
                     </ul>
                 </div>
                 
@@ -293,8 +341,11 @@
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
                     <ul class="space-y-2">
-                        <li><a href="/contact.html" class="text-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
-                        <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub</a></li>
+                        <li><span class="text-sm text-beige/80">hello@estivanayramia.com</span></li>
+                        <li><a href="contact.html" class="text-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="privacy.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -319,7 +370,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
     
     <!-- Site JavaScript -->
-    <script src="/assets/js/site.js" defer></script>
+    <script src="assets/js/site.js" defer></script>
     
 </body>
 </html>

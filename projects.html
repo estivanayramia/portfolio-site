@@ -49,7 +49,7 @@
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "uawk2g8xee");
+        })(window, document, "clarity", "script", "ubbdpwxnae");
     </script>
 </head>
 <body class="bg-beige text-chocolate font-sans antialiased">
@@ -68,7 +68,7 @@
                 <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
                 <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
                 <li><a href="/projects.html" class="text-sm text-indigodeep font-medium underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
-                <li><a href="/contact.html" class="text-sm font-medium text-white bg-indigodeep px-5 py-2 rounded-full hover:bg-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+                <li><a href="contact.html" class="text-sm font-medium text-white bg-indigodeep px-5 py-2 rounded-full hover:bg-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
             
             <!-- Language Switcher -->
@@ -77,6 +77,18 @@
                 <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
                 <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
             </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button id="theme-toggle" class="theme-toggle hidden md:block" aria-label="Toggle dark mode">
+                <div class="theme-toggle-slider">
+                    <svg class="theme-icon-sun" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <svg class="theme-icon-moon" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                    </svg>
+                </div>
+            </button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -93,7 +105,7 @@
                 <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
                 <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
                 <li><a href="/projects.html" class="block text-sm text-indigodeep font-medium py-2">Projects</a></li>
-                <li><a href="/contact.html" class="block text-sm font-medium text-white bg-indigodeep px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+                <li><a href="contact.html" class="block text-sm font-medium text-white bg-indigodeep px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
         </div>
     </header>
@@ -251,7 +263,7 @@
             <div class="bg-indigodeep rounded-3xl p-12 text-center space-y-6">
                 <h2 class="text-3xl font-bold text-white">Want to build something together?</h2>
                 <p class="text-base text-beige max-w-xl mx-auto leading-relaxed">Whether it's a system, a team coordination challenge, or an operational problem—let's talk.</p>
-                <a href="/contact.html" class="inline-block text-base font-medium text-indigodeep bg-white px-8 py-4 rounded-full hover:bg-beige transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-4 focus:ring-offset-indigodeep">
+                <a href="contact.html" class="inline-block text-base font-medium text-indigodeep bg-white px-8 py-4 rounded-full hover:bg-beige transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-4 focus:ring-offset-indigodeep">
                     Get in Touch
                 </a>
             </div>
@@ -284,7 +296,10 @@
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
                     <ul class="space-y-2">
-                        <li><a href="/contact.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub</a></li>
+                        <li><a href="mailto:hello@estivanayramia.com" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Email Me</a></li>
+                        <li><a href="contact.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
                         <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
                     </ul>
                 </div>
