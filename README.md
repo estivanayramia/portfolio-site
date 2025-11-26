@@ -61,6 +61,14 @@ Available project cards:
 
 ## 🔔 Recent Changes (Latest Commit)
 
+### Mobile Responsiveness Optimization
+- **Typography Scaling**: Stat numbers now use `text-3xl sm:text-4xl md:text-5xl` for mobile-friendly sizing
+- **Chat Widget Mobile**: Fully responsive with viewport-aware sizing and positioning
+- **Color Consistency**: Force brand colors on mobile devices (prevents OS dark mode override)
+- **Mobile Menu**: Enhanced with smooth animations and icon rotation
+- **Touch Optimization**: Larger touch targets (56px buttons) and comfortable padding
+- **Analytics Verified**: Google Analytics 4 and Microsoft Clarity confirmed in `<head>` for mobile tracking
+
 ### Chatbot Migration: Chatbase → Savonie AI
 - **Complete Replacement**: Removed all Chatbase scripts and code
 - **Custom Implementation**: Built serverless chatbot with Cloudflare Worker backend

@@ -79,6 +79,83 @@ header {
     background-color: #212842 !important;
 }
 
+/* ==========================================================================
+   Mobile Color Consistency (Force Brand Colors)
+   ========================================================================== */
+
+/* Force brand colors on mobile devices regardless of system dark mode */
+@media (max-width: 768px) {
+    /* Light theme enforcement on mobile */
+    body:not([data-theme="dark"]) {
+        background-color: #e1d4c2 !important;
+        color: #362017 !important;
+        -webkit-text-fill-color: #362017;
+    }
+    
+    body:not([data-theme="dark"]) .bg-beige {
+        background-color: #e1d4c2 !important;
+    }
+    
+    body:not([data-theme="dark"]) .text-chocolate {
+        color: #362017 !important;
+        -webkit-text-fill-color: #362017;
+    }
+    
+    body:not([data-theme="dark"]) .text-indigodeep {
+        color: #212842 !important;
+        -webkit-text-fill-color: #212842;
+    }
+    
+    body:not([data-theme="dark"]) .bg-indigodeep {
+        background-color: #212842 !important;
+    }
+    
+    /* Dark theme colors when explicitly set */
+    [data-theme="dark"] {
+        background-color: #0a0a0a !important;
+        color: #e1d4c2 !important;
+    }
+}
+
+/* ==========================================================================
+   Mobile Typography & Layout
+   ========================================================================== */
+
+/* Smooth mobile menu animations */
+#mobile-menu {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#mobile-menu.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+#mobile-menu:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#mobile-menu-toggle svg {
+    transition: transform 0.3s ease;
+}
+
+/* Comfortable padding on mobile */
+@media (max-width: 640px) {
+    .container,
+    section > div {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+    
+    /* Ensure headings don't touch edges */
+    h1, h2, h3, h4, h5, h6 {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
 /* Fix CTA button visibility in dark mode */
 [data-theme="dark"] .bg-indigodeep a.bg-white {
     background-color: #e1d4c2 !important;
@@ -1229,6 +1306,39 @@ select.border-red-500 {
 #chat-chips {
     -ms-overflow-style: none;
     scrollbar-width: none;
+}
+
+/* Mobile chat widget adjustments */
+@media (max-width: 640px) {
+    #chat-widget {
+        bottom: 1rem !important;
+        right: 1rem !important;
+    }
+    
+    #chat-window {
+        width: calc(100vw - 32px) !important;
+        max-width: calc(100vw - 32px) !important;
+        right: 16px !important;
+        left: 16px !important;
+        margin: 0 auto;
+    }
+    
+    #chat-toggle {
+        width: 56px !important;
+        height: 56px !important;
+    }
+    
+    #welcome-bubble {
+        right: 20px !important;
+        bottom: 80px !important;
+        max-width: calc(100vw - 100px);
+        font-size: 0.875rem;
+    }
+    
+    /* Prevent chat from blocking content on mobile */
+    body.chat-open {
+        padding-bottom: 80px;
+    }
 }
 
 /* Style links in bot messages to be visible and clickable */

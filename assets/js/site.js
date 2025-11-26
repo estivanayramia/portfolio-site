@@ -83,6 +83,11 @@ const initMobileMenu = () => {
         link.addEventListener('click', () => {
             mobileMenu.classList.add('hidden');
             menuToggle.setAttribute('aria-expanded', 'false');
+            // Reset icon rotation
+            const icon = menuToggle.querySelector('svg');
+            if (icon) {
+                icon.style.transform = 'rotate(0deg)';
+            }
         });
     });
 };
