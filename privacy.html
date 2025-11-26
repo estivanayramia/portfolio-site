@@ -25,6 +25,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
+    <!-- Preload Tailwind CSS CDN for faster initial paint -->
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script" crossorigin>
+    
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -45,26 +48,11 @@
         }
     </script>
     
-    <!-- Custom Theme CSS -->
-    <link rel="stylesheet" href="/assets/css/theme.css">
+    <!-- Custom Theme CSS (non-render-blocking) -->
+    <link rel="stylesheet" href="/assets/css/theme.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/assets/css/theme.css"></noscript>
     
-    <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MCN4RXCY6Q"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-MCN4RXCY6Q');
-    </script>
-    
-    <!-- Microsoft Clarity -->
-    <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "ubbdpwxnae");
-    </script>
+    <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -77,8 +65,7 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#212842">
     
-    <!-- Markdown Parser for Chat -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Markdown Parser loaded via lazy-loader.js -->
 </head>
 <body class="bg-beige text-chocolate font-sans antialiased">
     
@@ -89,7 +76,7 @@
     <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
         <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between">
             <a href="/index.html" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center" aria-label="Go to Portfolio home page">
-                <img src="/assets/img/logo-ea.webp" alt="EA" class="h-8 w-8 mr-2 object-contain" width="32" height="32" fetchpriority="high">
+                <img src="/assets/img/logo-ea.webp" alt="EA" class="h-8 w-8 mr-2 object-contain" width="300" height="264" fetchpriority="high">
                 <span>Estivan Ayramia</span>
             </a>
             
@@ -342,7 +329,7 @@
                 <!-- Column 1: Brand -->
                 <div class="space-y-4">
                     <div class="flex items-center space-x-3 mb-4">
-                        <img src="/assets/img/logo-ea.webp" alt="EA" class="h-12 w-12 object-contain" width="48" height="48">
+                        <img src="/assets/img/logo-ea.webp" alt="EA" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </div>
                     <p class="text-sm text-beige/80 leading-relaxed">Systems, people, clean execution. Making complex operations run smoothly.</p>
@@ -384,6 +371,9 @@
     <!-- Site JavaScript -->
     <script src="/assets/js/site.js" defer></script>
     
+    <!-- Lazy Loader for Analytics & Dependencies -->
+    <script src="/assets/js/lazy-loader.js" defer></script>
+    
     <!-- Scroll to Top Button -->
     <button id="scroll-to-top" aria-label="Scroll to top">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -396,7 +386,7 @@
         <div id="chat-window" class="hidden w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden mb-4 flex flex-col origin-bottom-right">
             <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
                 <h3 class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
-                    <img src="/assets/img/savonie-icon.webp" alt="Savonie" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="24" height="24">
+                    <img src="/assets/img/savonie-icon.webp" alt="Savonie" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="300" height="299">
                     Savonie AI
                 </h3>
                 <button id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer">&times;</button>
@@ -426,7 +416,7 @@
         </div>
 
         <button id="chat-toggle" class="bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 relative overflow-hidden" aria-label="Open Chat">
-            <img src="/assets/img/savonie-icon.webp" alt="Chat" class="w-full h-full object-cover" width="64" height="64">
+            <img src="/assets/img/savonie-icon.webp" alt="Chat" class="w-full h-full object-cover" width="300" height="299">
         </button>
     </div>
     

@@ -13,6 +13,7 @@ const ASSETS_TO_CACHE = [
     '/404.html',
     '/assets/css/theme.css',
     '/assets/js/site.js',
+    '/assets/js/lazy-loader.js',
     '/assets/img/headshot.webp'
 ];
 
