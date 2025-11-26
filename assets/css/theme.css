@@ -1368,6 +1368,12 @@ select.border-red-500 {
     background: rgba(225, 212, 194, 0.4);
 }
 
+/* Proof-strip metrics: force beige text in dark mode */
+[data-theme="dark"] #proof-strip .grid > .text-center > .text-5xl,
+[data-theme="dark"] #proof-strip .grid > .text-center > .text-sm,
+[data-theme="dark"] #proof-strip .grid > .text-center > .text-xs {
+    color: #e1d4c2 !important;
+}
 /* Mobile chat widget adjustments */
 @media (max-width: 640px) {
     #chat-widget {

@@ -1566,7 +1566,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     els.messages.scrollTop = els.messages.scrollHeight;
                 }
-            }, 30);
+            }, 12);
         } else {
             div.textContent = text;
         }
