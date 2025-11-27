@@ -8,7 +8,16 @@
     "deploy": "npm run prebuild && git add sw.js && git commit -m \"Bump SW cache version for deployment\" && git push origin main",
     "bump-sw": "node bump-sw-version.js"
   },
-  "keywords": ["portfolio", "pwa", "progressive-web-app"],
+  "keywords": [
+    "portfolio",
+    "pwa",
+    "progressive-web-app"
+  ],
   "author": "Estivan Ayramia",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17"
+  }
 }

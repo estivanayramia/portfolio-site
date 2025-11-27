@@ -31,6 +31,19 @@
     --bubble-ring: #e1d4c2;
 }
 
+/* High-contrast fixes: ensure text and links meet contrast on indigodeep */
+[data-theme="dark"] .bg-indigodeep a,
+[data-theme="dark"] a,
+[data-theme="dark"] .text-white,
+[data-theme="dark"] .text-beige {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .text-white\/80,
+[data-theme="dark"] .text-beige\/60 {
+    color: rgba(255,255,255,0.95) !important;
+}
+
 /* Apply theme colors to elements */
 body {
     background-color: var(--color-bg) !important;

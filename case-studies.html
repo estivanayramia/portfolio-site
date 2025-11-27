@@ -369,15 +369,12 @@
         </div>
     </footer>
 
-    <!-- GSAP -->
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/ScrollTrigger.min.js" defer></script>
+    <!-- GSAP (moved to end of body for performance) -->
 
     <!-- Site JavaScript -->
     <script src="/assets/js/site.js" defer></script>
     
-    <!-- Lazy Loader for Analytics & Dependencies -->
-    <script src="/assets/js/lazy-loader.js" defer></script>
+    <!-- Lazy Loader for Analytics & Dependencies (moved to end of body) -->
 
     <!-- Savonie AI Chat Widget -->
     <div id="chat-widget" class="fixed bottom-6 right-6 z-50 flex flex-col items-end font-sans transition-opacity duration-300" style="z-index: 9999;">
@@ -416,7 +413,11 @@
         <button id="chat-toggle" class="bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 relative overflow-hidden" aria-label="Open Chat">
             <img src="/assets/img/savonie-thumb.webp" alt="Chat" class="w-full h-full object-cover" width="64" height="64">
         </button>
-    </div>
-
-</body>
-</html>
+        </div>
+    
+        <!-- Moved external libs to end for performance -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+        <script src="/assets/js/lazy-loader.js" defer></script>
+    </body>
+    </html>

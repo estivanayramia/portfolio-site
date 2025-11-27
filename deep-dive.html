@@ -443,15 +443,12 @@
         </div>
     </footer>
     
-    <!-- GSAP + ScrollTrigger -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    <!-- GSAP + ScrollTrigger (moved to end of body for performance) -->
     
     <!-- Site JavaScript -->
     <script src="/assets/js/site.js" defer></script>
     
-    <!-- Lazy Loader for Analytics & Dependencies -->
-    <script src="/assets/js/lazy-loader.js" defer></script>
+    <!-- Lazy Loader for Analytics & Dependencies (moved to end of body) -->
     
     <!-- Scroll to Top Button -->
     <button id="scroll-to-top" aria-label="Scroll to top">
@@ -499,5 +496,9 @@
         </button>
     </div>
     
+    <!-- Moved external libs to end for performance -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    <script src="/assets/js/lazy-loader.js" defer></script>
 </body>
 </html>
