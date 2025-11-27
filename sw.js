@@ -12,6 +12,7 @@ const ASSETS_TO_CACHE = [
     '/privacy.html',
     '/404.html',
     '/assets/css/theme.css',
+    '/assets/css/style.css',
     '/assets/js/site.js',
     '/assets/js/lazy-loader.js',
     '/assets/img/headshot.webp',
