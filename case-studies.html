@@ -18,14 +18,17 @@
     <!-- Google Fonts: Inter (non-render-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
     
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
     <link rel="stylesheet" href="/assets/css/style.css">
-    
+    <link rel="preload" href="/assets/css/style.css" as="style">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    <script src="/assets/js/site.js" defer></script>
     <!-- Custom Theme CSS (non-render-blocking) -->
     <link rel="stylesheet" href="/assets/css/theme.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/assets/css/theme.css"></noscript>
@@ -350,9 +353,6 @@
 
     <!-- GSAP (moved to end of body for performance) -->
 
-    <!-- Site JavaScript -->
-    <script src="/assets/js/site.js" defer></script>
-    
     <!-- Lazy Loader for Analytics & Dependencies (moved to end of body) -->
 
     <!-- Savonie AI Chat Widget -->
@@ -394,9 +394,6 @@
         </button>
         </div>
     
-        <!-- Moved external libs to end for performance -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
         <script src="/assets/js/lazy-loader.js" defer></script>
     </body>
     </html>

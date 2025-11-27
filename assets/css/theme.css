@@ -1,3 +1,14 @@
+[/*
+   No-JS fallback: if JavaScript is slow or fails, ensure elements hidden via
+   `opacity-0` or `invisible` are still visible so content isn't invisible to users.
+*/]
+.no-js .opacity-0,
+.no-js .invisible {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+}
+
 /**
  * Portfolio Theme CSS
  * Custom utilities and overrides for Tailwind
