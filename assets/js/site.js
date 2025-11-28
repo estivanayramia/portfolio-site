@@ -948,6 +948,66 @@ const translations = {
                 "أنت فنان تصميم! 🎨"
             ]
         }
+    },
+    // Chat messages and suggestions
+    chat: {
+        welcome: {
+            en: "Hello! I am Savonie. Ask me anything about Estivan.",
+            es: "¡Hola! Soy Savonie. Pregúntame cualquier cosa sobre Estivan.",
+            ar: "مرحباً! أنا سافوني. اسألني أي شيء عن استيفان."
+        },
+        defaultChips: {
+            en: [
+                "What does Estivan do?",
+                "Tell me about his background",
+                "What are his skills?",
+                "How can I contact him?"
+            ],
+            es: [
+                "¿Qué hace Estivan?",
+                "Háblame de su experiencia",
+                "¿Cuáles son sus habilidades?",
+                "¿Cómo puedo contactarlo?"
+            ],
+            ar: [
+                "ماذا يفعل استيفان؟",
+                "أخبرني عن خلفيته",
+                "ما هي مهاراته؟",
+                "كيف يمكنني الاتصال به؟"
+            ]
+        },
+        contextualSuggestions: {
+            en: {
+                skills: ["What projects have you worked on?", "Tell me about your experience", "What are you learning currently?"],
+                background: ["What are your main skills?", "Tell me about your education", "What industries have you worked in?"],
+                projects: ["Can you show me your code?", "What technologies did you use?", "How long did it take to build?"],
+                contact: ["Are you available for freelance work?", "What's your typical response time?", "Do you work remotely?"],
+                education: ["What certifications do you have?", "What's your favorite programming language?", "How do you stay updated with technology?"],
+                projectResponse: ["Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?"],
+                skillResponse: ["How did you learn that?", "Have you used it in projects?", "What's your proficiency level?"],
+                early: ["What are your main skills?", "Tell me about your background", "What projects are you proud of?"]
+            },
+            es: {
+                skills: ["¿En qué proyectos has trabajado?", "Háblame de tu experiencia", "¿Qué estás aprendiendo actualmente?"],
+                background: ["¿Cuáles son tus principales habilidades?", "Háblame de tu educación", "¿En qué industrias has trabajado?"],
+                projects: ["¿Puedes mostrarme tu código?", "¿Qué tecnologías usaste?", "¿Cuánto tiempo tomó construirlo?"],
+                contact: ["¿Estás disponible para trabajo freelance?", "¿Cuál es tu tiempo típico de respuesta?", "¿Trabajas de forma remota?"],
+                education: ["¿Qué certificaciones tienes?", "¿Cuál es tu lenguaje de programación favorito?", "¿Cómo te mantienes actualizado con la tecnología?"],
+                projectResponse: ["¿Puedes contarme más sobre ese proyecto?", "¿Qué desafíos enfrentaste?", "¿Qué aprendiste de ello?"],
+                skillResponse: ["¿Cómo aprendiste eso?", "¿Lo has usado en proyectos?", "¿Cuál es tu nivel de competencia?"],
+                early: ["¿Cuáles son tus principales habilidades?", "Háblame de tu experiencia", "¿De qué proyectos estás orgulloso?"]
+            },
+            ar: {
+                skills: ["ما هي المشاريع التي عملت عليها؟", "أخبرني عن تجربتك", "ماذا تتعلم حالياً؟"],
+                background: ["ما هي مهاراتك الرئيسية؟", "أخبرني عن تعليمك", "في أي صناعات عملت؟"],
+                projects: ["هل يمكنك إظهار كودك؟", "ما هي التقنيات التي استخدمتها؟", "كم من الوقت استغرق بناؤه؟"],
+                contact: ["هل أنت متاح للعمل الحر؟", "ما هو وقت ردك المعتاد؟", "هل تعمل عن بعد؟"],
+                education: ["ما هي الشهادات التي لديك؟", "ما هو لغة البرمجة المفضلة لديك؟", "كيف تحافظ على تحديث نفسك بالتكنولوجيا؟"],
+                projectResponse: ["هل يمكنك إخباري المزيد عن هذا المشروع؟", "ما هي التحديات التي واجهتها؟", "ماذا تعلمت منه؟"],
+                skillResponse: ["كيف تعلمت ذلك؟", "هل استخدمته في مشاريع؟", "ما هو مستوى مهارتك؟"],
+                early: ["ما هي مهاراتك الرئيسية؟", "أخبرني عن خلفيتك", "ما هي المشاريع التي تفخر بها؟"]
+            }
+        }
     }
 };
 
@@ -1546,12 +1606,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add welcome message only if no history
     if (chatHistory.length === 0) {
-        addMessageToUI("Hello! I am Savonie. Ask me anything about Estivan.", 'bot', false);
+        const currentLang = document.documentElement.lang || 'en';
+        const welcomeMessage = translations.chat.welcome[currentLang] || "Hello! I am Savonie. Ask me anything about Estivan.";
+        addMessageToUI(welcomeMessage, 'bot', false);
         
         // Add default chips for home page
         const currentPage = window.location.pathname.split('/').pop() || 'index.html';
         if (currentPage === 'index.html' && els.chipsContainer) {
-            const defaultChips = [
+            const defaultChips = translations.chat.defaultChips[currentLang] || [
                 "What does Estivan do?",
                 "Tell me about his background",
                 "What are his skills?",
@@ -1713,42 +1775,125 @@ document.addEventListener('DOMContentLoaded', () => {
         const lastUserMessage = [...history].reverse().find(msg => msg.sender === 'user')?.text?.toLowerCase() || '';
         const lastBotMessage = [...history].reverse().find(msg => msg.sender === 'bot')?.text?.toLowerCase() || '';
         
+        // Detect language of the last user message
+        const detectedLang = detectLanguage(lastUserMessage);
+        const translations = translations.chat.contextualSuggestions;
+        
         // Analyze conversation context and suggest relevant follow-ups
-        if (lastUserMessage.includes('skill') || lastUserMessage.includes('technology') || lastUserMessage.includes('expertise')) {
-            suggestions.push("What projects have you worked on?", "Tell me about your experience", "What are you learning currently?");
-        } else if (lastUserMessage.includes('background') || lastUserMessage.includes('experience') || lastUserMessage.includes('career')) {
-            suggestions.push("What are your main skills?", "Tell me about your education", "What industries have you worked in?");
-        } else if (lastUserMessage.includes('project') || lastUserMessage.includes('work') || lastUserMessage.includes('portfolio')) {
-            suggestions.push("Can you show me your code?", "What technologies did you use?", "How long did it take to build?");
-        } else if (lastUserMessage.includes('contact') || lastUserMessage.includes('reach') || lastUserMessage.includes('email')) {
-            suggestions.push("Are you available for freelance work?", "What's your typical response time?", "Do you work remotely?");
-        } else if (lastUserMessage.includes('education') || lastUserMessage.includes('study') || lastUserMessage.includes('learn')) {
-            suggestions.push("What certifications do you have?", "What's your favorite programming language?", "How do you stay updated with technology?");
-        } else if (lastBotMessage.includes('project') || lastBotMessage.includes('work')) {
-            suggestions.push("Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?");
-        } else if (lastBotMessage.includes('skill') || lastBotMessage.includes('technology')) {
-            suggestions.push("How did you learn that?", "Have you used it in projects?", "What's your proficiency level?");
+        if (lastUserMessage.includes('skill') || lastUserMessage.includes('technology') || lastUserMessage.includes('expertise') ||
+            lastUserMessage.includes('habilidad') || lastUserMessage.includes('tecnología') || lastUserMessage.includes('experiencia') ||
+            lastUserMessage.includes('مهارة') || lastUserMessage.includes('تكنولوجيا') || lastUserMessage.includes('خبرة')) {
+            suggestions.push(...(translations[detectedLang]?.skills || [
+                "What projects have you worked on?", "Tell me about your experience", "What are you learning currently?"
+            ]));
+        } else if (lastUserMessage.includes('background') || lastUserMessage.includes('experience') || lastUserMessage.includes('career') ||
+                   lastUserMessage.includes('fondo') || lastUserMessage.includes('experiencia') || lastUserMessage.includes('carrera') ||
+                   lastUserMessage.includes('خلفية') || lastUserMessage.includes('خبرة') || lastUserMessage.includes('مسيرة')) {
+            suggestions.push(...(translations[detectedLang]?.background || [
+                "What are your main skills?", "Tell me about your education", "What industries have you worked in?"
+            ]));
+        } else if (lastUserMessage.includes('project') || lastUserMessage.includes('work') || lastUserMessage.includes('portfolio') ||
+                   lastUserMessage.includes('proyecto') || lastUserMessage.includes('trabajo') || lastUserMessage.includes('portafolio') ||
+                   lastUserMessage.includes('مشروع') || lastUserMessage.includes('عمل') || lastUserMessage.includes('محفظة')) {
+            suggestions.push(...(translations[detectedLang]?.projects || [
+                "Can you show me your code?", "What technologies did you use?", "How long did it take to build?"
+            ]));
+        } else if (lastUserMessage.includes('contact') || lastUserMessage.includes('reach') || lastUserMessage.includes('email') ||
+                   lastUserMessage.includes('contacto') || lastUserMessage.includes('alcanzar') || lastUserMessage.includes('correo') ||
+                   lastUserMessage.includes('اتصال') || lastUserMessage.includes('الوصول') || lastUserMessage.includes('بريد')) {
+            suggestions.push(...(translations[detectedLang]?.contact || [
+                "Are you available for freelance work?", "What's your typical response time?", "Do you work remotely?"
+            ]));
+        } else if (lastUserMessage.includes('education') || lastUserMessage.includes('study') || lastUserMessage.includes('learn') ||
+                   lastUserMessage.includes('educación') || lastUserMessage.includes('estudio') || lastUserMessage.includes('aprender') ||
+                   lastUserMessage.includes('تعليم') || lastUserMessage.includes('دراسة') || lastUserMessage.includes('تعلم')) {
+            suggestions.push(...(translations[detectedLang]?.education || [
+                "What certifications do you have?", "What's your favorite programming language?", "How do you stay updated with technology?"
+            ]));
+        } else if (lastBotMessage.includes('project') || lastBotMessage.includes('work') ||
+                   lastBotMessage.includes('proyecto') || lastBotMessage.includes('trabajo') ||
+                   lastBotMessage.includes('مشروع') || lastBotMessage.includes('عمل')) {
+            suggestions.push(...(translations[detectedLang]?.projectResponse || [
+                "Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?"
+            ]));
+        } else if (lastBotMessage.includes('skill') || lastBotMessage.includes('technology') ||
+                   lastBotMessage.includes('habilidad') || lastBotMessage.includes('tecnología') ||
+                   lastBotMessage.includes('مهارة') || lastBotMessage.includes('تكنولوجيا')) {
+            suggestions.push(...(translations[detectedLang]?.skillResponse || [
+                "How did you learn that?", "Have you used it in projects?", "What's your proficiency level?"
+            ]));
         } else if (history.length < 4) {
             // Early conversation - general suggestions
-            suggestions.push("What are your main skills?", "Tell me about your background", "What projects are you proud of?");
+            suggestions.push(...(translations[detectedLang]?.early || [
+                "What are your main skills?", "Tell me about your background", "What projects are you proud of?"
+            ]));
         }
         
         // Limit to 3 suggestions and ensure variety
         return suggestions.slice(0, 3);
     }
 
+    // Simple language detection based on character patterns
+    function detectLanguage(text) {
+        if (!text) return 'en';
+        
+        // Arabic detection (Arabic script)
+        const arabicChars = /[\u0600-\u06FF]/;
+        if (arabicChars.test(text)) return 'ar';
+        
+        // Spanish detection (common Spanish words and patterns)
+        const spanishWords = /\b(qué|como|dónde|cuándo|por qué|está|son|tiene|trabajo|habilidades?|experiencia|proyecto|contacto)\b/i;
+        if (spanishWords.test(text)) return 'es';
+        
+        // Default to English
+        return 'en';
+    }
+
     // 4. Functions
     function toggleChat() {
         const wasHidden = els.window?.classList.contains('hidden');
+        const isRTL = document.documentElement.dir === 'rtl';
         els.window?.classList.toggle('hidden');
         if (!els.window?.classList.contains('hidden')) {
             // Chat window is now visible
             if (wasHidden) {
-                // Reset positioning to normal flow
-                els.window.style.position = '';
-                els.window.style.left = '';
-                els.window.style.top = '';
-                els.window.style.zIndex = '';
+                // Position the chat window relative to the chat widget button
+                const widgetRect = els.widget?.getBoundingClientRect();
+                if (widgetRect) {
+                    const windowWidth = 320; // w-80 = 320px
+                    const windowHeight = 500; // h-[500px] = 500px
+                    const padding = 16;
+
+                    // Calculate position to appear above and aligned with the widget
+                    let leftPos = widgetRect.left;
+                    let topPos = widgetRect.top - windowHeight - padding;
+
+                    // Ensure it stays within viewport bounds
+                    if (leftPos + windowWidth > window.innerWidth) {
+                        leftPos = window.innerWidth - windowWidth - padding;
+                    }
+                    if (leftPos < padding) {
+                        leftPos = padding;
+                    }
+                    if (topPos < padding) {
+                        // If not enough space above, position below the widget
+                        topPos = widgetRect.bottom + padding;
+                    }
+
+                    // Apply positioning
+                    els.window.style.position = 'fixed';
+                    els.window.style.left = `${leftPos}px`;
+                    els.window.style.top = `${topPos}px`;
+                    els.window.style.right = 'auto';
+                    els.window.style.zIndex = '10000';
+                } else {
+                    // Fallback: reset to default positioning
+                    els.window.style.position = '';
+                    els.window.style.left = '';
+                    els.window.style.top = '';
+                    els.window.style.right = '';
+                    els.window.style.zIndex = '';
+                }
             }
             if(els.bubble) els.bubble.style.display = 'none';
             setTimeout(() => {
@@ -1775,8 +1920,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Detect user language
-        const language = document.documentElement.lang || 'en';
+        // Detect user language from their input
+        const detectedLanguage = detectLanguage(text);
+        const pageLanguage = document.documentElement.lang || 'en';
+        // Use detected language if it's different from page language, otherwise use page language
+        const language = detectedLanguage !== 'en' ? detectedLanguage : pageLanguage;
 
         addMessageToUI(text, 'user');
         els.input.value = '';
@@ -1957,6 +2105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 5. Draggable Header Logic with Viewport Constraints
     if (els.header && els.window) {
         let isDragging = false, startX, startY, initialLeft, initialTop;
+        const isRTL = document.documentElement.dir === 'rtl';
 
         // Set initial cursor
         els.header.style.cursor = 'move';
@@ -1975,7 +2124,14 @@ document.addEventListener('DOMContentLoaded', () => {
             // Make window absolutely positioned for dragging
             if (els.window.style.position !== 'fixed') {
                 els.window.style.position = 'fixed';
-                els.window.style.left = `${initialLeft}px`;
+                if (isRTL) {
+                    // For RTL, use right positioning
+                    const rightPos = window.innerWidth - rect.right;
+                    els.window.style.right = `${rightPos}px`;
+                    els.window.style.left = 'auto';
+                } else {
+                    els.window.style.left = `${initialLeft}px`;
+                }
                 els.window.style.top = `${initialTop}px`;
                 els.window.style.zIndex = '10000';
             }
@@ -1988,18 +2144,28 @@ document.addEventListener('DOMContentLoaded', () => {
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
 
-            let newLeft = initialLeft + dx;
-            let newTop = initialTop + dy;
-
             // Viewport constraints (with padding)
             const windowWidth = els.window.offsetWidth;
             const windowHeight = els.window.offsetHeight;
             const padding = 10;
 
-            newLeft = Math.max(padding, Math.min(newLeft, window.innerWidth - windowWidth - padding));
-            newTop = Math.max(padding, Math.min(newTop, window.innerHeight - windowHeight - padding));
+            if (isRTL) {
+                // For RTL: constrain right position
+                let newRight = (window.innerWidth - initialLeft - windowWidth) - dx;
+                newRight = Math.max(padding, Math.min(newRight, window.innerWidth - windowWidth - padding));
+                els.window.style.right = `${newRight}px`;
+                els.window.style.left = 'auto';
+            } else {
+                // For LTR: constrain left position
+                let newLeft = initialLeft + dx;
+                newLeft = Math.max(padding, Math.min(newLeft, window.innerWidth - windowWidth - padding));
+                els.window.style.left = `${newLeft}px`;
+                els.window.style.right = 'auto';
+            }
 
-            els.window.style.left = `${newLeft}px`;
+            // Always constrain top position
+            let newTop = initialTop + dy;
+            newTop = Math.max(padding, Math.min(newTop, window.innerHeight - windowHeight - padding));
             els.window.style.top = `${newTop}px`;
         });
 
