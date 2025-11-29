@@ -1508,6 +1508,65 @@ const initPerformanceMonitoring = () => {
 };
 
 // ==========================================================================
+// Phase 2: Enhanced Functionality
+// ==========================================================================
+
+const initPhase2 = () => {
+    // A. Email Interceptor - Use Event Delegation
+    document.body.addEventListener('click', (e) => {
+        const link = e.target.closest('a[href^="mailto:"]');
+        if (!link) return;
+        
+        e.preventDefault();
+        
+        // Extract email from href
+        const email = link.href.replace('mailto:', '').split('?')[0];
+        
+        // Copy to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(email).then(() => {
+                // Visual feedback: change text if link has inner text
+                if (link.innerText || link.textContent) {
+                    const originalText = link.innerText || link.textContent;
+                    link.innerText = 'Copied! ✅';
+                    
+                    // Revert after 2 seconds
+                    setTimeout(() => {
+                        link.innerText = originalText;
+                    }, 2000);
+                }
+            }).catch(() => {
+                // Fallback: open mailto if clipboard fails
+                window.location.href = link.href;
+            });
+        } else {
+            // Fallback: open mailto if clipboard API not available
+            window.location.href = link.href;
+        }
+    });
+    
+    // B. Copyright Year Update
+    const footerYear = document.querySelector('footer p.text-xs');
+    if (footerYear) {
+        const currentYear = new Date().getFullYear();
+        footerYear.innerHTML = footerYear.innerHTML.replace(/&copy;\s*\d{4}/, `&copy; ${currentYear}`);
+    }
+    
+    // C. Honeypot Check on Contact Form
+    const contactForm = document.querySelector('form[action*="formspree"]');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+            const honeypot = contactForm.querySelector('input[name="website_url"]');
+            if (honeypot && honeypot.value) {
+                // Bot detected - prevent submission
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+};
+
+// ==========================================================================
 // Initialization
 // ==========================================================================
 
@@ -1527,6 +1586,7 @@ const init = () => {
             initPWA();
             initAnalytics();
             initPerformanceMonitoring();
+            initPhase2(); // Phase 2: Enhanced Functionality
         });
     } else {
         // DOM already loaded
@@ -1542,6 +1602,7 @@ const init = () => {
         initPWA();
         initAnalytics();
         initPerformanceMonitoring();
+        initPhase2(); // Phase 2: Enhanced Functionality
     }
 };
 
