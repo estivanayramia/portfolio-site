@@ -51,6 +51,9 @@
 </head>
 <body class="bg-beige text-chocolate font-sans antialiased">
     
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" aria-hidden="true"></div>
+    
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
     
@@ -107,8 +110,11 @@
         <!-- Hero Section -->
         <section class="max-w-4xl mx-auto px-6 lg:px-12 py-20 lg:py-28">
             <div class="space-y-6">
-                <div class="inline-block px-4 py-2 bg-indigodeep/10 rounded-full">
-                    <span class="text-xs font-semibold text-indigodeep uppercase tracking-wider">1-Minute Overview</span>
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="inline-block px-4 py-2 bg-indigodeep/10 rounded-full">
+                        <span class="text-xs font-semibold text-indigodeep uppercase tracking-wider">1-Minute Overview</span>
+                    </div>
+                    <span class="text-xs text-chocolate/60">Last updated: January 2025</span>
                 </div>
                 <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up">
                     Five things that define the work
@@ -117,6 +123,26 @@
                     These aren't aspirations—they're patterns that show up consistently across roles, projects, and challenges.
                 </p>
             </div>
+        </section>
+        
+        <!-- How to Use This Site -->
+        <section class="max-w-4xl mx-auto px-6 lg:px-12 pb-12">
+            <details class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-6 opacity-0" data-gsap="fade-up">
+                <summary class="text-lg font-semibold text-indigodeep cursor-pointer list-none flex items-center justify-between">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        How to use this site
+                    </span>
+                    <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </summary>
+                <div class="mt-4 text-sm text-chocolate leading-relaxed space-y-3">
+                    <p><strong>If you have 30 seconds:</strong> Scroll through this page to see the five core strengths that define my work.</p>
+                    <p><strong>If you have 1 minute:</strong> You're in the right place. This overview page gives you the essentials.</p>
+                    <p><strong>If you have 5 minutes:</strong> Head to <a href="/deep-dive.html" class="text-indigodeep underline hover:text-chocolate">Deep Dive</a> for the full story including systems built and timeline.</p>
+                    <p><strong>To see specific work:</strong> Visit <a href="/projects.html" class="text-indigodeep underline hover:text-chocolate">Projects</a> for case studies and examples.</p>
+                    <p><strong>Have a question?</strong> Use the chat widget in the bottom right corner, or <a href="/contact.html" class="text-indigodeep underline hover:text-chocolate">get in touch directly</a>.</p>
+                </div>
+            </details>
         </section>
         
         <!-- Core Strengths Section -->
@@ -254,7 +280,7 @@
                         <img src="/assets/img/logo-ea.webp" alt="EA" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
-                    <p class="text-sm text-beige/80 leading-relaxed">Systems, people, clean execution. Making complex operations run smoothly.</p>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. Business student at SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
                 </div>
                 
                 <!-- Column 2: Quick Links -->

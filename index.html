@@ -102,6 +102,9 @@
 </head>
 <body class="bg-beige text-chocolate font-sans antialiased">
     
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" aria-hidden="true"></div>
+    
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
     
@@ -164,7 +167,7 @@
                                 </div>
                 
                 <h1 class="text-5xl lg:text-7xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up">
-                    General Business student.<br>Systems, people, clean execution.
+                    General Business student.<br>Personifying curiosity and self-improvement.
                 </h1>
                 <p class="text-lg lg:text-xl text-chocolate max-w-2xl mx-auto leading-relaxed opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
                     I turn messy operations into simple flows and measurable outcomes.
@@ -172,6 +175,27 @@
                 <div class="opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.4">
                     <a href="contact.html" class="inline-block text-base font-medium text-indigodeep bg-transparent border-2 border-indigodeep px-8 py-4 rounded-full hover:scale-110 dark:text-beige dark:border-indigodeep transition-all focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-4 focus:ring-offset-transparent dark:focus:ring-beige">
                         Start a Conversation
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Where to Start Strip -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 pb-12">
+            <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-6 opacity-0" data-gsap="fade-up">
+                <p class="text-sm font-medium text-chocolate/80 text-center mb-4">Not sure where to start?</p>
+                <div class="grid md:grid-cols-3 gap-4 text-center">
+                    <a href="/overview.html" class="flex items-center justify-center gap-2 text-sm text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="font-medium">Quick Overview</span>
+                    </a>
+                    <a href="/projects.html" class="flex items-center justify-center gap-2 text-sm text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        <span class="font-medium">See My Work</span>
+                    </a>
+                    <a href="/contact.html" class="flex items-center justify-center gap-2 text-sm text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        <span class="font-medium">Get in Touch</span>
                     </a>
                 </div>
             </div>
@@ -391,7 +415,7 @@
                         <img src="/assets/img/logo-ea.webp" alt="EA" class="h-12 w-12 object-contain" width="300" height="264" loading="lazy" decoding="async">
                         <h3 class="text-xl font-semibold text-white" translate="no">Estivan Ayramia</h3>
                     </a>
-                    <p class="text-sm text-beige/80 leading-relaxed">Systems, people, clean execution. Making complex operations run smoothly.</p>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. Business student at SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
                 </div>
                 
                 <!-- Column 2: Quick Links -->
@@ -434,21 +458,21 @@
     </button>
 
     <!-- Savonie AI Chat Widget -->
-    <div id="chat-widget" class="fixed bottom-6 z-50 font-sans" style="z-index: 9999;">
+    <div id="chat-widget" class="fixed bottom-6 z-50 font-sans" style="z-index: 9999;" role="region" aria-label="AI Chat Assistant">
         <!-- Chat Window (independently positioned when dragging) -->
-        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);">
+        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);" role="dialog" aria-modal="true" aria-labelledby="chat-title">
             <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
-                <h3 class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
+                <h3 id="chat-title" class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
                     <img src="/assets/img/savonie-thumb.webp" alt="Savonie" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64" loading="lazy" decoding="async">
                     Savonie AI
                 </h3>
-                <button id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer">&times;</button>
+                <button id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer" aria-label="Close chat">&times;</button>
             </div>
             
-            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white/50"></div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white/50" role="log" aria-live="polite" aria-label="Chat messages"></div>
 
             <!-- Dynamic Suggestion Chips Container -->
-            <div id="chat-chips" class="p-2 bg-white/80 border-t border-[#362017]/5 flex gap-2 overflow-x-auto whitespace-nowrap"></div>
+            <div id="chat-chips" class="p-2 bg-white/80 border-t border-[#362017]/5 flex gap-2 overflow-x-auto whitespace-nowrap" role="group" aria-label="Suggested questions"></div>
 
             <div id="chat-widget" class="pl-2 pr-4 py-4 bg-white border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
                 <button id="suggestions-btn" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] transition-colors">

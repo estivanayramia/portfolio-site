@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Beyond business—hobbies that fuel curiosity, discipline, and personal growth.">
+    <title>Hobbies | Portfolio</title>
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Hobbies | Estivan Ayramia">
+    <meta property="og:description" content="Beyond business—hobbies that fuel curiosity, discipline, and personal growth.">
+    <meta property="og:url" content="https://estivanayramia.com/hobbies.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Hobbies | Estivan Ayramia">
+    <meta name="twitter:description" content="Beyond business—hobbies that fuel curiosity, discipline, and personal growth.">
+    
+    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Inter (non-render-blocking) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
+    
+    <!-- Preload Critical LCP Image -->
+    <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
+    
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preload" href="/assets/css/style.css" as="style">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    <script src="/assets/js/site.js" defer></script>
+    <!-- Custom Theme CSS (non-render-blocking) -->
+    <link rel="stylesheet" href="/assets/css/theme.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/assets/css/theme.css"></noscript>
+    
+    <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
+
+    <!-- PWA Manifest -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="shortcut icon" href="/assets/img/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="mask-icon" href="/assets/img/safari-pinned-tab.svg" color="#212842">
+    <meta name="msapplication-TileColor" content="#212842">
+    <meta name="msapplication-TileImage" content="/assets/img/favicon-32x32.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#212842">
+    
+    <!-- Markdown Parser loaded via lazy-loader.js -->
+</head>
+<body class="bg-beige text-chocolate font-sans antialiased">
+    
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
+    
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between gap-2">
+            <a href="/index.html" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
+                <img src="/assets/img/logo-ea.webp" alt="EA" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
+                <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
+            </a>
+            
+            <!-- Main Navigation -->
+            <ul class="hidden md:flex items-center space-x-8">
+                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
+                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
+                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
+                <li><a href="/projects.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
+                <li><a href="contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+            
+            <!-- Language Switcher -->
+            <div id="lang-switcher" class="flex items-center space-x-3 shrink-0" style="z-index: 20;">
+                <a href="/hobbies.html" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">EN</a>
+                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
+                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
+            </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
+            <ul class="px-6 py-4 space-y-3">
+                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
+                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
+                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
+                <li><a href="/projects.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Projects</a></li>
+                <li><a href="/contact.html" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full text-center hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="pt-24">
+        
+        <!-- Hero Section -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-20 lg:py-28">
+            <div class="space-y-6">
+                <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up">
+                    Beyond Business
+                </h1>
+                <p class="text-lg text-chocolate leading-relaxed max-w-2xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
+                    Curiosity doesn't stop at spreadsheets. These are the hobbies that fuel personal growth, physical discipline, and creative thinking outside the office.
+                </p>
+            </div>
+        </section>
+        
+        <!-- Hobbies Grid -->
+        <section class="max-w-6xl mx-auto px-6 lg:px-12 py-16">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Hobby Card 1: Gym -->
+                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <div class="aspect-video bg-gradient-to-br from-indigodeep to-chocolate flex items-center justify-center">
+                        <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"></path>
+                        </svg>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Physical</span>
+                        </div>
+                        <h2 class="text-xl font-semibold text-indigodeep">Gym & Strength Training</h2>
+                        <p class="text-sm text-chocolate leading-relaxed">Building discipline through progressive overload. Tracking PRs, optimizing recovery, and proving that consistency beats intensity every time.</p>
+                        <div class="pt-2">
+                            <a href="/hobby-gym.html" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
+                                Learn More →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Hobby Card 2: Photography -->
+                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
+                    <div class="aspect-video bg-gradient-to-br from-chocolate to-indigodeep flex items-center justify-center">
+                        <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Creative</span>
+                        </div>
+                        <h2 class="text-xl font-semibold text-indigodeep">Photography</h2>
+                        <p class="text-sm text-chocolate leading-relaxed">Capturing moments worth remembering. iPhone shots that tell stories—no DSLR needed, just good lighting and better timing.</p>
+                        <div class="pt-2">
+                            <a href="/hobby-photography.html" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
+                                Learn More →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Hobby Card 3: Car -->
+                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
+                    <div class="aspect-video bg-gradient-to-br from-indigodeep/80 to-chocolate/80 flex items-center justify-center">
+                        <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+                        </svg>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Mechanical</span>
+                        </div>
+                        <h2 class="text-xl font-semibold text-indigodeep">Car Enthusiasm</h2>
+                        <p class="text-sm text-chocolate leading-relaxed">First car, first freedom. Not about speed—about ownership, maintenance, and the pride of keeping something running clean.</p>
+                        <div class="pt-2">
+                            <a href="/hobby-car.html" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
+                                Learn More →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Hobby Card 4: Cooking -->
+                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                    <div class="aspect-video bg-gradient-to-br from-chocolate/70 to-indigodeep/70 flex items-center justify-center">
+                        <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Culinary</span>
+                        </div>
+                        <h2 class="text-xl font-semibold text-indigodeep">Cooking</h2>
+                        <p class="text-sm text-chocolate leading-relaxed">Steak, pasta, and everything in between. Not a chef—just someone who refuses to eat mediocre food when good ingredients are available.</p>
+                        <div class="pt-2">
+                            <a href="/hobby-cooking.html" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
+                                Learn More →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Hobby Card 5: Whispers -->
+                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                    <div class="aspect-video bg-gradient-to-br from-indigodeep/60 to-chocolate/90 flex items-center justify-center">
+                        <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Reflective</span>
+                        </div>
+                        <h2 class="text-xl font-semibold text-indigodeep">Whispers (Sticky Notes)</h2>
+                        <p class="text-sm text-chocolate leading-relaxed">Random thoughts captured on sticky notes. Ideas, observations, reminders. Low-tech brain dump that keeps the mental clutter organized.</p>
+                        <div class="pt-2">
+                            <a href="/hobby-whispers.html" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
+                                Learn More →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Hobby Card 6: Reading -->
+                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                    <div class="aspect-video bg-gradient-to-br from-chocolate/80 to-indigodeep/60 flex items-center justify-center">
+                        <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Intellectual</span>
+                        </div>
+                        <h2 class="text-xl font-semibold text-indigodeep">Reading</h2>
+                        <p class="text-sm text-chocolate leading-relaxed">Books are compressed experience. Reading is the cheapest way to access decades of wisdom without making the same mistakes yourself.</p>
+                        <div class="pt-2">
+                            <a href="/hobby-reading.html" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
+                                Learn More →
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                
+            </div>
+        </section>
+        
+        <!-- CTA Section -->
+        <section class="max-w-4xl mx-auto px-6 lg:px-12 py-20">
+            <div class="bg-indigodeep rounded-3xl p-12 text-center space-y-6">
+                <h2 class="text-3xl font-bold text-beige">Curious about the work side?</h2>
+                <p class="text-base text-beige max-w-xl mx-auto leading-relaxed">Explore projects that showcase systems thinking, operational coordination, and execution under pressure.</p>
+                <a href="/projects.html" class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-110 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep">
+                    View Projects
+                </a>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-indigodeep text-beige py-12">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid md:grid-cols-3 gap-12 mb-12">
+                <!-- Column 1: Brand -->
+                <div class="space-y-4">
+                    <a href="/index.html" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
+                        <img src="/assets/img/logo-ea.webp" alt="EA" class="h-12 w-12 object-contain" width="300" height="264">
+                        <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
+                    </a>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. Business student at SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                </div>
+                
+                <!-- Column 2: Quick Links -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/deep-dive.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/projects.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
+                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3: Connect -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
+                    <ul class="space-y-2">
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub</a></li>
+                        <li><a href="contact.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded inline-flex items-center">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Resume (PDF)
+                        </a></li>
+                        <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-beige/20 pt-8 text-center">
+                <p class="text-xs text-beige/60">&copy; 2025 Portfolio. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- GSAP + ScrollTrigger (moved to end of body for performance) -->
+    
+    <!-- Site JavaScript (loaded in head) -->
+    
+    <!-- Lazy Loader for Analytics & Dependencies (moved to end of body) -->
+    
+    <!-- Scroll to Top Button -->
+    <button id="scroll-to-top" aria-label="Scroll to top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+    
+    <!-- Savonie AI Chat Widget -->
+    <div id="chat-widget" class="fixed bottom-6 right-4 z-50 font-sans" style="z-index: 9999;">
+        <!-- Chat Window (independently positioned when dragging) -->
+        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);">
+            <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
+                <h3 class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
+                    <img src="/assets/img/savonie-thumb.webp" alt="Savonie" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64">
+                    Savonie AI
+                </h3>
+                <button id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer">&times;</button>
+            </div>
+            
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white/50"></div>
+
+            <div id="chat-chips" class="p-2 bg-white/80 border-t border-[#362017]/5 flex gap-2 overflow-x-auto whitespace-nowrap">
+                <button class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">What are your skills?</button>
+                <button class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">Tell me about your background</button>
+                <button class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">Contact info</button>
+            </div>
+
+            <div id="chat-widget" class="pl-2 pr-4 py-4 bg-white border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
+                <button id="mic-btn" aria-label="Voice input" title="Voice input" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                </button>
+                <button id="suggestions-btn" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] transition-colors">
+                    💡
+                </button>
+                <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
+                <button id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Welcome Bubble (anchored above toggle button) -->
+        <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 90px; right: 32px;">
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+        </div>
+
+        <!-- Toggle Button (always stays in bottom-right corner) -->
+        <button id="chat-toggle" class="absolute bottom-0 right-0 bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 overflow-hidden" aria-label="Open Chat">
+            <img src="/assets/img/savonie-thumb.webp" alt="Chat" class="w-full h-full object-cover" width="64" height="64">
+        </button>
+    </div>
+    
+    <script src="/assets/js/lazy-loader.js" defer></script>
+</body>
+</html>

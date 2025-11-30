@@ -51,6 +51,9 @@
 </head>
 <body class="bg-beige text-chocolate font-sans antialiased">
     
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" aria-hidden="true"></div>
+    
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
     
@@ -126,10 +129,13 @@
         <section class="max-w-4xl mx-auto px-6 lg:px-12 py-20 lg:py-28">
             <div class="space-y-6">
                 <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up">
-                    Always be addicted<br>to bettering yourself
+                    <em>Always</em> be addicted<br>to bettering yourself
                 </h1>
                 <p class="text-lg text-chocolate leading-relaxed max-w-2xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
-                    That's the mission. Every day is an opportunity to build better systems, lead more effectively, and deliver cleaner execution.
+                    That's the mission. Every day is a chance to learn something new, build better systems, and become a stronger version of yourself.
+                </p>
+                <p class="text-base text-chocolate/80 leading-relaxed max-w-2xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
+                    In a world full of good and evil, why be evil when you can be good?
                 </p>
             </div>
         </section>
@@ -140,14 +146,42 @@
                 <div class="opacity-0" data-gsap="fade-up">
                     <h2 class="text-2xl lg:text-3xl font-bold text-indigodeep mb-6">What Drives the Work</h2>
                     <p class="text-base text-chocolate leading-relaxed mb-4">
-                        Improvement isn't a destination—it's a discipline. The goal isn't perfection, it's progress. Every system can be refined, every process can be clearer, every outcome can be more measurable.
+                        Curiosity is the engine. Self-improvement is the outcome. Every day is an opportunity to ask better questions, challenge assumptions, and push beyond comfort zones. Growth isn't passive—it requires intentional effort, disciplined habits, and an honest assessment of what's working and what isn't.
                     </p>
                     <p class="text-base text-chocolate leading-relaxed mb-4">
-                        This mindset shows up in logistics coordination, conflict resolution, personal productivity, and team leadership. It's not about working harder—it's about working smarter, building tools that scale, and creating environments where people can do their best work.
+                        This mindset shapes how I approach business problems, personal development, and leadership. It's not about having all the answers—it's about being obsessed with finding them. Reading widely, testing ideas through action, learning from failures, and building systems that compound over time.
                     </p>
                     <p class="text-base text-chocolate leading-relaxed">
-                        The addiction to bettering yourself means showing up consistently, learning from failures fast, and refusing to settle for "good enough" when "excellent" is achievable through discipline and systems thinking.
+                        The addiction to bettering yourself means treating life like a laboratory: experiment, measure, adjust, repeat. It means being uncomfortable on purpose, seeking feedback that stings, and committing to the daily grind of incremental improvement.
                     </p>
+                </div>
+                
+                <!-- Now Section -->
+                <div class="opacity-0 bg-indigodeep/5 rounded-2xl p-6 border border-indigodeep/10" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <h2 class="text-2xl lg:text-3xl font-bold text-indigodeep mb-4">What I Am Focused on Right Now</h2>
+                    <p class="text-sm text-chocolate/70 mb-4">Updated January 2025</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigodeep mt-1">•</span>
+                            <span class="text-base text-chocolate">Finishing my last semester at SDSU for my Business Administration degree</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigodeep mt-1">•</span>
+                            <span class="text-base text-chocolate">Building this portfolio site to document projects and thinking</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigodeep mt-1">•</span>
+                            <span class="text-base text-chocolate">Exploring how AI tools can enhance personal productivity and learning</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigodeep mt-1">•</span>
+                            <span class="text-base text-chocolate">Training consistently at the gym and improving my nutrition habits</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigodeep mt-1">•</span>
+                            <span class="text-base text-chocolate">Working on my car project and learning more about automotive restoration</span>
+                        </li>
+                    </ul>
                 </div>
                 
                 <!-- Core Values -->
@@ -196,26 +230,102 @@
                 <div class="space-y-8">
                     <div class="opacity-0" data-gsap="fade-up">
                         <h2 class="text-2xl lg:text-3xl font-bold text-indigodeep mb-6">Background</h2>
+                        
+                        <!-- Iraq Photo -->
+                        <figure class="float-right ml-6 mb-6 w-64 opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/Estivan_and_Alen_in_Iraq.jpg" alt="Estivan with brother Alen in Iraq, circa 2006, before moving to the United States" class="w-full rounded-xl shadow-lg border-2 border-white" loading="lazy" width="400" height="300">
+                            <figcaption class="mt-2 text-xs text-chocolate/70 text-center">Me with my brother Alen in Iraq, around 2006, before our family moved to the United States.</figcaption>
+                        </figure>
+                        
                         <p class="text-base text-chocolate leading-relaxed mb-4">
-                            Iraqi-American. Born in Baghdad, raised in San Diego. General Business student focused on operations management and systems thinking. Military community exposure taught structure, accountability, and the value of clear communication under pressure.
+                            I was born in Baghdad, Iraq. My family fled due to war, first going to Syria as refugees before being sponsored to come to the United States. After about 5 to 6 years, we earned US citizenship. I have lived in El Cajon, California since I was about 4 years old.
                         </p>
                         <p class="text-base text-chocolate leading-relaxed mb-4">
-                            First-generation trajectory means learning to navigate systems that weren't built with you in mind. That builds adaptability, resourcefulness, and a deep appreciation for clarity and documentation—because when instructions are unclear, you're the one who pays the price.
+                            I am Chaldean, part of an ancient community that traces back to Mesopotamian times. We speak Neo-Aramaic, a dialect related to the language Jesus spoke. Growing up between two worlds - Middle Eastern heritage at home, American culture outside - taught adaptability, cultural sensitivity, and the importance of bridging divides.
                         </p>
-                        <p class="text-base text-chocolate leading-relaxed">
-                            Functional competence in English, Spanish, and Arabic. Language is access—it opens doors, builds rapport, and prevents miscommunication when stakes are high. This multilingual background directly informs the commitment to clear, culturally-aware communication.
+                        <p class="text-base text-chocolate leading-relaxed mb-4">
+                            My parents had an arranged marriage. My dad was an electrical engineer. My mom restarted her education in the United States and earned a Bachelor of Science in Business Administration from SDSU after around 10 years of schooling. I am the youngest of four brothers: Alen (oldest), Andrew, Evan, and then me.
+                        </p>
+                        <p class="text-base text-chocolate leading-relaxed mb-4">
+                            The Chaldean experience is rooted in survival and reinvention. Ancestors fled persecution, rebuilt lives in new countries, and passed down a relentless work ethic. That history shapes perspective: when your family's story involves losing everything and starting over, you learn not to take opportunities for granted.
+                        </p>
+                        <p class="text-base text-chocolate leading-relaxed mb-4">
+                            First-generation trajectory means navigating systems that weren't built with you in mind. No family connections in corporate America, no inherited wealth, no safety net. That builds resourcefulness, self-reliance, and a deep appreciation for mentorship.
+                        </p>
+                        <p class="text-base text-chocolate leading-relaxed mb-4 clear-both">
+                            This background isn't a sob story - it's an advantage. It creates hunger, adaptability, and a refusal to settle for mediocrity. It's why the focus is on building systems that scale, documenting everything, and creating value that speaks louder than credentials.
+                        </p>
+                        
+                        <!-- Cognitive Detail -->
+                        <p class="text-base text-chocolate leading-relaxed mb-4">
+                            <strong class="text-indigodeep">Cognitive edge:</strong> I test in roughly the top 2 percent for pattern recognition, which helps with systems thinking and spotting connections others might miss.
                         </p>
                     </div>
                     
-                    <!-- Identity & Perspective -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
-                        <h3 class="text-xl font-semibold text-indigodeep mb-4">Identity & Perspective</h3>
-                        <p class="text-base text-chocolate leading-relaxed mb-4">
-                            Identity isn't decoration—it's context that shapes priorities and worldview. Growing up between cultures means seeing systems from multiple angles, understanding that what works in one environment doesn't automatically translate to another.
-                        </p>
+                    <!-- Work with Kids -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.15">
+                        <h3 class="text-xl font-semibold text-indigodeep mb-4">Working with Kids</h3>
                         <p class="text-base text-chocolate leading-relaxed">
-                            This perspective drives the focus on universal principles: reliability, clarity, measurable outcomes. These transcend cultural differences and form the foundation for systems that work regardless of context.
+                            I work with kids in a coach and chaperone type role. This experience has shaped how I think about responsibility and communication. When you're responsible for young people, you learn to be clear, patient, and consistent. You can't fake accountability when kids are watching. It reinforces that leadership is about actions, not words.
                         </p>
+                    </div>
+                    
+                    <!-- Languages Section -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
+                        <h3 class="text-xl font-semibold text-indigodeep mb-6">Languages</h3>
+                        <p class="text-base text-chocolate leading-relaxed mb-6">
+                            Language is more than communication - it's access to different ways of thinking. Each language opens doors to specific communities, business contexts, and cultural nuances.
+                        </p>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <!-- English -->
+                            <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 space-y-3">
+                                <div class="w-12 h-12 bg-indigodeep/10 rounded-full flex items-center justify-center">
+                                    <span class="text-2xl">🇺🇸</span>
+                                </div>
+                                <h4 class="text-lg font-semibold text-indigodeep">English</h4>
+                                <p class="text-sm text-chocolate">Speak, read, and write. Primary language for business, education, and professional communication.</p>
+                            </div>
+                            
+                            <!-- Spanish -->
+                            <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 space-y-3">
+                                <div class="w-12 h-12 bg-indigodeep/10 rounded-full flex items-center justify-center">
+                                    <span class="text-2xl">🇪🇸</span>
+                                </div>
+                                <h4 class="text-lg font-semibold text-indigodeep">Spanish</h4>
+                                <p class="text-sm text-chocolate">Speak, read, and write. Useful for San Diego's bilingual environment.</p>
+                            </div>
+                            
+                            <!-- Arabic -->
+                            <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 space-y-3">
+                                <div class="w-12 h-12 bg-indigodeep/10 rounded-full flex items-center justify-center">
+                                    <span class="text-2xl">🇮🇶</span>
+                                </div>
+                                <h4 class="text-lg font-semibold text-indigodeep">Arabic</h4>
+                                <p class="text-sm text-chocolate">Speak, read, and write. Maintains connection to heritage and Middle Eastern contexts.</p>
+                            </div>
+                            
+                            <!-- Chaldean -->
+                            <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 space-y-3">
+                                <div class="w-12 h-12 bg-indigodeep/10 rounded-full flex items-center justify-center">
+                                    <span class="text-2xl">✝️</span>
+                                </div>
+                                <h4 class="text-lg font-semibold text-indigodeep">Chaldean (Neo-Aramaic)</h4>
+                                <p class="text-sm text-chocolate">Fluent in speaking. An ancient dialect related to the language Jesus spoke.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hobbies CTA -->
+                    <div class="opacity-0 mt-12" data-gsap="fade-up" data-gsap-delay="0.3">
+                        <div class="bg-gradient-to-br from-indigodeep to-chocolate rounded-2xl p-8 text-center space-y-4">
+                            <h3 class="text-2xl font-bold text-beige">Beyond the Resume</h3>
+                            <p class="text-base text-beige/90 max-w-xl mx-auto leading-relaxed">
+                                Curiosity doesn't stop at business. Explore the hobbies that fuel personal growth, physical discipline, and creative thinking.
+                            </p>
+                            <a href="/hobbies.html" class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-110 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep">
+                                View Hobbies
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -289,50 +399,50 @@
         <!-- Testimonials Section -->
         <section class="max-w-6xl mx-auto px-6 lg:px-12 py-20">
             <div class="text-center mb-12 opacity-0" data-gsap="fade-up">
-                <h2 class="text-3xl lg:text-4xl font-bold text-indigodeep mb-4">What People Say</h2>
-                <p class="text-lg" style="color: #e1d4c2;">Feedback from colleagues and clients I've worked with</p>
+                <h2 class="text-3xl lg:text-4xl font-bold text-indigodeep mb-4">Principles I Try to Live By</h2>
+                <p class="text-lg text-chocolate">Ideas I return to when making decisions or facing challenges</p>
             </div>
             
             <div class="grid md:grid-cols-3 gap-6">
-                <!-- Testimonial 1 -->
-                <div class="testimonial-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
-                    <div class="testimonial-quote">
-                        "Estivan transformed our chaotic laundry operation into a streamlined system. Lost items dropped 87%, and our team actually enjoys using the tracking system he built."
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">RM</div>
-                        <div class="testimonial-info">
-                            <div class="testimonial-name">Rachel Martinez</div>
-                            <div class="testimonial-role">Operations Manager, Savonie</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Testimonial 2 -->
-                <div class="testimonial-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
-                    <div class="testimonial-quote">
-                        "He doesn't just build things that work—he documents everything so your team can actually maintain it. That's rare and incredibly valuable."
-                    </div>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">DK</div>
-                        <div class="testimonial-info">
-                            <div class="testimonial-name">David Kim</div>
-                            <div class="testimonial-role">Technical Lead, Student Project</div>
-                        </div>
+                <!-- Principle 1: Make allies, not enemies -->
+                <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <div class="text-2xl mb-4">🤝</div>
+                    <h3 class="text-lg font-semibold text-indigodeep mb-3">Make allies, not enemies</h3>
+                    <p class="text-sm text-chocolate leading-relaxed mb-4">
+                        Lincoln destroyed his enemies by making them his friends. Rather than attack or alienate opponents, he converted them into allies through patience and understanding.
+                    </p>
+                    <div class="border-t border-chocolate/10 pt-4 mt-4">
+                        <p class="text-xs text-chocolate/70 italic">
+                            Why this matters to me: In every conflict I have seen, the people who win long-term are the ones who build bridges instead of burning them. It is slower, but the relationships compound.
+                        </p>
                     </div>
                 </div>
                 
-                <!-- Testimonial 3 -->
-                <div class="testimonial-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
-                    <div class="testimonial-quote">
-                        "Estivan brings clarity to chaos. He listens carefully, identifies the real problem, and delivers solutions that stick. Highly recommend working with him."
+                <!-- Principle 2: Reserve judgment -->
+                <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
+                    <div class="text-2xl mb-4">⚖️</div>
+                    <h3 class="text-lg font-semibold text-indigodeep mb-3">Reserve judgment</h3>
+                    <p class="text-sm text-chocolate leading-relaxed mb-4">
+                        God himself does not propose to judge a man until the end of his days. Why should we rush to judge others before we have seen their full story unfold?
+                    </p>
+                    <div class="border-t border-chocolate/10 pt-4 mt-4">
+                        <p class="text-xs text-chocolate/70 italic">
+                            Why this matters to me: Everyone is fighting battles you cannot see. When someone frustrates me, I try to remember I am only seeing one moment in their entire life.
+                        </p>
                     </div>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">SJ</div>
-                        <div class="testimonial-info">
-                            <div class="testimonial-name">Sarah Johnson</div>
-                            <div class="testimonial-role">Small Business Owner</div>
-                        </div>
+                </div>
+                
+                <!-- Principle 3: Choose your hard -->
+                <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
+                    <div class="text-2xl mb-4">🎯</div>
+                    <h3 class="text-lg font-semibold text-indigodeep mb-3">Choose your hard</h3>
+                    <p class="text-sm text-chocolate leading-relaxed mb-4">
+                        Life will never be easy. It will often be hard. But we can choose our hard. Choose wisely.
+                    </p>
+                    <div class="border-t border-chocolate/10 pt-4 mt-4">
+                        <p class="text-xs text-chocolate/70 italic">
+                            Why this matters to me: Discipline is hard. Regret is hard. Either way, something will be difficult. I would rather pick the version of hard that leads somewhere I want to go.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -361,7 +471,7 @@
                         <img src="/assets/img/logo-ea.webp" alt="EA" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
-                    <p class="text-sm text-beige/80 leading-relaxed">Systems, people, clean execution. Making complex operations run smoothly.</p>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. Business student at SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
                 </div>
                 
                 <!-- Column 2: Quick Links -->

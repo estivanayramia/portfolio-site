@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Whispers on Paper - Daily handwritten sticky notes left around SDSU campus. Anonymous encouragement project spreading positivity one note at a time.">
+    <title>Whispers on Paper | Hobbies</title>
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Whispers on Paper | Estivan Ayramia">
+    <meta property="og:description" content="Daily handwritten sticky notes left around SDSU campus. Anonymous encouragement.">
+    <meta property="og:url" content="https://estivanayramia.com/hobby-whispers.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Whispers on Paper | Estivan Ayramia">
+    <meta name="twitter:description" content="Daily handwritten sticky notes left around SDSU campus. Anonymous encouragement.">
+    
+    <!-- Google Fonts: Inter (non-render-blocking) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
+    
+    <!-- Preload Critical LCP Image -->
+    <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
+    
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preload" href="/assets/css/style.css" as="style">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    <script src="/assets/js/site.js" defer></script>
+    <!-- Custom Theme CSS (non-render-blocking) -->
+    <link rel="stylesheet" href="/assets/css/theme.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/assets/css/theme.css"></noscript>
+    
+    <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
+
+    <!-- PWA Manifest -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="shortcut icon" href="/assets/img/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="mask-icon" href="/assets/img/safari-pinned-tab.svg" color="#212842">
+    <meta name="msapplication-TileColor" content="#212842">
+    <meta name="msapplication-TileImage" content="/assets/img/favicon-32x32.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#212842">
+    
+    <!-- Lightbox styles for gallery -->
+    <style>
+        .lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .lightbox-overlay.active {
+            display: flex;
+        }
+        .lightbox-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0.5rem;
+        }
+        .note-card {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .note-card:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="bg-beige text-chocolate font-sans antialiased">
+    
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
+    
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between gap-2">
+            <a href="/index.html" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
+                <img src="/assets/img/logo-ea.webp" alt="EA" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
+                <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
+            </a>
+            
+            <!-- Main Navigation -->
+            <ul class="hidden md:flex items-center space-x-8">
+                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Overview</a></li>
+                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Deep Dive</a></li>
+                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">About</a></li>
+                <li><a href="/projects.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Projects</a></li>
+                <li><a href="contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors">Contact</a></li>
+            </ul>
+            
+            <!-- Language Switcher -->
+            <div id="lang-switcher" class="flex items-center space-x-3 shrink-0" style="z-index: 20;">
+                <a href="/hobby-whispers.html" class="text-xs font-semibold text-indigodeep underline">EN</a>
+                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors">ES</a>
+                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors">AR</a>
+            </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-toggle" class="md:hidden text-chocolate p-2" aria-label="Toggle mobile menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
+            <ul class="px-6 py-4 space-y-3">
+                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Overview</a></li>
+                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Deep Dive</a></li>
+                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">About</a></li>
+                <li><a href="/projects.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Projects</a></li>
+                <li><a href="/contact.html" class="block text-sm font-medium text-beige bg-indigodeep px-5 py-2 rounded-full text-center">Contact</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox-overlay" aria-hidden="true">
+        <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+        <img src="" alt="" class="lightbox-content" id="lightbox-image">
+    </div>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="pt-24">
+        
+        <!-- Breadcrumb -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
+            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+                <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
+                    <li><a href="/index.html" class="hover:text-indigodeep transition-colors">Home</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li><a href="/hobbies.html" class="hover:text-indigodeep transition-colors">Hobbies</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li class="text-indigodeep font-medium">Whispers on Paper</li>
+                </ol>
+            </nav>
+        </section>
+        
+        <!-- Hero Section -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+            <div class="space-y-6">
+                <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Personal Project</span>
+                    <span class="text-xs text-ink/60">Ongoing</span>
+                </div>
+                <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
+                    Whispers on Paper
+                </h1>
+                <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
+                    Every day, I write a handwritten note and leave it somewhere on the SDSU campus. A stranger finds it. That's the whole point. Anonymous encouragement, one sticky note at a time.
+                </p>
+            </div>
+        </section>
+        
+        <!-- Stats -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8">
+            <div class="bg-indigodeep/5 border border-indigodeep/10 rounded-2xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                <div class="grid grid-cols-3 gap-6 text-center">
+                    <div>
+                        <div class="text-2xl font-bold text-indigodeep">Daily</div>
+                        <div class="text-sm text-chocolate">Frequency</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-indigodeep">SDSU</div>
+                        <div class="text-sm text-chocolate">Campus</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-indigodeep">Anonymous</div>
+                        <div class="text-sm text-chocolate">Always</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Content Grid -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
+            <div class="space-y-12">
+                
+                <!-- Why I Do This -->
+                <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                    <h2 class="text-2xl font-bold text-indigodeep mb-4">Why I Do This</h2>
+                    <div class="prose prose-lg text-chocolate leading-relaxed space-y-4 max-w-3xl">
+                        <p>College is hard. Everyone is stressed, rushing somewhere, thinking about exams or deadlines or relationships. I wanted to create small moments of pause. A reminder that someone out there is thinking about people they've never met, hoping they have a good day.</p>
+                        <p>The anonymity is the point. I don't sign them. I don't wait around to see reactions. It's not about me getting credit. It's about the note standing on its own, a small gift with no strings attached.</p>
+                        <p>Sometimes I wonder who finds them. A freshman having a rough week. A senior stressed about the future. A professor dealing with something I'll never know about. The notes don't discriminate. They're for whoever needs them in that moment.</p>
+                    </div>
+                </div>
+                
+                <!-- What I Write -->
+                <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                    <h2 class="text-2xl font-bold text-indigodeep mb-4">What I Write</h2>
+                    <div class="prose prose-lg text-chocolate leading-relaxed space-y-4 max-w-3xl">
+                        <p>Simple things. Not cheesy motivational quotes. Just honest reminders. "You're doing better than you think." "Take a breath. You'll figure it out." "Someone is proud of you." Things I would want to hear on a hard day.</p>
+                        <p>I try to make them feel personal even though they're universal. The handwriting matters. It's not typed or printed. Someone sat down and wrote this. That effort shows.</p>
+                    </div>
+                </div>
+                
+                <!-- Note Gallery -->
+                <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                    <h2 class="text-2xl font-bold text-indigodeep mb-6">The Notes</h2>
+                    <p class="text-chocolate mb-6">Click any note to view it larger.</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/note 1" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/note 2" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/note 3" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/note 4" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 5.jpg" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 6" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 7" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 8" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 9" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 10" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 11" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 12" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 13" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 14" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 15" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 16" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 17" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 18" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 19" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 20" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 21" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 22" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 23" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 24" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 25" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 26" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 27" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 28" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 29" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 30" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 31" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 32" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 33" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 34" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 35" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 36" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                        <figure class="note-card aspect-square rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
+                            <img src="/assets/img/Portolio-Media/Portfolio Media/whispers-/Note 37" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy">
+                        </figure>
+                    </div>
+                </div>
+                
+                <!-- Back to Hobbies CTA -->
+                <div class="text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.8">
+                    <a href="/hobbies.html" class="inline-block text-sm font-medium text-beige bg-indigodeep px-8 py-4 rounded-full hover:bg-chocolate transition-colors">
+                        ← Back to All Hobbies
+                    </a>
+                </div>
+                
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-indigodeep text-beige py-12">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid md:grid-cols-3 gap-12 mb-12">
+                <div class="space-y-4">
+                    <a href="/index.html" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
+                        <img src="/assets/img/logo-ea.webp" alt="EA" class="h-12 w-12 object-contain" width="300" height="264">
+                        <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
+                    </a>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. Business student at SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white transition-colors">Overview</a></li>
+                        <li><a href="/projects.html" class="text-sm text-beige/80 hover:text-white transition-colors">Projects</a></li>
+                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white transition-colors">About</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
+                    <ul class="space-y-2">
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white transition-colors">LinkedIn</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white transition-colors">GitHub</a></li>
+                        <li><a href="contact.html" class="text-sm text-beige/80 hover:text-white transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-beige/20 pt-8 text-center">
+                <p class="text-xs text-beige/60">&copy; 2025 Portfolio. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scroll to Top Button -->
+    <button id="scroll-to-top" aria-label="Scroll to top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+    
+    <!-- Savonie AI Chat Widget -->
+    <div id="chat-widget" class="fixed bottom-6 right-4 z-50 font-sans" style="z-index: 9999;">
+        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);">
+            <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
+                <h3 class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
+                    <img src="/assets/img/savonie-thumb.webp" alt="Savonie" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64">
+                    Savonie AI
+                </h3>
+                <button id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer">&times;</button>
+            </div>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white/50"></div>
+            <div id="chat-chips" class="p-2 bg-white/80 border-t border-[#362017]/5 flex gap-2 overflow-x-auto whitespace-nowrap">
+                <button class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">What are your skills?</button>
+                <button class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">Tell me about your background</button>
+                <button class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">Contact info</button>
+            </div>
+            <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
+                <button id="mic-btn" aria-label="Voice input" title="Voice input" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+                </button>
+                <button id="suggestions-btn" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] transition-colors">💡</button>
+                <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
+                <button id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </div>
+        </div>
+        <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 90px; right: 32px;">
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+        </div>
+        <button id="chat-toggle" class="absolute bottom-0 right-0 bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 overflow-hidden" aria-label="Open Chat">
+            <img src="/assets/img/savonie-thumb.webp" alt="Chat" class="w-full h-full object-cover" width="64" height="64">
+        </button>
+    </div>
+    
+    <!-- Lightbox Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImage = document.getElementById('lightbox-image');
+            const lightboxClose = document.querySelector('.lightbox-close');
+            const noteCards = document.querySelectorAll('.note-card img');
+            
+            noteCards.forEach(function(card) {
+                card.addEventListener('click', function() {
+                    lightboxImage.src = this.src;
+                    lightboxImage.alt = this.alt;
+                    lightbox.classList.add('active');
+                    lightbox.setAttribute('aria-hidden', 'false');
+                });
+            });
+            
+            lightboxClose.addEventListener('click', function() {
+                lightbox.classList.remove('active');
+                lightbox.setAttribute('aria-hidden', 'true');
+            });
+            
+            lightbox.addEventListener('click', function(e) {
+                if (e.target === lightbox) {
+                    lightbox.classList.remove('active');
+                    lightbox.setAttribute('aria-hidden', 'true');
+                }
+            });
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+                    lightbox.classList.remove('active');
+                    lightbox.setAttribute('aria-hidden', 'true');
+                }
+            });
+        });
+    </script>
+    
+    <script src="/assets/js/lazy-loader.js" defer></script>
+</body>
+</html>

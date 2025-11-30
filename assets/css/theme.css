@@ -2206,3 +2206,115 @@ footer, .section-below-fold {
         font-size: 1rem !important; /* text-base */
     }
 }
+
+/* ==========================================================================
+   Scroll Progress Bar (CSS-only)
+   ========================================================================== */
+
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: transparent;
+    z-index: 9998;
+}
+
+.scroll-progress::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(to right, #212842 var(--scroll-progress, 0%), transparent 0%);
+    transform-origin: 0 50%;
+    animation: scroll-progress linear;
+    animation-timeline: scroll();
+}
+
+@supports (animation-timeline: scroll()) {
+    @keyframes scroll-progress {
+        from { --scroll-progress: 0%; }
+        to { --scroll-progress: 100%; }
+    }
+}
+
+/* Fallback for browsers without scroll timeline support */
+@supports not (animation-timeline: scroll()) {
+    .scroll-progress::before {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+    /* Hide non-essential elements */
+    header,
+    footer,
+    nav,
+    #chat-widget,
+    .scroll-progress,
+    #scroll-to-top,
+    .no-print {
+        display: none !important;
+    }
+    
+    /* Reset backgrounds */
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    /* Reset colors for readability */
+    * {
+        color: black !important;
+        background: white !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+    
+    /* Ensure links are visible */
+    a {
+        text-decoration: underline !important;
+    }
+    
+    /* Show URLs after links */
+    a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.8em;
+        word-break: break-all;
+    }
+    
+    /* Don't show URLs for navigation links */
+    a[href^="/"]::after,
+    a[href^="#"]::after {
+        content: none;
+    }
+    
+    /* Reset margins and padding */
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Avoid page breaks inside important elements */
+    h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid;
+    }
+    
+    img, figure, blockquote {
+        page-break-inside: avoid;
+    }
+    
+    /* Ensure images print */
+    img {
+        max-width: 100% !important;
+        filter: none !important;
+    }
+}
+
