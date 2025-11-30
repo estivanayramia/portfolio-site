@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Personal Discipline Routine - Time-blocking system with daily review loops and weekly planning sessions.">
+    <title>Personal Discipline Routine | Projects</title>
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Personal Discipline Routine | Estivan Ayramia">
+    <meta property="og:description" content="Time-blocking system balancing school, work, and leadership without burnout.">
+    <meta property="og:url" content="https://estivanayramia.com/project-discipline.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Personal Discipline Routine | Estivan Ayramia">
+    <meta name="twitter:description" content="Consistent output without burnout.">
+    
+    <!-- Google Fonts: Inter (non-render-blocking) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
+    
+    <!-- Preload Critical LCP Image -->
+    <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
+    
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preload" href="/assets/css/style.css" as="style">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    <script src="/assets/js/site.js" defer></script>
+    <!-- Custom Theme CSS (non-render-blocking) -->
+    <link rel="stylesheet" href="/assets/css/theme.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/assets/css/theme.css"></noscript>
+    
+    <!-- PWA Manifest -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="shortcut icon" href="/assets/img/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="mask-icon" href="/assets/img/safari-pinned-tab.svg" color="#212842">
+    <meta name="msapplication-TileColor" content="#212842">
+    <meta name="msapplication-TileImage" content="/assets/img/favicon-32x32.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#212842">
+</head>
+<body class="bg-beige text-chocolate font-sans antialiased">
+    
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
+    
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between">
+            <a href="/index.html" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center" aria-label="Go to Portfolio home page">
+                <img src="/assets/img/logo-ea.webp" alt="EA" class="h-8 w-8 mr-2 object-contain" width="300" height="264" fetchpriority="high">
+                <span>Estivan Ayramia</span>
+            </a>
+            
+            <!-- Main Navigation -->
+            <ul class="hidden md:flex items-center space-x-8">
+                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
+                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
+                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
+                <li><a href="/projects.html" class="text-sm text-indigodeep font-medium underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
+                <li><a href="contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+            
+            <!-- Language Switcher -->
+            <div class="flex items-center space-x-3">
+                <a href="/project-discipline.html" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">EN</a>
+                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
+                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
+            </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
+            <ul class="px-6 py-4 space-y-3">
+                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
+                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
+                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
+                <li><a href="/projects.html" class="block text-sm text-indigodeep font-medium py-2">Projects</a></li>
+                <li><a href="contact.html" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="pt-24">
+        
+        <!-- Breadcrumb -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
+            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+                <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
+                    <li><a href="/index.html" class="hover:text-indigodeep transition-colors">Home</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li><a href="/projects.html" class="hover:text-indigodeep transition-colors">Projects</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li class="text-indigodeep font-medium">Personal Discipline Routine</li>
+                </ol>
+            </nav>
+        </section>
+        
+        <!-- Project Header -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+            <div class="space-y-6">
+                <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Productivity</span>
+                    <span class="text-xs text-ink/60">2023-Present</span>
+                </div>
+                <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
+                    Personal Discipline Routine
+                </h1>
+                <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
+                    Time-blocking system with daily review loops and weekly planning sessions. Balanced school, work, and leadership responsibilities without sacrificing quality or burning out.
+                </p>
+            </div>
+        </section>
+        
+        <!-- Project Visual -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8">
+            <div class="aspect-video bg-gradient-to-br from-indigodeep/80 to-chocolate/80 rounded-2xl flex items-center justify-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                <svg class="w-24 h-24 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+        </section>
+        
+        <!-- Project Details -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
+            <div class="grid lg:grid-cols-3 gap-12">
+                
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-12">
+                    
+                    <!-- Overview -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Overview</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>Juggling multiple responsibilities—school, work, leadership roles, and personal projects—without a clear system leads to burnout, missed deadlines, and compromised quality. The alternative isn't working harder; it's working smarter with intentional structure.</p>
+                            <p>This personal productivity system combines time-blocking, daily reflection loops, and weekly planning sessions to maintain consistent output across competing priorities while preserving mental clarity and avoiding burnout.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- The Challenge -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">The Challenge</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>Before implementing this system, productivity was inconsistent and stressful:</p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>Constant context-switching:</strong> Jumping between tasks killed deep focus and wasted mental energy</li>
+                                <li><strong>No clear priorities:</strong> Everything felt urgent; nothing got the attention it deserved</li>
+                                <li><strong>Reactive scheduling:</strong> Days controlled by incoming requests rather than proactive planning</li>
+                                <li><strong>Burnout cycles:</strong> Intense work sprints followed by exhaustion and missed commitments</li>
+                                <li><strong>Quality compromises:</strong> Rushing to meet deadlines resulted in subpar work</li>
+                            </ul>
+                            <p>The goal: Build a sustainable routine that delivers consistent results without sacrificing health, relationships, or quality.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- The Approach -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">The Approach</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p><strong>1. Time-Blocking Structure</strong></p>
+                            <p>Divided each day into three distinct blocks optimized for different types of work:</p>
+                            
+                            <p><strong>Morning Block (7-10 AM): Deep Focus Work</strong></p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>No meetings, no interruptions, phone on airplane mode</li>
+                                <li>Tackle most cognitively demanding tasks (coding, writing, analysis)</li>
+                                <li>Pre-planned the night before so no decision-making needed</li>
+                                <li>3-hour uninterrupted blocks produce more than 6 hours of distracted work</li>
+                            </ul>
+                            
+                            <p><strong>Midday Block (10 AM - 4 PM): Reactive & Collaborative Work</strong></p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>Email, Slack, coordination meetings</li>
+                                <li>Quick decisions and administrative tasks</li>
+                                <li>Team collaboration and problem-solving sessions</li>
+                                <li>Buffer time for unexpected issues</li>
+                            </ul>
+                            
+                            <p><strong>Evening Block (8-10 PM): Learning & Planning</strong></p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>Skills development, reading, online courses</li>
+                                <li>15-minute daily review: What worked? What didn't? Adjust tomorrow's plan</li>
+                                <li>Prepare materials for next morning's deep work session</li>
+                            </ul>
+                            
+                            <p><strong>2. Weekly Planning Sessions (Sunday 6-7 PM)</strong></p>
+                            <p>Dedicated one hour each week to strategic planning:</p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>Review previous week's wins and misses</li>
+                                <li>Prioritize upcoming week's deliverables using Eisenhower Matrix</li>
+                                <li>Block calendar for deep work sessions</li>
+                                <li>Identify potential conflicts and plan around them</li>
+                                <li>Set 3-5 non-negotiable outcomes for the week</li>
+                            </ul>
+                            
+                            <p><strong>3. Ruthless Task Prioritization</strong></p>
+                            <p>Implemented 4-quadrant system based on urgency and importance:</p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>Quadrant 1 (Urgent + Important):</strong> Handle immediately in morning block</li>
+                                <li><strong>Quadrant 2 (Not Urgent + Important):</strong> Schedule for deep work—this is where growth happens</li>
+                                <li><strong>Quadrant 3 (Urgent + Not Important):</strong> Delegate or batch process in midday block</li>
+                                <li><strong>Quadrant 4 (Not Urgent + Not Important):</strong> Eliminate ruthlessly</li>
+                            </ul>
+                            
+                            <p><strong>4. Buffer Time & Flexibility</strong></p>
+                            <p>Built 25% buffer time into schedule to handle unexpected issues without derailing entire day. If nothing urgent arose, used buffer for learning or getting ahead on future work.</p>
+                            
+                            <p><strong>5. Recovery Protocols</strong></p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>One full rest day per week (Saturday)—no work, no guilt</li>
+                                <li>20-minute post-lunch walks to reset mental state</li>
+                                <li>Hard stop at 10 PM to preserve sleep quality</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Results & Impact -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.8">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Results & Impact</h2>
+                        <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 space-y-4">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">3.8 GPA</div>
+                                    <p class="text-sm text-chocolate">Maintained while working 20+ hours/week</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">100%</div>
+                                    <p class="text-sm text-chocolate">On-time delivery rate for all commitments</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">Zero</div>
+                                    <p class="text-sm text-chocolate">Burnout episodes since implementation</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">8+ Hours</div>
+                                    <p class="text-sm text-chocolate">Average sleep per night maintained</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- System Evolution -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.9">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">System Evolution</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p><strong>Version 1.0 (Initial):</strong> Basic time-blocking with rigid schedule. Failed within 2 weeks due to lack of flexibility.</p>
+                            
+                            <p><strong>Version 2.0 (Current):</strong> Added buffer time, flexible boundaries, and recovery protocols. Sustainable for 18+ months and counting.</p>
+                            
+                            <p><strong>Key Refinements:</strong></p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>Moved deep work to mornings (originally evenings)—discovered peak cognitive performance early in day</li>
+                                <li>Added mandatory rest day after trying to "optimize" seven days/week led to burnout</li>
+                                <li>Implemented weekly reviews after realizing daily adjustments weren't catching strategic misalignment</li>
+                                <li>Built in walking breaks after noticing afternoon focus collapse</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Learnings -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="1.0">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Key Learnings</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>Systems > Motivation:</strong> Discipline isn't about willpower—it's about removing decisions and following structure</li>
+                                <li><strong>Protection Creates Freedom:</strong> Protecting morning deep work blocks made everything else easier</li>
+                                <li><strong>Buffer Time Prevents Collapse:</strong> 100% scheduled = first surprise derails entire day</li>
+                                <li><strong>Recovery Isn't Optional:</strong> Rest days improve weekly output—they're not a luxury</li>
+                                <li><strong>Clarity Compounds:</strong> Daily 15-minute reviews prevent small misalignments from becoming major problems</li>
+                                <li><strong>Perfect is the Enemy:</strong> Following the system 80% of the time beats trying for 100% and quitting</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="space-y-8">
+                    
+                    <!-- Project Info -->
+                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Project Info</h3>
+                        <dl class="space-y-4 text-sm">
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Status</dt>
+                                <dd class="text-indigodeep font-medium">Active & Evolving</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Role</dt>
+                                <dd class="text-indigodeep font-medium">Self (Personal System)</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Duration</dt>
+                                <dd class="text-indigodeep font-medium">18+ Months (Ongoing)</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 mb-1">Started</dt>
+                                <dd class="text-indigodeep font-medium">2023</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 mb-1">Version</dt>
+                                <dd class="text-indigodeep font-medium">2.0 (Refined)</dd>
+                            </div>
+                        </dl>
+                    </div>
+                    
+                    <!-- Skills Applied -->
+                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Skills Applied</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Time Management</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Strategic Planning</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Self-Discipline</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Priority Management</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Reflection & Iteration</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Systems Thinking</span>
+                        </div>
+                    </div>
+                    
+                    <!-- CTA -->
+                    <div class="bg-indigodeep text-beige rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                        <h3 class="text-lg font-semibold mb-3">Interested in this work?</h3>
+                        <p class="text-sm text-beige/80 mb-4">Let's discuss how structured productivity systems can help your team deliver consistent results.</p>
+                        <a href="/contact.html" class="inline-block text-sm font-medium bg-beige text-indigodeep px-5 py-2 rounded-full hover:bg-chocolate hover:text-beige transition-colors focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-2 focus:ring-offset-indigodeep">
+                            Get in Touch
+                        </a>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- Related Projects -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10">
+            <h2 class="text-2xl font-bold text-indigodeep mb-8 opacity-0" data-gsap="fade-up">Related Projects</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <a href="/project-logistics.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Operations</span>
+                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">Logistics Coordination System</h3>
+                    <p class="text-sm text-chocolate">Centralized scheduling with automated reminders.</p>
+                </a>
+                <a href="/project-documentation.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Documentation</span>
+                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">Process Documentation Library</h3>
+                    <p class="text-sm text-chocolate">Standard operating procedures for recurring tasks.</p>
+                </a>
+                <a href="/projects.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
+                    <div class="text-center py-8">
+                        <p class="text-sm text-chocolate mb-3">View all projects</p>
+                        <span class="inline-block text-2xl">→</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-indigodeep text-beige py-12 mt-20">
+        <div class="max-w-5xl mx-auto px-6 lg:px-12">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <div class="flex items-center space-x-6">
+                    <a href="/privacy.html" class="text-sm text-beige/80 hover:text-beige transition-colors">Privacy</a>
+                    <a href="/humans.txt" class="text-sm text-beige/80 hover:text-beige transition-colors">Humans.txt</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+</body>
+</html>

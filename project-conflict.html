@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Conflict Resolution Playbook - Tiered de-escalation framework with scripted responses for high-pressure situations.">
+    <title>Conflict Resolution Playbook | Projects</title>
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Conflict Resolution Playbook | Estivan Ayramia">
+    <meta property="og:description" content="De-escalation framework with scripted responses for high-pressure conflict management.">
+    <meta property="og:url" content="https://estivanayramia.com/project-conflict.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Conflict Resolution Playbook | Estivan Ayramia">
+    <meta name="twitter:description" content="Faster resolutions, fewer escalations.">
+    
+    <!-- Google Fonts: Inter (non-render-blocking) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
+    
+    <!-- Preload Critical LCP Image -->
+    <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
+    
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preload" href="/assets/css/style.css" as="style">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    <script src="/assets/js/site.js" defer></script>
+    <!-- Custom Theme CSS (non-render-blocking) -->
+    <link rel="stylesheet" href="/assets/css/theme.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/assets/css/theme.css"></noscript>
+    
+    <!-- PWA Manifest -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="shortcut icon" href="/assets/img/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="mask-icon" href="/assets/img/safari-pinned-tab.svg" color="#212842">
+    <meta name="msapplication-TileColor" content="#212842">
+    <meta name="msapplication-TileImage" content="/assets/img/favicon-32x32.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#212842">
+</head>
+<body class="bg-beige text-chocolate font-sans antialiased">
+    
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
+    
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between">
+            <a href="/index.html" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center" aria-label="Go to Portfolio home page">
+                <img src="/assets/img/logo-ea.webp" alt="EA" class="h-8 w-8 mr-2 object-contain" width="300" height="264" fetchpriority="high">
+                <span>Estivan Ayramia</span>
+            </a>
+            
+            <!-- Main Navigation -->
+            <ul class="hidden md:flex items-center space-x-8">
+                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
+                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
+                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
+                <li><a href="/projects.html" class="text-sm text-indigodeep font-medium underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
+                <li><a href="contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+            
+            <!-- Language Switcher -->
+            <div class="flex items-center space-x-3">
+                <a href="/project-conflict.html" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">EN</a>
+                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
+                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
+            </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
+            <ul class="px-6 py-4 space-y-3">
+                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
+                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
+                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
+                <li><a href="/projects.html" class="block text-sm text-indigodeep font-medium py-2">Projects</a></li>
+                <li><a href="contact.html" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="pt-24">
+        
+        <!-- Breadcrumb -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
+            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+                <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
+                    <li><a href="/index.html" class="hover:text-indigodeep transition-colors">Home</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li><a href="/projects.html" class="hover:text-indigodeep transition-colors">Projects</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li class="text-indigodeep font-medium">Conflict Resolution Playbook</li>
+                </ol>
+            </nav>
+        </section>
+        
+        <!-- Project Header -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+            <div class="space-y-6">
+                <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Leadership</span>
+                    <span class="text-xs text-ink/60">2024</span>
+                </div>
+                <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
+                    Conflict Resolution Playbook
+                </h1>
+                <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
+                    Developed tiered de-escalation framework with scripted responses. Trained team members on high-pressure conflict management, reducing escalations and improving resolution speed.
+                </p>
+            </div>
+        </section>
+        
+        <!-- Project Visual -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8">
+            <div class="aspect-video bg-gradient-to-br from-chocolate to-indigodeep rounded-2xl flex items-center justify-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                <svg class="w-24 h-24 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+            </div>
+        </section>
+        
+        <!-- Project Details -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
+            <div class="grid lg:grid-cols-3 gap-12">
+                
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-12">
+                    
+                    <!-- Overview -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Overview</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>Conflict is inevitable in high-pressure operational environments. The difference between productive resolution and destructive escalation often comes down to having a clear framework to follow when emotions run high.</p>
+                            <p>This project developed a tiered conflict resolution playbook—a practical, scripted framework that team members can reference and apply in real-time to de-escalate tensions, resolve disputes, and maintain professional relationships even during difficult conversations.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- The Challenge -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">The Challenge</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>Before implementing the playbook, conflict situations were handled inconsistently:</p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>Emotional reactions:</strong> Team members responded based on instinct, often escalating tensions</li>
+                                <li><strong>No standardized approach:</strong> Each person handled conflicts differently, creating unpredictability</li>
+                                <li><strong>Improvised responses:</strong> Without scripts or frameworks, people said what came to mind—sometimes making things worse</li>
+                                <li><strong>Delayed interventions:</strong> Conflicts festered because no one knew when or how to step in</li>
+                                <li><strong>Supervisor dependency:</strong> Minor issues escalated to leadership because front-line staff felt unprepared</li>
+                            </ul>
+                            <p>The goal: Create a simple, memorable framework that anyone could apply in the moment—even under stress.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- The Approach -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">The Approach</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p><strong>1. Three-Tier Framework</strong></p>
+                            <p>Developed a tiered escalation system matching response intensity to conflict severity:</p>
+                            
+                            <p><strong>Tier 1: Acknowledge & Resolve (70% of conflicts)</strong></p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>Acknowledge the concern with neutral language</li>
+                                <li>Clarify the issue without assigning blame</li>
+                                <li>Offer a concrete solution or next step</li>
+                                <li><em>Script example:</em> "I understand you're frustrated about [issue]. Let me clarify what happened, and we can figure out the next step together."</li>
+                            </ul>
+                            
+                            <p><strong>Tier 2: Separate & Mediate (25% of conflicts)</strong></p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>Physically separate parties to cool down</li>
+                                <li>Gather facts from each person individually</li>
+                                <li>Mediate using neutral, non-judgmental language</li>
+                                <li>Document the timeline and agreed resolution</li>
+                            </ul>
+                            
+                            <p><strong>Tier 3: Escalate & Document (5% of conflicts)</strong></p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>Escalate to supervisor with full documentation</li>
+                                <li>Include timeline, witness statements, and attempted resolutions</li>
+                                <li>Remove yourself from mediator role</li>
+                            </ul>
+                            
+                            <p><strong>2. Scripted Opening Lines</strong></p>
+                            <p>Created a library of tested opening phrases for common conflict scenarios:</p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>"I can see this is important to you. Can you help me understand what happened?"</li>
+                                <li>"Let's take a step back and make sure we're on the same page."</li>
+                                <li>"I want to find a solution that works for everyone. What would that look like for you?"</li>
+                            </ul>
+                            
+                            <p><strong>3. Active Listening Protocol</strong></p>
+                            <p>Trained team on active listening techniques:</p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>Paraphrase to confirm understanding</li>
+                                <li>Acknowledge emotions without validating behavior</li>
+                                <li>Ask clarifying questions before offering solutions</li>
+                            </ul>
+                            
+                            <p><strong>4. Role-Playing Training</strong></p>
+                            <p>Conducted monthly scenario-based training sessions where team members practiced de-escalation in simulated high-pressure situations. Feedback loops helped refine scripts and techniques.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Results & Impact -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.8">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Results & Impact</h2>
+                        <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 space-y-4">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">65%</div>
+                                    <p class="text-sm text-chocolate">Reduction in conflicts escalated to supervisors</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">40%</div>
+                                    <p class="text-sm text-chocolate">Faster average resolution time</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">90%</div>
+                                    <p class="text-sm text-chocolate">Team confidence increase in handling difficult conversations</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">Zero</div>
+                                    <p class="text-sm text-chocolate">Conflicts resulting in formal complaints after implementation</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Real-World Applications -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.9">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Real-World Applications</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p><strong>Case Study 1: Schedule Dispute</strong></p>
+                            <p>Two team members argued over shift priority. Using Tier 1 scripts, the lead acknowledged both concerns, clarified the scheduling policy, and offered a trade option. Resolved in 10 minutes without escalation.</p>
+                            
+                            <p><strong>Case Study 2: Customer Complaint</strong></p>
+                            <p>An upset customer confronted staff member about service delay. Staff used active listening protocol, separated the customer from the busy area (Tier 2), gathered facts, and offered immediate resolution plus follow-up. Customer left satisfied.</p>
+                            
+                            <p><strong>Case Study 3: Team Tension</strong></p>
+                            <p>Ongoing friction between departments caused communication breakdowns. Applied Tier 2 mediation with documented agreements and weekly check-ins. Tension reduced within 3 weeks.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Learnings -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="1.0">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Key Learnings</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>Scripts Reduce Stress:</strong> Having pre-written phrases eliminates the cognitive load of improvising under pressure</li>
+                                <li><strong>Practice Makes Instinct:</strong> Role-playing training turned conscious techniques into automatic responses</li>
+                                <li><strong>Tier System Prevents Over-Reaction:</strong> Clear escalation criteria prevented minor issues from being treated like major crises</li>
+                                <li><strong>Neutral Language Diffuses Tension:</strong> Removing accusatory words ("you did X") and replacing with observations ("I noticed X") changed conversation tone</li>
+                                <li><strong>Documentation Protects Everyone:</strong> Written records of Tier 2+ conflicts provided clarity and accountability</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="space-y-8">
+                    
+                    <!-- Project Info -->
+                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Project Info</h3>
+                        <dl class="space-y-4 text-sm">
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Status</dt>
+                                <dd class="text-indigodeep font-medium">Active & Evolving</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Role</dt>
+                                <dd class="text-indigodeep font-medium">Framework Designer & Lead Trainer</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Duration</dt>
+                                <dd class="text-indigodeep font-medium">4 Weeks (Initial) + Ongoing Training</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 mb-1">Year</dt>
+                                <dd class="text-indigodeep font-medium">2024</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 mb-1">Team Impact</dt>
+                                <dd class="text-indigodeep font-medium">25+ team members trained</dd>
+                            </div>
+                        </dl>
+                    </div>
+                    
+                    <!-- Skills Applied -->
+                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Skills Applied</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Conflict Resolution</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">De-escalation Techniques</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Leadership Training</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Active Listening</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Communication Frameworks</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Scenario Training</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Documentation Systems</span>
+                        </div>
+                    </div>
+                    
+                    <!-- CTA -->
+                    <div class="bg-indigodeep text-beige rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                        <h3 class="text-lg font-semibold mb-3">Interested in this work?</h3>
+                        <p class="text-sm text-beige/80 mb-4">Let's discuss how conflict resolution training can strengthen your team dynamics.</p>
+                        <a href="/contact.html" class="inline-block text-sm font-medium bg-beige text-indigodeep px-5 py-2 rounded-full hover:bg-chocolate hover:text-beige transition-colors focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-2 focus:ring-offset-indigodeep">
+                            Get in Touch
+                        </a>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- Related Projects -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10">
+            <h2 class="text-2xl font-bold text-indigodeep mb-8 opacity-0" data-gsap="fade-up">Related Projects</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <a href="/project-logistics.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Operations</span>
+                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">Logistics Coordination System</h3>
+                    <p class="text-sm text-chocolate">Centralized scheduling with automated reminders.</p>
+                </a>
+                <a href="/project-multilingual.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Communication</span>
+                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">Multilingual Bridge Building</h3>
+                    <p class="text-sm text-chocolate">Cross-cultural communication in three languages.</p>
+                </a>
+                <a href="/projects.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
+                    <div class="text-center py-8">
+                        <p class="text-sm text-chocolate mb-3">View all projects</p>
+                        <span class="inline-block text-2xl">→</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-indigodeep text-beige py-12 mt-20">
+        <div class="max-w-5xl mx-auto px-6 lg:px-12">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <div class="flex items-center space-x-6">
+                    <a href="/privacy.html" class="text-sm text-beige/80 hover:text-beige transition-colors">Privacy</a>
+                    <a href="/humans.txt" class="text-sm text-beige/80 hover:text-beige transition-colors">Humans.txt</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio Website System - Built static multilingual portfolio with time-budget navigation and AI chatbot integration.">
+    <title>Portfolio Website System | Projects</title>
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Portfolio Website System | Estivan Ayramia">
+    <meta property="og:description" content="Multilingual portfolio with time-budget navigation and AI integration.">
+    <meta property="og:url" content="https://estivanayramia.com/project-portfolio.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Portfolio Website System | Estivan Ayramia">
+    <meta name="twitter:description" content="Technical execution and user-centered design thinking.">
+    
+    <!-- Google Fonts: Inter (non-render-blocking) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
+    
+    <!-- Preload Critical LCP Image -->
+    <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
+    
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preload" href="/assets/css/style.css" as="style">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    <script src="/assets/js/site.js" defer></script>
+    <!-- Custom Theme CSS (non-render-blocking) -->
+    <link rel="stylesheet" href="/assets/css/theme.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/assets/css/theme.css"></noscript>
+    
+    <!-- PWA Manifest -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="shortcut icon" href="/assets/img/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="mask-icon" href="/assets/img/safari-pinned-tab.svg" color="#212842">
+    <meta name="msapplication-TileColor" content="#212842">
+    <meta name="msapplication-TileImage" content="/assets/img/favicon-32x32.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#212842">
+</head>
+<body class="bg-beige text-chocolate font-sans antialiased">
+    
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
+    
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between">
+            <a href="/index.html" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center" aria-label="Go to Portfolio home page">
+                <img src="/assets/img/logo-ea.webp" alt="EA" class="h-8 w-8 mr-2 object-contain" width="300" height="264" fetchpriority="high">
+                <span>Estivan Ayramia</span>
+            </a>
+            
+            <!-- Main Navigation -->
+            <ul class="hidden md:flex items-center space-x-8">
+                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
+                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
+                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
+                <li><a href="/projects.html" class="text-sm text-indigodeep font-medium underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
+                <li><a href="contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+            
+            <!-- Language Switcher -->
+            <div class="flex items-center space-x-3">
+                <a href="/project-portfolio.html" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">EN</a>
+                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
+                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
+            </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
+            <ul class="px-6 py-4 space-y-3">
+                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
+                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
+                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
+                <li><a href="/projects.html" class="block text-sm text-indigodeep font-medium py-2">Projects</a></li>
+                <li><a href="contact.html" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="pt-24">
+        
+        <!-- Breadcrumb -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
+            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+                <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
+                    <li><a href="/index.html" class="hover:text-indigodeep transition-colors">Home</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li><a href="/projects.html" class="hover:text-indigodeep transition-colors">Projects</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li class="text-indigodeep font-medium">Portfolio Website System</li>
+                </ol>
+            </nav>
+        </section>
+        
+        <!-- Project Header -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+            <div class="space-y-6">
+                <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Digital</span>
+                    <span class="text-xs text-ink/60">2025</span>
+                </div>
+                <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
+                    Portfolio Website System
+                </h1>
+                <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
+                    Built static multilingual portfolio with time-budget navigation, AI chatbot integration, and analytics tracking. Demonstrates technical execution and user-centered design thinking.
+                </p>
+            </div>
+        </section>
+        
+        <!-- Project Visual -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8">
+            <div class="aspect-video bg-gradient-to-br from-chocolate/80 to-indigodeep/60 rounded-2xl flex items-center justify-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                <svg class="w-24 h-24 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                </svg>
+            </div>
+        </section>
+        
+        <!-- Project Details -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
+            <div class="grid lg:grid-cols-3 gap-12">
+                
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-12">
+                    
+                    <!-- Overview -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Overview</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>This portfolio website itself is a technical project—designed to communicate professional experience while respecting the visitor's time and attention. The site demonstrates user-centered design thinking, technical execution, and attention to performance, accessibility, and internationalization.</p>
+                            <p>Built from scratch with a focus on speed, clarity, and progressive enhancement. The result: a fast, accessible, multilingual experience that works everywhere.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- The Challenge -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">The Challenge</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>Most portfolio websites fail because they:</p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>Waste the visitor's time with unnecessary animations and content</li>
+                                <li>Load slowly, especially on mobile connections</li>
+                                <li>Lack accessibility features for screen readers and keyboard navigation</li>
+                                <li>Don't adapt to different languages and cultural contexts</li>
+                                <li>Fail to communicate value quickly to busy hiring managers</li>
+                            </ul>
+                            <p>The goal: create a portfolio that respects attention, loads fast, works for everyone, and communicates value clearly.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- The Approach -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">The Approach</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p><strong>1. Time-Budget Navigation</strong></p>
+                            <p>Structured content for different time commitments: 30-second overview, 5-minute deep dive, and comprehensive project case studies. Visitors choose their own depth.</p>
+                            
+                            <p><strong>2. Performance-First Architecture</strong></p>
+                            <p>Static HTML/CSS/JS with no build dependencies, lazy-loaded images, service worker caching, and progressive web app (PWA) capabilities. Scores 95+ on Lighthouse performance.</p>
+                            
+                            <p><strong>3. Multilingual Support</strong></p>
+                            <p>Built-in English, Spanish, and Arabic versions with proper RTL support, culturally-aware translations, and SEO optimization for each language.</p>
+                            
+                            <p><strong>4. Accessibility & Progressive Enhancement</strong></p>
+                            <p>WCAG 2.1 compliant with semantic HTML, ARIA labels, keyboard navigation, screen reader support, and dark mode. Works without JavaScript.</p>
+                            
+                            <p><strong>5. Gamification & Engagement</strong></p>
+                            <p>8 hidden achievements, Konami code easter egg, mini-game after form submission—demonstrating personality while maintaining professionalism.</p>
+                            
+                            <p><strong>6. AI Chatbot Integration</strong></p>
+                            <p>Context-aware chat widget for quick questions, with conversation persistence and smart fallback to contact form.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Results & Impact -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.8">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Results & Impact</h2>
+                        <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 space-y-4">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">95+</div>
+                                    <p class="text-sm text-chocolate">Lighthouse Performance Score</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">3 Languages</div>
+                                    <p class="text-sm text-chocolate">English, Spanish, Arabic with full RTL support</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">WCAG 2.1</div>
+                                    <p class="text-sm text-chocolate">AA accessibility compliance</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">8 Achievements</div>
+                                    <p class="text-sm text-chocolate">Hidden gamification features for engagement</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Technical Stack -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.9">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Technical Stack</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>Frontend:</strong> Vanilla HTML5, CSS3, JavaScript (ES6+)</li>
+                                <li><strong>Styling:</strong> Tailwind CSS with custom theme system, CSS variables for dark mode</li>
+                                <li><strong>Animations:</strong> GSAP (GreenSock Animation Platform) with ScrollTrigger</li>
+                                <li><strong>Performance:</strong> Lazy loading, service worker caching, content-visibility CSS</li>
+                                <li><strong>Forms:</strong> Formspree integration with honeypot spam protection</li>
+                                <li><strong>PWA:</strong> Service worker, manifest.json, offline support</li>
+                                <li><strong>SEO:</strong> Schema.org markup, Open Graph tags, semantic HTML</li>
+                                <li><strong>Deployment:</strong> Static hosting with CDN, automated CI/CD</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Learnings -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="1.0">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Key Learnings</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>Simplicity Wins:</strong> Static sites are fast, secure, and easy to maintain—no framework needed</li>
+                                <li><strong>Performance = UX:</strong> Fast load times directly correlate with engagement and completion rates</li>
+                                <li><strong>Accessibility = Design:</strong> Building for everyone improves the experience for all users</li>
+                                <li><strong>Progressive Enhancement:</strong> Start with working HTML, add CSS for style, enhance with JS—works everywhere</li>
+                                <li><strong>Personality Matters:</strong> Small details like easter eggs and gamification show character without being unprofessional</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="space-y-8">
+                    
+                    <!-- Project Info -->
+                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Project Info</h3>
+                        <dl class="space-y-4 text-sm">
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Status</dt>
+                                <dd class="text-indigodeep font-medium">Live & Maintained</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Role</dt>
+                                <dd class="text-indigodeep font-medium">Solo Developer & Designer</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Duration</dt>
+                                <dd class="text-indigodeep font-medium">2 Weeks (Initial Build)</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 mb-1">Year</dt>
+                                <dd class="text-indigodeep font-medium">2025</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 mb-1">Repository</dt>
+                                <dd class="text-indigodeep font-medium">You're looking at it</dd>
+                            </div>
+                        </dl>
+                    </div>
+                    
+                    <!-- Skills Applied -->
+                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Skills Applied</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">HTML/CSS/JS</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Responsive Design</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Web Performance</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Accessibility (a11y)</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">SEO</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Internationalization</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">PWA Development</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">UX Design</span>
+                        </div>
+                    </div>
+                    
+                    <!-- CTA -->
+                    <div class="bg-indigodeep text-beige rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                        <h3 class="text-lg font-semibold mb-3">Like what you see?</h3>
+                        <p class="text-sm text-beige/80 mb-4">Let's discuss how I can help with your web development needs.</p>
+                        <a href="/contact.html" class="inline-block text-sm font-medium bg-beige text-indigodeep px-5 py-2 rounded-full hover:bg-chocolate hover:text-beige transition-colors focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-2 focus:ring-offset-indigodeep">
+                            Get in Touch
+                        </a>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- Related Projects -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10">
+            <h2 class="text-2xl font-bold text-indigodeep mb-8 opacity-0" data-gsap="fade-up">Related Projects</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <a href="/project-documentation.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Documentation</span>
+                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">Process Documentation Library</h3>
+                    <p class="text-sm text-chocolate">Standard operating procedures for recurring tasks.</p>
+                </a>
+                <a href="/project-multilingual.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Communication</span>
+                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">Multilingual Bridge Building</h3>
+                    <p class="text-sm text-chocolate">Cross-cultural communication in three languages.</p>
+                </a>
+                <a href="/projects.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
+                    <div class="text-center py-8">
+                        <p class="text-sm text-chocolate mb-3">View all projects</p>
+                        <span class="inline-block text-2xl">→</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-indigodeep text-beige py-12 mt-20">
+        <div class="max-w-5xl mx-auto px-6 lg:px-12">
+            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <div class="flex items-center space-x-6">
+                    <a href="/privacy.html" class="text-sm text-beige/80 hover:text-beige transition-colors">Privacy</a>
+                    <a href="/humans.txt" class="text-sm text-beige/80 hover:text-beige transition-colors">Humans.txt</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+</body>
+</html>
