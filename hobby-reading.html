@@ -45,8 +45,128 @@
     <meta name="msapplication-TileImage" content="/assets/img/favicon-32x32.png">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#212842">
+    
+    <!-- Carousel and Lightbox styles -->
+    <style>
+        .lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .lightbox-overlay.active { display: flex; }
+        .lightbox-content {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0.5rem;
+        }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+        .lightbox-nav:hover { background: rgba(0,0,0,0.8); }
+        .lightbox-prev { left: 1rem; }
+        .lightbox-next { right: 1rem; }
+        .gallery-carousel {
+            position: relative;
+            overflow: hidden;
+        }
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-out;
+            gap: 1rem;
+        }
+        .carousel-slide {
+            flex: 0 0 calc(50% - 0.5rem);
+            aspect-ratio: 2/3;
+        }
+        @media (min-width: 768px) {
+            .carousel-slide { flex: 0 0 calc(33.333% - 0.667rem); }
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: rgba(33, 40, 66, 0.9);
+            color: white;
+            border: none;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .carousel-btn:hover {
+            background: rgba(33, 40, 66, 1);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .carousel-btn-prev { left: 0.5rem; }
+        .carousel-btn-next { right: 0.5rem; }
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .carousel-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: rgba(33, 40, 66, 0.3);
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .carousel-dot.active {
+            background: rgba(33, 40, 66, 1);
+            transform: scale(1.3);
+        }
+        .gallery-card {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .gallery-card:hover { transform: scale(1.02); }
+    </style>
 </head>
 <body class="bg-beige text-chocolate font-sans antialiased">
+    
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox-overlay" aria-hidden="true">
+        <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+        <button class="lightbox-nav lightbox-prev" aria-label="Previous image">←</button>
+        <img src="" alt="" class="lightbox-content" id="lightbox-image">
+        <button class="lightbox-nav lightbox-next" aria-label="Next image">→</button>
+    </div>
     
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
@@ -168,51 +288,53 @@
                     
                     <!-- Book Covers & Photos -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
-                        <h2 class="text-2xl font-bold text-indigodeep mb-6">The Collection</h2>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            <figure class="aspect-[2/3] rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/48_laws_of_power_cover.webp" alt="The 48 Laws of Power by Robert Greene - book cover" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
-                            <figure class="aspect-[2/3] rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/Ego_Is_The_Enemy_Ryan_Holiday_Book_Cover.webp" alt="Ego Is The Enemy by Ryan Holiday - book cover" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
-                            <figure class="aspect-[2/3] rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/How_To_Win_Friends_and_Influence_People_Dale_Carnegie.jpg" alt="How To Win Friends and Influence People by Dale Carnegie - book cover" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
-                            <figure class="aspect-[2/3] rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/Outliers_The_Story_of_Success_Malcolm_Gladwell.PNG" alt="Outliers: The Story of Success by Malcolm Gladwell - book cover" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
-                            <figure class="aspect-[2/3] rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/fourth_wing_cover.jpg" alt="Fourth Wing book cover - fantasy fiction read" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
-                            <figure class="aspect-[2/3] rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/the_catcher_in_the_rye_cover.jpg" alt="The Catcher in the Rye by J.D. Salinger - classic literature" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
-                            <figure class="aspect-[2/3] rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/The_Perks_of_Being_A_Wallflower_Stephen_Chbosky.jpg" alt="The Perks of Being a Wallflower by Stephen Chbosky" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
-                            <figure class="aspect-[2/3] rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/looking_for_alaska_cover.jpg" alt="Looking for Alaska book cover - John Green" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
-                            <figure class="aspect-[2/3] rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/reading_by_beach.jpg" alt="Reading by the beach - where books and the ocean meet" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
-                        </div>
-                    </div>
-                    
-                    <!-- Kindle & Notes -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.8">
-                        <h2 class="text-2xl font-bold text-indigodeep mb-6">Notes & Highlights</h2>
-                        <div class="grid grid-cols-2 gap-4">
-                            <figure class="aspect-square rounded-xl overflow-hidden bg-chocolate/10">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/dead_kindle_3" alt="My well-used Kindle - a faithful reading companion" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
-                            <figure class="aspect-square rounded-xl overflow-hidden bg-chocolate/10">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/How_To_Win_Friends_and_Influence_People_Dale_Carnegie_page_note.jpg" alt="Highlighted page from How To Win Friends - active reading in practice" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
-                            <figure class="col-span-2 aspect-video rounded-xl overflow-hidden bg-chocolate/10">
-                                <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/How_To_Win_Friends_and_Influence_People_Dale_Carnegie_note_2.jpg" alt="Margin notes from Dale Carnegie book - extracting mental models" class="w-full h-full object-cover" loading="lazy">
-                            </figure>
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">The Collection</h2>
+                        <p class="text-chocolate mb-6 text-sm">Click any image to view larger. Use arrows or swipe to browse.</p>
+                        
+                        <div class="gallery-carousel" id="galleryCarousel">
+                            <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">←</button>
+                            <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">→</button>
+                            
+                            <div class="carousel-track" id="carouselTrack">
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/48_laws_of_power_cover.webp" alt="The 48 Laws of Power by Robert Greene - book cover" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/Ego_Is_The_Enemy_Ryan_Holiday_Book_Cover.webp" alt="Ego Is The Enemy by Ryan Holiday - book cover" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/How_To_Win_Friends_and_Influence_People_Dale_Carnegie.jpg" alt="How To Win Friends and Influence People by Dale Carnegie - book cover" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/Outliers_The_Story_of_Success_Malcolm_Gladwell.PNG" alt="Outliers: The Story of Success by Malcolm Gladwell - book cover" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/fourth_wing_cover.jpg" alt="Fourth Wing book cover - fantasy fiction read" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/the_catcher_in_the_rye_cover.jpg" alt="The Catcher in the Rye by J.D. Salinger - classic literature" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/The_Perks_of_Being_A_Wallflower_Stephen_Chbosky.jpg" alt="The Perks of Being a Wallflower by Stephen Chbosky" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/looking_for_alaska_cover.jpg" alt="Looking for Alaska book cover - John Green" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/reading_by_beach.jpg" alt="Reading by the beach - where books and the ocean meet" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/dead_kindle_3.jpg" alt="My well-used Kindle - a faithful reading companion" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/How_To_Win_Friends_and_Influence_People_Dale_Carnegie_page_note.jpg" alt="Highlighted page from How To Win Friends - active reading in practice" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10 shadow-md">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/reading-/How_To_Win_Friends_and_Influence_People_Dale_Carnegie_note_2.jpg" alt="Margin notes from Dale Carnegie book - extracting mental models" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
+                                </figure>
+                            </div>
+                            
+                            <div class="carousel-dots" id="carouselDots"></div>
                         </div>
                     </div>
                     
@@ -360,6 +482,95 @@
             <img src="/assets/img/savonie-thumb.webp" alt="Chat" class="w-full h-full object-cover" width="64" height="64">
         </button>
     </div>
+    
+    <!-- Carousel and Lightbox Script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const track = document.getElementById('carouselTrack');
+        const slides = document.querySelectorAll('.carousel-slide');
+        const prevBtn = document.getElementById('carouselPrev');
+        const nextBtn = document.getElementById('carouselNext');
+        const dotsContainer = document.getElementById('carouselDots');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-image');
+        
+        let currentIndex = 0;
+        let currentLightboxIndex = 0;
+        const images = Array.from(slides).map(s => s.querySelector('img'));
+        
+        function getSlidesPerView() {
+            return window.innerWidth >= 768 ? 3 : 2;
+        }
+        
+        let slidesPerView = getSlidesPerView();
+        const totalPages = Math.ceil(slides.length / slidesPerView);
+        
+        for (let i = 0; i < totalPages; i++) {
+            const dot = document.createElement('button');
+            dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+            dot.addEventListener('click', () => goToPage(i));
+            dotsContainer.appendChild(dot);
+        }
+        
+        function updateCarousel() {
+            const slideWidth = slides[0].offsetWidth + 16;
+            track.style.transform = `translateX(-${currentIndex * slideWidth * slidesPerView}px)`;
+            document.querySelectorAll('.carousel-dot').forEach((d, i) => {
+                d.classList.toggle('active', i === currentIndex);
+            });
+        }
+        
+        function goToPage(page) {
+            currentIndex = Math.max(0, Math.min(page, totalPages - 1));
+            updateCarousel();
+        }
+        
+        prevBtn.addEventListener('click', () => goToPage(currentIndex - 1));
+        nextBtn.addEventListener('click', () => goToPage(currentIndex + 1));
+        
+        slides.forEach((slide, i) => {
+            slide.addEventListener('click', () => {
+                currentLightboxIndex = i;
+                lightboxImg.src = images[i].src;
+                lightboxImg.alt = images[i].alt;
+                lightbox.classList.add('active');
+                lightbox.setAttribute('aria-hidden', 'false');
+            });
+        });
+        
+        document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+        
+        document.querySelector('.lightbox-prev').addEventListener('click', () => {
+            currentLightboxIndex = (currentLightboxIndex - 1 + images.length) % images.length;
+            lightboxImg.src = images[currentLightboxIndex].src;
+            lightboxImg.alt = images[currentLightboxIndex].alt;
+        });
+        
+        document.querySelector('.lightbox-next').addEventListener('click', () => {
+            currentLightboxIndex = (currentLightboxIndex + 1) % images.length;
+            lightboxImg.src = images[currentLightboxIndex].src;
+            lightboxImg.alt = images[currentLightboxIndex].alt;
+        });
+        
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            lightbox.setAttribute('aria-hidden', 'true');
+        }
+        
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') document.querySelector('.lightbox-prev').click();
+            if (e.key === 'ArrowRight') document.querySelector('.lightbox-next').click();
+        });
+        
+        window.addEventListener('resize', () => {
+            slidesPerView = getSlidesPerView();
+            updateCarousel();
+        });
+    });
+    </script>
     
     <script src="/assets/js/lazy-loader.js" defer></script>
 </body>
