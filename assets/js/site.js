@@ -1684,6 +1684,30 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSending = false; // Prevent duplicate sends
     let isInitialized = false;
     
+    // Helper function to add close button to chips container
+    function addChipsCloseButton() {
+        if (!els.chipsContainer) return;
+        
+        // Check if close button already exists
+        const existingCloseBtn = els.chipsContainer.querySelector('.chip-close-btn');
+        if (existingCloseBtn) return;
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
+        closeBtn.innerHTML = '×';
+        closeBtn.title = 'Hide suggestions';
+        closeBtn.setAttribute('aria-label', 'Hide suggestions');
+        
+        // Fix: Close button hides suggestions
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent event bubbling
+            els.chipsContainer.classList.add('hidden');
+            els.chipsContainer.style.display = 'none';
+        });
+        
+        els.chipsContainer.appendChild(closeBtn);
+    }
+    
     // 1. Initialize - restore history from session
     try { 
         const saved = sessionStorage.getItem('savonie_history');
@@ -1740,15 +1764,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 els.chipsContainer.appendChild(btn);
             });
             
-            // Add close button
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
-            closeBtn.innerHTML = '×';
-            closeBtn.title = 'Hide suggestions';
-            closeBtn.addEventListener('click', () => {
-                els.chipsContainer.style.display = 'none';
-            });
-            els.chipsContainer.appendChild(closeBtn);
+            // Add close button using helper function
+            addChipsCloseButton();
         }
     }
     
@@ -1771,15 +1788,18 @@ document.addEventListener('DOMContentLoaded', () => {
     els.closeBtn?.addEventListener('click', toggleChat);
     els.sendBtn?.addEventListener('click', handleSend);
     els.input?.addEventListener('keypress', (e) => e.key === 'Enter' && handleSend());
+    
+    // Fix: Lightbulb icon toggle for chat suggestions
     els.suggestionsBtn?.addEventListener('click', () => {
         if (els.chipsContainer) {
-            const isVisible = els.chipsContainer.style.display === 'flex';
-            if (isVisible) {
-                // Hide suggestions
-                els.chipsContainer.style.display = 'none';
-            } else {
+            const isHidden = els.chipsContainer.classList.contains('hidden') || 
+                           els.chipsContainer.style.display === 'none';
+            
+            if (isHidden) {
                 // Show suggestions
+                els.chipsContainer.classList.remove('hidden');
                 els.chipsContainer.style.display = 'flex';
+                
                 // Generate contextual chips if none are showing
                 if (els.chipsContainer.children.length === 0 && chatHistory.length > 0) {
                     const contextualChips = generateContextualChips(chatHistory);
@@ -1798,17 +1818,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
 
                         // Add close button
-                        const closeBtn = document.createElement('button');
-                        closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
-                        closeBtn.innerHTML = '×';
-                        closeBtn.title = 'Toggle suggestions';
-                        closeBtn.addEventListener('click', () => {
-                            const isVisible = els.chipsContainer.style.display === 'flex';
-                            els.chipsContainer.style.display = isVisible ? 'none' : 'flex';
-                        });
-                        els.chipsContainer.appendChild(closeBtn);
+                        addChipsCloseButton();
                     }
                 }
+            } else {
+                // Hide suggestions
+                els.chipsContainer.classList.add('hidden');
+                els.chipsContainer.style.display = 'none';
             }
         }
     });

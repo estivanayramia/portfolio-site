@@ -1751,6 +1751,76 @@ select.border-red-500 {
     padding: 10px 12px !important;
 }
 
+/* Fix: Chat Chips Container - Horizontal Scrolling */
+#chat-chips {
+    display: flex !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    gap: 8px !important;
+    padding-bottom: 4px !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important; /* Hide scrollbar on mobile */
+}
+
+/* Mobile: Hide scrollbar */
+#chat-chips::-webkit-scrollbar {
+    display: none !important;
+}
+
+/* Desktop: Show thin custom scrollbar for mouse users */
+@media (min-width: 768px) {
+    #chat-chips {
+        scrollbar-width: thin !important;
+        scrollbar-color: #212842 rgba(225, 212, 194, 0.2) !important;
+    }
+    
+    #chat-chips::-webkit-scrollbar {
+        display: block !important;
+        height: 6px !important;
+    }
+    
+    #chat-chips::-webkit-scrollbar-track {
+        background: rgba(225, 212, 194, 0.2) !important;
+        border-radius: 3px !important;
+    }
+    
+    #chat-chips::-webkit-scrollbar-thumb {
+        background: #212842 !important;
+        border-radius: 3px !important;
+    }
+    
+    #chat-chips::-webkit-scrollbar-thumb:hover {
+        background: #362017 !important;
+    }
+    
+    /* Dark mode scrollbar */
+    [data-theme="dark"] #chat-chips {
+        scrollbar-color: rgba(225, 212, 194, 0.6) rgba(225, 212, 194, 0.1) !important;
+    }
+    
+    [data-theme="dark"] #chat-chips::-webkit-scrollbar-track {
+        background: rgba(225, 212, 194, 0.1) !important;
+    }
+    
+    [data-theme="dark"] #chat-chips::-webkit-scrollbar-thumb {
+        background: rgba(225, 212, 194, 0.6) !important;
+    }
+    
+    [data-theme="dark"] #chat-chips::-webkit-scrollbar-thumb:hover {
+        background: rgba(225, 212, 194, 0.8) !important;
+    }
+}
+
+/* Fix: AI Chat Bubble - Single Line Chips */
+.chip-btn {
+    white-space: nowrap !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    height: auto !important;
+    color: #212842 !important;
+    line-height: 1.4;
+}
+
 [data-theme="dark"] .chip-btn {
     background: linear-gradient(135deg, rgba(225, 212, 194, 0.12), rgba(225, 212, 194, 0.08)) !important;
     border: 1px solid rgba(225, 212, 194, 0.2) !important;
@@ -2095,3 +2165,43 @@ footer, .section-below-fold {
     contain-intrinsic-size: 1px 1000px;
 }
 
+/* Fix: Chat widget high z-index for mobile visibility */
+#chat-widget {
+    z-index: 9999 !important;
+}
+
+/* Fix: Chat message links - bold and underlined */
+#chat-messages a {
+    font-weight: 700 !important;
+    text-decoration: underline !important;
+}
+
+/* Fix: Mobile language button spacing - reduce gap and padding */
+@media (max-width: 640px) {
+    /* Brand logo - reduce font size on mobile to prevent collision */
+    #brand-logo {
+        font-size: 1.125rem !important; /* text-lg */
+        margin-right: 8px !important;
+        flex-shrink: 1 !important;
+        min-width: 0 !important;
+    }
+    
+    /* Language switcher container - prevent crushing */
+    #lang-switcher {
+        flex-shrink: 0 !important;
+        gap: 0.5rem !important;
+    }
+    
+    /* Language link buttons - reduce padding on mobile */
+    #lang-switcher a {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+}
+
+/* Extra small screens - further reduce brand logo font */
+@media (max-width: 360px) {
+    #brand-logo {
+        font-size: 1rem !important; /* text-base */
+    }
+}
