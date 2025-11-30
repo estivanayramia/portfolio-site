@@ -2027,6 +2027,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Enhanced network detection for mobile compatibility
+    async function isActuallyOnline() {
+        // First check navigator.onLine
+        if (navigator.onLine) {
+            return true;
+        }
+        
+        // On mobile, navigator.onLine can be unreliable, so try a quick fetch
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+            
+            const response = await fetch('/favicon.ico', { 
+                method: 'HEAD', 
+                cache: 'no-cache',
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    }
+
     async function handleSend() {
         const text = els.input.value.trim();
         if (!text || isSending) return;
@@ -2039,6 +2064,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 'event_category': 'Chatbot',
                 'event_label': 'User Asked Question'
             });
+        }
+
+        // Enhanced network check for mobile devices
+        const online = await isActuallyOnline();
+        if (!online) {
+            addMessageToUI(text, 'user');
+            els.input.value = '';
+            addMessageToUI("You appear to be offline. Please check your connection and try again.", 'bot');
+            isSending = false;
+            return;
         }
 
         // Detect user language from their input
@@ -2148,7 +2183,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (e) {
             removeMessage(loadingId);
-            addMessageToUI("Offline mode. Please try again.", 'bot');
+            addMessageToUI("Unable to connect to the server. Please check your internet connection and try again.", 'bot');
         } finally {
             isSending = false;
         }
