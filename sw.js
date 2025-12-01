@@ -1,5 +1,13 @@
-// Bump this version whenever you deploy changes that affect cached files
-const CACHE_VERSION = 'v1764118744691';
+// ==========================================================================
+// Service Worker Configuration
+// ==========================================================================
+// Caching Strategy:
+//   - HTML (navigation): Network-first, fallback to cache, then 404
+//   - Static Assets (CSS/JS/images): Stale-while-revalidate
+//
+// Cache Version: Bump this whenever you deploy changes that affect cached files
+// ==========================================================================
+const CACHE_VERSION = 'v1733008500';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',

@@ -1,7 +1,47 @@
-[/*
+/* ==========================================================================
+   Font System Enforcement
+   Ensures consistent font rendering across local and production environments
+   ========================================================================== */
+
+/* Base font system - Inter for Latin scripts, Cairo for Arabic */
+html, body {
+    font-family: 'Inter', Helvetica, Arial, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Arabic pages use Cairo font */
+html[lang="ar"], 
+html[lang="ar"] body {
+    font-family: 'Cairo', 'Inter', Helvetica, Arial, sans-serif !important;
+}
+
+/* Ensure all text elements inherit the font system */
+h1, h2, h3, h4, h5, h6,
+p, span, a, button, input, textarea, select, label {
+    font-family: inherit;
+}
+
+/* Force font-display: swap behavior for consistent FOUT handling */
+@font-face {
+    font-family: 'Inter';
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Cairo';
+    font-display: swap;
+}
+
+/* ==========================================================================
+   No-JS Fallback
+   ========================================================================== */
+
+/*
    No-JS fallback: if JavaScript is slow or fails, ensure elements hidden via
    `opacity-0` or `invisible` are still visible so content isn't invisible to users.
-*/]
+*/
 .no-js .opacity-0,
 .no-js .invisible {
     opacity: 1 !important;
@@ -102,6 +142,33 @@ textarea,
 [data-theme="dark"] .text-ink\/70,
 [data-theme="dark"] .text-ink\/80 {
     color: rgba(225, 212, 194, 0.6) !important;
+}
+
+/* Fix 01/02/03 numbers in deep-dive.html to be visible in dark mode */
+[data-theme="dark"] .text-indigodeep\/20 {
+    color: rgba(225, 212, 194, 0.3) !important;
+}
+
+/* Mini-game (easter egg) dark mode text colors */
+[data-theme="dark"] #mini-game-root {
+    color: #e1d4c2;
+}
+
+[data-theme="dark"] #mini-game-root .text-indigodeep {
+    color: #e1d4c2 !important;
+}
+
+[data-theme="dark"] #mini-game-root .mg-end .text-indigodeep {
+    color: #e1d4c2 !important;
+}
+
+[data-theme="dark"] #mini-game-root .mg-end a.text-indigodeep {
+    color: #e1d4c2 !important;
+    border-color: rgba(225, 212, 194, 0.2) !important;
+}
+
+[data-theme="dark"] #mini-game-root .mg-end a.text-indigodeep:hover {
+    background-color: rgba(225, 212, 194, 0.1) !important;
 }
 
 /* Make Tailwind's dark: prefix work with [data-theme="dark"] */
@@ -587,7 +654,7 @@ body {
     border-radius: 50% !important;
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     /* Layer 1 (top): ring that covers image corners; Layer 2: Savonie image */
-    background-image: radial-gradient(circle at center, transparent 43%, var(--bubble-ring) 44%), url('../img/savonie-icon.webp') !important;
+    background-image: radial-gradient(circle at center, transparent 43%, var(--bubble-ring) 44%), url('/assets/img/savonie-icon.webp') !important;
     background-repeat: no-repeat, no-repeat !important;
     background-size: 100% 100%, 80% 80% !important; /* full-size ring + scaled icon */
     background-position: center center, center center !important;
@@ -945,7 +1012,7 @@ select {
     cursor: pointer;
     z-index: 2147483600;
     border: 2px solid rgba(0,0,0,0.25);
-    background-image: radial-gradient(circle at center, transparent 44%, var(--bubble-ring) 45%), url('../img/savonie-icon.webp');
+    background-image: radial-gradient(circle at center, transparent 44%, var(--bubble-ring) 45%), url('/assets/img/savonie-icon.webp');
     background-size: 100% 100%, 78% 78%;
     background-position: center center;
     background-repeat: no-repeat;
