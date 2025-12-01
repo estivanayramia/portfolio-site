@@ -1308,6 +1308,20 @@ const initKonamiCode = () => {
 const initPWA = () => {
     // Register service worker for offline support
     if ('serviceWorker' in navigator) {
+        let hasController = !!navigator.serviceWorker.controller;
+        let refreshing = false;
+
+        // Avoid forcing a reload the very first time a SW takes control
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!hasController) {
+                hasController = true;
+                return;
+            }
+            if (refreshing) return;
+            refreshing = true;
+            window.location.reload();
+        });
+
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
                 .then((registration) => {
@@ -1321,11 +1335,6 @@ const initPWA = () => {
                     if (registration.waiting) {
                         registration.waiting.postMessage({ type: 'SKIP_WAITING' });
                     }
-
-                    // Listen for new service worker controlling the page
-                    navigator.serviceWorker.addEventListener('controllerchange', () => {
-                        window.location.reload();
-                    });
 
                     // Detect updates found
                     registration.addEventListener('updatefound', () => {
