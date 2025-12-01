@@ -91,7 +91,7 @@
             </ul>
             
             <!-- Mobile Menu Toggle -->
-            <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" aria-expanded="false" aria-controls="mobile-menu">
+            <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" aria-expanded="false" aria-controls="mobile-menu">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
@@ -190,7 +190,7 @@
             </div>
             
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-xs text-beige/60">&copy; 2025 Portfolio. All rights reserved.</p>
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -199,7 +199,7 @@
     <script src="/assets/js/lazy-loader.js" defer></script>
     
     <!-- Scroll to Top Button -->
-    <button id="scroll-to-top" aria-label="Scroll to top">
+    <button type="button" id="scroll-to-top" aria-label="Scroll to top">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="18 15 12 9 6 15"></polyline>
         </svg>
@@ -207,29 +207,26 @@
     
     <!-- Savonie AI Chat Widget -->
     <div id="chat-widget" class="fixed bottom-6 right-4 z-50 flex flex-col items-end font-sans transition-opacity duration-300" style="z-index: 9999;">
-        <div id="chat-window" class="hidden w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden mb-4 flex flex-col origin-bottom-right">
+        <div id="chat-window" class="hidden w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden mb-4 flex-col origin-bottom-right">
             <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
                 <h3 class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
                     <img src="/assets/img/savonie-thumb.webp" alt="Savonie" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64">
                     Savonie AI
                 </h3>
-                <button id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer">&times;</button>
+                <button type="button" id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer">&times;</button>
             </div>
             
             <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white/50"></div>
 
             <div id="chat-chips" class="p-2 bg-white/80 border-t border-[#362017]/5 flex gap-2 overflow-x-auto whitespace-nowrap">
-                <button class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">What are your skills?</button>
-                <button class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">Tell me about your background</button>
-                <button class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">Contact info</button>
+                <button type="button" class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">What are your skills?</button>
+                <button type="button" class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">Tell me about your background</button>
+                <button type="button" class="chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors">Contact info</button>
             </div>
 
             <div id="chat-widget" class="pl-2 pr-4 py-4 bg-white border-t border-[#362017]/10 shrink-0 flex gap-2 items-center">
-                <button id="mic-btn" aria-label="Voice input" title="Voice input" class="shrink-0 px-2 py-1 flex justify-center items-center">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                </button>
                 <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-3 py-1 text-sm text-[#362017] focus:ring-2 focus:ring-[#212842]/20 outline-none">
-                <button id="send-btn" class="bg-[#212842] text-white px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
+                <button type="button" id="send-btn" class="bg-[#212842] text-white px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                 </button>
             </div>
@@ -239,7 +236,7 @@
             <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
         </div>
 
-        <button id="chat-toggle" class="bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 relative overflow-hidden" aria-label="Open Chat">
+        <button type="button" id="chat-toggle" class="bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 relative overflow-hidden" aria-label="Open Chat">
             <img src="/assets/img/savonie-thumb.webp" alt="Chat" class="w-full h-full object-cover" width="64" height="64">
         </button>
     </div>

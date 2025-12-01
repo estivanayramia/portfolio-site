@@ -9,6 +9,23 @@
     transform: none !important;
 }
 
+/* CSS-only fallback for critical content - will be visible even if JS fails
+   GSAP targets elements with data-gsap, but if GSAP doesn't load, this ensures
+   elements are visible after a reasonable delay for page load */
+@media (prefers-reduced-motion: no-preference) {
+    /* Animation fallback - show after 3 seconds if GSAP hasn't run */
+    .opacity-0[data-gsap] {
+        animation: reveal-fallback 0.5s ease-out 3s forwards;
+    }
+    
+    @keyframes reveal-fallback {
+        to {
+            opacity: 1;
+            transform: none;
+        }
+    }
+}
+
 /**
  * Portfolio Theme CSS
  * Custom utilities and overrides for Tailwind
@@ -68,17 +85,36 @@ textarea,
     --bubble-ring: #e1d4c2;
 }
 
-/* High-contrast fixes: ensure text and links meet contrast on indigodeep */
+/* High-contrast fixes: ensure text and links meet contrast on indigodeep backgrounds */
 [data-theme="dark"] .bg-indigodeep a,
-[data-theme="dark"] a,
-[data-theme="dark"] .text-white,
-[data-theme="dark"] .text-beige {
+[data-theme="dark"] .bg-indigodeep .text-white,
+[data-theme="dark"] .bg-indigodeep .text-beige {
     color: #ffffff !important;
 }
 
 [data-theme="dark"] .text-white\/80,
 [data-theme="dark"] .text-beige\/60 {
     color: rgba(255,255,255,0.95) !important;
+}
+
+/* Fix dark colors that would be invisible on dark backgrounds */
+[data-theme="dark"] .text-ink\/60,
+[data-theme="dark"] .text-ink\/70,
+[data-theme="dark"] .text-ink\/80 {
+    color: rgba(225, 212, 194, 0.6) !important;
+}
+
+/* Make Tailwind's dark: prefix work with [data-theme="dark"] */
+[data-theme="dark"] .dark\:text-beige {
+    color: #e1d4c2 !important;
+}
+
+[data-theme="dark"] .dark\:text-chocolate {
+    color: #362017 !important;
+}
+
+[data-theme="dark"] .dark\:text-indigodeep {
+    color: #212842 !important;
 }
 
 /* Apply theme colors to elements */
@@ -116,6 +152,50 @@ header {
 
 .text-chocolate {
     color: var(--color-text) !important;
+}
+
+/* Ensure text-chocolate variants also use the variable */
+.text-chocolate\/60 {
+    color: rgba(54, 32, 23, 0.6);
+}
+
+.text-chocolate\/70 {
+    color: rgba(54, 32, 23, 0.7);
+}
+
+.text-chocolate\/80 {
+    color: rgba(54, 32, 23, 0.8);
+}
+
+/* Dark mode: override text-chocolate variants to use beige */
+[data-theme="dark"] .text-chocolate\/60 {
+    color: rgba(225, 212, 194, 0.6) !important;
+}
+
+[data-theme="dark"] .text-chocolate\/70 {
+    color: rgba(225, 212, 194, 0.7) !important;
+}
+
+[data-theme="dark"] .text-chocolate\/80 {
+    color: rgba(225, 212, 194, 0.8) !important;
+}
+
+/* Dark mode: override arbitrary text-[#362017] classes (used in chat widgets) */
+[data-theme="dark"] .text-\[\#362017\] {
+    color: #e1d4c2 !important;
+}
+
+[data-theme="dark"] .text-\[\#362017\]\/60 {
+    color: rgba(225, 212, 194, 0.6) !important;
+}
+
+[data-theme="dark"] .hover\:text-\[\#362017\]:hover {
+    color: #e1d4c2 !important;
+}
+
+/* Dark mode: override hover:text-chocolate to use beige */
+[data-theme="dark"] .hover\:text-chocolate:hover {
+    color: #e1d4c2 !important;
 }
 
 .text-beige {

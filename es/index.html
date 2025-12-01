@@ -7,7 +7,6 @@
     <meta name="theme-color" content="#212842">
     <title>Portfolio | Inicio</title>
     
-    <!-- Google Fonts: Inter -->
     <!-- Google Fonts: Cairo (non-render-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,6 +26,13 @@
     <noscript><link rel="stylesheet" href="../assets/css/theme.css"></noscript>
     
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
+
+    <!-- PWA Manifest -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="shortcut icon" href="/assets/img/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
     
     <!-- Markdown Parser loaded via lazy-loader.js -->
 </head>
@@ -237,7 +243,7 @@
             </div>
             
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-xs text-beige/60">&copy; 2025 Portfolio. Todos los derechos reservados.</p>
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
@@ -246,7 +252,7 @@
     
     <!-- Savonie AI Chat Widget -->
     <div id="chat-widget" class="fixed bottom-6 z-50 flex flex-col items-end font-sans transition-opacity duration-300" style="z-index: 9999;">
-        <div id="chat-window" class="hidden w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden mb-4 flex flex-col origin-bottom-right">
+        <div id="chat-window" class="hidden w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden mb-4 flex-col origin-bottom-right">
             <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
                 <h3 class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
                     <img src="/assets/img/savonie-thumb.webp" alt="Savonie" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64">

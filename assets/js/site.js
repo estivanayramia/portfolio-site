@@ -1360,11 +1360,24 @@ const initPWA = () => {
 // Analytics Tracking (Microsoft Clarity)
 // ==========================================================================
 
+// Debug helper: logs analytics events when ?debug-analytics=1 is in URL
+const trackEventDebug = (tag, payload) => {
+    try {
+        if (window.location.search.includes('debug-analytics=1')) {
+            console.log('[analytics]', tag, payload || null);
+        }
+    } catch (e) {
+        // fail silently
+    }
+};
+
 const initAnalytics = () => {
     // Track button clicks
     const trackClick = (element, label) => {
+        const eventName = `button_click_${label}`;
+        trackEventDebug(eventName);
         if (typeof clarity === 'function') {
-            clarity('event', `button_click_${label}`);
+            clarity('event', eventName);
         }
     };
 
@@ -1380,6 +1393,7 @@ const initAnalytics = () => {
     document.querySelectorAll('nav a').forEach((link) => {
         link.addEventListener('click', () => {
             const page = link.getAttribute('href') || 'unknown';
+            trackEventDebug('navigation_click', { page });
             if (typeof clarity === 'function') {
                 clarity('event', 'navigation_click', { page });
             }
@@ -1390,6 +1404,7 @@ const initAnalytics = () => {
     document.querySelectorAll('a[href*="linkedin.com"], a[href*="github.com"]').forEach((link) => {
         link.addEventListener('click', () => {
             const platform = link.href.includes('linkedin') ? 'linkedin' : 'github';
+            trackEventDebug('social_click', { platform });
             if (typeof clarity === 'function') {
                 clarity('event', 'social_click', { platform });
             }
@@ -1400,6 +1415,7 @@ const initAnalytics = () => {
     const form = document.querySelector('form[action*="formspree.io"]');
     if (form) {
         form.addEventListener('submit', () => {
+            trackEventDebug('form_submission');
             if (typeof clarity === 'function') {
                 clarity('event', 'form_submission');
             }
@@ -1408,24 +1424,37 @@ const initAnalytics = () => {
 
     // Track scroll depth
     let maxScrollDepth = 0;
+    let scrollEventsLogged = { 25: false, 50: false, 75: false, 100: false };
     window.addEventListener('scroll', () => {
         const scrollDepth = Math.round((window.scrollY + window.innerHeight) / document.documentElement.scrollHeight * 100);
         if (scrollDepth > maxScrollDepth) {
             maxScrollDepth = scrollDepth;
-            if (maxScrollDepth >= 25 && maxScrollDepth < 50 && typeof clarity === 'function') {
-                clarity('event', 'scroll_25_percent');
-            } else if (maxScrollDepth >= 50 && maxScrollDepth < 75 && typeof clarity === 'function') {
-                clarity('event', 'scroll_50_percent');
-            } else if (maxScrollDepth >= 75 && maxScrollDepth < 100 && typeof clarity === 'function') {
-                clarity('event', 'scroll_75_percent');
-            } else if (maxScrollDepth >= 100 && typeof clarity === 'function') {
-                clarity('event', 'scroll_100_percent');
+            if (maxScrollDepth >= 25 && !scrollEventsLogged[25]) {
+                scrollEventsLogged[25] = true;
+                trackEventDebug('scroll_25_percent');
+                if (typeof clarity === 'function') clarity('event', 'scroll_25_percent');
+            }
+            if (maxScrollDepth >= 50 && !scrollEventsLogged[50]) {
+                scrollEventsLogged[50] = true;
+                trackEventDebug('scroll_50_percent');
+                if (typeof clarity === 'function') clarity('event', 'scroll_50_percent');
+            }
+            if (maxScrollDepth >= 75 && !scrollEventsLogged[75]) {
+                scrollEventsLogged[75] = true;
+                trackEventDebug('scroll_75_percent');
+                if (typeof clarity === 'function') clarity('event', 'scroll_75_percent');
+            }
+            if (maxScrollDepth >= 100 && !scrollEventsLogged[100]) {
+                scrollEventsLogged[100] = true;
+                trackEventDebug('scroll_100_percent');
+                if (typeof clarity === 'function') clarity('event', 'scroll_100_percent');
             }
         }
     });
 
     // Track Konami code usage
     window.addEventListener('konami-activated', () => {
+        trackEventDebug('konami_code_activated');
         if (typeof clarity === 'function') {
             clarity('event', 'konami_code_activated');
         }
@@ -1435,6 +1464,7 @@ const initAnalytics = () => {
     const originalUnlock = window.unlockAchievement;
     if (originalUnlock) {
         window.unlockAchievement = (achievementId) => {
+            trackEventDebug('achievement_unlocked', { achievement: achievementId });
             if (typeof clarity === 'function') {
                 clarity('event', 'achievement_unlocked', { achievement: achievementId });
             }
@@ -1899,54 +1929,54 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Detect language of the last user message
         const detectedLang = detectLanguage(lastUserMessage);
-        const translations = translations.chat.contextualSuggestions;
+        const contextualSuggestions = translations.chat.contextualSuggestions;
         
         // Analyze conversation context and suggest relevant follow-ups
         if (lastUserMessage.includes('skill') || lastUserMessage.includes('technology') || lastUserMessage.includes('expertise') ||
             lastUserMessage.includes('habilidad') || lastUserMessage.includes('tecnología') || lastUserMessage.includes('experiencia') ||
             lastUserMessage.includes('مهارة') || lastUserMessage.includes('تكنولوجيا') || lastUserMessage.includes('خبرة')) {
-            suggestions.push(...(translations[detectedLang]?.skills || [
+            suggestions.push(...(contextualSuggestions[detectedLang]?.skills || [
                 "What projects have you worked on?", "Tell me about your experience", "What are you learning currently?"
             ]));
         } else if (lastUserMessage.includes('background') || lastUserMessage.includes('experience') || lastUserMessage.includes('career') ||
                    lastUserMessage.includes('fondo') || lastUserMessage.includes('experiencia') || lastUserMessage.includes('carrera') ||
                    lastUserMessage.includes('خلفية') || lastUserMessage.includes('خبرة') || lastUserMessage.includes('مسيرة')) {
-            suggestions.push(...(translations[detectedLang]?.background || [
+            suggestions.push(...(contextualSuggestions[detectedLang]?.background || [
                 "What are your main skills?", "Tell me about your education", "What industries have you worked in?"
             ]));
         } else if (lastUserMessage.includes('project') || lastUserMessage.includes('work') || lastUserMessage.includes('portfolio') ||
                    lastUserMessage.includes('proyecto') || lastUserMessage.includes('trabajo') || lastUserMessage.includes('portafolio') ||
                    lastUserMessage.includes('مشروع') || lastUserMessage.includes('عمل') || lastUserMessage.includes('محفظة')) {
-            suggestions.push(...(translations[detectedLang]?.projects || [
+            suggestions.push(...(contextualSuggestions[detectedLang]?.projects || [
                 "Can you show me your code?", "What technologies did you use?", "How long did it take to build?"
             ]));
         } else if (lastUserMessage.includes('contact') || lastUserMessage.includes('reach') || lastUserMessage.includes('email') ||
                    lastUserMessage.includes('contacto') || lastUserMessage.includes('alcanzar') || lastUserMessage.includes('correo') ||
                    lastUserMessage.includes('اتصال') || lastUserMessage.includes('الوصول') || lastUserMessage.includes('بريد')) {
-            suggestions.push(...(translations[detectedLang]?.contact || [
+            suggestions.push(...(contextualSuggestions[detectedLang]?.contact || [
                 "Are you available for freelance work?", "What's your typical response time?", "Do you work remotely?"
             ]));
         } else if (lastUserMessage.includes('education') || lastUserMessage.includes('study') || lastUserMessage.includes('learn') ||
                    lastUserMessage.includes('educación') || lastUserMessage.includes('estudio') || lastUserMessage.includes('aprender') ||
                    lastUserMessage.includes('تعليم') || lastUserMessage.includes('دراسة') || lastUserMessage.includes('تعلم')) {
-            suggestions.push(...(translations[detectedLang]?.education || [
+            suggestions.push(...(contextualSuggestions[detectedLang]?.education || [
                 "What certifications do you have?", "What's your favorite programming language?", "How do you stay updated with technology?"
             ]));
         } else if (lastBotMessage.includes('project') || lastBotMessage.includes('work') ||
                    lastBotMessage.includes('proyecto') || lastBotMessage.includes('trabajo') ||
                    lastBotMessage.includes('مشروع') || lastBotMessage.includes('عمل')) {
-            suggestions.push(...(translations[detectedLang]?.projectResponse || [
+            suggestions.push(...(contextualSuggestions[detectedLang]?.projectResponse || [
                 "Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?"
             ]));
         } else if (lastBotMessage.includes('skill') || lastBotMessage.includes('technology') ||
                    lastBotMessage.includes('habilidad') || lastBotMessage.includes('tecnología') ||
                    lastBotMessage.includes('مهارة') || lastBotMessage.includes('تكنولوجيا')) {
-            suggestions.push(...(translations[detectedLang]?.skillResponse || [
+            suggestions.push(...(contextualSuggestions[detectedLang]?.skillResponse || [
                 "How did you learn that?", "Have you used it in projects?", "What's your proficiency level?"
             ]));
         } else if (history.length < 4) {
             // Early conversation - general suggestions
-            suggestions.push(...(translations[detectedLang]?.early || [
+            suggestions.push(...(contextualSuggestions[detectedLang]?.early || [
                 "What are your main skills?", "Tell me about your background", "What projects are you proud of?"
             ]));
         }
@@ -1975,7 +2005,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function toggleChat() {
         const wasHidden = els.window?.classList.contains('hidden');
         const isRTL = document.documentElement.dir === 'rtl';
-        els.window?.classList.toggle('hidden');
+        
+        if (wasHidden) {
+            // Opening: remove hidden, add flex
+            els.window?.classList.remove('hidden');
+            els.window?.classList.add('flex');
+        } else {
+            // Closing: remove flex, add hidden
+            els.window?.classList.remove('flex');
+            els.window?.classList.add('hidden');
+        }
+        
         if (!els.window?.classList.contains('hidden')) {
             // Chat window is now visible
             if (wasHidden) {
@@ -2053,6 +2093,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleSend() {
+        if (!els.input) return;
         const text = els.input.value.trim();
         if (!text || isSending) return;
 
@@ -2086,28 +2127,158 @@ document.addEventListener('DOMContentLoaded', () => {
         els.input.value = '';
         const loadingId = addMessageToUI('Thinking...', 'bot', true);
 
-        try {
-            const response = await fetch(WORKER_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    message: text,
-                    language: language,
-                    pageContent: document.body.innerText.substring(0, 2000) 
-                })
-            });
-            const data = await response.json();
-            removeMessage(loadingId);
+        // Enhanced fetch with timeout and retry logic
+        const REQUEST_TIMEOUT = 30000; // 30 seconds
+        const MAX_RETRIES = 2;
+        let lastError = null;
+        let data = null;
 
-            // Handle Smart Signals response
-            if (data.reply) {
-                addMessageToUI(data.reply, 'bot');
+        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+            try {
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        message: text,
+                        language: language,
+                        pageContent: document.body.innerText.substring(0, 2000) 
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                // Handle HTTP error responses
+                if (!response.ok) {
+                    if (response.status >= 500) {
+                        // Server error - may be worth retrying
+                        lastError = { type: 'server', status: response.status };
+                        if (attempt < MAX_RETRIES) {
+                            await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); // Exponential backoff
+                            continue;
+                        }
+                    } else if (response.status === 429) {
+                        // Rate limited
+                        lastError = { type: 'rate_limit' };
+                        break; // Don't retry rate limits
+                    } else {
+                        // Other client errors
+                        lastError = { type: 'client', status: response.status };
+                        break;
+                    }
+                }
+
+                data = await response.json();
+                lastError = null; // Success!
+                break;
+
+            } catch (fetchError) {
+                clearTimeout(timeoutId);
+                
+                if (fetchError.name === 'AbortError') {
+                    lastError = { type: 'timeout' };
+                    if (attempt < MAX_RETRIES) {
+                        continue; // Retry on timeout
+                    }
+                } else {
+                    lastError = { type: 'network', message: fetchError.message };
+                    if (attempt < MAX_RETRIES) {
+                        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+                        continue;
+                    }
+                }
             }
+        }
 
-            // Handle chips (suggestion buttons)
-            if (data.chips && Array.isArray(data.chips) && els.chipsContainer) {
+        // Handle errors after all retries exhausted
+        if (lastError) {
+            removeMessage(loadingId);
+            let errorMessage;
+            switch (lastError.type) {
+                case 'timeout':
+                    errorMessage = "The request took too long. The AI service might be busy. Please try again in a moment.";
+                    break;
+                case 'rate_limit':
+                    errorMessage = "Too many requests. Please wait a moment before sending another message.";
+                    break;
+                case 'server':
+                    errorMessage = "The AI service is temporarily unavailable. Please try again in a few seconds.";
+                    break;
+                case 'network':
+                    errorMessage = "Connection lost. Please check your internet connection and try again.";
+                    break;
+                default:
+                    errorMessage = "Something went wrong. Please try again.";
+            }
+            addMessageToUI(errorMessage, 'bot');
+            isSending = false;
+            return;
+        }
+
+        // Success - process the response
+        removeMessage(loadingId);
+
+        // Handle Smart Signals response
+        if (data.reply) {
+            addMessageToUI(data.reply, 'bot');
+        }
+
+        // Handle chips (suggestion buttons)
+        if (data.chips && Array.isArray(data.chips) && els.chipsContainer) {
+            els.chipsContainer.innerHTML = '';
+            data.chips.forEach(chipText => {
+                const btn = document.createElement('button');
+                btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
+                btn.textContent = chipText;
+                btn.addEventListener('click', () => {
+                    if (els.input) {
+                        els.input.value = chipText;
+                        handleSend();
+                    }
+                });
+                els.chipsContainer.appendChild(btn);
+            });
+            
+            // Add close button
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
+            closeBtn.innerHTML = '×';
+            closeBtn.title = 'Hide suggestions';
+            closeBtn.addEventListener('click', () => {
+                els.chipsContainer.style.display = 'none';
+            });
+            els.chipsContainer.appendChild(closeBtn);
+        }
+
+        // Handle actions
+        if (data.action) {
+            if (data.action === 'download_resume') {
+                const link = document.createElement('a');
+                link.href = '/assets/resume.pdf';
+                link.download = 'Estivan_Ayramia_Resume.pdf';
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else if (data.action === 'email_link') {
+                window.location.href = 'mailto:hello@estivanayramia.com';
+            }
+        }
+
+        // Handle card
+        if (data.card) {
+            addCardToUI(data.card);
+        }
+
+        // Generate contextual chips based on conversation
+        if (!data.chips && chatHistory.length > 0) {
+            const contextualChips = generateContextualChips(chatHistory);
+            if (contextualChips.length > 0 && els.chipsContainer) {
                 els.chipsContainer.innerHTML = '';
-                data.chips.forEach(chipText => {
+                contextualChips.forEach(chipText => {
                     const btn = document.createElement('button');
                     btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
                     btn.textContent = chipText;
@@ -2130,63 +2301,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 els.chipsContainer.appendChild(closeBtn);
             }
-
-            // Handle actions
-            if (data.action) {
-                if (data.action === 'download_resume') {
-                    const link = document.createElement('a');
-                    link.href = '/assets/resume.pdf';
-                    link.download = 'Estivan_Ayramia_Resume.pdf';
-                    link.style.display = 'none';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } else if (data.action === 'email_link') {
-                    window.location.href = 'mailto:hello@estivanayramia.com';
-                }
-            }
-
-            // Handle card
-            if (data.card) {
-                addCardToUI(data.card);
-            }
-
-            // Generate contextual chips based on conversation
-            if (!data.chips && chatHistory.length > 0) {
-                const contextualChips = generateContextualChips(chatHistory);
-                if (contextualChips.length > 0 && els.chipsContainer) {
-                    els.chipsContainer.innerHTML = '';
-                    contextualChips.forEach(chipText => {
-                        const btn = document.createElement('button');
-                        btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
-                        btn.textContent = chipText;
-                        btn.addEventListener('click', () => {
-                            if (els.input) {
-                                els.input.value = chipText;
-                                handleSend();
-                            }
-                        });
-                        els.chipsContainer.appendChild(btn);
-                    });
-                    
-                    // Add close button
-                    const closeBtn = document.createElement('button');
-                    closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
-                    closeBtn.innerHTML = '×';
-                    closeBtn.title = 'Hide suggestions';
-                    closeBtn.addEventListener('click', () => {
-                        els.chipsContainer.style.display = 'none';
-                    });
-                    els.chipsContainer.appendChild(closeBtn);
-                }
-            }
-
-        } catch (e) {
-            removeMessage(loadingId);
-            addMessageToUI("Unable to connect to the server. Please check your internet connection and try again.", 'bot');
-        } finally {
-            isSending = false;
         }
+
+        isSending = false;
     }
 
     function addMessageToUI(text, sender, isLoading = false) {
@@ -2342,5 +2459,21 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             toggleChat();
         }
+    });
+});
+
+// ==========================================================================
+// PDF Preview Toggle (for project pages)
+// ==========================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.preview-toggle').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const panel = btn.closest('section')?.querySelector('.preview-panel');
+            if (panel) {
+                panel.classList.toggle('hidden');
+                btn.textContent = panel.classList.contains('hidden') ? 'Show preview' : 'Hide preview';
+            }
+        });
     });
 });

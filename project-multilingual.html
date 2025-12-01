@@ -43,8 +43,27 @@
     <meta name="msapplication-TileImage" content="/assets/img/favicon-32x32.png">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#212842">
+    
+    <!-- Schema.org CreativeWork Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CreativeWork",
+      "name": "Endpoint Elosity Video Concept",
+      "description": "Conceptual video ad for clinical trial operations platform using visual metaphor of breaking bottlenecks.",
+      "author": {
+        "@type": "Person",
+        "name": "Estivan Ayramia",
+        "url": "https://estivanayramia.com"
+      },
+      "url": "https://estivanayramia.com/project-multilingual.html"
+    }
+    </script>
 </head>
 <body class="bg-beige text-chocolate font-sans antialiased">
+    
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" aria-hidden="true"></div>
     
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
@@ -129,11 +148,17 @@
         </section>
         
         <!-- Project Visual -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8">
-            <div class="aspect-video bg-gradient-to-br from-[#0d1f3c] to-[#1a3a5c] rounded-2xl flex items-center justify-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
-                <svg class="w-24 h-24 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                </svg>
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8 space-y-4">
+            <div class="aspect-video rounded-2xl overflow-hidden shadow-lg border border-chocolate/10 bg-black" data-gsap="fade-up" data-gsap-delay="0.4">
+                <video class="w-full h-full object-cover" controls preload="metadata" playsinline poster="/assets/img/logo-ea.webp">
+                    <source src="/assets/img/Portolio-Media/Portfolio Media/projects-/endpoint-elosity-video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div class="text-center" data-gsap="fade-up" data-gsap-delay="0.5">
+                <a href="/assets/img/Portolio-Media/Portfolio Media/projects-/endpoint-elosity-video.mp4" class="inline-flex items-center justify-center px-6 py-3 text-sm font-semibold text-beige bg-indigodeep rounded-full hover:bg-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" download>
+                    Download the MP4 (37 MB)
+                </a>
             </div>
         </section>
         
@@ -303,9 +328,9 @@
                     <p class="text-sm text-chocolate">Skin diagnostic experience for Vichy at Ulta stores.</p>
                 </a>
                 <a href="/project-conflict.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
-                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Interview</span>
-                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">Grimes Interview</h3>
-                    <p class="text-sm text-chocolate">Mashable ME interview with Isa Grimes, CMO of Chalhoub Group.</p>
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Strategy</span>
+                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">Endpoint Competitive Playbook</h3>
+                    <p class="text-sm text-chocolate">Go-to-market plan pitting Almac + 4G Clinical against Endpoint.</p>
                 </a>
                 <a href="/projects.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
                     <div class="text-center py-8">
@@ -334,7 +359,7 @@
     <!-- Savonie AI Chat Widget -->
     <div id="chat-widget" class="fixed bottom-6 right-4 z-50 font-sans" style="z-index: 9999;">
         <!-- Chat Window (independently positioned when dragging) -->
-        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);">
+        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);">
             <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
                 <h3 class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
                     <img src="/assets/img/savonie-thumb.webp" alt="Savonie" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64">
@@ -352,9 +377,6 @@
             </div>
 
             <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
-                <button id="mic-btn" aria-label="Voice input" title="Voice input" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center">
-                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                </button>
                 <button id="suggestions-btn" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] transition-colors">
                     💡
                 </button>
