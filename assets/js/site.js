@@ -20,97 +20,6 @@ const __markUserInteraction = () => {
 // Dark Mode Toggle
 // ==========================================================================
 
-// Debugging helper: enable with ?debug-scroll=1
-const __debugScrollEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).has('debug-scroll');
-const __dbg = (...args) => { if (__debugScrollEnabled) console.log('[debug-scroll]', ...args); };
-
-// On-screen debug overlay for mobile devices (shows recent __dbg messages)
-let __dbgOverlayEl = null;
-const __createDbgOverlay = () => {
-    if (!__debugScrollEnabled || typeof document === 'undefined') return;
-    if (document.getElementById('dbg-scroll-overlay')) return;
-
-    __dbgOverlayEl = document.createElement('div');
-    __dbgOverlayEl.id = 'dbg-scroll-overlay';
-    Object.assign(__dbgOverlayEl.style, {
-        position: 'fixed',
-        bottom: '0',
-        left: '0',
-        right: '0',
-        maxHeight: '35vh',
-        overflowY: 'auto',
-        background: 'rgba(33,40,66,0.95)',
-        color: '#e1d4c2',
-        fontSize: '12px',
-        zIndex: '99999',
-        padding: '8px',
-        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, monospace',
-        boxSizing: 'border-box',
-        display: 'none'
-    });
-
-    const header = document.createElement('div');
-    header.style.display = 'flex';
-    header.style.justifyContent = 'space-between';
-    header.style.alignItems = 'center';
-    header.style.marginBottom = '6px';
-
-    const title = document.createElement('div');
-    title.textContent = 'DEBUG SCROLL';
-    title.style.fontWeight = '600';
-    title.style.fontSize = '12px';
-
-    const btn = document.createElement('button');
-    btn.textContent = '×';
-    Object.assign(btn.style, { background: 'transparent', color: '#e1d4c2', border: 'none', fontSize: '16px', lineHeight: '1', padding: '0 6px' });
-    btn.addEventListener('click', () => { __dbgOverlayEl.style.display = 'none'; });
-
-    header.appendChild(title);
-    header.appendChild(btn);
-    __dbgOverlayEl.appendChild(header);
-
-    const list = document.createElement('div');
-    list.id = 'dbg-scroll-list';
-    __dbgOverlayEl.appendChild(list);
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.body.appendChild(__dbgOverlayEl);
-    });
-};
-
-const __dbgPush = (text) => {
-    if (!__debugScrollEnabled) return;
-    try {
-        if (!__dbgOverlayEl) __createDbgOverlay();
-        const list = __dbgOverlayEl.querySelector('#dbg-scroll-list');
-        if (!list) return;
-        __dbgOverlayEl.style.display = 'block';
-        const line = document.createElement('div');
-        line.textContent = (new Date()).toLocaleTimeString() + ' — ' + String(text);
-        line.style.padding = '2px 0';
-        list.appendChild(line);
-        while (list.childElementCount > 40) list.removeChild(list.firstChild);
-        // keep overlay scroll scrolled to bottom
-        __dbgOverlayEl.scrollTop = __dbgOverlayEl.scrollHeight;
-    } catch (e) {
-        // ignore overlay errors
-    }
-};
-
-// extend __dbg to push to overlay as well
-const __dbgWrap = (...args) => {
-    if (!__debugScrollEnabled) return;
-    try {
-        const txt = args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
-        __dbgPush(txt);
-    } catch (e) {}
-};
-// Keep both: console logging and overlay
-const __dbgOrig = __dbg;
-const __dbgBoth = (...args) => { __dbgOrig(...args); __dbgWrap(...args); };
-// Replace global __dbg with combined wrapper
-__dbg = __dbgBoth;
-
 const initDarkMode = () => {
     const toggleButton = document.getElementById('theme-toggle');
     if (!toggleButton) return;
@@ -523,7 +432,7 @@ const initFormValidation = () => {
                     // Focus on first invalid field (prevent scrolling the viewport)
                     const firstInvalid = form.querySelector('.border-red-500');
                     if (firstInvalid) {
-                        try { firstInvalid.focus({ preventScroll: true }); } catch (e) { __dbg('focus fallback on invalid field', e); firstInvalid.focus(); }
+                        try { firstInvalid.focus({ preventScroll: true }); } catch (e) { firstInvalid.focus(); }
                     }
             status.className = 'text-sm mt-3 text-red-700';
             status.textContent = 'Please complete required fields highlighted in red.';
@@ -1419,27 +1328,19 @@ const initPWA = () => {
 
         // Avoid forcing a reload the very first time a SW takes control
         navigator.serviceWorker.addEventListener('controllerchange', () => {
-            __dbg('controllerchange event fired', { hasController, refreshing, __userInteracting });
             if (!hasController) {
                     hasController = true;
-                    __dbg('initial controller assignment - skipping reload');
                     return;
                 }
-                if (refreshing) {
-                    __dbg('already refreshing - ignore');
-                    return;
-                }
+                if (refreshing) return;
                 refreshing = true;
 
                 // If the user is actively interacting (scrolling/touching), wait until idle
                 const doReload = () => {
-                    __dbg('doReload check, userInteracting=', __userInteracting);
                     if (!__userInteracting) {
-                        __dbg('performing reload now');
-                        try { __dbg('calling window.location.reload'); window.location.reload(); } catch (e) { __dbg('reload failed', e); }
+                        window.location.reload();
                     } else {
                         // Retry shortly until idle (max retry handled by refreshing flag)
-                        __dbg('user interacting - retrying in 500ms');
                         setTimeout(doReload, 500);
                     }
                 };
@@ -2032,7 +1933,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const transcript = event.results[0][0].transcript;
             if (els.input && transcript) {
                 els.input.value = transcript;
-                try { els.input.focus({ preventScroll: true }); } catch (e) { __dbg('focus fallback after speech recognition', e); els.input.focus(); }
+                try { els.input.focus({ preventScroll: true }); } catch (e) { els.input.focus(); }
             }
         };
 
@@ -2191,7 +2092,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if(els.bubble) els.bubble.style.display = 'none';
             setTimeout(() => {
-                try { els.input?.focus({ preventScroll: true }); } catch (e) { __dbg('focus fallback when opening chat', e); els.input?.focus && els.input.focus(); }
+                try { els.input?.focus({ preventScroll: true }); } catch (e) { els.input?.focus && els.input.focus(); }
                 // Scroll to bottom when opening chat (only scroll the chat container)
                 if (els.messages) {
                     els.messages.scrollTop = els.messages.scrollHeight;
