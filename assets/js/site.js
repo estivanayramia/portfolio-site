@@ -3,6 +3,19 @@
  * Handles interactions, animations, and performance
  */
 
+// Track recent user interaction to avoid forcing reloads or focusing
+// while the user is actively scrolling/touching (prevents unexpected jumps)
+let __userInteracting = false;
+let __userInteractingTimer = null;
+const __markUserInteraction = () => {
+    __userInteracting = true;
+    if (__userInteractingTimer) clearTimeout(__userInteractingTimer);
+    __userInteractingTimer = setTimeout(() => { __userInteracting = false; }, 1000);
+};
+['touchstart', 'touchmove', 'wheel', 'scroll'].forEach(ev => {
+    try { window.addEventListener(ev, __markUserInteraction, { passive: true }); } catch (e) { window.addEventListener(ev, __markUserInteraction); }
+});
+
 // ==========================================================================
 // Dark Mode Toggle
 // ==========================================================================
@@ -416,9 +429,11 @@ const initFormValidation = () => {
 
         e.preventDefault();
         if (!isValid) {
-            // Focus on first invalid field
-            const firstInvalid = form.querySelector('.border-red-500');
-            if (firstInvalid) firstInvalid.focus();
+                    // Focus on first invalid field (prevent scrolling the viewport)
+                    const firstInvalid = form.querySelector('.border-red-500');
+                    if (firstInvalid) {
+                        try { firstInvalid.focus({ preventScroll: true }); } catch (e) { firstInvalid.focus(); }
+                    }
             status.className = 'text-sm mt-3 text-red-700';
             status.textContent = 'Please complete required fields highlighted in red.';
             return;
@@ -1314,12 +1329,22 @@ const initPWA = () => {
         // Avoid forcing a reload the very first time a SW takes control
         navigator.serviceWorker.addEventListener('controllerchange', () => {
             if (!hasController) {
-                hasController = true;
-                return;
-            }
-            if (refreshing) return;
-            refreshing = true;
-            window.location.reload();
+                    hasController = true;
+                    return;
+                }
+                if (refreshing) return;
+                refreshing = true;
+
+                // If the user is actively interacting (scrolling/touching), wait until idle
+                const doReload = () => {
+                    if (!__userInteracting) {
+                        window.location.reload();
+                    } else {
+                        // Retry shortly until idle (max retry handled by refreshing flag)
+                        setTimeout(doReload, 500);
+                    }
+                };
+                doReload();
         });
 
         window.addEventListener('load', () => {
@@ -1908,7 +1933,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const transcript = event.results[0][0].transcript;
             if (els.input && transcript) {
                 els.input.value = transcript;
-                els.input.focus();
+                try { els.input.focus({ preventScroll: true }); } catch (e) { els.input.focus(); }
             }
         };
 
@@ -2067,8 +2092,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if(els.bubble) els.bubble.style.display = 'none';
             setTimeout(() => {
-                els.input?.focus();
-                // Scroll to bottom when opening chat
+                try { els.input?.focus({ preventScroll: true }); } catch (e) { els.input?.focus && els.input.focus(); }
+                // Scroll to bottom when opening chat (only scroll the chat container)
                 if (els.messages) {
                     els.messages.scrollTop = els.messages.scrollHeight;
                 }
