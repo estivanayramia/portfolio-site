@@ -16,6 +16,81 @@ const __markUserInteraction = () => {
     try { window.addEventListener(ev, __markUserInteraction, { passive: true }); } catch (e) { window.addEventListener(ev, __markUserInteraction); }
 });
 
+// Lightweight remote-free log collector: enable with ?collect-logs=1
+const __collectLogsEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).has('collect-logs');
+const __collectedLogs = [];
+const __saveCollected = () => {
+    try { localStorage.setItem('site_collect_logs', JSON.stringify(__collectedLogs.slice(-1000))); } catch (e) {}
+};
+const __logCollect = (msg, data) => {
+    if (!__collectLogsEnabled) return;
+    try {
+        const entry = { t: Date.now(), msg: String(msg), data: data || null, scrollY: window.scrollY || 0 };
+        __collectedLogs.push(entry);
+        __saveCollected();
+    } catch (e) {}
+};
+
+if (__collectLogsEnabled) {
+    // Throttled scroll logger
+    let __scrollTimer = null;
+    window.addEventListener('scroll', () => {
+        if (__scrollTimer) return;
+        __scrollTimer = setTimeout(() => {
+            __logCollect('scroll', { y: window.scrollY, innerHeight: window.innerHeight, docHeight: document.documentElement.scrollHeight });
+            __scrollTimer = null;
+        }, 200);
+    }, { passive: true });
+
+    // Service worker controller change
+    try {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                __logCollect('controllerchange', { controller: !!navigator.serviceWorker.controller });
+            });
+        }
+    } catch (e) {}
+
+    // Wrap location.reload to log calls
+    try {
+        const __origReload = window.location.reload.bind(window.location);
+        window.location.reload = function() {
+            __logCollect('location.reload called');
+            return __origReload();
+        };
+    } catch (e) {}
+
+    // Download button (small, non-intrusive)
+    const __createDownloadButton = () => {
+        const btn = document.createElement('button');
+        btn.id = 'collect-logs-btn';
+        btn.textContent = 'Logs';
+        Object.assign(btn.style, { position: 'fixed', left: '8px', bottom: '12px', zIndex: 99999, padding: '6px 8px', fontSize: '12px', background: 'rgba(33,40,66,0.85)', color: '#e1d4c2', border: '1px solid rgba(225,212,194,0.08)', borderRadius: '6px' });
+        btn.addEventListener('click', () => {
+            try {
+                const payload = JSON.stringify(__collectedLogs, null, 2);
+                const blob = new Blob([payload], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `site-logs-${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                // fallback: show in new window
+                const w = window.open();
+                if (w) w.document.write('<pre>' + (JSON.stringify(__collectedLogs, null, 2)) + '</pre>');
+            }
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.appendChild(btn);
+        });
+    };
+    __createDownloadButton();
+}
+
 // ==========================================================================
 // Dark Mode Toggle
 // ==========================================================================
@@ -432,7 +507,7 @@ const initFormValidation = () => {
                     // Focus on first invalid field (prevent scrolling the viewport)
                     const firstInvalid = form.querySelector('.border-red-500');
                     if (firstInvalid) {
-                        try { firstInvalid.focus({ preventScroll: true }); } catch (e) { firstInvalid.focus(); }
+                        try { firstInvalid.focus({ preventScroll: true }); } catch (e) { try { __logCollect && __logCollect('focus-fallback', { selector: firstInvalid.tagName + (firstInvalid.id ? '#'+firstInvalid.id : '' ) }); } catch(_){} firstInvalid.focus(); }
                     }
             status.className = 'text-sm mt-3 text-red-700';
             status.textContent = 'Please complete required fields highlighted in red.';
