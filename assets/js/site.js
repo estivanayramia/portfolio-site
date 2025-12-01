@@ -20,6 +20,10 @@ const __markUserInteraction = () => {
 // Dark Mode Toggle
 // ==========================================================================
 
+// Debugging helper: enable with ?debug-scroll=1
+const __debugScrollEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).has('debug-scroll');
+const __dbg = (...args) => { if (__debugScrollEnabled) console.log('[debug-scroll]', ...args); };
+
 const initDarkMode = () => {
     const toggleButton = document.getElementById('theme-toggle');
     if (!toggleButton) return;
@@ -432,7 +436,7 @@ const initFormValidation = () => {
                     // Focus on first invalid field (prevent scrolling the viewport)
                     const firstInvalid = form.querySelector('.border-red-500');
                     if (firstInvalid) {
-                        try { firstInvalid.focus({ preventScroll: true }); } catch (e) { firstInvalid.focus(); }
+                        try { firstInvalid.focus({ preventScroll: true }); } catch (e) { __dbg('focus fallback on invalid field', e); firstInvalid.focus(); }
                     }
             status.className = 'text-sm mt-3 text-red-700';
             status.textContent = 'Please complete required fields highlighted in red.';
@@ -1328,19 +1332,27 @@ const initPWA = () => {
 
         // Avoid forcing a reload the very first time a SW takes control
         navigator.serviceWorker.addEventListener('controllerchange', () => {
+            __dbg('controllerchange event fired', { hasController, refreshing, __userInteracting });
             if (!hasController) {
                     hasController = true;
+                    __dbg('initial controller assignment - skipping reload');
                     return;
                 }
-                if (refreshing) return;
+                if (refreshing) {
+                    __dbg('already refreshing - ignore');
+                    return;
+                }
                 refreshing = true;
 
                 // If the user is actively interacting (scrolling/touching), wait until idle
                 const doReload = () => {
+                    __dbg('doReload check, userInteracting=', __userInteracting);
                     if (!__userInteracting) {
-                        window.location.reload();
+                        __dbg('performing reload now');
+                        try { __dbg('calling window.location.reload'); window.location.reload(); } catch (e) { __dbg('reload failed', e); }
                     } else {
                         // Retry shortly until idle (max retry handled by refreshing flag)
+                        __dbg('user interacting - retrying in 500ms');
                         setTimeout(doReload, 500);
                     }
                 };
@@ -1933,7 +1945,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const transcript = event.results[0][0].transcript;
             if (els.input && transcript) {
                 els.input.value = transcript;
-                try { els.input.focus({ preventScroll: true }); } catch (e) { els.input.focus(); }
+                try { els.input.focus({ preventScroll: true }); } catch (e) { __dbg('focus fallback after speech recognition', e); els.input.focus(); }
             }
         };
 
@@ -2092,7 +2104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if(els.bubble) els.bubble.style.display = 'none';
             setTimeout(() => {
-                try { els.input?.focus({ preventScroll: true }); } catch (e) { els.input?.focus && els.input.focus(); }
+                try { els.input?.focus({ preventScroll: true }); } catch (e) { __dbg('focus fallback when opening chat', e); els.input?.focus && els.input.focus(); }
                 // Scroll to bottom when opening chat (only scroll the chat container)
                 if (els.messages) {
                     els.messages.scrollTop = els.messages.scrollHeight;
