@@ -1,0 +1,495 @@
+{
+  "events": [
+    {
+      "type": "response",
+      "url": "https://estivanayramia.com/",
+      "status": 200,
+      "time": 1764621188576
+    },
+    {
+      "type": "response",
+      "url": "https://estivanayramia.com/assets/js/lazy-loader.js",
+      "status": 200,
+      "time": 1764621188640
+    },
+    {
+      "type": "response",
+      "url": "https://estivanayramia.com/assets/img/logo-ea.webp",
+      "status": 200,
+      "time": 1764621188641
+    },
+    {
+      "type": "response",
+      "url": "https://estivanayramia.com/assets/js/site.js",
+      "status": 200,
+      "time": 1764621188641
+    },
+    {
+      "type": "response",
+      "url": "https://estivanayramia.com/assets/css/style.css",
+      "status": 200,
+      "time": 1764621188672
+    },
+    {
+      "type": "response",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js",
+      "status": 200,
+      "time": 1764621188725
+    },
+    {
+      "type": "response",
+      "url": "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap",
+      "status": 200,
+      "time": 1764621188770
+    },
+    {
+      "type": "response",
+      "url": "https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015",
+      "status": 200,
+      "time": 1764621188771
+    },
+    {
+      "type": "response",
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js",
+      "status": 200,
+      "time": 1764621188772
+    },
+    {
+      "type": "response",
+      "url": "https://estivanayramia.com/manifest.json",
+      "status": 200,
+      "time": 1764621188774
+    },
+    {
+      "type": "response",
+      "url": "https://estivanayramia.com/assets/css/theme.css",
+      "status": 200,
+      "time": 1764621188774
+    },
+    {
+      "type": "console",
+      "text": "%c Designed by Estivan Ayramia  background: #212842; color: #e1d4c2; padding: 4px; border-radius: 4px;",
+      "time": 1764621188820
+    },
+    {
+      "type": "console",
+      "text": "[LazyLoader] Waiting for user interaction to load scripts...",
+      "time": 1764621188867
+    },
+    {
+      "type": "response",
+      "url": "https://estivanayramia.com/assets/img/savonie-thumb.webp",
+      "status": 200,
+      "time": 1764621188945
+    },
+    {
+      "type": "response",
+      "url": "https://estivanayramia.com/cdn-cgi/zaraz/s.js?z=JTdCJTIyZXhlY3V0ZWQlMjIlM0ElNUIlNUQlMkMlMjJ0JTIyJTNBJTIyUG9ydGZvbGlvJTIwJTdDJTIwSG9tZSUyMiUyQyUyMnglMjIlM0EwLjAyMjU0ODg0ODY0Mjk2OTEzMyUyQyUyMnclMjIlM0EzOTAlMkMlMjJoJTIyJTNBODQ0JTJDJTIyaiUyMiUzQTY2NCUyQyUyMmUlMjIlM0EzOTAlMkMlMjJsJTIyJTNBJTIyaHR0cHMlM0ElMkYlMkZlc3RpdmFuYXlyYW1pYS5jb20lMkYlMjIlMkMlMjJyJTIyJTNBJTIyJTIyJTJDJTIyayUyMiUzQTI0JTJDJTIybiUyMiUzQSUyMlVURi04JTIyJTJDJTIybyUyMiUzQTQ4MCUyQyUyMnElMjIlM0ElNUIlNUQlN0Q=",
+      "status": 200,
+      "time": 1764621188956
+    },
+    {
+      "type": "response",
+      "url": "https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2",
+      "status": 200,
+      "time": 1764621188976
+    },
+    {
+      "type": "response",
+      "url": "https://stats.g.doubleclick.net/g/collect?t=dc&aip=1&_r=3&v=1&_v=j86&tid=G-MCN4RXCY6Q&cid=a49c319a-944c-49d2-9365-cbf2ef0b5016&_u=KGDAAEADQAAAAC%7E&z=2083786299",
+      "status": 204,
+      "time": 1764621189115
+    },
+    {
+      "type": "response",
+      "url": "https://estivanayramia.com/cdn-cgi/rum?",
+      "status": 204,
+      "time": 1764621189127
+    },
+    {
+      "type": "response",
+      "url": "https://estivanayramia.com/sw.js",
+      "status": 200,
+      "time": 1764621189148
+    },
+    {
+      "type": "console",
+      "text": "[LazyLoader] User interaction detected - loading scripts...",
+      "time": 1764621189196
+    },
+    {
+      "type": "response",
+      "url": "https://www.google.com/ads/ga-audiences?t=sr&aip=1&_r=4&v=1&_v=j86&tid=G-MCN4RXCY6Q&cid=a49c319a-944c-49d2-9365-cbf2ef0b5016&_u=KGDAAEADQAAAAC%7E&z=2083786299&slf_rd=1",
+      "status": 200,
+      "time": 1764621189241
+    },
+    {
+      "type": "response",
+      "url": "https://cdn.jsdelivr.net/npm/marked/marked.min.js",
+      "status": 200,
+      "time": 1764621189273
+    },
+    {
+      "type": "console",
+      "text": "[LazyLoader] Marked.js loaded",
+      "time": 1764621189293
+    },
+    {
+      "type": "console",
+      "text": "[LazyLoader] Google Analytics loaded",
+      "time": 1764621189308
+    },
+    {
+      "type": "console",
+      "text": "[LazyLoader] Microsoft Clarity loaded",
+      "time": 1764621189309
+    },
+    {
+      "type": "response",
+      "url": "https://www.googletagmanager.com/gtag/js?id=G-MCN4RXCY6Q",
+      "status": 200,
+      "time": 1764621189440
+    },
+    {
+      "type": "response",
+      "url": "https://www.clarity.ms/tag/ubbdpwxnae",
+      "status": 200,
+      "time": 1764621189727
+    },
+    {
+      "type": "response",
+      "url": "https://www.google-analytics.com/g/collect?v=2&tid=G-MCN4RXCY6Q&gtm=45je5bi1v9235936241za200zd9235936241&_p=1764621189299&gcd=13l3l3l3l1l1&npa=0&dma=0&cid=231769156.1764621190&ul=en-us&sr=390x844&frm=0&pscdl=noapi&_s=1&tag_exp=103116026~103200004~104527906~104528501~104684208~104684211~115583767~115938465~115938469~116184927~116184929~116217636~116217638~116251938~116251940~116474637&sid=1764621189&sct=1&seg=0&dl=https%3A%2F%2Festivanayramia.com%2F&dt=Portfolio%20%7C%20Home&en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=1662",
+      "status": 204,
+      "time": 1764621189803
+    },
+    {
+      "type": "response",
+      "url": "https://c.clarity.ms/c.gif",
+      "status": 302,
+      "time": 1764621189894
+    },
+    {
+      "type": "response",
+      "url": "https://scripts.clarity.ms/0.8.41/clarity.js",
+      "status": 200,
+      "time": 1764621189896
+    },
+    {
+      "type": "response",
+      "url": "https://c.bing.com/c.gif?ctsa=mr&CtsSyncId=D7D30DF647CE406C905C0FD14B99F331&RedC=c.clarity.ms&MXFR=2C176EDE5FB66DEA1BB5786B5BB6635B",
+      "status": 302,
+      "time": 1764621190109
+    },
+    {
+      "type": "response",
+      "url": "https://c.clarity.ms/c.gif?ctsa=mr&CtsSyncId=D7D30DF647CE406C905C0FD14B99F331&MUID=344A6232C3BA648F33D27487C2546553",
+      "status": 200,
+      "time": 1764621190154
+    },
+    {
+      "type": "response",
+      "url": "https://z.clarity.ms/collect",
+      "status": 204,
+      "time": 1764621190431
+    },
+    {
+      "type": "response",
+      "url": "https://z.clarity.ms/collect",
+      "status": 204,
+      "time": 1764621191013
+    },
+    {
+      "type": "response",
+      "url": "https://z.clarity.ms/collect",
+      "status": 204,
+      "time": 1764621193045
+    }
+  ],
+  "samples": [
+    {
+      "time": 1764621189274,
+      "y": 358,
+      "h": 7302
+    },
+    {
+      "time": 1764621189426,
+      "y": 400,
+      "h": 7302
+    },
+    {
+      "time": 1764621189727,
+      "y": 400,
+      "h": 7302
+    },
+    {
+      "time": 1764621189733,
+      "y": 400,
+      "h": 7302
+    },
+    {
+      "time": 1764621189894,
+      "y": 859,
+      "h": 7302
+    },
+    {
+      "time": 1764621190079,
+      "y": 859,
+      "h": 7302
+    },
+    {
+      "time": 1764621190208,
+      "y": 1200,
+      "h": 7302
+    },
+    {
+      "time": 1764621190367,
+      "y": 1546,
+      "h": 7302
+    },
+    {
+      "time": 1764621190516,
+      "y": 1600,
+      "h": 7302
+    },
+    {
+      "time": 1764621190672,
+      "y": 1885,
+      "h": 7302
+    },
+    {
+      "time": 1764621190858,
+      "y": 2000,
+      "h": 7302
+    },
+    {
+      "time": 1764621190994,
+      "y": 2019,
+      "h": 7302
+    },
+    {
+      "time": 1764621191153,
+      "y": 2392,
+      "h": 7302
+    },
+    {
+      "time": 1764621191302,
+      "y": 2400,
+      "h": 7302
+    },
+    {
+      "time": 1764621191466,
+      "y": 2782,
+      "h": 7302
+    },
+    {
+      "time": 1764621191613,
+      "y": 2800,
+      "h": 7302
+    },
+    {
+      "time": 1764621191771,
+      "y": 2945,
+      "h": 7302
+    },
+    {
+      "time": 1764621191927,
+      "y": 3189,
+      "h": 7302
+    },
+    {
+      "time": 1764621192087,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621192236,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621192388,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621192544,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621192700,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621192868,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621193010,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621193168,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621193322,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621193481,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621193645,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621193791,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621193948,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621194119,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621194257,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621194414,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621194590,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621194737,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621194880,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621195048,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621195191,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621195347,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621195503,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621195676,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621195821,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621195975,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621196151,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621196282,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621196442,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621196601,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621196768,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621196906,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621197060,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621197215,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621197374,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621197525,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621197684,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621197837,
+      "y": 3200,
+      "h": 7302
+    },
+    {
+      "time": 1764621197993,
+      "y": 3200,
+      "h": 7302
+    }
+  ]
+}

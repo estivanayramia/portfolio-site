@@ -92,9 +92,30 @@
                 // Update version
                 localStorage.setItem('siteVersion', BUILD_VERSION);
                 
-                // Force reload if not first visit
+                // Force reload if not first visit — guarded to avoid reloading while user interacts
                 if (lastVersion) {
-                    window.location.reload(true);
+                    (function() {
+                        const MAX = 30000;
+                        const RETRY = 1000;
+                        const start = Date.now();
+                        (function attempt() {
+                            try {
+                                const interacting = (typeof window.__userInteracting !== 'undefined') ? window.__userInteracting : false;
+                                if (!interacting) {
+                                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
+                                    return;
+                                }
+                                if (Date.now() - start < MAX) {
+                                    setTimeout(attempt, RETRY);
+                                    return;
+                                }
+                                // Timed out — force reload
+                                try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
+                            } catch (e) {
+                                try { window.location.reload(); } catch (_) {}
+                            }
+                        })();
+                    })();
                 }
             }
         })();

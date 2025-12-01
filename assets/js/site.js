@@ -89,6 +89,40 @@ if (__collectLogsEnabled) {
         });
     };
     __createDownloadButton();
+
+    // Guarded reload: retry until user is idle, then reload.
+    // Defaults: MAX = 30000 ms, RETRY = 500 ms.
+    // Usage: window.tryGuardedReload({ MAX: 30000, RETRY: 500, fallback: () => window.location.reload() });
+    window.tryGuardedReload = function(opts) {
+        opts = opts || {};
+        const MAX = (typeof opts.MAX === 'number') ? opts.MAX : 30000;
+        const RETRY = (typeof opts.RETRY === 'number') ? opts.RETRY : 500;
+        const fallback = (opts && typeof opts.fallback === 'function') ? opts.fallback : null;
+        const start = Date.now();
+
+        (function attempt() {
+            try {
+                const interacting = (typeof window.__userInteracting !== 'undefined') ? window.__userInteracting : false;
+                if (!interacting) {
+                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
+                    return;
+                }
+                if (Date.now() - start < MAX) {
+                    setTimeout(attempt, RETRY);
+                    return;
+                }
+                // Timed out — fallback
+                if (fallback) {
+                    try { fallback(); } catch (e) { try { window.location.reload(); } catch(_) {} }
+                } else {
+                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
+                }
+            } catch (e) {
+                if (fallback) { try { fallback(); } catch(_) { try { window.location.reload(); } catch(_) {} } }
+                else { try { window.location.reload(); } catch(_) {} }
+            }
+        })();
+    };
 }
 
 // ==========================================================================
@@ -1410,16 +1444,19 @@ const initPWA = () => {
                 if (refreshing) return;
                 refreshing = true;
 
-                // If the user is actively interacting (scrolling/touching), wait until idle
-                const doReload = () => {
-                    if (!__userInteracting) {
-                        window.location.reload();
-                    } else {
-                        // Retry shortly until idle (max retry handled by refreshing flag)
-                        setTimeout(doReload, 500);
-                    }
-                };
-                doReload();
+                // Use guarded reload helper when available so we don't reload mid-scroll
+                if (typeof window.tryGuardedReload === 'function') {
+                    window.tryGuardedReload({ MAX: 30000, RETRY: 500, fallback: () => { try { window.location.reload(); } catch(e) { try { window.location.href = window.location.href; } catch(_) {} } } });
+                } else {
+                    const __doReloadFallback = () => {
+                        if (!__userInteracting) {
+                            window.location.reload();
+                        } else {
+                            setTimeout(__doReloadFallback, 500);
+                        }
+                    };
+                    __doReloadFallback();
+                }
         });
 
         window.addEventListener('load', () => {
