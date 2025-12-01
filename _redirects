@@ -1,8 +1,11 @@
 # Cloudflare Pages / Netlify Redirects Configuration
 # https://developers.cloudflare.com/pages/platform/redirects/
 
-# Redirect www to non-www
-https://www.estivanayramia.com/*  https://estivanayramia.com/:splat  301!
+# Redirect www to non-www (configure in Cloudflare dashboard; Pages redirect file only supports relative paths)
+#
+# To keep the deployment logs clean, we leave this file free of absolute-host
+# redirects. Configure the www→apex redirect via Cloudflare Bulk Redirects
+# or a single Transform Rule targeting the `www` host.
 
 # Redirect old paths (if migrating from old site)
 # /old-path  /new-path  301
@@ -10,8 +13,8 @@ https://www.estivanayramia.com/*  https://estivanayramia.com/:splat  301!
 # Language detection (optional - serves default English if no match)
 # /*  /index.html  200
 
-# 404 Handling
-/*  /404.html  404
+# Cloudflare Pages automatically serves 404.html when a path is missing,
+# so no explicit redirect is required here.
 
 # SPA-style routing for future expansion
 # /app/*  /app/index.html  200
