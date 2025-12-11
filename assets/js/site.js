@@ -1,10 +1,67 @@
 /**
- * Portfolio Site Logic
- * Handles interactions, animations, and performance
+ * ============================================================================
+ * PORTFOLIO SITE - MAIN JAVASCRIPT
+ * ============================================================================
+ * 
+ * Purpose: Core functionality for the portfolio website including:
+ * - Mobile-optimized navigation and scroll handling
+ * - Dark/light theme management with system preference detection
+ * - GSAP animations with ScrollTrigger
+ * - Progressive PDF preview loading with graceful fallbacks
+ * - Savonie AI chatbot integration
+ * - Client-side diagnostics (opt-in with ?collect-logs=1)
+ * - PWA support with service worker
+ * - Achievement system
+ * - Custom analytics event tracking (theme changes, scroll depth, interactions)
+ * 
+ * Architecture Overview:
+ * 1. Core Utilities (user interaction tracking, guarded reload)
+ * 2. Instrumentation Module (diagnostic logging, gated by URL param)
+ * 3. Feature Modules (theme, animations, PDFs, chat, etc.)
+ * 4. Analytics Integration (custom events sent to GA4 & Clarity)
+ * 5. Initialization & Startup
+ * 
+ * Analytics Integration:
+ * ----------------------
+ * Analytics initialization is handled by lazy-loader.js (loaded via defer).
+ * This file sends CUSTOM EVENTS to the analytics services after they're loaded.
+ * 
+ * Services used:
+ * - Google Analytics 4 (GA4): G-MCN4RXCY6Q
+ * - Microsoft Clarity: ubbdpwxnae
+ * 
+ * How it works:
+ * 1. lazy-loader.js loads analytics on first user interaction (scroll, click, etc.)
+ * 2. This file checks if analytics are loaded before sending events
+ * 3. Custom events: theme toggle, scroll depth, navigation clicks, form submissions
+ * 4. All analytics code is defensive (checks typeof before calling)
+ * 
+ * To verify analytics:
+ * - GA4: https://analytics.google.com → Realtime → Events
+ * - Clarity: https://clarity.microsoft.com → Dashboard → Recordings
+ * 
+ * @version 2.1.0
+ * @author Estivan Ayramia
+ * @license MIT
  */
 
-// Track recent user interaction to avoid forcing reloads or focusing
-// while the user is actively scrolling/touching (prevents unexpected jumps)
+// ============================================================================
+// CORE UTILITIES - User Interaction Tracking
+// ============================================================================
+
+/**
+ * User Interaction State Tracker
+ * 
+ * Tracks whether the user is actively scrolling/touching to prevent
+ * unwanted reloads or focus changes that could cause scroll position jumps.
+ * 
+ * This is CRITICAL for mobile Safari where forced reloads during user
+ * interaction can cause the viewport to jump unexpectedly, creating a
+ * jarring user experience.
+ * 
+ * Events monitored: touchstart, touchmove, wheel, scroll
+ * Debounce period: 1000ms after last interaction
+ */
 let __userInteracting = false;
 let __userInteractingTimer = null;
 const __markUserInteraction = () => {
@@ -444,9 +501,37 @@ if (__collectLogsEnabled) {
         } catch (e) {}
         // ---------------------------------------------------------------------
     } catch (e) {}
-    // Guarded reload: retry until user is idle, then reload.
-    // Defaults: MAX = 30000 ms, RETRY = 500 ms.
-    // Usage: window.tryGuardedReload({ MAX: 30000, RETRY: 500, fallback: () => window.location.reload() });
+    /**
+     * Guarded Page Reload Utility
+     * 
+     * Attempts to reload the page only when the user is NOT actively interacting.
+     * This prevents the scroll-jump bug on mobile devices (especially iOS Safari)
+     * where a reload during scrolling causes the viewport to jump to an unexpected
+     * position, often losing the user's place.
+     * 
+     * How it works:
+     * 1. Checks if user is currently interacting (scrolling, touching)
+     * 2. If idle, reloads immediately
+     * 3. If active, waits and retries after RETRY milliseconds
+     * 4. After MAX milliseconds, forces reload regardless (timeout)
+     * 
+     * @param {Object} opts - Configuration options
+     * @param {number} [opts.MAX=30000] - Maximum milliseconds to wait before forcing reload
+     * @param {number} [opts.RETRY=500] - Milliseconds between retry attempts
+     * @param {Function} [opts.fallback] - Fallback function if reload fails
+     * 
+     * @example
+     * // Standard usage
+     * window.tryGuardedReload({ MAX: 30000, RETRY: 500 });
+     * 
+     * @example
+     * // With custom fallback
+     * window.tryGuardedReload({ 
+     *   MAX: 30000, 
+     *   RETRY: 500, 
+     *   fallback: () => window.location.href = window.location.href 
+     * });
+     */
     window.tryGuardedReload = function(opts) {
         opts = opts || {};
         const MAX = (typeof opts.MAX === 'number') ? opts.MAX : 30000;
@@ -479,10 +564,33 @@ if (__collectLogsEnabled) {
     };
 }
 
+// ============================================================================
+// FEATURE MODULES
+// ============================================================================
+
 // ==========================================================================
 // Dark Mode Toggle
 // ==========================================================================
 
+/**
+ * Initialize Dark Mode Theme Management
+ * 
+ * Handles theme switching between light and dark modes with:
+ * - System preference detection (prefers-color-scheme media query)
+ * - LocalStorage persistence across sessions
+ * - Manual toggle with immediate visual feedback
+ * - Automatic theme sync on page loads
+ * - Analytics tracking for theme changes
+ * 
+ * Theme state stored in:
+ * - data-theme attribute on <html> element ("light" | "dark")
+ * - localStorage key "theme" for persistence
+ * - localStorage key "theme_manual" if user manually toggled
+ * 
+ * CSS Implementation:
+ * - Uses [data-theme="dark"] selectors for dark mode styles
+ * - Tailwind dark: variants work through theme.css overrides
+ */
 const initDarkMode = () => {
     const toggleButton = document.getElementById('theme-toggle');
     if (!toggleButton) return;
@@ -515,9 +623,15 @@ const initDarkMode = () => {
         // Update icon
         toggleButton.innerHTML = newTheme === 'dark' ? '<span style="color: #e1d4c2">🔆</span>' : '<span style="color: #212842">🌙</span>';
         
-        // Track analytics
+        // Track analytics (both Clarity and GA4)
         if (typeof clarity === 'function') {
             clarity('event', 'theme_toggle', { theme: newTheme });
+        }
+        if (typeof gtag === 'function') {
+            gtag('event', 'theme_toggle', {
+                'event_category': 'user_preference',
+                'event_label': newTheme
+            });
         }
         
         // Update ARIA label
@@ -547,6 +661,20 @@ const initDarkMode = () => {
 // Mobile Menu Interaction
 // ==========================================================================
 
+/**
+ * Initialize Mobile Menu Toggle
+ * 
+ * Manages hamburger menu for mobile/tablet viewports:
+ * - Toggle menu visibility on button click
+ * - Close menu when clicking outside
+ * - Close menu when selecting a link
+ * - ARIA attribute management for accessibility
+ * - Icon rotation animation
+ * 
+ * Requires DOM elements:
+ * - #mobile-menu-toggle button
+ * - #mobile-menu navigation container
+ */
 const initMobileMenu = () => {
     const menuToggle = document.getElementById('mobile-menu-toggle');
     const mobileMenu = document.getElementById('mobile-menu');
@@ -602,6 +730,28 @@ const initMobileMenu = () => {
 // GSAP Animations
 // ==========================================================================
 
+/**
+ * Initialize GSAP ScrollTrigger Animations
+ * 
+ * Manages scroll-triggered animations throughout the site:
+ * - Fade-up animations for content elements ([data-gsap="fade-up"])
+ * - Parallax effect on hero sections
+ * - Card hover interactions
+ * - Graceful degradation if GSAP not loaded
+ * 
+ * Configuration:
+ * - Duration: 0.4s (faster animations per user feedback)
+ * - Trigger point: top 92% (elements animate sooner)
+ * - Easing: power2.out (snappy, responsive feel)
+ * 
+ * Performance:
+ * - Elements start visible (opacity: 1) to prevent blank screens
+ * - Only animates elements with [data-gsap] attribute
+ * - Uses will-change and transform for GPU acceleration
+ * 
+ * @requires gsap.js
+ * @requires ScrollTrigger plugin
+ */
 const initAnimations = () => {
     // Always unhide elements first to avoid blank screens
     const allAnimated = document.querySelectorAll('[data-gsap]');
@@ -628,13 +778,13 @@ const initAnimations = () => {
         
         gsap.from(element, {
             opacity: 0,
-            y: 30,
-            duration: 0.8,
-            delay: parseFloat(delay),
-            ease: 'power3.out',
+            y: 20,
+            duration: 0.4,
+            delay: parseFloat(delay) * 0.5,
+            ease: 'power2.out',
             scrollTrigger: {
                 trigger: element,
-                start: 'top 85%',
+                start: 'top 92%',
                 toggleActions: 'play none none none'
             }
         });
@@ -1290,6 +1440,121 @@ const initLazyLoading = () => {
     }
 };
 
+// ======================================================================
+// Progressive PDF Preview Loader
+// ======================================================================
+
+/**
+ * Initialize Progressive PDF Preview System
+ * 
+ * Attempts to display PDF previews inline using iframes with:
+ * - Stable background placeholder during loading
+ * - Smooth fade-in transition when ready
+ * - Graceful fallback if PDF cannot be embedded
+ * - No flashing or jarring visual changes
+ * 
+ * How it works:
+ * 1. Finds all .preview-panel elements
+ * 2. Locates associated PDF link in same section
+ * 3. Creates hidden iframe with opacity: 0
+ * 4. Shows loading spinner overlay
+ * 5. On iframe load, fades in PDF smoothly (0.3s transition)
+ * 6. On error/timeout, shows friendly fallback message
+ * 
+ * Browser Compatibility:
+ * - Some browsers block iframe embedding of PDFs
+ * - Hosting providers may block cross-origin framing
+ * - Fallback message guides users to open/download buttons
+ * 
+ * Performance:
+ * - 3-second timeout for slow connections
+ * - 100ms render delay after load for content stability
+ * - Uses CSS transitions for smooth UX
+ * 
+ * Instrumentation:
+ * - Logs attempts, successes, failures when ?collect-logs=1
+ */
+const initPdfPreviews = () => {
+    try {
+        document.querySelectorAll('.preview-panel').forEach(panel => {
+            try {
+                const section = panel.closest('section') || panel.parentElement;
+                if (!section) return;
+                // find first PDF link within the same section
+                const pdfLink = section.querySelector('a[href$=".pdf"]');
+                if (!pdfLink) return;
+                const pdfUrl = pdfLink.href;
+
+                // helper to show fallback message
+                const showFallback = (reason) => {
+                    try {
+                        panel.innerHTML = '<div class="rounded-xl border border-chocolate/20 bg-white/40 overflow-hidden p-8 text-center"><p class="text-sm text-chocolate/70">Inline PDF preview may be blocked by hosting or browser settings. Use the buttons below to open or download the deck.</p></div>';
+                        __logCollect && __logCollect('pdf.preview.fallback', { url: pdfUrl, reason: reason });
+                    } catch (e) {}
+                };
+
+                // prepare placeholder / spinner with stable background
+                panel.innerHTML = '<div class="py-12 bg-white/30 rounded-xl border border-chocolate/10 flex items-center justify-center min-h-[480px]">\n  <div class="text-sm text-chocolate/60 flex items-center gap-2"><svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Loading preview…</div>\n</div>';
+
+                // create iframe but keep it hidden until load confirmed
+                const iframe = document.createElement('iframe');
+                iframe.setAttribute('aria-label', 'PDF preview');
+                iframe.style.cssText = 'width:100%;height:480px;border:0;border-radius:12px;background:#fff;opacity:0;position:absolute;top:0;left:0;';
+                iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+                
+                // Set panel to relative positioning for absolute iframe
+                panel.style.position = 'relative';
+                panel.style.minHeight = '480px';
+
+                let loaded = false;
+                let settled = false;
+                
+                const finalize = (success) => {
+                    if (settled) return;
+                    settled = true;
+                    
+                    if (success) {
+                        // Smoothly fade in the iframe
+                        iframe.style.position = 'relative';
+                        iframe.style.opacity = '1';
+                        iframe.style.transition = 'opacity 0.3s ease';
+                        // Remove placeholder
+                        const placeholder = panel.querySelector('div');
+                        if (placeholder) placeholder.remove();
+                        __logCollect && __logCollect('pdf.preview.loaded', { url: pdfUrl });
+                    } else {
+                        try { iframe.remove(); } catch(_){}
+                        showFallback('load_failed');
+                    }
+                };
+
+                iframe.addEventListener('load', () => {
+                    loaded = true;
+                    // Give it a moment to actually render content
+                    setTimeout(() => finalize(true), 100);
+                });
+                
+                iframe.addEventListener('error', () => finalize(false));
+
+                // attempt to set src
+                try {
+                    iframe.src = pdfUrl;
+                    panel.appendChild(iframe);
+                    __logCollect && __logCollect('pdf.preview.attempt', { url: pdfUrl });
+                } catch (e) {
+                    finalize(false);
+                    return;
+                }
+
+                // fallback timeout: if not loaded within 3s, show fallback
+                setTimeout(() => {
+                    if (!loaded) finalize(false);
+                }, 3000);
+            } catch (e) {}
+        });
+    } catch (e) {}
+};
+
 // ==========================================================================
 // Scroll to Top Button
 // ==========================================================================
@@ -1313,9 +1578,15 @@ const initScrollToTop = () => {
 
     // Scroll to top smoothly
     const scrollToTop = () => {
-        // Track analytics
+        // Track analytics (both Clarity and GA4)
         if (typeof clarity === 'function') {
             clarity('event', 'scroll_to_top_clicked');
+        }
+        if (typeof gtag === 'function') {
+            gtag('event', 'scroll_to_top', {
+                'event_category': 'navigation',
+                'event_label': 'button_click'
+            });
         }
 
         window.scrollTo({
@@ -1857,27 +2128,62 @@ const initPWA = () => {
 };
 
 // ==========================================================================
-// Analytics Tracking (Microsoft Clarity)
+// ANALYTICS EVENT TRACKING
+// ==========================================================================
+//
+// This module sends CUSTOM EVENTS to analytics services (GA4 & Clarity).
+// Analytics initialization is handled by lazy-loader.js on first user interaction.
+//
+// Events tracked:
+// - Button clicks (CTAs, contact links)
+// - Navigation clicks (page navigation)
+// - Social media links (LinkedIn, GitHub)
+// - Form submissions
+// - Scroll depth milestones (25%, 50%, 75%, 100%)
+// - Theme toggles (light/dark mode)
+//
+// All analytics calls are defensive (checks if functions exist before calling).
+// This ensures no errors if analytics fail to load or are blocked by ad blockers.
+//
+// Debug mode: Add ?debug-analytics=1 to URL to see events in console
 // ==========================================================================
 
-// Debug helper: logs analytics events when ?debug-analytics=1 is in URL
+/**
+ * Debug helper: logs analytics events when ?debug-analytics=1 is in URL
+ * @param {string} tag - Event name
+ * @param {Object} payload - Optional event data
+ */
 const trackEventDebug = (tag, payload) => {
     try {
         if (window.location.search.includes('debug-analytics=1')) {
-            console.log('[analytics]', tag, payload || null);
+            console.log('[Analytics Event]', tag, payload || null);
         }
     } catch (e) {
-        // fail silently
+        // Fail silently
     }
 };
 
+/**
+ * Initialize custom analytics event tracking
+ * Called after DOM is ready to attach event listeners
+ */
 const initAnalytics = () => {
-    // Track button clicks
+    // Track button clicks with custom labels
     const trackClick = (element, label) => {
         const eventName = `button_click_${label}`;
         trackEventDebug(eventName);
+        
+        // Send to Clarity
         if (typeof clarity === 'function') {
             clarity('event', eventName);
+        }
+        
+        // Send to GA4
+        if (typeof gtag === 'function') {
+            gtag('event', 'button_click', {
+                'event_category': 'engagement',
+                'event_label': label
+            });
         }
     };
 
@@ -1894,8 +2200,18 @@ const initAnalytics = () => {
         link.addEventListener('click', () => {
             const page = link.getAttribute('href') || 'unknown';
             trackEventDebug('navigation_click', { page });
+            
+            // Send to Clarity
             if (typeof clarity === 'function') {
                 clarity('event', 'navigation_click', { page });
+            }
+            
+            // Send to GA4
+            if (typeof gtag === 'function') {
+                gtag('event', 'navigation_click', {
+                    'event_category': 'navigation',
+                    'event_label': page
+                });
             }
         });
     });
@@ -1905,8 +2221,18 @@ const initAnalytics = () => {
         link.addEventListener('click', () => {
             const platform = link.href.includes('linkedin') ? 'linkedin' : 'github';
             trackEventDebug('social_click', { platform });
+            
+            // Send to Clarity
             if (typeof clarity === 'function') {
                 clarity('event', 'social_click', { platform });
+            }
+            
+            // Send to GA4
+            if (typeof gtag === 'function') {
+                gtag('event', 'social_click', {
+                    'event_category': 'social',
+                    'event_label': platform
+                });
             }
         });
     });
@@ -1916,47 +2242,106 @@ const initAnalytics = () => {
     if (form) {
         form.addEventListener('submit', () => {
             trackEventDebug('form_submission');
+            
+            // Send to Clarity
             if (typeof clarity === 'function') {
                 clarity('event', 'form_submission');
+            }
+            
+            // Send to GA4
+            if (typeof gtag === 'function') {
+                gtag('event', 'form_submission', {
+                    'event_category': 'engagement',
+                    'event_label': 'contact_form'
+                });
             }
         });
     }
 
-    // Track scroll depth
+    // Track scroll depth milestones (25%, 50%, 75%, 100%)
     let maxScrollDepth = 0;
     let scrollEventsLogged = { 25: false, 50: false, 75: false, 100: false };
+    
     window.addEventListener('scroll', () => {
         const scrollDepth = Math.round((window.scrollY + window.innerHeight) / document.documentElement.scrollHeight * 100);
+        
         if (scrollDepth > maxScrollDepth) {
             maxScrollDepth = scrollDepth;
+            
+            // Check each milestone and fire once
             if (maxScrollDepth >= 25 && !scrollEventsLogged[25]) {
                 scrollEventsLogged[25] = true;
                 trackEventDebug('scroll_25_percent');
-                if (typeof clarity === 'function') clarity('event', 'scroll_25_percent');
+                
+                if (typeof clarity === 'function') {
+                    clarity('event', 'scroll_25_percent');
+                }
+                if (typeof gtag === 'function') {
+                    gtag('event', 'scroll', {
+                        'event_category': 'engagement',
+                        'event_label': '25_percent'
+                    });
+                }
             }
+            
             if (maxScrollDepth >= 50 && !scrollEventsLogged[50]) {
                 scrollEventsLogged[50] = true;
                 trackEventDebug('scroll_50_percent');
-                if (typeof clarity === 'function') clarity('event', 'scroll_50_percent');
+                
+                if (typeof clarity === 'function') {
+                    clarity('event', 'scroll_50_percent');
+                }
+                if (typeof gtag === 'function') {
+                    gtag('event', 'scroll', {
+                        'event_category': 'engagement',
+                        'event_label': '50_percent'
+                    });
+                }
             }
             if (maxScrollDepth >= 75 && !scrollEventsLogged[75]) {
                 scrollEventsLogged[75] = true;
                 trackEventDebug('scroll_75_percent');
-                if (typeof clarity === 'function') clarity('event', 'scroll_75_percent');
+                
+                if (typeof clarity === 'function') {
+                    clarity('event', 'scroll_75_percent');
+                }
+                if (typeof gtag === 'function') {
+                    gtag('event', 'scroll', {
+                        'event_category': 'engagement',
+                        'event_label': '75_percent'
+                    });
+                }
             }
+            
             if (maxScrollDepth >= 100 && !scrollEventsLogged[100]) {
                 scrollEventsLogged[100] = true;
                 trackEventDebug('scroll_100_percent');
-                if (typeof clarity === 'function') clarity('event', 'scroll_100_percent');
+                
+                if (typeof clarity === 'function') {
+                    clarity('event', 'scroll_100_percent');
+                }
+                if (typeof gtag === 'function') {
+                    gtag('event', 'scroll', {
+                        'event_category': 'engagement',
+                        'event_label': '100_percent'
+                    });
+                }
             }
         }
     });
 
-    // Track Konami code usage
+    // Track Konami code usage (easter egg)
     window.addEventListener('konami-activated', () => {
         trackEventDebug('konami_code_activated');
+        
         if (typeof clarity === 'function') {
             clarity('event', 'konami_code_activated');
+        }
+        if (typeof gtag === 'function') {
+            gtag('event', 'easter_egg', {
+                'event_category': 'engagement',
+                'event_label': 'konami_code'
+            });
         }
     });
 
@@ -1965,9 +2350,17 @@ const initAnalytics = () => {
     if (originalUnlock) {
         window.unlockAchievement = (achievementId) => {
             trackEventDebug('achievement_unlocked', { achievement: achievementId });
+            
             if (typeof clarity === 'function') {
                 clarity('event', 'achievement_unlocked', { achievement: achievementId });
             }
+            if (typeof gtag === 'function') {
+                gtag('event', 'achievement_unlock', {
+                    'event_category': 'gamification',
+                    'event_label': achievementId
+                });
+            }
+            
             originalUnlock(achievementId);
         };
     }
@@ -2114,6 +2507,7 @@ const init = () => {
             initFormValidation();
             initLazyLoading();
             initScrollToTop();
+            initPdfPreviews();
             initAchievements();
             initKonamiCode();
             initPWA();
@@ -2130,6 +2524,7 @@ const init = () => {
         initFormValidation();
         initLazyLoading();
         initScrollToTop();
+        initPdfPreviews();
         initAchievements();
         initKonamiCode();
         initPWA();
@@ -2143,12 +2538,47 @@ const init = () => {
 init();
 
 // ==========================================================================
-// Savonie AI Chatbot with Smart Signals
+// Savonie AI Chatbot Integration
 // ==========================================================================
 
-// --- Savonie AI Chatbot ---
+/**
+ * Savonie AI Chatbot System
+ * 
+ * Interactive AI assistant powered by Cloudflare Workers:
+ * - Context-aware responses about portfolio projects
+ * - Dynamic suggestion chips based on page content
+ * - Draggable chat window for better UX
+ * - Session history with localStorage persistence
+ * - Voice input support (Web Speech API)
+ * - Project card rendering with images
+ * - Multi-language support (EN, AR, ES)
+ * 
+ * Architecture:
+ * - Frontend: Native JavaScript with DOM manipulation
+ * - Backend: Cloudflare Worker at portfolio-chat.eayramia.workers.dev
+ * - Storage: localStorage for chat history and preferences
+ * 
+ * Features:
+ * - Contextual chip suggestions that adapt to conversation
+ * - Visual project cards with links
+ * - Typing indicators for AI responses
+ * - Markdown support in messages
+ * - Auto-scroll to latest message
+ * - Welcome message on first visit
+ * 
+ * Accessibility:
+ * - ARIA labels and live regions
+ * - Keyboard navigation support
+ * - Focus management
+ * - Screen reader friendly
+ * 
+ * @requires DOM elements: chat-widget, chat-window, chat-messages, etc.
+ */
 document.addEventListener('DOMContentLoaded', () => {
+    // ======================================================================
     // Configuration
+    // ======================================================================
+    
     const WORKER_URL = 'https://portfolio-chat.eayramia.workers.dev';
     const WELCOME_DELAY = 2500;
 
@@ -2176,7 +2606,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Elements
+    // ======================================================================
+    // DOM Element References
+    // ======================================================================
+    // Note: Using 'domElements' (abbreviated as 'els' for brevity in this large function)
+    
     const els = {
         widget: document.getElementById('chat-widget'),
         window: document.getElementById('chat-window'),
@@ -2322,13 +2756,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fix: Lightbulb icon toggle for chat suggestions
     els.suggestionsBtn?.addEventListener('click', () => {
         if (els.chipsContainer) {
-            const isHidden = els.chipsContainer.classList.contains('hidden') || 
-                           els.chipsContainer.style.display === 'none';
+            // Check visibility using computed styles to be accurate
+            const computedStyle = window.getComputedStyle(els.chipsContainer);
+            const isCurrentlyVisible = computedStyle.display !== 'none' && 
+                                       !els.chipsContainer.classList.contains('hidden');
             
-            if (isHidden) {
+            if (isCurrentlyVisible) {
+                // Hide suggestions
+                els.chipsContainer.classList.add('hidden');
+                els.chipsContainer.style.display = 'none';
+                els.suggestionsBtn.setAttribute('aria-pressed', 'false');
+            } else {
                 // Show suggestions
                 els.chipsContainer.classList.remove('hidden');
                 els.chipsContainer.style.display = 'flex';
+                els.suggestionsBtn.setAttribute('aria-pressed', 'true');
                 
                 // Generate contextual chips if none are showing
                 if (els.chipsContainer.children.length === 0 && chatHistory.length > 0) {
@@ -2351,10 +2793,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         addChipsCloseButton();
                     }
                 }
-            } else {
-                // Hide suggestions
-                els.chipsContainer.classList.add('hidden');
-                els.chipsContainer.style.display = 'none';
             }
         }
     });
@@ -2967,12 +3405,101 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Helper: produce the default fallback markup (keeps existing copy consistent)
+    const defaultFallback = () => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'rounded-xl border border-chocolate/20 bg-white/40 overflow-hidden p-8 text-center';
+        const p = document.createElement('p');
+        p.className = 'text-sm text-chocolate/70';
+        p.textContent = 'Inline PDF preview may be blocked by hosting or browser settings. Use the buttons below to open or download the deck.';
+        wrapper.appendChild(p);
+        return wrapper;
+    };
+
+    // Try to load a PDF into an iframe; if it fails, show fallback
+    const tryLoadPdf = (panel, pdfUrl) => {
+        if (!panel || !pdfUrl) return;
+        if (panel.dataset.pdfLoaded) return; // already attempted
+
+        // Insert a lightweight loading state
+        panel.innerHTML = '';
+        const loading = document.createElement('div');
+        loading.className = 'py-12 text-sm text-chocolate/60';
+        loading.textContent = 'Attempting to load inline preview…';
+        panel.appendChild(loading);
+
+        const iframe = document.createElement('iframe');
+        iframe.src = pdfUrl;
+        iframe.title = 'PDF preview';
+        iframe.style.width = '100%';
+        iframe.style.height = '480px';
+        iframe.style.border = '0';
+        iframe.loading = 'lazy';
+
+        let timedOut = false;
+        const timeout = setTimeout(() => {
+            timedOut = true;
+            // Loading took too long — assume blocked and fallback
+            try { iframe.remove(); } catch (e) {}
+            panel.innerHTML = '';
+            panel.appendChild(defaultFallback());
+            panel.dataset.pdfLoaded = 'false';
+        }, 2500);
+
+        const onFail = () => {
+            clearTimeout(timeout);
+            try { iframe.remove(); } catch (e) {}
+            panel.innerHTML = '';
+            panel.appendChild(defaultFallback());
+            panel.dataset.pdfLoaded = 'false';
+        };
+
+        iframe.addEventListener('load', () => {
+            clearTimeout(timeout);
+            // If iframe content is accessible, treat as success. If access throws, still consider success
+            // in many cases the PDF will render even if cross-origin access is blocked; show the iframe.
+            try {
+                panel.innerHTML = '';
+                panel.appendChild(iframe);
+                panel.dataset.pdfLoaded = 'true';
+            } catch (e) {
+                // If something goes wrong, fallback
+                onFail();
+            }
+        });
+
+        iframe.addEventListener('error', onFail);
+
+        // Append iframe so browser begins loading
+        panel.appendChild(iframe);
+    };
+
+    // Initialize toggles and progressive load for every preview-toggle on the page
     document.querySelectorAll('.preview-toggle').forEach((btn) => {
+        // Find the preview panel within the same section
+        const section = btn.closest('section');
+        const panel = section && section.querySelector('.preview-panel');
+
+        // Attempt to find a PDF link within the same section (first match)
+        let pdfLink = null;
+        if (section) {
+            pdfLink = section.querySelector('a[href$=".pdf"]') || section.querySelector('a[href*=".pdf?"]');
+        }
+        const pdfUrl = pdfLink ? pdfLink.getAttribute('href') : null;
+
+        // If a PDF URL exists, try to progressively load the iframe now (so the preview is ready).
+        // This preserves the user's expectation that an inline preview appears when possible.
+        if (panel && pdfUrl) {
+            tryLoadPdf(panel, pdfUrl);
+        }
+
         btn.addEventListener('click', () => {
-            const panel = btn.closest('section')?.querySelector('.preview-panel');
-            if (panel) {
-                panel.classList.toggle('hidden');
-                btn.textContent = panel.classList.contains('hidden') ? 'Show preview' : 'Hide preview';
+            if (!panel) return;
+            panel.classList.toggle('hidden');
+            btn.textContent = panel.classList.contains('hidden') ? 'Show preview' : 'Hide preview';
+            // If the panel becomes visible and we haven't attempted loading yet, try again
+            if (!panel.classList.contains('hidden') && !panel.dataset.pdfLoaded && pdfUrl) {
+                tryLoadPdf(panel, pdfUrl);
             }
         });
     });

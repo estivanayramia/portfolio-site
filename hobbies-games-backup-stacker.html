@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <!-- Meta Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Test your reflexes and strategy with premium arcade games: Snake, System Stacker, and System Merge (2048).">
+    <title>Arcade Games | Estivan Ayramia</title>
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Arcade Games | Estivan Ayramia">
+    <meta property="og:description" content="Premium arcade challenges: Snake, System Stacker tower game, and System Merge puzzle.">
+    <meta property="og:url" content="https://estivanayramia.com/hobbies-games.html">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/theme.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/img/icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+    
+    <style>
+        /* ============================================
+           CRITICAL FIX: Text Sharpness & Rendering
+           ============================================ */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        
+        /* Prevent sub-pixel blur from transforms */
+        .game-container,
+        .game-card,
+        .score-display,
+        button {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+        
+        /* ============================================
+           Layout & Spacing (Header Z-Index Fix)
+           ============================================ */
+        body {
+            padding-top: 0;
+        }
+        
+        main {
+            padding-top: 80px; /* Fixed header height + buffer */
+            min-height: calc(100vh - 80px);
+        }
+        
+        header {
+            z-index: 1000;
+        }
+        
+        /* ============================================
+           Dark Mode Support
+           ============================================ */
+        [data-theme="dark"] body {
+            background-color: #212842 !important;
+            color: #e1d4c2 !important;
+        }
+        
+        [data-theme="dark"] header {
+            background-color: rgba(33, 40, 66, 0.95) !important;
+            border-color: rgba(225, 212, 194, 0.1) !important;
+        }
+        
+        [data-theme="dark"] .bg-white\/50 {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+        
+        [data-theme="dark"] .border-chocolate\/10 {
+            border-color: rgba(225, 212, 194, 0.1) !important;
+        }
+        
+        [data-theme="dark"] .text-chocolate {
+            color: #e1d4c2 !important;
+        }
+        
+        [data-theme="dark"] .bg-chocolate {
+            background-color: #e1d4c2 !important;
+            color: #212842 !important;
+        }
+        
+        /* HIGH CONTRAST FIX: Skip button in dark mode */
+        [data-theme="dark"] .btn-skip {
+            background-color: #ffffff !important;
+            color: #212842 !important;
+            border: 2px solid #ffffff;
+        }
+        
+        [data-theme="dark"] .btn-skip:hover {
+            background-color: #e1d4c2 !important;
+            color: #212842 !important;
+        }
+        
+        /* ============================================
+           Game Container
+           ============================================ */
+        .game-container {
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        /* ============================================
+           Game Selection Cards
+           ============================================ */
+        .game-card {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: currentColor;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .game-card:hover::before {
+            left: 100%;
+        }
+        
+        .game-card:active {
+            transform: translateY(-4px) scale(1.01);
+        }
+        
+        /* ============================================
+           Score Display
+           ============================================ */
+        .score-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        /* ============================================
+           SNAKE GAME - Enhanced Visuals
+           ============================================ */
+        #snake-canvas {
+            border: 3px solid currentColor;
+            border-radius: 12px;
+            background: #1a1a2e;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        
+        [data-theme="light"] #snake-canvas {
+            background: #f5f5f5;
+            border-color: #362017;
+        }
+        
+        .touch-controls {
+            display: none;
+            gap: 8px;
+            margin-top: 24px;
+        }
+        
+        @media (max-width: 768px) {
+            .touch-controls {
+                display: grid;
+                grid-template-areas: 
+                    ". up ."
+                    "left . right"
+                    ". down .";
+                grid-template-columns: 60px 60px 60px;
+                grid-template-rows: 60px 60px 60px;
+            }
+        }
+        
+        .touch-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 28px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid currentColor;
+            color: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            transition: all 0.15s;
+        }
+        
+        .touch-btn:active {
+            background: rgba(0,0,0,0.6);
+            transform: scale(0.9);
+        }
+        
+        .touch-btn.up { grid-area: up; }
+        .touch-btn.down { grid-area: down; }
+        .touch-btn.left { grid-area: left; }
+        .touch-btn.right { grid-area: right; }
+        
+        /* ============================================
+           SYSTEM STACKER - Tower Building Game
+           ============================================ */
+        #stacker-canvas {
+            border: 3px solid currentColor;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #2d2d44 100%);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+        
+        [data-theme="light"] #stacker-canvas {
+            background: linear-gradient(180deg, #f5f5f5 0%, #e0e0e0 100%);
+        }
+        
+        /* ============================================
+           SYSTEM MERGE - 2048 Style Grid Game
+           ============================================ */
+        .merge-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 100%;
+            touch-action: none;
+        }
+        
+        .merge-tile {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .merge-tile.filled {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scale(1);
+            animation: tile-appear 0.2s ease-out;
+        }
+        
+        .merge-tile.merged {
+            animation: tile-merge 0.3s ease-out;
+        }
+        
+        @keyframes tile-appear {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes tile-merge {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        /* Tile colors based on value */
+        .merge-tile[data-value="2"] { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .merge-tile[data-value="4"] { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .merge-tile[data-value="8"] { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .merge-tile[data-value="16"] { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .merge-tile[data-value="32"] { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .merge-tile[data-value="64"] { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+        .merge-tile[data-value="128"] { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .merge-tile[data-value="256"] { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+        .merge-tile[data-value="512"] { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+        .merge-tile[data-value="1024"] { background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%); }
+        .merge-tile[data-value="2048"] { background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); }
+        
+        /* ============================================
+           MODAL - Non-Blocking, Auto-Dismiss
+           ============================================ */
+        .game-modal {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 999;
+            max-width: 400px;
+            padding: 24px;
+            background: rgba(33, 40, 66, 0.98);
+            border: 2px solid rgba(225, 212, 194, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            animation: modal-slide-in 0.3s ease-out;
+            pointer-events: auto;
+        }
+        
+        @keyframes modal-slide-in {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: inherit;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+        
+        /* ============================================
+           Responsive Adjustments
+           ============================================ */
+        @media (max-width: 640px) {
+            main {
+                padding-top: 70px;
+            }
+            
+            .game-modal {
+                left: 20px;
+                right: 20px;
+                top: 70px;
+                max-width: none;
+            }
+            
+            .score-display {
+                font-size: 1.25rem;
+                padding: 8px 16px;
+            }
+            
+            .merge-grid {
+                gap: 8px;
+                padding: 8px;
+            }
+            
+            .merge-tile {
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* ============================================
+           Utility Classes
+           ============================================ */
+        .hidden {
+            display: none !important;
+        }
+        
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.2);
+            border: 2px solid currentColor;
+            border-radius: 12px;
+            color: inherit;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-back:hover {
+            background: rgba(0,0,0,0.4);
+            transform: translateX(-4px);
+        }
+    </style>
+</head>
+<body class="bg-beige text-chocolate min-h-screen transition-colors duration-300">
+    <!-- Fixed Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/index.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <img src="/assets/img/logo-ea.webp" alt="EA Logo" class="w-8 h-8 object-contain" width="300" height="264" loading="eager">
+                <span class="font-semibold">Estivan Ayramia</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="/contact.html" class="text-sm font-medium hover:underline">Contact</a>
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-chocolate/10 transition-colors" aria-label="Toggle theme">
+                    🔆
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="pb-12 px-4">
+        <div class="max-w-5xl mx-auto">
+            <!-- ========================================
+                 GAME SELECTION SCREEN
+                 ======================================== -->
+            <section id="game-selection">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Select Your Challenge</h1>
+                    <p class="text-lg opacity-80 max-w-2xl mx-auto">
+                        Test your reflexes, strategy, and systems thinking with these premium arcade challenges.
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <!-- Snake Game -->
+                    <div class="game-card bg-white/50 rounded-2xl p-8 text-center" onclick="startGame('snake')">
+                        <div class="text-6xl mb-4">🐍</div>
+                        <h3 class="text-2xl font-bold mb-3">Snake</h3>
+                        <p class="text-sm opacity-70 mb-4">
+                            Classic reflexes test. Eat food, grow longer, avoid walls and yourself.
+                        </p>
+                        <div class="inline-block px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium">
+                            Test Reflexes
+                        </div>
+                    </div>
+                    
+                    <!-- System Stacker -->
+                    <div class="game-card bg-white/50 rounded-2xl p-8 text-center" onclick="startGame('stacker')">
+                        <div class="text-6xl mb-4">📦</div>
+                        <h3 class="text-2xl font-bold mb-3">System Stacker</h3>
+                        <p class="text-sm opacity-70 mb-4">
+                            Build a tower by stacking blocks. Perfect alignment or get sliced!
+                        </p>
+                        <div class="inline-block px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium">
+                            Test Precision
+                        </div>
+                    </div>
+                    
+                    <!-- System Merge -->
+                    <div class="game-card bg-white/50 rounded-2xl p-8 text-center" onclick="startGame('merge')">
+                        <div class="text-6xl mb-4">🧩</div>
+                        <h3 class="text-2xl font-bold mb-3">System Merge</h3>
+                        <p class="text-sm opacity-70 mb-4">
+                            Combine tiles to reach 2048. Strategy meets satisfying merges.
+                        </p>
+                        <div class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">
+                            Test Strategy
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Continue Button - Always Visible -->
+                <div class="text-center">
+                    <a href="/hobbies.html" class="btn-skip inline-flex items-center gap-2 px-8 py-4 bg-chocolate text-beige rounded-full font-semibold hover:opacity-90 transition-all text-lg">
+                        Continue to Hobbies
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                        </svg>
+                    </a>
+                    <p class="text-sm opacity-60 mt-3">Or pick a game above to test your skills first</p>
+                </div>
+            </section>
+
+            <!-- ========================================
+                 SNAKE GAME SCREEN
+                 ======================================== -->
+            <section id="snake-game" class="hidden">
+                <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                    <button onclick="backToSelection()" class="btn-back">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Back to Menu
+                    </button>
+                    <h2 class="text-3xl font-bold">🐍 Snake</h2>
+                    <div class="score-display">Score: <span id="snake-score">0</span></div>
+                </div>
+                
+                <div class="game-container">
+                    <canvas id="snake-canvas" width="400" height="400"></canvas>
+                    <div class="touch-controls">
+                        <button class="touch-btn up" onclick="setSnakeDirection('up')">↑</button>
+                        <button class="touch-btn left" onclick="setSnakeDirection('left')">←</button>
+                        <button class="touch-btn right" onclick="setSnakeDirection('right')">→</button>
+                        <button class="touch-btn down" onclick="setSnakeDirection('down')">↓</button>
+                    </div>
+                    <p class="mt-6 text-sm opacity-70">Desktop: Arrow keys or WASD | Mobile: Touch controls</p>
+                    <button id="snake-start" onclick="initSnake()" class="mt-4 px-8 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-semibold text-lg">
+                        Start Game
+                    </button>
+                </div>
+            </section>
+
+            <!-- ========================================
+                 SYSTEM STACKER GAME SCREEN
+                 ======================================== -->
+            <section id="stacker-game" class="hidden">
+                <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                    <button onclick="backToSelection()" class="btn-back">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Back to Menu
+                    </button>
+                    <h2 class="text-3xl font-bold">📦 System Stacker</h2>
+                    <div class="score-display">Height: <span id="stacker-score">0</span></div>
+                </div>
+                
+                <div class="game-container">
+                    <canvas id="stacker-canvas" width="400" height="500"></canvas>
+                    <p class="mt-6 text-sm opacity-70">Click/Tap to drop the block. Perfect alignment = full size!</p>
+                    <button id="stacker-start" onclick="initStacker()" class="mt-4 px-8 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors font-semibold text-lg">
+                        Start Game
+                    </button>
+                </div>
+            </section>
+
+            <!-- ========================================
+                 SYSTEM MERGE GAME SCREEN
+                 ======================================== -->
+            <section id="merge-game" class="hidden">
+                <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                    <button onclick="backToSelection()" class="btn-back">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Back to Menu
+                    </button>
+                    <h2 class="text-3xl font-bold">🧩 System Merge</h2>
+                    <div class="score-display">Score: <span id="merge-score">0</span></div>
+                </div>
+                
+                <div class="game-container">
+                    <div class="merge-grid" id="merge-grid">
+                        <!-- Generated by JS -->
+                    </div>
+                    <p class="mt-6 text-sm opacity-70">Desktop: Arrow keys | Mobile: Swipe to move tiles</p>
+                    <button id="merge-start" onclick="initMerge()" class="mt-4 px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold text-lg">
+                        Start Game
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-chocolate/10 py-6 px-4">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm opacity-70">
+            <a href="/index.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <img src="/assets/img/logo-ea.webp" alt="EA Logo" class="w-6 h-6 object-contain" width="300" height="264" loading="lazy">
+                <span>Estivan Ayramia</span>
+            </a>
+            <div class="flex gap-6">
+                <a href="/contact.html" class="hover:underline">Contact</a>
+                <a href="/privacy.html" class="hover:underline">Privacy</a>
+                <a href="/humans.txt" class="hover:underline">Humans.txt</a>
+            </div>
+            <p>© 2025 Estivan Ayramia</p>
+        </div>
+    </footer>
+
+    <script>
+        // ====================================================================
+        // THEME TOGGLE
+        // ====================================================================
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        const savedTheme = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme) {
+            html.setAttribute('data-theme', savedTheme);
+        } else if (!systemDark) {
+            html.setAttribute('data-theme', 'light');
+        } else {
+            html.setAttribute('data-theme', 'dark');
+        }
+        
+        const currentTheme = html.getAttribute('data-theme');
+        themeToggle.innerHTML = currentTheme === 'dark' ? '🔆' : '🌙';
+        
+        themeToggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            themeToggle.innerHTML = next === 'dark' ? '🔆' : '🌙';
+        });
+
+        // ====================================================================
+        // NAVIGATION
+        // ====================================================================
+        let currentGame = null;
+
+        function startGame(game) {
+            currentGame = game;
+            document.getElementById('game-selection').classList.add('hidden');
+            document.getElementById(`${game}-game`).classList.remove('hidden');
+            
+            // Auto-start games that don't require setup
+            if (game === 'merge') {
+                setTimeout(() => initMerge(), 100);
+            }
+        }
+
+        function backToSelection() {
+            if (snakeInterval) clearInterval(snakeInterval);
+            if (stackerAnimationId) cancelAnimationFrame(stackerAnimationId);
+            
+            document.querySelectorAll('section[id$="-game"]').forEach(s => s.classList.add('hidden'));
+            document.getElementById('game-selection').classList.remove('hidden');
+            currentGame = null;
+        }
+
+        function showGameOver(emoji, title, message) {
+            const modal = document.createElement('div');
+            modal.className = 'game-modal';
+            modal.innerHTML = `
+                <button class="modal-close" onclick="this.parentElement.remove()">×</button>
+                <div class="text-center">
+                    <div class="text-6xl mb-4">${emoji}</div>
+                    <h3 class="text-2xl font-bold mb-2">${title}</h3>
+                    <p class="text-lg mb-6 opacity-90">${message}</p>
+                    <div class="flex gap-3 justify-center flex-wrap">
+                        <button onclick="restartCurrentGame(); this.closest('.game-modal').remove();" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                            Play Again
+                        </button>
+                        <button onclick="this.closest('.game-modal').remove();" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Auto-dismiss after 10 seconds
+            setTimeout(() => {
+                if (modal.parentElement) modal.remove();
+            }, 10000);
+        }
+
+        function restartCurrentGame() {
+            if (currentGame === 'snake') initSnake();
+            else if (currentGame === 'stacker') initStacker();
+            else if (currentGame === 'merge') initMerge();
+        }
+
+        // ====================================================================
+        // SNAKE GAME (Enhanced Visuals)
+        // ====================================================================
+        const snakeCanvas = document.getElementById('snake-canvas');
+        const snakeCtx = snakeCanvas.getContext('2d');
+        const gridSize = 20;
+        const tileCount = snakeCanvas.width / gridSize;
+        
+        let snake = [];
+        let food = {};
+        let direction = { x: 0, y: 0 };
+        let nextDirection = { x: 0, y: 0 };
+        let snakeScore = 0;
+        let snakeInterval = null;
+        let gameRunning = false;
+
+        function initSnake() {
+            snake = [
+                { x: 10, y: 10 },
+                { x: 9, y: 10 },
+                { x: 8, y: 10 }
+            ];
+            direction = { x: 1, y: 0 };
+            nextDirection = { x: 1, y: 0 };
+            snakeScore = 0;
+            document.getElementById('snake-score').textContent = '0';
+            placeFood();
+            
+            if (snakeInterval) clearInterval(snakeInterval);
+            gameRunning = true;
+            snakeInterval = setInterval(gameLoop, 100);
+            document.getElementById('snake-start').textContent = 'Restart';
+        }
+
+        function placeFood() {
+            food = {
+                x: Math.floor(Math.random() * tileCount),
+                y: Math.floor(Math.random() * tileCount)
+            };
+            for (let segment of snake) {
+                if (segment.x === food.x && segment.y === food.y) {
+                    placeFood();
+                    return;
+                }
+            }
+        }
+
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            direction = { ...nextDirection };
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+            
+            if (head.x < 0 || head.x >= tileCount || head.y < 0 || head.y >= tileCount) {
+                gameOver('snake');
+                return;
+            }
+            
+            for (let segment of snake) {
+                if (head.x === segment.x && head.y === segment.y) {
+                    gameOver('snake');
+                    return;
+                }
+            }
+            
+            snake.unshift(head);
+            
+            if (head.x === food.x && head.y === food.y) {
+                snakeScore += 10;
+                document.getElementById('snake-score').textContent = snakeScore;
+                placeFood();
+            } else {
+                snake.pop();
+            }
+            
+            draw();
+        }
+
+        function draw() {
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            
+            snakeCtx.fillStyle = isDark ? '#1a1a2e' : '#f5f5f5';
+            snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+            
+            // Grid
+            snakeCtx.strokeStyle = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+            snakeCtx.lineWidth = 1;
+            for (let i = 0; i <= tileCount; i++) {
+                snakeCtx.beginPath();
+                snakeCtx.moveTo(i * gridSize, 0);
+                snakeCtx.lineTo(i * gridSize, snakeCanvas.height);
+                snakeCtx.stroke();
+                snakeCtx.beginPath();
+                snakeCtx.moveTo(0, i * gridSize);
+                snakeCtx.lineTo(snakeCanvas.width, i * gridSize);
+                snakeCtx.stroke();
+            }
+            
+            // Snake
+            snake.forEach((segment, index) => {
+                const gradient = snakeCtx.createRadialGradient(
+                    segment.x * gridSize + gridSize/2,
+                    segment.y * gridSize + gridSize/2,
+                    0,
+                    segment.x * gridSize + gridSize/2,
+                    segment.y * gridSize + gridSize/2,
+                    gridSize/2
+                );
+                
+                if (index === 0) {
+                    gradient.addColorStop(0, '#22c55e');
+                    gradient.addColorStop(1, '#16a34a');
+                } else {
+                    const brightness = Math.max(0.4, 1 - (index * 0.05));
+                    gradient.addColorStop(0, `rgba(34, 197, 94, ${brightness})`);
+                    gradient.addColorStop(1, `rgba(22, 163, 74, ${brightness})`);
+                }
+                
+                snakeCtx.fillStyle = gradient;
+                snakeCtx.beginPath();
+                snakeCtx.roundRect(
+                    segment.x * gridSize + 1,
+                    segment.y * gridSize + 1,
+                    gridSize - 2,
+                    gridSize - 2,
+                    4
+                );
+                snakeCtx.fill();
+                
+                // Eyes on head
+                if (index === 0) {
+                    snakeCtx.fillStyle = 'white';
+                    const eyeSize = 3;
+                    
+                    if (direction.x === 1) {
+                        snakeCtx.beginPath();
+                        snakeCtx.arc(segment.x * gridSize + 14, segment.y * gridSize + 6, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.arc(segment.x * gridSize + 14, segment.y * gridSize + 14, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.fill();
+                    } else if (direction.x === -1) {
+                        snakeCtx.beginPath();
+                        snakeCtx.arc(segment.x * gridSize + 6, segment.y * gridSize + 6, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.arc(segment.x * gridSize + 6, segment.y * gridSize + 14, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.fill();
+                    } else if (direction.y === -1) {
+                        snakeCtx.beginPath();
+                        snakeCtx.arc(segment.x * gridSize + 6, segment.y * gridSize + 6, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.arc(segment.x * gridSize + 14, segment.y * gridSize + 6, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.fill();
+                    } else {
+                        snakeCtx.beginPath();
+                        snakeCtx.arc(segment.x * gridSize + 6, segment.y * gridSize + 14, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.arc(segment.x * gridSize + 14, segment.y * gridSize + 14, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.fill();
+                    }
+                }
+            });
+            
+            // Food
+            snakeCtx.fillStyle = '#ef4444';
+            snakeCtx.beginPath();
+            snakeCtx.arc(
+                food.x * gridSize + gridSize/2,
+                food.y * gridSize + gridSize/2 + 2,
+                gridSize/2 - 3,
+                0,
+                Math.PI * 2
+            );
+            snakeCtx.fill();
+            
+            snakeCtx.fillStyle = '#84cc16';
+            snakeCtx.fillRect(food.x * gridSize + gridSize/2 - 2, food.y * gridSize + 2, 4, 6);
+        }
+
+        function gameOver(game) {
+            gameRunning = false;
+            if (snakeInterval) clearInterval(snakeInterval);
+            
+            let message = `Final Score: ${snakeScore}`;
+            let emoji = '🐍';
+            if (snakeScore >= 100) {
+                emoji = '🏆';
+                message += ' - Amazing!';
+            } else if (snakeScore >= 50) {
+                emoji = '🌟';
+                message += ' - Great job!';
+            }
+            
+            showGameOver(emoji, 'Game Over!', message);
+        }
+
+        function setSnakeDirection(dir) {
+            if (!gameRunning) return;
+            
+            const opposites = { up: 'down', down: 'up', left: 'right', right: 'left' };
+            const currentDir = direction.y === -1 ? 'up' : direction.y === 1 ? 'down' : direction.x === -1 ? 'left' : 'right';
+            
+            if (dir === opposites[currentDir]) return;
+            
+            switch(dir) {
+                case 'up': nextDirection = { x: 0, y: -1 }; break;
+                case 'down': nextDirection = { x: 0, y: 1 }; break;
+                case 'left': nextDirection = { x: -1, y: 0 }; break;
+                case 'right': nextDirection = { x: 1, y: 0 }; break;
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (currentGame !== 'snake' || !gameRunning) return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    e.preventDefault();
+                    setSnakeDirection('up');
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    e.preventDefault();
+                    setSnakeDirection('down');
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    e.preventDefault();
+                    setSnakeDirection('left');
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    e.preventDefault();
+                    setSnakeDirection('right');
+                    break;
+            }
+        });
+
+        // ====================================================================
+        // SYSTEM STACKER (Tower Building Game)
+        // ====================================================================
+        const stackerCanvas = document.getElementById('stacker-canvas');
+        const stackerCtx = stackerCanvas.getContext('2d');
+        
+        let stackerBlocks = [];
+        let stackerCurrentBlock = null;
+        let stackerScore = 0;
+        let stackerAnimationId = null;
+        let stackerRunning = false;
+        let stackerBlockWidth = 200;
+        const stackerBlockHeight = 30;
+        const stackerSpeed = 3;
+
+        function initStacker() {
+            stackerBlocks = [{ x: 100, y: 470, width: 200, color: getStackerColor(0) }];
+            stackerCurrentBlock = {
+                x: 0,
+                y: 440,
+                width: 200,
+                direction: 1,
+                color: getStackerColor(1)
+            };
+            stackerScore = 0;
+            stackerBlockWidth = 200;
+            document.getElementById('stacker-score').textContent = '0';
+            stackerRunning = true;
+            document.getElementById('stacker-start').textContent = 'Restart';
+            
+            stackerCanvas.onclick = dropBlock;
+            animateStacker();
+        }
+
+        function getStackerColor(level) {
+            const colors = [
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                'linear-gradient(135deg, #30cfd0 0%, #330867 100%)'
+            ];
+            return colors[level % colors.length];
+        }
+
+        function animateStacker() {
+            if (!stackerRunning) return;
+            
+            stackerCtx.clearRect(0, 0, stackerCanvas.width, stackerCanvas.height);
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            
+            // Background
+            const bgGradient = stackerCtx.createLinearGradient(0, 0, 0, stackerCanvas.height);
+            bgGradient.addColorStop(0, isDark ? '#1a1a2e' : '#f5f5f5');
+            bgGradient.addColorStop(1, isDark ? '#2d2d44' : '#e0e0e0');
+            stackerCtx.fillStyle = bgGradient;
+            stackerCtx.fillRect(0, 0, stackerCanvas.width, stackerCanvas.height);
+            
+            // Draw stacked blocks
+            stackerBlocks.forEach(block => {
+                drawGradientBlock(stackerCtx, block.x, block.y, block.width, stackerBlockHeight, block.color);
+            });
+            
+            // Draw current block
+            if (stackerCurrentBlock) {
+                stackerCurrentBlock.x += stackerSpeed * stackerCurrentBlock.direction;
+                
+                if (stackerCurrentBlock.x <= 0) {
+                    stackerCurrentBlock.x = 0;
+                    stackerCurrentBlock.direction = 1;
+                } else if (stackerCurrentBlock.x + stackerCurrentBlock.width >= stackerCanvas.width) {
+                    stackerCurrentBlock.x = stackerCanvas.width - stackerCurrentBlock.width;
+                    stackerCurrentBlock.direction = -1;
+                }
+                
+                drawGradientBlock(stackerCtx, stackerCurrentBlock.x, stackerCurrentBlock.y, stackerCurrentBlock.width, stackerBlockHeight, stackerCurrentBlock.color);
+            }
+            
+            stackerAnimationId = requestAnimationFrame(animateStacker);
+        }
+
+        function drawGradientBlock(ctx, x, y, width, height, gradientStr) {
+            // Parse gradient string (simplified)
+            ctx.fillStyle = '#667eea'; // Fallback
+            if (gradientStr.includes('#667eea')) ctx.fillStyle = '#667eea';
+            else if (gradientStr.includes('#f093fb')) ctx.fillStyle = '#f093fb';
+            else if (gradientStr.includes('#4facfe')) ctx.fillStyle = '#4facfe';
+            else if (gradientStr.includes('#43e97b')) ctx.fillStyle = '#43e97b';
+            else if (gradientStr.includes('#fa709a')) ctx.fillStyle = '#fa709a';
+            else if (gradientStr.includes('#30cfd0')) ctx.fillStyle = '#30cfd0';
+            
+            ctx.fillRect(x, y, width, height);
+            
+            // Add shine effect
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.fillRect(x, y, width, height / 3);
+        }
+
+        function dropBlock() {
+            if (!stackerRunning || !stackerCurrentBlock) return;
+            
+            const lastBlock = stackerBlocks[stackerBlocks.length - 1];
+            const overlap = calculateOverlap(stackerCurrentBlock.x, stackerCurrentBlock.width, lastBlock.x, lastBlock.width);
+            
+            if (overlap <= 0) {
+                // Miss - game over
+                stackerRunning = false;
+                cancelAnimationFrame(stackerAnimationId);
+                showGameOver('📦', 'Tower Collapsed!', `Final Height: ${stackerScore}`);
+                return;
+            }
+            
+            // Calculate new block position and width
+            const newX = Math.max(stackerCurrentBlock.x, lastBlock.x);
+            const newWidth = overlap;
+            
+            stackerBlocks.push({
+                x: newX,
+                y: stackerCurrentBlock.y,
+                width: newWidth,
+                color: stackerCurrentBlock.color
+            });
+            
+            stackerScore++;
+            document.getElementById('stacker-score').textContent = stackerScore;
+            
+            // Create next block
+            stackerCurrentBlock = {
+                x: 0,
+                y: stackerCurrentBlock.y - stackerBlockHeight,
+                width: newWidth,
+                direction: 1,
+                color: getStackerColor(stackerScore + 1)
+            };
+            
+            // Check if tower is too high
+            if (stackerCurrentBlock.y < 50) {
+                stackerRunning = false;
+                cancelAnimationFrame(stackerAnimationId);
+                showGameOver('🏆', 'Tower Complete!', `Incredible Height: ${stackerScore}!`);
+            }
+        }
+
+        function calculateOverlap(x1, w1, x2, w2) {
+            const left = Math.max(x1, x2);
+            const right = Math.min(x1 + w1, x2 + w2);
+            return Math.max(0, right - left);
+        }
+
+        // ====================================================================
+        // SYSTEM MERGE (2048-style Grid Game)
+        // ====================================================================
+        let mergeGrid = [];
+        let mergeScore = 0;
+        let mergeRunning = false;
+
+        function initMerge() {
+            mergeGrid = Array(4).fill(null).map(() => Array(4).fill(0));
+            mergeScore = 0;
+            document.getElementById('merge-score').textContent = '0';
+            mergeRunning = true;
+            document.getElementById('merge-start').textContent = 'Restart';
+            
+            addMergeTile();
+            addMergeTile();
+            renderMergeGrid();
+            
+            // Enable keyboard controls
+            document.addEventListener('keydown', handleMergeKey);
+            
+            // Enable touch controls
+            const gridEl = document.getElementById('merge-grid');
+            let touchStartX = 0;
+            let touchStartY = 0;
+            
+            gridEl.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
+            });
+            
+            gridEl.addEventListener('touchend', (e) => {
+                if (!mergeRunning) return;
+                const touchEndX = e.changedTouches[0].clientX;
+                const touchEndY = e.changedTouches[0].clientY;
+                
+                const deltaX = touchEndX - touchStartX;
+                const deltaY = touchEndY - touchStartY;
+                
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    if (deltaX > 30) moveMergeTiles('right');
+                    else if (deltaX < -30) moveMergeTiles('left');
+                } else {
+                    if (deltaY > 30) moveMergeTiles('down');
+                    else if (deltaY < -30) moveMergeTiles('up');
+                }
+            });
+        }
+
+        function addMergeTile() {
+            const emptySpots = [];
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 4; c++) {
+                    if (mergeGrid[r][c] === 0) {
+                        emptySpots.push({ r, c });
+                    }
+                }
+            }
+            
+            if (emptySpots.length > 0) {
+                const spot = emptySpots[Math.floor(Math.random() * emptySpots.length)];
+                mergeGrid[spot.r][spot.c] = Math.random() < 0.9 ? 2 : 4;
+            }
+        }
+
+        function renderMergeGrid() {
+            const gridEl = document.getElementById('merge-grid');
+            gridEl.innerHTML = '';
+            
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 4; c++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'merge-tile';
+                    
+                    if (mergeGrid[r][c] > 0) {
+                        tile.classList.add('filled');
+                        tile.textContent = mergeGrid[r][c];
+                        tile.setAttribute('data-value', mergeGrid[r][c]);
+                    }
+                    
+                    gridEl.appendChild(tile);
+                }
+            }
+        }
+
+        function handleMergeKey(e) {
+            if (currentGame !== 'merge' || !mergeRunning) return;
+            
+            switch(e.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    e.preventDefault();
+                    moveMergeTiles('up');
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    e.preventDefault();
+                    moveMergeTiles('down');
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    e.preventDefault();
+                    moveMergeTiles('left');
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    e.preventDefault();
+                    moveMergeTiles('right');
+                    break;
+            }
+        }
+
+        function moveMergeTiles(direction) {
+            let moved = false;
+            const oldGrid = JSON.stringify(mergeGrid);
+            
+            if (direction === 'left') {
+                for (let r = 0; r < 4; r++) {
+                    mergeGrid[r] = slideAndMerge(mergeGrid[r]);
+                }
+            } else if (direction === 'right') {
+                for (let r = 0; r < 4; r++) {
+                    mergeGrid[r] = slideAndMerge(mergeGrid[r].reverse()).reverse();
+                }
+            } else if (direction === 'up') {
+                for (let c = 0; c < 4; c++) {
+                    let column = mergeGrid.map(row => row[c]);
+                    column = slideAndMerge(column);
+                    for (let r = 0; r < 4; r++) {
+                        mergeGrid[r][c] = column[r];
+                    }
+                }
+            } else if (direction === 'down') {
+                for (let c = 0; c < 4; c++) {
+                    let column = mergeGrid.map(row => row[c]);
+                    column = slideAndMerge(column.reverse()).reverse();
+                    for (let r = 0; r < 4; r++) {
+                        mergeGrid[r][c] = column[r];
+                    }
+                }
+            }
+            
+            if (JSON.stringify(mergeGrid) !== oldGrid) {
+                moved = true;
+                addMergeTile();
+                renderMergeGrid();
+                
+                if (!canMove()) {
+                    mergeRunning = false;
+                    showGameOver('🧩', 'Game Over!', `Final Score: ${mergeScore}`);
+                }
+                
+                // Check for 2048
+                for (let r = 0; r < 4; r++) {
+                    for (let c = 0; c < 4; c++) {
+                        if (mergeGrid[r][c] === 2048) {
+                            mergeRunning = false;
+                            showGameOver('🏆', 'You Win!', `You reached 2048! Score: ${mergeScore}`);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        function slideAndMerge(row) {
+            // Remove zeros
+            let filtered = row.filter(x => x !== 0);
+            
+            // Merge adjacent tiles
+            for (let i = 0; i < filtered.length - 1; i++) {
+                if (filtered[i] === filtered[i + 1]) {
+                    filtered[i] *= 2;
+                    mergeScore += filtered[i];
+                    document.getElementById('merge-score').textContent = mergeScore;
+                    filtered.splice(i + 1, 1);
+                }
+            }
+            
+            // Add zeros back
+            while (filtered.length < 4) {
+                filtered.push(0);
+            }
+            
+            return filtered;
+        }
+
+        function canMove() {
+            // Check for empty cells
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 4; c++) {
+                    if (mergeGrid[r][c] === 0) return true;
+                }
+            }
+            
+            // Check for possible merges
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 4; c++) {
+                    const val = mergeGrid[r][c];
+                    if (c < 3 && val === mergeGrid[r][c + 1]) return true;
+                    if (r < 3 && val === mergeGrid[r + 1][c]) return true;
+                }
+            }
+            
+            return false;
+        }
+
+        // Initial canvas draw for Snake
+        if (snakeCanvas) draw();
+    </script>
+</body>
+</html>

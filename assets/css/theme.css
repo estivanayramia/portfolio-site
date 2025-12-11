@@ -1,3 +1,29 @@
+/**
+ * ============================================================================
+ * PORTFOLIO SITE - THEME & CUSTOM CSS
+ * ============================================================================
+ * 
+ * Purpose: Custom styles and Tailwind overrides for the portfolio website
+ * 
+ * Architecture:
+ * 1. Font System Enforcement (Inter for Latin, Cairo for Arabic)
+ * 2. No-JS Fallbacks & Accessibility
+ * 3. Branding (Selection colors, caret color)
+ * 4. CSS Variables (Theme colors)
+ * 5. Dark Mode Overrides ([data-theme="dark"] selectors)
+ * 6. Component Styles (Chat widget, mobile menu, etc.)
+ * 7. Utility Classes & Responsive Helpers
+ * 
+ * Dark Mode Implementation:
+ * - Uses [data-theme="dark"] attribute on <html> element
+ * - JavaScript in site.js manages theme switching
+ * - CSS Variables update based on theme
+ * - Tailwind dark: prefix mapped to [data-theme="dark"] selectors
+ * 
+ * @version 2.0.0
+ * @author Estivan Ayramia
+ */
+
 /* ==========================================================================
    Font System Enforcement
    Ensures consistent font rendering across local and production environments
@@ -111,6 +137,9 @@ textarea,
     --color-header-bg: rgba(225, 212, 194, 0.95);
     /* Bubble ring color for light theme */
     --bubble-ring: #212842;
+    /* Game canvas colors for light theme */
+    --game-fg: #212842;
+    --game-btn-fg: #241b0f;
 }
 
 [data-theme="dark"] {
@@ -123,6 +152,9 @@ textarea,
     --color-header-bg: rgba(10, 10, 10, 0.95);
     /* Bubble ring color for dark theme */
     --bubble-ring: #e1d4c2;
+    /* Game canvas colors for dark theme */
+    --game-fg: #ffffff;
+    --game-btn-fg: #ffffff;
 }
 
 /* High-contrast fixes: ensure text and links meet contrast on indigodeep backgrounds */
@@ -189,6 +221,11 @@ body {
     background-color: var(--color-bg) !important;
     color: var(--color-text) !important;
     overscroll-behavior-y: none; /* Prevent rubber-banding on mobile */
+}
+
+/* Game action buttons - theme-aware text color */
+.game-action {
+    color: var(--game-btn-fg) !important;
 }
 
 /* Typography: Balanced headings */
