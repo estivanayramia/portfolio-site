@@ -506,6 +506,8 @@
                 currentLightboxIndex = i;
                 lightboxImg.src = images[i].src;
                 lightboxImg.alt = images[i].alt;
+                // Copy inline transform (if present) so preview matches gallery orientation
+                lightboxImg.style.transform = images[i].style.transform || '';
                 lightbox.classList.add('active');
                 lightbox.setAttribute('aria-hidden', 'false');
             });
@@ -518,17 +520,21 @@
             currentLightboxIndex = (currentLightboxIndex - 1 + images.length) % images.length;
             lightboxImg.src = images[currentLightboxIndex].src;
             lightboxImg.alt = images[currentLightboxIndex].alt;
+            lightboxImg.style.transform = images[currentLightboxIndex].style.transform || '';
         });
         
         document.querySelector('.lightbox-next').addEventListener('click', () => {
             currentLightboxIndex = (currentLightboxIndex + 1) % images.length;
             lightboxImg.src = images[currentLightboxIndex].src;
             lightboxImg.alt = images[currentLightboxIndex].alt;
+            lightboxImg.style.transform = images[currentLightboxIndex].style.transform || '';
         });
         
         function closeLightbox() {
             lightbox.classList.remove('active');
             lightbox.setAttribute('aria-hidden', 'true');
+            // Clear any transform applied to the preview
+            lightboxImg.style.transform = '';
         }
         
         document.addEventListener('keydown', (e) => {
