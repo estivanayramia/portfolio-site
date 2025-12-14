@@ -2625,6 +2625,40 @@ document.addEventListener('DOMContentLoaded', () => {
         suggestionsBtn: document.getElementById('suggestions-btn')
     };
 
+    /* Scroll progress fallback: set --scroll-scale on .scroll-progress for browsers
+       that do not support scroll-linked animation timelines. */
+    (function registerScrollProgressFallback() {
+        try {
+            if (window.CSS && CSS.supports && CSS.supports('animation-timeline','scroll()')) return;
+        } catch (e) {}
+
+        const el = document.querySelector('.scroll-progress');
+        if (!el) return;
+
+        let ticking = false;
+
+        function update() {
+            const doc = document.documentElement;
+            const scrollTop = window.scrollY || doc.scrollTop || 0;
+            const docHeight = Math.max((doc.scrollHeight || document.body.scrollHeight || 0) - window.innerHeight, 0);
+            const frac = docHeight > 0 ? Math.min(1, Math.max(0, scrollTop / docHeight)) : 0;
+            el.style.setProperty('--scroll-scale', frac);
+            ticking = false;
+        }
+
+        const schedule = function() {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(update);
+        };
+
+        window.addEventListener('scroll', schedule, { passive: true });
+        window.addEventListener('resize', schedule, { passive: true });
+
+        // Initial sync
+        requestAnimationFrame(update);
+    })();
+
     // Position widget based on language
     const lang = document.documentElement.lang;
     if (lang === 'ar' && els.widget) {

@@ -2392,10 +2392,11 @@ footer, .section-below-fold {
 }
 
 /* ==========================================================================
-   Scroll Progress Bar (CSS-only)
+   Scroll Progress Bar (timeline-preserving + transform fallback)
    ========================================================================== */
 
 .scroll-progress {
+    --scroll-color: #212842; /* default (light theme) */
     position: fixed;
     top: 0;
     left: 0;
@@ -2403,32 +2404,43 @@ footer, .section-below-fold {
     height: 3px;
     background: transparent;
     z-index: 9998;
+    pointer-events: none;
+}
+
+/* Dark-theme override: Chocolate color */
+[data-theme="dark"] .scroll-progress {
+    --scroll-color: #362017;
 }
 
 .scroll-progress::before {
     content: '';
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 3px;
-    background: linear-gradient(to right, #212842 var(--scroll-progress, 0%), transparent 0%);
+    height: 100%;
+    background-color: var(--scroll-color);
     transform-origin: 0 50%;
-    animation: scroll-progress linear;
-    animation-timeline: scroll();
+    transform: scaleX(0);
+    will-change: transform;
 }
 
+/* Animation for browsers with support */
 @supports (animation-timeline: scroll()) {
-    @keyframes scroll-progress {
-        from { --scroll-progress: 0%; }
-        to { --scroll-progress: 100%; }
+    .scroll-progress::before {
+        animation: scroll-progress-anim linear;
+        animation-timeline: scroll();
+    }
+    @keyframes scroll-progress-anim {
+        from { transform: scaleX(0); }
+        to { transform: scaleX(1); }
     }
 }
 
-/* Fallback for browsers without scroll timeline support */
+/* Fallback for browsers without support */
 @supports not (animation-timeline: scroll()) {
     .scroll-progress::before {
-        display: none;
+        transform: scaleX(var(--scroll-scale, 0));
     }
 }
 
