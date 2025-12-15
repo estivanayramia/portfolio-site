@@ -30,7 +30,7 @@ console.log('[Savonie DEBUG] site.js loaded');
  * 
  * Services used:
  * - Google Analytics 4 (GA4): G-MCN4RXCY6Q
- * - Microsoft Clarity: ubbdpwxnae
+ * - Microsoft Clarity: uawk2g8xee
  * 
  * How it works:
  * 1. lazy-loader.js loads analytics on first user interaction (scroll, click, etc.)
@@ -3027,10 +3027,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // Opening: remove hidden, add flex
             els.window?.classList.remove('hidden');
             els.window?.classList.add('flex');
+
+            // Track open event
+            if (typeof clarity === 'function') clarity('event', 'chat_open');
+            if (typeof gtag === 'function') gtag('event', 'chat_open', {'event_category': 'Chatbot'});
         } else {
             // Closing: remove flex, add hidden
             els.window?.classList.remove('flex');
             els.window?.classList.add('hidden');
+
+            // Track close event
+            if (typeof clarity === 'function') clarity('event', 'chat_close');
+            if (typeof gtag === 'function') gtag('event', 'chat_close', {'event_category': 'Chatbot'});
         }
         
         if (!els.window?.classList.contains('hidden')) {
@@ -3122,6 +3130,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 'event_category': 'Chatbot',
                 'event_label': 'User Asked Question'
             });
+        }
+        // Clarity event tracking
+        if(typeof clarity === 'function') {
+            clarity('event', 'chat_question');
         }
 
         // Enhanced network check for mobile devices
@@ -3529,9 +3541,15 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             if (!panel) return;
             panel.classList.toggle('hidden');
-            btn.textContent = panel.classList.contains('hidden') ? 'Show preview' : 'Hide preview';
+            const isVisible = !panel.classList.contains('hidden');
+            btn.textContent = isVisible ? 'Hide preview' : 'Show preview';
+
+            // Track PDF toggle
+            if (typeof clarity === 'function') clarity('event', isVisible ? 'pdf_preview_show' : 'pdf_preview_hide');
+            if (typeof gtag === 'function') gtag('event', isVisible ? 'pdf_preview_show' : 'pdf_preview_hide', {'event_category': 'PDF'});
+
             // If the panel becomes visible and we haven't attempted loading yet, try again
-            if (!panel.classList.contains('hidden') && !panel.dataset.pdfLoaded && pdfUrl) {
+            if (isVisible && !panel.dataset.pdfLoaded && pdfUrl) {
                 tryLoadPdf(panel, pdfUrl);
             }
         });

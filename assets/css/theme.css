@@ -729,8 +729,8 @@ body {
 
 /* Dark theme adjustment so icon ring matches */
 [data-theme="dark"] #chatbase-bubble-button {
-    background-color: #e1d4c2 !important; /* invert to light circle in dark mode */
-    border-color: rgba(225,212,194,0.35) !important;
+    background-color: #362017 !important; /* chocolate brown in dark mode */
+    border-color: rgba(54,32,23,0.35) !important;
 }
 
 /* Hide any default Chatbase icon layers so only our background shows */

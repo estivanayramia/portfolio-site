@@ -13,7 +13,7 @@
  * 
  * Analytics Services:
  * - Google Analytics 4 (GA4): G-MCN4RXCY6Q
- * - Microsoft Clarity: ubbdpwxnae
+ * - Microsoft Clarity: uawk2g8xee
  * 
  * Triggers: scroll, mousemove, touchstart, keydown, click
  * Once triggered, loads: Google Analytics 4, Microsoft Clarity, Marked.js (for chat)
@@ -37,7 +37,7 @@
     // ========================================================================
     
     const GA_MEASUREMENT_ID = 'G-MCN4RXCY6Q';  // Google Analytics 4 measurement ID
-    const CLARITY_PROJECT_ID = 'ubbdpwxnae';   // Microsoft Clarity project ID
+    const CLARITY_PROJECT_ID = 'uawk2g8xee';   // Microsoft Clarity project ID
     
     // ========================================================================
     // INITIALIZATION STATE
