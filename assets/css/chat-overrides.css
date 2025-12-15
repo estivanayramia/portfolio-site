@@ -1,0 +1,7 @@
+/* Chat overrides to ensure suggestion chips can be hidden */
+#chat-chips.savonie-suggestions-hidden {
+    display: none !important;
+}
+[data-chat-suggestions="container"].savonie-suggestions-hidden {
+    display: none !important;
+}

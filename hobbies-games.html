@@ -36,6 +36,8 @@
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/theme.css">
     
+    <!-- Main Site Logic (Chat, Theme, etc.) -->
+    <script src="/assets/js/site.js" defer></script>
     <!-- Enhanced Instrumentation (opt-in with ?collect-logs=1) -->
     <script src="/assets/js/site-refactored.js" defer></script>
     
@@ -67,7 +69,6 @@
            ============================================ */
         body {
             padding-top: 0;
-            overflow-x: hidden;
         }
         
         main {
@@ -637,19 +638,53 @@
     </style>
 </head>
 <body class="bg-beige text-chocolate min-h-screen transition-colors duration-300">
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" aria-hidden="true"></div>
+    
     <!-- Fixed Header -->
     <header class="fixed top-0 left-0 right-0 z-50 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="/index.html" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                <img src="/assets/img/logo-ea.webp" alt="EA Logo" class="w-8 h-8 object-contain">
-                <span class="font-semibold">Estivan Ayramia</span>
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
+            <a href="/index.html" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center" aria-label="Go to Portfolio home page">
+                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain" width="300" height="264" fetchpriority="high">
+                <span>Estivan Ayramia</span>
             </a>
-            <div class="flex items-center gap-4">
-                <a href="/contact.html" class="text-sm font-medium hover:underline">Contact</a>
-                <button id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 p-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Toggle theme">
-                    🔆
-                </button>
+            
+            <!-- Main Navigation -->
+            <ul class="hidden md:flex items-center space-x-8">
+                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
+                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
+                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
+                <li><a href="/projects.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
+                <li><a href="/contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+            
+            <!-- Language Switcher -->
+            <div class="flex items-center space-x-3">
+                <a href="/hobbies-games.html" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">EN</a>
+                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
+                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
             </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
+            <ul class="px-6 py-4 space-y-3">
+                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
+                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
+                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
+                <li><a href="/projects.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Projects</a></li>
+                <li><a href="/contact.html" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full text-center hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
         </div>
     </header>
 
@@ -829,9 +864,41 @@
     </main>
 
     <!-- Footer -->
-    <footer class="border-t border-chocolate/10 py-6 px-4">
-        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm opacity-70">
-            <p>© 2025 Estivan Ayramia</p>
+    <footer class="bg-indigodeep text-beige py-12">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <!-- Column 1: About -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">About</h3>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. Business student at SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                </div>
+                
+                <!-- Column 2: Quick Links -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/deep-dive.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/projects.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
+                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3: Connect -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
+                    <ul class="space-y-2">
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
+                        <li><a href="/contact.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-beige/20 pt-8 text-center">
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
@@ -896,52 +963,10 @@
             });
         }
         
-        // Countdown system
-        let gameCountdownRunning = false;
-        
         // Helper: Get theme-aware foreground color for canvas
         function getGameFg() {
             const fg = getComputedStyle(document.documentElement).getPropertyValue('--game-fg').trim();
             return fg || '#ffffff'; // Fallback to white
-        }
-        
-        function showCountdown(durationMs, onComplete) {
-            if (gameCountdownRunning) return;
-            gameCountdownRunning = true;
-            
-            const overlay = document.createElement('div');
-            overlay.id = 'countdown-overlay';
-            overlay.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:100;display:flex;align-items:center;justify-content:center;pointer-events:none;';
-            overlay.innerHTML = '<div style="text-align:center;"><div id="countdown-number" style="font-size:8rem;font-weight:bold;color:#fff;text-shadow:0 0 20px rgba(255,255,255,0.5);" aria-live="polite">3</div></div>';
-            
-            // Append to current game container instead of body
-            const gameContainer = document.querySelector('[id$="-game"]:not(.hidden)');
-            if (gameContainer) {
-                gameContainer.style.position = 'relative'; // Ensure positioning context
-                gameContainer.appendChild(overlay);
-            } else {
-                document.body.appendChild(overlay); // Fallback
-            }
-            
-            let count = 3;
-            const countdownEl = document.getElementById('countdown-number');
-            
-            const interval = setInterval(() => {
-                count--;
-                if (count > 0) {
-                    countdownEl.textContent = count;
-                    if (sounds.shoot) sounds.shoot();
-                } else if (count === 0) {
-                    countdownEl.textContent = 'GO!';
-                    countdownEl.style.color = '#22c55e';
-                    if (sounds.powerup) sounds.powerup();
-                } else {
-                    clearInterval(interval);
-                    overlay.remove();
-                    gameCountdownRunning = false;
-                    if (onComplete) onComplete();
-                }
-            }, 1000);
         }
         
         function startGame(game) {
@@ -950,16 +975,14 @@
             document.getElementById('game-selection').classList.add('hidden');
             document.getElementById(`${game}-game`).classList.remove('hidden');
             
-            // Show countdown then start game
-            showCountdown(3000, () => {
-                if (game === 'snake') initSnake();
-                if (game === 'breaker') initBreaker();
-                if (game === 'merge') initMerge();
-                if (game === 'invaders') {
-                    console.log('Initializing Space Invaders...');
-                    initInvaders();
-                }
-            });
+            // Start game immediately without countdown
+            if (game === 'snake') initSnake();
+            if (game === 'breaker') initBreaker();
+            if (game === 'merge') initMerge();
+            if (game === 'invaders') {
+                console.log('Initializing Space Invaders...');
+                initInvaders();
+            }
         }
         let gamePaused = false;
         
@@ -1091,18 +1114,19 @@
             modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
         }
         
-        // Theme Logic
-        const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        html.setAttribute('data-theme', savedTheme);
-        themeToggle.innerHTML = savedTheme === 'dark' ? '🔆' : '🌙';
-        
-        themeToggle.addEventListener('click', () => {
-            const current = html.getAttribute('data-theme');
-            const next = current === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
-            themeToggle.innerHTML = next === 'dark' ? '🔆' : '🌙';
+        // Theme Logic - Handled by site.js, but we need to react to changes for canvas redraws
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                    // Re-init current game to update canvas colors
+                    if (currentGame === 'snake') initSnake();
+                    if (currentGame === 'breaker') initBreaker();
+                    if (currentGame === 'invaders') initInvaders();
+                }
+            });
         });
+        
+        observer.observe(html, { attributes: true });
         
         // Initialize progress displays
         function updateProgressDisplays() {
@@ -2158,6 +2182,7 @@
         let invaderPowerUps = [], invaderShield = 0, invaderMultiShot = false, invaderRapidFire = false;
         // Global safety caps to avoid runaway object growth
         const INVADER_OBJECT_CAP = 600; // aliens + bullets + powerups
+        let invaderListenersAdded = false;
 
         function setInvaderHUD(visible) {
             try {
@@ -2177,8 +2202,8 @@
                     aliens.push({x: c*40 + 20, y: r*30 + 20, w: 20, h: 20, active: true});
                 }
             }
-            invaderScore = 0; invaderWave = 1; alienSpeed = 1;
-            invaderAliensKilled = 0; invaderWaveHits = 0; invaderGameStarted = true; // start immediately after init
+            invaderScore = 0; invaderWave = 1; alienSpeed = 0.5;
+            invaderAliensKilled = 0; invaderWaveHits = 0; invaderGameStarted = false; // Wait for input
             // Show HUD now that game started
             setInvaderHUD(true);
             invaderShield = 0; invaderMultiShot = false; invaderRapidFire = false;
@@ -2191,13 +2216,11 @@
             }
             
             // Mobile touch controls for Space Invaders
-            if (isMobile) {
-                const canvas = document.getElementById('invaders-canvas');
-                let touchX = null;
-                let lastTapTime = 0;
-                
-                canvas.ontouchstart = (e) => {
-                    e.preventDefault();
+            const canvas = document.getElementById('invaders-canvas');
+            
+            if (!invaderListenersAdded) {
+                // Add click listener for desktop start
+                canvas.addEventListener('click', (e) => {
                     if (!invaderGameStarted) {
                         invaderGameStarted = true;
                         const invPauseBtn = document.getElementById('invaders-pause');
@@ -2206,33 +2229,53 @@
                             invPauseBtn.textContent = 'Pause';
                         }
                     }
+                    // Also shoot on click
+                    invaderShoot();
+                });
+
+                if (isMobile) {
+                    let touchX = null;
+                    let lastTapTime = 0;
                     
-                    const rect = canvas.getBoundingClientRect();
-                    touchX = e.touches[0].clientX - rect.left;
-                    
-                    // Double tap to shoot
-                    const now = Date.now();
-                    if (now - lastTapTime < 300) {
-                        invaderShoot();
-                    }
-                    lastTapTime = now;
-                };
-                
-                canvas.ontouchmove = (e) => {
-                    e.preventDefault();
-                    if (touchX !== null) {
+                    canvas.ontouchstart = (e) => {
+                        e.preventDefault();
+                        if (!invaderGameStarted) {
+                            invaderGameStarted = true;
+                            const invPauseBtn = document.getElementById('invaders-pause');
+                            if (invPauseBtn) {
+                                invPauseBtn.disabled = false;
+                                invPauseBtn.textContent = 'Pause';
+                            }
+                        }
+                        
                         const rect = canvas.getBoundingClientRect();
-                        const newTouchX = e.touches[0].clientX - rect.left;
-                        const canvasX = (newTouchX / rect.width) * 400;
-                        player.x = Math.max(0, Math.min(370, canvasX - player.w / 2));
-                        touchX = newTouchX;
-                    }
-                };
-                
-                canvas.ontouchend = (e) => {
-                    e.preventDefault();
-                    touchX = null;
-                };
+                        touchX = e.touches[0].clientX - rect.left;
+                        
+                        // Double tap to shoot
+                        const now = Date.now();
+                        if (now - lastTapTime < 300) {
+                            invaderShoot();
+                        }
+                        lastTapTime = now;
+                    };
+                    
+                    canvas.ontouchmove = (e) => {
+                        e.preventDefault();
+                        if (touchX !== null) {
+                            const rect = canvas.getBoundingClientRect();
+                            const newTouchX = e.touches[0].clientX - rect.left;
+                            const canvasX = (newTouchX / rect.width) * 400;
+                            player.x = Math.max(0, Math.min(370, canvasX - player.w / 2));
+                            touchX = newTouchX;
+                        }
+                    };
+                    
+                    canvas.ontouchend = (e) => {
+                        e.preventDefault();
+                        touchX = null;
+                    };
+                }
+                invaderListenersAdded = true;
             }
             
             invaderRunning = true;
@@ -2452,7 +2495,7 @@
                     invaderWaveHits = 0;
                     if (invaderWave >= 3) unlockAchievement('invaders', 'wave_3');
                     
-                    alienSpeed = 1 + (invaderWave - 1) * 0.5;
+                    alienSpeed = 0.5 + (invaderWave - 1) * 0.3;
                     document.getElementById('invaders-wave').textContent = invaderWave;
                     
                     // Spawn new wave (respect global cap)
@@ -2672,8 +2715,6 @@
 
         // Keyboard Input
         window.addEventListener('keydown', e => {
-            // Block inputs during countdown
-            if (gameCountdownRunning) return;
             
             // Pause with P key
             if(e.key === 'p' || e.key === 'P') {
@@ -2739,8 +2780,8 @@
                 if(e.key==='ArrowRight') moveMerge('right');
             }
             if(currentGame === 'invaders') {
-                if(e.key==='ArrowLeft') {
-                    console.log('Arrow Left pressed, currentGame:', currentGame, 'invaderGameStarted:', invaderGameStarted);
+                if(e.key==='ArrowLeft' || e.code==='KeyA') {
+                    console.log('Left pressed, currentGame:', currentGame, 'invaderGameStarted:', invaderGameStarted);
                     if (!invaderGameStarted) {
                         invaderGameStarted = true;
                         console.log('Starting Space Invaders game');
@@ -2753,8 +2794,8 @@
                     invaderDir = -1;
                     e.preventDefault();
                 }
-                if(e.key==='ArrowRight') {
-                    console.log('Arrow Right pressed, currentGame:', currentGame, 'invaderGameStarted:', invaderGameStarted);
+                if(e.key==='ArrowRight' || e.code==='KeyD') {
+                    console.log('Right pressed, currentGame:', currentGame, 'invaderGameStarted:', invaderGameStarted);
                     if (!invaderGameStarted) {
                         invaderGameStarted = true;
                         console.log('Starting Space Invaders game');
@@ -2767,8 +2808,8 @@
                     invaderDir = 1;
                     e.preventDefault();
                 }
-                if(e.code==='Space') {
-                    // Start game on Space if needed, then shoot
+                if(e.code==='Space' || e.code==='ArrowUp' || e.code==='KeyW') {
+                    // Start game on Space/Up/W if needed, then shoot
                     if (!invaderGameStarted) {
                         invaderGameStarted = true;
                         const invPauseBtn = document.getElementById('invaders-pause');
@@ -2789,11 +2830,51 @@
                 if(e.key==='ArrowRight' && breakerPaddleDir===1) breakerPaddleDir = 0;
             }
             if(currentGame === 'invaders') {
-                if(e.key==='ArrowLeft' && invaderDir===-1) invaderDir = 0;
-                if(e.key==='ArrowRight' && invaderDir===1) invaderDir = 0;
+                if((e.key==='ArrowLeft' || e.code==='KeyA') && invaderDir===-1) invaderDir = 0;
+                if((e.key==='ArrowRight' || e.code==='KeyD') && invaderDir===1) invaderDir = 0;
             }
         });
 
     </script>
+    <!-- Savonie AI Chat Widget -->
+    <div id="chat-widget" class="fixed bottom-6 z-50 font-sans" style="z-index: 9999;" role="region" aria-label="AI Chat Assistant">
+        <!-- Chat Window (independently positioned when dragging) -->
+        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);" role="dialog" aria-modal="true" aria-labelledby="chat-title">
+            <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
+                <h3 id="chat-title" class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
+                    <img src="/assets/img/savonie-thumb.webp" alt="Savonie chatbot avatar" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64" loading="lazy" decoding="async">
+                    Savonie AI
+                </h3>
+                <button type="button" id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer" aria-label="Close chat">&times;</button>
+            </div>
+            
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white/50" role="log" aria-live="polite" aria-label="Chat messages"></div>
+
+            <!-- Dynamic Suggestion Chips Container -->
+            <div id="chat-chips" class="p-2 bg-white/80 border-t border-[#362017]/5 flex gap-2 overflow-x-auto whitespace-nowrap" role="group" aria-label="Suggested questions"></div>
+
+            <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white dark:bg-[#362017] border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
+                <button type="button" id="suggestions-btn" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors">
+                    💡
+                </button>
+                <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] dark:text-[#e1d4c2] dark:placeholder-[#e1d4c2]/60 focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
+                <button type="button" id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Welcome Bubble (anchored above toggle button) -->
+        <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+        </div>
+
+        <!-- Toggle Button (always stays in bottom-right corner) -->
+        <button type="button" id="chat-toggle" class="absolute bottom-0 right-0 bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 overflow-hidden" aria-label="Open Chat">
+            <img src="/assets/img/savonie-thumb.webp" alt="Savonie chat UI" class="w-full h-full object-cover" width="64" height="64" loading="lazy" decoding="async">
+        </button>
+    </div>
+
+    <script src="/assets/js/site.js" defer></script>
 </body>
 </html>

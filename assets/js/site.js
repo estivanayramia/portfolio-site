@@ -1,3 +1,5 @@
+console.log('[Savonie DEBUG] site.js loaded');
+
 /**
  * ============================================================================
  * PORTFOLIO SITE - MAIN JAVASCRIPT
@@ -987,8 +989,7 @@ const initFormValidation = () => {
                 body: formData,
                 headers: { 'Accept': 'application/json' },
                 mode: 'cors',
-                credentials: 'omit',
-                redirect: 'follow'
+                credentials: 'omit'
             });
             if (res.ok) {
                 form.reset();
@@ -2622,7 +2623,11 @@ document.addEventListener('DOMContentLoaded', () => {
         closeBtn: document.getElementById('close-chat'),
         bubble: document.getElementById('welcome-bubble'),
         chipsContainer: document.getElementById('chat-chips'),
-        suggestionsBtn: document.getElementById('suggestions-btn')
+        suggestionsBtn: document.getElementById('suggestions-btn'),
+        // New: stable selectors for suggestion controls
+        suggestionsContainer: document.querySelector('[data-chat-suggestions="container"]'),
+        suggestionsToggle: document.querySelector('[data-chat-suggestions-toggle="button"]'),
+        suggestionsClose: null // Will be set dynamically when X button is created
     };
 
     /* Scroll progress fallback: set --scroll-scale on .scroll-progress for browsers
@@ -2682,29 +2687,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSending = false; // Prevent duplicate sends
     let isInitialized = false;
     
-    // Helper function to add close button to chips container
-    function addChipsCloseButton() {
-        if (!els.chipsContainer) return;
-        
-        // Check if close button already exists
-        const existingCloseBtn = els.chipsContainer.querySelector('.chip-close-btn');
-        if (existingCloseBtn) return;
-        
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
-        closeBtn.innerHTML = '×';
-        closeBtn.title = 'Hide suggestions';
-        closeBtn.setAttribute('aria-label', 'Hide suggestions');
-        
-        // Fix: Close button hides suggestions
-        closeBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent event bubbling
-            els.chipsContainer.classList.add('hidden');
-            els.chipsContainer.style.display = 'none';
-        });
-        
-        els.chipsContainer.appendChild(closeBtn);
-    }
+    // Helper function to add close button to chips container - DEPRECATED (handled by renderChips)
+    // function addChipsCloseButton() { ... }
+
+    // Fix: Suggestions Toggle Button Logic - DEPRECATED (handled by main listener below)
+    // if (els.suggestionsBtn) { ... }
     
     // 1. Initialize - restore history from session
     try { 
@@ -2716,8 +2703,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const userClass = 'bg-[#212842] text-white rounded-tr-none self-end ml-auto';
                 const botClass = 'bg-white text-[#362017] rounded-tl-none border border-[#362017]/5 self-start';
                 div.className = `p-3 rounded-lg shadow-sm max-w-[85%] mb-3 text-sm leading-relaxed ${msg.sender === 'user' ? userClass : botClass}`;
-                if (typeof marked !== 'undefined' && msg.sender === 'bot') {
-                    div.innerHTML = marked.parse(msg.text);
+                if (msg.sender === 'bot') {
+                    div.innerHTML = parseMarkdown(msg.text);
                 } else {
                     div.textContent = msg.text;
                 }
@@ -2737,34 +2724,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentLang = document.documentElement.lang || 'en';
         const welcomeMessage = translations.chat.welcome[currentLang] || "Hello! I am Savonie. Ask me anything about Estivan.";
         addMessageToUI(welcomeMessage, 'bot', false);
+    }
+
+    // Always update chips based on current language, regardless of history
+    if (els.chipsContainer) {
+        const currentLang = document.documentElement.lang || 'en';
+        const defaultChips = translations.chat.defaultChips[currentLang] || translations.chat.defaultChips['en'];
         
-        // Add default chips for home page
-        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-        if (currentPage === 'index.html' && els.chipsContainer) {
-            const defaultChips = translations.chat.defaultChips[currentLang] || [
-                "What does Estivan do?",
-                "Tell me about his background",
-                "What are his skills?",
-                "How can I contact him?"
-            ];
-            
-            els.chipsContainer.innerHTML = '';
-            defaultChips.forEach(chipText => {
-                const btn = document.createElement('button');
-                btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
-                btn.textContent = chipText;
-                btn.addEventListener('click', () => {
-                    if (els.input) {
-                        els.input.value = chipText;
-                        handleSend();
-                    }
-                });
-                els.chipsContainer.appendChild(btn);
-            });
-            
-            // Add close button using helper function
-            addChipsCloseButton();
-        }
+        renderChips(defaultChips);
     }
     
     isInitialized = true;
@@ -2787,49 +2754,53 @@ document.addEventListener('DOMContentLoaded', () => {
     els.sendBtn?.addEventListener('click', handleSend);
     els.input?.addEventListener('keypress', (e) => e.key === 'Enter' && handleSend());
     
-    // Fix: Lightbulb icon toggle for chat suggestions
-    els.suggestionsBtn?.addEventListener('click', () => {
-        if (els.chipsContainer) {
-            // Check visibility using computed styles to be accurate
-            const computedStyle = window.getComputedStyle(els.chipsContainer);
-            const isCurrentlyVisible = computedStyle.display !== 'none' && 
-                                       !els.chipsContainer.classList.contains('hidden');
-            
-            if (isCurrentlyVisible) {
-                // Hide suggestions
-                els.chipsContainer.classList.add('hidden');
-                els.chipsContainer.style.display = 'none';
-                els.suggestionsBtn.setAttribute('aria-pressed', 'false');
-            } else {
-                // Show suggestions
-                els.chipsContainer.classList.remove('hidden');
-                els.chipsContainer.style.display = 'flex';
-                els.suggestionsBtn.setAttribute('aria-pressed', 'true');
-                
-                // Generate contextual chips if none are showing
-                if (els.chipsContainer.children.length === 0 && chatHistory.length > 0) {
-                    const contextualChips = generateContextualChips(chatHistory);
-                    if (contextualChips.length > 0) {
-                        contextualChips.forEach(chipText => {
-                            const btn = document.createElement('button');
-                            btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
-                            btn.textContent = chipText;
-                            btn.addEventListener('click', () => {
-                                if (els.input) {
-                                    els.input.value = chipText;
-                                    handleSend();
-                                }
-                            });
-                            els.chipsContainer.appendChild(btn);
-                        });
-
-                        // Add close button
-                        addChipsCloseButton();
-                    }
-                }
-            }
+    // ======================================================================
+    // SUGGESTIONS CONTROL - Lightbulb and X Button
+    // ======================================================================
+    
+    function setSuggestionsVisible(isVisible) {
+        if (!els.suggestionsContainer) {
+            console.log('[Savonie DEBUG] setSuggestionsVisible called but no suggestions container');
+            return;
         }
-    });
+
+        if (isVisible) {
+            els.suggestionsContainer.classList.remove('savonie-suggestions-hidden');
+            els.suggestionsContainer.removeAttribute('hidden');
+            els.suggestionsContainer.style.display = 'flex';
+        } else {
+            els.suggestionsContainer.classList.add('savonie-suggestions-hidden');
+            els.suggestionsContainer.setAttribute('hidden', 'true');
+            els.suggestionsContainer.style.display = 'none';
+        }
+
+        console.log('[Savonie DEBUG] setSuggestionsVisible ->', isVisible, 'classes:', els.suggestionsContainer.className);
+    }
+
+    function attachSuggestionHandlers() {
+        if (!els.suggestionsContainer) {
+            console.log('[Savonie DEBUG] No suggestions container found on this page');
+            return;
+        }
+
+        if (els.suggestionsToggle) {
+            els.suggestionsToggle.addEventListener('click', () => {
+                const isHidden = els.suggestionsContainer.classList.contains('savonie-suggestions-hidden') || 
+                                 els.suggestionsContainer.hasAttribute('hidden') ||
+                                 els.suggestionsContainer.style.display === 'none';
+                const nextVisible = isHidden;
+                console.log('[Savonie DEBUG] Lightbulb clicked, nextVisible =', nextVisible);
+                setSuggestionsVisible(nextVisible);
+            });
+        } else {
+            console.log('[Savonie DEBUG] No suggestions toggle (lightbulb) found');
+        }
+
+        console.log('[Savonie DEBUG] attachSuggestionHandlers complete');
+    }
+
+    // Attach handlers immediately (DOM is already ready due to DOMContentLoaded)
+    attachSuggestionHandlers();
 
     // 3.1 Static Chip Buttons (pre-existing in HTML)
     if (els.chipsContainer) {
@@ -2974,6 +2945,80 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 4. Functions
+    
+    // Helper: Parse simple markdown links (safe fallback)
+    function parseMarkdown(text) {
+        if (!text) return '';
+
+        if (typeof window !== 'undefined' && typeof window.marked !== 'undefined') {
+            try {
+                return window.marked.parse(text);
+            } catch (e) {
+                console.warn('[Savonie DEBUG] marked.parse failed:', e);
+            }
+        }
+        
+        // Fallback: simple link parser [text](url)
+        // 1. Escape HTML to prevent XSS (basic)
+        let html = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        
+        // 2. Replace [text](url) with <a href="url">text</a>
+        html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (match, label, url) => {
+            return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="text-[#212842] underline hover:text-[#362017] font-medium">' + label + '</a>';
+        });
+        
+        // 3. Convert newlines to <br>
+        html = html.replace(/\n/g, '<br>');
+        
+        return html;
+    }
+
+    // Helper: Render chips and ensure close button exists
+    function renderChips(chips) {
+        if (!els.chipsContainer) return;
+        
+        els.chipsContainer.innerHTML = '';
+        
+        if (!chips || chips.length === 0) {
+            setSuggestionsVisible(false);
+            return;
+        }
+
+        // Render chips
+        chips.forEach(chipText => {
+            const btn = document.createElement('button');
+            btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
+            btn.textContent = chipText;
+            btn.addEventListener('click', () => {
+                if (els.input) {
+                    els.input.value = chipText;
+                    handleSend();
+                }
+            });
+            els.chipsContainer.appendChild(btn);
+        });
+
+        // Always add close button with proper data attribute
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
+        closeBtn.setAttribute('data-chat-suggestions-close', 'button');
+        closeBtn.innerHTML = '×';
+        closeBtn.title = 'Hide suggestions';
+        closeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('[Savonie DEBUG] Suggestions close X clicked, hiding suggestions');
+            setSuggestionsVisible(false);
+        });
+        els.chipsContainer.appendChild(closeBtn);
+        
+        // Store reference to close button
+        els.suggestionsClose = closeBtn;
+        
+        // Show container
+        setSuggestionsVisible(true);
+    }
+
     function toggleChat() {
         const wasHidden = els.window?.classList.contains('hidden');
         const isRTL = document.documentElement.dir === 'rtl';
@@ -3200,29 +3245,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Handle chips (suggestion buttons)
         if (data.chips && Array.isArray(data.chips) && els.chipsContainer) {
-            els.chipsContainer.innerHTML = '';
-            data.chips.forEach(chipText => {
-                const btn = document.createElement('button');
-                btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
-                btn.textContent = chipText;
-                btn.addEventListener('click', () => {
-                    if (els.input) {
-                        els.input.value = chipText;
-                        handleSend();
-                    }
-                });
-                els.chipsContainer.appendChild(btn);
-            });
-            
-            // Add close button
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
-            closeBtn.innerHTML = '×';
-            closeBtn.title = 'Hide suggestions';
-            closeBtn.addEventListener('click', () => {
-                els.chipsContainer.style.display = 'none';
-            });
-            els.chipsContainer.appendChild(closeBtn);
+            renderChips(data.chips);
         }
 
         // Handle actions
@@ -3249,29 +3272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!data.chips && chatHistory.length > 0) {
             const contextualChips = generateContextualChips(chatHistory);
             if (contextualChips.length > 0 && els.chipsContainer) {
-                els.chipsContainer.innerHTML = '';
-                contextualChips.forEach(chipText => {
-                    const btn = document.createElement('button');
-                    btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
-                    btn.textContent = chipText;
-                    btn.addEventListener('click', () => {
-                        if (els.input) {
-                            els.input.value = chipText;
-                            handleSend();
-                        }
-                    });
-                    els.chipsContainer.appendChild(btn);
-                });
-                
-                // Add close button
-                const closeBtn = document.createElement('button');
-                closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
-                closeBtn.innerHTML = '×';
-                closeBtn.title = 'Hide suggestions';
-                closeBtn.addEventListener('click', () => {
-                    els.chipsContainer.style.display = 'none';
-                });
-                els.chipsContainer.appendChild(closeBtn);
+                renderChips(contextualChips);
             }
         }
 
@@ -3302,14 +3303,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     clearInterval(typeInterval);
                     // Convert to markdown after typing is complete
-                    if (typeof marked !== 'undefined') {
-                        div.innerHTML = marked.parse(text);
-                    }
+                    div.innerHTML = parseMarkdown(text);
                     els.messages.scrollTop = els.messages.scrollHeight;
                 }
             }, 12);
         } else {
-            div.textContent = text;
+            div.innerHTML = parseMarkdown(text);
         }
 
         if (!isLoading && isInitialized) {

@@ -571,6 +571,19 @@ body {
     background: #212842;
 }
 
+/* Dark Mode Scrollbar */
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: #212842;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #e1d4c2;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #ffffff;
+}
+
 /* ==========================================================================
    Focus Visible (Modern Browsers)
    ========================================================================== */
@@ -1742,6 +1755,11 @@ select.border-red-500 {
     scrollbar-color: rgba(33, 40, 66, 0.3) transparent;
 }
 
+/* Hide suggestions when class is added */
+[data-chat-suggestions="container"].savonie-suggestions-hidden {
+    display: none !important;
+}
+
 #chat-chips::-webkit-scrollbar {
     height: 4px;
     display: block;
@@ -1944,56 +1962,58 @@ select.border-red-500 {
     gap: 8px !important;
     padding-bottom: 4px !important;
     -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: none !important; /* Hide scrollbar on mobile */
+    scrollbar-width: thin !important; /* Firefox */
+    scrollbar-color: #212842 rgba(225, 212, 194, 0.2) !important;
 }
 
-/* Mobile: Hide scrollbar */
-#chat-chips::-webkit-scrollbar {
+/* Fix: Ensure hidden class overrides the display: flex !important above */
+#chat-chips.savonie-suggestions-hidden {
     display: none !important;
 }
 
-/* Desktop: Show thin custom scrollbar for mouse users */
-@media (min-width: 768px) {
-    #chat-chips {
-        scrollbar-width: thin !important;
-        scrollbar-color: #212842 rgba(225, 212, 194, 0.2) !important;
-    }
-    
-    #chat-chips::-webkit-scrollbar {
-        display: block !important;
-        height: 6px !important;
-    }
-    
-    #chat-chips::-webkit-scrollbar-track {
-        background: rgba(225, 212, 194, 0.2) !important;
-        border-radius: 3px !important;
-    }
-    
-    #chat-chips::-webkit-scrollbar-thumb {
-        background: #212842 !important;
-        border-radius: 3px !important;
-    }
-    
-    #chat-chips::-webkit-scrollbar-thumb:hover {
-        background: #362017 !important;
-    }
-    
-    /* Dark mode scrollbar */
-    [data-theme="dark"] #chat-chips {
-        scrollbar-color: rgba(225, 212, 194, 0.6) rgba(225, 212, 194, 0.1) !important;
-    }
-    
-    [data-theme="dark"] #chat-chips::-webkit-scrollbar-track {
-        background: rgba(225, 212, 194, 0.1) !important;
-    }
-    
-    [data-theme="dark"] #chat-chips::-webkit-scrollbar-thumb {
-        background: rgba(225, 212, 194, 0.6) !important;
-    }
-    
-    [data-theme="dark"] #chat-chips::-webkit-scrollbar-thumb:hover {
-        background: rgba(225, 212, 194, 0.8) !important;
-    }
+/* Ensure scrollbar is visible on WebKit browsers */
+#chat-chips::-webkit-scrollbar {
+    display: block !important;
+    height: 6px !important;
+}
+
+#chat-chips::-webkit-scrollbar-track {
+    background: rgba(225, 212, 194, 0.2) !important;
+    border-radius: 3px !important;
+}
+
+#chat-chips::-webkit-scrollbar-thumb {
+    background: #212842 !important;
+    border-radius: 3px !important;
+}
+
+#chat-chips::-webkit-scrollbar-thumb:hover {
+    background: #362017 !important;
+}
+
+/* Dark mode scrollbar */
+[data-theme="dark"] #chat-chips {
+    scrollbar-color: rgba(225, 212, 194, 0.6) rgba(225, 212, 194, 0.1) !important;
+}
+
+[data-theme="dark"] #chat-chips::-webkit-scrollbar-track {
+    background: rgba(225, 212, 194, 0.1) !important;
+}
+
+[data-theme="dark"] #chat-chips::-webkit-scrollbar-thumb {
+    background: rgba(225, 212, 194, 0.6) !important;
+}
+
+/* Fix: Chip Hover State (Light Mode) - Force white text */
+.chip-btn:hover {
+    color: #ffffff !important;
+    background-color: #212842 !important;
+}
+
+/* Fix: Chip Hover State (Dark Mode) */
+[data-theme="dark"] .chip-btn:hover {
+    color: #e1d4c2 !important;
+    background: linear-gradient(135deg, rgba(225, 212, 194, 0.2), rgba(225, 212, 194, 0.15)) !important;
 }
 
 /* Fix: AI Chat Bubble - Single Line Chips */
@@ -2214,6 +2234,11 @@ select.border-red-500 {
     color: #e1d4c2 !important;
 }
 
+/* Dark mode override for scroll-to-top arrow */
+[data-theme="dark"] #scroll-to-top {
+    color: #362017 !important;
+}
+
 /* Konami Code Gift Animations */
 .gift-emoji {
     font-size: 4rem;
@@ -2407,9 +2432,9 @@ footer, .section-below-fold {
     pointer-events: none;
 }
 
-/* Dark-theme override: Chocolate color */
+/* Dark-theme override: Beige color */
 [data-theme="dark"] .scroll-progress {
-    --scroll-color: #362017;
+    --scroll-color: #e1d4c2;
 }
 
 .scroll-progress::before {

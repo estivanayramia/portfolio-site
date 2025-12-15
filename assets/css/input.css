@@ -3,6 +3,31 @@
 @tailwind utilities;
 
 /* ==========================================================================
+   Custom Scrollbars for Chat Widget
+   ========================================================================== */
+#chat-messages::-webkit-scrollbar,
+#chat-chips::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+#chat-messages::-webkit-scrollbar-track,
+#chat-chips::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#chat-messages::-webkit-scrollbar-thumb,
+#chat-chips::-webkit-scrollbar-thumb {
+    background-color: rgba(54, 32, 23, 0.2); /* chocolate/20 */
+    border-radius: 3px;
+}
+
+[data-theme="dark"] #chat-messages::-webkit-scrollbar-thumb,
+[data-theme="dark"] #chat-chips::-webkit-scrollbar-thumb {
+    background-color: rgba(225, 212, 194, 0.2); /* beige/20 */
+}
+
+/* ==========================================================================
    Mobile-Only Responsive Helpers
    ========================================================================== */
 
