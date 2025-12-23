@@ -1710,8 +1710,8 @@ select.border-red-500 {
     align-items: center;
     gap: 12px;
     padding: 14px 28px;
-    background: linear-gradient(135deg, #212842, #362017);
-    color: white;
+    background: #E1D4C2; /* Beige */
+    color: #212842; /* Indigodeep */
     font-weight: 600;
     border-radius: 12px;
     transition: all 0.3s ease;
@@ -1719,7 +1719,8 @@ select.border-red-500 {
 }
 
 .resume-download-btn:hover {
-    transform: translateY(-2px);
+    background: #FFFFFF; /* White */
+    transform: translateY(-4px); /* Pop up */
     box-shadow: 0 8px 20px rgba(33, 40, 66, 0.4);
 }
 
@@ -1729,8 +1730,8 @@ select.border-red-500 {
 }
 
 [data-theme="dark"] .resume-download-btn {
-    background: linear-gradient(135deg, #e1d4c2, #a89682);
-    color: #0a0a0a;
+    background: #E1D4C2; /* Beige */
+    color: #212842; /* Indigodeep */
 }
 
 /* ==========================================================================
@@ -2199,7 +2200,7 @@ select.border-red-500 {
 }
 
 [data-theme="dark"] footer a:hover {
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
 /* ==========================================================================
