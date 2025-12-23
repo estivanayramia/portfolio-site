@@ -1486,6 +1486,9 @@ const initPdfPreviews = () => {
                 if (!pdfLink) return;
                 const pdfUrl = pdfLink.href;
 
+                // Mark as loaded so other scripts don't try to load it again
+                panel.dataset.pdfLoaded = 'true';
+
                 // helper to show fallback message
                 const showFallback = (reason) => {
                     try {
@@ -1547,10 +1550,10 @@ const initPdfPreviews = () => {
                     return;
                 }
 
-                // fallback timeout: if not loaded within 3s, show fallback
+                // fallback timeout: if not loaded within 5s, assume success (browser swallowed load event)
                 setTimeout(() => {
-                    if (!loaded) finalize(false);
-                }, 3000);
+                    if (!loaded) finalize(true);
+                }, 5000);
             } catch (e) {}
         });
     } catch (e) {}
@@ -3484,12 +3487,14 @@ document.addEventListener('DOMContentLoaded', () => {
         let timedOut = false;
         const timeout = setTimeout(() => {
             timedOut = true;
-            // Loading took too long — assume blocked and fallback
-            try { iframe.remove(); } catch (e) {}
-            panel.innerHTML = '';
-            panel.appendChild(defaultFallback());
-            panel.dataset.pdfLoaded = 'false';
-        }, 2500);
+            // Loading took too long — assume success (browser swallowed load event for PDF)
+            console.log('PDF load timeout - assuming success');
+            
+            // Clean up loading state
+            try { loading.remove(); } catch(e) {}
+            if (!panel.contains(iframe)) panel.appendChild(iframe);
+            panel.dataset.pdfLoaded = 'true';
+        }, 5000);
 
         const onFail = () => {
             clearTimeout(timeout);
@@ -3501,11 +3506,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         iframe.addEventListener('load', () => {
             clearTimeout(timeout);
-            // If iframe content is accessible, treat as success. If access throws, still consider success
-            // in many cases the PDF will render even if cross-origin access is blocked; show the iframe.
+            // If iframe content is accessible, treat as success.
             try {
-                panel.innerHTML = '';
-                panel.appendChild(iframe);
+                try { loading.remove(); } catch(e) {}
+                if (!panel.contains(iframe)) panel.appendChild(iframe);
                 panel.dataset.pdfLoaded = 'true';
             } catch (e) {
                 // If something goes wrong, fallback
