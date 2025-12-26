@@ -865,6 +865,16 @@ select {
         font-size: 2rem;
         line-height: 1.3;
     }
+
+    /* Mobile CLS guard: neutralize initial GSAP/Tailwind entrance transforms */
+    [data-gsap].opacity-0 {
+        opacity: 1 !important;
+    }
+
+    [data-gsap].translate-y-8 {
+        transform: none !important;
+        translate: none !important;
+    }
 }
 
 /* ==========================================================================
@@ -2537,7 +2547,7 @@ footer, .section-below-fold {
     }
 
     a[href^="/"]::after {
-        content: " (https://estivanayramia.com" attr(href) ")";
+        content: " (https://www.estivanayramia.com" attr(href) ")";
         font-size: 9pt;
         word-break: break-word;
     }

@@ -811,7 +811,7 @@ Get-ChildItem -Include *.html -Recurse | Select-String -Pattern "site\.min\.js|t
 **Run Lighthouse Mobile Test:**
 ```bash
 # CLI method (if lighthouse installed globally)
-lighthouse https://estivanayramia.com --view --preset=mobile
+lighthouse https://www.estivanayramia.com --view --preset=mobile
 
 # Or use Chrome DevTools:
 # 1. Open DevTools (F12)
@@ -939,20 +939,20 @@ git push origin main
 
 ### Post-Deployment Verification (First 5 Minutes)
 
-1. **Open site in incognito mode:** `https://estivanayramia.com`
-2. **Check homepage loads correctly** (hero text visible immediately)
-3. **Open DevTools → Network tab:**
+1. **Open site in incognito mode:** `https://www.estivanayramia.com`
+1. **Check homepage loads correctly** (hero text visible immediately)
+1. **Open DevTools → Network tab:**
    - Verify `site.min.js` loads (70KB)
    - Verify `theme.min.css` loads (38KB)
    - Check "Timing" tab shows preconnect for GSAP CDN
-4. **Scroll page:**
+1. **Scroll page:**
    - Verify scroll progress bar animates smoothly
    - Verify scroll-to-top button appears, works
-5. **Test chat widget:**
+1. **Test chat widget:**
    - Opens correctly, images load
-6. **Run Lighthouse mobile test:**
+1. **Run Lighthouse mobile test:**
    - Performance score 90+ ✅
-7. **Check analytics:**
+1. **Check analytics:**
    - GA4 Realtime dashboard shows events
    - Clarity recordings work
 
@@ -961,6 +961,7 @@ git push origin main
 ## Success Metrics
 
 ### Quantifiable Improvements
+
 - **Files Minified:** 2 (site.js, theme.css)
 - **Total Payload Reduction:** 111KB (37% smaller)
   - JavaScript: 82KB (54% reduction)
@@ -971,6 +972,7 @@ git push origin main
 - **Reduced Motion Support:** Added for accessibility
 
 ### Expected Performance Gains
+
 - **Mobile Lighthouse:** 86 → 90-92 (+4-6 points)
 - **FCP:** 2.6s → 2.3-2.5s (-0.1-0.3s)
 - **LCP:** 3.3s → 3.0-3.1s (-0.2-0.3s)
@@ -979,6 +981,7 @@ git push origin main
 - **Repeat Visit:** ~0ms (cache hit)
 
 ### Qualitative Wins
+
 - ✅ **Zero Breaking Changes** - All features work as before
 - ✅ **Mobile-First** - Optimizations target mobile pain points
 - ✅ **Compositor-Friendly** - Smooth 60fps animations on low-end devices
@@ -994,16 +997,19 @@ git push origin main
 ### Build Commands
 
 **Minify JavaScript:**
+
 ```bash
 npx terser assets/js/site.js -o assets/js/site.min.js --compress --mangle --comments "/CRITICAL|Analytics|SINGLE SOURCE/"
 ```
 
 **Minify CSS:**
+
 ```bash
 npx cleancss -O2 assets/css/theme.css -o assets/css/theme.min.css
 ```
 
 **Update HTML References (PowerShell):**
+
 ```powershell
 Get-ChildItem -Path . -Include *.html -Recurse | ForEach-Object {
     (Get-Content $_.FullName -Raw) -replace 'site\.js', 'site.min.js' -replace 'theme\.css', 'theme.min.css' | Set-Content $_.FullName -NoNewline
@@ -1013,6 +1019,7 @@ Get-ChildItem -Path . -Include *.html -Recurse | ForEach-Object {
 ### Dependencies Added
 
 **package.json (devDependencies):**
+
 ```json
 {
   "devDependencies": {
@@ -1023,6 +1030,7 @@ Get-ChildItem -Path . -Include *.html -Recurse | ForEach-Object {
 ```
 
 **Install:**
+
 ```bash
 npm install --save-dev terser clean-css-cli
 ```
@@ -1042,6 +1050,7 @@ Phase 2 mobile performance optimization **successfully completed** with:
 **Expected Result:** Mobile Lighthouse 86 → 90-92 (+4-6 points)
 
 **Next Steps:**
+
 1. Deploy to Cloudflare Pages
 2. Run Lighthouse mobile test (verify 90+ score)
 3. Test on real mobile device (3G/4G)

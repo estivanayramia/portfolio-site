@@ -1,42 +1,66 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://estivanayramia.com/</loc>
+    <loc>https://www.estivanayramia.com/</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/index.html</loc>
+    <loc>https://www.estivanayramia.com/projects.html</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/projects.html</loc>
+    <loc>https://www.estivanayramia.com/overview.html</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/overview.html</loc>
+    <loc>https://www.estivanayramia.com/deep-dive.html</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/deep-dive.html</loc>
+    <loc>https://www.estivanayramia.com/about.html</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/about.html</loc>
+    <loc>https://www.estivanayramia.com/contact.html</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/contact.html</loc>
+    <loc>https://www.estivanayramia.com/hobbies.html</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/project-competitive-strategy.html</loc>
+    <loc>https://www.estivanayramia.com/hobbies-games.html</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/project-discipline.html</loc>
+    <loc>https://www.estivanayramia.com/hobby-car.html</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/project-documentation.html</loc>
+    <loc>https://www.estivanayramia.com/hobby-cooking.html</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/project-logistics.html</loc>
+    <loc>https://www.estivanayramia.com/hobby-gym.html</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/project-multilingual.html</loc>
+    <loc>https://www.estivanayramia.com/hobby-photography.html</loc>
   </url>
   <url>
-    <loc>https://estivanayramia.com/project-portfolio.html</loc>
+    <loc>https://www.estivanayramia.com/hobby-reading.html</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobby-whispers.html</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/privacy.html</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/project-competitive-strategy.html</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/project-discipline.html</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/project-documentation.html</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/project-logistics.html</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/project-multilingual.html</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/project-portfolio.html</loc>
   </url>
 </urlset>

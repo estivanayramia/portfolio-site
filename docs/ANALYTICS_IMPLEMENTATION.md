@@ -142,7 +142,7 @@ Analytics are included on all HTML pages via:
 ### Debug Mode
 Add `?debug-analytics=1` to any URL to see events in browser console:
 ```
-https://estivanayramia.com/?debug-analytics=1
+https://www.estivanayramia.com/?debug-analytics=1
 ```
 
 ### Verify GA4 Tracking

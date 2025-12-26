@@ -317,7 +317,7 @@ if (__collectLogsEnabled) {
             }
         } catch (e) {}
 
-        // Touch/pointer end snapshots — helpful to know last user gesture
+        // Touch/pointer end snapshots - helpful to know last user gesture
         ['touchend','pointerup','mouseup'].forEach(ev => {
             window.addEventListener(ev, (e) => {
                 try { __logCollect('gesture.'+ev, { x: (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientX) || e.clientX || null, y: (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientY) || e.clientY || null }); } catch(_) {}
@@ -552,7 +552,7 @@ if (__collectLogsEnabled) {
                     setTimeout(attempt, RETRY);
                     return;
                 }
-                // Timed out — fallback
+                // Timed out - fallback
                 if (fallback) {
                     try { fallback(); } catch (e) { try { window.location.reload(); } catch(_) {} }
                 } else {
@@ -755,6 +755,14 @@ const initMobileMenu = () => {
  * @requires ScrollTrigger plugin
  */
 const initAnimations = () => {
+    const isMobile = (typeof window !== 'undefined')
+        && (typeof window.matchMedia === 'function')
+        && window.matchMedia('(max-width: 768px)').matches;
+
+    const prefersReducedMotion = (typeof window !== 'undefined')
+        && (typeof window.matchMedia === 'function')
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     // Always unhide elements first to avoid blank screens
     const allAnimated = document.querySelectorAll('[data-gsap]');
     allAnimated.forEach(el => {
@@ -769,6 +777,11 @@ const initAnimations = () => {
         return;
     }
 
+    // Reduced motion: keep layout stable (no transform-based entrance/scroll animations)
+    if (prefersReducedMotion) {
+        return;
+    }
+
     // Register ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
 
@@ -777,7 +790,7 @@ const initAnimations = () => {
     
     fadeElements.forEach(element => {
         const delay = element.getAttribute('data-gsap-delay') || 0;
-        
+
         gsap.from(element, {
             opacity: 0,
             y: 20,
@@ -794,7 +807,7 @@ const initAnimations = () => {
 
     // Parallax effect for hero section (if exists)
     const heroSection = document.querySelector('section:first-of-type');
-    if (heroSection) {
+    if (heroSection && !isMobile) {
         gsap.to(heroSection, {
             yPercent: 20,
             ease: 'none',
@@ -997,7 +1010,7 @@ const initFormValidation = () => {
                 const card = form.parentElement;
                 if (card) {
                     card.innerHTML = `
-                        <h2 class="text-2xl font-bold text-indigodeep mb-2">Thanks — message sent!</h2>
+                        <h2 class="text-2xl font-bold text-indigodeep mb-2">Thanks - message sent!</h2>
                         <p class="text-sm text-chocolate mb-4">Enjoy a quick game while you're here.</p>
                         <div id="mini-game-root" class="w-full bg-white border border-chocolate/10 rounded-xl p-4"></div>
                     `;
@@ -1285,7 +1298,7 @@ const initMiniGame = (rootId) => {
         endMsg.className = 'mt-3 text-sm text-indigodeep mg-end';
         endMsg.innerHTML = `
             <div class="mb-1 font-medium">Game over! Final score: ${state.score}</div>
-            <p class="text-ink/80 mb-2">Hope you enjoyed this little easter egg — I'll be in touch soon.</p>
+            <p class="text-ink/80 mb-2">Hope you enjoyed this little easter egg - I'll be in touch soon.</p>
             <p class="text-ink/60">Want more surprises? Explore a few corners of the site:</p>
             <div class="mt-2 flex flex-wrap gap-2">
                 <a href="overview.html" class="text-xs px-3 py-1 rounded-full border border-chocolate/20 text-indigodeep hover:bg-beige transition-colors">Overview</a>
@@ -3487,7 +3500,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let timedOut = false;
         const timeout = setTimeout(() => {
             timedOut = true;
-            // Loading took too long — assume success (browser swallowed load event for PDF)
+            // Loading took too long - assume success (browser swallowed load event for PDF)
             console.log('PDF load timeout - assuming success');
             
             // Clean up loading state

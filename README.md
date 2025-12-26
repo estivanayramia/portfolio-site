@@ -104,9 +104,9 @@ These changes were made to finalize branding and PWA/favicon support before you 
 
 Required assets to upload before commit (place these under `assets/img/` unless noted):
 
-- `logo-ea.png` — site logo used across header/hero/footer.
+- `logo-ea.png` - site logo used across header/hero/footer.
 - `favicon-32x32.png`, `favicon-16x16.png`, `favicon.ico`, `apple-touch-icon.png`, `safari-pinned-tab.svg` (the last is already added).
-- `assets/docs/Estivan-Ayramia-Resume.pdf` — resume PDF (you'll upload this later; links/buttons already in place).
+- `assets/docs/Estivan-Ayramia-Resume.pdf` - resume PDF (you'll upload this later; links/buttons already in place).
 
 Pre-commit checklist (quick):
 
@@ -137,7 +137,7 @@ git push origin main
 
 Notes:
 
-- The `safari-pinned-tab.svg` is a solid-black mask SVG — Safari applies the color from the `mask-icon` link.
+- The `safari-pinned-tab.svg` is a solid-black mask SVG - Safari applies the color from the `mask-icon` link.
 - If you update any assets, re-run `bump-sw-version` so the service worker sees a new cache name/version and clients get the update.
 - The resume file should be named exactly `Estivan-Ayramia-Resume.pdf` and placed in `assets/docs/` so existing links work.
 
@@ -199,7 +199,7 @@ cd C:\Users\Admin\OneDrive\portfolio-site
 ```
 
 ### 2. Test Locally
-No build process required—just serve static files:
+No build process required - just serve static files:
 
 ```powershell
 # Using Python

@@ -5,4 +5,4 @@ Disallow: /ar/
 # Allow main English pages
 Allow: /
 
-Sitemap: https://estivanayramia.com/sitemap.xml
+Sitemap: https://www.estivanayramia.com/sitemap.xml
