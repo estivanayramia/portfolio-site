@@ -65,6 +65,14 @@
             font-size: 16px !important;
         }
     }
+
+    /* Performance: Content Visibility for below-the-fold content */
+    @media (max-width: 768px) {
+        main > section:nth-child(n+2) {
+            content-visibility: auto;
+            contain-intrinsic-size: 1px 800px;
+        }
+    }
 }
 
 /* ==========================================================================

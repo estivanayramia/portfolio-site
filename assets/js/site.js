@@ -832,6 +832,43 @@ const initAnimations = () => {
     });
 };
 
+const loadGSAPAndInit = () => {
+    const isMobile = (typeof window !== 'undefined') && (typeof window.matchMedia === 'function') && window.matchMedia('(max-width: 768px)').matches;
+    
+    const loadScripts = () => {
+        if (window.gsap && window.ScrollTrigger) {
+            initAnimations();
+            return;
+        }
+        const gsapScript = document.createElement('script');
+        gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+        gsapScript.onload = () => {
+            const stScript = document.createElement('script');
+            stScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
+            stScript.onload = () => {
+                initAnimations();
+            };
+            document.body.appendChild(stScript);
+        };
+        document.body.appendChild(gsapScript);
+    };
+
+    if (isMobile) {
+        // Mobile: Reveal content immediately (static)
+        initAnimations();
+        
+        // Load GSAP on interaction
+        const onInteraction = () => {
+            ['scroll', 'touchstart', 'mousemove'].forEach(ev => window.removeEventListener(ev, onInteraction));
+            loadScripts();
+        };
+        ['scroll', 'touchstart', 'mousemove'].forEach(ev => window.addEventListener(ev, onInteraction, { once: true, passive: true }));
+    } else {
+        // Desktop: Load GSAP immediately (content stays hidden until loaded)
+        loadScripts();
+    }
+};
+
 // ==========================================================================
 // Smooth Scroll for Anchor Links
 // ==========================================================================
@@ -2519,7 +2556,7 @@ const init = () => {
         document.addEventListener('DOMContentLoaded', () => {
             initDarkMode();
             initMobileMenu();
-            initAnimations();
+            loadGSAPAndInit();
             initSmoothScroll();
             initFormValidation();
             initLazyLoading();
@@ -2536,7 +2573,7 @@ const init = () => {
         // DOM already loaded
         initDarkMode();
         initMobileMenu();
-        initAnimations();
+        loadGSAPAndInit();
         initSmoothScroll();
         initFormValidation();
         initLazyLoading();
