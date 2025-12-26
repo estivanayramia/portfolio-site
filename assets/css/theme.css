@@ -2475,40 +2475,82 @@ footer, .section-below-fold {
    ========================================================================== */
 
 @media print {
-    /* Hide non-essential elements */
-    header,
-    footer,
-    nav,
-    #chat-widget,
-    .scroll-progress,
-    #scroll-to-top,
-    .no-print {
+    /* Enable background graphics */
+    body {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        background-color: white !important;
+        color: black !important;
+    }
+
+    /* Hide UI elements */
+    header, 
+    footer, 
+    nav, 
+    #chat-widget, 
+    .scroll-progress, 
+    #theme-toggle, 
+    .preview-toggle,
+    .sr-only,
+    [aria-hidden="true"] {
         display: none !important;
     }
-    
-    /* Reset backgrounds */
-    body {
-        background: white !important;
-        color: black !important;
+
+    /* Reset main container */
+    main {
+        padding-top: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
     }
-    
-    /* Reset colors for readability */
-    * {
+
+    /* Typography overrides */
+    h1, h2, h3, h4, h5, h6, p, li, dt, dd {
         color: black !important;
-        background: white !important;
-        box-shadow: none !important;
         text-shadow: none !important;
     }
     
-    /* Ensure links are visible */
-    a {
-        text-decoration: underline !important;
+    /* Ensure text is visible against any background */
+    .text-beige, .text-white, .text-indigodeep, .text-chocolate {
+        color: black !important;
+    }
+
+    /* Allow backgrounds on specific elements if needed, but generally keep it clean */
+    .bg-indigodeep, .bg-chocolate, .bg-beige {
+        background-color: transparent !important; /* Save ink */
+        border: 1px solid #ccc !important; /* Add border to define shape */
     }
     
-    /* Show URLs after links */
+    /* Specific fix for tags */
+    .rounded-full {
+        border: 1px solid #000 !important;
+        background-color: #f0f0f0 !important;
+        color: #000 !important;
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+    }
+
+    /* Project Visual Gradient - make it a simple box */
+    .aspect-video {
+        background: #f5f5f5 !important;
+        border: 1px solid #ddd !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+    }
+    
+    /* Hide iframes (videos) */
+    iframe {
+        display: none !important;
+    }
+    
+    /* Show link hrefs only for external links */
     a[href^="http"]::after {
         content: " (" attr(href) ")";
         font-size: 0.8em;
+        color: #666;
         word-break: break-all;
     }
     
@@ -2517,11 +2559,21 @@ footer, .section-below-fold {
     a[href^="#"]::after {
         content: none;
     }
+
+    /* Layout adjustments */
+    .grid {
+        display: block !important; /* Stack grids for print usually safer */
+    }
+    .grid > * {
+        margin-bottom: 2rem;
+        page-break-inside: avoid;
+    }
     
-    /* Reset margins and padding */
-    main {
-        padding: 0 !important;
-        margin: 0 !important;
+    /* Opacity fixes (GSAP) - CRITICAL for visibility */
+    .opacity-0 {
+        opacity: 1 !important;
+        transform: none !important;
+        visibility: visible !important;
     }
     
     /* Avoid page breaks inside important elements */
