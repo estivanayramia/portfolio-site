@@ -613,33 +613,6 @@ body {
 }
 
 /* ==========================================================================
-   Print Styles
-   ========================================================================== */
-
-@media print {
-    header,
-    nav,
-    footer,
-    .no-print,
-    #chat-widget,
-    #chat-window,
-    #welcome-bubble,
-    button {
-        display: none !important;
-    }
-    
-    body {
-        background: white !important;
-        color: black !important;
-    }
-    
-    a {
-        color: black !important;
-        text-decoration: underline !important;
-    }
-}
-
-/* ==========================================================================
    Mobile Menu Animation
    ========================================================================== */
 
@@ -2475,22 +2448,63 @@ footer, .section-below-fold {
    ========================================================================== */
 
 @media print {
-    /* Enable background graphics */
-    body {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        background-color: white !important;
-        color: black !important;
+    @page {
+        margin: 0.75in;
     }
 
-    /* Hide UI elements */
-    header, 
-    footer, 
-    nav, 
-    #chat-widget, 
-    .scroll-progress, 
-    #theme-toggle, 
+    html,
+    body {
+        background: #fff !important;
+        color: #000 !important;
+    }
+
+    body {
+        font-size: 11pt;
+        line-height: 1.45;
+    }
+
+    /* Print-only header: page title + URL pulled from <body> data attributes */
+    body::before {
+        content: attr(data-print-title) "\A" attr(data-print-url);
+        display: block;
+        white-space: pre-line;
+        color: #000 !important;
+        font-size: 12pt;
+        font-weight: 700;
+        padding-bottom: 0.15in;
+        margin-bottom: 0.2in;
+        border-bottom: 1px solid #000;
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        filter: none !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+        background-image: none !important;
+    }
+
+    /* Hide UI and interactive elements */
+    header,
+    footer,
+    nav,
+    .scroll-progress,
+    #chat-widget,
+    #theme-toggle,
+    #mobile-menu-toggle,
     .preview-toggle,
+    button,
+    input,
+    select,
+    textarea,
+    form,
+    .resume-download-btn,
     .sr-only,
     [aria-hidden="true"] {
         display: none !important;
@@ -2504,91 +2518,186 @@ footer, .section-below-fold {
         max-width: none !important;
     }
 
-    /* Typography overrides */
-    h1, h2, h3, h4, h5, h6, p, li, dt, dd {
-        color: black !important;
-        text-shadow: none !important;
-    }
-    
-    /* Ensure text is visible against any background */
-    .text-beige, .text-white, .text-indigodeep, .text-chocolate {
-        color: black !important;
+    /* Make GSAP-initialized hidden content printable */
+    .opacity-0 {
+        opacity: 1 !important;
     }
 
-    /* Allow backgrounds on specific elements if needed, but generally keep it clean */
-    .bg-indigodeep, .bg-chocolate, .bg-beige {
-        background-color: transparent !important; /* Save ink */
-        border: 1px solid #ccc !important; /* Add border to define shape */
+    /* Improve typography and link printing */
+    a,
+    a:visited {
+        color: #000 !important;
+        text-decoration: underline !important;
     }
-    
-    /* Specific fix for tags */
+
+    a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 9pt;
+        word-break: break-word;
+    }
+
+    a[href^="/"]::after {
+        content: " (https://estivanayramia.com" attr(href) ")";
+        font-size: 9pt;
+        word-break: break-word;
+    }
+
+    a[href^="#"]::after,
+    a[href^="mailto:"]::after,
+    a[href^="tel:"]::after {
+        content: "";
+    }
+
+    /* Avoid awkward page breaks */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        break-after: avoid;
+        page-break-after: avoid;
+    }
+
+    p,
+    li {
+        orphans: 3;
+        widows: 3;
+    }
+
+    img,
+    svg,
+    pre,
+    blockquote,
+    table {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    pre,
+    code {
+        white-space: pre-wrap !important;
+        word-wrap: break-word !important;
+    }
+
+    /* Typography and spacing */
+    h1, h2, h3, h4, h5, h6, p, li, dt, dd {
+        color: #000 !important;
+    }
+
+    p,
+    ul,
+    ol {
+        margin-bottom: 0.6rem;
+    }
+
+    /* Ensure text is visible against any background */
+    .text-beige,
+    .text-white,
+    .text-indigodeep,
+    .text-chocolate {
+        color: #000 !important;
+    }
+
+    /* Link treatment */
+    a {
+        color: #000 !important;
+        text-decoration: underline !important;
+    }
+
+    /* Append URLs only for real links (exclude anchors / javascript / empty) */
+    a[href^="http"]::after,
+    a[href^="/"]::after,
+    a[href^="mailto:"]::after {
+        content: " (" attr(href) ")";
+        font-size: 0.85em;
+        color: #444 !important;
+        word-break: break-all;
+    }
+
+    a[href^="#"]::after,
+    a[href^="javascript"]::after,
+    a[href=""]::after {
+        content: none !important;
+    }
+
+    /* Strip color backgrounds and gradients */
+    .bg-indigodeep,
+    .bg-chocolate,
+    .bg-beige,
+    [class*="bg-gradient"],
+    [class*="from-"],
+    [class*="to-"] {
+        background: transparent !important;
+    }
+
+    /* Keep pill tags readable */
     .rounded-full {
         border: 1px solid #000 !important;
-        background-color: #f0f0f0 !important;
+        background: #f0f0f0 !important;
         color: #000 !important;
-        print-color-adjust: exact !important;
-        -webkit-print-color-adjust: exact !important;
     }
 
-    /* Project Visual Gradient - make it a simple box */
+    /* Project visual blocks: make them plain */
     .aspect-video {
         background: #f5f5f5 !important;
         border: 1px solid #ddd !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        print-color-adjust: exact !important;
-        -webkit-print-color-adjust: exact !important;
     }
-    
-    /* Hide iframes (videos) */
-    iframe {
+
+    /* Hide embedded media */
+    iframe,
+    video,
+    .video-container,
+    .video-wrapper,
+    .embed-container {
         display: none !important;
-    }
-    
-    /* Show link hrefs only for external links */
-    a[href^="http"]::after {
-        content: " (" attr(href) ")";
-        font-size: 0.8em;
-        color: #666;
-        word-break: break-all;
-    }
-    
-    /* Don't show URLs for navigation links */
-    a[href^="/"]::after,
-    a[href^="#"]::after {
-        content: none;
     }
 
     /* Layout adjustments */
     .grid {
-        display: block !important; /* Stack grids for print usually safer */
+        display: block !important;
     }
     .grid > * {
-        margin-bottom: 2rem;
+        margin-bottom: 1.25rem;
+        break-inside: avoid;
         page-break-inside: avoid;
     }
-    
-    /* Opacity fixes (GSAP) - CRITICAL for visibility */
+
+    section,
+    article,
+    .rounded-2xl,
+    .rounded-xl,
+    .rounded-lg,
+    .rounded-md,
+    .rounded {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    /* Opacity fixes (GSAP) */
     .opacity-0 {
         opacity: 1 !important;
-        transform: none !important;
         visibility: visible !important;
     }
-    
+
     /* Avoid page breaks inside important elements */
     h1, h2, h3, h4, h5, h6 {
         page-break-after: avoid;
     }
-    
-    img, figure, blockquote {
+
+    img,
+    figure,
+    blockquote {
+        break-inside: avoid;
         page-break-inside: avoid;
     }
-    
-    /* Ensure images print */
+
     img {
         max-width: 100% !important;
-        filter: none !important;
+        height: auto !important;
     }
 }
 

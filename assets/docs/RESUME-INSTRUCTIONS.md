@@ -29,7 +29,7 @@ You need to add your actual resume PDF file here.
 
 #### Savonie - Operations Coordinator/Systems Analyst
 *Dates*
-- Built laundry tracking system that reduced lost items by 87% (from 12-15/month to 1-2/month)
+- Built an operations tracking system that reduced lost items by 87% (from 12-15/month to 1-2/month)
 - Decreased order processing time by 50% (48hrs → 24hrs) through workflow automation
 - Saved $18,000 annually by eliminating redundant manual processes
 - Reduced customer complaints by 80% and improved satisfaction from 3.2★ to 4.8★
@@ -42,7 +42,7 @@ You need to add your actual resume PDF file here.
 
 ### Projects
 
-#### Laundry Management System
+#### Operations Management System
 - Real-time tracking dashboard for 200+ daily orders
 - QR code scanning, automated notifications, multi-user access control
 - Technologies: HTML/CSS/JavaScript, Python, Git

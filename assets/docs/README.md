@@ -6,7 +6,7 @@ The resume should be:
 - Professional format (1-2 pages recommended)
 - Includes contact info, education, experience, skills
 - Highlights: Systems thinking, operations, project management, multilingual capability
-- Projects: Savonie laundry tracking system, etc.
+- Projects: Savonie operations tracking system, etc.
 - Achievements: Measurable outcomes (87% reduction, $18K savings, etc.)
 
 ## File name

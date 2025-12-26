@@ -1,2 +1,8 @@
 User-agent: *
+Disallow: /es/
+Disallow: /ar/
+
+# Allow main English pages
 Allow: /
+
+Sitemap: https://estivanayramia.com/sitemap.xml

@@ -95,7 +95,7 @@ Available project cards:
 
 These changes were made to finalize branding and PWA/favicon support before you commit and deploy. Follow the short checklist below before pushing to `main`.
 
-- Added comprehensive favicon references across pages (`index.html`, `about.html`, `projects.html`, `case-studies.html`, `contact.html`, `privacy.html`, `deep-dive.html`, `overview.html`, `404.html`).
+- Added comprehensive favicon references across pages (`index.html`, `about.html`, `projects.html`, `contact.html`, `privacy.html`, `deep-dive.html`, `overview.html`, `404.html`).
 - Created `assets/img/README.md` with instructions on required icon files.
 - Created `assets/img/safari-pinned-tab.svg` (monochrome mask-ready pinned tab for Safari).
 - Replaced header home icon / "Portfolio" text with `logo-ea.png` references across pages (place the real `logo-ea.png` in `/assets/img/`).

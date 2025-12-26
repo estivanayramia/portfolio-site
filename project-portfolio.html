@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="This Website - Hand-coded portfolio built from scratch over 120+ hours with HTML, CSS, JavaScript, PWA features, and WCAG accessibility.">
     <title>This Website | Projects</title>
+    <link rel="canonical" href="https://estivanayramia.com/project-portfolio.html">
     
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="article">
@@ -60,7 +61,7 @@
     }
     </script>
 </head>
-<body class="bg-beige text-chocolate font-sans antialiased">
+<body class="bg-beige text-chocolate font-sans antialiased" data-print-title="This Website | Projects" data-print-url="https://estivanayramia.com/project-portfolio.html">
     
     <!-- Scroll Progress Bar -->
     <div class="scroll-progress" aria-hidden="true"></div>
@@ -78,10 +79,11 @@
             
             <!-- Main Navigation -->
             <ul class="hidden md:flex items-center space-x-8">
+                <li><a href="/index.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Home</a></li>
+                <li><a href="/projects.html" class="text-sm text-indigodeep font-medium underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
                 <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
                 <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
                 <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
-                <li><a href="/projects.html" class="text-sm text-indigodeep font-medium underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
                 <li><a href="/contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
             
@@ -106,10 +108,11 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
             <ul class="px-6 py-4 space-y-3">
+                <li><a href="/index.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Home</a></li>
+                <li><a href="/projects.html" class="block text-sm text-indigodeep font-medium py-2">Projects</a></li>
                 <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
                 <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
                 <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
-                <li><a href="/projects.html" class="block text-sm text-indigodeep font-medium py-2">Projects</a></li>
                 <li><a href="/contact.html" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
         </div>
@@ -180,7 +183,7 @@
                             <ul class="list-disc pl-6 space-y-2">
                                 <li>I wanted to understand responsive design at the CSS level, not the drag-and-drop level</li>
                                 <li>I wanted to learn GSAP animations by implementing them, not copying snippets</li>
-                                <li>I wanted to build a PWA from scratch so I actually know how service workers function</li>
+                                <li>I wanted to build a PWA (progressive web app) from scratch so I actually know how service workers function</li>
                                 <li>I wanted a portfolio that doubles as proof of technical capability</li>
                             </ul>
                             <p>The result: I now understand every line of code on this site. That matters.</p>
@@ -200,7 +203,7 @@
                             <p><strong>3. PWA with Offline Support</strong></p>
                             <p>Service worker, manifest.json, installable on mobile. Works without internet after the first visit.</p>
                             
-                            <p><strong>4. WCAG 2.1 Accessibility</strong></p>
+                            <p><strong>4. WCAG (Web Content Accessibility Guidelines) 2.1 Accessibility</strong></p>
                             <p>Semantic HTML, ARIA (Accessible Rich Internet Applications) labels, keyboard navigation, screen reader tested, dark mode toggle with system preference detection.</p>
                             
                             <p><strong>5. AI Chat Integration</strong></p>
@@ -352,8 +355,8 @@
                 </a>
                 <a href="/project-logistics.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
                     <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Go-to-Market</span>
-                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">L'Oréal MAPS Retail Program</h3>
-                    <p class="text-sm text-chocolate">Launch kit for derm reps piloting Vichy co-op displays.</p>
+                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">L'Oréal Cell BioPrint MAPS Campaign</h3>
+                    <p class="text-sm text-chocolate">Class concept campaign deck that maps three personas and their touchpoints.</p>
                 </a>
                 <a href="/projects.html" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
                     <div class="text-center py-8">
@@ -367,14 +370,44 @@
     </main>
     
     <!-- Footer -->
-    <footer class="bg-indigodeep text-beige py-12 mt-20">
-        <div class="max-w-5xl mx-auto px-6 lg:px-12">
-            <div class="flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
-                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
-                <div class="flex items-center space-x-6">
-                    <a href="/privacy.html" class="text-sm text-beige/80 hover:text-beige transition-colors">Privacy</a>
-                    <a href="/humans.txt" class="text-sm text-beige/80 hover:text-beige transition-colors">Humans.txt</a>
+<footer class="bg-indigodeep text-beige py-12">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid md:grid-cols-3 gap-12 mb-12">
+                <!-- Column 1: Brand -->
+                <div class="space-y-4">
+                    <a href="/index.html" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
+                        <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
+                        <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
+                    </a>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
                 </div>
+                
+                <!-- Column 2: Quick Links -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/deep-dive.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/projects.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
+                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3: Connect -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
+                    <ul class="space-y-2">
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
+                        <li><a href="/contact.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="/assets/docs/Estivan_Ayramia_Resume_12-25-25.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
+                        <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-beige/20 pt-8 text-center">
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
     </footer>
