@@ -1133,6 +1133,21 @@
             });
         });
 
+        function startGame(game) {
+            stopAllGames();
+            document.getElementById('game-selection').classList.add('hidden');
+            document.getElementById(`${game}-game`).classList.remove('hidden');
+            currentGame = game;
+            
+            // Initialize specific game
+            if (game === 'snake') initSnake();
+            if (game === 'breaker') initBreaker();
+            if (game === 'merge') initMerge();
+            if (game === 'invaders') initInvaders();
+            
+            updateProgressDisplays();
+        }
+
         function backToSelection() {
             stopAllGames();
             gamePaused = false;
@@ -2808,6 +2823,31 @@
                 if((e.key==='ArrowRight' || e.code==='KeyD') && invaderDir===1) invaderDir = 0;
             }
         });
+
+        // FPS Counter
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('debug')) {
+                const fpsDiv = document.createElement('div');
+                fpsDiv.style.cssText = 'position:fixed;top:0;left:0;background:rgba(0,0,0,0.5);color:lime;padding:2px 5px;z-index:10000;font-family:monospace;pointer-events:none;';
+                document.body.appendChild(fpsDiv);
+                
+                let lastTime = performance.now();
+                let frames = 0;
+                
+                function loop() {
+                    const now = performance.now();
+                    frames++;
+                    if (now - lastTime >= 1000) {
+                        fpsDiv.textContent = frames + ' FPS';
+                        frames = 0;
+                        lastTime = now;
+                    }
+                    requestAnimationFrame(loop);
+                }
+                loop();
+            }
+        })();
 
     </script>
     <!-- Savonie AI Chat Widget -->
