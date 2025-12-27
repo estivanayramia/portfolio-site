@@ -1,20 +1,66 @@
-# Cloudflare Pages / Netlify Redirects Configuration
-# https://developers.cloudflare.com/pages/platform/redirects/
+# Canonical URL normalization (SEO)
+# Redirect .html URLs to extensionless canonical paths
 
-# Redirect www to non-www (configure in Cloudflare dashboard; Pages redirect file only supports relative paths)
-#
-# To keep the deployment logs clean, we leave this file free of absolute-host
-# redirects. Configure the www→apex redirect via Cloudflare Bulk Redirects
-# or a single Transform Rule targeting the `www` host.
+/index.html / 301!
+/es/index.html /es/ 301!
+/ar/index.html /ar/ 301!
 
-# Redirect old paths (if migrating from old site)
-# /old-path  /new-path  301
+/about.html /about 301!
+/about /about.html 200
 
-# Language detection (optional - serves default English if no match)
-# /*  /index.html  200
+/contact.html /contact 301!
+/contact /contact.html 200
 
-# Cloudflare Pages automatically serves 404.html when a path is missing,
-# so no explicit redirect is required here.
+/deep-dive.html /deep-dive 301!
+/deep-dive /deep-dive.html 200
 
-# SPA-style routing for future expansion
-# /app/*  /app/index.html  200
+/hobbies-games.html /hobbies-games 301!
+/hobbies-games /hobbies-games.html 200
+
+/hobbies.html /hobbies 301!
+/hobbies /hobbies.html 200
+
+/hobby-car.html /hobby-car 301!
+/hobby-car /hobby-car.html 200
+
+/hobby-cooking.html /hobby-cooking 301!
+/hobby-cooking /hobby-cooking.html 200
+
+/hobby-gym.html /hobby-gym 301!
+/hobby-gym /hobby-gym.html 200
+
+/hobby-photography.html /hobby-photography 301!
+/hobby-photography /hobby-photography.html 200
+
+/hobby-reading.html /hobby-reading 301!
+/hobby-reading /hobby-reading.html 200
+
+/hobby-whispers.html /hobby-whispers 301!
+/hobby-whispers /hobby-whispers.html 200
+
+/overview.html /overview 301!
+/overview /overview.html 200
+
+/privacy.html /privacy 301!
+/privacy /privacy.html 200
+
+/project-competitive-strategy.html /project-competitive-strategy 301!
+/project-competitive-strategy /project-competitive-strategy.html 200
+
+/project-discipline.html /project-discipline 301!
+/project-discipline /project-discipline.html 200
+
+/project-documentation.html /project-documentation 301!
+/project-documentation /project-documentation.html 200
+
+/project-logistics.html /project-logistics 301!
+/project-logistics /project-logistics.html 200
+
+/project-multilingual.html /project-multilingual 301!
+/project-multilingual /project-multilingual.html 200
+
+/project-portfolio.html /project-portfolio 301!
+/project-portfolio /project-portfolio.html 200
+
+/projects.html /projects 301!
+/projects /projects.html 200
