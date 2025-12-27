@@ -11,9 +11,11 @@
     const scoreDisplay = document.getElementById('score-display');
     
     // New UI Elements
-    const statusArea = document.getElementById('form-status');
+    const statusArea = document.getElementById('contact-status');
+    const fileHelp = document.getElementById('contact-file-help');
+    const maxFileMbEl = document.getElementById('contact-max-file-mb');
     const clearBtn = document.getElementById('clear-form-btn');
-    const copyEmailBtn = document.getElementById('copy-email-btn');
+    const copyEmailBtns = Array.from(document.querySelectorAll('[data-copy-email]'));
     const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
 
     if (!form || !modal) return;
@@ -27,13 +29,15 @@
     let ctx;
     let inFlight = false;
     let pageLoadTime = Date.now();
+    let fileValid = true;
     
     // Constants
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_FILE_BYTES = 5 * 1024 * 1024; // 5MB
     const MIN_SUBMIT_TIME = 2500; // 2.5 seconds
     const COOLDOWN_TIME = 15000; // 15 seconds
     const STORAGE_KEY = 'contact_form_draft';
     const COOLDOWN_KEY = 'contact_form_cooldown';
+    const EMAIL_TO_COPY = 'hello@estivanayramia.com';
 
     // ==========================================
     // INITIALIZATION
@@ -55,18 +59,89 @@
     // Check cooldown
     checkCooldown();
 
+    // Sync file help text to MAX_FILE_BYTES
+    try {
+        const mb = Math.round((MAX_FILE_BYTES / (1024 * 1024)) * 10) / 10;
+        if (maxFileMbEl) maxFileMbEl.textContent = String(mb);
+        if (fileHelp && !fileHelp.textContent.includes('max')) {
+            // no-op; keep existing copy
+        }
+    } catch (e) {}
+
+    // Anti-bot timer starts at page load per spec
+
     // ==========================================
     // FORM HELPERS
     // ==========================================
 
     function setStatus(type, message) {
         if (!statusArea) return;
-        statusArea.className = `min-h-[1.5rem] text-sm font-medium mt-2 ${
-            type === 'error' ? 'text-red-600 dark:text-red-400' : 
-            type === 'success' ? 'text-green-600 dark:text-green-400' : 
-            'text-indigodeep dark:text-beige'
-        }`;
+        statusArea.setAttribute('data-status', type);
         statusArea.textContent = message;
+    }
+
+    function showToast(kind, message) {
+        try {
+            const toast = document.createElement('div');
+            toast.setAttribute('role', 'status');
+            toast.setAttribute('aria-live', 'polite');
+            toast.textContent = message;
+
+            // Use existing theme primitives via CSS variables (no new hard-coded colors)
+            const bg = getComputedStyle(document.documentElement).getPropertyValue('--color-primary').trim() || 'transparent';
+            const fg = getComputedStyle(document.documentElement).getPropertyValue('--color-bg').trim() || 'inherit';
+            const border = getComputedStyle(document.documentElement).getPropertyValue('--color-border').trim() || 'transparent';
+
+            toast.style.position = 'fixed';
+            toast.style.left = '50%';
+            toast.style.top = '16px';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.zIndex = '99999';
+            toast.style.maxWidth = '520px';
+            toast.style.width = 'min(92vw, 520px)';
+            toast.style.padding = '10px 14px';
+            toast.style.borderRadius = '999px';
+            toast.style.fontSize = '14px';
+            toast.style.fontWeight = '600';
+            toast.style.background = bg;
+            toast.style.color = fg;
+            toast.style.border = `1px solid ${border}`;
+
+            if (kind === 'error') {
+                // Keep within palette by swapping bg/fg
+                toast.style.background = fg;
+                toast.style.color = getComputedStyle(document.documentElement).getPropertyValue('--color-text').trim() || 'inherit';
+            }
+
+            document.body.appendChild(toast);
+            window.setTimeout(() => {
+                try { toast.remove(); } catch (e) {}
+            }, 2600);
+        } catch (e) {}
+    }
+
+    function isElementInViewport(el) {
+        try {
+            const r = el.getBoundingClientRect();
+            const vh = window.innerHeight || document.documentElement.clientHeight;
+            return r.top >= 0 && r.bottom <= vh;
+        } catch (e) {
+            return true;
+        }
+    }
+
+    function focusFirstInvalid() {
+        try { form.reportValidity(); } catch (e) {}
+        const invalid = form.querySelector(':invalid');
+        if (!invalid) return;
+        try {
+            invalid.focus({ preventScroll: true });
+        } catch (e) {
+            try { invalid.focus(); } catch (e2) {}
+        }
+        if (!isElementInViewport(invalid)) {
+            try { invalid.scrollIntoView({ block: 'center' }); } catch (e) {}
+        }
     }
 
     function checkCooldown() {
@@ -120,32 +195,96 @@
             form.reset();
             sessionStorage.removeItem(STORAGE_KEY);
             setStatus('idle', '');
+            fileValid = true;
             disableSubmit(false);
         });
     }
 
-    // Copy Email
-    if (copyEmailBtn) {
-        copyEmailBtn.addEventListener('click', async () => {
-            const email = "hello@estivanayramia.com";
+    // Copy Email (supports multiple buttons; iOS-safe fallback)
+    copyEmailBtns.forEach((btn) => {
+        btn.addEventListener('click', async () => {
+            const originalText = btn.innerText;
+            const markCopied = () => {
+                btn.innerText = 'Copied';
+                showToast('success', 'Email copied');
+                window.setTimeout(() => { btn.innerText = originalText; }, 1800);
+            };
+
             try {
-                await navigator.clipboard.writeText(email);
-                const originalText = copyEmailBtn.innerText;
-                copyEmailBtn.innerText = "Copied!";
-                setTimeout(() => copyEmailBtn.innerText = originalText, 2000);
-            } catch (err) {
-                // Fallback
-                const textArea = document.createElement("textarea");
-                textArea.value = email;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand("copy");
-                document.body.removeChild(textArea);
-                const originalText = copyEmailBtn.innerText;
-                copyEmailBtn.innerText = "Copied!";
-                setTimeout(() => copyEmailBtn.innerText = originalText, 2000);
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(EMAIL_TO_COPY);
+                    markCopied();
+                    return;
+                }
+            } catch (e) {}
+
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = EMAIL_TO_COPY;
+                ta.setAttribute('readonly', '');
+                ta.style.position = 'fixed';
+                ta.style.left = '-9999px';
+                ta.style.top = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                markCopied();
+            } catch (e) {
+                showToast('error', 'Copy failed');
             }
         });
+    });
+
+    // File validation (size + type) and submit disabling
+    const fileInput = form.querySelector('#attachment');
+    const acceptList = (fileInput && fileInput.getAttribute('accept'))
+        ? fileInput.getAttribute('accept').split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
+        : [];
+
+    const validateFile = () => {
+        fileValid = true;
+        const inCooldown = !!localStorage.getItem(COOLDOWN_KEY);
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            if (!inCooldown) {
+                setStatus('idle', '');
+                disableSubmit(false);
+            }
+            return;
+        }
+
+        const f = fileInput.files[0];
+        const name = (f && f.name ? f.name : '').toLowerCase();
+        const ext = name.includes('.') ? name.split('.').pop() : '';
+
+        if (f.size > MAX_FILE_BYTES) {
+            fileValid = false;
+            disableSubmit(true);
+            setStatus('error', `File is too large. Max size is ${Math.round(MAX_FILE_BYTES / (1024 * 1024))}MB.`);
+            return;
+        }
+
+        // If accept list is specified, validate extension loosely
+        if (acceptList.length > 0) {
+            const allowedExts = acceptList
+                .filter(a => a.startsWith('.'))
+                .map(a => a.replace('.', ''));
+            if (allowedExts.length > 0 && ext && !allowedExts.includes(ext)) {
+                fileValid = false;
+                disableSubmit(true);
+                setStatus('error', 'Unsupported file type. Please choose an allowed format.');
+                return;
+            }
+        }
+
+        if (!inCooldown) {
+            setStatus('idle', '');
+            disableSubmit(false);
+        }
+    };
+
+    if (fileInput) {
+        fileInput.addEventListener('change', validateFile);
     }
 
     // ==========================================
@@ -158,41 +297,32 @@
 
         // Anti-bot: Time to submit
         if (Date.now() - pageLoadTime < MIN_SUBMIT_TIME) {
-            setStatus('error', "Unable to send. Please try again in a few seconds.");
+            setStatus('error', 'Failed. Copy the email and send manually. Try again later.');
+            showToast('error', 'Failed — copy email and try again later');
             return;
         }
 
-        // File size check
-        const fileInput = form.querySelector('input[type="file"]');
-        if (fileInput && fileInput.files.length > 0) {
-            if (fileInput.files[0].size > MAX_FILE_SIZE) {
-                setStatus('error', "File is too large. Max size is 5MB.");
-                fileInput.focus();
-                return;
-            }
+        // File validation guard
+        validateFile();
+        if (!fileValid) {
+            showToast('error', 'Fix the attachment and try again');
+            return;
         }
 
         // Trim inputs
-        const inputs = form.querySelectorAll('input[type="text"], input[type="email"], textarea');
-        inputs.forEach(input => {
-            input.value = input.value.trim();
-        });
+        const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="url"], textarea');
+        inputs.forEach(input => { input.value = input.value.trim(); });
 
         if (!form.checkValidity()) {
-            // Focus first invalid
-            const invalid = form.querySelector(':invalid');
-            if (invalid) {
-                invalid.focus({ preventScroll: true });
-                invalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            focusFirstInvalid();
             return;
         }
 
         inFlight = true;
         const originalText = submitBtn.innerText;
         disableSubmit(true);
-        submitBtn.innerText = 'Sending...';
-        setStatus('neutral', 'Sending message...');
+        submitBtn.innerText = 'Sending…';
+        setStatus('neutral', 'Sending…');
         
         try {
             const endpoint = form.getAttribute('data-form-endpoint');
@@ -201,6 +331,7 @@
             const response = await fetch(endpoint, {
                 method: 'POST',
                 body: formData,
+                redirect: 'manual',
                 headers: {
                     'Accept': 'application/json'
                 }
@@ -210,28 +341,41 @@
                 form.reset();
                 sessionStorage.removeItem(STORAGE_KEY);
                 localStorage.setItem(COOLDOWN_KEY, Date.now().toString());
-                
-                setStatus('success', 'Message sent successfully!');
+
+                setStatus('success', 'Sent. If you do not hear back within 24 hours, copy the email and send manually.');
+                showToast('success', 'Message sent');
                 openModal();
                 
                 // Start cooldown
                 checkCooldown();
             } else {
-                const data = await response.json();
-                if (Object.hasOwn(data, 'errors')) {
-                    setStatus('error', data["errors"].map(error => error["message"]).join(", "));
-                } else {
-                    setStatus('error', "Oops! There was a problem submitting your form. If this keeps failing, copy my email and send manually.");
-                }
+                // Cooldown after any attempt (success or failure)
+                localStorage.setItem(COOLDOWN_KEY, Date.now().toString());
+                let msg = 'Failed. Copy the email and send manually. Try again later.';
+                try {
+                    const data = await response.json();
+                    if (data && Object.hasOwn(data, 'errors')) {
+                        msg = data.errors.map(error => error.message).join(', ');
+                        msg += ' If this keeps failing, copy the email and send manually.';
+                    }
+                } catch (e) {}
+                setStatus('error', msg);
+                showToast('error', 'Failed — copy email and try again later');
+                checkCooldown();
             }
         } catch (error) {
-            setStatus('error', "Network error. If this keeps failing, copy my email and send manually.");
+            // Cooldown after any attempt (success or failure)
+            localStorage.setItem(COOLDOWN_KEY, Date.now().toString());
+            setStatus('error', 'Failed. Copy the email and send manually. Try again later.');
+            showToast('error', 'Failed — copy email and try again later');
+            checkCooldown();
         } finally {
             inFlight = false;
+            // Restore button label; cooldown handler will manage disabling + countdown text
+            submitBtn.innerText = originalText;
             if (!localStorage.getItem(COOLDOWN_KEY)) {
                 disableSubmit(false);
             }
-            submitBtn.innerText = originalText;
         }
     });
 
@@ -239,13 +383,15 @@
     // MODAL & SCROLL LOCK
     // ==========================================
     function openModal() {
-        // Capture scroll position
-        scrollY = window.scrollY;
-        
-        // Lock body
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${scrollY}px`;
-        document.body.style.width = '100%';
+        // Capture scroll position + lock body (prefer shared lock from site.js)
+        if (window.__eaScrollLock && typeof window.__eaScrollLock.lock === 'function') {
+            window.__eaScrollLock.lock('contact-modal');
+        } else {
+            scrollY = window.scrollY;
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
+        }
         
         modal.hidden = false;
         modal.setAttribute('aria-hidden', 'false');
@@ -259,17 +405,31 @@
     function closeModal() {
         modal.hidden = true;
         modal.setAttribute('aria-hidden', 'true');
-        
+
         // Unlock body
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        window.scrollTo(0, scrollY);
+        if (window.__eaScrollLock && typeof window.__eaScrollLock.unlock === 'function') {
+            window.__eaScrollLock.unlock('contact-modal');
+        } else {
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            window.scrollTo(0, scrollY);
+        }
         
         stopGame();
     }
 
+    const restartBtn = document.getElementById('restart-success-game');
+
     closeBtn.addEventListener('click', closeModal);
+    if (restartBtn) {
+        restartBtn.addEventListener('click', () => {
+            if (modal.hidden) return;
+            initGame();
+            try { canvas.focus({ preventScroll: true }); } catch (e) {}
+            showToast('success', 'Restarted');
+        });
+    }
     
     // Close on ESC and Click Outside
     document.addEventListener('keydown', (e) => {
@@ -330,6 +490,7 @@
     function stopGame() {
         gameActive = false;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
         window.removeEventListener('resize', resizeCanvas);
         canvas.removeEventListener('pointerdown', handleInput);
     }
@@ -405,6 +566,10 @@
 
     function loop() {
         if (!gameActive) return;
+        // Single RAF loop guard
+        if (!animationFrameId) {
+            // allow first frame to schedule
+        }
         
         const rect = canvas.getBoundingClientRect();
         const width = rect.width;
@@ -460,10 +625,11 @@
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             if (gameActive) {
-                cancelAnimationFrame(animationFrameId);
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
             }
         } else {
-            if (gameActive && !modal.hidden) {
+            if (gameActive && !modal.hidden && !animationFrameId) {
                 loop();
             }
         }

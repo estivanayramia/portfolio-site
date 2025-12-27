@@ -684,9 +684,31 @@ const initMobileMenu = () => {
     if (!menuToggle || !mobileMenu) return;
 
     let scrollY = 0;
+    let overlay = null;
+
+    const ensureOverlay = () => {
+        if (overlay) return overlay;
+        overlay = document.createElement('div');
+        overlay.setAttribute('aria-hidden', 'true');
+        overlay.style.position = 'fixed';
+        overlay.style.left = '0';
+        overlay.style.top = '0';
+        overlay.style.right = '0';
+        overlay.style.bottom = '0';
+        overlay.style.zIndex = '35';
+        overlay.style.background = 'rgba(0,0,0,0.35)';
+        overlay.addEventListener('click', () => closeMenu());
+        return overlay;
+    };
 
     const openMenu = () => {
         scrollY = window.scrollY;
+        // Prevent background interaction while menu is open
+        try {
+            const ov = ensureOverlay();
+            if (!ov.parentElement) document.body.appendChild(ov);
+        } catch (e) {}
+
         mobileMenu.classList.remove('hidden');
         menuToggle.setAttribute('aria-expanded', 'true');
         // Lock scroll
@@ -703,6 +725,11 @@ const initMobileMenu = () => {
         
         mobileMenu.classList.add('hidden');
         menuToggle.setAttribute('aria-expanded', 'false');
+
+        if (overlay && overlay.parentElement) {
+            overlay.parentElement.removeChild(overlay);
+        }
+
         // Unlock scroll
         document.body.style.position = '';
         document.body.style.top = '';
@@ -746,6 +773,42 @@ const initMobileMenu = () => {
         if (e.target.tagName === 'A' || e.target.closest('a')) {
             closeMenu();
         }
+    });
+};
+
+// ========================================================================== 
+// aria-current="page" for Navigation
+// ==========================================================================
+
+const initAriaCurrent = () => {
+    const normalize = (p) => {
+        try {
+            if (!p) return '/';
+            // Strip query/hash if present
+            p = String(p).split('#')[0].split('?')[0];
+            // Convert .html routes to clean URL form
+            if (p.endsWith('.html')) p = p.slice(0, -5);
+            // Remove trailing slash (except root)
+            if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
+            return p || '/';
+        } catch (e) {
+            return '/';
+        }
+    };
+
+    const currentPath = normalize(window.location && window.location.pathname);
+    const links = document.querySelectorAll('header a[href], #mobile-menu a[href]');
+    links.forEach((a) => {
+        try {
+            const href = a.getAttribute('href');
+            if (!href) return;
+            // Ignore external links, mailto, hashes
+            if (/^(https?:)?\/\//i.test(href) || /^mailto:/i.test(href) || href.startsWith('#')) return;
+
+            const linkPath = normalize(href);
+            if (linkPath === currentPath) a.setAttribute('aria-current', 'page');
+            else a.removeAttribute('aria-current');
+        } catch (e) {}
     });
 };
 
@@ -2586,6 +2649,7 @@ const init = () => {
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             initDarkMode();
+            initAriaCurrent();
             initMobileMenu();
             loadGSAPAndInit();
             initSmoothScroll();
@@ -2603,6 +2667,7 @@ const init = () => {
     } else {
         // DOM already loaded
         initDarkMode();
+        initAriaCurrent();
         initMobileMenu();
         loadGSAPAndInit();
         initSmoothScroll();

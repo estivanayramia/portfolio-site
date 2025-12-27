@@ -134,7 +134,7 @@
                         <h2 class="text-2xl font-bold text-indigodeep mb-6">Send a Message</h2>
                         
                         <!-- Formspree Form -->
-                        <form id="contact-form" action="https://formspree.io/f/mblbnwoy" method="POST" enctype="multipart/form-data" class="space-y-6" data-form-endpoint="https://formspree.io/f/mblbnwoy">
+                        <form id="contact-form" action="/contact" method="POST" enctype="multipart/form-data" class="space-y-6" data-form-endpoint="https://formspree.io/f/mblbnwoy">
                             
                             <!-- Name Field -->
                             <div>
@@ -221,7 +221,7 @@
                                     accept=".csv,.doc,.docx,.pdf,.txt,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.svg,.webp"
                                     class="w-full px-4 py-3 bg-white border border-chocolate/20 rounded-lg text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:border-transparent transition-all"
                                 >
-                                <p class="mt-2 text-xs" style="color: var(--color-text); opacity: 0.7;">Accepted: CSV, DOC, DOCX, PDF, TXT, XLS, XLSX, JPG, PNG, GIF, SVG, WEBP (max 5MB).</p>
+                                <p class="mt-2 text-xs" id="contact-file-help" style="color: var(--color-text); opacity: 0.7;">Accepted: CSV, DOC, DOCX, PDF, TXT, XLS, XLSX, JPG, PNG, GIF, SVG, WEBP (max <span id="contact-max-file-mb">5</span>MB).</p>
                             </div>
 
                             <!-- Honeypot Field -->
@@ -229,6 +229,9 @@
                             
                             <!-- Submit Button Area -->
                             <div class="space-y-4">
+                                <!-- Inline Status (idle / sending / sent / failed) -->
+                                <div id="contact-status" role="status" aria-live="polite" class="min-h-[1.5rem] text-sm font-medium"></div>
+
                                 <div class="flex flex-col sm:flex-row gap-3">
                                     <button 
                                         type="submit" 
@@ -246,9 +249,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Status Message Area -->
-                                <div id="form-status" role="status" aria-live="polite" class="min-h-[1.5rem] text-sm font-medium"></div>
-
                                 <p class="text-xs text-chocolate/70 text-center">
                                     I typically reply within 24 hours.
                                 </p>
@@ -265,6 +265,7 @@
                                         type="button"
                                         id="copy-email-btn"
                                         class="flex-1 inline-flex items-center justify-center border border-chocolate/20 text-chocolate bg-transparent font-medium px-6 py-3 rounded-full hover:bg-chocolate/5 transition-all focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white"
+                                        data-copy-email
                                     >
                                         Copy Email
                                     </button>
@@ -292,7 +293,12 @@
                                 </svg>
                                 <div>
                                     <div class="text-sm font-medium text-indigodeep">Email</div>
-                                    <a href="mailto:hello@estivanayramia.com" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep rounded notranslate" translate="no">hello@estivanayramia.com</a>
+                                    <div class="flex items-center gap-3 flex-wrap">
+                                        <a href="mailto:hello@estivanayramia.com" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep rounded notranslate" translate="no">hello@estivanayramia.com</a>
+                                        <button type="button" class="text-xs font-medium px-3 py-1 rounded-full border border-chocolate/20 text-chocolate hover:bg-chocolate/5 transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep" data-copy-email>
+                                            Copy
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -449,8 +455,8 @@
                 <p class="text-chocolate/80 dark:text-beige/80">Thanks for reaching out. While you wait for a reply, pop some bubbles!</p>
             </div>
             
-            <div class="relative flex-1 bg-beige/20 dark:bg-black/20 min-h-[300px] touch-none select-none" id="game-container">
-                <canvas id="success-game-canvas" class="absolute inset-0 w-full h-full"></canvas>
+            <div class="relative flex-1 bg-beige/20 dark:bg-black/20 min-h-[300px] touch-none select-none" id="game-container" style="overscroll-behavior: contain;">
+                <canvas id="success-game-canvas" class="absolute inset-0 w-full h-full touch-none"></canvas>
                 <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
                     <p class="text-sm opacity-50 font-mono">Tap/Click to pop</p>
                 </div>
@@ -458,9 +464,17 @@
 
             <div class="p-4 border-t border-chocolate/10 dark:border-white/10 flex justify-between items-center bg-white dark:bg-[#212842]">
                 <span class="text-sm font-mono text-indigodeep dark:text-beige" id="score-display">Score: 0</span>
-                <button type="button" id="close-success-modal" class="px-6 py-2 bg-indigodeep text-beige rounded-full hover:bg-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigodeep">
-                    Close
-                </button>
+                <div class="flex items-center gap-3 flex-wrap justify-end">
+                    <button type="button" class="px-6 py-2 border border-chocolate/20 text-chocolate bg-transparent rounded-full hover:bg-chocolate/5 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigodeep" data-copy-email>
+                        Copy email
+                    </button>
+                    <button type="button" id="restart-success-game" class="px-6 py-2 border border-chocolate/20 text-chocolate bg-transparent rounded-full hover:bg-chocolate/5 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigodeep">
+                        Restart
+                    </button>
+                    <button type="button" id="close-success-modal" class="px-6 py-2 bg-indigodeep text-beige rounded-full hover:bg-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigodeep">
+                        Close and return
+                    </button>
+                </div>
             </div>
         </div>
     </div>

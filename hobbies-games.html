@@ -758,10 +758,10 @@
                 <div class="game-container">
                     <canvas id="snake-canvas" width="400" height="400"></canvas>
                     <div class="touch-controls">
-                        <button class="touch-btn up" ontouchstart="setSnakeDirection('up')" onclick="setSnakeDirection('up')">↑</button>
-                        <button class="touch-btn left" ontouchstart="setSnakeDirection('left')" onclick="setSnakeDirection('left')">←</button>
-                        <button class="touch-btn right" ontouchstart="setSnakeDirection('right')" onclick="setSnakeDirection('right')">→</button>
-                        <button class="touch-btn down" ontouchstart="setSnakeDirection('down')" onclick="setSnakeDirection('down')">↓</button>
+                        <button class="touch-btn up" onpointerdown="setSnakeDirection('up')">↑</button>
+                        <button class="touch-btn left" onpointerdown="setSnakeDirection('left')">←</button>
+                        <button class="touch-btn right" onpointerdown="setSnakeDirection('right')">→</button>
+                        <button class="touch-btn down" onpointerdown="setSnakeDirection('down')">↓</button>
                     </div>
                     <div class="flex gap-2 mt-4 justify-center">
                         <button onclick="togglePause('snake')" id="snake-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
@@ -783,8 +783,8 @@
                 <div class="game-container">
                     <canvas id="breaker-canvas" width="400" height="500"></canvas>
                     <div class="touch-controls horizontal">
-                        <button class="touch-btn" ontouchstart="breakerPaddleDir = -1" ontouchend="breakerPaddleDir = 0" onmousedown="breakerPaddleDir = -1" onmouseup="breakerPaddleDir = 0">←</button>
-                        <button class="touch-btn" ontouchstart="breakerPaddleDir = 1" ontouchend="breakerPaddleDir = 0" onmousedown="breakerPaddleDir = 1" onmouseup="breakerPaddleDir = 0">→</button>
+                        <button class="touch-btn" onpointerdown="breakerPaddleDir = -1" onpointerup="breakerPaddleDir = 0" onpointercancel="breakerPaddleDir = 0" onpointerleave="breakerPaddleDir = 0">←</button>
+                        <button class="touch-btn" onpointerdown="breakerPaddleDir = 1" onpointerup="breakerPaddleDir = 0" onpointercancel="breakerPaddleDir = 0" onpointerleave="breakerPaddleDir = 0">→</button>
                     </div>
                     <div class="flex gap-2 mt-4 justify-center">
                         <button onclick="togglePause('breaker')" id="breaker-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
@@ -834,9 +834,9 @@
                 <div class="game-container">
                     <canvas id="invaders-canvas" width="400" height="500"></canvas>
                     <div class="touch-controls horizontal">
-                        <button class="touch-btn" ontouchstart="invaderDir = -1" ontouchend="invaderDir = 0" onmousedown="invaderDir = -1" onmouseup="invaderDir = 0">←</button>
-                        <button class="touch-btn" ontouchstart="invaderShoot()" onclick="invaderShoot()">🔥</button>
-                        <button class="touch-btn" ontouchstart="invaderDir = 1" ontouchend="invaderDir = 0" onmousedown="invaderDir = 1" onmouseup="invaderDir = 0">→</button>
+                        <button class="touch-btn" onpointerdown="invaderDir = -1" onpointerup="invaderDir = 0" onpointercancel="invaderDir = 0" onpointerleave="invaderDir = 0">←</button>
+                        <button class="touch-btn" onpointerdown="invaderShoot()">🔥</button>
+                        <button class="touch-btn" onpointerdown="invaderDir = 1" onpointerup="invaderDir = 0" onpointercancel="invaderDir = 0" onpointerleave="invaderDir = 0">→</button>
                     </div>
                     <div class="flex gap-2 mt-4 justify-center">
                         <button onclick="togglePause('invaders')" id="invaders-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action" disabled>Pause</button>
@@ -903,7 +903,13 @@
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
         
         // Sound System
-        let soundsEnabled = localStorage.getItem('gameSoundsEnabled') !== 'false';
+        const __storedSoundsEnabled = localStorage.getItem('gameSoundsEnabled');
+        // Default muted on mobile/iPhone unless user explicitly enabled
+        let soundsEnabled = (__storedSoundsEnabled === null)
+            ? (!isMobile)
+            : (__storedSoundsEnabled !== 'false');
+
+        let audioContext = null;
         const sounds = {
             eat: null,
             hit: null,
@@ -914,22 +920,41 @@
         };
         
         function initSounds() {
-            // Create audio context for simple sound effects
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            // Lazily create/resume AudioContext only when needed (prevents autoplay issues on iOS)
+            const ensureAudio = () => {
+                if (audioContext) return audioContext;
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    audioContext = null;
+                }
+                return audioContext;
+            };
+
+            const ensureAudioRunning = () => {
+                const ctx = ensureAudio();
+                if (!ctx) return null;
+                try {
+                    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+                } catch (e) {}
+                return ctx;
+            };
             
             function createBeep(freq, duration, type = 'sine') {
                 return () => {
                     if (!soundsEnabled) return;
+                    const ctx = ensureAudioRunning();
+                    if (!ctx) return;
                     const osc = audioContext.createOscillator();
                     const gain = audioContext.createGain();
                     osc.connect(gain);
-                    gain.connect(audioContext.destination);
+                    gain.connect(ctx.destination);
                     osc.frequency.value = freq;
                     osc.type = type;
-                    gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-                    osc.start(audioContext.currentTime);
-                    osc.stop(audioContext.currentTime + duration);
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + duration);
                 };
             }
             
@@ -944,6 +969,17 @@
         function toggleSound() {
             soundsEnabled = !soundsEnabled;
             localStorage.setItem('gameSoundsEnabled', soundsEnabled);
+            // User gesture: attempt to resume audio when enabling
+            if (soundsEnabled) {
+                try {
+                    if (!audioContext) {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                    if (audioContext && audioContext.state === 'suspended') {
+                        audioContext.resume().catch(() => {});
+                    }
+                } catch (e) {}
+            }
             const icon = soundsEnabled ? '🔊' : '🔇';
             // Update all sound toggle buttons
             ['sound-toggle', 'sound-toggle-snake', 'sound-toggle-breaker', 'sound-toggle-invaders'].forEach(id => {
@@ -951,6 +987,42 @@
                 if (btn) btn.textContent = icon;
             });
         }
+
+        // Pause RAF-based games when tab is backgrounded
+        let __pausedByVisibility = false;
+        let __wasPausedBeforeVisibility = false;
+        document.addEventListener('visibilitychange', () => {
+            try {
+                if (document.hidden) {
+                    if (!currentGame) return;
+                    __pausedByVisibility = true;
+                    __wasPausedBeforeVisibility = !!gamePaused;
+                    gamePaused = true;
+                    if (typeof snakeAnimId !== 'undefined' && snakeAnimId) { cancelAnimationFrame(snakeAnimId); snakeAnimId = null; }
+                    if (typeof breakerAnimId !== 'undefined' && breakerAnimId) { cancelAnimationFrame(breakerAnimId); breakerAnimId = null; }
+                    if (typeof invaderAnimId !== 'undefined' && invaderAnimId) { cancelAnimationFrame(invaderAnimId); invaderAnimId = null; }
+                    return;
+                }
+
+                if (__pausedByVisibility) {
+                    __pausedByVisibility = false;
+                    if (!__wasPausedBeforeVisibility) {
+                        gamePaused = false;
+                        if (currentGame === 'snake' && typeof snakeRunning !== 'undefined' && snakeRunning && typeof snakeLoop !== 'undefined' && !snakeAnimId) {
+                            try { snakeLastMove = performance.now(); } catch (e) {}
+                            snakeAnimId = requestAnimationFrame(snakeLoop);
+                        }
+                        if (currentGame === 'breaker' && typeof breakerRunning !== 'undefined' && breakerRunning && typeof breakerLoop !== 'undefined' && typeof breakerAnimId !== 'undefined' && !breakerAnimId) {
+                            breakerAnimId = requestAnimationFrame(breakerLoop);
+                        }
+                        if (currentGame === 'invaders' && typeof invaderRunning !== 'undefined' && invaderRunning && typeof invaderLoop !== 'undefined' && typeof invaderAnimId !== 'undefined' && !invaderAnimId) {
+                            invaderAnimId = requestAnimationFrame(invaderLoop);
+                        }
+                    }
+                    __wasPausedBeforeVisibility = false;
+                }
+            } catch (e) {}
+        });
         
         // Helper: Get theme-aware foreground color for canvas
         function getGameFg() {
@@ -1263,6 +1335,7 @@
         const snakeCanvas = document.getElementById('snake-canvas');
         const snakeCtx = snakeCanvas.getContext('2d');
         let snake = [], food = {}, snakeDir = {}, nextSnakeDir = {}, snakeScore = 0, snakeInterval, snakeRunning = false;
+        let snakeAnimId = null, snakeLastMove = 0;
         let snakeLevel = 1, snakeSpeed = 100, snakeFoodEaten = 0;
         let snakeCombo = 0, snakeComboTimer = null, snakeGameStarted = false;
         let snakeHighScore = parseInt(localStorage.getItem('snakeHighScore') || '0');
