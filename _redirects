@@ -28,28 +28,8 @@
 /projects.html                   /projects                       301!
 
 # 2. Rewrites (200) - Serve content for clean URLs
-/es/                         /es/index.html               200
-/ar/                         /ar/index.html               200
-/about                       /about.html                       200
-/contact                       /contact.html                       200
-/deep-dive                       /deep-dive.html                       200
-/hobbies-games                       /hobbies-games.html                       200
-/hobbies                       /hobbies.html                       200
-/hobby-car                       /hobby-car.html                       200
-/hobby-cooking                       /hobby-cooking.html                       200
-/hobby-gym                       /hobby-gym.html                       200
-/hobby-photography                       /hobby-photography.html                       200
-/hobby-reading                       /hobby-reading.html                       200
-/hobby-whispers                       /hobby-whispers.html                       200
-/overview                       /overview.html                       200
-/privacy                       /privacy.html                       200
-/project-competitive-strategy                       /project-competitive-strategy.html                       200
-/project-discipline                       /project-discipline.html                       200
-/project-documentation                       /project-documentation.html                       200
-/project-logistics                       /project-logistics.html                       200
-/project-multilingual                       /project-multilingual.html                       200
-/project-portfolio                       /project-portfolio.html                       200
-/projects                       /projects.html                       200
+# Cloudflare Pages automatically handles extensionless URLs (e.g. /about -> about.html)
+# so explicit rewrites are not needed and can cause redirect loops.
 
 # 404 Fallback
 /404.html                    404
