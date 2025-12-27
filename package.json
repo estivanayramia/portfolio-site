@@ -5,8 +5,7 @@
   "scripts": {
     "build:css": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --minify",
     "build:js": "esbuild assets/js/site.js --minify --outfile=assets/js/site.min.js",
-    "build:critical": "npx tailwindcss -c tailwind.critical.config.js -o assets/css/critical.css && esbuild assets/css/critical.css --minify --outfile=assets/css/critical.min.css",
-    "build": "npm run build:css && npm run build:js && npm run build:critical",
+    "build": "npm run build:css && npm run build:js",
     "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
     "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push"
   },
