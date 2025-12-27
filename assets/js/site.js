@@ -683,48 +683,69 @@ const initMobileMenu = () => {
 
     if (!menuToggle || !mobileMenu) return;
 
-    // Handler function for menu toggle
-    const toggleMenu = () => {
-        const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+    let scrollY = 0;
 
-        // Toggle menu visibility
-        mobileMenu.classList.toggle('hidden');
-
-        // Update ARIA attribute
-        menuToggle.setAttribute('aria-expanded', !isExpanded);
-
-        // Animate icon (optional enhancement)
+    const openMenu = () => {
+        scrollY = window.scrollY;
+        mobileMenu.classList.remove('hidden');
+        menuToggle.setAttribute('aria-expanded', 'true');
+        // Lock scroll
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.width = '100%';
+        
         const icon = menuToggle.querySelector('svg');
-        if (icon) {
-            icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(90deg)';
-        }
+        if (icon) icon.style.transform = 'rotate(90deg)';
     };
 
-    // Add click event for menu toggle
+    const closeMenu = () => {
+        if (mobileMenu.classList.contains('hidden')) return;
+        
+        mobileMenu.classList.add('hidden');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        // Unlock scroll
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollY);
+        
+        const icon = menuToggle.querySelector('svg');
+        if (icon) icon.style.transform = 'rotate(0deg)';
+    };
+
+    const toggleMenu = () => {
+        const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+        if (isExpanded) closeMenu();
+        else openMenu();
+    };
+
     menuToggle.addEventListener('click', (e) => {
         e.preventDefault();
+        e.stopPropagation();
         toggleMenu();
     });
 
-    // Close menu when clicking outside
+    // Close on outside click
     document.addEventListener('click', (e) => {
         if (!menuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
-            mobileMenu.classList.add('hidden');
-            menuToggle.setAttribute('aria-expanded', 'false');
+            closeMenu();
         }
     });
 
-    // Close menu when clicking a link
-    mobileMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-            mobileMenu.classList.add('hidden');
-            menuToggle.setAttribute('aria-expanded', 'false');
-            // Reset icon rotation
-            const icon = menuToggle.querySelector('svg');
-            if (icon) {
-                icon.style.transform = 'rotate(0deg)';
-            }
-        });
+    // Close on ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeMenu();
+    });
+
+    // Close on navigation
+    window.addEventListener('hashchange', closeMenu);
+    window.addEventListener('popstate', closeMenu);
+
+    // Event delegation for links
+    mobileMenu.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A' || e.target.closest('a')) {
+            closeMenu();
+        }
     });
 };
 
@@ -874,20 +895,27 @@ const loadGSAPAndInit = () => {
 // ==========================================================================
 
 const initSmoothScroll = () => {
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const targetId = this.getAttribute('href');
-            
-            // Prevent default for # only to stop scroll jumps
-            if (targetId === '#') {
-                e.preventDefault();
-                return;
-            }
-
-            const targetElement = document.querySelector(targetId);
+    // Global handler for href="#" to prevent scroll jumps
+    document.addEventListener('click', (e) => {
+        const anchor = e.target.closest('a');
+        if (!anchor) return;
+        
+        const href = anchor.getAttribute('href');
+        
+        // Strictly prevent default for "#" links
+        if (href === '#') {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+        }
+        
+        // Smooth scroll for internal anchors
+        if (href && href.startsWith('#') && href.length > 1) {
+            // Ignore if it's just a hash change for routing (if you had that)
+            // But here we assume #id is a scroll target
+            const targetElement = document.querySelector(href);
             if (targetElement) {
                 e.preventDefault();
-                
                 const headerOffset = 100;
                 const elementPosition = targetElement.getBoundingClientRect().top;
                 const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
@@ -897,8 +925,8 @@ const initSmoothScroll = () => {
                     behavior: 'smooth'
                 });
             }
-        });
-    });
+        }
+    }, { passive: false });
 };
 
 // ==========================================================================

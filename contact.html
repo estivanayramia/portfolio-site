@@ -227,22 +227,48 @@
                             <!-- Honeypot Field -->
                             <input type="text" name="website_url" style="display:none !important;" tabindex="-1" autocomplete="off">
                             
-                            <!-- Submit Button -->
-                            <div>
-                                <button 
-                                    type="submit" 
-                                    class="w-full bg-indigodeep border border-white/20 text-beige font-medium px-8 py-4 rounded-full hover:bg-chocolate transition-all hover:scale-105 dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white"
-                                >
-                                    Send Message
-                                </button>
+                            <!-- Submit Button Area -->
+                            <div class="space-y-4">
+                                <div class="flex flex-col sm:flex-row gap-3">
+                                    <button 
+                                        type="submit" 
+                                        class="flex-1 bg-indigodeep border border-white/20 text-beige font-medium px-6 py-4 rounded-full hover:bg-chocolate transition-all hover:scale-105 dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white disabled:opacity-70 disabled:cursor-not-allowed"
+                                    >
+                                        Send Message
+                                    </button>
+                                    
+                                    <button 
+                                        type="button"
+                                        id="clear-form-btn"
+                                        class="px-6 py-4 border border-chocolate/20 text-chocolate font-medium rounded-full hover:bg-chocolate/5 transition-all focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white"
+                                    >
+                                        Clear
+                                    </button>
+                                </div>
+
+                                <!-- Status Message Area -->
+                                <div id="form-status" role="status" aria-live="polite" class="min-h-[1.5rem] text-sm font-medium"></div>
+
+                                <p class="text-xs text-chocolate/70 text-center">
+                                    I typically reply within 24 hours.
+                                </p>
                                 
                                 <!-- Alternate Email Contact -->
-                                <a 
-                                    href="mailto:hello@estivanayramia.com?subject=Website%20Inquiry"
-                                    class="mt-3 w-full inline-flex items-center justify-center border-2 border-indigodeep text-indigodeep bg-transparent font-medium px-8 py-4 rounded-full hover:scale-105 dark:border-beige dark:text-beige transition-all focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige dark:focus:ring-beige"
-                                >
-                                    Email Me Instead
-                                </a>
+                                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                                    <a 
+                                        href="mailto:hello@estivanayramia.com?subject=Website%20Inquiry"
+                                        class="flex-1 inline-flex items-center justify-center border-2 border-indigodeep text-indigodeep bg-transparent font-medium px-6 py-3 rounded-full hover:scale-105 dark:border-beige dark:text-beige transition-all focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige dark:focus:ring-beige"
+                                    >
+                                        Email Me Instead
+                                    </a>
+                                    <button 
+                                        type="button"
+                                        id="copy-email-btn"
+                                        class="flex-1 inline-flex items-center justify-center border border-chocolate/20 text-chocolate bg-transparent font-medium px-6 py-3 rounded-full hover:bg-chocolate/5 transition-all focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white"
+                                    >
+                                        Copy Email
+                                    </button>
+                                </div>
                             </div>
                             
                             <!-- Privacy Note -->
