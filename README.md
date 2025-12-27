@@ -17,6 +17,17 @@ Static multilingual portfolio built with HTML, Tailwind CSS, GSAP, and modern we
 - **Security**: CSP headers, X-Frame-Options, secure cache policies
 - **Dark Mode**: Polished dark theme with optimized chat widget styling
 
+## 🛠️ Development
+
+### Local Server (Clean URLs)
+To test the site locally with clean URLs (e.g., `/projects` instead of `/projects.html`), run:
+
+```bash
+npm start
+```
+
+This uses `serve` with `cleanUrls: true` to mimic production routing.
+
 ---
 
 ## 🤖 Savonie AI Chatbot

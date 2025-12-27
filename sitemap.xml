@@ -4,13 +4,10 @@
     <loc>https://www.estivanayramia.com/</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/projects</loc>
+    <loc>https://www.estivanayramia.com/es/</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/overview</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/deep-dive</loc>
+    <loc>https://www.estivanayramia.com/ar/</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/about</loc>
@@ -19,10 +16,13 @@
     <loc>https://www.estivanayramia.com/contact</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies</loc>
+    <loc>https://www.estivanayramia.com/deep-dive</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/hobbies-games</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/hobby-car</loc>
@@ -41,6 +41,9 @@
   </url>
   <url>
     <loc>https://www.estivanayramia.com/hobby-whispers</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/overview</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/privacy</loc>
@@ -62,5 +65,8 @@
   </url>
   <url>
     <loc>https://www.estivanayramia.com/project-portfolio</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/projects</loc>
   </url>
 </urlset>
