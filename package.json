@@ -7,7 +7,7 @@
     "build:js": "esbuild assets/js/site.js --minify --outfile=assets/js/site.min.js",
     "build": "npm run build:css && npm run build:js",
     "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
-    "start": "serve .",
+    "start": "serve . -p 5500",
     "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push"
   },
   "keywords": [
