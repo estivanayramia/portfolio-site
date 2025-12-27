@@ -10,6 +10,9 @@
 ALL_CODE_COPY.txt
 node_modules/
 
+# Local one-off scripts
+audit.js
+
 # Lighthouse reports (local profiling only)
 .lighthouse/
 .lighthouse/*
@@ -17,4 +20,5 @@ node_modules/
 .lighthouse/**
 /.lighthouse/
 /.lighthouse/**
+
 

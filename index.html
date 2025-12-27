@@ -53,28 +53,27 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#212842">
     
-    <!-- Schema.org Person Markup -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Estivan Ayramia",
-    "url": "https://www.estivanayramia.com",
-    "jobTitle": "Marketing & Strategy Advisor",
-      "knowsAbout": ["Marketing", "Strategy", "Web Design"]
-    }
-    </script>
+        <!-- Schema.org markup (homepage only) -->
         <script type="application/ld+json">
         {
             "@context": "https://schema.org",
-            "@type": "WebSite",
-            "url": "https://www.estivanayramia.com/",
-            "name": "Estivan Ayramia",
-            "potentialAction": {
-                "@type": "SearchAction",
-                "target": "https://www.estivanayramia.com/?q={search_term_string}",
-                "query-input": "required name=search_term_string"
-            }
+            "@graph": [
+                {
+                    "@type": "WebSite",
+                    "@id": "https://www.estivanayramia.com/#website",
+                    "url": "https://www.estivanayramia.com/",
+                    "name": "Estivan Ayramia"
+                },
+                {
+                    "@type": "Person",
+                    "@id": "https://www.estivanayramia.com/#person",
+                    "name": "Estivan Ayramia",
+                    "url": "https://www.estivanayramia.com/",
+                    "sameAs": [
+                        "https://www.linkedin.com/in/estivanayramia/"
+                    ]
+                }
+            ]
         }
         </script>
     
