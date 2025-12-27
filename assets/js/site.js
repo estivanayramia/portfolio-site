@@ -878,8 +878,11 @@ const initSmoothScroll = () => {
         anchor.addEventListener('click', function(e) {
             const targetId = this.getAttribute('href');
             
-            // Don't prevent default for # only
-            if (targetId === '#') return;
+            // Prevent default for # only to stop scroll jumps
+            if (targetId === '#') {
+                e.preventDefault();
+                return;
+            }
 
             const targetElement = document.querySelector(targetId);
             if (targetElement) {

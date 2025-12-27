@@ -134,7 +134,7 @@
                         <h2 class="text-2xl font-bold text-indigodeep mb-6">Send a Message</h2>
                         
                         <!-- Formspree Form -->
-                        <form action="https://formspree.io/f/mblbnwoy" method="POST" enctype="multipart/form-data" class="space-y-6">
+                        <form id="contact-form" action="https://formspree.io/f/mblbnwoy" method="POST" enctype="multipart/form-data" class="space-y-6" data-form-endpoint="https://formspree.io/f/mblbnwoy">
                             
                             <!-- Name Field -->
                             <div>
@@ -413,5 +413,30 @@
     </div>
     
     <script src="/assets/js/lazy-loader.js" defer></script>
+    <script src="/assets/js/contact-form.js" defer></script>
+
+    <!-- Contact Success Modal -->
+    <div id="contact-success-modal" hidden class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="success-title">
+        <div class="bg-white dark:bg-[#212842] rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden relative flex flex-col max-h-[90vh]">
+            <div class="p-6 text-center border-b border-chocolate/10 dark:border-white/10">
+                <h3 id="success-title" class="text-2xl font-bold text-indigodeep dark:text-beige mb-2">Message Sent!</h3>
+                <p class="text-chocolate/80 dark:text-beige/80">Thanks for reaching out. While you wait for a reply, pop some bubbles!</p>
+            </div>
+            
+            <div class="relative flex-1 bg-beige/20 dark:bg-black/20 min-h-[300px] touch-none select-none" id="game-container">
+                <canvas id="success-game-canvas" class="absolute inset-0 w-full h-full"></canvas>
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <p class="text-sm opacity-50 font-mono">Tap/Click to pop</p>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-chocolate/10 dark:border-white/10 flex justify-between items-center bg-white dark:bg-[#212842]">
+                <span class="text-sm font-mono text-indigodeep dark:text-beige" id="score-display">Score: 0</span>
+                <button type="button" id="close-success-modal" class="px-6 py-2 bg-indigodeep text-beige rounded-full hover:bg-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigodeep">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

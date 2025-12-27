@@ -19,28 +19,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin>
     
-    <script>
-        // Define startGame function globally so onclick handlers can find it
-        function startGame(game) {
-            currentGame = game;
-            document.getElementById('game-selection').classList.add('hidden');
-            document.getElementById(`${game}-game`).classList.remove('hidden');
-            
-            if (game === 'snake') initSnake();
-            if (game === 'breaker') initBreaker();
-            if (game === 'merge') initMerge();
-            if (game === 'invaders') initInvaders();
-        }
-    </script>
-    
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/theme.css">
     
     <!-- Main Site Logic (Chat, Theme, etc.) -->
     <script src="/assets/js/site.js" defer></script>
-    <!-- Enhanced Instrumentation (opt-in with ?collect-logs=1) -->
-    <script src="/assets/js/site-refactored.js" defer></script>
     
     <!-- Favicon -->
     <link rel="icon" href="/assets/img/icon-192.png" type="image/png">
@@ -974,21 +958,6 @@
             return fg || '#ffffff'; // Fallback to white
         }
         
-        function startGame(game) {
-            currentGame = game;
-            console.log('startGame called with:', game, 'currentGame now:', currentGame);
-            document.getElementById('game-selection').classList.add('hidden');
-            document.getElementById(`${game}-game`).classList.remove('hidden');
-            
-            // Start game immediately without countdown
-            if (game === 'snake') initSnake();
-            if (game === 'breaker') initBreaker();
-            if (game === 'merge') initMerge();
-            if (game === 'invaders') {
-                console.log('Initializing Space Invaders...');
-                initInvaders();
-            }
-        }
         let gamePaused = false;
         
         // Achievement & Stats System
