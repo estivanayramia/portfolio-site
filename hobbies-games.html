@@ -700,6 +700,8 @@
                         <h3 class="text-2xl font-bold mb-2">Snake</h3>
                         <p class="text-sm opacity-70 mb-4">Classic reflex test with growing difficulty. Eat and grow!</p>
                         <div id="snake-progress" class="text-xs opacity-60 mb-3"></div>
+                        <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" data-ach-toggle="snake" aria-expanded="false">Achievements ▸</button>
+                        <div id="snake-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
                         <div class="inline-block px-4 py-2 bg-green-600 rounded-lg text-sm font-medium game-action">Play Snake</div>
                     </div>
                     
@@ -709,6 +711,8 @@
                         <h3 class="text-2xl font-bold mb-2">Block Breaker</h3>
                         <p class="text-sm opacity-70 mb-4">Smash bricks with increasing speed and power-ups!</p>
                         <div id="breaker-progress" class="text-xs opacity-60 mb-3"></div>
+                        <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" data-ach-toggle="breaker" aria-expanded="false">Achievements ▸</button>
+                        <div id="breaker-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
                         <div class="inline-block px-4 py-2 bg-purple-600 rounded-lg text-sm font-medium game-action">Play Breaker</div>
                     </div>
                     
@@ -718,6 +722,8 @@
                         <h3 class="text-2xl font-bold mb-2">2048</h3>
                         <p class="text-sm opacity-70 mb-4">Combine tiles to reach 2048 with smooth animations!</p>
                         <div id="merge-progress" class="text-xs opacity-60 mb-3"></div>
+                        <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" data-ach-toggle="merge" aria-expanded="false">Achievements ▸</button>
+                        <div id="merge-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
                         <div class="inline-block px-4 py-2 bg-blue-600 rounded-lg text-sm font-medium game-action">Play 2048</div>
                     </div>
 
@@ -727,6 +733,8 @@
                         <h3 class="text-2xl font-bold mb-2">Space Invaders</h3>
                         <p class="text-sm opacity-70 mb-4">Defend Earth from alien waves with escalating difficulty!</p>
                         <div id="invaders-progress" class="text-xs opacity-60 mb-3"></div>
+                        <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" data-ach-toggle="invaders" aria-expanded="false">Achievements ▸</button>
+                        <div id="invaders-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
                         <div class="inline-block px-4 py-2 bg-red-600 rounded-lg text-sm font-medium game-action">Play Invaders</div>
                     </div>
                 </div>
@@ -834,9 +842,9 @@
                 <div class="game-container">
                     <canvas id="invaders-canvas" width="400" height="500"></canvas>
                     <div class="touch-controls horizontal">
-                        <button class="touch-btn" onpointerdown="invaderDir = -1" onpointerup="invaderDir = 0" onpointercancel="invaderDir = 0" onpointerleave="invaderDir = 0">←</button>
-                        <button class="touch-btn" onpointerdown="invaderShoot()">🔥</button>
-                        <button class="touch-btn" onpointerdown="invaderDir = 1" onpointerup="invaderDir = 0" onpointercancel="invaderDir = 0" onpointerleave="invaderDir = 0">→</button>
+                        <button class="touch-btn" onpointerdown="setInvaderInput('left', true)" onpointerup="setInvaderInput('left', false)" onpointercancel="setInvaderInput('left', false)" onpointerleave="setInvaderInput('left', false)">←</button>
+                        <button class="touch-btn" onpointerdown="setInvaderInput('shoot', true)" onpointerup="setInvaderInput('shoot', false)" onpointercancel="setInvaderInput('shoot', false)" onpointerleave="setInvaderInput('shoot', false)">🔥</button>
+                        <button class="touch-btn" onpointerdown="setInvaderInput('right', true)" onpointerup="setInvaderInput('right', false)" onpointercancel="setInvaderInput('right', false)" onpointerleave="setInvaderInput('right', false)">→</button>
                     </div>
                     <div class="flex gap-2 mt-4 justify-center">
                         <button onclick="togglePause('invaders')" id="invaders-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action" disabled>Pause</button>
@@ -1033,6 +1041,13 @@
         let gamePaused = false;
         
         // Achievement & Stats System
+        const GAME_OBJECTIVES = {
+            snake: ['Eat food to grow', 'Build combos for multipliers', 'Survive long enough to level up'],
+            breaker: ['Break all bricks to advance', 'Collect power-ups', 'Keep the ball alive'],
+            merge: ['Merge tiles to grow values', 'Reach 2048', 'Push for a higher score'],
+            invaders: ['Clear waves of aliens', 'Collect power-ups', 'Avoid enemy fire']
+        };
+
         const ACHIEVEMENTS = {
             snake: [
                 {id: 'first_food', name: 'First Bite', desc: 'Eat your first food', icon: '🍎'},
@@ -1088,7 +1103,71 @@
                 if (achievement) {
                     showAchievementUnlock(achievement);
                 }
+                // Keep UI in sync as achievements are earned
+                updateProgressDisplays();
+                renderAllAchievementPanels();
             }
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        const achievementPanelState = {
+            snake: { open: false, tab: 'pending' },
+            breaker: { open: false, tab: 'pending' },
+            merge: { open: false, tab: 'pending' },
+            invaders: { open: false, tab: 'pending' }
+        };
+
+        function renderAchievementPanel(game) {
+            const panel = document.getElementById(`${game}-achievements`);
+            if (!panel) return;
+
+            const state = achievementPanelState[game] || { open: false, tab: 'pending' };
+            const all = (ACHIEVEMENTS[game] || []);
+            const data = loadGameData(game);
+            const unlockedIds = new Set((data.achievements || []));
+            const earned = all.filter(a => unlockedIds.has(a.id));
+            const pending = all.filter(a => !unlockedIds.has(a.id));
+
+            const objectives = (GAME_OBJECTIVES[game] || []).map(o => `<div style="opacity:0.85;">• ${escapeHtml(o)}</div>`).join('');
+
+            const list = (state.tab === 'earned' ? earned : pending).map(a => {
+                const isEarned = unlockedIds.has(a.id);
+                const icon = isEarned ? (a.icon || '✔') : '🔒';
+                return `
+                    <div style="display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:10px;background:${isEarned ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.18)'};">
+                        <div style="font-size:18px;line-height:1.2;">${icon}</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:700;">${escapeHtml(a.name)}</div>
+                            <div style="opacity:0.8;">${escapeHtml(a.desc)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            panel.innerHTML = `
+                <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                    <div style="font-weight:700;opacity:0.9;">Objectives</div>
+                    <div style="opacity:0.7;">🏆 ${earned.length}/${all.length}</div>
+                </div>
+                <div style="margin-bottom:12px;">${objectives}</div>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+                    <button type="button" data-ach-tab="${game}" data-tab="pending" class="text-xs" style="padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);background:${state.tab === 'pending' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.18)'};color:inherit;cursor:pointer;">Pending (${pending.length})</button>
+                    <button type="button" data-ach-tab="${game}" data-tab="earned" class="text-xs" style="padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);background:${state.tab === 'earned' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.18)'};color:inherit;cursor:pointer;">Earned (${earned.length})</button>
+                </div>
+                <div style="display:grid;gap:8px;">${list || '<div style="opacity:0.75;">No achievements in this view yet.</div>'}</div>
+            `;
+        }
+
+        function renderAllAchievementPanels() {
+            ['snake', 'breaker', 'merge', 'invaders'].forEach(renderAchievementPanel);
         }
         
         function showAchievementUnlock(achievement) {
@@ -1187,6 +1266,38 @@
             });
         }
         updateProgressDisplays();
+
+        // Tiny Achievements tabs inside the selection cards (collapsed by default)
+        document.addEventListener('click', (e) => {
+            const toggle = e.target && e.target.closest ? e.target.closest('[data-ach-toggle]') : null;
+            if (toggle) {
+                e.preventDefault();
+                e.stopPropagation();
+                const game = toggle.getAttribute('data-ach-toggle');
+                if (!game) return;
+                const panel = document.getElementById(`${game}-achievements`);
+                if (!panel) return;
+                const state = achievementPanelState[game] || (achievementPanelState[game] = { open: false, tab: 'pending' });
+                state.open = !state.open;
+                toggle.setAttribute('aria-expanded', state.open ? 'true' : 'false');
+                toggle.textContent = state.open ? 'Achievements ▾' : 'Achievements ▸';
+                panel.classList.toggle('hidden', !state.open);
+                if (state.open) renderAchievementPanel(game);
+                return;
+            }
+
+            const tab = e.target && e.target.closest ? e.target.closest('[data-ach-tab]') : null;
+            if (tab) {
+                e.preventDefault();
+                e.stopPropagation();
+                const game = tab.getAttribute('data-ach-tab');
+                const which = tab.getAttribute('data-tab');
+                if (!game || !which) return;
+                const state = achievementPanelState[game] || (achievementPanelState[game] = { open: false, tab: 'pending' });
+                state.tab = which;
+                renderAchievementPanel(game);
+            }
+        }, { passive: false });
 
         // Prevent Space Scroll
         window.addEventListener('keydown', (e) => {
@@ -2246,6 +2357,30 @@
         const INVADER_OBJECT_CAP = 600; // aliens + bullets + powerups
         let invaderListenersAdded = false;
 
+        const inputState = {
+            invaders: { left: false, right: false, shoot: false }
+        };
+
+        function setInvaderInput(action, isDown) {
+            const s = inputState.invaders;
+            if (action === 'left') s.left = !!isDown;
+            if (action === 'right') s.right = !!isDown;
+            if (action === 'shoot') {
+                s.shoot = !!isDown;
+                if (isDown) {
+                    if (!invaderGameStarted) {
+                        invaderGameStarted = true;
+                        const invPauseBtn = document.getElementById('invaders-pause');
+                        if (invPauseBtn) {
+                            invPauseBtn.disabled = false;
+                            invPauseBtn.textContent = 'Pause';
+                        }
+                    }
+                    invaderShoot();
+                }
+            }
+        }
+
         function setInvaderHUD(visible) {
             try {
                 const el = document.getElementById('invaders-hud');
@@ -2266,6 +2401,9 @@
             }
             invaderScore = 0; invaderWave = 1; alienSpeed = 0.5;
             invaderAliensKilled = 0; invaderWaveHits = 0; invaderGameStarted = false; // Wait for input
+            inputState.invaders.left = false;
+            inputState.invaders.right = false;
+            inputState.invaders.shoot = false;
             // Show HUD now that game started
             setInvaderHUD(true);
             invaderShield = 0; invaderMultiShot = false; invaderRapidFire = false;
@@ -2374,10 +2512,14 @@
                 // Calculate fire rate based on wave
                 const baseFireRate = Math.min(0.01 + (invaderWave - 1) * 0.002, 0.025);
                 
-                // Player movement
+                // Player movement (stateful input allows move + shoot simultaneously)
+                invaderDir = (inputState.invaders.left && !inputState.invaders.right) ? -1 : (inputState.invaders.right && !inputState.invaders.left) ? 1 : 0;
                 player.x += invaderDir * 6;
                 if(player.x < 0) player.x = 0;
                 if(player.x > 370) player.x = 370;
+
+                // Auto-fire while shoot is held (respects invaderShoot() cooldown)
+                if (inputState.invaders.shoot) invaderShoot();
                 
                 // Bullet movement and collision (theme-aware fallback)
                 invCtx.fillStyle = (typeof getGameFg === 'function' ? getGameFg() : '#ffff00') || '#ffff00';
@@ -2392,6 +2534,7 @@
                                 b.active = false;
                                 if (invaderShield > 0) {
                                     invaderShield--;
+                                    invaderWaveHits++;
                                     createParticles(player.x + 15, player.y, 8, '#00ffff');
                                 } else {
                                     invaderRunning = false;
@@ -2843,31 +2986,27 @@
             }
             if(currentGame === 'invaders') {
                 if(e.key==='ArrowLeft' || e.code==='KeyA') {
-                    console.log('Left pressed, currentGame:', currentGame, 'invaderGameStarted:', invaderGameStarted);
                     if (!invaderGameStarted) {
                         invaderGameStarted = true;
-                        console.log('Starting Space Invaders game');
                         const invPauseBtn = document.getElementById('invaders-pause');
                         if (invPauseBtn) {
                             invPauseBtn.disabled = false;
                             invPauseBtn.textContent = 'Pause';
                         }
                     }
-                    invaderDir = -1;
+                    inputState.invaders.left = true;
                     e.preventDefault();
                 }
                 if(e.key==='ArrowRight' || e.code==='KeyD') {
-                    console.log('Right pressed, currentGame:', currentGame, 'invaderGameStarted:', invaderGameStarted);
                     if (!invaderGameStarted) {
                         invaderGameStarted = true;
-                        console.log('Starting Space Invaders game');
                         const invPauseBtn = document.getElementById('invaders-pause');
                         if (invPauseBtn) {
                             invPauseBtn.disabled = false;
                             invPauseBtn.textContent = 'Pause';
                         }
                     }
-                    invaderDir = 1;
+                    inputState.invaders.right = true;
                     e.preventDefault();
                 }
                 if(e.code==='Space' || e.code==='ArrowUp' || e.code==='KeyW') {
@@ -2880,6 +3019,7 @@
                             invPauseBtn.textContent = 'Pause';
                         }
                     }
+                    inputState.invaders.shoot = true;
                     invaderShoot();
                     e.preventDefault();
                 }
@@ -2892,8 +3032,9 @@
                 if(e.key==='ArrowRight' && breakerPaddleDir===1) breakerPaddleDir = 0;
             }
             if(currentGame === 'invaders') {
-                if((e.key==='ArrowLeft' || e.code==='KeyA') && invaderDir===-1) invaderDir = 0;
-                if((e.key==='ArrowRight' || e.code==='KeyD') && invaderDir===1) invaderDir = 0;
+                if(e.key==='ArrowLeft' || e.code==='KeyA') inputState.invaders.left = false;
+                if(e.key==='ArrowRight' || e.code==='KeyD') inputState.invaders.right = false;
+                if(e.code==='Space' || e.code==='ArrowUp' || e.code==='KeyW') inputState.invaders.shoot = false;
             }
         });
 
