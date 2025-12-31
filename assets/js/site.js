@@ -2496,7 +2496,8 @@ const initAnalytics = () => {
     // Track achievement unlocks
     const originalUnlock = window.unlockAchievement;
     if (originalUnlock) {
-        window.unlockAchievement = (achievementId) => {
+        window.unlockAchievement = (...args) => {
+            const achievementId = args.length > 1 ? args[1] : args[0];
             trackEventDebug('achievement_unlocked', { achievement: achievementId });
             
             if (typeof clarity === 'function') {
@@ -2509,7 +2510,7 @@ const initAnalytics = () => {
                 });
             }
             
-            originalUnlock(achievementId);
+            originalUnlock.apply(window, args);
         };
     }
 };

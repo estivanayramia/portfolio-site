@@ -1,0 +1,101 @@
+[
+  {
+    "slug": "1024-moves",
+    "title": "1024 Moves",
+    "category": "Puzzle",
+    "description": "WebGL puzzle - push cubes to reach the orb in limited moves.",
+    "entry": "/assets/MiniGames/1024-moves/index.html",
+    "icon": "🧊",
+    "color": "from-purple-500 to-indigo-600"
+  },
+  {
+    "slug": "back-attacker",
+    "title": "Back Attacker",
+    "category": "Action",
+    "description": "Fast-paced action combat game.",
+    "entry": "/assets/MiniGames/back-attacker/index.html",
+    "icon": "⚔️",
+    "color": "from-red-500 to-orange-600"
+  },
+  {
+    "slug": "nano-wirebot",
+    "title": "Nano Wirebot",
+    "category": "Action",
+    "description": "Guide a tiny robot through wire mazes.",
+    "entry": "/assets/MiniGames/nano-wirebot/index.html",
+    "icon": "🤖",
+    "color": "from-cyan-500 to-blue-600"
+  },
+  {
+    "slug": "off-the-line",
+    "title": "Off The Line",
+    "category": "Arcade",
+    "description": "Stay off the line as long as possible.",
+    "entry": "/assets/MiniGames/off-the-line/index.html",
+    "icon": "〰️",
+    "color": "from-pink-500 to-rose-600"
+  },
+  {
+    "slug": "oh-flip",
+    "title": "Oh Flip",
+    "category": "Puzzle",
+    "description": "Flip tiles to match the pattern.",
+    "entry": "/assets/MiniGames/oh-flip/index.html",
+    "icon": "🔄",
+    "color": "from-amber-500 to-yellow-600"
+  },
+  {
+    "slug": "onoff",
+    "title": "On/Off",
+    "category": "Puzzle",
+    "description": "Toggle switches to solve each level.",
+    "entry": "/assets/MiniGames/onoff/onoff/index.html",
+    "icon": "💡",
+    "color": "from-emerald-500 to-teal-600"
+  },
+  {
+    "slug": "pizza-undelivery",
+    "title": "Pizza Undelivery",
+    "category": "Casual",
+    "description": "Reverse the pizza delivery in this quirky game.",
+    "entry": "/assets/MiniGames/pizza-undelivery/index.html",
+    "icon": "🍕",
+    "color": "from-orange-500 to-red-600"
+  },
+  {
+    "slug": "racer",
+    "title": "Racer",
+    "category": "Racing",
+    "description": "High-speed arcade racing action.",
+    "entry": "/assets/MiniGames/racer/index.html",
+    "icon": "🏎️",
+    "color": "from-blue-500 to-purple-600"
+  },
+  {
+    "slug": "the-matr13k",
+    "title": "The Matr13k",
+    "category": "Experimental",
+    "description": "Enter the matrix in this experimental game.",
+    "entry": "/assets/MiniGames/the-matr13k/index.html",
+    "icon": "🔢",
+    "color": "from-green-500 to-lime-600"
+  },
+  {
+    "slug": "triangle-back-to-home",
+    "title": "Triangle: Back to Home",
+    "category": "Puzzle",
+    "description": "Guide the triangle back to its home.",
+    "entry": "/assets/MiniGames/triangle-back-to-home/index.html",
+    "icon": "🔺",
+    "color": "from-violet-500 to-purple-600"
+  },
+  {
+    "slug": "xx142-b2exe",
+    "title": "XX142-B2.EXE",
+    "category": "Experimental",
+    "description": "Glitchy experimental adventure.",
+    "entry": "/assets/MiniGames/xx142-b2exe/index.html",
+    "icon": "💾",
+    "color": "from-gray-500 to-slate-600"
+  }
+]

@@ -10,22 +10,69 @@
 /contact.html                   /contact                       301!
 /deep-dive.html                   /deep-dive                       301!
 /hobbies-games.html                   /hobbies-games                       301!
-/hobbies.html                   /hobbies                       301!
-/hobby-car.html                   /hobby-car                       301!
-/hobby-cooking.html                   /hobby-cooking                       301!
-/hobby-gym.html                   /hobby-gym                       301!
-/hobby-photography.html                   /hobby-photography                       301!
-/hobby-reading.html                   /hobby-reading                       301!
-/hobby-whispers.html                   /hobby-whispers                       301!
+# Hobby Redirects (Old -> New)
+/hobby-car.html                      /hobbies/car                     301!
+/hobby-car                           /hobbies/car                     301!
+/hobby-cooking.html                  /hobbies/cooking                 301!
+/hobby-cooking                       /hobbies/cooking                 301!
+/hobby-gym.html                      /hobbies/gym                     301!
+/hobby-gym                           /hobbies/gym                     301!
+/hobby-photography.html              /hobbies/photography             301!
+/hobby-photography                   /hobbies/photography             301!
+/hobby-reading.html                  /hobbies/reading                 301!
+/hobby-reading                       /hobbies/reading                 301!
+/hobby-whispers.html                 /hobbies/whispers                301!
+/hobby-whispers                      /hobbies/whispers                301!
+/hobbies.html                        /hobbies/                        301!
+/hobbies                             /hobbies/                        301!
+
+# New Canonical Redirects
+/hobbies/car.html                    /hobbies/car                     301!
+/hobbies/cooking.html                /hobbies/cooking                 301!
+/hobbies/gym.html                    /hobbies/gym                     301!
+/hobbies/photography.html            /hobbies/photography             301!
+/hobbies/reading.html                /hobbies/reading                 301!
+/hobbies/whispers.html               /hobbies/whispers                301!
+/hobbies/index.html                  /hobbies/                        301!
 /overview.html                   /overview                       301!
 /privacy.html                   /privacy                       301!
-/project-competitive-strategy.html                   /project-competitive-strategy                       301!
-/project-discipline.html                   /project-discipline                       301!
-/project-documentation.html                   /project-documentation                       301!
-/project-logistics.html                   /project-logistics                       301!
-/project-multilingual.html                   /project-multilingual                       301!
-/project-portfolio.html                   /project-portfolio                       301!
-/projects.html                   /projects                       301!
+# Project Redirects (Old -> New)
+/project-competitive-strategy.html   /projects/competitive-strategy   301!
+/project-competitive-strategy        /projects/competitive-strategy   301!
+/project-discipline.html             /projects/discipline             301!
+/project-discipline                  /projects/discipline             301!
+/project-documentation.html          /projects/documentation          301!
+/project-documentation               /projects/documentation          301!
+/project-logistics.html              /projects/logistics              301!
+/project-logistics                   /projects/logistics              301!
+/project-multilingual.html           /projects/multilingual           301!
+/project-multilingual                /projects/multilingual           301!
+/project-portfolio.html              /projects/portfolio              301!
+/project-portfolio                   /projects/portfolio              301!
+/projects.html                       /projects/                       301!
+/projects                            /projects/                       301!
+
+# New Canonical Redirects
+/projects/competitive-strategy.html  /projects/competitive-strategy   301!
+/projects/discipline.html            /projects/discipline             301!
+/projects/documentation.html         /projects/documentation          301!
+/projects/logistics.html             /projects/logistics              301!
+/projects/multilingual.html          /projects/multilingual           301!
+/projects/portfolio.html             /projects/portfolio              301!
+/projects/index.html                 /projects/                       301!
+
+# Mini-Games Clean URL Redirects
+/hobbies-games/1024-moves.html            /hobbies-games/1024-moves                301!
+/hobbies-games/back-attacker.html         /hobbies-games/back-attacker             301!
+/hobbies-games/nano-wirebot.html          /hobbies-games/nano-wirebot              301!
+/hobbies-games/off-the-line.html          /hobbies-games/off-the-line              301!
+/hobbies-games/oh-flip.html               /hobbies-games/oh-flip                   301!
+/hobbies-games/onoff.html                 /hobbies-games/onoff                     301!
+/hobbies-games/pizza-undelivery.html      /hobbies-games/pizza-undelivery          301!
+/hobbies-games/racer.html                 /hobbies-games/racer                     301!
+/hobbies-games/the-matr13k.html           /hobbies-games/the-matr13k               301!
+/hobbies-games/triangle-back-to-home.html /hobbies-games/triangle-back-to-home     301!
+/hobbies-games/xx142-b2exe.html           /hobbies-games/xx142-b2exe               301!
 
 # 2. Rewrites (200) - Serve content for clean URLs
 # Cloudflare Pages automatically handles extensionless URLs (e.g. /about -> about.html)

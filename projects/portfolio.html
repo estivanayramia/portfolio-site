@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="This Website - Hand-coded portfolio built from scratch over 120+ hours with HTML, CSS, JavaScript, PWA features, and WCAG accessibility.">
+    <title>This Website | Projects</title>
+    <link rel="canonical" href="https://www.estivanayramia.com/projects/portfolio">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="This Website | Estivan Ayramia">
+    <meta property="og:description" content="120+ hours of hand-coded HTML, CSS, and JavaScript. No templates.">
+    <meta property="og:url" content="https://www.estivanayramia.com/projects/portfolio">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="This Website | Estivan Ayramia">
+    <meta name="twitter:description" content="Hand-coded portfolio with PWA features and WCAG accessibility.">
+    
+    <!-- Google Fonts: Inter (non-render-blocking) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="(max-width: 768px)">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" onload="this.media='(min-width: 769px)'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
+    
+    <!-- Preload Critical LCP Image -->
+    <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
+    
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="preload" href="/assets/css/style.css" as="style">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
+    <script src="/assets/js/site.js" defer></script>
+    <!-- Custom Theme CSS -->
+    <link rel="stylesheet" href="/assets/css/theme.css" media="(max-width: 768px)">
+    <link rel="stylesheet" href="/assets/css/theme.css" media="print" onload="this.media='(min-width: 769px)'">
+    <noscript><link rel="stylesheet" href="/assets/css/theme.css"></noscript>
+    
+    <!-- PWA Manifest -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
+    <link rel="shortcut icon" href="/assets/img/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
+    <link rel="mask-icon" href="/assets/img/safari-pinned-tab.svg" color="#212842">
+    <meta name="msapplication-TileColor" content="#212842">
+    <meta name="msapplication-TileImage" content="/assets/img/favicon-32x32.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#212842">
+    
+    <!-- Schema.org CreativeWork Markup -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CreativeWork",
+      "name": "This Website",
+      "description": "Hand-coded portfolio built from scratch over 120+ hours with HTML, CSS, JavaScript, PWA features, and WCAG accessibility.",
+      "author": {
+        "@type": "Person",
+        "name": "Estivan Ayramia",
+        "url": "https://www.estivanayramia.com"
+      },
+    "url": "https://www.estivanayramia.com/projects/portfolio"
+    }
+    </script>
+</head>
+<body class="bg-beige text-chocolate font-sans antialiased" data-print-title="This Website | Projects" data-print-url="https://www.estivanayramia.com/projects/portfolio">
+    
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" aria-hidden="true"></div>
+    
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
+    
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between">
+            <a href="/" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center" aria-label="Go to Portfolio home page">
+                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain" width="300" height="264" fetchpriority="high">
+                <span>Estivan Ayramia</span>
+            </a>
+            
+            <!-- Main Navigation -->
+            <ul class="hidden md:flex items-center space-x-8">
+                <li><a href="/" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Home</a></li>
+                <li><a href="/projects" class="text-sm text-indigodeep font-medium underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
+                <li><a href="/overview" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
+                <li><a href="/deep-dive" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
+                <li><a href="/about" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
+                <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+            
+            <!-- Language Switcher -->
+            <div class="flex items-center space-x-3">
+                <a href="/projects/portfolio" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">EN</a>
+                <a href="/es/" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
+                <a href="/ar/" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
+            </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
+            <ul class="px-6 py-4 space-y-3">
+                <li><a href="/" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Home</a></li>
+                <li><a href="/projects" class="block text-sm text-indigodeep font-medium py-2">Projects</a></li>
+                <li><a href="/overview" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
+                <li><a href="/deep-dive" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
+                <li><a href="/about" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
+                <li><a href="/contact" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="pt-24">
+        
+        <!-- Breadcrumb -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
+            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+                <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
+                    <li><a href="/" class="hover:text-indigodeep transition-colors">Home</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li><a href="/projects" class="hover:text-indigodeep transition-colors">Projects</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li class="text-indigodeep font-medium">This Website</li>
+                </ol>
+            </nav>
+        </section>
+        
+        <!-- Project Header -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+            <div class="space-y-6">
+                <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Development</span>
+                    <span class="text-xs text-ink/60">2025</span>
+                </div>
+                <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
+                    This Website
+                </h1>
+                <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
+                    120+ hours of hand-coded HTML, CSS, and JavaScript. No templates. No page builders. Just code, intention, and too many late nights.
+                </p>
+            </div>
+        </section>
+        
+        <!-- Project Visual -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8">
+            <div class="aspect-video bg-gradient-to-br from-chocolate/80 to-indigodeep/60 rounded-2xl flex items-center justify-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                <svg class="w-24 h-24 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+                </svg>
+            </div>
+        </section>
+        
+        <!-- Project Details -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
+            <div class="grid lg:grid-cols-3 gap-12">
+                
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-12">
+                    
+                    <!-- Overview -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Overview</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>You are looking at it. This portfolio is not a template download or a Squarespace site with a custom font. It is 120+ hours of hand-written HTML, CSS, and JavaScript, built from an empty folder.</p>
+                            <p>Why build from scratch? Because I wanted full control over every pixel, every animation, every line of code. And because I needed a project that would prove I could actually ship something real.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Why From Scratch -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Why From Scratch</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>I could have used a template. It would have taken a weekend. But templates teach you how to configure someone else's code; they do not teach you how to build.</p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li>I wanted to understand responsive design at the CSS level, not the drag-and-drop level</li>
+                                <li>I wanted to learn GSAP animations by implementing them, not copying snippets</li>
+                                <li>I wanted to build a PWA (progressive web app) from scratch so I actually know how service workers function</li>
+                                <li>I wanted a portfolio that doubles as proof of technical capability</li>
+                            </ul>
+                            <p>The result: I now understand every line of code on this site. That matters.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- What I Built -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">What I Built</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p><strong>1. Static HTML, Tailwind CSS, Vanilla JavaScript</strong></p>
+                            <p>No React. No Next.js. No build step dependencies that break in six months. Just files that work in any browser, forever.</p>
+                            
+                            <p><strong>2. GSAP Animations with ScrollTrigger</strong></p>
+                            <p>Every fade-in, every slide-up, every scroll-triggered animation is hand-configured. The animations serve the content; they do not distract from it.</p>
+                            
+                            <p><strong>3. PWA with Offline Support</strong></p>
+                            <p>Service worker, manifest.json, installable on mobile. Works without internet after the first visit.</p>
+                            
+                            <p><strong>4. WCAG (Web Content Accessibility Guidelines) 2.1 Accessibility</strong></p>
+                            <p>Semantic HTML, ARIA (Accessible Rich Internet Applications) labels, keyboard navigation, screen reader tested, dark mode toggle with system preference detection.</p>
+                            
+                            <p><strong>5. AI Chat Integration</strong></p>
+                            <p>Savonie chat widget lets visitors ask questions about my work directly on the site.</p>
+
+                            <p><strong>6. Achievement System</strong></p>
+                            <p>Achievement system: 8 unlockable achievements + easter eggs (Konami code, mini-game).</p>
+                        </div>
+                    </div>
+                    
+                    <!-- The Numbers -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.8">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">The Numbers</h2>
+                        <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 space-y-4">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">120+</div>
+                                    <p class="text-sm text-chocolate">Hours of development time</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">90+</div>
+                                    <p class="text-sm text-chocolate">PageSpeed Insights scores tuned throughout development (best observed: 90+).</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">0</div>
+                                    <p class="text-sm text-chocolate">Templates or page builders used</p>
+                                </div>
+                                <div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">100%</div>
+                                    <p class="text-sm text-chocolate">Hand-written code I understand</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tech Stack -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.9">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Tech Stack</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>Structure:</strong> Semantic HTML5</li>
+                                <li><strong>Styling:</strong> Tailwind CSS with custom theme</li>
+                                <li><strong>Interactivity:</strong> Vanilla JavaScript (ES6+)</li>
+                                <li><strong>Animations:</strong> GSAP (GreenSock Animation Platform) 3.12.2 with ScrollTrigger</li>
+                                <li><strong>PWA:</strong> PWA (progressive web app) service worker, manifest.json, offline caching</li>
+                                <li><strong>Accessibility:</strong> WCAG (Web Content Accessibility Guidelines) 2.1 AA, ARIA (Accessible Rich Internet Applications), keyboard navigation</li>
+                                <li><strong>Analytics:</strong> Microsoft Clarity, Google Analytics 4</li>
+                                <li><strong>AI:</strong> Savonie chat widget integration</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- What I Learned -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="1.0">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">What I Learned</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>CSS is deep:</strong> Flexbox, Grid, custom properties, responsive design patterns; there is always more to learn</li>
+                                <li><strong>Performance is a feature:</strong> Every kilobyte matters on mobile; lazy loading and compression are not optional</li>
+                                <li><strong>Accessibility forces good design:</strong> Building for screen readers improves the experience for everyone</li>
+                                <li><strong>Simple beats clever:</strong> Static HTML will outlive any JavaScript framework</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- How I Use AI -->
+                    <div class="opacity-0 bg-indigodeep/5 rounded-2xl p-6 border border-indigodeep/10" data-gsap="fade-up" data-gsap-delay="1.1">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">How I Use AI on This Site</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>AI tools helped build this site, but not by generating finished code. Here is how I use them:</p>
+                            <ul class="list-disc pl-6 space-y-2">
+                                <li><strong>Drafting and iteration:</strong> I use Claude and ChatGPT to explore ideas, get feedback on structure, and refine my writing. The final words are mine.</li>
+                                <li><strong>Learning accelerator:</strong> When I hit a CSS problem or JavaScript bug, AI explains concepts faster than documentation alone. I still need to understand and implement.</li>
+                                <li><strong>Code review partner:</strong> AI catches mistakes I miss and suggests improvements. But I review every suggestion and only keep what makes sense.</li>
+                                <li><strong>Not autopilot:</strong> AI does not write my content or make design decisions. It helps me move faster on tasks I already understand conceptually.</li>
+                            </ul>
+                            <p class="text-sm text-chocolate/70 mt-4">The goal is augmentation, not replacement. Every line of code is something I can explain and maintain.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="space-y-8">
+                    
+                    <!-- Project Info -->
+                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Project Info</h3>
+                        <dl class="space-y-4 text-sm">
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Status</dt>
+                                <dd class="text-indigodeep font-medium">Live</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Role</dt>
+                                <dd class="text-indigodeep font-medium">Solo Developer</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Time Invested</dt>
+                                <dd class="text-indigodeep font-medium">120+ Hours</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 mb-1">Year</dt>
+                                <dd class="text-indigodeep font-medium">2025</dd>
+                            </div>
+                            <div>
+                                <dt class="text-chocolate/60 mb-1">Repository</dt>
+                                <dd><a href="https://github.com/estivanayramia/portfolio-site" target="_blank" rel="noopener noreferrer" class="text-indigodeep font-medium hover:underline">View on GitHub →</a></dd>
+                            </div>
+                        </dl>
+                    </div>
+                    
+                    <!-- Skills Applied -->
+                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Skills Applied</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">HTML5</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">CSS3</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">JavaScript</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Tailwind CSS</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">GSAP</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">PWA</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">WCAG</span>
+                            <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Web Performance</span>
+                        </div>
+                    </div>
+                    
+                    <!-- CTA -->
+                    <div class="bg-indigodeep text-beige rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                        <h3 class="text-lg font-semibold mb-3">Like what you see?</h3>
+                        <p class="text-sm text-beige/80 mb-4">Let's discuss how I can help with your web development needs.</p>
+                        <a href="/contact" class="inline-block text-sm font-medium bg-beige text-indigodeep px-5 py-2 rounded-full hover:bg-chocolate hover:text-beige transition-colors focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-2 focus:ring-offset-indigodeep">
+                            Get in Touch
+                        </a>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </section>
+        
+        <!-- Related Projects -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10">
+            <h2 class="text-2xl font-bold text-indigodeep mb-8 opacity-0" data-gsap="fade-up">Related Projects</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <a href="/projects/competitive-strategy" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Strategy</span>
+                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">Endpoint Competitive Playbook</h3>
+                    <p class="text-sm text-chocolate">Joint Almac + 4G plan to steal three Endpoint accounts.</p>
+                </a>
+                <a href="/projects/logistics" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Go-to-Market</span>
+                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">L'Oréal Cell BioPrint MAPS Campaign</h3>
+                    <p class="text-sm text-chocolate">Class concept campaign deck that maps three personas and their touchpoints.</p>
+                </a>
+                <a href="/projects" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
+                    <div class="text-center py-8">
+                        <p class="text-sm text-chocolate mb-3">View all projects</p>
+                        <span class="inline-block text-2xl">→</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Footer -->
+<footer class="bg-indigodeep text-beige py-12">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid md:grid-cols-3 gap-12 mb-12">
+                <!-- Column 1: Brand -->
+                <div class="space-y-4">
+                    <a href="/" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
+                        <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
+                        <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
+                    </a>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                </div>
+                
+                <!-- Column 2: Quick Links -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/overview" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/deep-dive" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/projects" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
+                        <li><a href="/about" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3: Connect -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
+                    <ul class="space-y-2">
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
+                        <li><a href="/contact" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="/assets/docs/Estivan_Ayramia_Resume_12-25-25.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
+                        <li><a href="/privacy" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-beige/20 pt-8 text-center">
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Scroll to Top Button -->
+    <button type="button" id="scroll-to-top" aria-label="Scroll to top">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+    </button>
+
+    <!-- Savonie AI Chat Widget -->
+    <div id="chat-widget" class="fixed bottom-6 z-50 font-sans" style="z-index: 9999;" role="region" aria-label="AI Chat Assistant">
+        <!-- Chat Window (independently positioned when dragging) -->
+        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);" role="dialog" aria-modal="true" aria-labelledby="chat-title">
+            <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
+                <h3 id="chat-title" class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
+                    <img src="/assets/img/savonie-thumb.webp" alt="Savonie chatbot avatar" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64" loading="lazy" decoding="async">
+                    Savonie AI
+                </h3>
+                <button type="button" id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer" aria-label="Close chat">&times;</button>
+            </div>
+            
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white/50" role="log" aria-live="polite" aria-label="Chat messages"></div>
+
+            <!-- Dynamic Suggestion Chips Container -->
+            <div id="chat-chips" data-chat-suggestions="container" class="p-2 bg-white/80 border-t border-[#362017]/5 flex gap-2 overflow-x-auto whitespace-nowrap" role="group" aria-label="Suggested questions"></div>
+
+            <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white dark:bg-[#362017] border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
+                <button type="button" id="suggestions-btn" data-chat-suggestions-toggle="button" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors">
+                    💡
+                </button>
+                <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] dark:text-[#e1d4c2] dark:placeholder-[#e1d4c2]/60 focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
+                <button type="button" id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Welcome Bubble (anchored above toggle button) -->
+        <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+        </div>
+
+        <!-- Toggle Button (always stays in bottom-right corner) -->
+        <button type="button" id="chat-toggle" class="absolute bottom-0 right-0 bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 overflow-hidden" aria-label="Open Chat">
+            <img src="/assets/img/savonie-thumb.webp" alt="Savonie chat UI" class="w-full h-full object-cover" width="64" height="64" loading="lazy" decoding="async">
+        </button>
+    </div>
+    
+    <script src="/assets/js/lazy-loader.js" defer></script>
+</body>
+</html>

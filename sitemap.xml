@@ -22,25 +22,25 @@
     <loc>https://www.estivanayramia.com/hobbies-games</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies</loc>
+    <loc>https://www.estivanayramia.com/hobbies/</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobby-car</loc>
+    <loc>https://www.estivanayramia.com/hobbies/car</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobby-cooking</loc>
+    <loc>https://www.estivanayramia.com/hobbies/cooking</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobby-gym</loc>
+    <loc>https://www.estivanayramia.com/hobbies/gym</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobby-photography</loc>
+    <loc>https://www.estivanayramia.com/hobbies/photography</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobby-reading</loc>
+    <loc>https://www.estivanayramia.com/hobbies/reading</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobby-whispers</loc>
+    <loc>https://www.estivanayramia.com/hobbies/whispers</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/overview</loc>
@@ -49,24 +49,58 @@
     <loc>https://www.estivanayramia.com/privacy</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/project-competitive-strategy</loc>
+    <loc>https://www.estivanayramia.com/projects/competitive-strategy</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/project-discipline</loc>
+    <loc>https://www.estivanayramia.com/projects/discipline</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/project-documentation</loc>
+    <loc>https://www.estivanayramia.com/projects/documentation</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/project-logistics</loc>
+    <loc>https://www.estivanayramia.com/projects/logistics</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/project-multilingual</loc>
+    <loc>https://www.estivanayramia.com/projects/multilingual</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/project-portfolio</loc>
+    <loc>https://www.estivanayramia.com/projects/portfolio</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/projects</loc>
+    <loc>https://www.estivanayramia.com/projects/</loc>
+  </url>
+  <!-- Mini-Games -->
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/1024-moves</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/back-attacker</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/nano-wirebot</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/off-the-line</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/oh-flip</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/onoff</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/pizza-undelivery</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/racer</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/the-matr13k</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/triangle-back-to-home</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/xx142-b2exe</loc>
   </url>
 </urlset>
