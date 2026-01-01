@@ -25,6 +25,7 @@
     
     <!-- Main Site Logic (Chat, Theme, etc.) -->
     <script src="/assets/js/site.js" defer></script>
+    <script type="module" src="/assets/js/arcade/arcade-core.js"></script>
     
     <!-- Favicon -->
     <link rel="icon" href="/assets/img/icon-192.png" type="image/png">
@@ -643,16 +644,16 @@
             
             <!-- Main Navigation -->
             <ul class="hidden md:flex items-center space-x-8">
-                <li><a href="/overview" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
-                <li><a href="/deep-dive" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
-                <li><a href="/about" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
-                <li><a href="/projects" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
-                <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
+                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
+                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
+                <li><a href="/projects/" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
+                <li><a href="/contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
             
             <!-- Language Switcher -->
             <div class="flex items-center space-x-3">
-                <a href="/hobbies-games" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">EN</a>
+                <a href="/hobbies-games.html" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">EN</a>
                 <a href="/es/" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
                 <a href="/ar/" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
             </div>
@@ -671,11 +672,11 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
             <ul class="px-6 py-4 space-y-3">
-                <li><a href="/overview" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
-                <li><a href="/deep-dive" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
-                <li><a href="/about" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
-                <li><a href="/projects" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Projects</a></li>
-                <li><a href="/contact" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full text-center hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
+                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
+                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
+                <li><a href="/projects/" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Projects</a></li>
+                <li><a href="/contact.html" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full text-center hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
         </div>
     </header>
@@ -751,7 +752,7 @@
                         🔊
                     </button>
                     <br>
-                    <a href="/hobbies" class="btn-skip inline-flex items-center gap-2 px-8 py-3 bg-chocolate text-beige rounded-full font-semibold hover:opacity-90 transition-all">
+                    <a href="/hobbies/index.html" class="btn-skip inline-flex items-center gap-2 px-8 py-3 bg-chocolate text-beige rounded-full font-semibold hover:opacity-90 transition-all">
                         Continue to Hobbies
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                     </a>
@@ -768,22 +769,22 @@
                     <div class="mb-10">
                         <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🧩 Puzzle</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <a href="/hobbies-games/1024-moves" class="game-card bg-white/50 rounded-xl p-4 text-center block">
+                            <a href="/hobbies-games/1024-moves.html" class="game-card bg-white/50 rounded-xl p-4 text-center block">
                                 <div class="text-3xl mb-2">🧊</div>
                                 <h4 class="font-bold text-sm">1024 Moves</h4>
                                 <p class="text-xs opacity-60 mt-1">Push cubes to the orb</p>
                             </a>
-                            <a href="/hobbies-games/oh-flip" class="game-card bg-white/50 rounded-xl p-4 text-center block">
+                            <a href="/hobbies-games/oh-flip.html" class="game-card bg-white/50 rounded-xl p-4 text-center block">
                                 <div class="text-3xl mb-2">🔄</div>
                                 <h4 class="font-bold text-sm">Oh Flip</h4>
                                 <p class="text-xs opacity-60 mt-1">Flip tiles to match</p>
                             </a>
-                            <a href="/hobbies-games/onoff" class="game-card bg-white/50 rounded-xl p-4 text-center block">
+                            <a href="/hobbies-games/onoff.html" class="game-card bg-white/50 rounded-xl p-4 text-center block">
                                 <div class="text-3xl mb-2">💡</div>
                                 <h4 class="font-bold text-sm">On/Off</h4>
                                 <p class="text-xs opacity-60 mt-1">Toggle switch puzzles</p>
                             </a>
-                            <a href="/hobbies-games/triangle-back-to-home" class="game-card bg-white/50 rounded-xl p-4 text-center block">
+                            <a href="/hobbies-games/triangle-back-to-home.html" class="game-card bg-white/50 rounded-xl p-4 text-center block">
                                 <div class="text-3xl mb-2">🔺</div>
                                 <h4 class="font-bold text-sm">Triangle Home</h4>
                                 <p class="text-xs opacity-60 mt-1">Guide triangle home</p>
@@ -795,7 +796,7 @@
                     <div class="mb-10">
                         <h3 class="text-xl font-bold mb-4 flex items-center gap-2">⚔️ Action</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <a href="/hobbies-games/nano-wirebot" class="game-card bg-white/50 rounded-xl p-4 text-center block">
+                            <a href="/hobbies-games/nano-wirebot.html" class="game-card bg-white/50 rounded-xl p-4 text-center block">
                                 <div class="text-3xl mb-2">🤖</div>
                                 <h4 class="font-bold text-sm">Nano Wirebot</h4>
                                 <p class="text-xs opacity-60 mt-1">Robot wire mazes</p>
@@ -807,7 +808,7 @@
                     <div class="mb-10">
                         <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🕹️ Arcade</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <a href="/hobbies-games/off-the-line" class="game-card bg-white/50 rounded-xl p-4 text-center block">
+                            <a href="/hobbies-games/off-the-line.html" class="game-card bg-white/50 rounded-xl p-4 text-center block">
                                 <div class="text-3xl mb-2">〰️</div>
                                 <h4 class="font-bold text-sm">Off The Line</h4>
                                 <p class="text-xs opacity-60 mt-1">Stay off the line</p>
@@ -819,7 +820,7 @@
                     <div class="mb-10">
                         <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🏎️ Racing</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <a href="/hobbies-games/racer" class="game-card bg-white/50 rounded-xl p-4 text-center block">
+                            <a href="/hobbies-games/racer.html" class="game-card bg-white/50 rounded-xl p-4 text-center block">
                                 <div class="text-3xl mb-2">🏎️</div>
                                 <h4 class="font-bold text-sm">Racer</h4>
                                 <p class="text-xs opacity-60 mt-1">High-speed racing</p>
@@ -831,7 +832,7 @@
                     <div class="mb-10">
                         <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🎲 Casual</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <a href="/hobbies-games/pizza-undelivery" class="game-card bg-white/50 rounded-xl p-4 text-center block">
+                            <a href="/hobbies-games/pizza-undelivery.html" class="game-card bg-white/50 rounded-xl p-4 text-center block">
                                 <div class="text-3xl mb-2">🍕</div>
                                 <h4 class="font-bold text-sm">Pizza Undelivery</h4>
                                 <p class="text-xs opacity-60 mt-1">Quirky delivery game</p>
@@ -843,12 +844,12 @@
                     <div class="mb-10">
                         <h3 class="text-xl font-bold mb-4 flex items-center gap-2">🧪 Experimental</h3>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <a href="/hobbies-games/the-matr13k" class="game-card bg-white/50 rounded-xl p-4 text-center block">
+                            <a href="/hobbies-games/the-matr13k.html" class="game-card bg-white/50 rounded-xl p-4 text-center block">
                                 <div class="text-3xl mb-2">🔢</div>
                                 <h4 class="font-bold text-sm">The Matr13k</h4>
                                 <p class="text-xs opacity-60 mt-1">Enter the matrix</p>
                             </a>
-                            <a href="/hobbies-games/xx142-b2exe" class="game-card bg-white/50 rounded-xl p-4 text-center block">
+                            <a href="/hobbies-games/xx142-b2exe.html" class="game-card bg-white/50 rounded-xl p-4 text-center block">
                                 <div class="text-3xl mb-2">💾</div>
                                 <h4 class="font-bold text-sm">XX142-B2.EXE</h4>
                                 <p class="text-xs opacity-60 mt-1">Glitchy adventure</p>
@@ -939,7 +940,7 @@
                  ======================================== -->
             <section id="invaders-game" class="hidden">
                 <div class="flex items-center justify-between mb-4 max-w-md mx-auto">
-                    <a href="/hobbies-games" class="btn-back" style="text-decoration:none;">← Menu</a>
+                    <a href="/hobbies-games.html" class="btn-back" style="text-decoration:none;">← Menu</a>
                     <div style="display:flex;align-items:center;gap:12px;">
                         <div class="score-display py-2 px-4 text-lg">Score: <span id="invaders-score">0</span> | Wave: <span id="invaders-wave">1</span></div>
                         <div id="invaders-hud" style="font-weight:700;color:#22c55e;padding:6px 10px;border-radius:8px;background:rgba(34,197,94,0.08);display:none">LIVE</div>
@@ -957,6 +958,51 @@
                         <button onclick="togglePause('invaders')" id="invaders-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action" disabled>Pause</button>
                         <button onclick="initInvaders()" class="px-6 py-2 bg-red-600 rounded-lg font-medium game-action">Restart</button>
                         <button onclick="toggleSound()" id="sound-toggle-invaders" class="px-6 py-2 bg-indigodeep text-white rounded-lg font-medium" title="Toggle Sound">🔊</button>
+                    </div>
+
+                    <!-- Navigation & Suggestions -->
+                    <div class="mt-12 pt-8 border-t border-white/10">
+                        <div class="text-center mb-12">
+                            <a href="/hobbies/" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigodeep to-[#362017] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                                <span>Continue to Hobbies</span>
+                                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                            </a>
+                        </div>
+                        
+                        <h4 class="text-center text-sm font-bold uppercase tracking-widest opacity-50 mb-8">More Games to Play</h4>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                            <a href="/snake.html" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+                                <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">🐍</div>
+                                <div class="font-bold text-sm">Snake</div>
+                                <div class="text-xs opacity-60 mt-1">Classic Nokia vibes</div>
+                            </a>
+                            <a href="/breaker.html" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+                                <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">🧱</div>
+                                <div class="font-bold text-sm">Block Breaker</div>
+                                <div class="text-xs opacity-60 mt-1">Smash the bricks</div>
+                            </a>
+                            <a href="/2048.html" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+                                <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">🧩</div>
+                                <div class="font-bold text-sm">2048</div>
+                                <div class="text-xs opacity-60 mt-1">Merge the numbers</div>
+                            </a>
+                            <a href="/hobbies-games/racer.html" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+                                <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">🏎️</div>
+                                <div class="font-bold text-sm">Racer</div>
+                                <div class="text-xs opacity-60 mt-1">Fast reflex racing</div>
+                            </a>
+                            <a href="/hobbies-games/oh-flip.html" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+                                <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">🤸</div>
+                                <div class="font-bold text-sm">Oh Flip</div>
+                                <div class="text-xs opacity-60 mt-1">Timing + tricks</div>
+                            </a>
+                            <a href="/hobbies-games/onoff.html" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+                                <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">⚡</div>
+                                <div class="font-bold text-sm">ON/OFF</div>
+                                <div class="text-xs opacity-60 mt-1">Switch-based puzzle</div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -980,10 +1026,10 @@
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a href="/overview" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
-                        <li><a href="/deep-dive" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
-                        <li><a href="/projects" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
-                        <li><a href="/about" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/deep-dive.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/projects/" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
+                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
                     </ul>
                 </div>
                 
@@ -993,9 +1039,9 @@
                     <ul class="space-y-2">
                         <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
                         <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
-                        <li><a href="/contact" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
-                        <li><a href="/assets/docs/Estivan_Ayramia_Resume_12-25-25.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
-                        <li><a href="/privacy" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                        <li><a href="/contact.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="/assets/docs/Estivan_Ayramia_Resume_12-25-25.pdf.html" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
+                        <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -1209,17 +1255,13 @@
         }
         
         function unlockAchievement(game, achievementId) {
-            const data = loadGameData(game);
-            if (!data.achievements.includes(achievementId)) {
-                data.achievements.push(achievementId);
-                saveGameData(game, data);
-                const achievement = ACHIEVEMENTS[game].find(a => a.id === achievementId);
-                if (achievement) {
-                    showAchievementUnlock(achievement);
-                }
-                // Keep UI in sync as achievements are earned
-                updateProgressDisplays();
-                renderAllAchievementPanels();
+            let fullId = achievementId;
+            if (!achievementId.startsWith(game + '_')) {
+                fullId = game + '_' + achievementId;
+            }
+            
+            if (window.ArcadeAchievements) {
+                window.ArcadeAchievements.unlock(fullId);
             }
         }
 
@@ -1313,8 +1355,9 @@
         
         function showStats(game) {
             const data = loadGameData(game);
-            const achievements = ACHIEVEMENTS[game] || [];
-            const unlockedIds = data.achievements || [];
+            const allDefs = window.ArcadeAchievements ? window.ArcadeAchievements.getDefinitions() : {};
+            const achievements = Object.values(allDefs).filter(a => a.game === game);
+            const unlockedIds = window.ArcadeAchievements ? window.ArcadeAchievements.getUnlocked() : [];
             
             let achievementHTML = achievements.length ? achievements.map(ach => {
                 const unlocked = unlockedIds.includes(ach.id);
@@ -1322,8 +1365,8 @@
                     <div style="display:flex;align-items:center;gap:12px;padding:12px;background:${unlocked?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.2)'};border-radius:8px;margin-bottom:8px;${unlocked?'':'opacity:0.5;'}">
                         <div style="font-size:28px;">${unlocked ? ach.icon : '🔒'}</div>
                         <div style="flex:1;">
-                            <div style="font-weight:bold;font-size:14px;">${ach.name}</div>
-                            <div style="font-size:12px;opacity:0.8;">${ach.desc}</div>
+                            <div style="font-weight:bold;font-size:14px;">${ach.title}</div>
+                            <div style="font-size:12px;opacity:0.8;">${ach.description}</div>
                         </div>
                         ${unlocked ? '<div style="color:#22c55e;font-size:20px;">✔</div>' : ''}
                     </div>
@@ -3138,7 +3181,6 @@
                     e.preventDefault();
                 }
                 if(e.code==='Space' || e.code==='ArrowUp' || e.code==='KeyW') {
-                    // Start game on Space/Up/W if needed, then shoot
                     if (!invaderGameStarted) {
                         invaderGameStarted = true;
                         const invPauseBtn = document.getElementById('invaders-pause');
@@ -3148,7 +3190,6 @@
                         }
                     }
                     inputState.invaders.shoot = true;
-                    invaderShoot();
                     e.preventDefault();
                 }
             }
@@ -3246,3 +3287,4 @@
     </script>
 </body>
 </html>
+

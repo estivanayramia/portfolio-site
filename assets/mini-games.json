@@ -9,15 +9,6 @@
     "color": "from-purple-500 to-indigo-600"
   },
   {
-    "slug": "back-attacker",
-    "title": "Back Attacker",
-    "category": "Action",
-    "description": "Fast-paced action combat game.",
-    "entry": "/assets/MiniGames/back-attacker/index.html",
-    "icon": "⚔️",
-    "color": "from-red-500 to-orange-600"
-  },
-  {
     "slug": "nano-wirebot",
     "title": "Nano Wirebot",
     "category": "Action",

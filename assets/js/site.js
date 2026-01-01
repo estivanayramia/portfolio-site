@@ -891,7 +891,7 @@ const initAnimations = () => {
 
     // Parallax effect for hero section (if exists)
     const heroSection = document.querySelector('section:first-of-type');
-    if (heroSection && !isMobile) {
+    if (heroSection && !isMobile && !heroSection.classList.contains('no-parallax')) {
         gsap.to(heroSection, {
             yPercent: 20,
             ease: 'none',
@@ -2214,22 +2214,11 @@ const initPWA = () => {
                     hasController = true;
                     return;
                 }
+                // Do NOT auto-reload on SW updates.
+                // Auto-reloads can interrupt in-page UI (like the contact success-game).
+                // The new SW will take effect naturally on next navigation/load.
                 if (refreshing) return;
                 refreshing = true;
-
-                // Use guarded reload helper when available so we don't reload mid-scroll
-                if (typeof window.tryGuardedReload === 'function') {
-                    window.tryGuardedReload({ MAX: 30000, RETRY: 500, fallback: () => { try { window.location.reload(); } catch(e) { try { window.location.href = window.location.href; } catch(_) {} } } });
-                } else {
-                    const __doReloadFallback = () => {
-                        if (!__userInteracting) {
-                            window.location.reload();
-                        } else {
-                            setTimeout(__doReloadFallback, 500);
-                        }
-                    };
-                    __doReloadFallback();
-                }
         });
 
         window.addEventListener('load', () => {

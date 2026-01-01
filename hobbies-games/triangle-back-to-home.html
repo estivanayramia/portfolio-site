@@ -20,8 +20,14 @@
     .back-link { color: #e1d4c2; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; }
     .back-link:hover { opacity: 0.8; }
     .game-title { color: #e1d4c2; font-size: 1.25rem; font-weight: 700; margin: 0; }
+    .pc-warning { margin-left: auto; color: #e1d4c2; font-size: 0.85rem; font-weight: 600; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(225,212,194,0.2); background: rgba(0,0,0,0.15); white-space: nowrap; }
     .game-frame-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; }
     .game-frame { width: 100%; max-width: 960px; height: 70vh; border: none; border-radius: 12px; background: #000; }
+
+    @media (max-width: 640px) {
+      .game-header { flex-wrap: wrap; row-gap: 8px; }
+      .pc-warning { margin-left: 0; }
+    }
   
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
@@ -34,8 +40,9 @@
 <body>
   <div class="game-wrapper">
     <header class="game-header">
-      <a href="/hobbies-games" class="back-link" aria-label="Back to Arcade Zone">&#8592; Arcade Zone</a>
+      <a href="/hobbies-games.html" class="back-link" aria-label="Back to Arcade Zone">&#8592; Arcade Zone</a>
       <h1 class="game-title">Triangle: Back to Home</h1>
+        <span class="pc-warning" role="note">Designed for PC/laptop only</span>
           </header>
     <main class="game-frame-container">
       <iframe 

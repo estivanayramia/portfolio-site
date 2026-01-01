@@ -2,7 +2,7 @@ $games = Get-ChildItem "c:\Users\estiv\portfolio-site\assets\MiniGames" -Directo
 
 $uiHtml = @"
 <div id="arcade-ui" style="position: fixed; top: 20px; left: 20px; z-index: 9999; display: flex; gap: 10px; font-family: 'Inter', sans-serif;">
-    <a href="/hobbies-games" style="text-decoration: none; background: rgba(33, 40, 66, 0.9); color: #e1d4c2; padding: 10px 20px; border-radius: 12px; font-weight: 600; border: 1px solid rgba(225, 212, 194, 0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.2s ease;">← Back</a>
+    <a href="/hobbies-games.html" style="text-decoration: none; background: rgba(33, 40, 66, 0.9); color: #e1d4c2; padding: 10px 20px; border-radius: 12px; font-weight: 600; border: 1px solid rgba(225, 212, 194, 0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.2s ease;">← Back</a>
     <button onclick="togglePause()" style="background: rgba(33, 40, 66, 0.9); color: #e1d4c2; padding: 10px 20px; border-radius: 12px; font-weight: 600; border: 1px solid rgba(225, 212, 194, 0.2); box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; transition: all 0.2s ease;">Pause</button>
 </div>
 <style>
