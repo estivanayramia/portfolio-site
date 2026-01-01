@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v1733008500';
+const CACHE_VERSION = 'v1767142900';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -23,6 +23,7 @@ const ASSETS_TO_CACHE = [
     '/assets/css/style.css',
     '/assets/js/site.js',
     '/assets/js/lazy-loader.js',
+    '/assets/js/contact-form.js',
     '/assets/img/headshot.webp',
     '/assets/img/savonie-thumb.webp'
 ];

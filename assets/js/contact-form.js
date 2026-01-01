@@ -20,12 +20,24 @@
 
     if (!form || !modal) return;
 
+    const isModalOpen = () => !modal.classList.contains('hidden');
+
     // State
     let scrollY = 0;
     let gameActive = false;
     let animationFrameId;
     let bubbles = [];
     let score = 0;
+    let misses = 0;
+    let gameOver = false;
+    let wave = 1;
+    let waveTotal = 0;
+    let waveSpawned = 0;
+    let waveRemaining = 0;
+    let waveBannerUntil = 0;
+    let lastFrameAt = 0;
+    let spawnAccumulatorMs = 0;
+    let slowUntil = 0;
     let ctx;
     let inFlight = false;
     let pageLoadTime = Date.now();
@@ -38,6 +50,15 @@
     const STORAGE_KEY = 'contact_form_draft';
     const COOLDOWN_KEY = 'contact_form_cooldown';
     const EMAIL_TO_COPY = 'hello@estivanayramia.com';
+
+    // Game tuning
+    const MAX_MISSES = 10;
+    const BASE_WAVE_BALLOONS = 18;
+    const BASE_SPAWN_INTERVAL_MS = 520;
+    const MIN_SPAWN_INTERVAL_MS = 220;
+    const WAVE_BANNER_MS = 1200;
+    const BETWEEN_WAVE_PAUSE_MS = 800;
+    const SLOW_EFFECT_MS = 4500;
 
     // ==========================================
     // INITIALIZATION
@@ -393,7 +414,7 @@
             document.body.style.width = '100%';
         }
         
-        modal.hidden = false;
+        modal.classList.remove('hidden');
         modal.setAttribute('aria-hidden', 'false');
         
         // Focus management
@@ -403,7 +424,7 @@
     }
 
     function closeModal() {
-        modal.hidden = true;
+        modal.classList.add('hidden');
         modal.setAttribute('aria-hidden', 'true');
 
         // Unlock body
@@ -424,29 +445,22 @@
     closeBtn.addEventListener('click', closeModal);
     if (restartBtn) {
         restartBtn.addEventListener('click', () => {
-            if (modal.hidden) return;
+            if (!isModalOpen()) return;
             initGame();
             try { canvas.focus({ preventScroll: true }); } catch (e) {}
             showToast('success', 'Restarted');
         });
     }
     
-    // Close on ESC and Click Outside
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !modal.hidden) {
-            closeModal();
-        }
-    });
+    // Removed ESC key to close modal - only close button now closes it
 
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            closeModal();
-        }
-    });
+    const getModalPanel = () => modal.querySelector('[data-contact-modal-panel]');
+
+    // Removed click-outside to close modal - only close button now closes it
 
     // Trap focus
     modal.addEventListener('keydown', (e) => {
-        if (e.key === 'Tab' && !modal.hidden) {
+        if (e.key === 'Tab' && isModalOpen()) {
             const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
             const first = focusable[0];
             const last = focusable[focusable.length - 1];
@@ -471,9 +485,12 @@
     function initGame() {
         if (gameActive) stopGame(); // Ensure clean start
         gameActive = true;
+        gameOver = false;
         score = 0;
+        misses = 0;
         bubbles = [];
-        updateScore();
+        wave = 1;
+        startWave(wave);
         
         ctx = canvas.getContext('2d');
         resizeCanvas();
@@ -484,15 +501,52 @@
         // Show tutorial
         showTutorial();
 
+        lastFrameAt = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        spawnAccumulatorMs = 0;
         loop();
     }
 
     function stopGame() {
         gameActive = false;
+        gameOver = false;
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+        slowUntil = 0;
+        window.removeEventListener('resize', resizeCanvas);
+        canvas.removeEventListener('pointerdown', handleInput);
+    }
+
+    function endGame() {
+        gameOver = true;
+        gameActive = false;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
         window.removeEventListener('resize', resizeCanvas);
         canvas.removeEventListener('pointerdown', handleInput);
+        drawGameOver();
+    }
+
+    function drawGameOver() {
+        try {
+            if (!ctx) ctx = canvas.getContext('2d');
+            const rect = canvas.getBoundingClientRect();
+            const w = rect.width;
+            const h = rect.height;
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.save();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '24px Inter, sans-serif';
+            ctx.fillText('Game over', w / 2, h / 2 - 18);
+            ctx.font = '16px Inter, sans-serif';
+            ctx.fillText(`Score: ${score}`, w / 2, h / 2 + 10);
+            ctx.fillText('Press Restart to play again', w / 2, h / 2 + 34);
+            ctx.restore();
+        } catch (e) {}
     }
 
     function showTutorial() {
@@ -529,25 +583,16 @@
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    function spawnBubble() {
-        const rect = canvas.getBoundingClientRect();
-        const radius = 15 + Math.random() * 25;
-        bubbles.push({
-            x: Math.random() * rect.width,
-            y: rect.height + radius,
-            radius: radius,
-            speed: (1 + Math.random() * 3) * (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0.5 : 1),
-            color: `hsl(${Math.random() * 360}, 70%, 60%)`,
-            popped: false
-        });
-    }
-
-    function updateScore() {
-        scoreDisplay.innerText = `Score: ${score}`;
+    function updateHud() {
+        if (!scoreDisplay) return;
+        const remaining = Math.max(0, waveRemaining);
+        scoreDisplay.innerText = `Score: ${score} • Wave: ${wave} • Remaining: ${remaining} • Misses: ${misses}/${MAX_MISSES}`;
     }
 
     function handleInput(e) {
         e.preventDefault(); // Prevent default touch actions
+        if (gameOver) return;
+        if (!gameActive) return;
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -558,34 +603,133 @@
             const dy = y - b.y;
             if (dx*dx + dy*dy < (b.radius + 15)**2) { // +15 for easier touch
                 b.popped = true;
-                score += 10;
-                updateScore();
+                applyBalloonEffect(b);
             }
         });
     }
 
-    function loop() {
-        if (!gameActive) return;
-        // Single RAF loop guard
-        if (!animationFrameId) {
-            // allow first frame to schedule
+    function startWave(w) {
+        wave = w;
+        waveTotal = BASE_WAVE_BALLOONS + (w - 1) * 6;
+        waveSpawned = 0;
+        waveRemaining = waveTotal;
+        waveBannerUntil = ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) + WAVE_BANNER_MS;
+        spawnAccumulatorMs = 0;
+        slowUntil = 0;
+        updateHud();
+    }
+
+    function scheduleNextWave() {
+        // Pause briefly, then start next wave
+        const tokenWave = wave;
+        gameActive = false;
+        updateHud();
+        setTimeout(() => {
+            if (gameOver) return;
+            if (!isModalOpen()) return;
+            if (wave !== tokenWave) return;
+            gameActive = true;
+            startWave(wave + 1);
+            lastFrameAt = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+            loop();
+        }, BETWEEN_WAVE_PAUSE_MS);
+    }
+
+    function pickBalloonType() {
+        // Weighted random: normal most common; specials add variety.
+        const r = Math.random();
+        if (r < 0.80) return 'normal';
+        if (r < 0.88) return 'gold';
+        if (r < 0.93) return 'heart';
+        if (r < 0.97) return 'slow';
+        return 'bomb';
+    }
+
+    function balloonStyle(type) {
+        switch (type) {
+            case 'gold': return { color: '#f2c94c', label: '★' };
+            case 'heart': return { color: '#eb5757', label: '❤' };
+            case 'slow': return { color: '#56ccf2', label: '⏱' };
+            case 'bomb': return { color: '#333333', label: '!' };
+            default: return { color: `hsl(${Math.random() * 360}, 70%, 60%)`, label: '' };
         }
+    }
+
+    function applyBalloonEffect(b) {
+        // Popping always reduces remaining for the wave.
+        waveRemaining = Math.max(0, waveRemaining - 1);
+
+        if (b.type === 'gold') {
+            score += 50;
+        } else if (b.type === 'heart') {
+            misses = Math.max(0, misses - 2);
+            score += 15;
+        } else if (b.type === 'slow') {
+            slowUntil = ((typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now()) + SLOW_EFFECT_MS;
+            score += 10;
+        } else if (b.type === 'bomb') {
+            score = Math.max(0, score - 50);
+        } else {
+            score += 10;
+        }
+
+        updateHud();
+
+        if (waveRemaining <= 0) {
+            scheduleNextWave();
+        }
+    }
+
+    function spawnBubble() {
+        const rect = canvas.getBoundingClientRect();
+        const radius = 15 + Math.random() * 25;
+        const type = pickBalloonType();
+        const style = balloonStyle(type);
+        bubbles.push({
+            x: Math.random() * rect.width,
+            y: rect.height + radius,
+            radius: radius,
+            speed: (1 + Math.random() * 3) * (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0.5 : 1),
+            color: style.color,
+            label: style.label,
+            type: type,
+            popped: false
+        });
+    }
+
+    function loop() {
+        if (gameOver) {
+            drawGameOver();
+            return;
+        }
+        if (!gameActive) return;
+
+        const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+        const dt = Math.min(64, Math.max(0, now - lastFrameAt));
+        lastFrameAt = now;
         
         const rect = canvas.getBoundingClientRect();
         const width = rect.width;
         const height = rect.height;
         
         ctx.clearRect(0, 0, width, height);
-        
-        // Spawn logic
-        if (Math.random() < 0.05) spawnBubble();
+
+        // Spawn logic (wave-based)
+        const spawnInterval = Math.max(MIN_SPAWN_INTERVAL_MS, BASE_SPAWN_INTERVAL_MS - (wave - 1) * 35);
+        spawnAccumulatorMs += dt;
+        while (spawnAccumulatorMs >= spawnInterval && waveSpawned < waveTotal) {
+            spawnAccumulatorMs -= spawnInterval;
+            spawnBubble();
+            waveSpawned += 1;
+        }
         
         // Update & Draw
         for (let i = bubbles.length - 1; i >= 0; i--) {
             const b = bubbles[i];
             
             if (!b.popped) {
-                b.y -= b.speed;
+                const slowFactor = (now < slowUntil) ? 0.45 : 1;
+                b.y -= (b.speed * slowFactor);
                 
                 // Draw bubble
                 ctx.beginPath();
@@ -595,10 +739,34 @@
                 ctx.strokeStyle = 'rgba(255,255,255,0.5)';
                 ctx.stroke();
                 ctx.closePath();
+
+                if (b.label) {
+                    try {
+                        ctx.save();
+                        ctx.fillStyle = 'rgba(255,255,255,0.95)';
+                        ctx.font = `${Math.max(12, Math.round(b.radius * 0.9))}px Inter, sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(b.label, b.x, b.y);
+                        ctx.restore();
+                    } catch (e) {}
+                }
                 
                 // Remove if off screen
                 if (b.y + b.radius < 0) {
                     bubbles.splice(i, 1);
+                    misses += 1;
+                    waveRemaining = Math.max(0, waveRemaining - 1);
+                    updateHud();
+                    if (misses >= MAX_MISSES) {
+                        endGame();
+                        return;
+                    }
+
+                    if (waveRemaining <= 0) {
+                        scheduleNextWave();
+                        return;
+                    }
                 }
             } else {
                 // Pop animation (simple fade/shrink)
@@ -617,6 +785,26 @@
                 }
             }
         }
+
+        // Wave banner animation
+        if (now < waveBannerUntil) {
+            const remainingMs = waveBannerUntil - now;
+            const t = 1 - Math.min(1, remainingMs / WAVE_BANNER_MS);
+            const alpha = (t < 0.25) ? (t / 0.25) : (t > 0.85 ? (1 - (t - 0.85) / 0.15) : 1);
+            try {
+                ctx.save();
+                ctx.fillStyle = `rgba(0, 0, 0, ${0.55 * alpha})`;
+                ctx.fillRect(0, 0, width, height);
+                ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.font = '28px Inter, sans-serif';
+                ctx.fillText(`Wave ${wave}`, width / 2, height / 2);
+                ctx.font = '14px Inter, sans-serif';
+                ctx.fillText(`Balloons: ${waveTotal}`, width / 2, height / 2 + 28);
+                ctx.restore();
+            } catch (e) {}
+        }
         
         animationFrameId = requestAnimationFrame(loop);
     }
@@ -629,7 +817,7 @@
                 animationFrameId = null;
             }
         } else {
-            if (gameActive && !modal.hidden && !animationFrameId) {
+            if (gameActive && isModalOpen() && !animationFrameId) {
                 loop();
             }
         }
