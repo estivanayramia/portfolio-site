@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Block Breaker | Arcade Zone</title>
+  <meta name="description" content="Play Block Breaker in Arcade Zone. Break bricks, grab power-ups, and earn achievements." />
+  <link rel="canonical" href="https://www.estivanayramia.com/hobbies-games/block-breaker" />
+
+  <meta property="og:title" content="Block Breaker | Arcade Zone" />
+  <meta property="og:description" content="Play Block Breaker in Arcade Zone. Break bricks, grab power-ups, and earn achievements." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.estivanayramia.com/hobbies-games/block-breaker" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Block Breaker | Arcade Zone" />
+  <meta name="twitter:description" content="Play Block Breaker in Arcade Zone. Break bricks, grab power-ups, and earn achievements." />
+
+  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/theme.css" />
+  <link rel="stylesheet" href="/assets/css/arcade.css" />
+</head>
+<body>
+  <header></header>
+  <main class="container mx-auto px-4" style="padding-top:80px;">
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <a class="btn-back" href="/hobbies-games" aria-label="Back to Arcade Zone">← Arcade Zone</a>
+        <div class="score-display py-2 px-4 text-lg">Score: <span id="breaker-score">0</span> | Lives: <span id="breaker-lives">3</span></div>
+        <button type="button" id="breaker-sound" class="btn-back" title="Toggle Sound" aria-pressed="false">🔊</button>
+      </div>
+
+      <section class="game-container" aria-label="Block Breaker game">
+        <canvas id="breaker-canvas" width="400" height="500"></canvas>
+        <div class="touch-controls horizontal" aria-label="Touch controls">
+          <button class="touch-btn" data-breaker-move="left" type="button">←</button>
+          <button class="touch-btn" data-breaker-move="right" type="button">→</button>
+        </div>
+        <div class="flex gap-2 mt-4 justify-center">
+          <button type="button" id="breaker-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
+          <button type="button" id="breaker-restart" class="px-6 py-2 bg-purple-600 rounded-lg font-medium game-action">Restart</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/assets/js/site.js" defer></script>
+  <script type="module" src="/assets/js/arcade/games/block-breaker.js"></script>
+</body>
+</html>

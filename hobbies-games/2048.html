@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2048 | Arcade Zone</title>
+  <meta name="description" content="Play 2048 in Arcade Zone. Merge tiles, chase highscores, and unlock achievements." />
+  <link rel="canonical" href="https://www.estivanayramia.com/hobbies-games/2048" />
+
+  <meta property="og:title" content="2048 | Arcade Zone" />
+  <meta property="og:description" content="Play 2048 in Arcade Zone. Merge tiles, chase highscores, and unlock achievements." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.estivanayramia.com/hobbies-games/2048" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="2048 | Arcade Zone" />
+  <meta name="twitter:description" content="Play 2048 in Arcade Zone. Merge tiles, chase highscores, and unlock achievements." />
+
+  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/theme.css" />
+  <link rel="stylesheet" href="/assets/css/arcade.css" />
+</head>
+<body>
+  <header></header>
+  <main class="container mx-auto px-4" style="padding-top:80px;">
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <a class="btn-back" href="/hobbies-games" aria-label="Back to Arcade Zone">← Arcade Zone</a>
+        <div class="score-display py-2 px-4 text-lg">Score: <span id="merge-score">0</span> | Best: <span id="merge-best">0</span></div>
+        <button type="button" id="merge-sound" class="btn-back" title="Toggle Sound" aria-pressed="false">🔊</button>
+      </div>
+
+      <section class="game-container" aria-label="2048 game">
+        <div class="merge-grid-container" id="merge-container">
+          <div class="merge-grid-bg">
+            <div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div>
+            <div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div>
+            <div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div>
+            <div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div>
+          </div>
+          <div id="merge-tiles-layer"></div>
+        </div>
+        <p class="mt-4 text-sm opacity-70">Arrow keys or swipe to merge tiles.</p>
+        <button type="button" id="merge-restart" class="mt-2 px-6 py-2 bg-blue-600 text-white rounded-lg font-medium">Restart</button>
+      </section>
+    </div>
+  </main>
+
+  <script src="/assets/js/site.js" defer></script>
+  <script type="module" src="/assets/js/arcade/games/2048.js"></script>
+</body>
+</html>

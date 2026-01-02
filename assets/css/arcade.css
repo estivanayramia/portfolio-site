@@ -1,0 +1,558 @@
+/* Arcade Zone styles extracted from hobbies-games.html to avoid duplicating on each game page. */
+
+/* ============================================
+   CRITICAL FIX: Text Sharpness & Rendering
+   ============================================ */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Prevent sub-pixel blur from transforms */
+.game-container,
+.game-card,
+.score-display,
+button {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* ============================================
+   Layout & Spacing
+   ============================================ */
+body {
+    padding-top: 0;
+}
+
+main {
+    padding-top: 80px;
+    min-height: calc(100vh - 80px);
+}
+
+header {
+    z-index: 1000;
+}
+
+/* ============================================
+   Dark Mode Support
+   ============================================ */
+[data-theme="dark"] body {
+    background-color: #212842 !important;
+    color: #e1d4c2 !important;
+}
+
+[data-theme="dark"] header {
+    background-color: rgba(33, 40, 66, 0.95) !important;
+    border-color: rgba(225, 212, 194, 0.1) !important;
+}
+
+[data-theme="dark"] .bg-white\/50 {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .border-chocolate\/10 {
+    border-color: rgba(225, 212, 194, 0.1) !important;
+}
+
+[data-theme="dark"] .text-chocolate {
+    color: #e1d4c2 !important;
+}
+
+[data-theme="dark"] .bg-chocolate {
+    background-color: #e1d4c2 !important;
+    color: #212842 !important;
+}
+
+[data-theme="dark"] .btn-skip {
+    background-color: #ffffff !important;
+    color: #212842 !important;
+    border: 2px solid #ffffff;
+}
+
+[data-theme="dark"] .btn-skip:hover {
+    background-color: #e1d4c2 !important;
+    color: #212842 !important;
+}
+
+/* ============================================
+   Game Container
+   ============================================ */
+.game-container {
+    min-height: 450px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+canvas {
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    max-width: 100%;
+    height: auto;
+    transition: all 0.3s ease;
+    touch-action: none;
+}
+
+/* ============================================
+   Game Selection Cards
+   ============================================ */
+.game-card {
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.game-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s;
+}
+
+.game-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: currentColor;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.game-card:hover::before {
+    left: 100%;
+}
+
+.game-card:active {
+    transform: translateY(-4px) scale(1.01);
+}
+
+/* ============================================
+   Score Display
+   ============================================ */
+.score-display {
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+}
+
+/* ============================================
+   SNAKE GAME - Enhanced with Animated Background
+   ============================================ */
+#snake-canvas {
+    border: 3px solid currentColor;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    image-rendering: pixelated;
+    position: relative;
+}
+
+#snake-canvas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 255, 198, 0.1) 0%, transparent 50%);
+    animation: bg-float 8s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes bg-float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(10px, -10px) scale(1.05); }
+    66% { transform: translate(-10px, 10px) scale(0.95); }
+}
+
+[data-theme="light"] #snake-canvas {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    border-color: #362017;
+}
+
+/* ============================================
+   BLOCK BREAKER - Enhanced with Animated Background
+   ============================================ */
+#breaker-canvas {
+    border: 3px solid currentColor;
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    position: relative;
+}
+
+#breaker-canvas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 70%, rgba(168, 85, 247, 0.1) 0%, transparent 60%),
+                radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.1) 0%, transparent 60%);
+    animation: bg-pulse 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes bg-pulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+[data-theme="light"] #breaker-canvas {
+    background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-color: #362017;
+}
+
+/* ============================================
+   SPACE INVADERS - Enhanced with Animated Background
+   ============================================ */
+#invaders-canvas {
+    border: 3px solid currentColor;
+    background: linear-gradient(180deg, #000000 0%, #0f0f23 100%);
+    position: relative;
+}
+
+#invaders-canvas::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.05) 0%, transparent 70%),
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 0, 0.05) 0%, transparent 70%),
+                radial-gradient(circle at 80% 20%, rgba(0, 0, 255, 0.05) 0%, transparent 70%);
+    animation: bg-stars 10s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes bg-stars {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-20px); }
+}
+
+[data-theme="light"] #invaders-canvas {
+    background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%);
+    border-color: #362017;
+}
+
+/* ============================================
+   2048 - Fixed Alignment & Enhanced
+   ============================================ */
+.merge-grid-container {
+    position: relative;
+    background: rgba(0,0,0,0.2);
+    padding: 12px;
+    border-radius: 12px;
+    width: 340px;
+    height: 340px;
+    touch-action: none;
+    overflow: hidden;
+}
+
+.merge-grid-container::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+    animation: merge-bg-glow 4s ease-in-out infinite alternate;
+    pointer-events: none;
+    border-radius: 8px;
+}
+
+@keyframes merge-bg-glow {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.6; }
+}
+
+.merge-grid-bg {
+    display: grid;
+    grid-template-columns: repeat(4, 70px);
+    grid-template-rows: repeat(4, 70px);
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 12px;
+    left: 12px;
+}
+
+#merge-tiles-layer {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: calc(100% - 24px);
+    height: calc(100% - 24px);
+    pointer-events: none;
+}
+
+.merge-cell-bg {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+}
+
+.merge-tile {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.12s ease;
+    will-change: transform, opacity;
+    z-index: 10;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    border: 2px solid rgba(255,255,255,0.1);
+    transform-origin: center center;
+}
+
+.merge-tile.new {
+    animation: pop-in 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.merge-tile.merged {
+    animation: pop-merge 0.24s ease-out;
+    z-index: 20;
+}
+
+.merge-tile.moving {
+    transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pop-in {
+    0% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(0); opacity: 0; }
+    50% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1.1); opacity: 0.8; }
+    100% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1); opacity: 1; }
+}
+
+@keyframes pop-merge {
+    0% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    50% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1.3); box-shadow: 0 8px 16px rgba(0,0,0,0.4); }
+    100% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .merge-tile {
+        transition: transform 0.08s ease, opacity 0.08s ease;
+    }
+    .merge-tile.new,
+    .merge-tile.merged {
+        animation: none;
+    }
+}
+
+.tile-2 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tile-4 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tile-8 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tile-16 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tile-32 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.tile-64 { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+.tile-128 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+.tile-256 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+.tile-512 { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+.tile-1024 { background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%); }
+.tile-2048 { background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); box-shadow: 0 0 20px #8ec5fc; }
+
+/* ============================================
+   Touch Controls
+   ============================================ */
+.touch-controls {
+    display: none;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .touch-controls {
+        display: grid;
+        grid-template-areas:
+            ". up ."
+            "left . right"
+            ". down .";
+        grid-template-columns: 60px 60px 60px;
+        grid-template-rows: 60px 60px 60px;
+    }
+
+    .touch-controls.horizontal {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
+}
+
+.touch-btn {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.2);
+    color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.touch-btn:active {
+    background: rgba(255,255,255,0.4);
+    transform: scale(0.95);
+    border-color: rgba(255,255,255,0.5);
+}
+
+.touch-btn.up { grid-area: up; }
+.touch-btn.down { grid-area: down; }
+.touch-btn.left { grid-area: left; }
+.touch-btn.right { grid-area: right; }
+
+.hidden { display: none !important; }
+
+/* ============================================
+   Arcade Hub: fixed CTA + achievements drawer
+   ============================================ */
+
+.arcade-cta {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 1100;
+    pointer-events: none;
+    max-width: calc(100vw - 24px);
+}
+
+.arcade-cta-link {
+    pointer-events: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.arcade-cta.is-hidden {
+    display: none;
+}
+
+.arcade-achievements-root {
+    position: fixed;
+    left: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 1200;
+    max-width: calc(100vw - 24px);
+}
+
+.arcade-achievements-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.15);
+    background: rgba(0,0,0,0.08);
+    color: inherit;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    pointer-events: auto;
+}
+
+.arcade-achievements-panel {
+    position: fixed;
+    left: 12px;
+    bottom: calc(56px + 12px + env(safe-area-inset-bottom, 0px));
+    width: min(420px, calc(100vw - 24px));
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: rgba(0,0,0,0.06);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 16px 54px rgba(0,0,0,0.35);
+    pointer-events: auto;
+}
+
+.arcade-achievements-panel.hidden {
+    pointer-events: none;
+}
+
+.arcade-achievements-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.arcade-ach-tab {
+    padding: 8px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(0,0,0,0.15);
+    background: rgba(0,0,0,0.06);
+    color: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.arcade-ach-tab[aria-selected="true"] {
+    background: rgba(0,0,0,0.12);
+}
+
+.arcade-achievements-list {
+    display: grid;
+    gap: 10px;
+    max-height: min(60vh, 420px);
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.arcade-ach-section {
+    font-weight: 800;
+    opacity: 0.85;
+    margin: 8px 0 2px;
+}
+
+.arcade-progress-bar {
+    height: 10px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.12);
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.arcade-progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: rgba(33, 40, 66, 0.8);
+}
+
+@media (max-width: 480px) {
+    .arcade-achievements-root {
+        left: 10px;
+    }
+
+    .arcade-achievements-panel {
+        left: 10px;
+        width: calc(100vw - 20px);
+    }
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snake | Arcade Zone</title>
+  <meta name="description" content="Play Snake in Arcade Zone. Eat, grow, and chase achievements." />
+  <link rel="canonical" href="https://www.estivanayramia.com/hobbies-games/snake" />
+
+  <meta property="og:title" content="Snake | Arcade Zone" />
+  <meta property="og:description" content="Play Snake in Arcade Zone. Eat, grow, and chase achievements." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.estivanayramia.com/hobbies-games/snake" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Snake | Arcade Zone" />
+  <meta name="twitter:description" content="Play Snake in Arcade Zone. Eat, grow, and chase achievements." />
+
+  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/theme.css" />
+  <link rel="stylesheet" href="/assets/css/arcade.css" />
+</head>
+<body>
+  <header></header>
+  <main class="container mx-auto px-4" style="padding-top:80px;">
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <a class="btn-back" href="/hobbies-games" aria-label="Back to Arcade Zone">← Arcade Zone</a>
+        <div class="score-display py-2 px-4 text-lg">Score: <span id="snake-score">0</span> | Level: <span id="snake-level">1</span></div>
+        <button type="button" id="snake-sound" class="btn-back" title="Toggle Sound" aria-pressed="false">🔊</button>
+      </div>
+
+      <section class="game-container" aria-label="Snake game">
+        <canvas id="snake-canvas" width="400" height="400"></canvas>
+        <div class="touch-controls" aria-label="Touch controls">
+          <button class="touch-btn up" data-snake-dir="up" type="button">↑</button>
+          <button class="touch-btn left" data-snake-dir="left" type="button">←</button>
+          <button class="touch-btn right" data-snake-dir="right" type="button">→</button>
+          <button class="touch-btn down" data-snake-dir="down" type="button">↓</button>
+        </div>
+        <div class="flex gap-2 mt-4 justify-center">
+          <button type="button" id="snake-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
+          <button type="button" id="snake-restart" class="px-6 py-2 bg-green-600 rounded-lg font-medium game-action">Restart</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/assets/js/site.js" defer></script>
+  <script type="module" src="/assets/js/arcade/games/snake.js"></script>
+</body>
+</html>

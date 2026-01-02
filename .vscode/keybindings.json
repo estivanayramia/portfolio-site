@@ -1,0 +1,10 @@
+[
+    {
+        "key": "ctrl+delete",
+        "command": "-"
+    },
+    {
+        "key": "ctrl+del",
+        "command": "-"
+    }
+]

@@ -22,3 +22,13 @@ audit.js
 /.lighthouse/**
 
 
+
+# Restore tool artifacts
+.vscode_restore_backup/
+.vscode_restore_reports/
+dryrun-transcript*.txt
+
+# Restore tool artifacts
+.vscode_restore_backup/
+.vscode_restore_reports/
+dryrun-transcript*.txt

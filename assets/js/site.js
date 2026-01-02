@@ -1972,9 +1972,10 @@ const initAchievements = () => {
         if (unlocked[achievementId]) return; // Already unlocked
         
         const lang = getCurrentLanguage();
+        const t = translations.achievement[lang] || translations.achievement.en;
         const translatedAchievement = {
             ...achievements[achievementId],
-            ...translations.achievement[lang][achievementId]
+            ...(t && t[achievementId] ? t[achievementId] : {})
         };
         
         unlocked[achievementId] = {
@@ -1983,19 +1984,78 @@ const initAchievements = () => {
         };
         saveAchievements(unlocked);
         showAchievementNotification(translatedAchievement);
+
+        // Also mirror to arcade achievements store so the Arcade Achievements drawer
+        // can show site achievements consistently.
+        try {
+            const key = 'arcade_achievements';
+            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            if (Array.isArray(list) && !list.includes(achievementId)) {
+                list.push(achievementId);
+                localStorage.setItem(key, JSON.stringify(list));
+            }
+            if (window.ArcadeAchievements && typeof window.ArcadeAchievements.updateUI === 'function') {
+                window.ArcadeAchievements.updateUI();
+            }
+        } catch {}
     };
 
     // Show achievement notification
     const showAchievementNotification = (achievement) => {
         const lang = getCurrentLanguage();
+        const t = translations.achievement[lang] || translations.achievement.en;
+
+        const toObj = (a) => {
+            if (!a) return {};
+            if (typeof a === 'string') return { id: a };
+            if (typeof a === 'object') return a;
+            return {};
+        };
+
+        const a = toObj(achievement);
+        const rawId = a.id || a.achievementId || a.key;
+        const id = typeof rawId === 'string' ? rawId : '';
+        const normalizedId = id.replace(/^site_/, '');
+
+        let resolved = {
+            icon: a.icon,
+            name: a.name || a.title,
+            description: a.description || a.desc
+        };
+
+        // If we were only given an id (or missing details), try to resolve from ArcadeAchievements
+        if ((!resolved.name || !resolved.description || !resolved.icon) && id && window.ArcadeAchievements && typeof window.ArcadeAchievements.getDefinitions === 'function') {
+            const defs = window.ArcadeAchievements.getDefinitions();
+            const def = defs && defs[id];
+            if (def) {
+                resolved = {
+                    icon: resolved.icon || def.icon,
+                    name: resolved.name || def.title || def.name,
+                    description: resolved.description || def.description || def.desc
+                };
+            }
+        }
+
+        // Resolve site translations by id as a last resort
+        if ((!resolved.name || !resolved.description) && t && normalizedId && t[normalizedId]) {
+            resolved = {
+                icon: resolved.icon || (achievements[normalizedId] && achievements[normalizedId].icon),
+                name: resolved.name || t[normalizedId].name,
+                description: resolved.description || t[normalizedId].description
+            };
+        }
+
+        const safeIcon = resolved.icon || '🏆';
+        const safeName = resolved.name || 'Achievement';
+        const safeDesc = resolved.description || '';
         const notification = document.createElement('div');
         notification.className = 'achievement-notification';
         notification.innerHTML = `
-            <div class="achievement-icon">${achievement.icon}</div>
+            <div class="achievement-icon">${safeIcon}</div>
             <div class="achievement-content">
-                <div class="achievement-title">${translations.achievement[lang].unlocked}</div>
-                <div class="achievement-name">${achievement.name}</div>
-                <div class="achievement-desc">${achievement.description}</div>
+                <div class="achievement-title">${(t && t.unlocked) ? t.unlocked : 'Achievement Unlocked!'}</div>
+                <div class="achievement-name">${safeName}</div>
+                <div class="achievement-desc">${safeDesc}</div>
             </div>
             <button class="achievement-close" aria-label="Close achievement notification">×</button>
         `;

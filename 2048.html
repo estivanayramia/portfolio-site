@@ -1289,18 +1289,35 @@
             if (!panel) return;
 
             const state = achievementPanelState[game] || { open: false, tab: 'pending' };
-            const all = (ACHIEVEMENTS[game] || []);
+            let all = (ACHIEVEMENTS[game] || []);
+            let unlockedIds = new Set();
+            let earned = [];
+            let pending = [];
+
+            if (window.ArcadeAchievements) {
+                const allDefs = window.ArcadeAchievements.getDefinitions();
+                const defs = Object.values(allDefs).filter(a => a.game === game);
+                all = defs.map(a => ({
+                    id: a.id,
+                    name: a.title || a.name,
+                    desc: a.description || a.desc,
+                    icon: a.icon
+                }));
+                unlockedIds = new Set(window.ArcadeAchievements.getUnlocked());
+                earned = all.filter(a => unlockedIds.has(a.id));
+                pending = all.filter(a => !unlockedIds.has(a.id));
+            } else {
+                const data = loadGameData(game);
+                unlockedIds = new Set((data.achievements || []));
+                earned = all.filter(a => unlockedIds.has(a.id));
+                pending = all.filter(a => !unlockedIds.has(a.id));
+            }
             
             // Safety check for undefined achievements
             if (!all || all.length === 0) {
                 panel.innerHTML = '<div style="opacity:0.75; padding: 10px;">No achievements available for this game.</div>';
                 return;
             }
-
-            const data = loadGameData(game);
-            const unlockedIds = new Set((data.achievements || []));
-            const earned = all.filter(a => unlockedIds.has(a.id));
-            const pending = all.filter(a => !unlockedIds.has(a.id));
 
             const objectives = (GAME_OBJECTIVES[game] || []).map(o => `<div style="opacity:0.85;">• ${escapeHtml(o)}</div>`).join('');
 
@@ -1328,7 +1345,7 @@
                     <button type="button" data-ach-tab="${game}" data-tab="pending" class="text-xs" style="padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);background:${state.tab === 'pending' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.18)'};color:inherit;cursor:pointer;">Pending (${pending.length})</button>
                     <button type="button" data-ach-tab="${game}" data-tab="earned" class="text-xs" style="padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);background:${state.tab === 'earned' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.18)'};color:inherit;cursor:pointer;">Earned (${earned.length})</button>
                 </div>
-                <div style="display:grid;gap:8px;">${list || '<div style="opacity:0.75;">No achievements in this view yet.</div>'}</div>
+                <div style="display:grid;gap:8px;max-height:190px;overflow-y:auto;padding-right:4px;">${list || '<div style="opacity:0.75;">No achievements in this view yet.</div>'}</div>
             `;
         }
 
@@ -1339,13 +1356,16 @@
         function showAchievementUnlock(achievement) {
             const toast = document.createElement('div');
             toast.style.cssText = 'position:fixed;top:100px;right:20px;z-index:10000;background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:16px 24px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3);animation:achievement-slide 0.5s ease-out;max-width:300px;';
+            const title = (achievement && (achievement.title || achievement.name)) || 'Achievement';
+            const desc = (achievement && (achievement.description || achievement.desc)) || '';
+            const icon = (achievement && achievement.icon) || '🏆';
             toast.innerHTML = `
                 <div style="display:flex;align-items:center;gap:12px;">
-                    <div style="font-size:32px;">${achievement.icon}</div>
+                    <div style="font-size:32px;">${icon}</div>
                     <div>
                         <div style="font-weight:bold;margin-bottom:4px;">Achievement Unlocked!</div>
-                        <div style="font-size:14px;opacity:0.9;">${achievement.name}</div>
-                        <div style="font-size:12px;opacity:0.7;">${achievement.desc}</div>
+                        <div style="font-size:14px;opacity:0.9;">${title}</div>
+                        <div style="font-size:12px;opacity:0.7;">${desc}</div>
                     </div>
                 </div>
             `;
@@ -1372,6 +1392,9 @@
                 achievements = ACHIEVEMENTS[game] || [];
                 unlockedIds = data.achievements || [];
             }
+
+            const unlockedSet = new Set(unlockedIds);
+            const unlockedCount = achievements.filter(ach => unlockedSet.has(ach.id)).length;
             
             let achievementHTML = achievements.length ? achievements.map(ach => {
                 const unlocked = unlockedIds.includes(ach.id);
@@ -1407,7 +1430,7 @@
                             </div>
                         </div>
                     </div>
-                    <h3 style="font-size:18px;font-weight:bold;margin-bottom:12px;">🏆 Achievements (${unlockedIds.length}/${achievements.length})</h3>
+                    <h3 style="font-size:18px;font-weight:bold;margin-bottom:12px;">🏆 Achievements (${unlockedCount}/${achievements.length})</h3>
                     <div style="max-height:300px;overflow-y:auto;">
                         ${achievementHTML}
                     </div>
@@ -1435,8 +1458,16 @@
         function updateProgressDisplays() {
             ['snake', 'breaker', 'merge', 'invaders'].forEach(game => {
                 const data = loadGameData(game);
-                const total = ACHIEVEMENTS[game].length;
-                const unlocked = (data.achievements || []).length;
+                let total = (ACHIEVEMENTS[game] || []).length;
+                let unlocked = (data.achievements || []).length;
+
+                if (window.ArcadeAchievements) {
+                    const allDefs = window.ArcadeAchievements.getDefinitions();
+                    const defs = Object.values(allDefs).filter(a => a.game === game);
+                    const unlockedSet = new Set(window.ArcadeAchievements.getUnlocked());
+                    total = defs.length;
+                    unlocked = defs.filter(a => unlockedSet.has(a.id)).length;
+                }
                 const progressEl = document.getElementById(`${game}-progress`);
                 if (progressEl) {
                     progressEl.innerHTML = `🏆 ${unlocked}/${total} achievements | 🎮 High: ${data.highScore || 0}`;
@@ -1444,6 +1475,14 @@
             });
         }
         updateProgressDisplays();
+
+        window.addEventListener('arcade-achievements-update', () => {
+            updateProgressDisplays();
+            ['snake', 'breaker', 'merge', 'invaders'].forEach(game => {
+                const state = achievementPanelState[game];
+                if (state && state.open) renderAchievementPanel(game);
+            });
+        });
 
         // Tiny Achievements tabs inside the selection cards (collapsed by default)
         document.addEventListener('click', (e) => {
@@ -1750,7 +1789,9 @@
                 if (snakeFoodEaten === 1) unlockAchievement('snake', 'first_food');
                 if (multiplier >= 5) unlockAchievement('snake', 'combo_5');
                 if (snakeScore >= 100) unlockAchievement('snake', 'score_100');
+                if (snakeScore >= 250) unlockAchievement('snake', 'score_250');
                 if (snake.length >= 20) unlockAchievement('snake', 'length_20');
+                if (snake.length >= 35) unlockAchievement('snake', 'length_35');
                 
                 // Visual feedback for combo
                 if (multiplier > 1) {
@@ -1763,6 +1804,7 @@
                     snakeSpeed = Math.max(50, snakeSpeed - 10);
                     document.getElementById('snake-level').textContent = snakeLevel;
                     if (snakeLevel >= 5) unlockAchievement('snake', 'level_5');
+                    if (snakeLevel >= 10) unlockAchievement('snake', 'level_10');
                     createParticles(food.x * 20 + 10, food.y * 20 + 10, 8, '#22c55e');
                 }
                 
@@ -2094,6 +2136,7 @@
                             
                             if (breakerBricksDestroyed === 1) unlockAchievement('breaker', 'first_brick');
                             if (brScore >= 500) unlockAchievement('breaker', 'score_500');
+                            if (brScore >= 1000) unlockAchievement('breaker', 'score_1000');
                             
                             const powerUpChance = Math.random();
                             if (powerUpChance < 0.25) {
@@ -2124,6 +2167,7 @@
                                 
                                 if (sounds.hit) sounds.hit();
                                 if (brScore >= 500) unlockAchievement('breaker', 'score_500');
+                                if (brScore >= 1000) unlockAchievement('breaker', 'score_1000');
                             }
                         }
                     }
@@ -2137,6 +2181,7 @@
                             breakerLevel++;
                             breakerSpeed += 0.5;
                             if (breakerLevel >= 3) unlockAchievement('breaker', 'level_3');
+                            if (breakerLevel >= 5) unlockAchievement('breaker', 'level_5');
                             breakerLivesAtLevelStart = breakerLives;
                             
                             // Reset bricks for next level (centered)
@@ -2163,6 +2208,7 @@
                     // Collected
                     breakerPowerupsCollected++;
                     if (breakerPowerupsCollected >= 5) unlockAchievement('breaker', 'powerup_5');
+                    if (breakerPowerupsCollected >= 10) unlockAchievement('breaker', 'powerup_10');
                     
                     if (p.type === 'expand') {
                         brPaddle.w = Math.min(180, brPaddle.w + 40);
@@ -2467,7 +2513,9 @@
                         if (obstacle.val === 512) unlockAchievement('merge', 'tile_512');
                         if (obstacle.val === 1024) unlockAchievement('merge', 'tile_1024');
                         if (obstacle.val === 2048) unlockAchievement('merge', 'tile_2048');
+                        if (obstacle.val === 4096) unlockAchievement('merge', 'tile_4096');
                         if (mergeScore >= 5000) unlockAchievement('merge', 'score_5000');
+                        if (mergeScore >= 10000) unlockAchievement('merge', 'score_10000');
                         
                         if (mergeScore > mergeBest) {
                             mergeBest = mergeScore;
@@ -2760,7 +2808,9 @@
                                     // Check achievements
                                     if (invaderAliensKilled === 1) unlockAchievement('invaders', 'first_kill');
                                     if (invaderAliensKilled >= 50) unlockAchievement('invaders', 'aliens_50');
+                                    if (invaderAliensKilled >= 200) unlockAchievement('invaders', 'aliens_200');
                                     if (invaderScore >= 500) unlockAchievement('invaders', 'score_500');
+                                    if (invaderScore >= 2000) unlockAchievement('invaders', 'score_2000');
                                     
                                     createParticles(a.x + 10, a.y + 10, 6, '#ff0000');
                                     screenShake(4, 150);
@@ -2877,6 +2927,7 @@
                     invaderWave++;
                     invaderWaveHits = 0;
                     if (invaderWave >= 3) unlockAchievement('invaders', 'wave_3');
+                    if (invaderWave >= 5) unlockAchievement('invaders', 'wave_5');
                     
                     alienSpeed = 0.5 + (invaderWave - 1) * 0.3;
                     document.getElementById('invaders-wave').textContent = invaderWave;
