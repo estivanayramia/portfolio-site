@@ -524,7 +524,7 @@
         }
         
         function goToPage(page) {
-            currentIndex = Math.max(0, Math.min(page, totalPages - 1));
+            currentIndex = (page + totalPages) % totalPages;
             updateCarousel();
         }
         
