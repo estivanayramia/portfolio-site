@@ -248,7 +248,7 @@
                     Cooking
                 </h1>
                 <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
-                    Not about fancy recipes or Instagram-worthy plates. It's about fueling a body that trains hard, on a student budget, with minimal waste of time or ingredients.
+                    Cooking is a relaxing activity that helps me unwind. It gives me something to do when I need a break. The food turns out tasty. I focus on simple meals that keep me fueled for workouts. I avoid complicated recipes. I stick to basics that work well on a budget.
                 </p>
             </div>
         </section>
@@ -264,9 +264,8 @@
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">How I Plan Meals</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>I treat the kitchen like a lab. Inputs and outputs. Protein targets, calorie ranges, prep time. Everything has a number attached, and I optimize for the best ratio of nutrition to effort.</p>
-                            <p>Sunday is prep day. I cook in bulk for the week. Proteins get portioned. Rice gets made. Vegetables get prepped. During the week, I'm assembling, not cooking from scratch. That saves hours.</p>
-                            <p>I track macros loosely. Not obsessively, but enough to know I'm hitting my protein targets. When you're trying to build muscle on a student schedule, you can't leave nutrition to chance. The gym is only half the equation.</p>
+                            <p>I keep things easy in the kitchen. I cook when I feel like it. Sometimes I make a big batch. Other times I do quick meals. I eat what I enjoy. Chicken, rice, and pasta are my favorites. They fill me up and taste good.</p>
+                            <p>Breakfast is simple. Eggs or yogurt work. Lunch depends on what I have. Dinner might be something fresh or leftovers. I don't plan too far ahead. I just make sure I have ingredients I like.</p>
                         </div>
                     </div>
                     
@@ -274,19 +273,19 @@
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">Staple Meals</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>My rotation is simple because consistency beats variety when the goal is performance. Chicken thighs (cheaper and more flavorful than breast), ground beef, eggs, rice, potatoes, and whatever vegetables are on sale.</p>
-                            <p>Breakfast is usually eggs and toast, or Greek yogurt with oats. Quick, high protein, minimal cleanup. Lunch is whatever I prepped on Sunday. Dinner is where I might actually cook something fresh.</p>
-                            <p>I've learned to make a few things really well instead of being mediocre at many. A good stir fry. A solid rice bowl. Grilled meat that's actually seasoned properly. These basics, executed consistently, beat fancy recipes I'll never make twice.</p>
+                            <p>I keep it simple because I love carbs. Pasta is my go-to. I love rice and potatoes too. They keep me full and happy. Chicken thighs are a staple because they have more flavor than breast.</p>
+                            <p>Breakfast is usually eggs and toast or yogurt. Quick and easy. Lunch is whatever I have ready. Dinner is when I might actually cook something fresh.</p>
+                            <p>I stick to a few things I make well. A good pasta dish. A solid rice bowl. Grilled meat. I'd rather make a simple meal taste great than fail at something fancy.</p>
                         </div>
                     </div>
                     
                     <!-- The Kitchen as a System -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
-                        <h2 class="text-2xl font-bold text-indigodeep mb-4">The Kitchen as a System</h2>
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">What I've Learned</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>Cooking taught me about mise en place - having everything ready before you start. That principle applies everywhere. Preparation reduces friction. When everything is in place, execution becomes smooth.</p>
-                            <p>It also taught me about timing and parallel processing. While the rice cooks, prep the vegetables. While the meat rests, plate the sides. Finding those overlaps and using dead time is how you cook a full meal in 30 minutes.</p>
-                            <p>And cleanup as you go. Never let dishes pile up. The same discipline that keeps a kitchen functional keeps everything else functional too.</p>
+                            <p>Cooking taught me to be organized. Having everything ready before you start makes it so much easier. It's less stressful when you're not scrambling.</p>
+                            <p>It also taught me how to multitask. Rice cooking while I chop veggies. It's satisfying when it all comes together at the same time.</p>
+                            <p>And cleaning as I go is a lifesaver. No one likes a sink full of dishes at the end. It keeps the process enjoyable.</p>
                         </div>
                     </div>
                     
@@ -382,14 +381,10 @@
                             </li>
                             <li class="flex items-start">
                                 <span class="text-indigodeep mr-2">2.</span>
-                                <span>Prep in bulk on Sunday</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">3.</span>
                                 <span>Clean as you go</span>
                             </li>
                             <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">4.</span>
+                                <span class="text-indigodeep mr-2">3.</span>
                                 <span>Simple, repeatable meals</span>
                             </li>
                         </ul>
@@ -524,6 +519,7 @@
         for (let i = 0; i < totalPages; i++) {
             const dot = document.createElement('button');
             dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', `Go to page ${i + 1}`);
             dot.addEventListener('click', () => goToPage(i));
             dotsContainer.appendChild(dot);
         }

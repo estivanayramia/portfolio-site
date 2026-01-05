@@ -266,7 +266,6 @@
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
                             <p>I read mostly non-fiction. Business, psychology, strategy, history. Books that explain how things work, why people behave the way they do, how systems succeed or fail. I'm looking for patterns I can apply.</p>
                             <p>Robert Greene is a favorite. His books on power, strategy, and human nature are dense with examples and frameworks. They teach you to see beneath the surface of situations. The 48 Laws, The 33 Strategies of War, Mastery. Each one gives you a different lens.</p>
-                            <p>I also read biographies. Lives of people who built things, faced challenges, made decisions under pressure. Not for entertainment, but to understand how they thought. What made their decisions right or wrong in context.</p>
                         </div>
                     </div>
                     
@@ -509,6 +508,7 @@
         for (let i = 0; i < totalPages; i++) {
             const dot = document.createElement('button');
             dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', `Go to page ${i + 1}`);
             dot.addEventListener('click', () => goToPage(i));
             dotsContainer.appendChild(dot);
         }

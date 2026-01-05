@@ -248,7 +248,7 @@
                     Photography
                 </h1>
                 <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
-                    Not about documenting everything. It's about seeing patterns and systems in motion, then capturing the moment where everything aligns.
+                    Photography lets me capture scenes that grab my attention. I use my Canon EOS 70D to shoot everyday moments, landscapes, and details. It's not about technique or art. I just enjoy pointing the camera and seeing what comes out.
                 </p>
             </div>
         </section>
@@ -274,9 +274,9 @@
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">How I Think About Composition</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>Photography is decision-making under constraints. You have a frame, and you decide what goes in it and what gets cut. Where the eye lands first. What creates tension. What creates balance.</p>
-                            <p>I look for leading lines that pull you through the image. Negative space that lets subjects breathe. Layers of depth that give dimension. The interplay of light and shadow that creates mood.</p>
-                            <p>Every photo is a small act of editing reality. You choose the angle, the moment, the crop. You decide what story gets told. That's a skill that transfers to everything else. Knowing what to include, what to cut, what to emphasize.</p>
+                            <p>Photography is just deciding what fits in the frame. You choose what stays and what goes. It's about where the eye lands and what feels balanced.</p>
+                            <p>I look for lines that pull you into the image. Empty space lets the subject breathe. Light and shadow create the mood. It's not complicated.</p>
+                            <p>Every photo is a choice. You pick the angle and the moment. You decide the story. That skill works everywhere. Knowing what to keep and what to cut.</p>
                         </div>
                     </div>
                     
@@ -325,23 +325,23 @@
                         <ul class="space-y-3 text-sm text-chocolate">
                             <li class="flex items-start">
                                 <span class="text-indigodeep mr-2">•</span>
-                                <span>Angles and Geometry</span>
+                                <span>Cool Angles</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="text-indigodeep mr-2">•</span>
-                                <span>Symmetry and Pattern</span>
+                                <span>Patterns</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="text-indigodeep mr-2">•</span>
-                                <span>Texture and Surface</span>
+                                <span>Textures</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="text-indigodeep mr-2">•</span>
-                                <span>Light and Shadow</span>
+                                <span>Lighting</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="text-indigodeep mr-2">•</span>
-                                <span>Systems in Motion</span>
+                                <span>Movement</span>
                             </li>
                         </ul>
                     </div>
@@ -474,6 +474,7 @@
         for (let i = 0; i < totalPages; i++) {
             const dot = document.createElement('button');
             dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', `Go to page ${i + 1}`);
             dot.addEventListener('click', () => goToPage(i));
             dotsContainer.appendChild(dot);
         }

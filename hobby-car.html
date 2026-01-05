@@ -511,6 +511,7 @@
         for (let i = 0; i < totalPages; i++) {
             const dot = document.createElement('button');
             dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', `Go to page ${i + 1}`);
             dot.addEventListener('click', () => goToPage(i));
             dotsContainer.appendChild(dot);
         }

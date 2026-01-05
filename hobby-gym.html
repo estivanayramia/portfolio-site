@@ -248,7 +248,7 @@
                     Gym & Strength Training
                 </h1>
                 <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
-                    Building discipline through progressive overload. The gym is my daily checkpoint - a system to manage ADHD energy and keep the rest of life organized.
+                    Building discipline through progressive overload. The gym is my daily checkpoint.
                 </p>
             </div>
         </section>
@@ -288,7 +288,7 @@
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">Why I Train</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>The gym isn't just about looking good. It's a daily checkpoint that keeps everything else in my life organized. When you have ADHD, your brain is constantly firing in different directions. The gym gives me a place to channel that energy productively.</p>
+                            <p>The gym isn't just about looking good. It's a daily checkpoint that keeps everything else in my life organized. The gym gives me a place to channel that energy productively.</p>
                             <p>Every session is a small win. Show up, do the work, leave better than you came in. That rhythm builds momentum that carries into school, work, and relationships. When you start the day by doing something hard on purpose, the rest of the day feels more manageable.</p>
                             <p>I'm not training for competition or Instagram. I'm training for consistency, for discipline, for the version of myself that doesn't quit when things get uncomfortable. The weights don't care about your excuses. They just ask: did you show up today?</p>
                         </div>
@@ -299,7 +299,6 @@
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">How I Structure My Training</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
                             <p>I follow a progressive overload approach. The goal is to do slightly more than last time - one more rep, five more pounds, better form. Small increments compound over months and years into real change.</p>
-                            <p>I track everything. Sets, reps, weights, how I felt. If I can't measure it, I can't improve it. The data shows me when to push harder and when to back off. It removes the guesswork and keeps me honest about whether I'm actually progressing or just going through the motions.</p>
                             <p>Nutrition matches the goal. Right now that means eating in a slight surplus with high protein to support lean muscle growth. No random bulking, no crash diets. Just consistent fuel that supports the work.</p>
                         </div>
                     </div>
@@ -366,10 +365,6 @@
                             <div>
                                 <dt class="text-chocolate/60 mb-1">Current Phase</dt>
                                 <dd class="text-indigodeep font-medium">Lean Bulk</dd>
-                            </div>
-                            <div>
-                                <dt class="text-chocolate/60 mb-1">Tracking Method</dt>
-                                <dd class="text-indigodeep font-medium">App + Notes</dd>
                             </div>
                             <div>
                                 <dt class="text-chocolate/60 mb-1">Primary Goal</dt>
@@ -506,6 +501,7 @@
         for (let i = 0; i < totalPages; i++) {
             const dot = document.createElement('button');
             dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', `Go to page ${i + 1}`);
             dot.addEventListener('click', () => goToPage(i));
             dotsContainer.appendChild(dot);
         }

@@ -316,7 +316,7 @@
                     <h2 class="text-2xl font-bold text-indigodeep mb-4">What I Write</h2>
                     <div class="prose prose-lg text-chocolate leading-relaxed space-y-4 max-w-3xl">
                         <p>Simple things. Not cheesy motivational quotes. Just honest reminders. "You're doing better than you think." "Take a breath. You'll figure it out." "Someone is proud of you." Things I would want to hear on a hard day.</p>
-                        <p>I try to make them feel personal even though they're universal. The handwriting matters. It's not typed or printed. Someone sat down and wrote this. That effort shows.</p>
+                        <p>I try to make them feel personal even though they're universal. The handwriting matters. It's not typed or printed. Someone sat down and wrote this. Even if the handwriting is the equivalent of a toddler's!</p>
                     </div>
                 </div>
                 
@@ -448,8 +448,9 @@
                 </div>
                 
                 <!-- Back to Hobbies CTA -->
-                <div class="text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.8">
-                    <a href="/hobbies.html#hobby-whispers-card" class="inline-block text-sm font-medium text-beige bg-indigodeep px-8 py-4 rounded-full hover:bg-chocolate transition-colors">
+                <div class="bg-indigodeep rounded-xl p-6 text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.8">
+                    <p class="text-beige/90 text-sm mb-4">Explore more hobbies</p>
+                    <a href="/hobbies.html#hobby-whispers-card" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
                         ← Back to All Hobbies
                     </a>
                 </div>
@@ -606,26 +607,24 @@
                 updateDots();
                 
                 // Update button states
-                prevBtn.disabled = currentIndex === 0;
-                nextBtn.disabled = currentIndex >= totalSlides - slidesPerView;
+                // prevBtn.disabled = currentIndex === 0;
+                // nextBtn.disabled = currentIndex >= totalSlides - slidesPerView;
             }
             
             prevBtn.addEventListener('click', function() {
-                if (currentIndex > 0) {
-                    currentIndex -= slidesPerView;
-                    if (currentIndex < 0) currentIndex = 0;
-                    updateCarousel();
+                currentIndex -= slidesPerView;
+                if (currentIndex < 0) {
+                    currentIndex = Math.max(0, totalSlides - slidesPerView);
                 }
+                updateCarousel();
             });
             
             nextBtn.addEventListener('click', function() {
-                if (currentIndex < totalSlides - slidesPerView) {
-                    currentIndex += slidesPerView;
-                    if (currentIndex > totalSlides - slidesPerView) {
-                        currentIndex = totalSlides - slidesPerView;
-                    }
-                    updateCarousel();
+                currentIndex += slidesPerView;
+                if (currentIndex > totalSlides - slidesPerView) {
+                    currentIndex = 0;
                 }
+                updateCarousel();
             });
             
             // Touch/swipe support
