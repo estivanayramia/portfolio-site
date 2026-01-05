@@ -21,7 +21,13 @@ let lastShot;
 let waveHits; // counts hits this wave (including shield hits)
 let aliensKilled;
 
-const input = { left: false, right: false, shoot: false };
+let powerups;
+let rapidFireUntil;
+let spreadShotUntil;
+let slowAliensUntil;
+let shieldCharges;
+
+const input = { left: false, right: false, shootHeld: false, autoFire: false };
 
 function setText(el, value) {
   if (el) el.textContent = String(value);
@@ -39,9 +45,10 @@ function spawnAliens() {
 function reset() {
   player = { x: 180, y: 450, w: 30, h: 20 };
   bullets = [];
+  powerups = [];
   spawnAliens();
   alienDir = 1;
-  alienSpeed = 0.75;
+  alienSpeed = 0.6;
   score = 0;
   wave = 1;
   lastShot = 0;
@@ -49,22 +56,50 @@ function reset() {
   aliensKilled = 0;
   input.left = false;
   input.right = false;
-  input.shoot = false;
+  input.shootHeld = false;
+  input.autoFire = false;
+  rapidFireUntil = 0;
+  spreadShotUntil = 0;
+  slowAliensUntil = 0;
+  shieldCharges = 0;
   setText(scoreEl, 0);
   setText(waveEl, 1);
 }
 
 function shoot() {
-  const cooldown = 220;
   const now = performance.now();
+  const cooldown = now < rapidFireUntil ? 120 : 220;
   if (now - lastShot < cooldown) return;
 
   const activePlayerBullets = bullets.filter((b) => b.alive && !b.enemy).length;
   if (activePlayerBullets >= 3) return;
 
-  bullets.push({ x: player.x + 13, y: player.y, w: 4, h: 10, dy: -8, enemy: false, alive: true });
+  const hasSpread = now < spreadShotUntil;
+  if (hasSpread) {
+    bullets.push({ x: player.x + 13, y: player.y, w: 4, h: 10, dx: -2, dy: -8, enemy: false, alive: true });
+    bullets.push({ x: player.x + 13, y: player.y, w: 4, h: 10, dx: 0, dy: -8, enemy: false, alive: true });
+    bullets.push({ x: player.x + 13, y: player.y, w: 4, h: 10, dx: 2, dy: -8, enemy: false, alive: true });
+  } else {
+    bullets.push({ x: player.x + 13, y: player.y, w: 4, h: 10, dy: -8, enemy: false, alive: true });
+  }
   lastShot = now;
   playBeep(300, 0.04, "square", 0.15);
+}
+
+function spawnPowerup(x, y) {
+  const roll = Math.random();
+  const type = roll < 0.35 ? "rapid" : roll < 0.65 ? "spread" : roll < 0.85 ? "shield" : "slow";
+  powerups.push({ x: x - 7, y: y - 7, w: 14, h: 14, dy: 2, type, alive: true });
+}
+
+function applyPowerup(type) {
+  const now = performance.now();
+  if (type === "rapid") rapidFireUntil = Math.max(rapidFireUntil, now + 8000);
+  if (type === "spread") spreadShotUntil = Math.max(spreadShotUntil, now + 9000);
+  if (type === "slow") slowAliensUntil = Math.max(slowAliensUntil, now + 6000);
+  if (type === "shield") shieldCharges = Math.min(shieldCharges + 1, 3);
+
+  playBeep(520, 0.05, "triangle", 0.18);
 }
 
 function update() {
@@ -73,11 +108,12 @@ function update() {
   player.x += dir * 6;
   player.x = Math.max(0, Math.min(canvas.width - player.w, player.x));
 
-  if (input.shoot) shoot();
+  if (input.autoFire || input.shootHeld) shoot();
 
   // bullets
   for (const b of bullets) {
     if (!b.alive) continue;
+    if (typeof b.dx === "number") b.x += b.dx;
     b.y += b.dy;
 
     if (b.y < -20 || b.y > canvas.height + 20) b.alive = false;
@@ -93,6 +129,8 @@ function update() {
           aliensKilled++;
           setText(scoreEl, score);
           playBeep(160, 0.06, "sawtooth", 0.18);
+
+          if (Math.random() < 0.12) spawnPowerup(a.x + a.w / 2, a.y + a.h / 2);
 
           unlock("invaders:first_kill");
           if (score >= 500) unlock("invaders:score_500");
@@ -110,9 +148,31 @@ function update() {
       ) {
         b.alive = false;
         waveHits++;
-        running = false;
-        playBeep(90, 0.12, "triangle", 0.22);
+        if (shieldCharges > 0) {
+          shieldCharges--;
+          playBeep(140, 0.08, "triangle", 0.18);
+        } else {
+          running = false;
+          playBeep(90, 0.12, "triangle", 0.22);
+        }
       }
+    }
+  }
+
+  // powerups
+  for (const p of powerups) {
+    if (!p.alive) continue;
+    p.y += p.dy;
+    if (p.y > canvas.height + 20) p.alive = false;
+
+    if (
+      p.y + p.h >= player.y &&
+      p.y <= player.y + player.h &&
+      p.x + p.w >= player.x &&
+      p.x <= player.x + player.w
+    ) {
+      p.alive = false;
+      applyPowerup(p.type);
     }
   }
 
@@ -131,16 +191,19 @@ function update() {
 
   // move aliens
   let hitEdge = false;
+  const now = performance.now();
+  const slowFactor = now < slowAliensUntil ? 0.6 : 1;
   for (const a of aliens) {
     if (!a.alive) continue;
-    a.x += alienDir * alienSpeed;
+    a.x += alienDir * alienSpeed * slowFactor;
     if (a.x <= 0 || a.x + a.w >= canvas.width) hitEdge = true;
   }
 
   if (hitEdge) {
     alienDir *= -1;
-    for (const a of aliens) a.y += 15;
-    alienSpeed += 0.12;
+    const drop = Math.min(12 + (wave - 1) * 2, 18);
+    for (const a of aliens) a.y += drop;
+    alienSpeed += 0.1 + Math.min((wave - 1) * 0.02, 0.1);
   }
 
   // lose if aliens reach bottom
@@ -161,8 +224,9 @@ function update() {
     if (wave >= 3) unlock("invaders:wave_3");
 
     bullets = [];
+    powerups = [];
     spawnAliens();
-    alienSpeed = 0.75 + (wave - 1) * 0.25;
+    alienSpeed = 0.6 + (wave - 1) * 0.22;
   }
 }
 
@@ -182,6 +246,14 @@ function draw() {
   ctx.closePath();
   ctx.fill();
 
+  // shield indicator
+  if (shieldCharges > 0) {
+    ctx.strokeStyle = "rgba(59,130,246,0.9)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(player.x - 3, player.y - 3, player.w + 6, player.h + 6);
+    ctx.lineWidth = 1;
+  }
+
   // aliens
   ctx.fillStyle = "rgba(239,68,68,0.95)";
   aliens.forEach((a) => {
@@ -194,6 +266,20 @@ function draw() {
     if (!b.alive) return;
     ctx.fillStyle = b.enemy ? "rgba(248,113,113,0.95)" : "rgba(250,204,21,0.95)";
     ctx.fillRect(b.x, b.y, b.w, b.h);
+  });
+
+  // powerups
+  powerups.forEach((p) => {
+    if (!p.alive) return;
+    const color = p.type === "rapid" ? "rgba(59,130,246,0.95)" : p.type === "spread" ? "rgba(168,85,247,0.95)" : p.type === "shield" ? "rgba(34,211,238,0.95)" : "rgba(250,204,21,0.95)";
+    const label = p.type === "rapid" ? "R" : p.type === "spread" ? "S" : p.type === "shield" ? "H" : "L";
+    ctx.fillStyle = color;
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+    ctx.fillStyle = "rgba(0,0,0,0.75)";
+    ctx.font = "bold 10px Inter, system-ui, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(label, p.x + p.w / 2, p.y + p.h / 2 + 0.5);
   });
 
   if (!running) {
@@ -236,9 +322,15 @@ function bindInputs() {
         e.preventDefault();
         input.right = true;
       }
-      if (e.code === "Space" || e.code === "KeyW" || e.code === "ArrowUp") {
+      if (e.code === "Space") {
         e.preventDefault();
-        input.shoot = true;
+        if (e.repeat) return;
+        input.autoFire = !input.autoFire;
+        if (input.autoFire) shoot();
+      }
+      if (e.code === "KeyW" || e.code === "ArrowUp") {
+        e.preventDefault();
+        input.shootHeld = true;
         shoot();
       }
     },
@@ -248,7 +340,7 @@ function bindInputs() {
   window.addEventListener("keyup", (e) => {
     if (e.key === "ArrowLeft" || e.code === "KeyA") input.left = false;
     if (e.key === "ArrowRight" || e.code === "KeyD") input.right = false;
-    if (e.code === "Space" || e.code === "KeyW" || e.code === "ArrowUp") input.shoot = false;
+    if (e.code === "KeyW" || e.code === "ArrowUp") input.shootHeld = false;
   });
 
   // touch buttons - stateful hold
@@ -261,7 +353,7 @@ function bindInputs() {
       if (action === "left") input.left = true;
       if (action === "right") input.right = true;
       if (action === "shoot") {
-        input.shoot = true;
+        input.shootHeld = true;
         shoot();
       }
     };
@@ -272,7 +364,7 @@ function bindInputs() {
       } catch {}
       if (action === "left") input.left = false;
       if (action === "right") input.right = false;
-      if (action === "shoot") input.shoot = false;
+      if (action === "shoot") input.shootHeld = false;
     };
 
     btn.addEventListener("pointerdown", down);

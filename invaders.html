@@ -1585,6 +1585,9 @@
         }
 
         function showGameOver(emoji, title, message, restartFn) {
+            // Ensure we only ever show one game-over modal at a time.
+            document.querySelectorAll('.game-modal').forEach(m => m.remove());
+
             const modal = document.createElement('div');
             modal.className = 'game-modal';
             modal.innerHTML = `
@@ -1597,13 +1600,16 @@
                 </div>
             `;
             document.body.appendChild(modal);
-            
-            document.getElementById('modal-restart').onclick = () => {
-                modal.remove();
-                restartFn();
-            };
-            
-            setTimeout(() => { if(modal.parentElement) modal.remove(); }, 8000);
+
+            const restartBtn = modal.querySelector('#modal-restart');
+            if (restartBtn) {
+                restartBtn.addEventListener('click', () => {
+                    modal.remove();
+                    restartFn();
+                }, { once: true });
+            }
+
+            setTimeout(() => { if (modal.parentElement) modal.remove(); }, 8000);
         }
 
         function createParticles(x, y, count = 5, color = '#fff') {

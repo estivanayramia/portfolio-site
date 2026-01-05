@@ -2,6 +2,8 @@
   "default": true,
   "ignores": [
     "_headers",
-    "_redirects"
+    "**/_headers",
+    "_redirects",
+    "**/_redirects"
   ]
 }
