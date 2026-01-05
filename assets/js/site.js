@@ -2667,11 +2667,19 @@ const initPhase2 = () => {
     });
     
     // B. Copyright Year Update
-    const footerYear = document.querySelector('footer p.text-xs');
-    if (footerYear) {
-        const currentYear = new Date().getFullYear();
-        footerYear.innerHTML = footerYear.innerHTML.replace(/&copy;\s*\d{4}/, `&copy; ${currentYear}`);
-    }
+    try {
+        const yearEl = document.getElementById('copyright-year');
+        if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+    } catch (e) {}
+
+    // Back-compat for older footer markup
+    try {
+        const footerYear = document.querySelector('footer p.text-xs');
+        if (footerYear) {
+            const currentYear = new Date().getFullYear();
+            footerYear.innerHTML = footerYear.innerHTML.replace(/&copy;\s*\d{4}/, `&copy; ${currentYear}`);
+        }
+    } catch (e) {}
     
     // C. Honeypot Check on Contact Form
     const contactForm = document.querySelector('form[action*="formspree"]');
@@ -2691,6 +2699,323 @@ const initPhase2 = () => {
 // Initialization
 // ==========================================================================
 
+const __isEnglishChromePage = () => {
+    try {
+        const lang = (document.documentElement && document.documentElement.lang) ? document.documentElement.lang.toLowerCase() : 'en';
+        const path = (window.location && window.location.pathname) ? window.location.pathname : '/';
+        if (path.startsWith('/es/') || path.startsWith('/ar/')) return false;
+        return lang === 'en';
+    } catch (e) {
+        return false;
+    }
+};
+
+const __ensureStandardEnglishChrome = () => {
+    if (!__isEnglishChromePage()) return;
+
+    // Header: inject only if missing (avoid clobbering per-page scripts)
+    try {
+        const hasStandardHeader = !!document.querySelector('header #brand-logo, header #mobile-menu-toggle');
+        if (!hasStandardHeader) {
+            const header = document.createElement('header');
+            header.className = 'fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10';
+            header.innerHTML = `
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between gap-2">
+            <a href="/index.html" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
+                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
+                <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
+            </a>
+            
+            <!-- Main Navigation -->
+            <ul class="hidden md:flex items-center space-x-8">
+                <li><a href="/index.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="home">Home</a></li>
+                <li><a href="/projects.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="projects">Projects</a></li>
+                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="overview">Overview</a></li>
+                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="deep-dive">Deep Dive</a></li>
+                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="about">About</a></li>
+                <li><a href="/contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
+            </ul>
+            
+            <!-- Language Switcher -->
+            <div id="lang-switcher" class="flex items-center space-x-3 shrink-0" style="z-index: 20;">
+                <a href="#" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-lang-key="en">EN</a>
+                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
+                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
+            </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
+            <ul class="px-6 py-4 space-y-3">
+                <li><a href="/index.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="home">Home</a></li>
+                <li><a href="/projects.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="projects">Projects</a></li>
+                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="overview">Overview</a></li>
+                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="deep-dive">Deep Dive</a></li>
+                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="about">About</a></li>
+                <li><a href="/contact.html" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
+            </ul>
+        </div>
+            `;
+
+            if (document.body) {
+                document.body.insertBefore(header, document.body.firstChild);
+            }
+
+            // Ensure content isn't hidden under fixed header
+            const hasMainPad = !!document.querySelector('main.pt-24');
+            if (!hasMainPad) {
+                document.body && document.body.classList && document.body.classList.add('pt-24');
+            }
+
+            // Set EN link to current English path
+            try {
+                const enLink = header.querySelector('[data-lang-key="en"]');
+                if (enLink) {
+                    const p = window.location.pathname || '/';
+                    enLink.href = (p === '/' ? '/index.html' : p);
+                }
+            } catch (e) {}
+        }
+    } catch (e) {}
+
+    // Footer: inject only if missing
+    try {
+        const hasFooter = !!document.querySelector('footer.bg-indigodeep.text-beige.py-12');
+        if (!hasFooter) {
+            const footer = document.createElement('footer');
+            footer.className = 'bg-indigodeep text-beige py-12';
+            footer.innerHTML = `
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid md:grid-cols-3 gap-12 mb-12">
+                <div class="space-y-4">
+                    <a href="/" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
+                        <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
+                        <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
+                    </a>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/deep-dive.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/projects/" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
+                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                    </ul>
+                </div>
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
+                    <ul class="space-y-2">
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
+                        <li><a href="/contact.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="/assets/docs/Estivan_Ayramia_Resume_12-25-25.pdf.html" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
+                        <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-beige/20 pt-8 text-center">
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+            </div>
+        </div>
+            `;
+            document.body && document.body.appendChild(footer);
+        }
+    } catch (e) {}
+};
+
+const __arcadeStorageKey = 'site_played_games_v1';
+
+const __safeJsonParse = (val, fallback) => {
+    try {
+        return JSON.parse(val);
+    } catch (e) {
+        return fallback;
+    }
+};
+
+const __getPlayedGames = () => {
+    try {
+        const raw = localStorage.getItem(__arcadeStorageKey);
+        const data = __safeJsonParse(raw, {});
+        return (data && typeof data === 'object') ? data : {};
+    } catch (e) {
+        return {};
+    }
+};
+
+const __setPlayedGames = (obj) => {
+    try {
+        localStorage.setItem(__arcadeStorageKey, JSON.stringify(obj || {}));
+    } catch (e) {}
+};
+
+const __normalizePath = (p) => {
+    try {
+        return (p || '/').replace(/\/+$/, '') || '/';
+    } catch (e) {
+        return '/';
+    }
+};
+
+const __getCurrentGameId = () => {
+    try {
+        const filter = document.body && document.body.getAttribute('data-arcade-achievements-filter');
+        if (filter && /^mini_/.test(filter)) return filter.replace(/^mini_/, '');
+        if (filter && /^arcade_/.test(filter)) return filter.replace(/^arcade_/, '');
+
+        const path = __normalizePath(window.location.pathname || '/');
+
+        // /hobbies-games/<slug> or /hobbies-games/<slug>.html
+        const hg = path.match(/^\/hobbies-games\/(.+)$/);
+        if (hg && hg[1]) return hg[1].replace(/\.html$/i, '');
+
+        // /<name>.html
+        const base = path.split('/').pop() || '';
+        if (base.endsWith('.html')) return base.replace(/\.html$/i, '');
+        return null;
+    } catch (e) {
+        return null;
+    }
+};
+
+const __markGamePlayed = (gameId) => {
+    if (!gameId) return;
+    try {
+        const played = __getPlayedGames();
+        played[gameId] = { lastPlayedAt: Date.now() };
+        __setPlayedGames(played);
+    } catch (e) {}
+};
+
+const __hashString = (str) => {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+        h ^= str.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0);
+};
+
+const __mulberry32 = (seed) => {
+    let t = seed >>> 0;
+    return function() {
+        t += 0x6D2B79F5;
+        let r = Math.imul(t ^ (t >>> 15), 1 | t);
+        r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+        return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+    };
+};
+
+const __shuffleInPlace = (arr, rnd) => {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(rnd() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+};
+
+const __GAME_CATALOG = [
+    { id: 'snake', href: '/snake.html', emoji: '🐍', title: 'Snake', subtitle: 'Classic growth game' },
+    { id: 'breaker', href: '/breaker.html', emoji: '🧱', title: 'Block Breaker', subtitle: 'Smash the bricks' },
+    { id: '2048', href: '/2048.html', emoji: '🧩', title: '2048', subtitle: 'Merge the numbers' },
+    { id: 'invaders', href: '/invaders.html', emoji: '👾', title: 'Space Invaders', subtitle: 'Defend the earth' },
+    { id: 'racer', href: '/hobbies-games/racer.html', emoji: '🏎️', title: 'Racer', subtitle: 'Fast reflex racing' },
+    { id: 'oh-flip', href: '/hobbies-games/oh-flip.html', emoji: '🤸', title: 'Oh Flip', subtitle: 'Timing + tricks' },
+    { id: 'onoff', href: '/hobbies-games/onoff.html', emoji: '⚡', title: 'ON/OFF', subtitle: 'Switch-based puzzle' },
+    { id: '1024-moves', href: '/hobbies-games/1024-moves.html', emoji: '🧠', title: '1024 Moves', subtitle: 'Move-limited strategy' },
+    { id: 'back-attacker', href: '/hobbies-games/back-attacker.html', emoji: '🛡️', title: 'Back Attacker', subtitle: 'Survive the attacks' },
+    { id: 'nano-wirebot', href: '/hobbies-games/nano-wirebot.html', emoji: '🤖', title: 'Nano Wirebot', subtitle: 'Precision platforming' },
+    { id: 'off-the-line', href: '/hobbies-games/off-the-line.html', emoji: '🧷', title: 'Off The Line', subtitle: 'Don’t cross the line' },
+    { id: 'pizza-undelivery', href: '/hobbies-games/pizza-undelivery.html', emoji: '🍕', title: 'Pizza Undelivery', subtitle: 'Fast food chaos' },
+    { id: 'the-matr13k', href: '/hobbies-games/the-matr13k.html', emoji: '🧬', title: 'The Matr13k', subtitle: 'Pattern puzzle' },
+    { id: 'triangle-back-to-home', href: '/hobbies-games/triangle-back-to-home.html', emoji: '🔺', title: 'Triangle: Back to Home', subtitle: 'Geometry adventure' },
+    { id: 'xx142-b2exe', href: '/hobbies-games/xx142-b2exe.html', emoji: '🧪', title: 'XX142-B2EXE', subtitle: 'Experimental arcade' }
+];
+
+const __renderSuggestionGrid = (gridEl, opts) => {
+    if (!gridEl) return;
+
+    const count = (opts && opts.count) ? opts.count : 6;
+    const currentId = (opts && opts.currentId) ? opts.currentId : null;
+
+    const played = __getPlayedGames();
+    const now = Date.now();
+
+    const candidates = __GAME_CATALOG.filter(g => g && g.id && g.href && g.id !== currentId);
+    const unplayed = candidates.filter(g => !played[g.id]);
+    const playedList = candidates.filter(g => !!played[g.id]);
+
+    // Rotate / randomize: daily seed + per-page increment
+    const day = Math.floor(now / 86400000);
+    const n = parseInt(sessionStorage.getItem('site_suggest_nonce') || '0', 10) || 0;
+    sessionStorage.setItem('site_suggest_nonce', String(n + 1));
+    const seed = (day * 1000) + n + __hashString(String(window.location.pathname || '/'));
+    const rnd = __mulberry32(seed);
+
+    __shuffleInPlace(unplayed, rnd);
+    // Prefer least-recently-played among played ones, then shuffle within similar recency
+    playedList.sort((a, b) => {
+        const ta = (played[a.id] && played[a.id].lastPlayedAt) ? played[a.id].lastPlayedAt : 0;
+        const tb = (played[b.id] && played[b.id].lastPlayedAt) ? played[b.id].lastPlayedAt : 0;
+        return ta - tb;
+    });
+    // Light shuffle for variety while keeping recency bias
+    __shuffleInPlace(playedList, rnd);
+
+    const chosen = [];
+    for (const g of unplayed) {
+        if (chosen.length >= count) break;
+        chosen.push(g);
+    }
+    for (const g of playedList) {
+        if (chosen.length >= count) break;
+        chosen.push(g);
+    }
+
+    const tileClass = 'flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20';
+    const emojiClass = 'text-4xl mb-3 group-hover:scale-110 transition-transform';
+
+    gridEl.innerHTML = chosen.map(g => `
+        <a href="${g.href}" class="${tileClass}" data-game-id="${g.id}">
+            <div class="${emojiClass}">${g.emoji || '🎮'}</div>
+            <div class="font-bold text-sm">${g.title || g.id}</div>
+            <div class="text-xs opacity-60 mt-1">${g.subtitle || ''}</div>
+        </a>
+    `).join('');
+};
+
+const __initDynamicGameSuggestions = () => {
+    try {
+        const currentId = __getCurrentGameId();
+        if (currentId) __markGamePlayed(currentId);
+
+        // Find any existing "quick links" grids by matching the tile style
+        const grids = new Set();
+        document.querySelectorAll('a[class*="bg-white/5"][class*="rounded-xl"][class*="hover:bg-white/10"]').forEach(a => {
+            const grid = a.closest('.grid');
+            if (grid) grids.add(grid);
+        });
+
+        grids.forEach(grid => {
+            // Only touch grids that look like the game quick-links (6 tiles typically)
+            const links = grid.querySelectorAll('a');
+            if (!links || links.length < 4) return;
+            __renderSuggestionGrid(grid, { count: 6, currentId });
+        });
+    } catch (e) {}
+};
+
 const init = () => {
     // Developer signature
     console.log('%c Designed by Estivan Ayramia ', 'background: #212842; color: #e1d4c2; padding: 4px; border-radius: 4px;');
@@ -2698,9 +3023,11 @@ const init = () => {
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
+            __ensureStandardEnglishChrome();
             initDarkMode();
             initAriaCurrent();
             initMobileMenu();
+            __initDynamicGameSuggestions();
             loadGSAPAndInit();
             initSmoothScroll();
             initFormValidation();
@@ -2716,9 +3043,11 @@ const init = () => {
         });
     } else {
         // DOM already loaded
+        __ensureStandardEnglishChrome();
         initDarkMode();
         initAriaCurrent();
         initMobileMenu();
+        __initDynamicGameSuggestions();
         loadGSAPAndInit();
         initSmoothScroll();
         initFormValidation();
