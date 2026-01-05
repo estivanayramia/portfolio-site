@@ -1,0 +1,7 @@
+{
+  "default": true,
+  "ignores": [
+    "_headers",
+    "_redirects"
+  ]
+}

@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    /* Global fix for fixed header overlap */
+    body {
+        padding-top: 7rem; /* Header (5rem) + Buffer (2rem) */
+    }
+    /* Reset main padding to avoid double spacing with utility classes like pt-24 */
+    main {
+        padding-top: 0 !important;
+    }
+}
+
 /* ==========================================================================
    Custom Scrollbars for Chat Widget
    ========================================================================== */
