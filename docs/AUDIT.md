@@ -99,14 +99,14 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 - Chat assistant rendering should remain DOM-based (no `innerHTML`).
 - Large amount of inline JS and inline handlers across arcade/game pages makes
    CSP tightening non-trivial.
-- `document.write` exists in a debug/logging path inside the main bundle.
+- `document.write` should remain removed (legacy sink).
 
 ---
 
 ## Quick wins (3–5)
 
 1) Remove chat `innerHTML` rendering; switch to DOM-based safe rendering. (done)
-2) Remove `document.write` from the bundle (keep download path).
+2) Remove `document.write` from the bundle (keep download path). (done)
 3) Switch non-game pages to `/assets/js/site.min.js` (keep `/assets/js/site.js`
    for dev only).
 4) Reduce CSP reliance on `'unsafe-inline'` for core pages by migrating the
@@ -122,7 +122,7 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 
 - Remove chat assistant `innerHTML` and provide a console self-test harness for
    XSS payloads. (done)
-- Replace `document.write` with DOM-safe output.
+- Replace `document.write` with DOM-safe output. (done)
 
 ### P1: CSP hardening (staged)
 
@@ -144,7 +144,7 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 
 1) `docs: audit report + verification steps`
 2) `security(chat): avoid innerHTML`
-3) `fix(security): remove document.write from debug path`
+3) `fix(security): remove document.write from debug path` (done)
 4) `perf: switch core pages to site.min.js`
 5) `fix(security): staged CSP tightening (core pages first)`
 6) `fix(pwa): align precache list with actual critical assets after perf changes`
