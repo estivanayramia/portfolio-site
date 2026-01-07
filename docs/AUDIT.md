@@ -73,9 +73,10 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 
 ## Top 5 risks (ordered)
 
-1) **XSS footgun: chat rendering uses `innerHTML` for assistant content**
-    - Escaping reduces risk, but `innerHTML` is still a fragile sink and future
-       changes can regress quickly.
+1) **XSS: any `innerHTML` sink is a long-term footgun**
+      - Chat rendering was converted to DOM-based rendering (no `innerHTML`) to
+         remove the highest-risk sink; other dynamic HTML sinks should still be
+         treated carefully.
 
 2) **CSP depends on `script-src 'unsafe-inline'`**
    - Driven by inline scripts + inline event handlers + Clarity loader injection.
@@ -95,7 +96,7 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 
 ## Red flags
 
-- `innerHTML` is used for chat assistant rendering.
+- Chat assistant rendering should remain DOM-based (no `innerHTML`).
 - Large amount of inline JS and inline handlers across arcade/game pages makes
    CSP tightening non-trivial.
 - `document.write` exists in a debug/logging path inside the main bundle.
@@ -104,7 +105,7 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 
 ## Quick wins (3–5)
 
-1) Remove chat `innerHTML` rendering; switch to DOM-based safe rendering.
+1) Remove chat `innerHTML` rendering; switch to DOM-based safe rendering. (done)
 2) Remove `document.write` from the bundle (keep download path).
 3) Switch non-game pages to `/assets/js/site.min.js` (keep `/assets/js/site.js`
    for dev only).
@@ -120,7 +121,7 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 ### P0: correctness + security (minimal UX risk)
 
 - Remove chat assistant `innerHTML` and provide a console self-test harness for
-   XSS payloads.
+   XSS payloads. (done)
 - Replace `document.write` with DOM-safe output.
 
 ### P1: CSP hardening (staged)
@@ -142,7 +143,7 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 ## Proposed commit plan (ordered)
 
 1) `docs: audit report + verification steps`
-2) `fix(security): remove chat innerHTML + add XSS self-test harness`
+2) `security(chat): avoid innerHTML`
 3) `fix(security): remove document.write from debug path`
 4) `perf: switch core pages to site.min.js`
 5) `fix(security): staged CSP tightening (core pages first)`
@@ -166,6 +167,7 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 
 - Home page loads clean with no console errors.
 - Chat opens, sends/receives messages, renders links, and XSS payloads remain inert.
+   Optional: run `window.__savonieXssSelfTest()` in DevTools console.
 - Arcade pages still run (no broken controls).
 - Service Worker registers without update loops; offline reload serves at least
    the shell.
