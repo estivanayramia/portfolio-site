@@ -22,7 +22,9 @@ const ASSETS_TO_CACHE = [
     '/assets/css/theme.css',
     '/assets/css/style.css',
     '/assets/js/site.js',
+    '/assets/js/site.min.js',
     '/assets/js/lazy-loader.js',
+    '/assets/js/cache-refresh.js',
     '/assets/js/contact-form.js',
     '/assets/img/headshot.webp',
     '/assets/img/savonie-thumb.webp'
@@ -37,7 +39,6 @@ self.addEventListener('install', (event) => {
                 console.log('Service Worker: Caching files');
                 return cache.addAll(ASSETS_TO_CACHE);
             })
-            .finally(() => self.skipWaiting())
     );
 });
 
@@ -54,7 +55,6 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             ))
-            .finally(() => self.clients.claim())
     );
 });
 
@@ -114,9 +114,3 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-// Optional: Listen for messages to trigger skipWaiting from page
-self.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
-});

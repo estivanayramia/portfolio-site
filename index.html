@@ -103,57 +103,9 @@
     
     <!-- Auto Cache Refresh Script -->
     <script>
-        // Force cache refresh on mobile
-        (function() {
-            const BUILD_VERSION = '20251125-001';
-            const lastVersion = localStorage.getItem('siteVersion');
-            
-            if (lastVersion !== BUILD_VERSION) {
-                // Clear all caches
-                if ('caches' in window) {
-                    caches.keys().then(function(names) {
-                        names.forEach(name => caches.delete(name));
-                    });
-                }
-                
-                // Unregister service workers
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                        registrations.forEach(reg => reg.unregister());
-                    });
-                }
-                
-                // Update version
-                localStorage.setItem('siteVersion', BUILD_VERSION);
-                
-                // Force reload if not first visit; guarded to avoid reloading while user interacts
-                if (lastVersion) {
-                    (function() {
-                        const MAX = 30000;
-                        const RETRY = 1000;
-                        const start = Date.now();
-                        (function attempt() {
-                            try {
-                                const interacting = (typeof window.__userInteracting !== 'undefined') ? window.__userInteracting : false;
-                                if (!interacting) {
-                                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
-                                    return;
-                                }
-                                if (Date.now() - start < MAX) {
-                                    setTimeout(attempt, RETRY);
-                                    return;
-                                }
-                                // Timed out; force reload
-                                try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
-                            } catch (e) {
-                                try { window.location.reload(); } catch (_) {}
-                            }
-                        })();
-                    })();
-                }
-            }
-        })();
+        const BUILD_VERSION = '20251125-001';
     </script>
+    <script src="/assets/js/cache-refresh.js" defer></script>
 </head>
 <body class="bg-beige text-chocolate font-sans antialiased" data-print-title="Estivan Ayramia | Portfolio" data-print-url="https://www.estivanayramia.com/">
     

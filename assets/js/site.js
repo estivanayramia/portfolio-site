@@ -2285,28 +2285,16 @@ const initPWA = () => {
             navigator.serviceWorker.register('/sw.js')
                 .then((registration) => {
 
-                    // Periodically check for updates
-                    setInterval(() => {
-                        registration.update();
-                    }, 60000);
-
-                    // If there's an update waiting, skip waiting and reload
-                    if (registration.waiting) {
-                        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-                    }
-
-                    // Detect updates found
-                    registration.addEventListener('updatefound', () => {
-                        const newSW = registration.installing;
-                        if (newSW) {
-                            newSW.addEventListener('statechange', () => {
-                                if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // New content is available; activate immediately
-                                    newSW.postMessage({ type: 'SKIP_WAITING' });
-                                }
-                            });
+                    // Best-effort: check for updates at most once per session.
+                    try {
+                        const key = 'sw_last_update_ts';
+                        const now = Date.now();
+                        const last = parseInt(sessionStorage.getItem(key) || '0', 10);
+                        if (!Number.isFinite(last) || now - last > 6 * 60 * 60 * 1000) {
+                            sessionStorage.setItem(key, String(now));
+                            registration.update().catch(() => {});
                         }
-                    });
+                    } catch (e) {}
                 })
                 .catch((error) => {
                     // Service worker registration failed - continue without it
@@ -3478,26 +3466,68 @@ document.addEventListener('DOMContentLoaded', () => {
     function parseMarkdown(text) {
         if (!text) return '';
 
-        if (typeof window !== 'undefined' && typeof window.marked !== 'undefined') {
+        const escapeHTML = (value) => {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        };
+
+        const getSafeHttpUrl = (rawUrl) => {
             try {
-                return window.marked.parse(text);
-            } catch (e) {
-                console.warn('[Savonie DEBUG] marked.parse failed:', e);
+                const u = new URL(String(rawUrl));
+                if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+                return u.toString();
+            } catch (_) {
+                return null;
             }
-        }
-        
-        // Fallback: simple link parser [text](url)
-        // 1. Escape HTML to prevent XSS (basic)
-        let html = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        
-        // 2. Replace [text](url) with <a href="url">text</a>
-        html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (match, label, url) => {
-            return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="text-[#212842] underline hover:text-[#362017] font-medium">' + label + '</a>';
+        };
+
+        const escapeAttr = (value) => {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        };
+
+        const anchorHtml = (href, labelHtml) => {
+            return '<a href="' + escapeAttr(href) + '" target="_blank" rel="noopener noreferrer" class="text-[#212842] underline hover:text-[#362017] font-medium">' + labelHtml + '</a>';
+        };
+
+        // Replace markdown links first using placeholders so we can escape everything else safely.
+        const replacements = [];
+        const withTokens = String(text).replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (match, label, url) => {
+            const safe = getSafeHttpUrl(url);
+            const token = `__MD_LINK_${replacements.length}__`;
+            if (!safe) {
+                replacements.push(escapeHTML(match));
+                return token;
+            }
+            replacements.push(anchorHtml(safe, escapeHTML(label)));
+            return token;
         });
-        
-        // 3. Convert newlines to <br>
+
+        // Escape everything else.
+        let html = escapeHTML(withTokens);
+
+        // Linkify bare http(s) URLs.
+        html = html.replace(/\bhttps?:\/\/[^\s<]+/g, (url) => {
+            const safe = getSafeHttpUrl(url);
+            if (!safe) return escapeHTML(url);
+            return anchorHtml(safe, escapeHTML(url));
+        });
+
+        // Restore placeholders.
+        for (let i = 0; i < replacements.length; i++) {
+            const token = `__MD_LINK_${i}__`;
+            html = html.split(token).join(replacements[i]);
+        }
+
+        // Convert newlines to <br>
         html = html.replace(/\n/g, '<br>');
-        
         return html;
     }
 
@@ -3701,7 +3731,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ 
                         message: text,
                         language: language,
-                        pageContent: document.body.innerText.substring(0, 2000) 
+                        pageContent: `${window.location.pathname} | ${document.title}`
                     }),
                     signal: controller.signal
                 });
