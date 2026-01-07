@@ -176,7 +176,19 @@ if (__collectLogsEnabled) {
             } catch (e) {
                 // fallback: show in new window
                 const w = window.open();
-                if (w) w.document.write('<pre>' + (JSON.stringify(__collectedLogs, null, 2)) + '</pre>');
+                if (w) {
+                    try {
+                        const payload = JSON.stringify(__collectedLogs, null, 2);
+                        const doc = w.document;
+                        doc.title = 'Site logs';
+                        doc.body.style.margin = '0';
+                        const pre = doc.createElement('pre');
+                        pre.style.margin = '0';
+                        pre.style.padding = '12px';
+                        pre.textContent = payload;
+                        doc.body.appendChild(pre);
+                    } catch (_) {}
+                }
             }
         });
         document.addEventListener('DOMContentLoaded', () => {
