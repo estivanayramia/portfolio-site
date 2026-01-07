@@ -3220,7 +3220,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const botClass = 'bg-white text-[#362017] rounded-tl-none border border-[#362017]/5 self-start';
                 div.className = `p-3 rounded-lg shadow-sm max-w-[85%] mb-3 text-sm leading-relaxed ${msg.sender === 'user' ? userClass : botClass}`;
                 if (msg.sender === 'bot') {
-                    div.innerHTML = parseMarkdown(msg.text);
+                    div.replaceChildren(parseMarkdown(msg.text));
                 } else {
                     div.textContent = msg.text;
                 }
@@ -3462,18 +3462,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Functions
     
-    // Helper: Parse simple markdown links (safe fallback)
+    // Helper: Parse simple markdown links into safe DOM nodes (no innerHTML)
     function parseMarkdown(text) {
-        if (!text) return '';
-
-        const escapeHTML = (value) => {
-            return String(value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        };
+        const frag = document.createDocumentFragment();
+        if (!text) return frag;
 
         const getSafeHttpUrl = (rawUrl) => {
             try {
@@ -3485,51 +3477,79 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        const escapeAttr = (value) => {
-            return String(value)
-                .replace(/&/g, '&amp;')
-                .replace(/"/g, '&quot;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;');
+        const createLink = (href, label) => {
+            const a = document.createElement('a');
+            a.href = href;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.className = 'text-[#212842] underline hover:text-[#362017] font-medium';
+            a.textContent = label;
+            return a;
         };
 
-        const anchorHtml = (href, labelHtml) => {
-            return '<a href="' + escapeAttr(href) + '" target="_blank" rel="noopener noreferrer" class="text-[#212842] underline hover:text-[#362017] font-medium">' + labelHtml + '</a>';
-        };
+        const appendTextWithLinks = (parent, raw) => {
+            const pattern = /\[([^\]]+)\]\(([^)\s]+)\)|\bhttps?:\/\/[^\s<]+/g;
+            const s = String(raw);
+            let lastIndex = 0;
+            let m;
+            while ((m = pattern.exec(s)) !== null) {
+                if (m.index > lastIndex) {
+                    parent.appendChild(document.createTextNode(s.slice(lastIndex, m.index)));
+                }
 
-        // Replace markdown links first using placeholders so we can escape everything else safely.
-        const replacements = [];
-        const withTokens = String(text).replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (match, label, url) => {
-            const safe = getSafeHttpUrl(url);
-            const token = `__MD_LINK_${replacements.length}__`;
-            if (!safe) {
-                replacements.push(escapeHTML(match));
-                return token;
+                if (m[1] && m[2]) {
+                    const safe = getSafeHttpUrl(m[2]);
+                    if (safe) {
+                        parent.appendChild(createLink(safe, m[1]));
+                    } else {
+                        parent.appendChild(document.createTextNode(m[0]));
+                    }
+                } else {
+                    const safe = getSafeHttpUrl(m[0]);
+                    if (safe) {
+                        parent.appendChild(createLink(safe, m[0]));
+                    } else {
+                        parent.appendChild(document.createTextNode(m[0]));
+                    }
+                }
+
+                lastIndex = pattern.lastIndex;
             }
-            replacements.push(anchorHtml(safe, escapeHTML(label)));
-            return token;
-        });
 
-        // Escape everything else.
-        let html = escapeHTML(withTokens);
+            if (lastIndex < s.length) {
+                parent.appendChild(document.createTextNode(s.slice(lastIndex)));
+            }
+        };
 
-        // Linkify bare http(s) URLs.
-        html = html.replace(/\bhttps?:\/\/[^\s<]+/g, (url) => {
-            const safe = getSafeHttpUrl(url);
-            if (!safe) return escapeHTML(url);
-            return anchorHtml(safe, escapeHTML(url));
-        });
-
-        // Restore placeholders.
-        for (let i = 0; i < replacements.length; i++) {
-            const token = `__MD_LINK_${i}__`;
-            html = html.split(token).join(replacements[i]);
+        const lines = String(text).split(/\n/);
+        for (let i = 0; i < lines.length; i++) {
+            appendTextWithLinks(frag, lines[i]);
+            if (i < lines.length - 1) frag.appendChild(document.createElement('br'));
         }
 
-        // Convert newlines to <br>
-        html = html.replace(/\n/g, '<br>');
-        return html;
+        return frag;
     }
+
+    // Console helper: quickly verify link/HTML safety without needing the backend.
+    // Usage: window.__savonieXssSelfTest()
+    window.__savonieXssSelfTest = function () {
+        const samples = [
+            '<img src=x onerror=alert(1)>',
+            '[bad](javascript:alert(1))',
+            '[ok](https://example.com)',
+            'https://example.com/test?x=<script>alert(1)</script>',
+            'Line 1\nLine 2 with https://example.com'
+        ];
+
+        const out = samples.map((s) => {
+            const wrapper = document.createElement('div');
+            wrapper.appendChild(parseMarkdown(s));
+            return wrapper.innerHTML;
+        });
+
+        console.log('[Savonie] XSS self-test rendered HTML:', out);
+        return out;
+    };
 
     // Helper: Render chips and ensure close button exists
     function renderChips(chips) {
@@ -3873,12 +3893,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     clearInterval(typeInterval);
                     // Convert to markdown after typing is complete
-                    div.innerHTML = parseMarkdown(text);
+                    div.replaceChildren(parseMarkdown(text));
                     els.messages.scrollTop = els.messages.scrollHeight;
                 }
             }, 12);
         } else {
-            div.innerHTML = parseMarkdown(text);
+            div.replaceChildren(parseMarkdown(text));
         }
 
         if (!isLoading && isInitialized) {
