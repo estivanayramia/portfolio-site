@@ -42,7 +42,6 @@ majority of pages, increasing JS bytes and parse/compile cost for most sessions.
 This codebase contains multiple inline `<script>` blocks; they fall into:
 
 1) **Required executable JS**
-   - Example: `index.html` includes a small inline block that sets `BUILD_VERSION`.
    - Many game pages include large inline scripts powering gameplay.
 
 2) **Inert data scripts**
@@ -51,8 +50,8 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 
 3) **Analytics loaders**
     - No obvious GA/Clarity inline loader was found in HTML. Analytics is loaded
-       via `assets/js/lazy-loader.js`, which itself injects an inline snippet for
-       Clarity.
+   via `assets/js/lazy-loader.js`. Clarity is loaded via an external script
+   URL (no inline injection required).
 
 ### Inline event handlers (CSP-relevant)
 
@@ -79,7 +78,7 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
          treated carefully.
 
 2) **CSP depends on `script-src 'unsafe-inline'`**
-   - Driven by inline scripts + inline event handlers + Clarity loader injection.
+   - Driven by inline scripts (notably JSON-LD and games) + inline event handlers.
 
 3) **Most pages ship unminified JS**
    - Core pages now use `site.min.js`; game/arcade pages still use `site.js`.
@@ -110,7 +109,8 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 3) Switch non-game pages to `/assets/js/site.min.js` (keep `/assets/js/site.js`
    for dev only). (done for core pages)
 4) Reduce CSP reliance on `'unsafe-inline'` for core pages by migrating the
-   small inline blocks first.
+   small inline blocks first. (BUILD_VERSION moved to a meta tag; hobby-page
+   carousel/lightbox scripts migrated to `assets/js/site.js`)
 5) Split CSP by path (strict for core pages; temporarily relaxed for games) to
    make hardening tractable.
 

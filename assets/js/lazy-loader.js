@@ -72,16 +72,6 @@
         document.body.appendChild(script);
     }
 
-    /**
-     * Inject inline script content
-     * @param {string} content - Script content to inject
-     */
-    function injectInlineScript(content) {
-        const script = document.createElement('script');
-        script.textContent = content;
-        document.body.appendChild(script);
-    }
-
     // ========================================================================
     // GOOGLE ANALYTICS 4 (GA4) INITIALIZATION
     // ========================================================================
@@ -168,17 +158,11 @@
             (window.clarity.q = window.clarity.q || []).push(arguments);
         };
 
-        // Official Microsoft Clarity initialization snippet
-        // This injects the Clarity tracking script asynchronously
-        const clarityScript = `
-            (function(c,l,a,r,i,t,y){
-                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "${CLARITY_PROJECT_ID}");
-        `;
-        
-        injectInlineScript(clarityScript);
+        // CSP-friendly Clarity load: no inline script injection.
+        // The official snippet injects an inline <script>; we replicate the behavior by:
+        // 1) defining the queueing stub above, and
+        // 2) loading the Clarity tag script directly.
+        injectScript(`https://www.clarity.ms/tag/${CLARITY_PROJECT_ID}`);
         
         console.log('[LazyLoader] ✓ Microsoft Clarity initialized:', CLARITY_PROJECT_ID);
     }

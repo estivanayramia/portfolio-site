@@ -1,9 +1,21 @@
 (() => {
   'use strict';
 
-  // BUILD_VERSION is injected by the page.
-  // eslint-disable-next-line no-undef
-  const buildVersion = typeof BUILD_VERSION === 'string' ? BUILD_VERSION : null;
+  // Prefer a meta tag to avoid inline scripts (CSP-friendly).
+  // Backwards-compatible with older pages that used a global BUILD_VERSION.
+  let buildVersion = null;
+  try {
+    const meta = document.querySelector('meta[name="build-version"]');
+    buildVersion = meta && meta.content ? String(meta.content) : null;
+  } catch (e) {}
+
+  if (!buildVersion) {
+    try {
+      // eslint-disable-next-line no-undef
+      buildVersion = typeof BUILD_VERSION === 'string' ? BUILD_VERSION : null;
+    } catch (e) {}
+  }
+
   if (!buildVersion) return;
 
   const storageKey = 'siteVersion';

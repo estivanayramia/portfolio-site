@@ -1,94 +1,4 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Cooking hobby - Performance-focused cooking, high protein student meals, treating the kitchen as a lab for efficiency and nutrition.">
-    <link rel="canonical" href="https://www.estivanayramia.com/hobby-cooking.html">
-    <title>Cooking | Hobbies</title>
-    
-    <!-- Open Graph / Social Media -->
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Cooking | Estivan Ayramia">
-    <meta property="og:description" content="Performance-focused cooking. High protein, student budget, kitchen as lab.">
-    <meta property="og:url" content="https://www.estivanayramia.com/hobby-cooking.html">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Cooking | Estivan Ayramia">
-    <meta name="twitter:description" content="Performance-focused cooking. High protein, student budget, kitchen as lab.">
-    
-    <!-- Google Fonts: Inter (non-render-blocking) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="(max-width: 768px)">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" data-media="(min-width: 769px)">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
-    
-    <!-- Preload Critical LCP Image -->
-    <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
-    
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="preload" href="/assets/css/style.css" as="style">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
-    <script src="/assets/js/site.min.js" defer></script>
-    <!-- Custom Theme CSS -->
-    <link rel="stylesheet" href="/assets/css/theme.css" media="(max-width: 768px)">
-    <link rel="stylesheet" href="/assets/css/theme.css" media="print" data-media="(min-width: 769px)">
-    <noscript><link rel="stylesheet" href="/assets/css/theme.css"></noscript>
-    
-    <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
-
-    <!-- PWA Manifest -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
-    <link rel="shortcut icon" href="/assets/img/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
-    <link rel="mask-icon" href="/assets/img/safari-pinned-tab.svg" color="#212842">
-    <meta name="msapplication-TileColor" content="#212842">
-    <meta name="msapplication-TileImage" content="/assets/img/favicon-32x32.png">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#212842">
-    
-    <!-- Carousel and Lightbox styles -->
-    <style>
-        .lightbox-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 9998;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-        .lightbox-overlay.active { display: flex; }
-        .lightbox-content {
-            max-width: 90vw;
-            max-height: 90vh;
-            object-fit: contain;
-        }
-        .lightbox-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            color: white;
-            font-size: 2rem;
-            cursor: pointer;
-            background: none;
-            border: none;
-            padding: 0.5rem;
-        }
-        .lightbox-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            color: white;
-            font-size: 2.5rem;
-            cursor: pointer;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
             transition: background 0.2s;
         }
         .lightbox-nav:hover { background: rgba(0,0,0,0.8); }
@@ -298,7 +208,7 @@
                             <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">←</button>
                             <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">→</button>
                             
-                            <div class="carousel-track" id="carouselTrack">
+                            <div class="carousel-track" id="carouselTrack" data-carousel-wrap="1">
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
                                     <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/avocado_steak_eggs_smoothie.jpg" alt="High protein breakfast - steak with eggs, avocado, and a smoothie on the side" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
                                 </figure>
@@ -493,98 +403,7 @@
         </button>
     </div>
     
-    <!-- Carousel and Lightbox Script -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const track = document.getElementById('carouselTrack');
-        const slides = document.querySelectorAll('.carousel-slide');
-        const prevBtn = document.getElementById('carouselPrev');
-        const nextBtn = document.getElementById('carouselNext');
-        const dotsContainer = document.getElementById('carouselDots');
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-image');
-        
-        let currentIndex = 0;
-        let currentLightboxIndex = 0;
-        const images = Array.from(slides).map(s => s.querySelector('img'));
-        
-        function getSlidesPerView() {
-            return window.innerWidth >= 768 ? 3 : 2;
-        }
-        
-        let slidesPerView = getSlidesPerView();
-        const totalPages = Math.ceil(slides.length / slidesPerView);
-        
-        // Create dots
-        for (let i = 0; i < totalPages; i++) {
-            const dot = document.createElement('button');
-            dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-            dot.setAttribute('aria-label', `Go to page ${i + 1}`);
-            dot.addEventListener('click', () => goToPage(i));
-            dotsContainer.appendChild(dot);
-        }
-        
-        function updateCarousel() {
-            const slideWidth = slides[0].offsetWidth + 16;
-            track.style.transform = `translateX(-${currentIndex * slideWidth * slidesPerView}px)`;
-            document.querySelectorAll('.carousel-dot').forEach((d, i) => {
-                d.classList.toggle('active', i === currentIndex);
-            });
-        }
-        
-        function goToPage(page) {
-            currentIndex = (page + totalPages) % totalPages;
-            updateCarousel();
-        }
-        
-        prevBtn.addEventListener('click', () => goToPage(currentIndex - 1));
-        nextBtn.addEventListener('click', () => goToPage(currentIndex + 1));
-        
-        // Lightbox
-        slides.forEach((slide, i) => {
-            slide.addEventListener('click', () => {
-                currentLightboxIndex = i;
-                lightboxImg.src = images[i].src;
-                lightboxImg.alt = images[i].alt;
-                lightbox.classList.add('active');
-                lightbox.setAttribute('aria-hidden', 'false');
-            });
-        });
-        
-        document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
-        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
-        
-        document.querySelector('.lightbox-prev').addEventListener('click', () => {
-            currentLightboxIndex = (currentLightboxIndex - 1 + images.length) % images.length;
-            lightboxImg.src = images[currentLightboxIndex].src;
-            lightboxImg.alt = images[currentLightboxIndex].alt;
-        });
-        
-        document.querySelector('.lightbox-next').addEventListener('click', () => {
-            currentLightboxIndex = (currentLightboxIndex + 1) % images.length;
-            lightboxImg.src = images[currentLightboxIndex].src;
-            lightboxImg.alt = images[currentLightboxIndex].alt;
-        });
-        
-        function closeLightbox() {
-            lightbox.classList.remove('active');
-            lightbox.setAttribute('aria-hidden', 'true');
-        }
-        
-        document.addEventListener('keydown', (e) => {
-            if (!lightbox.classList.contains('active')) return;
-            if (e.key === 'Escape') closeLightbox();
-            if (e.key === 'ArrowLeft') document.querySelector('.lightbox-prev').click();
-            if (e.key === 'ArrowRight') document.querySelector('.lightbox-next').click();
-        });
-        
-        window.addEventListener('resize', () => {
-            slidesPerView = getSlidesPerView();
-            updateCarousel();
-        });
-    });
-    </script>
-    
+    <script src="/assets/js/site.min.js" defer></script>
     <script src="/assets/js/lazy-loader.js" defer></script>
 </body>
 </html>
