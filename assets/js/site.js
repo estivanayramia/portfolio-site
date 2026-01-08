@@ -75,6 +75,63 @@ const __markUserInteraction = () => {
     try { window.addEventListener(ev, __markUserInteraction, { passive: true }); } catch (e) { window.addEventListener(ev, __markUserInteraction); }
 });
 
+// Deferred stylesheet activation (CSP-friendly replacement for inline onload handlers)
+// Pattern supported: <link rel="stylesheet" media="print" data-media="all|(min-width: 769px)|...">
+const __initDeferredStylesheets = () => {
+    try {
+        const links = document.querySelectorAll('link[rel="stylesheet"][media="print"][data-media]');
+        links.forEach(link => {
+            const targetMedia = link.getAttribute('data-media') || 'all';
+            const apply = () => {
+                try { link.media = targetMedia; } catch (e) {}
+            };
+
+            // Apply as soon as the stylesheet finishes loading.
+            try { link.addEventListener('load', apply, { once: true }); } catch (e) { link.addEventListener('load', apply); }
+            try { link.addEventListener('error', apply, { once: true }); } catch (e) { link.addEventListener('error', apply); }
+
+            // If already loaded/cached by the time we attach listeners.
+            setTimeout(() => {
+                try { if (link.sheet) apply(); } catch (e) {}
+            }, 0);
+        });
+    } catch (e) {}
+};
+__initDeferredStylesheets();
+
+// CSP-friendly replacement for: <link rel="preload" as="style" onload="this.rel='stylesheet'">
+const __initPreloadStylesheets = () => {
+    try {
+        const links = document.querySelectorAll('link[rel="preload"][as="style"][data-onload-rel]');
+        links.forEach(link => {
+            const targetRel = link.getAttribute('data-onload-rel') || 'stylesheet';
+            const apply = () => {
+                try {
+                    link.rel = targetRel;
+                    link.removeAttribute('data-onload-rel');
+                } catch (e) {}
+            };
+
+            try { link.addEventListener('load', apply, { once: true }); } catch (e) { link.addEventListener('load', apply); }
+
+            // If already fetched before we attached listeners (best-effort).
+            try {
+                if (typeof performance !== 'undefined' && typeof performance.getEntriesByName === 'function') {
+                    const href = link.href;
+                    const entries = href ? performance.getEntriesByName(href) : [];
+                    if (entries && entries.length) {
+                        const entry = entries[0];
+                        if (entry && typeof entry.responseEnd === 'number' && entry.responseEnd > 0) {
+                            apply();
+                        }
+                    }
+                }
+            } catch (e) {}
+        });
+    } catch (e) {}
+};
+__initPreloadStylesheets();
+
 // Lightweight remote-free log collector: enable with ?collect-logs=1
 const __collectLogsEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).has('collect-logs');
 const __collectedLogs = [];
