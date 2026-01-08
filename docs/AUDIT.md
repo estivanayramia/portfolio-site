@@ -82,7 +82,7 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
    - Driven by inline scripts + inline event handlers + Clarity loader injection.
 
 3) **Most pages ship unminified JS**
-   - Only the homepage uses `site.min.js`; most pages use `site.js`.
+   - Core pages now use `site.min.js`; game/arcade pages still use `site.js`.
 
 4) **SW install can be fragile if precache diverges**
     - Today the precache list appears to match key assets; any missing URL would
@@ -108,7 +108,7 @@ This codebase contains multiple inline `<script>` blocks; they fall into:
 1) Remove chat `innerHTML` rendering; switch to DOM-based safe rendering. (done)
 2) Remove `document.write` from the bundle (keep download path). (done)
 3) Switch non-game pages to `/assets/js/site.min.js` (keep `/assets/js/site.js`
-   for dev only).
+   for dev only). (done for core pages)
 4) Reduce CSP reliance on `'unsafe-inline'` for core pages by migrating the
    small inline blocks first.
 5) Split CSP by path (strict for core pages; temporarily relaxed for games) to
