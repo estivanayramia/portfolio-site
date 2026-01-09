@@ -32,3 +32,8 @@ dryrun-transcript*.txt
 .vscode_restore_backup/
 .vscode_restore_reports/
 dryrun-transcript*.txt
+
+worker/.wrangler/
+.wrangler/
+.vscode_restore_backup/
+.vscode/

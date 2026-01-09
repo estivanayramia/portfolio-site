@@ -3087,7 +3087,7 @@ const __ensureStandardEnglishChrome = () => {
                         <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
                         <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
                         <li><a href="/contact.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
-                        <li><a href="/assets/docs/Estivan_Ayramia_Resume_12-25-25.pdf.html" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
+                        <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
                         <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
                     </ul>
                 </div>
@@ -3376,30 +3376,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configuration
     // ======================================================================
     
-    const WORKER_URL = 'https://portfolio-chat.eayramia.workers.dev';
+    const CHAT_ENDPOINT = 'https://portfolio-chat.eayramia.workers.dev/chat';
+    const RESUME_URL = '/assets/docs/Estivan-Ayramia-Resume.pdf';
+    const LINKEDIN_URL = 'https://www.linkedin.com/in/estivanayramia';
     const WELCOME_DELAY = 2500;
 
     // Project Data Mapping
     const projectData = {
         logistics: {
-            title: "Logistics System",
-            img: "assets/img/project-logistics.jpg",
-            link: "/deep-dive.html#logistics"
+            title: 'Logistics System',
+            summary: 'A systems-focused project centered on execution, coordination, and operational clarity.',
+            img: '/assets/img/project-logistics.jpg',
+            link: '/projects/logistics'
         },
         conflict: {
-            title: "Conflict Playbook",
-            img: "assets/img/project-conflict.jpg",
-            link: "/deep-dive.html#conflict"
+            title: 'Conflict Playbook',
+            summary: 'A practical framework for navigating conflict with structure, empathy, and outcomes.',
+            img: '/assets/img/project-conflict.jpg',
+            link: '/deep-dive#conflict'
         },
         discipline: {
-            title: "Discipline Routine",
-            img: "assets/img/project-discipline.jpg",
-            link: "/deep-dive.html#discipline"
+            title: 'Discipline Routine',
+            summary: 'A repeatable routine and mindset system for sustainable discipline and follow-through.',
+            img: '/assets/img/project-discipline.jpg',
+            link: '/projects/discipline'
         },
         website: {
-            title: "Portfolio Website",
-            img: "assets/img/og-image.png",
-            link: "/"
+            title: 'Portfolio Website',
+            summary: 'The site you’re on—built for speed, clarity, and a clean browsing experience.',
+            img: '/assets/img/og-image.png',
+            link: '/'
         }
     };
 
@@ -3461,8 +3467,8 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 
     // Position widget based on language
-    const lang = document.documentElement.lang;
-    if (lang === 'ar' && els.widget) {
+    const pageLang = document.documentElement.lang || 'en';
+    if (pageLang === 'ar' && els.widget) {
         els.widget.style.left = '1rem';
         els.widget.style.right = 'auto';
         if (els.bubble) {
@@ -3482,6 +3488,34 @@ document.addEventListener('DOMContentLoaded', () => {
     let chatHistory = [];
     let isSending = false; // Prevent duplicate sends
     let isInitialized = false;
+
+    const historyStorageKey = `savonie_history:${pageLang}:${window.location.pathname || '/'}`;
+    const MAX_HISTORY_ITEMS = 50;
+
+    function buildSafePageContext() {
+        try {
+            const parts = [];
+            const path = window.location.pathname || '/';
+            parts.push(`path: ${path}`);
+            parts.push(`title: ${document.title || ''}`);
+
+            const headings = Array.from(document.querySelectorAll('h1, h2'))
+                .map((h) => (h.textContent || '').trim())
+                .filter(Boolean)
+                .slice(0, 10);
+
+            if (headings.length) {
+                parts.push('headings:');
+                headings.forEach((t) => parts.push(`- ${t}`));
+            }
+
+            const combined = parts.join('\n');
+            // Cap to ~3.5k chars to avoid leaking too much content.
+            return combined.length > 3500 ? combined.slice(0, 3500) : combined;
+        } catch (e) {
+            return `${window.location.pathname || '/'} | ${document.title || ''}`;
+        }
+    }
     
     // Helper function to add close button to chips container - DEPRECATED (handled by renderChips)
     // function addChipsCloseButton() { ... }
@@ -3491,18 +3525,25 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 1. Initialize - restore history from session
     try { 
-        const saved = sessionStorage.getItem('savonie_history');
+        const saved = sessionStorage.getItem(historyStorageKey);
         if (saved) {
             chatHistory = JSON.parse(saved);
-            chatHistory.forEach(msg => {
+            chatHistory.forEach((item) => {
+                if (item && item.kind === 'card') {
+                    addCardToUI(item.cardId);
+                    return;
+                }
+
+                if (!item || item.kind !== 'text') return;
+
                 const div = document.createElement('div');
                 const userClass = 'bg-[#212842] text-white rounded-tr-none self-end ml-auto';
                 const botClass = 'bg-white text-[#362017] rounded-tl-none border border-[#362017]/5 self-start';
-                div.className = `p-3 rounded-lg shadow-sm max-w-[85%] mb-3 text-sm leading-relaxed ${msg.sender === 'user' ? userClass : botClass}`;
-                if (msg.sender === 'bot') {
-                    div.replaceChildren(parseMarkdown(msg.text));
+                div.className = `p-3 rounded-lg shadow-sm max-w-[85%] mb-3 text-sm leading-relaxed ${item.sender === 'user' ? userClass : botClass}`;
+                if (item.sender === 'bot') {
+                    div.replaceChildren(renderBotContent(item.text));
                 } else {
-                    div.textContent = msg.text;
+                    div.textContent = item.text;
                 }
                 els.messages?.appendChild(div);
             });
@@ -3548,7 +3589,15 @@ document.addEventListener('DOMContentLoaded', () => {
     els.toggleBtn?.addEventListener('click', toggleChat);
     els.closeBtn?.addEventListener('click', toggleChat);
     els.sendBtn?.addEventListener('click', handleSend);
-    els.input?.addEventListener('keypress', (e) => e.key === 'Enter' && handleSend());
+    els.input?.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return;
+
+        const isTextArea = (e.target && e.target.tagName === 'TEXTAREA');
+        if (isTextArea && e.shiftKey) return; // newline
+
+        e.preventDefault();
+        handleSend();
+    });
     
     // ======================================================================
     // SUGGESTIONS CONTROL - Lightbulb and X Button
@@ -3810,6 +3859,82 @@ document.addEventListener('DOMContentLoaded', () => {
         return frag;
     }
 
+    function sanitizeMarkdownHtmlToFragment(html) {
+        const template = document.createElement('template');
+        template.innerHTML = String(html || '');
+
+        const allowedTags = new Set(['P', 'BR', 'STRONG', 'EM', 'CODE', 'PRE', 'UL', 'OL', 'LI', 'A', 'BLOCKQUOTE']);
+        const safeUrl = (raw) => {
+            if (!raw) return null;
+            const s = String(raw).trim();
+            if (s.startsWith('/')) return s;
+            try {
+                const u = new URL(s);
+                if (u.protocol === 'http:' || u.protocol === 'https:') return u.toString();
+                return null;
+            } catch (_) {
+                return null;
+            }
+        };
+
+        const walk = (node) => {
+            const children = Array.from(node.childNodes);
+            for (const child of children) {
+                if (child.nodeType === Node.ELEMENT_NODE) {
+                    const el = /** @type {HTMLElement} */ (child);
+                    const tag = el.tagName;
+
+                    if (!allowedTags.has(tag)) {
+                        const replacement = document.createTextNode(el.textContent || '');
+                        el.replaceWith(replacement);
+                        continue;
+                    }
+
+                    // Strip all attributes by default.
+                    const attrs = Array.from(el.attributes);
+                    for (const a of attrs) el.removeAttribute(a.name);
+
+                    if (tag === 'A') {
+                        const href = safeUrl(el.getAttribute('href'));
+                        if (!href) {
+                            const replacement = document.createTextNode(el.textContent || '');
+                            el.replaceWith(replacement);
+                            continue;
+                        }
+                        el.setAttribute('href', href);
+                        el.setAttribute('target', '_blank');
+                        el.setAttribute('rel', 'noopener noreferrer');
+                        el.className = 'text-[#212842] underline hover:text-[#362017] font-medium';
+                    }
+
+                    walk(el);
+                }
+            }
+        };
+
+        walk(template.content);
+        return template.content;
+    }
+
+    function renderBotContent(text) {
+        const raw = String(text || '');
+        const marked = (typeof window !== 'undefined' && window.marked && typeof window.marked.parse === 'function') ? window.marked : null;
+        if (!marked) return parseMarkdown(raw);
+
+        // Prevent raw HTML injection.
+        const escaped = raw
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        try {
+            const html = marked.parse(escaped);
+            return sanitizeMarkdownHtmlToFragment(html);
+        } catch (e) {
+            return parseMarkdown(raw);
+        }
+    }
+
     // Console helper: quickly verify link/HTML safety without needing the backend.
     // Usage: window.__savonieXssSelfTest()
     window.__savonieXssSelfTest = function () {
@@ -4004,12 +4129,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Detect user language from their input
-        const detectedLanguage = detectLanguage(text);
-        const pageLanguage = document.documentElement.lang || 'en';
-        // Use detected language if it's different from page language, otherwise use page language
-        const language = detectedLanguage !== 'en' ? detectedLanguage : pageLanguage;
-
         addMessageToUI(text, 'user');
         els.input.value = '';
         const loadingId = addMessageToUI('Thinking...', 'bot', true);
@@ -4025,13 +4144,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
             try {
-                const response = await fetch(WORKER_URL, {
+                const response = await fetch(CHAT_ENDPOINT, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         message: text,
-                        language: language,
-                        pageContent: `${window.location.pathname} | ${document.title}`
+                        pageContent: buildSafePageContext(),
+                        language: pageLang
                     }),
                     signal: controller.signal
                 });
@@ -4108,6 +4227,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Success - process the response
         removeMessage(loadingId);
 
+        // Contract-level error types (may be absent)
+        if (data && data.errorType) {
+            let friendly = 'Something went wrong. Please try again.';
+            if (data.errorType === 'RateLimit') {
+                friendly = 'Too many requests. Please wait a moment before trying again.';
+            } else if (data.errorType === 'BadRequest') {
+                friendly = 'Please rephrase your question and try again.';
+            } else if (data.errorType === 'UpstreamError') {
+                friendly = 'Service hiccup—please try again in a moment.';
+            }
+            addMessageToUI(friendly, 'bot');
+            isSending = false;
+            return;
+        }
+
         // Handle Smart Signals response
         if (data.reply) {
             addMessageToUI(data.reply, 'bot');
@@ -4121,15 +4255,26 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle actions
         if (data.action) {
             if (data.action === 'download_resume') {
-                const link = document.createElement('a');
-                link.href = '/assets/resume.pdf';
-                link.download = 'Estivan_Ayramia_Resume.pdf';
-                link.style.display = 'none';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                // Open in a new tab (works well on mobile); keep a download fallback.
+                try {
+                    window.open(RESUME_URL, '_blank', 'noopener');
+                } catch (e) {
+                    const link = document.createElement('a');
+                    link.href = RESUME_URL;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.download = 'Estivan-Ayramia-Resume.pdf';
+                    link.style.display = 'none';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
             } else if (data.action === 'email_link') {
                 window.location.href = 'mailto:hello@estivanayramia.com';
+            } else if (data.action === 'open_linkedin') {
+                try {
+                    window.open(LINKEDIN_URL, '_blank', 'noopener');
+                } catch (e) {}
             }
         }
 
@@ -4173,17 +4318,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     clearInterval(typeInterval);
                     // Convert to markdown after typing is complete
-                    div.replaceChildren(parseMarkdown(text));
+                    div.replaceChildren(renderBotContent(text));
                     els.messages.scrollTop = els.messages.scrollHeight;
                 }
             }, 12);
         } else {
-            div.replaceChildren(parseMarkdown(text));
+            if (sender === 'bot') {
+                div.replaceChildren(renderBotContent(text));
+            } else {
+                div.textContent = text;
+            }
         }
 
         if (!isLoading && isInitialized) {
-            chatHistory.push({ text, sender });
-            sessionStorage.setItem('savonie_history', JSON.stringify(chatHistory));
+            chatHistory.push({ kind: 'text', text, sender });
+            if (chatHistory.length > MAX_HISTORY_ITEMS) {
+                chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY_ITEMS);
+            }
+            sessionStorage.setItem(historyStorageKey, JSON.stringify(chatHistory));
         }
         
         els.messages.scrollTop = els.messages.scrollHeight;
@@ -4194,21 +4346,54 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!els.messages || !projectData[cardId]) return;
         
         const project = projectData[cardId];
+
         const card = document.createElement('div');
         card.className = 'bg-white rounded-lg shadow-md overflow-hidden border border-[#362017]/10 mb-3 max-w-[85%] self-start';
-        
-        card.innerHTML = `
-            <img src="${project.img}" alt="${project.title}" class="w-full h-32 object-cover" onerror="this.src='assets/img/og-image.png'">
-            <div class="p-3">
-                <h4 class="font-semibold text-[#212842] mb-2">${project.title}</h4>
-                <a href="${project.link}" class="inline-block bg-[#212842] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#362017] transition-colors">
-                    View Project
-                </a>
-            </div>
-        `;
+
+        const body = document.createElement('div');
+        body.className = 'p-3';
+
+        const title = document.createElement('h4');
+        title.className = 'font-semibold text-[#212842] mb-1';
+        title.textContent = project.title;
+
+        const summary = document.createElement('p');
+        summary.className = 'text-xs text-[#362017]/80 mb-3 leading-relaxed';
+        summary.textContent = project.summary || '';
+
+        const view = document.createElement('a');
+        view.href = project.link;
+        view.className = 'inline-block bg-[#212842] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#362017] transition-colors';
+        view.textContent = 'View';
+
+        body.appendChild(title);
+        if (project.summary) body.appendChild(summary);
+        body.appendChild(view);
+
+        // Optional image header
+        if (project.img) {
+            const img = document.createElement('img');
+            img.src = project.img;
+            img.alt = project.title;
+            img.className = 'w-full h-32 object-cover';
+            img.addEventListener('error', () => {
+                try { img.remove(); } catch (e) {}
+            });
+            card.appendChild(img);
+        }
+
+        card.appendChild(body);
         
         els.messages.appendChild(card);
         els.messages.scrollTop = els.messages.scrollHeight;
+
+        if (isInitialized) {
+            chatHistory.push({ kind: 'card', cardId });
+            if (chatHistory.length > MAX_HISTORY_ITEMS) {
+                chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY_ITEMS);
+            }
+            sessionStorage.setItem(historyStorageKey, JSON.stringify(chatHistory));
+        }
     }
 
     function removeMessage(id) {
