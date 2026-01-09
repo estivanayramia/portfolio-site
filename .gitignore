@@ -35,5 +35,6 @@ dryrun-transcript*.txt
 
 worker/.wrangler/
 .wrangler/
+worker/node_modules/
 .vscode_restore_backup/
 .vscode/

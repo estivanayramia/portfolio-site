@@ -1,3 +1,6 @@
-name = "savonie-backend"
+name = "savonie-ai-chatbot"
 main = "worker.js"
-compatibility_date = "2024-04-05"
+compatibility_date = "2024-11-30"
+
+# Environment variables
+# Add GEMINI_API_KEY as a secret via: wrangler secret put GEMINI_API_KEY
