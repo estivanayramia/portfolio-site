@@ -12,6 +12,173 @@ const localRateLimiter = new Map();
 const RATE_LIMIT_WINDOW = 60000; // 60 seconds
 const RATE_LIMIT_MAX = 20;
 
+function extractFirstJsonObjectRange(text, fromIndex = 0) {
+  if (typeof text !== "string" || !text) return null;
+  const startAt = Math.max(0, fromIndex | 0);
+
+  for (let i = startAt; i < text.length; i++) {
+    if (text[i] !== "{") continue;
+
+    let objectStart = i;
+    let braceDepth = 1;
+    let inString = false;
+    let stringQuote = null;
+    let escaped = false;
+
+    for (let j = i + 1; j < text.length; j++) {
+      const ch = text[j];
+
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+          continue;
+        }
+        if (ch === "\\") {
+          escaped = true;
+          continue;
+        }
+        if (ch === stringQuote) {
+          inString = false;
+          stringQuote = null;
+        }
+        continue;
+      }
+
+      if (ch === '"' || ch === "'") {
+        inString = true;
+        stringQuote = ch;
+        continue;
+      }
+
+      if (ch === "{") {
+        braceDepth++;
+        continue;
+      }
+
+      if (ch === "}") {
+        braceDepth--;
+        if (braceDepth === 0) {
+          return { start: objectStart, end: j + 1, json: text.slice(objectStart, j + 1) };
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+function extractFirstJsonObject(text) {
+  return extractFirstJsonObjectRange(text)?.json ?? null;
+}
+
+function safeParseJson(text) {
+  if (typeof text !== "string" || !text.trim()) return null;
+  try {
+    const parsed = JSON.parse(text);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
+function stripParsedJsonObjects(text) {
+  if (typeof text !== "string" || !text) return "";
+  let out = text;
+  let searchFrom = 0;
+
+  while (true) {
+    const range = extractFirstJsonObjectRange(out, searchFrom);
+    if (!range) break;
+
+    if (safeParseJson(range.json)) {
+      out = (out.slice(0, range.start) + out.slice(range.end)).trim();
+      searchFrom = 0;
+      continue;
+    }
+
+    searchFrom = range.start + 1;
+    if (searchFrom >= out.length) break;
+  }
+
+  return out.trim();
+}
+
+function detectIntent(lowerMsg) {
+  const msg = typeof lowerMsg === "string" ? lowerMsg : "";
+
+  if (/(^|\b)(hi|hello|hey|yo|good morning|good afternoon|good evening)(\b|!|\.)/.test(msg)) return "greeting";
+  if (/(recruiter|hiring manager|interview|role|position|opportunity|availability|available|start date)/.test(msg)) return "recruiter";
+  if (/(email|contact|reach|message|connect)/.test(msg)) return "contact";
+  if (/(salary|compensation|rate|pay|wage|range)/.test(msg)) return "salary";
+  if (/(project|projects|case study|portfolio|work samples|experience)/.test(msg)) return "projects";
+  if (/(who are you|about you|about estivan|summary|tell me about|elevator pitch|quick summary)/.test(msg)) return "summary";
+  if (/(hobbies|hobby|gym|workout|fitness|car|cars|reading|books|cooking|photography|whispers)/.test(msg)) return "hobbies";
+
+  return "default";
+}
+
+function buildChips(lowerMsg) {
+  switch (detectIntent(lowerMsg)) {
+    case "greeting":
+      return ["Quick summary", "View projects", "Get resume"];
+    case "summary":
+      return ["Key strengths", "Best projects", "Resume"];
+    case "projects":
+      return ["Operations systems work", "Portfolio site build", "Other case studies"];
+    case "recruiter":
+      return ["Availability", "Location", "Resume"];
+    case "contact":
+      return ["Email", "LinkedIn", "Resume"];
+    case "salary":
+      return ["Target roles", "Availability", "Contact"];
+    case "hobbies":
+      return ["Gym and discipline", "Cars", "Reading"];
+    default:
+      return ["Projects", "Skills", "Contact"];
+  }
+}
+
+function shouldAllowModelChips(lowerMsg) {
+  const msg = typeof lowerMsg === "string" ? lowerMsg : "";
+  return /(what else can i ask|what can i ask|what should i ask|how can you help)/.test(msg);
+}
+
+function normalizeSmartResponse(obj) {
+  const replyRaw = typeof obj?.reply === "string" ? obj.reply : String(obj?.reply ?? "");
+
+  return {
+    reply: stripParsedJsonObjects(replyRaw),
+    chips: Array.isArray(obj?.chips)
+      ? obj.chips
+          .filter(c => typeof c === "string")
+          .map(c => c.trim())
+          .filter(Boolean)
+          .slice(0, 3)
+      : [],
+    action: typeof obj?.action === "string" ? obj.action : null,
+    card: typeof obj?.card === "string" ? obj.card : null
+  };
+}
+
+function finalizeResponse(body, lowerMsg) {
+  const allowedActions = new Set(["download_resume", "email_link"]);
+  const allowedCards = new Set(["logistics", "conflict", "discipline", "website"]);
+
+  const chips =
+    shouldAllowModelChips(lowerMsg) && Array.isArray(body?.chips) && body.chips.length
+      ? body.chips.slice(0, 3)
+      : buildChips(lowerMsg);
+
+  return {
+    errorType: body?.errorType ?? null,
+    reply: typeof body?.reply === "string" ? body.reply : String(body?.reply ?? ""),
+    chips: Array.isArray(chips) ? chips.slice(0, 3) : [],
+    action: allowedActions.has(body?.action) ? body.action : null,
+    card: allowedCards.has(body?.card) ? body.card : null
+  };
+}
+
 /**
  * Get CORS headers with origin validation
  */
@@ -40,7 +207,24 @@ function getCorsHeaders(request) {
  * Send consistent JSON responses
  */
 function jsonReply(body, status, corsHeaders) {
-  return new Response(JSON.stringify(body), {
+  const allowedActions = new Set(["download_resume", "email_link"]);
+  const allowedCards = new Set(["logistics", "conflict", "discipline", "website"]);
+
+  const payload = {
+    errorType: body?.errorType ?? null,
+    reply: typeof body?.reply === "string" ? body.reply : String(body?.reply ?? ""),
+    chips: Array.isArray(body?.chips)
+      ? body.chips
+          .filter(c => typeof c === "string")
+          .map(c => c.trim())
+          .filter(Boolean)
+          .slice(0, 3)
+      : [],
+    action: allowedActions.has(body?.action) ? body.action : null,
+    card: allowedCards.has(body?.card) ? body.card : null
+  };
+
+  return new Response(JSON.stringify(payload), {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" }
   });
@@ -188,8 +372,10 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "I'm open to market rates for Operations roles. Do you have a range in mind? Let's discuss details at [hello@estivanayramia.com](mailto:hello@estivanayramia.com).",
-            action: "email_link"
+            reply: "I'm open to market-aligned compensation for operations roles and happy to talk details. If you share the range, I can confirm fit and next steps. You can also reach Estivan at [hello@estivanayramia.com](mailto:hello@estivanayramia.com).",
+            chips: buildChips(lowerMsg),
+            action: "email_link",
+            card: null
           },
           200,
           corsHeaders
@@ -201,8 +387,10 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com). He typically responds within 24 hours!",
-            action: "email_link"
+            reply: "You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com). He aims to respond within 24 hours.",
+            chips: buildChips(lowerMsg),
+            action: "email_link",
+            card: null
           },
           200,
           corsHeaders
@@ -215,8 +403,9 @@ export default {
           {
             errorType: null,
             reply: "Here's Estivan's resume! Click below to download the PDF.",
+            chips: buildChips(lowerMsg),
             action: "download_resume",
-            chips: ["View Projects", "Contact Estivan"]
+            card: null
           },
           200,
           corsHeaders
@@ -230,7 +419,8 @@ export default {
             errorType: null,
             reply: "The Logistics System automated supply chain operations and reduced delivery delays by 35%. Check out the full case study!",
             card: "logistics",
-            chips: ["See Other Projects", "Contact Estivan"]
+            chips: buildChips(lowerMsg),
+            action: null
           },
           200,
           corsHeaders
@@ -241,9 +431,10 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "The Conflict Resolution Playbook standardized de-escalation protocols, reducing workplace incidents by 40%.",
+            reply: "The Conflict Resolution Playbook standardized de-escalation protocols and reduced workplace incidents by 40%.",
             card: "conflict",
-            chips: ["View All Projects", "Learn More"]
+            chips: buildChips(lowerMsg),
+            action: null
           },
           200,
           corsHeaders
@@ -274,17 +465,26 @@ SYSTEM: You are Savonie AI, Estivan Ayramia's personal portfolio assistant.
 DATE: ${today}
 USER LANGUAGE: ${language || "English"} (Reply in this language!)
 
-*** PRIME DIRECTIVE: MATCH ENERGY ***
-- IF FORMAL (recruiter/hiring manager): Be professional, structured, and grateful. Trigger "email_link" action.
-- IF CASUAL: Be friendly, punchy, and engaging. Use emojis sparingly.
-- IF TECHNICAL: Show expertise with concrete metrics and outcomes.
+*** TONE + ADVOCACY (NON-NEGOTIABLE) ***
+- Professional, confident, supportive.
+- Always advocate for Estivan with positive framing.
+- Never insult, diminish, or talk down.
+- If asked about weaknesses: frame as growth areas + mitigation + strengths.
+- Do not invent credentials, titles, or experience.
+- Describe Estivan as an early-career operations and systems candidate: process improvement, logistics thinking, execution.
 
-*** SMART SIGNALS - YOU CAN RETURN JSON WITH: ***
+*** OUTPUT FORMAT (STRICT) ***
+Return ONLY valid JSON. Do not include any other text before or after the JSON.
+Do not wrap in code fences.
+Markdown is allowed ONLY inside the "reply" string.
+Keep chips to a maximum of 3.
+
+Schema example:
 {
-  "reply": "Your markdown text response",
-  "chips": ["Suggestion 1", "Suggestion 2"],  // Optional quick reply buttons
-  "action": "download_resume" | "email_link",  // Optional action trigger
-  "card": "logistics" | "conflict" | "discipline" | "website"  // Optional project card
+  "reply": "(string, may contain markdown)",
+  "chips": ["(string)", "(string)", "(string)"],
+  "action": "download_resume" | "email_link" | null,
+  "card": "logistics" | "conflict" | "discipline" | "website" | null
 }
 
 *** NAVIGATION LINKS ***
@@ -297,7 +497,7 @@ Use markdown links for navigation:
 - Conflict Playbook: [View Strategy](/deep-dive.html#conflict)
 
 *** ESTIVAN'S BACKGROUND ***
-**Current Status**: Seeking Operations Manager roles (Supply Chain, Logistics, Project Management)
+**Current Status**: Seeking operations roles (Supply Chain, Logistics, Project Management)
 **Location**: Southern California
 **Email**: hello@estivanayramia.com
 **LinkedIn**: [linkedin.com/in/estivanayramia](https://linkedin.com/in/estivanayramia)
@@ -308,7 +508,7 @@ Use markdown links for navigation:
 3. **Discipline Tracking System** - Progressive discipline workflow, improved compliance 50%
 4. **Portfolio Website** - Modern PWA with offline support, achievements, analytics
 
-**Skills**: Supply Chain Management, Logistics Optimization, Conflict Resolution, Process Improvement, Data Analysis, Team Leadership
+**Skills**: Supply Chain, Logistics, Conflict Resolution, Process Improvement, Data Analysis, Team Leadership
 
 **Education**: California State University San Marcos (CSUSM)
 
@@ -466,27 +666,31 @@ PAGE CONTEXT: ${pageContent || "Home"}
         );
       }
 
-      // Try to parse as JSON (Smart Signals format)
-      let responseObj;
-      try {
-        responseObj = JSON.parse(cleaned);
-        // Validate it has at least a reply field
-        if (!responseObj.reply || typeof responseObj.reply !== "string") {
-          responseObj = { reply: cleaned };
-        }
-      } catch (e) {
-        // Not JSON, treat as plain text
-        responseObj = { reply: cleaned };
-      }
+      const parsedStrict = safeParseJson(cleaned);
+      const parsedFromExtracted = parsedStrict ? null : safeParseJson(extractFirstJsonObject(cleaned));
+      const parsed = parsedStrict || parsedFromExtracted;
 
-      return jsonReply(
+      const responseObj = parsed
+        ? normalizeSmartResponse(parsed)
+        : {
+            reply: stripParsedJsonObjects(cleaned),
+            chips: [],
+            action: null,
+            card: null
+          };
+
+      const finalBody = finalizeResponse(
         {
           errorType: null,
-          ...responseObj
+          reply: responseObj.reply,
+          chips: responseObj.chips,
+          action: responseObj.action,
+          card: responseObj.card
         },
-        200,
-        corsHeaders
+        lowerMsg
       );
+
+      return jsonReply(finalBody, 200, corsHeaders);
 
     } catch (error) {
       console.error("Worker error:", error.message, error.stack);
@@ -528,9 +732,10 @@ async function callGemini(modelName, context, userMessage, apiKey) {
           }
         ],
         generationConfig: {
-          temperature: 0.5,
+          temperature: 0.4,
           maxOutputTokens: 700,
-          topP: 0.9
+          topP: 0.9,
+          responseMimeType: "application/json"
         },
         safetySettings: [
           {
