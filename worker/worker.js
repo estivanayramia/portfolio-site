@@ -91,7 +91,11 @@ function stripParsedJsonObjects(text) {
     const range = extractFirstJsonObjectRange(out, searchFrom);
     if (!range) break;
 
-    if (safeParseJson(range.json)) {
+    const isParsable = safeParseJson(range.json);
+    // Heuristic: if it looks like our schema (contains our field names), strip it even if invalid JSON
+    const looksLikeSchema = /"(reply|chips|action|card|errorType)"\s*:/.test(range.json);
+
+    if (isParsable || looksLikeSchema) {
       out = (out.slice(0, range.start) + out.slice(range.end)).trim();
       searchFrom = 0;
       continue;
