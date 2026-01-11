@@ -12,6 +12,48 @@ const localRateLimiter = new Map();
 const RATE_LIMIT_WINDOW = 60000; // 60 seconds
 const RATE_LIMIT_MAX = 20;
 
+function extractJSONObject(text) {
+  if (typeof text !== "string") return null;
+  const firstBrace = text.indexOf("{");
+  const lastBrace = text.lastIndexOf("}");
+  if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) return null;
+  const candidate = text.slice(firstBrace, lastBrace + 1).trim();
+  if (!candidate.startsWith("{") || !candidate.endsWith("}")) return null;
+  return candidate;
+}
+
+function normalizeSmartResponse(obj, fallbackReply) {
+  const normalized = {
+    reply:
+      typeof obj?.reply === "string"
+        ? obj.reply
+        : obj?.reply != null
+          ? String(obj.reply)
+          : fallbackReply
+  };
+
+  if (Array.isArray(obj?.chips)) {
+    const chips = obj.chips
+      .filter(c => typeof c === "string")
+      .map(c => c.trim())
+      .filter(Boolean)
+      .slice(0, 3);
+    if (chips.length) normalized.chips = chips;
+  }
+
+  if (typeof obj?.action === "string") {
+    const allowedActions = new Set(["download_resume", "email_link"]);
+    if (allowedActions.has(obj.action)) normalized.action = obj.action;
+  }
+
+  if (typeof obj?.card === "string") {
+    const allowedCards = new Set(["logistics", "conflict", "discipline", "website"]);
+    if (allowedCards.has(obj.card)) normalized.card = obj.card;
+  }
+
+  return normalized;
+}
+
 /**
  * Get CORS headers with origin validation
  */
@@ -279,12 +321,18 @@ USER LANGUAGE: ${language || "English"} (Reply in this language!)
 - IF CASUAL: Be friendly, punchy, and engaging. Use emojis sparingly.
 - IF TECHNICAL: Show expertise with concrete metrics and outcomes.
 
-*** SMART SIGNALS - YOU CAN RETURN JSON WITH: ***
+*** OUTPUT FORMAT (STRICT) ***
+Return ONLY valid JSON. Do not include any other text before or after the JSON.
+Do not wrap in code fences.
+Markdown is allowed ONLY inside the "reply" string.
+Keep chips to a maximum of 3.
+
+Schema example:
 {
-  "reply": "Your markdown text response",
-  "chips": ["Suggestion 1", "Suggestion 2"],  // Optional quick reply buttons
-  "action": "download_resume" | "email_link",  // Optional action trigger
-  "card": "logistics" | "conflict" | "discipline" | "website"  // Optional project card
+  "reply": "(string, may contain markdown)",
+  "chips": ["(string)", "(string)", "(string)"],
+  "action": "download_resume" | "email_link" | null,
+  "card": "logistics" | "conflict" | "discipline" | "website" | null
 }
 
 *** NAVIGATION LINKS ***
@@ -466,18 +514,35 @@ PAGE CONTEXT: ${pageContent || "Home"}
         );
       }
 
-      // Try to parse as JSON (Smart Signals format)
-      let responseObj;
-      try {
-        responseObj = JSON.parse(cleaned);
-        // Validate it has at least a reply field
-        if (!responseObj.reply || typeof responseObj.reply !== "string") {
-          responseObj = { reply: cleaned };
+      const tryParseJsonObject = (text) => {
+        if (typeof text !== "string") return null;
+        try {
+          const parsed = JSON.parse(text);
+          if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) return parsed;
+        } catch {
+          // ignore
         }
-      } catch (e) {
-        // Not JSON, treat as plain text
-        responseObj = { reply: cleaned };
+        return null;
+      };
+
+      // Try strict JSON first
+      let parsedObj = tryParseJsonObject(cleaned);
+
+      // If model disobeys and includes extra text, try extracting the JSON object
+      let extractedJson = null;
+      if (!parsedObj) {
+        extractedJson = extractJSONObject(cleaned);
+        if (extractedJson) parsedObj = tryParseJsonObject(extractedJson);
       }
+
+      // If still not JSON, return plain text but strip any accidental JSON blob
+      if (!parsedObj) {
+        const jsonCandidate = extractedJson || extractJSONObject(cleaned);
+        const stripped = jsonCandidate ? cleaned.replace(jsonCandidate, "").trim() : cleaned;
+        parsedObj = { reply: stripped || "" };
+      }
+
+      const responseObj = normalizeSmartResponse(parsedObj, cleaned);
 
       return jsonReply(
         {
@@ -528,9 +593,10 @@ async function callGemini(modelName, context, userMessage, apiKey) {
           }
         ],
         generationConfig: {
-          temperature: 0.5,
+          temperature: 0.4,
           maxOutputTokens: 700,
-          topP: 0.9
+          topP: 0.9,
+          responseMimeType: "application/json"
         },
         safetySettings: [
           {
