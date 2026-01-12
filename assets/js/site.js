@@ -4211,6 +4211,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 clearTimeout(timeoutId);
+                console.log('[Chat Debug] Fetch completed. Status:', response.status, 'OK:', response.ok);
 
                 // Handle HTTP error responses
                 if (!response.ok) {
@@ -4246,6 +4247,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 data = await response.json();
+                console.log('[Chat Debug] Response parsed successfully:', data);
                 lastError = null; // Success!
                 break;
 
@@ -4294,6 +4296,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Success - process the response
         removeMessage(loadingId);
+        console.log('[Chat Debug] Processing response. Data structure:', { hasData: !!data, hasErrorType: !!(data && data.errorType), hasReply: !!(data && data.reply) });
 
         // Contract-level error types (may be absent)
         if (data && data.errorType) {
@@ -4346,6 +4349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Handle Smart Signals response
+        console.log('[Chat Debug] About to check reply. data.reply exists:', !!data.reply, 'Value:', data.reply ? data.reply.substring(0, 100) + '...' : 'undefined');
         if (data.reply) {
             // SAFETY: Strip any trailing JSON blobs if the Worker ever leaks them
             data.reply = data.reply.replace(/\n?\s*\{\s*"(reply|chips|action|card|errorType)"[\s\S]*$/, "").trim();

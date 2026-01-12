@@ -3,7 +3,7 @@
 // Cloudflare Worker with Rate Limiting, Smart Signals, & Auto-Healing
 // ============================================================================
 
-let cachedModel = "models/gemini-1.5-flash";
+let cachedModel = "gemini-2.5-flash";
 const GEMINI_TIMEOUT = 35000; // Increased to account for larger tokens/retries
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_REPLY_CHARS = 8000; // Increased from 3000
@@ -166,15 +166,21 @@ function isGreeting(lowerMsg) {
 function getCorsHeaders(request) {
   const origin = request.headers.get("Origin");
   
-  // Add any dev origins here (e.g. Vite/Live Server ports like 5173, 5500, etc)
+  // Production origins
   const allowedOrigins = [
     "https://estivanayramia.com",
-    "https://www.estivanayramia.com",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000"
+    "https://www.estivanayramia.com"
   ];
   
-  const allowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  // Allow all localhost and 127.0.0.1 origins for development (any port)
+  const isLocalhost = origin && (
+    origin.startsWith("http://localhost:") || 
+    origin.startsWith("http://127.0.0.1:")
+  );
+  
+  const allowedOrigin = (allowedOrigins.includes(origin) || isLocalhost) 
+    ? origin 
+    : allowedOrigins[0];
   
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
@@ -563,6 +569,8 @@ PAGE CONTEXT: ${pageContent || "Home"}
           { msgLen: userMessage.length }
         );
 
+        console.log("Initial Gemini call completed:", { hasData: !!data, hasError: !!(data?.error), errorCode: data?.error?.code });
+
         // If Gemini returns any structured error, retry once with a fallback model.
         if (data?.error) {
           console.log("Gemini call error", {
@@ -573,7 +581,7 @@ PAGE CONTEXT: ${pageContent || "Home"}
           });
 
           if (!String(cachedModel).includes("pro")) {
-            cachedModel = "models/gemini-1.5-pro";
+            cachedModel = "gemini-2.5-pro";
             data = await callGeminiWithRetry(
               cachedModel,
               context,
@@ -675,12 +683,12 @@ PAGE CONTEXT: ${pageContent || "Home"}
         );
 
       } catch (err) {
-        console.error("Gemini processing error:", err.message);
+        console.error("Gemini processing error:", err.message, err.stack);
         
         // Parse error to determine upstream status
         let upstreamCode = 500;
         let upstreamStatus = "UNKNOWN_ERROR";
-        let debugInfo = null;
+        let debugInfo = { errorMessage: err.message, stack: err.stack?.slice(0, 200) };
         
         if (err.message.includes('Gemini Error:')) {
           try {
@@ -698,14 +706,14 @@ PAGE CONTEXT: ${pageContent || "Home"}
           upstreamStatus = "NETWORK_ERROR";
         }
         
-        if (isDebug) {
-          debugInfo = {
-            upstreamStatus: upstreamCode,
-            upstreamError: upstreamStatus,
-            message: err.message.slice(0, 100),
-            timestamp: new Date().toISOString()
-          };
-        }
+        // Always include debug info
+        debugInfo = {
+          ...debugInfo,
+          upstreamStatus: upstreamCode,
+          upstreamError: upstreamStatus,
+          message: err.message.slice(0, 200),
+          timestamp: new Date().toISOString()
+        };
         
         // Determine response based on upstream error
         if (upstreamCode === 429) {
@@ -839,13 +847,18 @@ async function callGemini(modelName, context, userMessage, apiKey, maxTokens = 5
     ? modelName 
     : `models/${modelName}`;
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/${cleanName}:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/${cleanName}:generateContent`;
+  
+  console.log("Calling Gemini API:", { model: cleanName, url });
 
   const resp = await fetchWithTimeout(
     url,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey
+      },
       body: JSON.stringify({
         contents: [
           {
@@ -890,11 +903,14 @@ async function callGemini(modelName, context, userMessage, apiKey, maxTokens = 5
     };
   }
 
-  if (!resp.ok && !json.error) {
-    json.error = {
-      code: resp.status,
-      message: `HTTP ${resp.status} from Gemini`
-    };
+  if (!resp.ok) {
+    console.error("Gemini API error response:", JSON.stringify(json).slice(0, 300));
+    if (!json.error) {
+      json.error = {
+        code: resp.status,
+        message: `HTTP ${resp.status} from Gemini`
+      };
+    }
   }
 
   return json;

@@ -2,6 +2,26 @@
 
 This document outlines the deployment steps and verification procedures for the chat system reliability improvements.
 
+## ✅ RESOLVED (Jan 12, 2026)
+
+**Issue**: Gemini API 404 errors due to outdated model names and authentication method.
+
+**Root Cause**: Google upgraded to Gemini 2.x models and changed the API authentication from query parameter to header-based.
+
+**Solution Applied**:
+1. Updated model names:
+   - `gemini-1.5-flash` → `gemini-2.5-flash`
+   - `gemini-1.5-pro` → `gemini-2.5-pro`
+2. Changed authentication method:
+   - Old: `?key=${apiKey}` (query parameter)
+   - New: `x-goog-api-key: ${apiKey}` (HTTP header)
+3. Updated API endpoint format:
+   - URL: `https://generativelanguage.googleapis.com/v1beta/${model}:generateContent`
+
+**Status**: ✅ Chatbot is now fully operational with Gemini 2.5 Flash.
+
+---
+
 ## 🎯 Overview
 
 The upgrade addresses "AI service is busy" failures by:
