@@ -3798,7 +3798,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const getSafeHttpUrl = (rawUrl) => {
             try {
-                const u = new URL(String(rawUrl));
+                const s = String(rawUrl).trim();
+                // Allow relative URLs starting with /
+                if (s.startsWith('/')) return s;
+                
+                const u = new URL(s);
                 if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
                 return u.toString();
             } catch (_) {
@@ -3809,8 +3813,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const createLink = (href, label) => {
             const a = document.createElement('a');
             a.href = href;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
+            // Internal links open in same tab, external in new tab
+            const isInternal = href.startsWith('/');
+            a.target = isInternal ? '_self' : '_blank';
+            if (!isInternal) a.rel = 'noopener noreferrer';
+            
             a.className = 'text-[#212842] underline hover:text-[#362017] font-medium';
             a.textContent = label;
             return a;
@@ -3902,8 +3909,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             continue;
                         }
                         el.setAttribute('href', href);
-                        el.setAttribute('target', '_blank');
-                        el.setAttribute('rel', 'noopener noreferrer');
+                        
+                        const isInternal = href.startsWith('/');
+                        if (isInternal) {
+                            el.setAttribute('target', '_self');
+                        } else {
+                            el.setAttribute('target', '_blank');
+                            el.setAttribute('rel', 'noopener noreferrer');
+                        }
+                        
                         el.className = 'text-[#212842] underline hover:text-[#362017] font-medium';
                     }
 
