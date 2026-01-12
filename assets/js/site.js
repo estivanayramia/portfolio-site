@@ -3487,6 +3487,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // State
     let chatHistory = [];
     let isSending = false; // Prevent duplicate sends
+    let lastContext = null; // Store truncation tail logic
     let isInitialized = false;
 
     const historyStorageKey = `savonie_history:${pageLang}:${window.location.pathname || '/'}`;
@@ -4013,6 +4014,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
+                // Continuation Logic
+                if (chipText === "Continue reading...") {
+                    handleSend("Continue", lastContext);
+                    return;
+                }
+
                 // Default behavior: send text as message
                 if (els.input) {
                     els.input.value = chipText;
@@ -4141,9 +4148,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function handleSend() {
+    async function handleSend(overrideText = null, overrideContext = null) {
         if (!els.input) return;
-        const text = els.input.value.trim();
+        const text = (typeof overrideText === 'string') ? overrideText : els.input.value.trim();
         if (!text || isSending) return;
 
         isSending = true;
@@ -4164,14 +4171,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const online = await isActuallyOnline();
         if (!online) {
             addMessageToUI(text, 'user');
-            els.input.value = '';
+            if(!overrideText) els.input.value = '';
             addMessageToUI("You appear to be offline. Please check your connection and try again.", 'bot');
             isSending = false;
             return;
         }
 
         addMessageToUI(text, 'user');
-        els.input.value = '';
+        if(!overrideText) els.input.value = '';
         const loadingId = addMessageToUI('Thinking...', 'bot', true);
 
         // Enhanced fetch with timeout and retry logic
@@ -4191,7 +4198,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ 
                         message: text,
                         pageContent: buildSafePageContext(),
-                        language: pageLang
+                        language: pageLang,
+                        previousContext: overrideContext || null // Support continuation
                     }),
                     signal: controller.signal
                 });
@@ -4289,6 +4297,20 @@ document.addEventListener('DOMContentLoaded', () => {
             data.reply = data.reply.replace(/\n?\s*\{\s*"(reply|chips|action|card|errorType)"[\s\S]*$/, "").trim();
             
             addMessageToUI(data.reply, 'bot');
+        }
+        
+        // Handle Continuation context
+        if (data.truncated && (data.continuation_hint || data.reply)) {
+            // Store helpful context for the next request
+            lastContext = data.continuation_hint || data.reply.slice(-800);
+            
+            // Inject "Continue reading..." chip
+            if (!data.chips) data.chips = [];
+            // Remove any existing continue chips to avoid dupes
+            data.chips = data.chips.filter(c => c !== "Continue reading...");
+            data.chips.unshift("Continue reading...");
+        } else {
+            lastContext = null;
         }
 
         // Handle chips (suggestion buttons)

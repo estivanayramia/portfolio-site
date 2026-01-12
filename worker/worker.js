@@ -4,10 +4,10 @@
 // ============================================================================
 
 let cachedModel = "models/gemini-1.5-flash";
-const GEMINI_TIMEOUT = 25000;
+const GEMINI_TIMEOUT = 35000; // Increased to account for larger tokens/retries
 const MAX_MESSAGE_LENGTH = 2000;
-const MAX_REPLY_CHARS = 3000;
-const VERSION_TAG = "v2026.01.11-truth-map-v1";
+const MAX_REPLY_CHARS = 8000; // Increased from 3000
+const VERSION_TAG = "v2026.01.11-dynamic-audit";
 
 // Optional local rate limiter (fallback if env.RATE_LIMITER not configured)
 const localRateLimiter = new Map();
@@ -40,6 +40,44 @@ function stripJsonBlobs(text) {
   }
   
   return text.trim();
+}
+
+/**
+ * Truncate text safely at a sentence boundary
+ */
+function safeTruncate(text, limit) {
+  if (!text || text.length <= limit) return text;
+
+  // Take the substring up to the limit
+  const sub = text.slice(0, limit);
+
+  // Look for the last sentence ending punctuation (. ? !)
+  // We look in the last 100 characters to avoid cutting too much content
+  const searchWindow = 100; // Search in the last 100 chars
+  const startSearch = Math.max(0, limit - searchWindow);
+  const tail = sub.slice(startSearch);
+  
+  // Find last punctuation
+  const lastPunct = Math.max(
+    tail.lastIndexOf('.'), 
+    tail.lastIndexOf('!'), 
+    tail.lastIndexOf('?')
+  );
+
+  if (lastPunct !== -1) {
+    // Cut at punctuation + 1 (to include it)
+    return sub.slice(0, startSearch + lastPunct + 1);
+  }
+
+  // Fallback: Try to cut at the last space
+  const lastSpace = tail.lastIndexOf(' ');
+  if (lastSpace !== -1) {
+    return sub.slice(0, startSearch + lastSpace) + "...";
+  }
+
+  // Worst case: hard chop
+  // Ensure we stay within limit
+  return sub.slice(0, Math.max(0, limit - 3)) + "...";
 }
 
 /**
@@ -244,7 +282,7 @@ export default {
         );
       }
 
-      const { message, pageContent, language } = body || {};
+      const { message, pageContent, language, previousContext } = body || {};
 
       if (typeof message !== "string" || !message.trim()) {
         return jsonReply(
@@ -255,7 +293,14 @@ export default {
       }
 
       // Sanitize message
-      const sanitizedMessage = message.trim().slice(0, MAX_MESSAGE_LENGTH);
+      let sanitizedMessage = message.trim().slice(0, MAX_MESSAGE_LENGTH);
+      
+      // If continuation context is provided, inject it
+      if (previousContext && typeof previousContext === 'string') {
+        const tail = previousContext.slice(0, 1000); // Limit context size
+        sanitizedMessage = `(PREVIOUS REPLY ENDED WITH: "...${tail}")\n\nUSER ASKS: ${sanitizedMessage}`;
+      }
+
       const lowerMsg = sanitizedMessage.toLowerCase();
       const clientIP = request.headers.get("CF-Connecting-IP") || "unknown";
 
@@ -434,165 +479,121 @@ If user says "hi"/"hello":
 PAGE CONTEXT: ${pageContent || "Home"}
 `.trim();
 
-      // --- CALL GEMINI WITH TIMEOUT ---
+      // --- CALL GEMINI WITH EXTENDED LOGIC ---
+      let maxTokens = 900;
+      if (lowerMsg.includes("detailed") || lowerMsg.includes("explain") || lowerMsg.includes("story") || lowerMsg.includes("step by step")) {
+        maxTokens = 1200;
+      }
+
       let data;
+      let finalReply = "";
+      let isTruncated = false;
+
       try {
-        data = await callGemini(cachedModel, context, sanitizedMessage, env.GEMINI_API_KEY);
+        // Initial Call
+        data = await callGemini(cachedModel, context, sanitizedMessage, env.GEMINI_API_KEY, maxTokens);
+
+        // --- AUTO-HEAL MODEL ERRORS (If first call fails with 404/Unsupported) ---
+        if (data?.error?.code === 404 || 
+            (data?.error?.message && 
+            (data.error.message.includes("not found") || 
+              data.error.message.includes("unsupported")))) {
+          
+          console.log(`Model ${cachedModel} failed. Auto-detecting...`);
+          // ... (simplified logic: just try 'gemini-1.5-pro' if flash failed)
+          cachedModel = "models/gemini-1.5-pro"; 
+          data = await callGemini(cachedModel, context, sanitizedMessage, env.GEMINI_API_KEY, maxTokens);
+        }
+
+        if (data?.error) {
+           throw new Error(`Gemini Error: ${JSON.stringify(data.error)}`);
+        }
+
+        // Process First Chunk
+        let candidate = data?.candidates?.[0];
+        let originalText = candidate?.content?.parts?.map(p => p.text).join("") || "";
+        finalReply = originalText;
+
+        // --- CONTINUATION LOGIC ---
+        // Check if truncated by model token limit
+        const finishReason = candidate?.finishReason;
+        const seemsTruncated = finishReason === "MAX_TOKENS" || (originalText.length > maxTokens * 3); // Approx char check
+
+        if (seemsTruncated) {
+          console.log("Response truncated. Attempting continuation...");
+          
+          // Helper to get last chunk for context
+          const tail = originalText.slice(-600); 
+          const continuationPrompt = `You stopped mid-sentence. Please continue safely from: "...${tail}". Do not repeat the prefix. Just continuation.`;
+          
+          try {
+            const part2 = await callGemini(
+              cachedModel, 
+              context, 
+              `${sanitizedMessage}\n\nSYSTEM: ${continuationPrompt}`, 
+              env.GEMINI_API_KEY, 
+              500 // smaller token limit for continuation
+            );
+            
+            const part2Text = part2?.candidates?.[0]?.content?.parts?.map(p => p.text).join("") || "";
+            if (part2Text) {
+              finalReply += part2Text;
+            }
+          } catch (contErr) {
+            console.warn("Continuation failed:", contErr);
+            isTruncated = true; // Mark as truncated if we couldn't continue
+          }
+        }
+
       } catch (err) {
-        console.error("Gemini error:", err.message);
+        console.error("Gemini processing error:", err.message);
         
-        if (err.message === 'Request timeout') {
+        if (err.message.includes('timeout')) {
           return jsonReply(
-            {
-              errorType: "Timeout",
-              reply: "I'm thinking too hard! Try a shorter question?",
-              chips: ["View Projects", "Contact Estivan", "Download Resume"]
-            },
-            504,
-            corsHeaders
+            { errorType: "Timeout", reply: "I'm thinking too hard! Shorten your question?", chips: ["Resume", "Contact"] },
+            504, corsHeaders
           );
         }
         
         return jsonReply(
-          {
-            errorType: "UpstreamError",
-            reply: "I'm temporarily offline. Try again in a moment!",
-            chips: ["View Projects", "Contact Page"]
-          },
-          502,
-          corsHeaders
+          { errorType: "UpstreamError", reply: "Service temporarily offline.", chips: ["Resume", "Contact"] },
+          502, corsHeaders
         );
       }
 
-      // --- AUTO-HEAL MODEL ERRORS ---
-      if (data?.error?.code === 404 || 
-          (data?.error?.message && 
-           (data.error.message.includes("not found") || 
-            data.error.message.includes("unsupported")))) {
-        
-        console.log(`Model ${cachedModel} failed. Auto-detecting...`);
-
-        try {
-          const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${env.GEMINI_API_KEY}`;
-          const listResp = await fetchWithTimeout(listUrl, {}, 5000);
-          const listData = await listResp.json().catch(() => null);
-
-          if (listResp.ok && Array.isArray(listData?.models)) {
-            const bestModel = listData.models.find(
-              m => m.name?.includes("flash") && 
-                   m.supportedGenerationMethods?.includes("generateContent")
-            ) || listData.models.find(
-              m => m.name?.includes("pro") && 
-                   m.supportedGenerationMethods?.includes("generateContent")
-            );
-
-            if (bestModel?.name) {
-              cachedModel = bestModel.name;
-              console.log("✓ Switched to:", cachedModel);
-              data = await callGemini(cachedModel, context, sanitizedMessage, env.GEMINI_API_KEY);
-            }
-          }
-        } catch (healErr) {
-          console.error("Auto-heal failed:", healErr.message);
-        }
-      }
-
-      // --- HANDLE GEMINI ERRORS ---
-      if (data?.error) {
-        console.error("Gemini error:", JSON.stringify(data.error));
-        
-        return jsonReply(
-          {
-            errorType: "AIError",
-            reply: "I'm having trouble thinking right now. Try again in a moment!",
-            chips: ["View Projects", "Contact Estivan"]
-          },
-          502,
-          corsHeaders
-        );
-      }
-
-      // --- EXTRACT RAW TEXT (JOIN MULTIPLE PARTS) ---
-      const parts = data?.candidates?.[0]?.content?.parts;
-      
-      if (!Array.isArray(parts) || parts.length === 0) {
-        console.warn("Empty AI response - no parts");
-        return jsonReply(
-          {
-            errorType: "EmptyResponse",
-            reply: "The AI did not return any content. Please try rephrasing your question.",
-            chips: ["View Projects", "About Estivan", "Contact"]
-          },
-          502,
-          corsHeaders
-        );
-      }
-
-      // Join all text parts with double newlines
-      const rawText = parts
-        .filter(part => part.text && typeof part.text === "string")
-        .map(part => part.text)
-        .join("\n\n");
-
-      if (!rawText || !rawText.trim()) {
-        console.warn("Empty AI response after joining parts");
-        return jsonReply(
-          {
-            errorType: "EmptyResponse",
-            reply: "The AI did not return any content. Please try rephrasing your question.",
-            chips: ["View Projects", "About Estivan", "Contact"]
-          },
-          502,
-          corsHeaders
-        );
-      }
-
-      // --- CLEAN CODE BLOCKS & STRIP JSON BLOBS ---
-      let cleaned = rawText
-        .replace(/^```json\s*/i, "")  // Remove start fence with optional 'json'
-        .replace(/^```\s*/, "")       // Remove start fence without language
-        .replace(/\s*```$/, "")       // Remove end fence
+      // --- CLEAN & PROCESS FINAL TEXT ---
+      let cleaned = finalReply
+        .replace(/^```json\s*/i, "")
+        .replace(/^```\s*/, "")
+        .replace(/\s*```$/, "")
         .trim();
 
       if (!cleaned) {
         return jsonReply(
-          {
-            errorType: "EmptyResponse",
-            reply: "The AI did not return any content. Please try rephrasing your question.",
-            chips: buildChips(lowerMsg),
-            action: null,
-            card: null
-          },
-          502,
-          corsHeaders
+          { errorType: "EmptyResponse", reply: "I couldn't generate a response.", chips: ["Projects", "Contact"] },
+          502, corsHeaders
         );
       }
 
-      // Strip any JSON blobs from reply
-      let sanitizedReply = stripJsonBlobs(cleaned).slice(0, MAX_REPLY_CHARS).trim();
-      
-      // Auto-linkify key pages if missed by model
+      // 1. Strip JSON blobs (accidental leaks)
+      let sanitizedReply = stripJsonBlobs(cleaned);
+
+      // 2. Safe Truncate (Hard Limit)
+      const wasLonger = sanitizedReply.length > MAX_REPLY_CHARS;
+      sanitizedReply = safeTruncate(sanitizedReply, MAX_REPLY_CHARS);
+      if (wasLonger) isTruncated = true;
+
+      // 3. Linkify
       sanitizedReply = linkifyPages(sanitizedReply);
-
-      if (!sanitizedReply) {
-        return jsonReply(
-          {
-            errorType: "EmptyResponse",
-            reply: "The AI did not return any content. Please try rephrasing your question.",
-            chips: buildChips(lowerMsg),
-            action: null,
-            card: null
-          },
-          502,
-          corsHeaders
-        );
-      }
 
       return jsonReply(
         {
           errorType: null,
           reply: sanitizedReply,
           chips: buildChips(lowerMsg),
+          truncated: isTruncated,
+          continuation_hint: isTruncated ? sanitizedReply.slice(-1000) : null,
+          reply_length: sanitizedReply.length,
           action: null,
           card: null
         },
@@ -619,7 +620,7 @@ PAGE CONTEXT: ${pageContent || "Home"}
 // ============================================================================
 // GEMINI API HELPER
 // ============================================================================
-async function callGemini(modelName, context, userMessage, apiKey) {
+async function callGemini(modelName, context, userMessage, apiKey, maxTokens = 500) {
   const cleanName = modelName.startsWith("models/") 
     ? modelName 
     : `models/${modelName}`;
@@ -641,7 +642,7 @@ async function callGemini(modelName, context, userMessage, apiKey) {
         ],
         generationConfig: {
           temperature: 0.6,
-          maxOutputTokens: 500,
+          maxOutputTokens: maxTokens,
           topP: 0.95
         },
         safetySettings: [
