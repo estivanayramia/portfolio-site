@@ -1,43 +1,44 @@
 {
-    "name":  "portfolio-site",
-    "version":  "2.0.0",
-    "description":  "Estivan Ayramia\u0027s portfolio site with PWA support",
-    "scripts":  {
-                    "build:css":  "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --minify",
-                    "build:js":  "esbuild assets/js/site.js --minify --outfile=assets/js/site.min.js",
-                    "build":  "npm run build:css \u0026\u0026 npm run build:js",
-                    "watch":  "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
-                    "start":  "serve . -p 5500",
-                    "ship":  "npm run build \u0026\u0026 git add -A \u0026\u0026 git commit -m \"auto-deploy: build\" || echo \u0027No changes to commit\u0027 \u0026\u0026 git push",
-                    "dev:worker":  "cd worker \u0026\u0026 npx wrangler dev",
-                    "deploy:worker":  "cd worker \u0026\u0026 npx wrangler deploy"
-                },
-    "keywords":  [
-                     "portfolio",
-                     "pwa",
-                     "progressive-web-app"
-                 ],
-    "author":  "Estivan Ayramia",
-    "license":  "MIT",
-    "devDependencies":  {
-                            "autoprefixer":  "^10.4.22",
-                            "esbuild":  "^0.27.2",
-                            "lightningcss":  "^1.30.2",
-                            "postcss":  "^8.5.6",
-                            "serve":  "^14.2.5",
-                            "tailwindcss":  "^3.4.17"
-                        },
-    "main":  "postcss.config.js",
-    "directories":  {
-                        "doc":  "docs"
-                    },
-    "repository":  {
-                       "type":  "git",
-                       "url":  "git+https://github.com/estivanayramia/portfolio-site.git"
-                   },
-    "type":  "commonjs",
-    "bugs":  {
-                 "url":  "https://github.com/estivanayramia/portfolio-site/issues"
-             },
-    "homepage":  "https://github.com/estivanayramia/portfolio-site#readme"
+    "name": "portfolio-site",
+    "version": "2.0.0",
+    "description": "Estivan Ayramia's portfolio site with PWA support",
+    "scripts": {
+        "build:css": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --minify",
+        "build:js": "esbuild assets/js/site.js --minify --outfile=assets/js/site.min.js",
+        "build": "npm run build:css && npm run build:js",
+        "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
+        "start": "serve . -p 5500",
+        "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push",
+        "dev:worker": "cd worker && npx wrangler dev",
+        "deploy:worker": "cd worker && npx wrangler deploy"
+    },
+    "keywords": [
+        "portfolio",
+        "pwa",
+        "progressive-web-app"
+    ],
+    "author": "Estivan Ayramia",
+    "license": "MIT",
+    "devDependencies": {
+        "autoprefixer": "^10.4.22",
+        "esbuild": "^0.27.2",
+        "lightningcss": "^1.30.2",
+        "postcss": "^8.5.6",
+        "serve": "^14.2.5",
+        "tailwindcss": "^3.4.17",
+        "terser": "^5.44.1"
+    },
+    "main": "postcss.config.js",
+    "directories": {
+        "doc": "docs"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/estivanayramia/portfolio-site.git"
+    },
+    "type": "commonjs",
+    "bugs": {
+        "url": "https://github.com/estivanayramia/portfolio-site/issues"
+    },
+    "homepage": "https://github.com/estivanayramia/portfolio-site#readme"
 }
