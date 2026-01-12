@@ -4335,10 +4335,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderChips(data.chips);
                 }
                 
-                if (shouldRetry && !overrideText) {
-                    // Auto-retry after delay (only if not already a retry)
+                if (shouldRetry) {
+                    // Auto-retry after delay
                     setTimeout(() => {
-                        sendMessage(text, true); // Pass true to indicate retry
+                        handleSend(text, overrideContext); // Retry with same text and context
                     }, retryDelay);
                 }
                 
