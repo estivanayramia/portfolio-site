@@ -7,7 +7,7 @@ let cachedModel = "models/gemini-1.5-flash";
 const GEMINI_TIMEOUT = 25000;
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_REPLY_CHARS = 3000;
-const VERSION_TAG = "v2026.01.11-deploy-fix";
+const VERSION_TAG = "v2026.01.11-friendly-fix-v1";
 
 // Optional local rate limiter (fallback if env.RATE_LIMITER not configured)
 const localRateLimiter = new Map();
@@ -20,21 +20,55 @@ const RATE_LIMIT_MAX = 20;
 function stripJsonBlobs(text) {
   if (typeof text !== "string" || !text) return "";
   
-  // Find first occurrence of JSON-like pattern
+  // Find first occurrence of JSON-like pattern with common keys
   const jsonStart = text.search(/\n?\s*\{\s*"(reply|chips|action|card|errorType)"/);
   if (jsonStart !== -1) {
     return text.substring(0, jsonStart).trim();
   }
   
-  // Also check for standalone { at line start
+  // Remove any trailing ```json block
+  text = text.replace(/```json[\s\S]*?```$/i, "").trim();
+
+  // Also check for standalone { at line start which looks like a JSON object beginning
   const lines = text.split('\n');
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].trim() === '{' || lines[i].trim().startsWith('{ "')) {
+    const line = lines[i].trim();
+    if (line === '{' || (line.startsWith('{') && line.includes('"'))) {
+      // If it looks like the start of a JSON block, cut everything from here
       return lines.slice(0, i).join('\n').trim();
     }
   }
   
   return text.trim();
+}
+
+/**
+ * Auto-linkify key pages if they are not already linked
+ */
+function linkifyPages(text) {
+  if (!text) return "";
+  
+  // Helper to replace word if not inside [link](url)
+  // We use a simplified approach: just strict replacements if the exact case-insensitive plain word exists.
+  // Note: This is best-effort. The prompt instructions are the primary defense.
+  
+  const map = [
+    { word: "Overview", link: "[Overview](/overview.html)" },
+    { word: "Projects", link: "[Projects](/projects.html)" },
+    { word: "Contact", link: "[Contact](/contact.html)" },
+    { word: "Resume", link: "[Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)" }
+  ];
+
+  let linked = text;
+  
+  map.forEach(({ word, link }) => {
+     // Regex checks for word boundary, case insensitive, but NOT preceded by [ and NOT followed by ]
+     // This prevents double linking: [Overview](/overview.html) won't become [[Overview](/overview.html)](...)
+     const regex = new RegExp(`(?<!\\[)\\b${word}\\b(?!\\])`, 'gi');
+     linked = linked.replace(regex, link);
+  });
+  
+  return linked;
 }
 
 /**
@@ -57,25 +91,27 @@ function detectIntent(lowerMsg) {
 function buildChips(lowerMsg) {
   const intent = detectIntent(lowerMsg);
   
-  // VALID_TOPICS: overview, projects, resume, contact, hobbies, fitness, reading, gym, cars
+  // Chip sets mapping to actionable buttons in frontend
+  // Frontend handles: "Projects", "Resume", "Contact", "LinkedIn" specially.
   
   switch (intent) {
     case "greeting":
-      return ["Quick summary", "View projects", "Get resume"];
+      return ["Quick summary", "Projects", "Resume"];
     case "summary":
-      return ["Key strengths", "Best projects", "Resume"];
+      return ["Projects", "Resume", "Contact"];
     case "projects":
-      return ["Logistics System", "Conflict Playbook", "Other case studies"];
+      // "Operations work" and "Site build" are text queries; "Contact" is action
+      return ["Operations work", "Site build", "Contact"];
     case "recruiter":
       return ["Availability", "Location", "Resume"];
     case "contact":
-      return ["Email Estivan", "LinkedIn", "Resume"];
+      return ["Email", "LinkedIn", "Resume"];
     case "salary":
-      return ["Target roles", "Availability", "Contact"];
+      return ["Projects", "Resume", "Contact"];
     case "hobbies":
-      return ["Gym routine", "Cars", "Reading list"]; // "Gym and discipline" -> "Gym routine" to match topics
+      return ["Gym routine", "Cars", "Reading list"];
     default:
-      return ["View Projects", "Contact", "About"];
+      return ["Projects", "Resume", "Contact"];
   }
 }
 
@@ -357,47 +393,35 @@ SYSTEM: You are Savonie AI, Estivan Ayramia's personal portfolio assistant.
 DATE: ${today}
 USER LANGUAGE: ${language || "English"} (Reply in this language!)
 
-*** PERSONA CONTEXT ***
-- **Identity**: Estivan Ayramia (He/Him), Chaldean American from El Cajon, CA.
-- **Education**: General Business graduate from San Diego State University (SDSU).
-- **Vibe**: Charismatic, grounded, "student-of-life", happy, curious, outgoing.
-- **Strengths**: Adaptable, logical, disciplined.
-- **Values**: Success, discipline, kindness.
-- **Communication**: Friendly, concise, confident, slightly humorous.
-- **Goals**: Seeking early-career operations roles (Operations Assistant, Coordinator, Analyst) in SoCal.
-- **Languages**: English (Primary), Chaldean (Fluent spoken), Arabic/Spanish (Conversational).
+*** RULES (STRICT) ***
+1. **Answer First**: Answer the user's specific question immediately. Do not start with a bio unless asked "tell me about yourself".
+2. **Concise & Witty**: Keep replies short (2-4 sentences). Be confident, friendly, and slightly witty. No lengthy paragraphs.
+3. **No Slogans**: Do NOT use "Systems over Chaos", "Game changer", "Ops pro", or similar hype.
+4. **Truthful**: Do NOT invent titles/metrics. Do NOT claim "Operations Manager". Title: "Operations/Systems Candidate" or "General Business Grad".
+5. **No Emojis**: Do not use emojis unless the user uses them first.
+6. **Plain Text Only**: Output clean Markdown. No JSON blobs.
 
-*** TONE & RULES ***
-- **Be conversational and friendly.** Use Estivan's voice: confident but kind, direct but warm.
-- **Mirror visitor energy**: Professional -> Professional, Casual -> Relaxed.
-- **Encourage curiosity**: Guide them to explore projects or ask about his hobbies.
-- **No self-criticism**: Explain weaknesses as growth areas.
-- **No slogans/hype**: Avoid "Systems over Chaos" or "game-changer" unless quoted.
-- **Length**: Keep replies short (3-6 lines) unless explicitly asked for more.
-- **Formatting**: Use Markdown for all links (see below).
+*** LINKS ***
+Use these markdown links naturally:
+- [Overview](/overview.html)
+- [Projects](/projects.html)
+- [Contact](/contact.html)
+- [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)
 
-*** LINKING RULES (CRITICAL) ***
-Always use these Markdown links when referring to these topics:
-- Overview/About: [Overview](/overview.html)
-- Projects: [Projects](/projects.html)
-- Contact: [Contact](/contact.html)
-- Resume: [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)
-- Logistics Review: [Logistics System](/project-logistics.html)
-- Conflict Playbook: [Conflict Resolution](/project-conflict.html)
-- Deep Dive: [Deep Dive](/deep-dive.html)
+*** ESTIVAN'S PROFILE (FACTS) ***
+- **Name**: Estivan Ayramia (He/Him). Lives in El Cajon, CA (San Diego) since 2008.
+- **Origin**: Born Jan 21, 2004 in Baghdad. Lived in Syria.
+- **Ed**: General Business, San Diego State University (SDSU).
+- **Languages**: English, Chaldean (spoken), conversational Arabic/Spanish.
+- **Goal**: Supply Chain, Logistics, or Project Execution roles.
+- **Projects**: Logistics System (automation/efficiency), Conflict Playbook (safety/protocols), Discipline System (consistency), Portfolio PWA.
+- **Hobbies**: Gym (discipline), Cars, Reading.
 
-*** ESTIVAN'S BACKGROUND (TRUTH) ***
-**Current**: Seeking operations roles. Based in Southern California.
-**Projects**:
-1. [Logistics System](/project-logistics.html) - Automated supply chain ops, reduced delays, cut fuel costs.
-2. [Conflict Playbook](/project-conflict.html) - Standardized de-escalation, improved safety.
-3. [Discipline System](/project-discipline.html) - Progressive discipline workflow.
-4. [Portfolio](/project-portfolio.html) - This PWA site.
-**Hobbies**: Gym/Fitness (discipline), Cars, Reading, Photography.
-
-*** GREETING RULES ***
-- Only greet if the user says hi/hello/hey.
-- Otherwise, dive straight into the answer.
+*** GREETING STRATEGY ***
+If user says "hi"/"hello":
+- Say a quick friendly hello.
+- Ask how you can help (e.g., "Want to see my projects or grab my resume?").
+- Do NOT dump the full bio.
 
 PAGE CONTEXT: ${pageContent || "Home"}
 `.trim();
@@ -537,7 +561,10 @@ PAGE CONTEXT: ${pageContent || "Home"}
       }
 
       // Strip any JSON blobs from reply
-      const sanitizedReply = stripJsonBlobs(cleaned).slice(0, MAX_REPLY_CHARS).trim();
+      let sanitizedReply = stripJsonBlobs(cleaned).slice(0, MAX_REPLY_CHARS).trim();
+      
+      // Auto-linkify key pages if missed by model
+      sanitizedReply = linkifyPages(sanitizedReply);
 
       if (!sanitizedReply) {
         return jsonReply(

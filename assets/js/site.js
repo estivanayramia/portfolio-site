@@ -3967,12 +3967,39 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const projectLabels = ["Projects", "View Projects", "Projects & Case Studies", "View projects"];
+        const resumeLabels = ["Resume", "Download Resume", "View Resume", "Get resume"];
+        const contactLabels = ["Contact", "Email", "Email Estivan", "LinkedIn", "Contact Estivan"];
+        const linkedinLabels = ["LinkedIn", "Open LinkedIn"];
+
         // Render chips
         chips.forEach(chipText => {
             const btn = document.createElement('button');
             btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
             btn.textContent = chipText;
+            
             btn.addEventListener('click', () => {
+                // Check if this chip maps to a direct action
+                if (projectLabels.includes(chipText)) {
+                    window.location.href = "/projects.html";
+                    return;
+                }
+                if (resumeLabels.includes(chipText)) {
+                    // Try to open download logic via message loop or direct link
+                    // Best experience: open PDF in new tab
+                    try { window.open(RESUME_URL, '_blank', 'noopener'); } catch(e) {}
+                    return;
+                }
+                if (contactLabels.includes(chipText)) {
+                    window.location.href = "/contact.html";
+                    return;
+                }
+                 if (linkedinLabels.includes(chipText)) {
+                    try { window.open(LINKEDIN_URL, '_blank', 'noopener'); } catch(e) {}
+                    return;
+                }
+
+                // Default behavior: send text as message
                 if (els.input) {
                     els.input.value = chipText;
                     handleSend();
