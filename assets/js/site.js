@@ -4244,6 +4244,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Handle Smart Signals response
         if (data.reply) {
+            // SAFETY: Strip any trailing JSON blobs if the Worker ever leaks them
+            data.reply = data.reply.replace(/\n?\s*\{\s*"(reply|chips|action|card|errorType)"[\s\S]*$/, "").trim();
+            
             addMessageToUI(data.reply, 'bot');
         }
 

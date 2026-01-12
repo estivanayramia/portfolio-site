@@ -6,7 +6,8 @@
 let cachedModel = "models/gemini-1.5-flash";
 const GEMINI_TIMEOUT = 25000;
 const MAX_MESSAGE_LENGTH = 2000;
-const MAX_REPLY_CHARS = 800;
+const MAX_REPLY_CHARS = 3000;
+const VERSION_TAG = "v2026.01.11-deploy-fix";
 
 // Optional local rate limiter (fallback if env.RATE_LIMITER not configured)
 const localRateLimiter = new Map();
@@ -109,7 +110,9 @@ function getCorsHeaders(request) {
  * Send consistent JSON responses
  */
 function jsonReply(body, status, corsHeaders) {
-  return new Response(JSON.stringify(body), {
+  // Inject version for debugging
+  const enhancedBody = { ...body, version: VERSION_TAG };
+  return new Response(JSON.stringify(enhancedBody), {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" }
   });
@@ -302,7 +305,7 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "The Logistics System automated supply chain operations and reduced delivery delays by 35%. Check out the full case study!",
+            reply: "The Logistics System automated supply chain operations to reduce delivery delays and fuel costs. Check out the full case study!",
             chips: buildChips(lowerMsg),
             card: "logistics",
             action: null
@@ -316,7 +319,7 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "The Conflict Resolution Playbook standardized de-escalation protocols and reduced workplace incidents by 40%.",
+            reply: "The Conflict Resolution Playbook standardized de-escalation protocols to reduce workplace incidents.",
             chips: buildChips(lowerMsg),
             card: "conflict",
             action: null
@@ -376,14 +379,14 @@ Use markdown links for navigation:
 **LinkedIn**: [linkedin.com/in/estivanayramia](https://linkedin.com/in/estivanayramia)
 
 **Key Projects**:
-1. **Logistics System** - Automated supply chain operations, reduced delivery delays 35%, cut fuel costs 18%
-2. **Conflict Resolution Playbook** - Standardized de-escalation protocols, reduced incidents 40%
-3. **Discipline Tracking System** - Progressive discipline workflow, improved compliance 50%
+1. **Logistics System** - Automated supply chain operations to improve delivery times and reduce fuel costs
+2. **Conflict Resolution Playbook** - Standardized de-escalation protocols to improve workplace safety
+3. **Discipline Tracking System** - Progressive discipline workflow to ensure consistent compliance
 4. **Portfolio Website** - Modern PWA with offline support, achievements, analytics
 
 **Skills**: Supply Chain, Logistics, Conflict Resolution, Process Improvement, Data Analysis, Team Leadership
 
-**Education**: California State University San Marcos (CSUSM) - General Business
+**Education**: San Diego State University (SDSU) - General Business
 
 **Achievements**: 
 - Explorer (visited all pages)
