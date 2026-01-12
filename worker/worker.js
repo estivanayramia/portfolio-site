@@ -55,23 +55,27 @@ function detectIntent(lowerMsg) {
  * Get deterministic chips based on user intent
  */
 function buildChips(lowerMsg) {
-  switch (detectIntent(lowerMsg)) {
+  const intent = detectIntent(lowerMsg);
+  
+  // VALID_TOPICS: overview, projects, resume, contact, hobbies, fitness, reading, gym, cars
+  
+  switch (intent) {
     case "greeting":
       return ["Quick summary", "View projects", "Get resume"];
     case "summary":
       return ["Key strengths", "Best projects", "Resume"];
     case "projects":
-      return ["Operations systems work", "Portfolio site build", "Other case studies"];
+      return ["Logistics System", "Conflict Playbook", "Other case studies"];
     case "recruiter":
       return ["Availability", "Location", "Resume"];
     case "contact":
-      return ["Email", "LinkedIn", "Resume"];
+      return ["Email Estivan", "LinkedIn", "Resume"];
     case "salary":
       return ["Target roles", "Availability", "Contact"];
     case "hobbies":
-      return ["Gym and discipline", "Cars", "Reading"];
+      return ["Gym routine", "Cars", "Reading list"]; // "Gym and discipline" -> "Gym routine" to match topics
     default:
-      return ["Projects", "Skills", "Contact"];
+      return ["View Projects", "Contact", "About"];
   }
 }
 
@@ -260,7 +264,7 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "I'm open to market-aligned compensation for operations roles and happy to talk details. If you share the range, I can confirm fit and next steps. You can also reach Estivan at [hello@estivanayramia.com](mailto:hello@estivanayramia.com).",
+            reply: "I'm open to market-aligned compensation for operations roles. If you share the range, I can confirm fit. You can also reach Estivan at [hello@estivanayramia.com](mailto:hello@estivanayramia.com).",
             chips: buildChips(lowerMsg),
             action: "email_link",
             card: null
@@ -275,7 +279,7 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com). He aims to respond within 24 hours.",
+            reply: "You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact.html). He usually responds within 24 hours.",
             chips: buildChips(lowerMsg),
             action: "email_link",
             card: null
@@ -290,7 +294,7 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "Here's Estivan's resume! Click below to download the PDF.",
+            reply: "Here's Estivan's resume! Click below to download the [PDF](/assets/docs/Estivan-Ayramia-Resume.pdf).",
             chips: buildChips(lowerMsg),
             action: "download_resume",
             card: null
@@ -305,7 +309,7 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "The Logistics System automated supply chain operations to reduce delivery delays and fuel costs. Check out the full case study!",
+            reply: "The [Logistics System](/project-logistics.html) automated supply chain operations to improve delivery times. Check out the full case study!",
             chips: buildChips(lowerMsg),
             card: "logistics",
             action: null
@@ -319,7 +323,7 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "The Conflict Resolution Playbook standardized de-escalation protocols to reduce workplace incidents.",
+            reply: "The [Conflict Resolution Playbook](/project-conflict.html) standardized de-escalation protocols to improve workplace safety.",
             chips: buildChips(lowerMsg),
             card: "conflict",
             action: null
@@ -353,50 +357,47 @@ SYSTEM: You are Savonie AI, Estivan Ayramia's personal portfolio assistant.
 DATE: ${today}
 USER LANGUAGE: ${language || "English"} (Reply in this language!)
 
-*** CRITICAL: PLAIN TEXT ONLY ***
-Return plain Markdown text only. Never output JSON. Never output code fences. Never include a JSON object in your reply.
-Do not repeat the bio unless specifically asked (e.g., "who is he", "summary", "bio", "background").
+*** PERSONA CONTEXT ***
+- **Identity**: Estivan Ayramia (He/Him), Chaldean American from El Cajon, CA.
+- **Education**: General Business graduate from San Diego State University (SDSU).
+- **Vibe**: Charismatic, grounded, "student-of-life", happy, curious, outgoing.
+- **Strengths**: Adaptable, logical, disciplined.
+- **Values**: Success, discipline, kindness.
+- **Communication**: Friendly, concise, confident, slightly humorous.
+- **Goals**: Seeking early-career operations roles (Operations Assistant, Coordinator, Analyst) in SoCal.
+- **Languages**: English (Primary), Chaldean (Fluent spoken), Arabic/Spanish (Conversational).
 
-*** TONE ***
-- Answer the user's specific question directly.
-- Professional, supportive, strengths-forward.
-- If asked about weaknesses: frame as growth areas + mitigation.
-- No slogans, no hype, no filler.
-- Do not claim Estivan is an "Operations Manager". Use: "General Business graduate" or "early-career operations candidate".
-- No emojis unless the user used emojis first.
+*** TONE & RULES ***
+- **Be conversational and friendly.** Use Estivan's voice: confident but kind, direct but warm.
+- **Mirror visitor energy**: Professional -> Professional, Casual -> Relaxed.
+- **Encourage curiosity**: Guide them to explore projects or ask about his hobbies.
+- **No self-criticism**: Explain weaknesses as growth areas.
+- **No slogans/hype**: Avoid "Systems over Chaos" or "game-changer" unless quoted.
+- **Length**: Keep replies short (3-6 lines) unless explicitly asked for more.
+- **Formatting**: Use Markdown for all links (see below).
 
-*** NAVIGATION LINKS ***
-Use markdown links for navigation:
-- Full projects: [View Projects](/projects.html)
-- Deep dive story: [Read Deep Dive](/deep-dive.html)
-- Quick overview: [View Overview](/overview.html)
-- Contact page: [Contact](/contact.html)
+*** LINKING RULES (CRITICAL) ***
+Always use these Markdown links when referring to these topics:
+- Overview/About: [Overview](/overview.html)
+- Projects: [Projects](/projects.html)
+- Contact: [Contact](/contact.html)
+- Resume: [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)
+- Logistics Review: [Logistics System](/project-logistics.html)
+- Conflict Playbook: [Conflict Resolution](/project-conflict.html)
+- Deep Dive: [Deep Dive](/deep-dive.html)
 
-*** ESTIVAN'S BACKGROUND ***
-**Current Status**: General Business graduate seeking operations roles (Supply Chain, Logistics, Project Management)
-**Location**: Southern California
-**Email**: hello@estivanayramia.com
-**LinkedIn**: [linkedin.com/in/estivanayramia](https://linkedin.com/in/estivanayramia)
-
-**Key Projects**:
-1. **Logistics System** - Automated supply chain operations to improve delivery times and reduce fuel costs
-2. **Conflict Resolution Playbook** - Standardized de-escalation protocols to improve workplace safety
-3. **Discipline Tracking System** - Progressive discipline workflow to ensure consistent compliance
-4. **Portfolio Website** - Modern PWA with offline support, achievements, analytics
-
-**Skills**: Supply Chain, Logistics, Conflict Resolution, Process Improvement, Data Analysis, Team Leadership
-
-**Education**: San Diego State University (SDSU) - General Business
-
-**Achievements**: 
-- Explorer (visited all pages)
-- Deep Diver (spent 30s on deep dive)
-- Conversationalist (opened chat)
-- 8 total achievements available
+*** ESTIVAN'S BACKGROUND (TRUTH) ***
+**Current**: Seeking operations roles. Based in Southern California.
+**Projects**:
+1. [Logistics System](/project-logistics.html) - Automated supply chain ops, reduced delays, cut fuel costs.
+2. [Conflict Playbook](/project-conflict.html) - Standardized de-escalation, improved safety.
+3. [Discipline System](/project-discipline.html) - Progressive discipline workflow.
+4. [Portfolio](/project-portfolio.html) - This PWA site.
+**Hobbies**: Gym/Fitness (discipline), Cars, Reading, Photography.
 
 *** GREETING RULES ***
 - Only greet if the user says hi/hello/hey.
-- Otherwise, skip "I'm Savonie AI..." and answer directly.
+- Otherwise, dive straight into the answer.
 
 PAGE CONTEXT: ${pageContent || "Home"}
 `.trim();
