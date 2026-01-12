@@ -219,6 +219,29 @@ async function fetchWithTimeout(url, options, timeout) {
   }
 }
 
+// Retry Gemini calls once for transient upstream failures.
+// Logs lengths and flags only, never user content.
+async function callGeminiWithRetry(modelName, context, userMessage, apiKey, maxTokens, meta) {
+  const first = await callGemini(modelName, context, userMessage, apiKey, maxTokens);
+  if (!first?.error) return first;
+
+  const code = Number(first.error.code || 0);
+  const retryable = code === 429 || code === 500 || code === 502 || code === 503 || code === 504;
+
+  console.log("Gemini retry check", {
+    model: modelName,
+    maxTokens,
+    msgLen: meta?.msgLen ?? null,
+    code,
+    retryable
+  });
+
+  if (!retryable) return first;
+
+  await new Promise((r) => setTimeout(r, 400));
+  return await callGemini(modelName, context, userMessage, apiKey, maxTokens);
+}
+
 /**
  * Local rate limiter (fallback when Cloudflare binding unavailable)
  */
@@ -492,7 +515,14 @@ PAGE CONTEXT: ${pageContent || "Home"}
 
       try {
         // Initial call
-        data = await callGemini(cachedModel, context, sanitizedMessage, env.GEMINI_API_KEY, maxTokens);
+        data = await callGeminiWithRetry(
+          cachedModel,
+          context,
+          sanitizedMessage,
+          env.GEMINI_API_KEY,
+          maxTokens,
+          { msgLen: userMessage.length }
+        );
 
         // If Gemini returns any structured error, retry once with a fallback model.
         if (data?.error) {
@@ -505,7 +535,14 @@ PAGE CONTEXT: ${pageContent || "Home"}
 
           if (!String(cachedModel).includes("pro")) {
             cachedModel = "models/gemini-1.5-pro";
-            data = await callGemini(cachedModel, context, sanitizedMessage, env.GEMINI_API_KEY, maxTokens);
+            data = await callGeminiWithRetry(
+              cachedModel,
+              context,
+              sanitizedMessage,
+              env.GEMINI_API_KEY,
+              maxTokens,
+              { msgLen: userMessage.length }
+            );
           }
         }
 
@@ -538,12 +575,13 @@ PAGE CONTEXT: ${pageContent || "Home"}
           const continuationPrompt = `You stopped mid-sentence. Please continue safely from: "...${tail}". Do not repeat the prefix. Just continuation.`;
           
           try {
-            const part2 = await callGemini(
+            const part2 = await callGeminiWithRetry(
               cachedModel, 
               context, 
               `${sanitizedMessage}\n\nSYSTEM: ${continuationPrompt}`, 
               env.GEMINI_API_KEY, 
-              500 // smaller token limit for continuation
+              500,
+              { msgLen: userMessage.length }
             );
             
             const part2Text = part2?.candidates?.[0]?.content?.parts?.map(p => p.text).join("") || "";
@@ -567,8 +605,18 @@ PAGE CONTEXT: ${pageContent || "Home"}
         }
         
         return jsonReply(
-          { errorType: "UpstreamError", reply: "Service temporarily offline.", chips: ["Resume", "Contact"] },
-          502, corsHeaders
+          {
+            errorType: null,
+            reply: "The AI service is busy right now. You can still browse [Projects](/projects.html), open the [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf), or use [Contact](/contact.html).",
+            chips: ["Projects", "Resume", "Contact"],
+            truncated: false,
+            continuation_hint: null,
+            reply_length: 0,
+            action: null,
+            card: null
+          },
+          200,
+          corsHeaders
         );
       }
 
