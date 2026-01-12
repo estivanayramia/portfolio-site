@@ -4214,7 +4214,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Handle HTTP error responses
                 if (!response.ok) {
-                    if (response.status >= 500) {
+                    // Try to parse error response body
+                    try {
+                        const errorData = await response.json();
+                        // If worker returned structured error with errorType, use it
+                        if (errorData && errorData.errorType) {
+                            data = errorData;
+                            lastError = null;
+                            break;
+                        }
+                    } catch (parseErr) {
+                        // Failed to parse, treat as generic error
+                    }
+                    
+                    if (response.status >= 500 || response.status === 503 || response.status === 504) {
                         // Server error - may be worth retrying
                         lastError = { type: 'server', status: response.status };
                         if (attempt < MAX_RETRIES) {
@@ -4293,33 +4306,43 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (data.errorType === 'BadRequest') {
                 friendly = 'Please rephrase your question and try again.';
             } else if (data.errorType === 'UpstreamError') {
-                friendly = 'Service hiccup, please try again in a moment.';
+                friendly = 'The AI service is temporarily unavailable. Please try again in a moment.';
             } else if (data.errorType === 'UpstreamBusy') {
-                friendly = 'The AI service is busy. Retrying automatically...';
+                friendly = 'The AI service is experiencing high demand. Retrying automatically in 30 seconds...';
                 shouldRetry = true;
                 retryDelay = 30000; // 30 seconds from Retry-After header
             } else if (data.errorType === 'AuthError') {
-                friendly = 'The AI service is having configuration issues. Please try again later.';
+                friendly = 'The AI service is having configuration issues. Please try again later or explore projects directly.';
             } else if (data.errorType === 'Timeout') {
                 friendly = 'The request timed out. Please try again with a shorter question.';
             } else if (data.errorType === 'OfflineMode') {
                 // This is actually a fallback response, not an error
-                friendly = null; // Don't show error message, proceed to render the reply
+                // Don't show error message, proceed to render the reply
+                friendly = null;
             }
             
             if (friendly) {
                 addMessageToUI(friendly, 'bot');
             }
             
-            if (shouldRetry) {
-                // Auto-retry after delay
-                setTimeout(() => {
-                    sendMessage(text, true); // Pass true to indicate retry
-                }, retryDelay);
+            // For OfflineMode, still render the reply and chips even though errorType is set
+            if (data.errorType !== 'OfflineMode') {
+                // Handle chips for error states
+                if (data.chips && Array.isArray(data.chips) && els.chipsContainer) {
+                    renderChips(data.chips);
+                }
+                
+                if (shouldRetry && !overrideText) {
+                    // Auto-retry after delay (only if not already a retry)
+                    setTimeout(() => {
+                        sendMessage(text, true); // Pass true to indicate retry
+                    }, retryDelay);
+                }
+                
+                isSending = false;
+                return;
             }
-            
-            isSending = false;
-            return;
+            // If OfflineMode, continue to render reply below
         }
 
         // Handle Smart Signals response

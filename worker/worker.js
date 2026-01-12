@@ -230,6 +230,8 @@ async function callGeminiWithRetry(modelName, context, userMessage, apiKey, maxT
   if (!first?.error) return first;
 
   const code = Number(first.error.code || 0);
+  // Only retry on transient errors (429, 500, 502, 503, 504)
+  // Do NOT retry on 401, 403, 400
   const retryable = code === 429 || code === 500 || code === 502 || code === 503 || code === 504;
 
   console.log("Gemini retry check", {
@@ -247,11 +249,20 @@ async function callGeminiWithRetry(modelName, context, userMessage, apiKey, maxT
   for (let i = 0; i < delays.length; i++) {
     const jitter = Math.random() * 100; // Add up to 100ms jitter
     await new Promise((r) => setTimeout(r, delays[i] + jitter));
+    
+    console.log(`Retry attempt ${i + 1} after ${delays[i]}ms`);
     const retryResult = await callGemini(modelName, context, userMessage, apiKey, maxTokens);
-    if (!retryResult?.error) return retryResult;
+    
+    if (!retryResult?.error) {
+      console.log(`Retry ${i + 1} succeeded`);
+      return retryResult;
+    }
+    
+    console.log(`Retry ${i + 1} failed with code ${retryResult.error.code}`);
     // If still error, continue to next delay
   }
 
+  console.log("All retries exhausted, returning original error");
   return first; // Return original error if all retries failed
 }
 
@@ -297,7 +308,8 @@ export default {
     }
 
     // --- HEALTH CHECK ---
-    if (request.method === "GET" && new URL(request.url).pathname === "/health") {
+    const url = new URL(request.url);
+    if (request.method === "GET" && url.pathname === "/health") {
       const hasKey = !!(env.GEMINI_API_KEY && env.GEMINI_API_KEY.length > 10);
       return jsonReply(
         { ok: true, version: VERSION_TAG, hasKey },
@@ -621,6 +633,47 @@ PAGE CONTEXT: ${pageContent || "Home"}
           }
         }
 
+        // --- CLEAN & PROCESS FINAL TEXT ---
+        let cleaned = finalReply
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/, "")
+          .replace(/\s*```$/, "")
+          .trim();
+
+        if (!cleaned) {
+          return jsonReply(
+            { errorType: "EmptyResponse", reply: "I couldn't generate a response.", chips: ["Projects", "Contact"] },
+            502, 
+            corsHeaders
+          );
+        }
+
+        // 1. Strip JSON blobs (accidental leaks)
+        let sanitizedReply = stripJsonBlobs(cleaned);
+
+        // 2. Safe Truncate (Hard Limit)
+        const wasLonger = sanitizedReply.length > MAX_REPLY_CHARS;
+        sanitizedReply = safeTruncate(sanitizedReply, MAX_REPLY_CHARS);
+        if (wasLonger) isTruncated = true;
+
+        // 3. Linkify
+        sanitizedReply = linkifyPages(sanitizedReply);
+
+        return jsonReply(
+          {
+            errorType: null,
+            reply: sanitizedReply,
+            chips: buildChips(lowerMsg),
+            truncated: isTruncated,
+            continuation_hint: isTruncated ? sanitizedReply.slice(-1000) : null,
+            reply_length: sanitizedReply.length,
+            action: null,
+            card: null
+          },
+          200,
+          corsHeaders
+        );
+
       } catch (err) {
         console.error("Gemini processing error:", err.message);
         
@@ -637,16 +690,20 @@ PAGE CONTEXT: ${pageContent || "Home"}
           } catch (parseErr) {
             console.error("Failed to parse Gemini error:", parseErr);
           }
-        } else if (err.message.includes('timeout')) {
+        } else if (err.message.includes('timeout') || err.message.includes('Request timeout')) {
           upstreamCode = 504;
           upstreamStatus = "TIMEOUT";
+        } else if (err.message.includes('network') || err.message.includes('fetch')) {
+          upstreamCode = 503;
+          upstreamStatus = "NETWORK_ERROR";
         }
         
         if (isDebug) {
           debugInfo = {
             upstreamStatus: upstreamCode,
             upstreamError: upstreamStatus,
-            message: err.message.slice(0, 100)
+            message: err.message.slice(0, 100),
+            timestamp: new Date().toISOString()
           };
         }
         
@@ -655,8 +712,8 @@ PAGE CONTEXT: ${pageContent || "Home"}
           return jsonReply(
             {
               errorType: "UpstreamBusy",
-              reply: "The AI service is rate limited. Please try again in a moment.",
-              chips: ["Retry", "Projects", "Contact"],
+              reply: "The AI service is experiencing high demand. Please try again in a moment.",
+              chips: ["Retry", "Projects", "Resume", "Contact"],
               debug: debugInfo
             },
             503,
@@ -666,8 +723,8 @@ PAGE CONTEXT: ${pageContent || "Home"}
           return jsonReply(
             {
               errorType: "AuthError",
-              reply: "The AI service is misconfigured. Please contact support.",
-              chips: ["Contact"],
+              reply: "The AI service is misconfigured. Please try contacting support or explore Estivan's [Projects](/projects.html) and [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) directly.",
+              chips: ["Projects", "Resume", "Contact"],
               debug: debugInfo
             },
             503,
@@ -677,19 +734,19 @@ PAGE CONTEXT: ${pageContent || "Home"}
           return jsonReply(
             {
               errorType: "Timeout",
-              reply: "The AI service timed out. Please try again with a shorter question.",
-              chips: ["Retry", "Projects", "Contact"],
+              reply: "The AI service timed out. Please try again with a shorter question or explore Estivan's [Projects](/projects.html) directly.",
+              chips: ["Retry", "Projects", "Resume", "Contact"],
               debug: debugInfo
             },
             504,
             corsHeaders
           );
-        } else if ([500, 502, 503].includes(upstreamCode)) {
+        } else if ([500, 502, 503].includes(upstreamCode) || upstreamStatus === "NETWORK_ERROR") {
           return jsonReply(
             {
               errorType: "UpstreamError",
-              reply: "The AI service is temporarily unavailable. Please try again later.",
-              chips: ["Retry", "Projects", "Contact"],
+              reply: "The AI service is temporarily unavailable. Please try again later or explore Estivan's [Projects](/projects.html) and [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) directly.",
+              chips: ["Retry", "Projects", "Resume", "Contact"],
               debug: debugInfo
             },
             503,
@@ -698,20 +755,54 @@ PAGE CONTEXT: ${pageContent || "Home"}
         }
         
         // Offline fallback mode: deterministic helpful response
-        const fallbackReply = `I'm currently offline, but I can help you navigate Estivan's portfolio. 
+        const intent = detectIntent(lowerMsg);
+        let fallbackReply = "";
+        let fallbackChips = ["Projects", "Resume", "Contact", "Retry"];
+        
+        if (intent === "greeting") {
+          fallbackReply = `Hello! I'm currently offline, but I can still help you navigate Estivan's portfolio. 
 
-Here are some quick options:
-- **Projects**: Browse his work at [Projects](/projects.html)
-- **Resume**: Download his resume [here](/assets/docs/Estivan-Ayramia-Resume.pdf)
-- **Contact**: Reach out via [Contact](/contact.html)
+Estivan is a Software Engineer specializing in operations and infrastructure. He has experience with cloud platforms, DevOps, and full-stack development.
 
-Estivan is a software engineer specializing in operations and infrastructure. He has experience with cloud platforms, DevOps, and full-stack development.`;
+Quick links:
+- [View Projects](/projects.html)
+- [Download Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)
+- [Contact Estivan](/contact.html)`;
+        } else if (intent === "projects") {
+          fallbackReply = `Here are some of Estivan's key projects:
+
+- **Logistics System**: Automated supply chain flows - [View Project](/project-logistics.html)
+- **Conflict Playbook**: Workplace safety & de-escalation framework
+- **getWispers**: Anonymous messaging app focused on ethics
+- **This Portfolio**: The site you're on - built for speed and clarity
+
+[Explore all projects →](/projects.html)`;
+        } else if (intent === "summary") {
+          fallbackReply = `Estivan Ayramia is a Software Engineer based in San Diego, specializing in operations and infrastructure.
+
+**Background**: Born in Baghdad/Syria (2004), educated at SDSU (Business). 3 years coaching experience.
+
+**Focus Areas**: Supply Chain, Logistics, Project Execution, DevOps.
+
+**Key Projects**: Logistics System, Conflict Playbook, getWispers.
+
+[View full resume →](/assets/docs/Estivan-Ayramia-Resume.pdf)`;
+        } else {
+          fallbackReply = `I'm currently offline, but I can help you navigate Estivan's portfolio. 
+
+**Quick Options**:
+- [Projects](/projects.html) - Browse his work
+- [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) - Download his CV
+- [Contact](/contact.html) - Reach out directly at hello@estivanayramia.com
+
+Estivan is a Software Engineer specializing in operations and infrastructure with experience in cloud platforms, DevOps, and full-stack development.`;
+        }
         
         return jsonReply(
           {
             errorType: "OfflineMode",
             reply: fallbackReply,
-            chips: ["Projects", "Resume", "Contact"],
+            chips: fallbackChips,
             truncated: false,
             continuation_hint: null,
             reply_length: fallbackReply.length,
@@ -719,50 +810,10 @@ Estivan is a software engineer specializing in operations and infrastructure. He
             card: null,
             debug: debugInfo
           },
-          200, // Still 200 for fallback to avoid breaking frontend
+          200, // Return 200 for fallback to keep UI functional
           corsHeaders
         );
       }
-
-      // --- CLEAN & PROCESS FINAL TEXT ---
-      let cleaned = finalReply
-        .replace(/^```json\s*/i, "")
-        .replace(/^```\s*/, "")
-        .replace(/\s*```$/, "")
-        .trim();
-
-      if (!cleaned) {
-        return jsonReply(
-          { errorType: "EmptyResponse", reply: "I couldn't generate a response.", chips: ["Projects", "Contact"] },
-          502, corsHeaders
-        );
-      }
-
-      // 1. Strip JSON blobs (accidental leaks)
-      let sanitizedReply = stripJsonBlobs(cleaned);
-
-      // 2. Safe Truncate (Hard Limit)
-      const wasLonger = sanitizedReply.length > MAX_REPLY_CHARS;
-      sanitizedReply = safeTruncate(sanitizedReply, MAX_REPLY_CHARS);
-      if (wasLonger) isTruncated = true;
-
-      // 3. Linkify
-      sanitizedReply = linkifyPages(sanitizedReply);
-
-      return jsonReply(
-        {
-          errorType: null,
-          reply: sanitizedReply,
-          chips: buildChips(lowerMsg),
-          truncated: isTruncated,
-          continuation_hint: isTruncated ? sanitizedReply.slice(-1000) : null,
-          reply_length: sanitizedReply.length,
-          action: null,
-          card: null
-        },
-        200,
-        corsHeaders
-      );
 
     } catch (error) {
       console.error("Worker error:", error.message, error.stack);
