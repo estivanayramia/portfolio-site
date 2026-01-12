@@ -293,15 +293,16 @@ export default {
       }
 
       // Sanitize message
-      let sanitizedMessage = message.trim().slice(0, MAX_MESSAGE_LENGTH);
-      
-      // If continuation context is provided, inject it
+      const userMessage = message.trim().slice(0, MAX_MESSAGE_LENGTH);
+      const lowerMsg = userMessage.toLowerCase();
+
+      // If continuation context is provided, inject it for the model only.
+      // Keep lowerMsg based on the user's actual message for intent and chip logic.
+      let sanitizedMessage = userMessage;
       if (previousContext && typeof previousContext === 'string') {
         const tail = previousContext.slice(0, 1000); // Limit context size
-        sanitizedMessage = `(PREVIOUS REPLY ENDED WITH: "...${tail}")\n\nUSER ASKS: ${sanitizedMessage}`;
+        sanitizedMessage = `(PREVIOUS REPLY ENDED WITH: "...${tail}")\n\nUSER ASKS: ${userMessage}`;
       }
-
-      const lowerMsg = sanitizedMessage.toLowerCase();
       const clientIP = request.headers.get("CF-Connecting-IP") || "unknown";
 
       // --- RATE LIMITING ---
@@ -490,23 +491,26 @@ PAGE CONTEXT: ${pageContent || "Home"}
       let isTruncated = false;
 
       try {
-        // Initial Call
+        // Initial call
         data = await callGemini(cachedModel, context, sanitizedMessage, env.GEMINI_API_KEY, maxTokens);
 
-        // --- AUTO-HEAL MODEL ERRORS (If first call fails with 404/Unsupported) ---
-        if (data?.error?.code === 404 || 
-            (data?.error?.message && 
-            (data.error.message.includes("not found") || 
-              data.error.message.includes("unsupported")))) {
-          
-          console.log(`Model ${cachedModel} failed. Auto-detecting...`);
-          // ... (simplified logic: just try 'gemini-1.5-pro' if flash failed)
-          cachedModel = "models/gemini-1.5-pro"; 
-          data = await callGemini(cachedModel, context, sanitizedMessage, env.GEMINI_API_KEY, maxTokens);
+        // If Gemini returns any structured error, retry once with a fallback model.
+        if (data?.error) {
+          console.log("Gemini call error", {
+            code: data.error.code,
+            status: data.error.status || null,
+            model: cachedModel,
+            msgLen: userMessage.length
+          });
+
+          if (!String(cachedModel).includes("pro")) {
+            cachedModel = "models/gemini-1.5-pro";
+            data = await callGemini(cachedModel, context, sanitizedMessage, env.GEMINI_API_KEY, maxTokens);
+          }
         }
 
         if (data?.error) {
-           throw new Error(`Gemini Error: ${JSON.stringify(data.error)}`);
+          throw new Error(`Gemini Error: ${JSON.stringify({ code: data.error.code, status: data.error.status || null })}`);
         }
 
         // Process First Chunk
@@ -515,9 +519,16 @@ PAGE CONTEXT: ${pageContent || "Home"}
         finalReply = originalText;
 
         // --- CONTINUATION LOGIC ---
-        // Check if truncated by model token limit
+        // Only auto-continue when the model likely stopped due to a cap.
+        // Avoid extra calls when finishReason is STOP.
         const finishReason = candidate?.finishReason;
-        const seemsTruncated = finishReason === "MAX_TOKENS" || (originalText.length > maxTokens * 3); // Approx char check
+        const trimmed = String(originalText || "").trim();
+        const lastChar = trimmed ? trimmed.slice(-1) : "";
+        const endsCleanly = !trimmed || /[\.!\?\)\]"']$/.test(lastChar);
+
+        const seemsTruncated =
+          finishReason === "MAX_TOKENS" ||
+          (!finishReason && !endsCleanly && trimmed.length > 1800);
 
         if (seemsTruncated) {
           console.log("Response truncated. Attempting continuation...");

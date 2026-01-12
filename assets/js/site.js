@@ -3403,7 +3403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         website: {
             title: 'Portfolio Website',
-            summary: 'The site you’re on—built for speed, clarity, and a clean browsing experience.',
+            summary: 'The site you are on, built for speed, clarity, and a clean browsing experience.',
             img: '/assets/img/og-image.png',
             link: '/'
         }
@@ -3490,7 +3490,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastContext = null; // Store truncation tail logic
     let isInitialized = false;
 
-    const historyStorageKey = `savonie_history:${pageLang}:${window.location.pathname || '/'}`;
+    // Cross-page chat memory
+    // Use sessionStorage so conversation persists across pages in the same tab.
+    // If you want memory across browser restarts, switch this to localStorage.
+    const historyStorageKey = `savonie_history:v1:${pageLang || 'en'}`;
     const MAX_HISTORY_ITEMS = 50;
 
     function buildSafePageContext() {
@@ -4284,7 +4287,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (data.errorType === 'BadRequest') {
                 friendly = 'Please rephrase your question and try again.';
             } else if (data.errorType === 'UpstreamError') {
-                friendly = 'Service hiccup—please try again in a moment.';
+                friendly = 'Service hiccup, please try again in a moment.';
             }
             addMessageToUI(friendly, 'bot');
             isSending = false;

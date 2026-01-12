@@ -11,10 +11,10 @@ global.fetch = async (url, options) => {
     return {
       ok: true, 
       status: 200,
-      json: async () => res
+      text: async () => JSON.stringify(res)
     };
   }
-  return { ok: false, status: 500 };
+  return { ok: false, status: 500, text: async () => '' };
 };
 
 async function testTruncationAndContinuation() {
