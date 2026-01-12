@@ -4285,14 +4285,39 @@ document.addEventListener('DOMContentLoaded', () => {
         // Contract-level error types (may be absent)
         if (data && data.errorType) {
             let friendly = 'Something went wrong. Please try again.';
+            let shouldRetry = false;
+            let retryDelay = 0;
+            
             if (data.errorType === 'RateLimit') {
                 friendly = 'Too many requests. Please wait a moment before trying again.';
             } else if (data.errorType === 'BadRequest') {
                 friendly = 'Please rephrase your question and try again.';
             } else if (data.errorType === 'UpstreamError') {
                 friendly = 'Service hiccup, please try again in a moment.';
+            } else if (data.errorType === 'UpstreamBusy') {
+                friendly = 'The AI service is busy. Retrying automatically...';
+                shouldRetry = true;
+                retryDelay = 30000; // 30 seconds from Retry-After header
+            } else if (data.errorType === 'AuthError') {
+                friendly = 'The AI service is having configuration issues. Please try again later.';
+            } else if (data.errorType === 'Timeout') {
+                friendly = 'The request timed out. Please try again with a shorter question.';
+            } else if (data.errorType === 'OfflineMode') {
+                // This is actually a fallback response, not an error
+                friendly = null; // Don't show error message, proceed to render the reply
             }
-            addMessageToUI(friendly, 'bot');
+            
+            if (friendly) {
+                addMessageToUI(friendly, 'bot');
+            }
+            
+            if (shouldRetry) {
+                // Auto-retry after delay
+                setTimeout(() => {
+                    sendMessage(text, true); // Pass true to indicate retry
+                }, retryDelay);
+            }
+            
             isSending = false;
             return;
         }

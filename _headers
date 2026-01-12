@@ -30,8 +30,8 @@
 /*.woff
   Cache-Control: public, max-age=31536000, immutable
 
-/sw.js
+/assets/js/site.min.js
   Cache-Control: no-cache, no-store, must-revalidate
 
-/manifest.json
-  Cache-Control: public, max-age=86400
+/assets/css/style.css
+  Cache-Control: no-cache, no-store, must-revalidate

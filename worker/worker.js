@@ -192,7 +192,11 @@ function jsonReply(body, status, corsHeaders) {
   const enhancedBody = { ...body, version: VERSION_TAG };
   return new Response(JSON.stringify(enhancedBody), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" }
+    headers: { 
+      ...corsHeaders, 
+      "Content-Type": "application/json",
+      "X-Savonie-Version": VERSION_TAG
+    }
   });
 }
 
@@ -219,7 +223,7 @@ async function fetchWithTimeout(url, options, timeout) {
   }
 }
 
-// Retry Gemini calls once for transient upstream failures.
+// Retry Gemini calls with exponential backoff + jitter for transient upstream failures.
 // Logs lengths and flags only, never user content.
 async function callGeminiWithRetry(modelName, context, userMessage, apiKey, maxTokens, meta) {
   const first = await callGemini(modelName, context, userMessage, apiKey, maxTokens);
@@ -238,8 +242,17 @@ async function callGeminiWithRetry(modelName, context, userMessage, apiKey, maxT
 
   if (!retryable) return first;
 
-  await new Promise((r) => setTimeout(r, 400));
-  return await callGemini(modelName, context, userMessage, apiKey, maxTokens);
+  // Exponential backoff with jitter: 300ms, 900ms, 1800ms
+  const delays = [300, 900, 1800];
+  for (let i = 0; i < delays.length; i++) {
+    const jitter = Math.random() * 100; // Add up to 100ms jitter
+    await new Promise((r) => setTimeout(r, delays[i] + jitter));
+    const retryResult = await callGemini(modelName, context, userMessage, apiKey, maxTokens);
+    if (!retryResult?.error) return retryResult;
+    // If still error, continue to next delay
+  }
+
+  return first; // Return original error if all retries failed
 }
 
 /**
@@ -283,6 +296,16 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
+    // --- HEALTH CHECK ---
+    if (request.method === "GET" && new URL(request.url).pathname === "/health") {
+      const hasKey = !!(env.GEMINI_API_KEY && env.GEMINI_API_KEY.length > 10);
+      return jsonReply(
+        { ok: true, version: VERSION_TAG, hasKey },
+        200,
+        corsHeaders
+      );
+    }
+
     if (request.method !== "POST") {
       return jsonReply(
         { errorType: "BadRequest", reply: "Method not allowed." },
@@ -306,6 +329,10 @@ export default {
       }
 
       const { message, pageContent, language, previousContext } = body || {};
+
+      // Check for debug mode
+      const url = new URL(request.url);
+      const isDebug = url.searchParams.get('debug') === '1' || request.headers.get('X-Savonie-Debug') === '1';
 
       if (typeof message !== "string" || !message.trim()) {
         return jsonReply(
@@ -597,25 +624,102 @@ PAGE CONTEXT: ${pageContent || "Home"}
       } catch (err) {
         console.error("Gemini processing error:", err.message);
         
-        if (err.message.includes('timeout')) {
+        // Parse error to determine upstream status
+        let upstreamCode = 500;
+        let upstreamStatus = "UNKNOWN_ERROR";
+        let debugInfo = null;
+        
+        if (err.message.includes('Gemini Error:')) {
+          try {
+            const errorJson = JSON.parse(err.message.replace('Gemini Error: ', ''));
+            upstreamCode = errorJson.code || 500;
+            upstreamStatus = errorJson.status || "UNKNOWN_ERROR";
+          } catch (parseErr) {
+            console.error("Failed to parse Gemini error:", parseErr);
+          }
+        } else if (err.message.includes('timeout')) {
+          upstreamCode = 504;
+          upstreamStatus = "TIMEOUT";
+        }
+        
+        if (isDebug) {
+          debugInfo = {
+            upstreamStatus: upstreamCode,
+            upstreamError: upstreamStatus,
+            message: err.message.slice(0, 100)
+          };
+        }
+        
+        // Determine response based on upstream error
+        if (upstreamCode === 429) {
           return jsonReply(
-            { errorType: "Timeout", reply: "I'm thinking too hard! Shorten your question?", chips: ["Resume", "Contact"] },
-            504, corsHeaders
+            {
+              errorType: "UpstreamBusy",
+              reply: "The AI service is rate limited. Please try again in a moment.",
+              chips: ["Retry", "Projects", "Contact"],
+              debug: debugInfo
+            },
+            503,
+            { ...corsHeaders, "Retry-After": "30" }
+          );
+        } else if (upstreamCode === 401 || upstreamCode === 403) {
+          return jsonReply(
+            {
+              errorType: "AuthError",
+              reply: "The AI service is misconfigured. Please contact support.",
+              chips: ["Contact"],
+              debug: debugInfo
+            },
+            503,
+            corsHeaders
+          );
+        } else if (upstreamCode === 504 || upstreamStatus === "TIMEOUT") {
+          return jsonReply(
+            {
+              errorType: "Timeout",
+              reply: "The AI service timed out. Please try again with a shorter question.",
+              chips: ["Retry", "Projects", "Contact"],
+              debug: debugInfo
+            },
+            504,
+            corsHeaders
+          );
+        } else if ([500, 502, 503].includes(upstreamCode)) {
+          return jsonReply(
+            {
+              errorType: "UpstreamError",
+              reply: "The AI service is temporarily unavailable. Please try again later.",
+              chips: ["Retry", "Projects", "Contact"],
+              debug: debugInfo
+            },
+            503,
+            corsHeaders
           );
         }
         
+        // Offline fallback mode: deterministic helpful response
+        const fallbackReply = `I'm currently offline, but I can help you navigate Estivan's portfolio. 
+
+Here are some quick options:
+- **Projects**: Browse his work at [Projects](/projects.html)
+- **Resume**: Download his resume [here](/assets/docs/Estivan-Ayramia-Resume.pdf)
+- **Contact**: Reach out via [Contact](/contact.html)
+
+Estivan is a software engineer specializing in operations and infrastructure. He has experience with cloud platforms, DevOps, and full-stack development.`;
+        
         return jsonReply(
           {
-            errorType: null,
-            reply: "The AI service is busy right now. You can still browse [Projects](/projects.html), open the [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf), or use [Contact](/contact.html).",
+            errorType: "OfflineMode",
+            reply: fallbackReply,
             chips: ["Projects", "Resume", "Contact"],
             truncated: false,
             continuation_hint: null,
-            reply_length: 0,
+            reply_length: fallbackReply.length,
             action: null,
-            card: null
+            card: null,
+            debug: debugInfo
           },
-          200,
+          200, // Still 200 for fallback to avoid breaking frontend
           corsHeaders
         );
       }
