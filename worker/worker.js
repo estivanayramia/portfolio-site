@@ -660,12 +660,20 @@ async function callGemini(modelName, context, userMessage, apiKey, maxTokens = 5
     GEMINI_TIMEOUT
   );
 
+  const text = await resp.text();
   let json;
   try {
-    json = await resp.json();
+    json = JSON.parse(text);
   } catch (e) {
-    console.error("Failed to parse Gemini JSON:", e);
-    throw new Error("Failed to parse Gemini response");
+    console.error("Failed to parse Gemini JSON. Raw text:", text.slice(0, 200));
+    // Return a structured error instead of throwing, so auto-heal can catch 404s/500s
+    return {
+      error: {
+        code: resp.status,
+        message: `Invalid JSON from upstream: ${text.replace(/\s+/g, ' ').slice(0, 50)}...`,
+        status: "PARSING_ERROR"
+      }
+    };
   }
 
   if (!resp.ok && !json.error) {
