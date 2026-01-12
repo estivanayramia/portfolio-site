@@ -6,11 +6,80 @@
 let cachedModel = "models/gemini-1.5-flash";
 const GEMINI_TIMEOUT = 25000;
 const MAX_MESSAGE_LENGTH = 2000;
+const MAX_REPLY_CHARS = 800;
 
 // Optional local rate limiter (fallback if env.RATE_LIMITER not configured)
 const localRateLimiter = new Map();
 const RATE_LIMIT_WINDOW = 60000; // 60 seconds
 const RATE_LIMIT_MAX = 20;
+
+/**
+ * Strip any JSON object blocks from text
+ */
+function stripJsonBlobs(text) {
+  if (typeof text !== "string" || !text) return "";
+  
+  // Find first occurrence of JSON-like pattern
+  const jsonStart = text.search(/\n?\s*\{\s*"(reply|chips|action|card|errorType)"/);
+  if (jsonStart !== -1) {
+    return text.substring(0, jsonStart).trim();
+  }
+  
+  // Also check for standalone { at line start
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].trim() === '{' || lines[i].trim().startsWith('{ "')) {
+      return lines.slice(0, i).join('\n').trim();
+    }
+  }
+  
+  return text.trim();
+}
+
+/**
+ * Detect user intent from message
+ */
+function detectIntent(lowerMsg) {
+  if (/(^|\b)(hi|hello|hey|yo|good morning|good afternoon|good evening)(\b|!|\.)/.test(lowerMsg)) return "greeting";
+  if (/(recruiter|hiring manager|interview|role|position|opportunity|availability|available|start date)/.test(lowerMsg)) return "recruiter";
+  if (/(email|contact|reach|message|connect)/.test(lowerMsg)) return "contact";
+  if (/(salary|compensation|rate|pay|wage|range)/.test(lowerMsg)) return "salary";
+  if (/(project|projects|case study|portfolio|work samples|experience)/.test(lowerMsg)) return "projects";
+  if (/(who is he|who are you|about you|about estivan|summary|tell me about|elevator pitch|quick summary|bio|background)/.test(lowerMsg)) return "summary";
+  if (/(hobbies|hobby|gym|workout|fitness|car|cars|reading|books|cooking|photography|whispers)/.test(lowerMsg)) return "hobbies";
+  return "default";
+}
+
+/**
+ * Get deterministic chips based on user intent
+ */
+function buildChips(lowerMsg) {
+  switch (detectIntent(lowerMsg)) {
+    case "greeting":
+      return ["Quick summary", "View projects", "Get resume"];
+    case "summary":
+      return ["Key strengths", "Best projects", "Resume"];
+    case "projects":
+      return ["Operations systems work", "Portfolio site build", "Other case studies"];
+    case "recruiter":
+      return ["Availability", "Location", "Resume"];
+    case "contact":
+      return ["Email", "LinkedIn", "Resume"];
+    case "salary":
+      return ["Target roles", "Availability", "Contact"];
+    case "hobbies":
+      return ["Gym and discipline", "Cars", "Reading"];
+    default:
+      return ["Projects", "Skills", "Contact"];
+  }
+}
+
+/**
+ * Check if message is a greeting
+ */
+function isGreeting(lowerMsg) {
+  return detectIntent(lowerMsg) === "greeting";
+}
 
 /**
  * Get CORS headers with origin validation
@@ -188,8 +257,10 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "I'm open to market rates for Operations roles. Do you have a range in mind? Let's discuss details at [hello@estivanayramia.com](mailto:hello@estivanayramia.com).",
-            action: "email_link"
+            reply: "I'm open to market-aligned compensation for operations roles and happy to talk details. If you share the range, I can confirm fit and next steps. You can also reach Estivan at [hello@estivanayramia.com](mailto:hello@estivanayramia.com).",
+            chips: buildChips(lowerMsg),
+            action: "email_link",
+            card: null
           },
           200,
           corsHeaders
@@ -201,8 +272,10 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com). He typically responds within 24 hours!",
-            action: "email_link"
+            reply: "You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com). He aims to respond within 24 hours.",
+            chips: buildChips(lowerMsg),
+            action: "email_link",
+            card: null
           },
           200,
           corsHeaders
@@ -215,8 +288,9 @@ export default {
           {
             errorType: null,
             reply: "Here's Estivan's resume! Click below to download the PDF.",
+            chips: buildChips(lowerMsg),
             action: "download_resume",
-            chips: ["View Projects", "Contact Estivan"]
+            card: null
           },
           200,
           corsHeaders
@@ -229,8 +303,9 @@ export default {
           {
             errorType: null,
             reply: "The Logistics System automated supply chain operations and reduced delivery delays by 35%. Check out the full case study!",
+            chips: buildChips(lowerMsg),
             card: "logistics",
-            chips: ["See Other Projects", "Contact Estivan"]
+            action: null
           },
           200,
           corsHeaders
@@ -241,9 +316,10 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "The Conflict Resolution Playbook standardized de-escalation protocols, reducing workplace incidents by 40%.",
+            reply: "The Conflict Resolution Playbook standardized de-escalation protocols and reduced workplace incidents by 40%.",
+            chips: buildChips(lowerMsg),
             card: "conflict",
-            chips: ["View All Projects", "Learn More"]
+            action: null
           },
           200,
           corsHeaders
@@ -274,18 +350,17 @@ SYSTEM: You are Savonie AI, Estivan Ayramia's personal portfolio assistant.
 DATE: ${today}
 USER LANGUAGE: ${language || "English"} (Reply in this language!)
 
-*** PRIME DIRECTIVE: MATCH ENERGY ***
-- IF FORMAL (recruiter/hiring manager): Be professional, structured, and grateful. Trigger "email_link" action.
-- IF CASUAL: Be friendly, punchy, and engaging. Use emojis sparingly.
-- IF TECHNICAL: Show expertise with concrete metrics and outcomes.
+*** CRITICAL: PLAIN TEXT ONLY ***
+Return plain Markdown text only. Never output JSON. Never output code fences. Never include a JSON object in your reply.
+Do not repeat the bio unless specifically asked (e.g., "who is he", "summary", "bio", "background").
 
-*** SMART SIGNALS - YOU CAN RETURN JSON WITH: ***
-{
-  "reply": "Your markdown text response",
-  "chips": ["Suggestion 1", "Suggestion 2"],  // Optional quick reply buttons
-  "action": "download_resume" | "email_link",  // Optional action trigger
-  "card": "logistics" | "conflict" | "discipline" | "website"  // Optional project card
-}
+*** TONE ***
+- Answer the user's specific question directly.
+- Professional, supportive, strengths-forward.
+- If asked about weaknesses: frame as growth areas + mitigation.
+- No slogans, no hype, no filler.
+- Do not claim Estivan is an "Operations Manager". Use: "General Business graduate" or "early-career operations candidate".
+- No emojis unless the user used emojis first.
 
 *** NAVIGATION LINKS ***
 Use markdown links for navigation:
@@ -293,11 +368,9 @@ Use markdown links for navigation:
 - Deep dive story: [Read Deep Dive](/deep-dive.html)
 - Quick overview: [View Overview](/overview.html)
 - Contact page: [Contact](/contact.html)
-- Logistics: [View Logistics](/deep-dive.html#logistics)
-- Conflict Playbook: [View Strategy](/deep-dive.html#conflict)
 
 *** ESTIVAN'S BACKGROUND ***
-**Current Status**: Seeking Operations Manager roles (Supply Chain, Logistics, Project Management)
+**Current Status**: General Business graduate seeking operations roles (Supply Chain, Logistics, Project Management)
 **Location**: Southern California
 **Email**: hello@estivanayramia.com
 **LinkedIn**: [linkedin.com/in/estivanayramia](https://linkedin.com/in/estivanayramia)
@@ -308,9 +381,9 @@ Use markdown links for navigation:
 3. **Discipline Tracking System** - Progressive discipline workflow, improved compliance 50%
 4. **Portfolio Website** - Modern PWA with offline support, achievements, analytics
 
-**Skills**: Supply Chain Management, Logistics Optimization, Conflict Resolution, Process Improvement, Data Analysis, Team Leadership
+**Skills**: Supply Chain, Logistics, Conflict Resolution, Process Improvement, Data Analysis, Team Leadership
 
-**Education**: California State University San Marcos (CSUSM)
+**Education**: California State University San Marcos (CSUSM) - General Business
 
 **Achievements**: 
 - Explorer (visited all pages)
@@ -318,17 +391,9 @@ Use markdown links for navigation:
 - Conversationalist (opened chat)
 - 8 total achievements available
 
-*** SPECIAL MODES ***
-- If user asks to "quiz me" or "play a game": Ask trivia about Estivan's background
-- If user mentions Konami code: Reference the easter egg (↑↑↓↓←→←→BA)
-- If discussing achievements: Explain the 8-achievement system
-
-*** RESPONSE GUIDELINES ***
-- Keep responses under 100 words unless explaining a complex project
-- Use chips for follow-up suggestions (max 3)
-- Trigger actions when appropriate (resume downloads, email links)
-- Show project cards when discussing specific projects
-- Be human, not robotic
+*** GREETING RULES ***
+- Only greet if the user says hi/hello/hey.
+- Otherwise, skip "I'm Savonie AI..." and answer directly.
 
 PAGE CONTEXT: ${pageContent || "Home"}
 `.trim();
@@ -446,8 +511,7 @@ PAGE CONTEXT: ${pageContent || "Home"}
         );
       }
 
-      // --- CLEAN CODE BLOCKS & PARSE SMART SIGNALS ---
-      // CORRECTED REGEX SECTION BELOW
+      // --- CLEAN CODE BLOCKS & STRIP JSON BLOBS ---
       let cleaned = rawText
         .replace(/^```json\s*/i, "")  // Remove start fence with optional 'json'
         .replace(/^```\s*/, "")       // Remove start fence without language
@@ -459,30 +523,39 @@ PAGE CONTEXT: ${pageContent || "Home"}
           {
             errorType: "EmptyResponse",
             reply: "The AI did not return any content. Please try rephrasing your question.",
-            chips: ["View Projects", "About Estivan", "Contact"]
+            chips: buildChips(lowerMsg),
+            action: null,
+            card: null
           },
           502,
           corsHeaders
         );
       }
 
-      // Try to parse as JSON (Smart Signals format)
-      let responseObj;
-      try {
-        responseObj = JSON.parse(cleaned);
-        // Validate it has at least a reply field
-        if (!responseObj.reply || typeof responseObj.reply !== "string") {
-          responseObj = { reply: cleaned };
-        }
-      } catch (e) {
-        // Not JSON, treat as plain text
-        responseObj = { reply: cleaned };
+      // Strip any JSON blobs from reply
+      const sanitizedReply = stripJsonBlobs(cleaned).slice(0, MAX_REPLY_CHARS).trim();
+
+      if (!sanitizedReply) {
+        return jsonReply(
+          {
+            errorType: "EmptyResponse",
+            reply: "The AI did not return any content. Please try rephrasing your question.",
+            chips: buildChips(lowerMsg),
+            action: null,
+            card: null
+          },
+          502,
+          corsHeaders
+        );
       }
 
       return jsonReply(
         {
           errorType: null,
-          ...responseObj
+          reply: sanitizedReply,
+          chips: buildChips(lowerMsg),
+          action: null,
+          card: null
         },
         200,
         corsHeaders
@@ -528,9 +601,9 @@ async function callGemini(modelName, context, userMessage, apiKey) {
           }
         ],
         generationConfig: {
-          temperature: 0.5,
-          maxOutputTokens: 700,
-          topP: 0.9
+          temperature: 0.6,
+          maxOutputTokens: 500,
+          topP: 0.95
         },
         safetySettings: [
           {
