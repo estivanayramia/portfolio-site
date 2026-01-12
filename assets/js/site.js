@@ -3990,7 +3990,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const projectLabels = ["Projects", "View Projects", "Projects & Case Studies", "View projects"];
         const resumeLabels = ["Resume", "Download Resume", "View Resume", "Get resume"];
-        const contactLabels = ["Contact", "Email", "Email Estivan", "LinkedIn", "Contact Estivan"];
+        const contactLabels = ["Contact", "Email", "Email Estivan", "Contact Estivan"];
         const linkedinLabels = ["LinkedIn", "Open LinkedIn"];
 
         // Render chips
