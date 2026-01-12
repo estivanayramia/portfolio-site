@@ -3895,6 +3895,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const el = /** @type {HTMLElement} */ (child);
                     const tag = el.tagName;
 
+                    // Capture attributes we might want to keep before stripping.
+                    const originalHref = tag === 'A' ? el.getAttribute('href') : null;
+
                     if (!allowedTags.has(tag)) {
                         const replacement = document.createTextNode(el.textContent || '');
                         el.replaceWith(replacement);
@@ -3906,7 +3909,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (const a of attrs) el.removeAttribute(a.name);
 
                     if (tag === 'A') {
-                        const href = safeUrl(el.getAttribute('href'));
+                        const href = safeUrl(originalHref);
                         if (!href) {
                             const replacement = document.createTextNode(el.textContent || '');
                             el.replaceWith(replacement);
