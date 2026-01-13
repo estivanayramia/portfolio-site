@@ -429,15 +429,18 @@
             </div>
         </div>
     </footer>
-    
     <!-- Scroll to Top Button -->
-    <button id="scroll-to-top" aria-label="Scroll to top">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="18 15 12 9 6 15"></polyline>
+    <button id="scroll-to-top" class="scroll-to-top-btn" type="button" title="Back to top" aria-label="Back to top" aria-describedby="scroll-to-top-tooltip">
+        <svg class="scroll-progress-ring" viewBox="0 0 47 47" width="47" height="47" aria-hidden="true" focusable="false">
+            <circle class="scroll-progress-track" cx="23.5" cy="23.5" r="22" fill="none" stroke="currentColor" stroke-width="3"></circle>
+            <circle class="scroll-progress-circle" cx="23.5" cy="23.5" r="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></circle>
         </svg>
+        <svg class="scroll-to-top-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M18 15l-6-6-6 6"></path>
+        </svg>
+        <div id="scroll-to-top-tooltip" class="scroll-to-top-btn-tooltip" role="tooltip">Back to top</div>
     </button>
-    
-    <!-- Savonie AI Chat Widget -->
+<!-- Savonie AI Chat Widget -->
     <div id="chat-widget" class="fixed bottom-6 z-50 font-sans" style="z-index: 9999;" role="region" aria-label="AI Chat Assistant">
         <!-- Chat Window (independently positioned when dragging) -->
         <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);" role="dialog" aria-modal="true" aria-labelledby="chat-title">
@@ -479,3 +482,7 @@
     <script src="/assets/js/lazy-loader.js" defer></script>
 </body>
 </html>
+
+
+
+

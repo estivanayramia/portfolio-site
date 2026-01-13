@@ -1991,6 +1991,16 @@ const initScrollToTop = () => {
     const scrollBtn = document.getElementById('scroll-to-top');
     if (!scrollBtn) return;
 
+    const progressCircle = scrollBtn.querySelector('.scroll-progress-circle');
+    const radius = progressCircle ? parseFloat(progressCircle.getAttribute('r') || '22') : 0;
+    const circumference = radius > 0 ? (radius * 2 * Math.PI) : 0;
+
+    // Ensure ring works even if HTML doesn't include inline dash styles.
+    if (progressCircle && circumference > 0) {
+        progressCircle.style.strokeDasharray = `${circumference}`;
+        progressCircle.style.strokeDashoffset = `${circumference}`;
+    }
+
     // Show/hide button based on scroll position (25% of page height)
     const toggleButton = () => {
         const pageHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -2001,6 +2011,13 @@ const initScrollToTop = () => {
             scrollBtn.classList.add('show');
         } else {
             scrollBtn.classList.remove('show');
+        }
+
+        // Update progress circle
+        if (progressCircle && circumference > 0 && pageHeight > 0) {
+            const scrollPercent = currentScroll / pageHeight;
+            const offset = circumference - (scrollPercent * circumference);
+            progressCircle.style.strokeDashoffset = offset;
         }
     };
 

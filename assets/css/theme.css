@@ -1182,15 +1182,17 @@ select {
     position: fixed;
     bottom: 30px;
     left: 30px;
-    width: 50px;
-    height: 50px;
+    --scroll-to-top-size: 47px;
+    --scroll-to-top-icon-size: 24px;
+    width: var(--scroll-to-top-size);
+    height: var(--scroll-to-top-size);
     background: var(--color-primary);
     color: white;
-    border: 2px solid var(--color-border);
+    /* Removed border to fix centering, relying on SVG track */
+    border: none;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    place-items: center;
     cursor: pointer;
     opacity: 0;
     visibility: hidden;
@@ -1198,6 +1200,10 @@ select {
     transition: all 0.3s ease;
     z-index: 10000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    /* Ensure padding doesn't affect centering */
+    padding: 0;
+    box-sizing: border-box;
+    isolation: isolate;
 }
 
 #scroll-to-top:hover {
@@ -1212,17 +1218,82 @@ select {
     transform: translateY(0);
 }
 
-#scroll-to-top svg {
-    width: 24px;
-    height: 24px;
+#scroll-to-top .scroll-to-top-icon {
+    width: var(--scroll-to-top-icon-size);
+    height: var(--scroll-to-top-icon-size);
+    display: block;
+    pointer-events: none;
+    position: relative;
+    z-index: 1;
+}
+
+/* Scroll progress circle SVG container */
+#scroll-to-top .scroll-progress-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: block;
+    z-index: 0;
+}
+
+#scroll-to-top .scroll-progress-track {
+    opacity: 0.2;
+}
+
+#scroll-to-top .scroll-progress-circle {
+    transition: stroke-dashoffset 0.1s linear;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+}
+
+/* Tooltip - Restored */
+.scroll-to-top-btn-tooltip {
+    position: absolute;
+    bottom: 110%; /* Place above button */
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background-color: var(--color-primary);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    z-index: 10001;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Tooltip arrow */
+.scroll-to-top-btn-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: var(--color-primary) transparent transparent transparent;
+}
+
+#scroll-to-top:hover .scroll-to-top-btn-tooltip,
+#scroll-to-top:focus .scroll-to-top-btn-tooltip,
+#scroll-to-top:focus-visible .scroll-to-top-btn-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
 }
 
 @media (max-width: 768px) {
     #scroll-to-top {
         bottom: 20px;
         left: 20px;
-        width: 45px;
-        height: 45px;
+        --scroll-to-top-size: 42px;
     }
 }
 
@@ -2162,8 +2233,7 @@ select.border-red-500 {
 #mobile-menu-toggle,
 #send-btn,
 #mic-btn,
-#theme-toggle,
-#scroll-to-top {
+#theme-toggle {
     min-width: 48px;
     min-height: 48px;
 }
@@ -2218,9 +2288,29 @@ select.border-red-500 {
     color: #e1d4c2 !important;
 }
 
-/* Dark mode override for scroll-to-top arrow */
+/* Dark mode override for scroll-to-top button */
 [data-theme="dark"] #scroll-to-top {
+    background: #e1d4c2 !important;
     color: #362017 !important;
+    border-color: rgba(54, 32, 23, 0.2) !important;
+}
+
+[data-theme="dark"] #scroll-to-top:hover {
+    background: #d4c4ae !important;
+}
+
+/* Dark mode override for scroll-to-top tooltip text */
+[data-theme="dark"] #scroll-to-top:hover .scroll-to-top-btn-tooltip,
+[data-theme="dark"] #scroll-to-top:focus .scroll-to-top-btn-tooltip,
+[data-theme="dark"] #scroll-to-top:focus-visible .scroll-to-top-btn-tooltip {
+    color: #362017 !important; /* chocolate */
+    background-color: #212842 !important; /* dark primary for better contrast */
+}
+
+[data-theme="dark"] #scroll-to-top:hover .scroll-to-top-btn-tooltip::after,
+[data-theme="dark"] #scroll-to-top:focus .scroll-to-top-btn-tooltip::after,
+[data-theme="dark"] #scroll-to-top:focus-visible .scroll-to-top-btn-tooltip::after {
+    border-color: #212842 transparent transparent transparent !important;
 }
 
 /* Konami Code Gift Animations */
