@@ -2304,13 +2304,13 @@ select.border-red-500 {
 [data-theme="dark"] #scroll-to-top:focus .scroll-to-top-btn-tooltip,
 [data-theme="dark"] #scroll-to-top:focus-visible .scroll-to-top-btn-tooltip {
     color: #362017 !important; /* chocolate */
-    background-color: #212842 !important; /* dark primary for better contrast */
+    background-color: #e1d4c2 !important; /* site beige in dark mode */
 }
 
 [data-theme="dark"] #scroll-to-top:hover .scroll-to-top-btn-tooltip::after,
 [data-theme="dark"] #scroll-to-top:focus .scroll-to-top-btn-tooltip::after,
 [data-theme="dark"] #scroll-to-top:focus-visible .scroll-to-top-btn-tooltip::after {
-    border-color: #212842 transparent transparent transparent !important;
+    border-color: #e1d4c2 transparent transparent transparent !important;
 }
 
 /* Konami Code Gift Animations */

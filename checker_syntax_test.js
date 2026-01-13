@@ -1,0 +1,1 @@
+﻿const fs=require("fs"); const path = "assets/js/site.min.js"; const src = fs.readFileSync(path, "utf8"); try { new Function(src); console.log("PARSE_OK"); } catch (e) { console.error("PARSE_ERROR", e && e.message); process.exit(2); }
