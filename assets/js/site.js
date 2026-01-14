@@ -2225,6 +2225,28 @@ const translations = {
                 skillResponse: ["كيف تعلمت ذلك؟", "هل استخدمته في مشاريع؟", "ما هو مستوى مهارتك؟", "ما هي طريقتك المفضلة لتطبيق هذه المهارة؟", "أي نصائح للمبتدئين؟", "كيف تطورت هذه المهارة بالنسبة لك؟"],
                 early: ["ما هي مهاراتك الرئيسية؟", "أخبرني عن خلفيتك", "ما هي المشاريع التي تفخر بها؟", "ما الشيء الفريد فيك؟", "لماذا اخترت هذا المجال؟", "ما هو أكبر إنجاز لك؟"]
             }
+        },
+        pinnedChips: {
+            en: ["Projects", "Resume", "Contact"],
+            es: ["Proyectos", "Currículum", "Contacto"],
+            ar: ["مشاريع", "السيرة الذاتية", "اتصال"]
+        },
+        pinnedFollowUps: {
+            en: {
+                projects: ["Show me your top project", "What tech stack do you use most?", "Any case studies?"],
+                resume: ["Summarize your experience", "What roles are you targeting?", "What are your strongest skills?"],
+                contact: ["Email", "LinkedIn", "Best way to reach you?"]
+            },
+            es: {
+                projects: ["Muéstrame tu mejor proyecto", "¿Qué stack tecnológico usas más?", "¿Algún caso de estudio?"],
+                resume: ["Resume tu experiencia", "¿Qué roles buscas?", "¿Cuáles son tus habilidades más fuertes?"],
+                contact: ["Email", "LinkedIn", "¿Mejor forma de contactarte?"]
+            },
+            ar: {
+                projects: ["أرني أفضل مشروع لك", "ما هي التقنيات الأكثر استخداماً؟", "أي دراسات حالة؟"],
+                resume: ["لخص خبرتك", "ما هي الأدوار المستهدفة؟", "ما هي أقوى مهاراتك؟"],
+                contact: ["البريد الإلكتروني", "LinkedIn", "أفضل طريقة للتواصل؟"]
+            }
         }
     }
 };
@@ -3507,6 +3529,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let lastContext = null; // Store truncation tail logic
     let isInitialized = false;
 
+    // Chips state management - single source of truth
+    let dynamicChips = []; // Dynamic chips from worker responses or context
+    let currentLanguage = document.documentElement.lang || 'en';
+
     // Cross-page chat memory
     // Use sessionStorage so conversation persists across pages in the same tab.
     // If you want memory across browser restarts, switch this to localStorage.
@@ -3586,10 +3612,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Always update chips based on current language, regardless of history
     if (els.chipsContainer) {
-        const currentLang = document.documentElement.lang || 'en';
-        const defaultChips = translations.chat.defaultChips[currentLang] || translations.chat.defaultChips['en'];
+        currentLanguage = document.documentElement.lang || 'en';
+        const defaultChipsForLang = translations.chat.defaultChips[currentLanguage] || translations.chat.defaultChips.en;
         
-        renderChips(defaultChips);
+        // Set initial dynamic chips
+        dynamicChips = defaultChipsForLang;
+        renderChips();
     }
     
     isInitialized = true;
@@ -3974,45 +4002,84 @@ document.addEventListener('DOMContentLoaded', () => {
         return out;
     };
 
-    // Helper: Render chips and ensure close button exists
-    function renderChips(chips) {
+    // Helper: Render chips with dynamic + pinned structure
+    function renderChips(newDynamicChips = null) {
         if (!els.chipsContainer) return;
         
+        // Update dynamic chips if provided
+        if (newDynamicChips && Array.isArray(newDynamicChips)) {
+            dynamicChips = newDynamicChips;
+        }
+        
+        // Get current language
+        currentLanguage = document.documentElement.lang || 'en';
+        
+        // Get pinned chips for current language
+        const pinnedChips = translations.chat.pinnedChips[currentLanguage] || translations.chat.pinnedChips.en;
+        
+        // Deduplicate: remove any dynamic chips that match pinned chips (case-insensitive)
+        const pinnedLower = pinnedChips.map(p => p.toLowerCase());
+        const uniqueDynamicChips = dynamicChips.filter(chip => 
+            !pinnedLower.includes(chip.toLowerCase())
+        );
+        
+        // Combine: dynamic first, then pinned
+        const allChips = [...uniqueDynamicChips, ...pinnedChips];
+        
+        // Clear and rebuild
         els.chipsContainer.innerHTML = '';
         
-        if (!chips || chips.length === 0) {
+        if (allChips.length === 0) {
             setSuggestionsVisible(false);
             return;
         }
 
-        const projectLabels = ["Projects", "View Projects", "Projects & Case Studies", "View projects"];
-        const resumeLabels = ["Resume", "Download Resume", "View Resume", "Get resume"];
-        const contactLabels = ["Contact", "Email", "Email Estivan", "Contact Estivan"];
+        // Define action labels for special handling
+        const projectLabels = ["Projects", "View Projects", "Projects & Case Studies", "View projects", "Proyectos", "Ver proyectos", "مشاريع", "عرض المشاريع"];
+        const resumeLabels = ["Resume", "Download Resume", "View Resume", "Get resume", "Currículum", "Descargar currículum", "السيرة الذاتية", "تحميل السيرة"];
+        const contactLabels = ["Contact", "Email", "Email Estivan", "Contact Estivan", "Contacto", "Correo electrónico", "اتصال", "البريد الإلكتروني"];
         const linkedinLabels = ["LinkedIn", "Open LinkedIn"];
 
-        // Render chips
-        chips.forEach(chipText => {
+        // Render all chips
+        allChips.forEach(chipText => {
             const btn = document.createElement('button');
-            btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
+            const isPinned = pinnedChips.some(p => p.toLowerCase() === chipText.toLowerCase());
+            
+            // Style pinned chips slightly differently (optional)
+            const pinnedStyle = isPinned ? 'font-medium' : '';
+            btn.className = `chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors ${pinnedStyle}`;
             btn.textContent = chipText;
             
             btn.addEventListener('click', () => {
-                // Check if this chip maps to a direct action
+                // Handle pinned chip actions
                 if (projectLabels.includes(chipText)) {
                     window.location.href = "/projects.html";
+                    // Update dynamic chips with project-related follow-ups
+                    const followUps = translations.chat.pinnedFollowUps[currentLanguage]?.projects || 
+                                     translations.chat.pinnedFollowUps.en.projects;
+                    dynamicChips = followUps;
+                    renderChips();
                     return;
                 }
                 if (resumeLabels.includes(chipText)) {
-                    // Try to open download logic via message loop or direct link
-                    // Best experience: open PDF in new tab
                     try { window.open(RESUME_URL, '_blank', 'noopener'); } catch(e) {}
+                    // Update dynamic chips with resume-related follow-ups
+                    const followUps = translations.chat.pinnedFollowUps[currentLanguage]?.resume || 
+                                     translations.chat.pinnedFollowUps.en.resume;
+                    dynamicChips = followUps;
+                    renderChips();
                     return;
                 }
                 if (contactLabels.includes(chipText)) {
                     window.location.href = "/contact.html";
+                    // Update dynamic chips with contact-related follow-ups
+                    const followUps = translations.chat.pinnedFollowUps[currentLanguage]?.contact || 
+                                     translations.chat.pinnedFollowUps.en.contact;
+                    dynamicChips = followUps;
+                    renderChips();
                     return;
                 }
-                 if (linkedinLabels.includes(chipText)) {
+                if (linkedinLabels.includes(chipText)) {
                     try { window.open(LINKEDIN_URL, '_blank', 'noopener'); } catch(e) {}
                     return;
                 }
@@ -4026,7 +4093,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Default behavior: send text as message
                 if (els.input) {
                     els.input.value = chipText;
-                    const messageToSend = chipText;
                     // Clear input immediately after capturing the value
                     setTimeout(() => {
                         if (els.input) els.input.value = '';
@@ -4037,7 +4103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             els.chipsContainer.appendChild(btn);
         });
 
-        // Always add close button with proper data attribute
+        // Always add close button
         const closeBtn = document.createElement('button');
         closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
         closeBtn.setAttribute('data-chat-suggestions-close', 'button');
@@ -4332,9 +4398,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // For OfflineMode, still render the reply and chips even though errorType is set
             if (data.errorType !== 'OfflineMode') {
-                // Handle chips for error states
+                // Handle chips for error states - update dynamic chips if provided
                 if (data.chips && Array.isArray(data.chips) && els.chipsContainer) {
                     renderChips(data.chips);
+                } else {
+                    // Keep current dynamic chips, just re-render to show pinned
+                    renderChips();
                 }
                 
                 if (shouldRetry) {
@@ -4375,7 +4444,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Handle chips (suggestion buttons)
         if (data.chips && Array.isArray(data.chips) && els.chipsContainer) {
+            // Update dynamic chips from worker response
             renderChips(data.chips);
+        } else if (!data.chips && chatHistory.length > 0) {
+            // No chips from worker, generate contextual ones
+            const contextualChips = generateContextualChips(chatHistory);
+            if (contextualChips.length > 0 && els.chipsContainer) {
+                renderChips(contextualChips);
+            } else {
+                // No contextual chips either, keep current dynamic chips and re-render
+                renderChips();
+            }
+        } else {
+            // Ensure pinned chips are always visible
+            renderChips();
         }
 
         // Handle actions
@@ -4407,14 +4489,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle card
         if (data.card) {
             addCardToUI(data.card);
-        }
-
-        // Generate contextual chips based on conversation
-        if (!data.chips && chatHistory.length > 0) {
-            const contextualChips = generateContextualChips(chatHistory);
-            if (contextualChips.length > 0 && els.chipsContainer) {
-                renderChips(contextualChips);
-            }
         }
 
         isSending = false;
