@@ -71,21 +71,48 @@ wait
 
 ## Expected Responses
 
-### Successful Response
+### Successful Response (Dynamic Chips)
+Chips are now **contextual and dynamic** based on the user's question. The backend returns 3-5 relevant follow-up suggestions. The frontend adds pinned chips (Projects, Resume, Contact) at the end.
+
 ```json
 {
   "errorType": null,
-  "reply": "Estivan is a Software Engineer...",
-  "chips": ["Projects", "Resume", "Contact"],
+  "reply": "Estivan is a Software Engineer with operations expertise...",
+  "chips": ["What are his key skills?", "Recent work experience", "Top projects", "Education background"],
   "version": "v2026.01.11-dynamic-audit"
 }
 ```
+
+**Note:** Chips vary by intent:
+- **Greeting**: `["What does Estivan do?", "Show me top skills", "View best projects"]`
+- **Summary**: `["What are his key skills?", "Recent work experience", "Top projects", "Education background"]`
+- **Skills**: `["What's his tech stack?", "Operations experience", "Any certifications?", "Programming languages", "Tools and frameworks"]`
+- **Projects**: `["Logistics Management System", "Whispers App", "Conflict Resolution Playbook", "Portfolio website"]`
+- **Default**: `["What does Estivan do?", "Key skills overview", "Top projects showcase"]`
 
 ### Rate Limited
 ```json
 {
   "errorType": "RateLimit",
   "reply": "Whoa, too fast! Give me a minute to catch up. ⏱️",
+  "chips": ["Wait a moment", "What can you help with?"],
+  "version": "v2026.01.11-dynamic-audit"
+}
+```
+
+### Debug Mode Response
+When `?debug=1` query parameter is added, responses include debug information:
+
+```json
+{
+  "errorType": null,
+  "reply": "Estivan's skills include...",
+  "chips": ["What's his tech stack?", "Operations experience", "Any certifications?"],
+  "debug": {
+    "intent": "skills",
+    "chips_source": "gemini_ai",
+    "message_lower": "what are his skills"
+  },
   "version": "v2026.01.11-dynamic-audit"
 }
 ```

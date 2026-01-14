@@ -117,40 +117,67 @@ function detectIntent(lowerMsg) {
   if (/(recruiter|hiring manager|interview|role|position|opportunity|availability|available|start date)/.test(lowerMsg)) return "recruiter";
   if (/(email|contact|reach|message|connect)/.test(lowerMsg)) return "contact";
   if (/(salary|compensation|rate|pay|wage|range)/.test(lowerMsg)) return "salary";
-  if (/(project|projects|case study|portfolio|work samples|experience)/.test(lowerMsg)) return "projects";
-  if (/(who is he|who are you|about you|about estivan|summary|tell me about|elevator pitch|quick summary|bio|background)/.test(lowerMsg)) return "summary";
+  if (/(project|projects|case study|portfolio|work samples)/.test(lowerMsg)) return "projects";
+  // Detect "What does Estivan do?" and similar summary questions
+  if (/(what does (he|estivan) do|what is (he|estivan)|who is (he|estivan)|who are you|about you|about estivan|summary|tell me about|elevator pitch|quick summary|bio|background|experience|his background)/.test(lowerMsg)) return "summary";
+  // Detect skills-related questions
+  if (/(skill|skills|what are (his|your) skills|technical|technology|technologies|tech stack|expertise|proficiency|what can (he|you) do|capabilities)/.test(lowerMsg)) return "skills";
   if (/(hobbies|hobby|gym|workout|fitness|car|cars|reading|books|cooking|photography|whispers)/.test(lowerMsg)) return "hobbies";
   return "default";
 }
 
 /**
  * Get deterministic chips based on user intent
+ * Returns ONLY dynamic contextual chips - Frontend adds pinned chips (Projects, Resume, Contact)
  */
 function buildChips(lowerMsg) {
   const intent = detectIntent(lowerMsg);
   
-  // Chip sets mapping to actionable buttons in frontend
-  // Frontend handles: "Projects", "Resume", "Contact", "LinkedIn" specially.
+  // Return 3-5 contextual suggestions per intent
+  // Do NOT include pinned chips here - frontend handles those
   
   switch (intent) {
     case "greeting":
-      return ["Quick summary", "Projects", "Resume"];
+      return ["What does Estivan do?", "Show me top skills", "View best projects"];
+    
     case "summary":
-      return ["Projects", "Resume", "Contact"];
+      return ["What are his key skills?", "Recent work experience", "Top projects", "Education background"];
+    
+    case "skills":
+      return ["What's his tech stack?", "Operations experience", "Any certifications?", "Programming languages", "Tools and frameworks"];
+    
     case "projects":
-      // "Operations work" and "Site build" are text queries; "Contact" is action
-      return ["Logistics System", "Whispers App", "Contact"];
+      return ["Logistics Management System", "Whispers App", "Conflict Resolution Playbook", "Portfolio website"];
+    
     case "recruiter":
-      return ["Availability", "Location", "Resume"];
+      return ["When can you start?", "Preferred work location?", "Salary expectations?", "Open to relocation?"];
+    
     case "contact":
-      return ["Email", "LinkedIn", "Resume"];
+      return ["Email address", "LinkedIn profile", "Best time to reach out?"];
+    
     case "salary":
-      return ["Projects", "Resume", "Contact"];
+      return ["What's your experience level?", "Recent projects impact", "Skills and expertise", "Career goals"];
+    
     case "hobbies":
-      return ["Gym routine", "BMW 540i", "Reading list"];
+      return ["Gym and fitness routine", "BMW 540i details", "Reading list", "Photography work"];
+    
     default:
-      return ["Projects", "Resume", "Contact"];
+      return ["What does Estivan do?", "Key skills overview", "Top projects showcase"];
   }
+}
+
+/**
+ * Build debug info for response (when debug mode is enabled)
+ */
+function buildDebugInfo(isDebug, lowerMsg, source = "buildChips") {
+  if (!isDebug) return undefined;
+  
+  const intent = detectIntent(lowerMsg);
+  return {
+    intent: intent,
+    chips_source: source,
+    message_lower: lowerMsg.slice(0, 100)
+  };
 }
 
 /**
@@ -383,7 +410,8 @@ export default {
             return jsonReply(
               {
                 errorType: "RateLimit",
-                reply: "Whoa, too fast! Give me a minute to catch up. ⏱️"
+                reply: "Whoa, too fast! Give me a minute to catch up. ⏱️",
+                chips: ["Wait a moment", "What can you help with?"]
               },
               429,
               corsHeaders
@@ -399,7 +427,8 @@ export default {
           return jsonReply(
             {
               errorType: "RateLimit",
-              reply: "Whoa, too fast! Give me a minute to catch up. ⏱️"
+              reply: "Whoa, too fast! Give me a minute to catch up. ⏱️",
+              chips: ["Wait a moment", "What can you help with?"]
             },
             429,
             corsHeaders
@@ -417,7 +446,8 @@ export default {
             reply: "I'm open to market-aligned compensation for operations roles. If you share the range, I can confirm fit. You can also reach Estivan at [hello@estivanayramia.com](mailto:hello@estivanayramia.com).",
             chips: buildChips(lowerMsg),
             action: "email_link",
-            card: null
+            card: null,
+            debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_salary")
           },
           200,
           corsHeaders
@@ -432,7 +462,8 @@ export default {
             reply: "You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact.html). He usually responds within 24 hours.",
             chips: buildChips(lowerMsg),
             action: "email_link",
-            card: null
+            card: null,
+            debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_contact")
           },
           200,
           corsHeaders
@@ -447,7 +478,8 @@ export default {
             reply: "Here's Estivan's resume! Click below to download the [PDF](/assets/docs/Estivan-Ayramia-Resume.pdf).",
             chips: buildChips(lowerMsg),
             action: "download_resume",
-            card: null
+            card: null,
+            debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_resume")
           },
           200,
           corsHeaders
@@ -462,7 +494,8 @@ export default {
             reply: "The [Logistics System](/project-logistics.html) automated supply chain operations to improve delivery times. Check out the full case study!",
             chips: buildChips(lowerMsg),
             card: "logistics",
-            action: null
+            action: null,
+            debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_logistics")
           },
           200,
           corsHeaders
@@ -476,7 +509,8 @@ export default {
             reply: "The [Conflict Resolution Playbook](/project-conflict.html) standardized de-escalation protocols to improve workplace safety.",
             chips: buildChips(lowerMsg),
             card: "conflict",
-            action: null
+            action: null,
+            debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_conflict")
           },
           200,
           corsHeaders
@@ -734,7 +768,8 @@ If asked about page-specific content you don't have info about:
             continuation_hint: isTruncated ? sanitizedReply.slice(-1000) : null,
             reply_length: sanitizedReply.length,
             action: null,
-            card: null
+            card: null,
+            debug: buildDebugInfo(isDebug, lowerMsg, "gemini_ai")
           },
           200,
           corsHeaders

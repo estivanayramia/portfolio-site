@@ -3532,6 +3532,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Chips state management - single source of truth
     let dynamicChips = []; // Dynamic chips from worker responses or context
     let currentLanguage = document.documentElement.lang || 'en';
+    let requestIdCounter = 0; // Race condition protection
+    let lastRequestId = 0;
 
     // Cross-page chat memory
     // Use sessionStorage so conversation persists across pages in the same tab.
@@ -4228,6 +4230,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!text || isSending) return;
 
         isSending = true;
+        
+        // Generate unique request ID for race condition protection
+        requestIdCounter++;
+        const thisRequestId = requestIdCounter;
+        lastRequestId = thisRequestId;
 
         // Google Analytics event tracking
         if(typeof gtag === 'function') {
@@ -4442,10 +4449,30 @@ document.addEventListener('DOMContentLoaded', () => {
             lastContext = null;
         }
 
-        // Handle chips (suggestion buttons)
+        // Race condition protection: Only process if this is still the latest request
+        if (thisRequestId !== lastRequestId) {
+            console.log('[Chat Debug] Ignoring stale response from request', thisRequestId);
+            isSending = false;
+            return;
+        }
+
+        // Handle chips (suggestion buttons) with smart logic
         if (data.chips && Array.isArray(data.chips) && els.chipsContainer) {
-            // Update dynamic chips from worker response
-            renderChips(data.chips);
+            // Get pinned chips for current language to check if response is pinned-only
+            const pinnedChips = translations.chat.pinnedChips[currentLanguage] || translations.chat.pinnedChips.en;
+            const pinnedLower = pinnedChips.map(p => p.toLowerCase());
+            
+            // Check if ALL chips are pinned chips (case-insensitive)
+            const allPinned = data.chips.every(chip => pinnedLower.includes(chip.toLowerCase()));
+            
+            if (allPinned && data.chips.length > 0) {
+                // Response contains ONLY pinned chips - don't wipe dynamic chips
+                console.log('[Chat Debug] Response contains only pinned chips, keeping existing dynamic chips');
+                renderChips(); // Re-render with existing dynamic chips + pinned
+            } else {
+                // Response contains at least one non-pinned chip - update dynamic chips
+                renderChips(data.chips);
+            }
         } else if (!data.chips && chatHistory.length > 0) {
             // No chips from worker, generate contextual ones
             const contextualChips = generateContextualChips(chatHistory);
