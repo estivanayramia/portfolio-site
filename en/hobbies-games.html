@@ -887,7 +887,7 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-4xl mx-auto">
                     <!-- Snake -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/en/hobbies-games/snake.html'">
+                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="startGame('snake')">
                         <div class="text-5xl mb-3">🐍</div>
                         <h3 class="text-2xl font-bold mb-2">Snake</h3>
                         <p class="text-sm opacity-70 mb-4">Classic reflex test with growing difficulty. Eat and grow!</p>
@@ -898,7 +898,7 @@
                     </div>
                     
                     <!-- Block Breaker -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/en/hobbies-games/block-breaker.html'">
+                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="startGame('breaker')">
                         <div class="text-5xl mb-3">🧱</div>
                         <h3 class="text-2xl font-bold mb-2">Block Breaker</h3>
                         <p class="text-sm opacity-70 mb-4">Smash bricks with increasing speed and power-ups!</p>
@@ -909,7 +909,7 @@
                     </div>
                     
                     <!-- 2048 -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/en/hobbies-games/2048.html'">
+                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="startGame('merge')">
                         <div class="text-5xl mb-3">🧩</div>
                         <h3 class="text-2xl font-bold mb-2">2048</h3>
                         <p class="text-sm opacity-70 mb-4">Combine tiles to reach 2048 with smooth animations!</p>
@@ -920,7 +920,7 @@
                     </div>
 
                     <!-- Space Invaders -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/en/hobbies-games/space-invaders.html'">
+                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="startGame('invaders')">
                         <div class="text-5xl mb-3">👾</div>
                         <h3 class="text-2xl font-bold mb-2">Space Invaders</h3>
                         <p class="text-sm opacity-70 mb-4">Defend Earth from alien waves with escalating difficulty!</p>
@@ -932,10 +932,6 @@
                 </div>
                 
                 <div class="text-center">
-                    <button onclick="toggleSound()" id="sound-toggle" class="mb-4 px-6 py-2 bg-indigodeep text-white rounded-lg font-medium hover:opacity-90 transition-all" title="Toggle Sound Effects">
-                        🔊
-                    </button>
-                    <br>
                     <a href="/en/hobbies/index.html" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigodeep to-[#362017] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                         <span>Continue to Hobbies</span>
                         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>

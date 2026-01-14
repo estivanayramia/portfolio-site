@@ -8,14 +8,14 @@
 /index.html                  /en/index.html               301
 
 # ===== 1.5 /en/ Game Shortcuts =====
-/en/snake.html               /en/hobbies-games/snake.html              301
-/en/snake                    /en/hobbies-games/snake.html              301
-/en/breaker.html             /en/hobbies-games/block-breaker.html      301
-/en/breaker                  /en/hobbies-games/block-breaker.html      301
-/en/2048.html                /en/hobbies-games/2048.html               301
-/en/2048                     /en/hobbies-games/2048.html               301
-/en/invaders.html            /en/hobbies-games/space-invaders.html     301
-/en/invaders                 /en/hobbies-games/space-invaders.html     301
+/en/snake.html               /en/hobbies-games.html              301
+/en/snake                    /en/hobbies-games.html              301
+/en/breaker.html             /en/hobbies-games.html              301
+/en/breaker                  /en/hobbies-games.html              301
+/en/2048.html                /en/hobbies-games.html              301
+/en/2048                     /en/hobbies-games.html              301
+/en/invaders.html            /en/hobbies-games.html              301
+/en/invaders                 /en/hobbies-games.html              301
 
 # ===== 2. Legacy Root Pages → /en/*.html =====
 /about.html                  /en/about.html               301
