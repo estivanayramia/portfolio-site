@@ -3,11 +3,92 @@
 // Cloudflare Worker with Rate Limiting, Smart Signals, & Auto-Healing
 // ============================================================================
 
+// Site facts - single source of truth for projects and hobbies
+// Generated from HTML content by scripts/generate-site-facts.js
+const siteFacts = {
+  "projects": [
+    {
+      "title": "This Website (Every Line)",
+      "summary": "No templates, no CMS. Just hand-written HTML/CSS/JS, service worker, Savonie chat, and Lighthouse 90+ scores.",
+      "url": "https://www.estivanayramia.com/projects/portfolio.html",
+      "path": "/projects/portfolio.html"
+    },
+    {
+      "title": "L'Oréal Cell BioPrint MAPS Campaign",
+      "summary": "Class concept campaign deck for L'Oréal Cell BioPrint that maps three personas and their touchpoints across the funnel.",
+      "url": "https://www.estivanayramia.com/projects/logistics.html",
+      "path": "/projects/logistics.html"
+    },
+    {
+      "title": "Franklin Templeton Class Concept",
+      "summary": "17-page class concept deck for a Franklin Templeton 'Voice of Progress' campaign.",
+      "url": "https://www.estivanayramia.com/projects/discipline.html",
+      "path": "/projects/discipline.html"
+    },
+    {
+      "title": "EndPoint LinkedIn Campaign",
+      "summary": "15-page deck outlining Phase 2A and Phase 2B of an EndPoint LinkedIn retargeting campaign.",
+      "url": "https://www.estivanayramia.com/projects/documentation.html",
+      "path": "/projects/documentation.html"
+    },
+    {
+      "title": "Endpoint Elosity Launch Video",
+      "summary": "Motion storyboard and full voiceover script showing bottlenecks shattering into a clean trial timeline.",
+      "url": "https://www.estivanayramia.com/projects/multilingual.html",
+      "path": "/projects/multilingual.html"
+    },
+    {
+      "title": "Taking Down Endpoint (Almac Group + 4G Clinical)",
+      "summary": "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.",
+      "url": "https://www.estivanayramia.com/projects/competitive-strategy.html",
+      "path": "/projects/competitive-strategy.html"
+    }
+  ],
+  "hobbies": [
+    {
+      "title": "Gym & Strength Training",
+      "summary": "Building discipline through progressive overload. Tracking PRs, optimizing recovery, and proving that consistency beats intensity every time.",
+      "url": "https://www.estivanayramia.com/hobbies/gym.html",
+      "path": "/hobbies/gym.html"
+    },
+    {
+      "title": "Photography",
+      "summary": "Capturing moments worth remembering. iPhone shots that tell stories; no DSLR needed, just good lighting and better timing.",
+      "url": "https://www.estivanayramia.com/hobbies/photography.html",
+      "path": "/hobbies/photography.html"
+    },
+    {
+      "title": "Car Enthusiasm",
+      "summary": "First car, first freedom. Not about speed; about ownership, maintenance, and the pride of keeping something running clean.",
+      "url": "https://www.estivanayramia.com/hobbies/car.html",
+      "path": "/hobbies/car.html"
+    },
+    {
+      "title": "Cooking",
+      "summary": "Steak, pasta, and everything in between. Not a chef; just someone who refuses to eat mediocre food when good ingredients are available.",
+      "url": "https://www.estivanayramia.com/hobbies/cooking.html",
+      "path": "/hobbies/cooking.html"
+    },
+    {
+      "title": "Whispers (Sticky Notes)",
+      "summary": "Random thoughts captured on sticky notes. Ideas, observations, reminders. Low-tech brain dump that keeps the mental clutter organized.",
+      "url": "https://www.estivanayramia.com/hobbies/whispers.html",
+      "path": "/hobbies/whispers.html"
+    },
+    {
+      "title": "Reading",
+      "summary": "Books are compressed experience. Reading is the cheapest way to access decades of wisdom without making the same mistakes yourself.",
+      "url": "https://www.estivanayramia.com/hobbies/reading.html",
+      "path": "/hobbies/reading.html"
+    }
+  ]
+};
+
 let cachedModel = "gemini-2.5-flash";
 const GEMINI_TIMEOUT = 35000; // Increased to account for larger tokens/retries
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_REPLY_CHARS = 8000; // Increased from 3000
-const VERSION_TAG = "v2026.01.11-dynamic-audit";
+const VERSION_TAG = "v2026.01.13-site-facts";
 
 // Optional local rate limiter (fallback if env.RATE_LIMITER not configured)
 const localRateLimiter = new Map();
@@ -92,7 +173,8 @@ function linkifyPages(text) {
   
   const map = [
     { word: "Overview", link: "[Overview](/overview.html)" },
-    { word: "Projects", link: "[Projects](/projects.html)" },
+    { word: "Projects", link: "[Projects](/projects/)" },  // Fixed: canonical URL
+    { word: "Hobbies", link: "[Hobbies](/hobbies/)" },    // Fixed: canonical URL
     { word: "Contact", link: "[Contact](/contact.html)" },
     { word: "Resume", link: "[Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)" }
   ];
@@ -122,13 +204,15 @@ function detectIntent(lowerMsg) {
   if (/(what does (he|estivan) do|what is (he|estivan)|who is (he|estivan)|who are you|about you|about estivan|summary|tell me about|elevator pitch|quick summary|bio|background|experience|his background)/.test(lowerMsg)) return "summary";
   // Detect skills-related questions
   if (/(skill|skills|what are (his|your) skills|technical|technology|technologies|tech stack|expertise|proficiency|what can (he|you) do|capabilities)/.test(lowerMsg)) return "skills";
-  if (/(hobbies|hobby|gym|workout|fitness|car|cars|reading|books|cooking|photography|whispers)/.test(lowerMsg)) return "hobbies";
+  // Detect hobbies - IMPORTANT: whispers is a hobby (sticky notes), not a project
+  if (/(hobbies|hobby|gym|workout|fitness|car|cars|reading|books|cooking|photography|whispers|sticky notes)/.test(lowerMsg)) return "hobbies";
   return "default";
 }
 
 /**
  * Get deterministic chips based on user intent
  * Returns ONLY dynamic contextual chips - Frontend adds pinned chips (Projects, Resume, Contact)
+ * Uses site-facts as the authoritative source for projects and hobbies
  */
 function buildChips(lowerMsg) {
   const intent = detectIntent(lowerMsg);
@@ -147,7 +231,8 @@ function buildChips(lowerMsg) {
       return ["What's his tech stack?", "Operations experience", "Any certifications?", "Programming languages", "Tools and frameworks"];
     
     case "projects":
-      return ["Logistics Management System", "Whispers App", "Conflict Resolution Playbook", "Portfolio website"];
+      // Use first 4 projects from site-facts (the authoritative source)
+      return siteFacts.projects.slice(0, 4).map(p => p.title);
     
     case "recruiter":
       return ["When can you start?", "Preferred work location?", "Salary expectations?", "Open to relocation?"];
@@ -159,7 +244,8 @@ function buildChips(lowerMsg) {
       return ["What's your experience level?", "Recent projects impact", "Skills and expertise", "Career goals"];
     
     case "hobbies":
-      return ["Gym and fitness routine", "BMW 540i details", "Reading list", "Photography work"];
+      // Use first 4 hobbies from site-facts (the authoritative source)
+      return siteFacts.hobbies.slice(0, 4).map(h => h.title);
     
     default:
       return ["What does Estivan do?", "Key skills overview", "Top projects showcase"];
@@ -178,6 +264,45 @@ function buildDebugInfo(isDebug, lowerMsg, source = "buildChips") {
     chips_source: source,
     message_lower: lowerMsg.slice(0, 100)
   };
+}
+
+/**
+ * Guardrail validation - prevent hallucinated projects
+ * Validates that any project mentioned exists in site-facts
+ */
+function validateProjectMentions(text) {
+  if (!text) return { isValid: true, violations: [] };
+  
+  // Check for specific fake projects we know about
+  const knownFakeProjects = [
+    "getwispers",
+    "get wispers", 
+    "whispers app",
+    "whispers application",
+    "messaging app",
+    "discipline system"
+  ];
+  
+  const lowerText = text.toLowerCase();
+  const violations = [];
+  
+  // Check for fake projects
+  for (const fake of knownFakeProjects) {
+    if (lowerText.includes(fake)) {
+      violations.push(fake);
+    }
+  }
+  
+  // If violations found, return invalid
+  if (violations.length > 0) {
+    return {
+      isValid: false,
+      violations: violations,
+      correctedReply: `That project is not listed on the portfolio site. Check out [Projects](/projects/) to see Estivan's actual work, or reach out at [Contact](/contact.html) for more information.`
+    };
+  }
+  
+  return { isValid: true, violations: [] };
 }
 
 /**
@@ -502,6 +627,35 @@ export default {
         );
       }
 
+      // Handle Whispers clarification - it's a HOBBY, not a project
+      if (lowerMsg.includes("whispers") || lowerMsg.includes("getwispers") || lowerMsg.includes("get wispers")) {
+        if (lowerMsg.includes("getwispers") || lowerMsg.includes("get wispers")) {
+          // getWispers is not a real project
+          return jsonReply(
+            {
+              errorType: null,
+              reply: "That project is not listed on the portfolio site. Check out [Projects](/projects/) to see Estivan's actual work, or reach out at [Contact](/contact.html) for more information.",
+              chips: siteFacts.projects.slice(0, 3).map(p => p.title),
+              debug: buildDebugInfo(isDebug, lowerMsg, "getwispers_correction")
+            },
+            200,
+            corsHeaders
+          );
+        } else {
+          // Whispers is a hobby
+          return jsonReply(
+            {
+              errorType: null,
+              reply: "[Whispers (Sticky Notes)](/hobbies/whispers.html) is one of Estivan's hobbies - a low-tech way to capture random thoughts and ideas on sticky notes. It's not a project. Check out [Hobbies](/hobbies/) for more.",
+              chips: siteFacts.hobbies.slice(0, 4).map(h => h.title),
+              debug: buildDebugInfo(isDebug, lowerMsg, "whispers_hobby_clarification")
+            },
+            200,
+            corsHeaders
+          );
+        }
+      }
+
       if (lowerMsg.includes("conflict") || lowerMsg.includes("playbook")) {
         return jsonReply(
           {
@@ -550,10 +704,16 @@ USER LANGUAGE: ${language || "English"} (Reply in this language!)
 6. Speak in THIRD PERSON by default ("Estivan is...", "He does...")
 7. Switch to FIRST PERSON only if visitor asks for "Estivan's voice" or "speak as Estivan"
 
+*** CRITICAL: WHISPERS IS A HOBBY, NOT A PROJECT ***
+- "Whispers" / "Whispers (Sticky Notes)" = HOBBY (capturing thoughts on sticky notes)
+- "getWispers" / "get Wispers" = DOES NOT EXIST (never mention this)
+- If asked about whispers, clarify it's a hobby and link to /hobbies/whispers.html
+- If asked about getWispers, say it's not listed and link to /projects/
+
 *** BOUNDARIES (FAMILY-SAFE & PROFESSIONAL) ***
 ✅ CAN discuss: Projects, skills, education, hobbies, career goals, personality, values
 ❌ NEVER discuss: Sexual content, health diagnoses, family drama, exact addresses, political debates
-If asked inappropriate questions: "Professional inquiries only. Check out [Projects](/projects.html) or [Contact](/contact.html) instead."
+If asked inappropriate questions: "Professional inquiries only. Check out [Projects](/projects/) or [Contact](/contact.html) instead."
 
 *** WHO ESTIVAN IS ***
 - **Name**: Estivan Ayramia (He/Him), 21 years old
@@ -571,18 +731,12 @@ If asked inappropriate questions: "Professional inquiries only. Check out [Proje
 - **Pattern recognition**: Naturally analytical, questions everything, loves learning
 
 *** KEY PROJECTS ***
-- **Logistics System**: Automated supply chain workflows and tracking
-- **Conflict Playbook**: Workplace safety and de-escalation framework
-- **getWispers**: Anonymous messaging app with ethics-first moderation
-- **Discipline System**: Personal consistency tracking tool
-- **This Portfolio**: Fast, clean, built for clarity
+Use the siteFacts.projects array as the authoritative source. Current projects:
+${siteFacts.projects.map(p => `- **${p.title}**: ${p.summary}`).join('\n')}
 
 *** HOBBIES & INTERESTS ***
-- **Gym**: 4-5 days/week, bro split (back/bi, chest/tri, legs/shoulders), 170 lbs lean goal
-- **Cars**: Drives BMW 540i (V8), does own maintenance, loves driving as therapy
-- **Reading**: "How to Win Friends and Influence People" is favorite, reads young adult & self-improvement
-- **Cooking**: Makes excellent steak, cooks 3x more than eating out
-- **Music**: Arctic Monkeys, Don Toliver, Drake, Clairo, The Neighbourhood, Lana Del Rey
+Use the siteFacts.hobbies array as the authoritative source. Current hobbies:
+${siteFacts.hobbies.map(h => `- **${h.title}**: ${h.summary}`).join('\n')}
 
 *** CAREER GOALS ***
 - **Next year**: High-paying job, clear 5-year plan, closer to owning house
@@ -608,9 +762,10 @@ When visitor mentions these keywords, suggest these actions:
 - "resume" / "CV" / "download" → Point to [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)
 - "contact" / "email" / "hire" / "reach out" → Point to [Contact](/contact.html) or hello@estivanayramia.com
 - "LinkedIn" → Mention professional networking
-- "logistics" / "supply chain" → Highlight Logistics System project
-- "whispers" / "messaging" → Highlight getWispers project
-- "conflict" / "workplace" → Highlight Conflict Playbook
+- "logistics" / "supply chain" → Highlight the relevant project from site-facts
+- "whispers" / "sticky notes" → Clarify this is a HOBBY (not a project), link to /hobbies/whispers.html
+- "conflict" / "workplace" → Highlight the relevant project from site-facts
+- "projects" → Link to [Projects](/projects/) to see all work
 
 *** OUTPUT RULES ***
 - Write in clean Markdown only
@@ -759,6 +914,26 @@ If asked about page-specific content you don't have info about:
         // 3. Linkify
         sanitizedReply = linkifyPages(sanitizedReply);
 
+        // 4. Guardrail validation - prevent hallucinated projects
+        const validation = validateProjectMentions(sanitizedReply);
+        if (!validation.isValid) {
+          console.log(`Guardrail triggered: hallucinated projects detected - ${validation.violations.join(', ')}`);
+          // Replace with corrected reply and show real project chips
+          sanitizedReply = validation.correctedReply;
+          return jsonReply(
+            {
+              errorType: null,
+              reply: sanitizedReply,
+              chips: siteFacts.projects.slice(0, 3).map(p => p.title),
+              guardrail_triggered: true,
+              violations: validation.violations,
+              debug: buildDebugInfo(isDebug, lowerMsg, "guardrail_correction")
+            },
+            200,
+            corsHeaders
+          );
+        }
+
         return jsonReply(
           {
             errorType: null,
@@ -870,33 +1045,34 @@ Quick links:
 - [Download Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)
 - [Contact Estivan](/contact.html)`;
         } else if (intent === "projects") {
+          // Use real projects from site-facts
+          const projectList = siteFacts.projects.slice(0, 4).map(p => 
+            `- **${p.title}**: ${p.summary}`
+          ).join('\n');
           fallbackReply = `Here are some of Estivan's key projects:
 
-- **Logistics System**: Automated supply chain flows - [View Project](/project-logistics.html)
-- **Conflict Playbook**: Workplace safety & de-escalation framework
-- **getWispers**: Anonymous messaging app focused on ethics
-- **This Portfolio**: The site you're on - built for speed and clarity
+${projectList}
 
-[Explore all projects →](/projects.html)`;
+[Explore all projects →](/projects/)`;
         } else if (intent === "summary") {
-          fallbackReply = `Estivan Ayramia is a Software Engineer based in San Diego, specializing in operations and infrastructure.
+          fallbackReply = `Estivan Ayramia is a Business graduate from SDSU based in San Diego, specializing in operations and strategic execution.
 
-**Background**: Born in Baghdad/Syria (2004), educated at SDSU (Business). 3 years coaching experience.
+**Background**: Born in Baghdad/Syria (2004), SDSU General Business (3.8 GPA). 3 years coaching experience.
 
-**Focus Areas**: Supply Chain, Logistics, Project Execution, DevOps.
+**Focus Areas**: Supply Chain, Logistics, Operations, Project Execution.
 
-**Key Projects**: Logistics System, Conflict Playbook, getWispers.
+**Key Projects**: ${siteFacts.projects.slice(0, 3).map(p => p.title).join(', ')}.
 
 [View full resume →](/assets/docs/Estivan-Ayramia-Resume.pdf)`;
         } else {
           fallbackReply = `I'm currently offline, but I can help you navigate Estivan's portfolio. 
 
 **Quick Options**:
-- [Projects](/projects.html) - Browse his work
+- [Projects](/projects/) - Browse his work
 - [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) - Download his CV
 - [Contact](/contact.html) - Reach out directly at hello@estivanayramia.com
 
-Estivan is a Software Engineer specializing in operations and infrastructure with experience in cloud platforms, DevOps, and full-stack development.`;
+Estivan is a Business graduate specializing in operations and strategic execution with experience in supply chain, logistics, and project management.`;
         }
         
         return jsonReply(

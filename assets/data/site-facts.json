@@ -1,0 +1,84 @@
+{
+  "generated": "2026-01-14T03:33:27.480Z",
+  "projects": [
+    {
+      "title": "This Website (Every Line)",
+      "summary": "No templates, no CMS. Just hand-written HTML/CSS/JS, service worker, Savonie chat, and Lighthouse 90+ scores. The repo is the proof.",
+      "url": "https://www.estivanayramia.com/projects/portfolio.html",
+      "path": "/projects/portfolio.html"
+    },
+    {
+      "title": "L'Oréal Cell BioPrint MAPS Campaign",
+      "summary": "Class concept campaign deck for L'Oréal Cell BioPrint that maps three personas and their touchpoints across the funnel.",
+      "url": "https://www.estivanayramia.com/projects/logistics.html",
+      "path": "/projects/logistics.html"
+    },
+    {
+      "title": "Franklin Templeton Class Concept",
+      "summary": "17-page class concept deck for a Franklin Templeton 'Voice of Progress' campaign.",
+      "url": "https://www.estivanayramia.com/projects/discipline.html",
+      "path": "/projects/discipline.html"
+    },
+    {
+      "title": "EndPoint LinkedIn Campaign",
+      "summary": "15-page deck outlining Phase 2A and Phase 2B of an EndPoint LinkedIn retargeting campaign.",
+      "url": "https://www.estivanayramia.com/projects/documentation.html",
+      "path": "/projects/documentation.html"
+    },
+    {
+      "title": "Endpoint Elosity Launch Video",
+      "summary": "Motion storyboard and full voiceover script showing bottlenecks shattering into a clean trial timeline. Built for silent autoplay with bold typography.",
+      "url": "https://www.estivanayramia.com/projects/multilingual.html",
+      "path": "/projects/multilingual.html"
+    },
+    {
+      "title": "Taking Down Endpoint (Almac Group + 4G Clinical)",
+      "summary": "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.",
+      "url": "https://www.estivanayramia.com/projects/competitive-strategy.html",
+      "path": "/projects/competitive-strategy.html"
+    }
+  ],
+  "hobbies": [
+    {
+      "title": "Gym & Strength Training",
+      "summary": "Building discipline through progressive overload. Tracking PRs, optimizing recovery, and proving that consistency beats intensity every time.",
+      "url": "https://www.estivanayramia.com/hobbies/gym.html",
+      "path": "/hobbies/gym.html"
+    },
+    {
+      "title": "Photography",
+      "summary": "Capturing moments worth remembering. iPhone shots that tell stories; no DSLR needed, just good lighting and better timing.",
+      "url": "https://www.estivanayramia.com/hobbies/photography.html",
+      "path": "/hobbies/photography.html"
+    },
+    {
+      "title": "Car Enthusiasm",
+      "summary": "First car, first freedom. Not about speed; about ownership, maintenance, and the pride of keeping something running clean.",
+      "url": "https://www.estivanayramia.com/hobbies/car.html",
+      "path": "/hobbies/car.html"
+    },
+    {
+      "title": "Cooking",
+      "summary": "Steak, pasta, and everything in between. Not a chef; just someone who refuses to eat mediocre food when good ingredients are available.",
+      "url": "https://www.estivanayramia.com/hobbies/cooking.html",
+      "path": "/hobbies/cooking.html"
+    },
+    {
+      "title": "Whispers (Sticky Notes)",
+      "summary": "Random thoughts captured on sticky notes. Ideas, observations, reminders. Low-tech brain dump that keeps the mental clutter organized.",
+      "url": "https://www.estivanayramia.com/hobbies/whispers.html",
+      "path": "/hobbies/whispers.html"
+    },
+    {
+      "title": "Reading",
+      "summary": "Books are compressed experience. Reading is the cheapest way to access decades of wisdom without making the same mistakes yourself.",
+      "url": "https://www.estivanayramia.com/hobbies/reading.html",
+      "path": "/hobbies/reading.html"
+    }
+  ],
+  "meta": {
+    "projectCount": 6,
+    "hobbyCount": 6,
+    "source": "Generated from HTML content by scripts/generate-site-facts.js"
+  }
+}
