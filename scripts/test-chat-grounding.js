@@ -170,8 +170,8 @@ console.log('\n🔧 Test Group: L\'Oréal Handler');
 
 // Check that the L'Oréal project exists with correct URL
 if (siteFacts?.projects) {
-  const lorealProject = siteFacts.projects.find(p => p.url === '/projects/logistics');
-  test('L\'Oréal project exists with URL /projects/logistics', !!lorealProject);
+  const lorealProject = siteFacts.projects.find(p => p.url === '/en/projects/logistics');
+  test('L\'Oréal project exists with URL /en/projects/logistics', !!lorealProject);
   
   if (lorealProject) {
     test('L\'Oréal project has title', !!lorealProject.title);
@@ -186,8 +186,8 @@ if (siteFacts?.projects) {
   
   // Verify worker uses URL-based lookup, not hardcoded id
   const workerContents = fs.readFileSync(WORKER_PATH, 'utf-8');
-  test('Worker uses URL lookup for L\'Oréal (p.url === "/projects/logistics")', 
-    workerContents.includes('p.url === "/projects/logistics"')
+  test('Worker uses URL lookup for L\'Oréal (p.url === "/en/projects/logistics")', 
+    workerContents.includes('p.url === "/en/projects/logistics"')
   );
   test('Worker does not use old broken id lookup',
     !workerContents.includes('p.id === "loreal-cell-bioprint"')
@@ -206,9 +206,9 @@ if (siteFacts?.projects) {
 console.log('\n📁 Test Group: File Existence');
 
 const criticalFiles = [
-  'index.html',
-  'projects/index.html',
-  'hobbies/index.html',
+  'en/index.html',
+  'en/projects/index.html',
+  'en/hobbies/index.html',
   'assets/js/site.min.js',
   'assets/css/style.css',
   'robots.txt',

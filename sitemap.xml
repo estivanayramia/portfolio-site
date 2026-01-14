@@ -1,103 +1,164 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Language Roots -->
   <url>
-    <loc>https://www.estivanayramia.com/</loc>
+    <loc>https://www.estivanayramia.com/en/</loc>
+    <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/es/</loc>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/ar/</loc>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- English Pages -->
+  <url>
+    <loc>https://www.estivanayramia.com/en/about</loc>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/about</loc>
+    <loc>https://www.estivanayramia.com/en/contact</loc>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/contact</loc>
+    <loc>https://www.estivanayramia.com/en/overview</loc>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/deep-dive</loc>
+    <loc>https://www.estivanayramia.com/en/deep-dive</loc>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies-games</loc>
+    <loc>https://www.estivanayramia.com/en/privacy</loc>
+    <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies/</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games</loc>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- English Projects -->
+  <url>
+    <loc>https://www.estivanayramia.com/en/projects/</loc>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies/car</loc>
+    <loc>https://www.estivanayramia.com/en/projects/portfolio</loc>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies/cooking</loc>
+    <loc>https://www.estivanayramia.com/en/projects/logistics</loc>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies/gym</loc>
+    <loc>https://www.estivanayramia.com/en/projects/discipline</loc>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies/photography</loc>
+    <loc>https://www.estivanayramia.com/en/projects/documentation</loc>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies/reading</loc>
+    <loc>https://www.estivanayramia.com/en/projects/multilingual</loc>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies/whispers</loc>
+    <loc>https://www.estivanayramia.com/en/projects/competitive-strategy</loc>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- English Hobbies -->
+  <url>
+    <loc>https://www.estivanayramia.com/en/hobbies/</loc>
+    <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/overview</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/gym</loc>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/privacy</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/photography</loc>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/projects/competitive-strategy</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/car</loc>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/projects/discipline</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/cooking</loc>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/projects/documentation</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/whispers</loc>
+    <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/projects/logistics</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/reading</loc>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- English Mini-Games -->
+  <url>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/1024-moves</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/projects/multilingual</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/2048</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/projects/portfolio</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/back-attacker</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/projects/</loc>
-  </url>
-  <!-- Mini-Games -->
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/1024-moves</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/block-breaker</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/nano-wirebot</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/nano-wirebot</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/off-the-line</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/off-the-line</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/oh-flip</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/oh-flip</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/onoff</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/onoff</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/pizza-undelivery</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/pizza-undelivery</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/racer</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/racer</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/the-matr13k</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/snake</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/triangle-back-to-home</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/space-invaders</loc>
+    <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/xx142-b2exe</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/the-matr13k</loc>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/triangle-back-to-home</loc>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/xx142-b2exe</loc>
+    <priority>0.4</priority>
   </url>
 </urlset>
