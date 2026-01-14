@@ -339,6 +339,21 @@ header {
     background-color: #212842 !important;
 }
 
+/* Sticky section headers (e.g., game/hobby lists) */
+/* In dark mode: use the site's indigo and beige colors for better contrast */
+[data-theme="dark"] h3.sticky {
+    background-color: #212842 !important; /* site indigo */
+    color: #e1d4c2 !important; /* site beige for text */
+    border-color: rgba(225, 212, 194, 0.08) !important;
+}
+
+/* Ensure badges and child inline elements inherit readable text color */
+[data-theme="dark"] h3.sticky .rounded-full,
+[data-theme="dark"] h3.sticky span,
+[data-theme="dark"] h3.sticky * {
+    color: #e1d4c2 !important;
+}
+
 /* ==========================================================================
    Responsive Typography & Layout (Hybrid Approach - Mobile First)
    ========================================================================== */
