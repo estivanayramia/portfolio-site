@@ -3740,58 +3740,38 @@ document.addEventListener('DOMContentLoaded', () => {
         const detectedLang = detectLanguage(lastUserMessage);
         const contextualSuggestions = translations.chat.contextualSuggestions;
         
-        // Analyze conversation context and suggest relevant follow-ups
-        if (lastUserMessage.includes('skill') || lastUserMessage.includes('technology') || lastUserMessage.includes('expertise') ||
-            lastUserMessage.includes('habilidad') || lastUserMessage.includes('tecnología') || lastUserMessage.includes('experiencia') ||
-            lastUserMessage.includes('مهارة') || lastUserMessage.includes('تكنولوجيا') || lastUserMessage.includes('خبرة')) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.skills || [
-                "What projects have you worked on?", "Tell me about your experience", "What are you learning currently?"
-            ]));
-        } else if (lastUserMessage.includes('background') || lastUserMessage.includes('experience') || lastUserMessage.includes('career') ||
-                   lastUserMessage.includes('fondo') || lastUserMessage.includes('experiencia') || lastUserMessage.includes('carrera') ||
-                   lastUserMessage.includes('خلفية') || lastUserMessage.includes('خبرة') || lastUserMessage.includes('مسيرة')) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.background || [
-                "What are your main skills?", "Tell me about your education", "What industries have you worked in?"
-            ]));
-        } else if (lastUserMessage.includes('project') || lastUserMessage.includes('work') || lastUserMessage.includes('portfolio') ||
-                   lastUserMessage.includes('proyecto') || lastUserMessage.includes('trabajo') || lastUserMessage.includes('portafolio') ||
-                   lastUserMessage.includes('مشروع') || lastUserMessage.includes('عمل') || lastUserMessage.includes('محفظة')) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.projects || [
-                "Can you show me your code?", "What technologies did you use?", "How long did it take to build?"
-            ]));
-        } else if (lastUserMessage.includes('contact') || lastUserMessage.includes('reach') || lastUserMessage.includes('email') ||
-                   lastUserMessage.includes('contacto') || lastUserMessage.includes('alcanzar') || lastUserMessage.includes('correo') ||
-                   lastUserMessage.includes('اتصال') || lastUserMessage.includes('الوصول') || lastUserMessage.includes('بريد')) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.contact || [
-                "Are you available for freelance work?", "What's your typical response time?", "Do you work remotely?"
-            ]));
-        } else if (lastUserMessage.includes('education') || lastUserMessage.includes('study') || lastUserMessage.includes('learn') ||
-                   lastUserMessage.includes('educación') || lastUserMessage.includes('estudio') || lastUserMessage.includes('aprender') ||
-                   lastUserMessage.includes('تعليم') || lastUserMessage.includes('دراسة') || lastUserMessage.includes('تعلم')) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.education || [
-                "What certifications do you have?", "What's your favorite programming language?", "How do you stay updated with technology?"
-            ]));
-        } else if (lastBotMessage.includes('project') || lastBotMessage.includes('work') ||
-                   lastBotMessage.includes('proyecto') || lastBotMessage.includes('trabajo') ||
-                   lastBotMessage.includes('مشروع') || lastBotMessage.includes('عمل')) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.projectResponse || [
-                "Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?"
-            ]));
-        } else if (lastBotMessage.includes('skill') || lastBotMessage.includes('technology') ||
-                   lastBotMessage.includes('habilidad') || lastBotMessage.includes('tecnología') ||
-                   lastBotMessage.includes('مهارة') || lastBotMessage.includes('تكنولوجيا')) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.skillResponse || [
-                "How did you learn that?", "Have you used it in projects?", "What's your proficiency level?"
-            ]));
+        // Analyze both user question AND bot response for better context detection
+        const combinedContext = lastUserMessage + ' ' + lastBotMessage;
+        
+        // More intelligent context detection based on both question and answer
+        if (combinedContext.match(/skill|technology|expertise|proficiency|technical|programming|coding|developer|engineer|habilidad|tecnología|experiencia|programación|مهارة|تكنولوجيا|خبرة|برمجة/i)) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.skills || contextualSuggestions.en.skills));
+        } else if (combinedContext.match(/background|experience|career|journey|history|education|degree|university|studied|fondo|experiencia|carrera|educación|universidad|خلفية|خبرة|مسيرة|تعليم|جامعة/i)) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.background || contextualSuggestions.en.background));
+        } else if (combinedContext.match(/project|portfolio|work|built|created|developed|application|website|system|proyecto|trabajo|portafolio|construido|desarrollado|aplicación|مشروع|عمل|محفظة|بنى|طور/i)) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.projects || contextualSuggestions.en.projects));
+        } else if (combinedContext.match(/contact|reach|email|connect|hire|available|freelance|contacto|alcanzar|correo|conectar|contratar|disponible|اتصال|الوصول|بريد|توظيف|متاح/i)) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.contact || contextualSuggestions.en.contact));
+        } else if (combinedContext.match(/education|study|learn|course|certification|degree|training|class|educación|estudio|aprender|curso|certificación|grado|تعليم|دراسة|تعلم|دورة|شهادة/i)) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.education || contextualSuggestions.en.education));
+        } else if (lastBotMessage.match(/project|portfolio|application|system|website|built|created|developed|proyecto|aplicación|sistema|construido|desarrollado|مشروع|محفظة|بنى|طور/i)) {
+            // Bot is talking about projects, offer project-related follow-ups
+            suggestions.push(...(contextualSuggestions[detectedLang]?.projectResponse || contextualSuggestions.en.projectResponse));
+        } else if (lastBotMessage.match(/skill|technology|proficiency|expertise|language|framework|tool|habilidad|tecnología|lenguaje|herramienta|مهارة|تكنولوجيا|لغة|أداة/i)) {
+            // Bot is talking about skills, offer skill-related follow-ups
+            suggestions.push(...(contextualSuggestions[detectedLang]?.skillResponse || contextualSuggestions.en.skillResponse));
         } else if (history.length < 4) {
             // Early conversation - general suggestions
-            suggestions.push(...(contextualSuggestions[detectedLang]?.early || [
-                "What are your main skills?", "Tell me about your background", "What projects are you proud of?"
-            ]));
+            suggestions.push(...(contextualSuggestions[detectedLang]?.early || contextualSuggestions.en.early));
         }
         
-        // Limit to 3 suggestions and ensure variety
-        return suggestions.slice(0, 3);
+        // If no suggestions found, default to early conversation suggestions
+        if (suggestions.length === 0) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.early || contextualSuggestions.en.early));
+        }
+        
+        // Limit to 5 suggestions for more elaborate options
+        return suggestions.slice(0, 5);
     }
 
     // Simple language detection based on character patterns
@@ -4046,6 +4026,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Default behavior: send text as message
                 if (els.input) {
                     els.input.value = chipText;
+                    const messageToSend = chipText;
+                    // Clear input immediately after capturing the value
+                    setTimeout(() => {
+                        if (els.input) els.input.value = '';
+                    }, 0);
                     handleSend();
                 }
             });
