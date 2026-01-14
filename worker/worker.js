@@ -3,86 +3,68 @@
 // Cloudflare Worker with Rate Limiting, Smart Signals, & Auto-Healing
 // ============================================================================
 
-// Site facts - single source of truth for projects and hobbies
-// Generated from HTML content by scripts/generate-site-facts.js
-const siteFacts = {
-  "projects": [
-    {
-      "title": "This Website (Every Line)",
-      "summary": "No templates, no CMS. Just hand-written HTML/CSS/JS, service worker, Savonie chat, and Lighthouse 90+ scores.",
-      "url": "https://www.estivanayramia.com/projects/portfolio.html",
-      "path": "/projects/portfolio.html"
-    },
-    {
-      "title": "L'Oréal Cell BioPrint MAPS Campaign",
-      "summary": "Class concept campaign deck for L'Oréal Cell BioPrint that maps three personas and their touchpoints across the funnel.",
-      "url": "https://www.estivanayramia.com/projects/logistics.html",
-      "path": "/projects/logistics.html"
-    },
-    {
-      "title": "Franklin Templeton Class Concept",
-      "summary": "17-page class concept deck for a Franklin Templeton 'Voice of Progress' campaign.",
-      "url": "https://www.estivanayramia.com/projects/discipline.html",
-      "path": "/projects/discipline.html"
-    },
-    {
-      "title": "EndPoint LinkedIn Campaign",
-      "summary": "15-page deck outlining Phase 2A and Phase 2B of an EndPoint LinkedIn retargeting campaign.",
-      "url": "https://www.estivanayramia.com/projects/documentation.html",
-      "path": "/projects/documentation.html"
-    },
-    {
-      "title": "Endpoint Elosity Launch Video",
-      "summary": "Motion storyboard and full voiceover script showing bottlenecks shattering into a clean trial timeline.",
-      "url": "https://www.estivanayramia.com/projects/multilingual.html",
-      "path": "/projects/multilingual.html"
-    },
-    {
-      "title": "Taking Down Endpoint (Almac Group + 4G Clinical)",
-      "summary": "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.",
-      "url": "https://www.estivanayramia.com/projects/competitive-strategy.html",
-      "path": "/projects/competitive-strategy.html"
+// ============================================================================
+// SITE FACTS - KV-BACKED WITH IN-MEMORY CACHE
+// ============================================================================
+// Facts are generated from HTML by scripts/generate-site-facts.js
+// Uploaded to KV as "site-facts:v1" via: npm run upload:facts
+// This ensures chatbot responses stay grounded in actual site content
+
+// In-memory cache for site facts (expires after 1 hour)
+let cachedSiteFacts = null;
+let cacheTimestamp = 0;
+const CACHE_TTL_MS = 3600000; // 1 hour
+
+/**
+ * Load site facts from KV with caching
+ * Falls back to embedded default if KV fails
+ */
+async function getSiteFacts(env) {
+  const now = Date.now();
+  
+  // Return cached facts if still valid
+  if (cachedSiteFacts && (now - cacheTimestamp) < CACHE_TTL_MS) {
+    return cachedSiteFacts;
+  }
+  
+  // Try loading from KV
+  try {
+    const kvData = await env.SAVONIE_KV.get("site-facts:v1", { type: "json" });
+    if (kvData && kvData.projects && kvData.hobbies) {
+      cachedSiteFacts = kvData;
+      cacheTimestamp = now;
+      console.log(`✅ Loaded site facts from KV (${kvData.projects.length} projects, ${kvData.hobbies.length} hobbies)`);
+      return cachedSiteFacts;
     }
-  ],
-  "hobbies": [
-    {
-      "title": "Gym & Strength Training",
-      "summary": "Building discipline through progressive overload. Tracking PRs, optimizing recovery, and proving that consistency beats intensity every time.",
-      "url": "https://www.estivanayramia.com/hobbies/gym.html",
-      "path": "/hobbies/gym.html"
-    },
-    {
-      "title": "Photography",
-      "summary": "Capturing moments worth remembering. iPhone shots that tell stories; no DSLR needed, just good lighting and better timing.",
-      "url": "https://www.estivanayramia.com/hobbies/photography.html",
-      "path": "/hobbies/photography.html"
-    },
-    {
-      "title": "Car Enthusiasm",
-      "summary": "First car, first freedom. Not about speed; about ownership, maintenance, and the pride of keeping something running clean.",
-      "url": "https://www.estivanayramia.com/hobbies/car.html",
-      "path": "/hobbies/car.html"
-    },
-    {
-      "title": "Cooking",
-      "summary": "Steak, pasta, and everything in between. Not a chef; just someone who refuses to eat mediocre food when good ingredients are available.",
-      "url": "https://www.estivanayramia.com/hobbies/cooking.html",
-      "path": "/hobbies/cooking.html"
-    },
-    {
-      "title": "Whispers (Sticky Notes)",
-      "summary": "Random thoughts captured on sticky notes. Ideas, observations, reminders. Low-tech brain dump that keeps the mental clutter organized.",
-      "url": "https://www.estivanayramia.com/hobbies/whispers.html",
-      "path": "/hobbies/whispers.html"
-    },
-    {
-      "title": "Reading",
-      "summary": "Books are compressed experience. Reading is the cheapest way to access decades of wisdom without making the same mistakes yourself.",
-      "url": "https://www.estivanayramia.com/hobbies/reading.html",
-      "path": "/hobbies/reading.html"
-    }
-  ]
-};
+  } catch (error) {
+    console.error("⚠️ KV fetch failed, using fallback:", error.message);
+  }
+  
+  // Fallback: minimal embedded facts (should never be needed after KV upload)
+  const fallbackFacts = {
+    projects: [
+      { id: "portfolio", title: "This Website (Every Line)", summary: "Hand-coded portfolio with no templates.", url: "/projects/portfolio", fullUrl: "https://www.estivanayramia.com/projects/portfolio" },
+      { id: "loreal", title: "L'Oréal Cell BioPrint MAPS Campaign", summary: "Campaign strategy deck.", url: "/projects/logistics", fullUrl: "https://www.estivanayramia.com/projects/logistics" },
+      { id: "franklin", title: "Franklin Templeton Class Concept", summary: "17-page concept deck.", url: "/projects/discipline", fullUrl: "https://www.estivanayramia.com/projects/discipline" },
+      { id: "endpoint-linkedin", title: "EndPoint LinkedIn Campaign", summary: "Retargeting campaign deck.", url: "/projects/documentation", fullUrl: "https://www.estivanayramia.com/projects/documentation" },
+      { id: "elosity", title: "Endpoint Elosity Launch Video", summary: "Motion storyboard and voiceover.", url: "/projects/multilingual", fullUrl: "https://www.estivanayramia.com/projects/multilingual" },
+      { id: "competitive", title: "Taking Down Endpoint", summary: "Competitive strategy deck.", url: "/projects/competitive-strategy", fullUrl: "https://www.estivanayramia.com/projects/competitive-strategy" }
+    ],
+    hobbies: [
+      { id: "gym", title: "Gym & Strength Training", summary: "Progressive overload and consistency.", url: "/hobbies/gym", fullUrl: "https://www.estivanayramia.com/hobbies/gym" },
+      { id: "photography", title: "Photography", summary: "iPhone shots with good timing.", url: "/hobbies/photography", fullUrl: "https://www.estivanayramia.com/hobbies/photography" },
+      { id: "car", title: "Car Enthusiasm", summary: "First car, maintenance pride.", url: "/hobbies/car", fullUrl: "https://www.estivanayramia.com/hobbies/car" },
+      { id: "cooking", title: "Cooking", summary: "Good ingredients, no compromises.", url: "/hobbies/cooking", fullUrl: "https://www.estivanayramia.com/hobbies/cooking" },
+      { id: "whispers", title: "Whispers (Sticky Notes)", summary: "Low-tech brain dump on sticky notes.", url: "/hobbies/whispers", fullUrl: "https://www.estivanayramia.com/hobbies/whispers" },
+      { id: "reading", title: "Reading", summary: "Compressed experience from books.", url: "/hobbies/reading", fullUrl: "https://www.estivanayramia.com/hobbies/reading" }
+    ]
+  };
+  
+  cachedSiteFacts = fallbackFacts;
+  cacheTimestamp = now;
+  console.warn("⚠️ Using fallback site facts - KV unavailable");
+  return fallbackFacts;
+}
 
 let cachedModel = "gemini-2.5-flash";
 const GEMINI_TIMEOUT = 35000; // Increased to account for larger tokens/retries
@@ -172,10 +154,10 @@ function linkifyPages(text) {
   // Note: This is best-effort. The prompt instructions are the primary defense.
   
   const map = [
-    { word: "Overview", link: "[Overview](/overview.html)" },
-    { word: "Projects", link: "[Projects](/projects/)" },  // Fixed: canonical URL
-    { word: "Hobbies", link: "[Hobbies](/hobbies/)" },    // Fixed: canonical URL
-    { word: "Contact", link: "[Contact](/contact.html)" },
+    { word: "Overview", link: "[Overview](/overview)" },    // Canonical URL
+    { word: "Projects", link: "[Projects](/projects/)" },   // Canonical URL
+    { word: "Hobbies", link: "[Hobbies](/hobbies/)" },      // Canonical URL
+    { word: "Contact", link: "[Contact](/contact)" },       // Canonical URL
     { word: "Resume", link: "[Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)" }
   ];
 
@@ -183,7 +165,7 @@ function linkifyPages(text) {
   
   map.forEach(({ word, link }) => {
      // Regex checks for word boundary, case insensitive, but NOT preceded by [ and NOT followed by ]
-     // This prevents double linking: [Overview](/overview.html) won't become [[Overview](/overview.html)](...)
+     // This prevents double linking: [Overview](/overview) won't become [[Overview](/overview)](...)
      const regex = new RegExp(`(?<!\\[)\\b${word}\\b(?!\\])`, 'gi');
      linked = linked.replace(regex, link);
   });
@@ -214,7 +196,7 @@ function detectIntent(lowerMsg) {
  * Returns ONLY dynamic contextual chips - Frontend adds pinned chips (Projects, Resume, Contact)
  * Uses site-facts as the authoritative source for projects and hobbies
  */
-function buildChips(lowerMsg) {
+function buildChips(lowerMsg, siteFacts) {
   const intent = detectIntent(lowerMsg);
   
   // Return 3-5 contextual suggestions per intent
@@ -298,7 +280,7 @@ function validateProjectMentions(text) {
     return {
       isValid: false,
       violations: violations,
-      correctedReply: `That project is not listed on the portfolio site. Check out [Projects](/projects/) to see Estivan's actual work, or reach out at [Contact](/contact.html) for more information.`
+      correctedReply: `That project is not listed on the portfolio site. Check out [Projects](/projects/) to see Estivan's actual work, or reach out at [Contact](/contact) for more information.`
     };
   }
   
@@ -459,6 +441,9 @@ function checkLocalRateLimit(clientIP) {
 export default {
   async fetch(request, env) {
     const corsHeaders = getCorsHeaders(request);
+    
+    // Load site facts from KV (cached, fast after first call)
+    const siteFacts = await getSiteFacts(env);
 
     // --- CORS PREFLIGHT ---
     if (request.method === "OPTIONS") {
@@ -470,7 +455,7 @@ export default {
     if (request.method === "GET" && url.pathname === "/health") {
       const hasKey = !!(env.GEMINI_API_KEY && env.GEMINI_API_KEY.length > 10);
       return jsonReply(
-        { ok: true, version: VERSION_TAG, hasKey },
+        { ok: true, version: VERSION_TAG, hasKey, kv: !!env.SAVONIE_KV },
         200,
         corsHeaders
       );
@@ -569,7 +554,7 @@ export default {
           {
             errorType: null,
             reply: "I'm open to market-aligned compensation for operations roles. If you share the range, I can confirm fit. You can also reach Estivan at [hello@estivanayramia.com](mailto:hello@estivanayramia.com).",
-            chips: buildChips(lowerMsg),
+            chips: buildChips(lowerMsg, siteFacts),
             action: "email_link",
             card: null,
             debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_salary")
@@ -584,8 +569,8 @@ export default {
         return jsonReply(
           {
             errorType: null,
-            reply: "You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact.html). He usually responds within 24 hours.",
-            chips: buildChips(lowerMsg),
+            reply: "You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact). He usually responds within 24 hours.",
+            chips: buildChips(lowerMsg, siteFacts),
             action: "email_link",
             card: null,
             debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_contact")
@@ -601,7 +586,7 @@ export default {
           {
             errorType: null,
             reply: "Here's Estivan's resume! Click below to download the [PDF](/assets/docs/Estivan-Ayramia-Resume.pdf).",
-            chips: buildChips(lowerMsg),
+            chips: buildChips(lowerMsg, siteFacts),
             action: "download_resume",
             card: null,
             debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_resume")
@@ -611,16 +596,17 @@ export default {
         );
       }
 
-      // Project inquiries
-      if (lowerMsg.includes("logistics") || lowerMsg.includes("supply chain")) {
+      // Project inquiries - use actual project from siteFacts
+      if (lowerMsg.includes("logistics") || lowerMsg.includes("loreal") || lowerMsg.includes("l'oréal") || lowerMsg.includes("bioprint") || lowerMsg.includes("maps campaign")) {
+        const project = siteFacts.projects.find(p => p.id === "loreal-cell-bioprint");
         return jsonReply(
           {
             errorType: null,
-            reply: "The [Logistics System](/project-logistics.html) automated supply chain operations to improve delivery times. Check out the full case study!",
-            chips: buildChips(lowerMsg),
-            card: "logistics",
+            reply: `The [${project.title}](${project.url}) is one of Estivan's projects - ${project.summary}`,
+            chips: buildChips(lowerMsg, siteFacts),
+            card: "loreal",
             action: null,
-            debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_logistics")
+            debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_loreal")
           },
           200,
           corsHeaders
@@ -634,7 +620,7 @@ export default {
           return jsonReply(
             {
               errorType: null,
-              reply: "That project is not listed on the portfolio site. Check out [Projects](/projects/) to see Estivan's actual work, or reach out at [Contact](/contact.html) for more information.",
+              reply: "That project is not listed on the portfolio site. Check out [Projects](/projects/) to see Estivan's actual work, or reach out at [Contact](/contact) for more information.",
               chips: siteFacts.projects.slice(0, 3).map(p => p.title),
               debug: buildDebugInfo(isDebug, lowerMsg, "getwispers_correction")
             },
@@ -646,7 +632,7 @@ export default {
           return jsonReply(
             {
               errorType: null,
-              reply: "[Whispers (Sticky Notes)](/hobbies/whispers.html) is one of Estivan's hobbies - a low-tech way to capture random thoughts and ideas on sticky notes. It's not a project. Check out [Hobbies](/hobbies/) for more.",
+              reply: "[Whispers (Sticky Notes)](/hobbies/whispers) is one of Estivan's hobbies - a low-tech way to capture random thoughts and ideas on sticky notes. It's not a project. Check out [Hobbies](/hobbies/) for more.",
               chips: siteFacts.hobbies.slice(0, 4).map(h => h.title),
               debug: buildDebugInfo(isDebug, lowerMsg, "whispers_hobby_clarification")
             },
@@ -654,21 +640,6 @@ export default {
             corsHeaders
           );
         }
-      }
-
-      if (lowerMsg.includes("conflict") || lowerMsg.includes("playbook")) {
-        return jsonReply(
-          {
-            errorType: null,
-            reply: "The [Conflict Resolution Playbook](/project-conflict.html) standardized de-escalation protocols to improve workplace safety.",
-            chips: buildChips(lowerMsg),
-            card: "conflict",
-            action: null,
-            debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_conflict")
-          },
-          200,
-          corsHeaders
-        );
       }
 
       // --- VALIDATE API KEY ---
@@ -698,7 +669,7 @@ USER LANGUAGE: ${language || "English"} (Reply in this language!)
 *** YOUR MISSION (TRUTH-FIRST CONCIERGE) ***
 1. Answer the visitor's question directly and accurately
 2. Keep responses SHORT (2-4 sentences) and information-dense
-3. NEVER invent information you don't have - if you don't know, say so and redirect to [Contact](/contact.html) or hello@estivanayramia.com
+3. NEVER invent information you don't have - if you don't know, say so and redirect to [Contact](/contact) or hello@estivanayramia.com
 4. NO mailto: links - just show the email address or contact page link
 5. Always end with a clear next action or question
 6. Speak in THIRD PERSON by default ("Estivan is...", "He does...")
@@ -707,13 +678,13 @@ USER LANGUAGE: ${language || "English"} (Reply in this language!)
 *** CRITICAL: WHISPERS IS A HOBBY, NOT A PROJECT ***
 - "Whispers" / "Whispers (Sticky Notes)" = HOBBY (capturing thoughts on sticky notes)
 - "getWispers" / "get Wispers" = DOES NOT EXIST (never mention this)
-- If asked about whispers, clarify it's a hobby and link to /hobbies/whispers.html
+- If asked about whispers, clarify it's a hobby and link to /hobbies/whispers
 - If asked about getWispers, say it's not listed and link to /projects/
 
 *** BOUNDARIES (FAMILY-SAFE & PROFESSIONAL) ***
 ✅ CAN discuss: Projects, skills, education, hobbies, career goals, personality, values
 ❌ NEVER discuss: Sexual content, health diagnoses, family drama, exact addresses, political debates
-If asked inappropriate questions: "Professional inquiries only. Check out [Projects](/projects/) or [Contact](/contact.html) instead."
+If asked inappropriate questions: "Professional inquiries only. Check out [Projects](/projects/) or [Contact](/contact) instead."
 
 *** WHO ESTIVAN IS ***
 - **Name**: Estivan Ayramia (He/Him), 21 years old
@@ -760,10 +731,10 @@ ${siteFacts.hobbies.map(h => `- **${h.title}**: ${h.summary}`).join('\n')}
 *** SMART ACTIONS (TRIGGER THESE) ***
 When visitor mentions these keywords, suggest these actions:
 - "resume" / "CV" / "download" → Point to [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)
-- "contact" / "email" / "hire" / "reach out" → Point to [Contact](/contact.html) or hello@estivanayramia.com
+- "contact" / "email" / "hire" / "reach out" → Point to [Contact](/contact) or hello@estivanayramia.com
 - "LinkedIn" → Mention professional networking
 - "logistics" / "supply chain" → Highlight the relevant project from site-facts
-- "whispers" / "sticky notes" → Clarify this is a HOBBY (not a project), link to /hobbies/whispers.html
+- "whispers" / "sticky notes" → Clarify this is a HOBBY (not a project), link to /hobbies/whispers
 - "conflict" / "workplace" → Highlight the relevant project from site-facts
 - "projects" → Link to [Projects](/projects/) to see all work
 
@@ -791,7 +762,7 @@ If visitor says "hi"/"hello":
 Current page: ${pageContent || "Home"}
 If asked about page-specific content you don't have info about:
 - Say "I don't have that specific information right now"
-- Offer: "Check out [Contact](/contact.html) or email hello@estivanayramia.com and Estivan will answer directly"
+- Offer: "Check out [Contact](/contact) or email hello@estivanayramia.com and Estivan will answer directly"
 - NEVER make up page details
 `.trim();
 
@@ -938,7 +909,7 @@ If asked about page-specific content you don't have info about:
           {
             errorType: null,
             reply: sanitizedReply,
-            chips: buildChips(lowerMsg),
+            chips: buildChips(lowerMsg, siteFacts),
             truncated: isTruncated,
             continuation_hint: isTruncated ? sanitizedReply.slice(-1000) : null,
             reply_length: sanitizedReply.length,
@@ -999,7 +970,7 @@ If asked about page-specific content you don't have info about:
           return jsonReply(
             {
               errorType: "AuthError",
-              reply: "The AI service is misconfigured. Please try contacting support or explore Estivan's [Projects](/projects.html) and [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) directly.",
+              reply: "The AI service is misconfigured. Please try contacting support or explore Estivan's [Projects](/projects/) and [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) directly.",
               chips: ["Projects", "Resume", "Contact"],
               debug: debugInfo
             },
@@ -1010,7 +981,7 @@ If asked about page-specific content you don't have info about:
           return jsonReply(
             {
               errorType: "Timeout",
-              reply: "The AI service timed out. Please try again with a shorter question or explore Estivan's [Projects](/projects.html) directly.",
+              reply: "The AI service timed out. Please try again with a shorter question or explore Estivan's [Projects](/projects/) directly.",
               chips: ["Retry", "Projects", "Resume", "Contact"],
               debug: debugInfo
             },
@@ -1021,7 +992,7 @@ If asked about page-specific content you don't have info about:
           return jsonReply(
             {
               errorType: "UpstreamError",
-              reply: "The AI service is temporarily unavailable. Please try again later or explore Estivan's [Projects](/projects.html) and [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) directly.",
+              reply: "The AI service is temporarily unavailable. Please try again later or explore Estivan's [Projects](/projects/) and [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) directly.",
               chips: ["Retry", "Projects", "Resume", "Contact"],
               debug: debugInfo
             },
@@ -1041,9 +1012,9 @@ If asked about page-specific content you don't have info about:
 Estivan is a Software Engineer specializing in operations and infrastructure. He has experience with cloud platforms, DevOps, and full-stack development.
 
 Quick links:
-- [View Projects](/projects.html)
+- [View Projects](/projects/)
 - [Download Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)
-- [Contact Estivan](/contact.html)`;
+- [Contact Estivan](/contact)`;
         } else if (intent === "projects") {
           // Use real projects from site-facts
           const projectList = siteFacts.projects.slice(0, 4).map(p => 
@@ -1070,7 +1041,7 @@ ${projectList}
 **Quick Options**:
 - [Projects](/projects/) - Browse his work
 - [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) - Download his CV
-- [Contact](/contact.html) - Reach out directly at hello@estivanayramia.com
+- [Contact](/contact) - Reach out directly at hello@estivanayramia.com
 
 Estivan is a Business graduate specializing in operations and strategic execution with experience in supply chain, logistics, and project management.`;
         }
