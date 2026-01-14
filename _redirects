@@ -57,11 +57,12 @@
 /hobbies-games               /en/hobbies-games            301!
 
 # ===== 3. Clean URL Redirects for /en/ Pages =====
-/en/about.html               /en/about                    301!
-/en/contact.html             /en/contact                  301!
-/en/overview.html            /en/overview                 301!
-/en/deep-dive.html           /en/deep-dive                301!
-/en/privacy.html             /en/privacy                  301!
+# Removed conflicting 301 redirects for main pages - using 200 rewrites instead
+# /en/about.html               /en/about                    301!
+# /en/contact.html             /en/contact                  301!
+# /en/overview.html            /en/overview                 301!
+# /en/deep-dive.html           /en/deep-dive                301!
+# /en/privacy.html             /en/privacy                  301!
 /en/hobbies-games.html       /en/hobbies-games            301!
 
 # ===== 4. Projects: Root to /en/projects/ =====
