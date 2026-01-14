@@ -12,19 +12,14 @@
 # ===== 0. Clean URL Rewrites (MUST come first to avoid loops) =====
 # These rewrite extensionless URLs to serve .html files (200 status = no redirect)
 
-# Generic patterns (fallback for all pages)
-/en/:page                           /en/:page.html                          200
-/en/projects/:slug                  /en/projects/:slug.html                 200
-/en/hobbies/:slug                   /en/hobbies/:slug.html                  200
-/en/hobbies-games/:slug             /en/hobbies-games/:slug.html            200
-
-# Explicit mini-game rewrites (for clarity and guaranteed routing)
-# Explicit main page rewrites (for guaranteed routing)
+# Explicit main page rewrites (for guaranteed routing - must come before generic patterns)
 /en/about                        /en/about.html                        200
 /en/contact                      /en/contact.html                      200
 /en/overview                     /en/overview.html                     200
 /en/deep-dive                    /en/deep-dive.html                    200
 /en/privacy                      /en/privacy.html                      200
+
+# Explicit mini-game rewrites (for clarity and guaranteed routing)
 /en/hobbies-games/2048              /en/hobbies-games/2048.html             200
 /en/hobbies-games/snake             /en/hobbies-games/snake.html            200
 /en/hobbies-games/space-invaders    /en/hobbies-games/space-invaders.html   200
@@ -34,6 +29,12 @@
 /en/hobbies/whispers                /en/hobbies/whispers.html               200
 /en/hobbies/cooking                 /en/hobbies/cooking.html                200
 /en/hobbies/car                     /en/hobbies/car.html                    200
+
+# Generic patterns (fallback for all pages)
+/en/:page                           /en/:page.html                          200
+/en/projects/:slug                  /en/projects/:slug.html                 200
+/en/hobbies/:slug                   /en/hobbies/:slug.html                  200
+/en/hobbies-games/:slug             /en/hobbies-games/:slug.html            200
 
 # ===== 1. Language Default =====
 /                            /en/                         302
