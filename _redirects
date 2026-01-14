@@ -19,6 +19,12 @@
 /en/hobbies-games/:slug             /en/hobbies-games/:slug.html            200
 
 # Explicit mini-game rewrites (for clarity and guaranteed routing)
+# Explicit main page rewrites (for guaranteed routing)
+/en/about                        /en/about.html                        200
+/en/contact                      /en/contact.html                      200
+/en/overview                     /en/overview.html                     200
+/en/deep-dive                    /en/deep-dive.html                    200
+/en/privacy                      /en/privacy.html                      200
 /en/hobbies-games/2048              /en/hobbies-games/2048.html             200
 /en/hobbies-games/snake             /en/hobbies-games/snake.html            200
 /en/hobbies-games/space-invaders    /en/hobbies-games/space-invaders.html   200
