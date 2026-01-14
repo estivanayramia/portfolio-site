@@ -1,7 +1,7 @@
 
 try {
-    # 1. capture the valid widget HTML from index.html (Source of Truth)
-    $indexContent = Get-Content -Path "index.html" -Raw -Encoding UTF8
+    # 1. capture the valid widget HTML from en/index.html (Source of Truth)
+    $indexContent = Get-Content -Path "en/index.html" -Raw -Encoding UTF8
     
     $buttonHtml = '    <!-- Scroll to Top Button -->
     <button id="scroll-to-top" aria-label="Back to top" aria-describedby="scroll-to-top-tooltip" role="button" tabindex="0">
@@ -30,7 +30,9 @@ try {
         $_.FullName -notmatch "backup" -and
         $_.FullName -notmatch "docs\\" -and
         $_.FullName -notmatch "assets\\css" -and
-        $_.FullName -notmatch "assets\\js"
+        $_.FullName -notmatch "assets\\js" -and
+        $_.FullName -notmatch "assets\\MiniGames\\" -and
+        $_.FullName -notmatch "en\\hobbies-games\\"
     }
 
     foreach ($file in $files) {

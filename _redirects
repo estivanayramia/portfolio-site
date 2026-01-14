@@ -2,6 +2,13 @@
 # Language Structure: /en/ for English, /es/ for Spanish, /ar/ for Arabic
 # All old English URLs redirect to /en/ with 301 (permanent)
 
+# 0A) Strip .html first (prevents .html.html rewrites)
+# These must be ABOVE the 200 rewrites below.
+/en/:page.html               /en/:page               301
+/en/projects/:slug.html      /en/projects/:slug      301
+/en/hobbies/:slug.html       /en/hobbies/:slug       301
+/en/hobbies-games/:slug.html /en/hobbies-games/:slug 301
+
 # ===== 0. Clean URL Rewrites (MUST come first to avoid loops) =====
 # These rewrite extensionless URLs to serve .html files (200 status = no redirect)
 

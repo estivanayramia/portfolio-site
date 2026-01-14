@@ -1,6 +1,6 @@
 try {
-    # 1. capture the valid widget HTML from index.html (Source of Truth)
-    $indexContent = Get-Content -Path "index.html" -Raw -Encoding UTF8
+    # 1. capture the valid widget HTML from en/index.html (Source of Truth)
+    $indexContent = Get-Content -Path "en/index.html" -Raw -Encoding UTF8
     
     # Extract existing scroll button including tooltip if present (to replicate exactly if we wanted, but we have a NEW string to enforce)
     # We will use the hardcoded new string for scroll button to ENFORCE the tooltip restoration.
@@ -30,7 +30,9 @@ try {
         $_.FullName -notmatch "node_modules" -and 
         $_.FullName -notmatch ".git" -and
         $_.FullName -notmatch "ar\\" -and
-        $_.FullName -notmatch "es\\"
+        $_.FullName -notmatch "es\\" -and
+        $_.FullName -notmatch "assets\\MiniGames\\" -and
+        $_.FullName -notmatch "en\\hobbies-games\\"
     }
 
     foreach ($file in $files) {
