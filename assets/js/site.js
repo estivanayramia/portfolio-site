@@ -2196,34 +2196,34 @@ const translations = {
         },
         contextualSuggestions: {
             en: {
-                skills: ["What projects have you worked on?", "Tell me about your experience", "What are you learning currently?"],
-                background: ["What are your main skills?", "Tell me about your education", "What industries have you worked in?"],
-                projects: ["Can you show me your code?", "What technologies did you use?", "How long did it take to build?"],
-                contact: ["Are you available for freelance work?", "What's your typical response time?", "Do you work remotely?"],
-                education: ["What certifications do you have?", "What's your favorite programming language?", "How do you stay updated with technology?"],
-                projectResponse: ["Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?"],
-                skillResponse: ["How did you learn that?", "Have you used it in projects?", "What's your proficiency level?"],
-                early: ["What are your main skills?", "Tell me about your background", "What projects are you proud of?"]
+                skills: ["What projects have you worked on?", "Tell me about your experience", "What are you learning currently?", "How do you approach problem-solving?", "What's your favorite skill to use?", "How do you stay motivated in your work?"],
+                background: ["What are your main skills?", "Tell me about your education", "What industries have you worked in?", "What inspired you to get into tech?", "What's your professional journey been like?", "Any mentors who influenced you?"],
+                projects: ["Can you show me your code?", "What technologies did you use?", "How long did it take to build?", "What challenges did you overcome?", "Did you work with a team?", "What are your future plans for this project?"],
+                contact: ["Are you available for freelance work?", "What's your typical response time?", "Do you work remotely?", "How can I best reach you?", "What's your preferred way of communication?", "Are you open to collaborations?"],
+                education: ["What certifications do you have?", "What's your favorite programming language?", "How do you stay updated with technology?", "What was your most challenging course?", "How has your education shaped your career?", "Any online courses or self-learning?"],
+                projectResponse: ["Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?", "What was the most interesting part?", "How did you test it?", "Would you do anything differently now?"],
+                skillResponse: ["How did you learn that?", "Have you used it in projects?", "What's your proficiency level?", "What's your favorite way to apply this skill?", "Any tips for beginners?", "How has this skill evolved for you?"],
+                early: ["What are your main skills?", "Tell me about your background", "What projects are you proud of?", "What's something unique about you?", "Why did you choose this field?", "What's your biggest achievement?"]
             },
             es: {
-                skills: ["¿En qué proyectos has trabajado?", "Háblame de tu experiencia", "¿Qué estás aprendiendo actualmente?"],
-                background: ["¿Cuáles son tus principales habilidades?", "Háblame de tu educación", "¿En qué industrias has trabajado?"],
-                projects: ["¿Puedes mostrarme tu código?", "¿Qué tecnologías usaste?", "¿Cuánto tiempo tomó construirlo?"],
-                contact: ["¿Estás disponible para trabajo freelance?", "¿Cuál es tu tiempo típico de respuesta?", "¿Trabajas de forma remota?"],
-                education: ["¿Qué certificaciones tienes?", "¿Cuál es tu lenguaje de programación favorito?", "¿Cómo te mantienes actualizado con la tecnología?"],
-                projectResponse: ["¿Puedes contarme más sobre ese proyecto?", "¿Qué desafíos enfrentaste?", "¿Qué aprendiste de ello?"],
-                skillResponse: ["¿Cómo aprendiste eso?", "¿Lo has usado en proyectos?", "¿Cuál es tu nivel de competencia?"],
-                early: ["¿Cuáles son tus principales habilidades?", "Háblame de tu experiencia", "¿De qué proyectos estás orgulloso?"]
+                skills: ["¿En qué proyectos has trabajado?", "Háblame de tu experiencia", "¿Qué estás aprendiendo actualmente?", "¿Cómo abordas la resolución de problemas?", "¿Cuál es tu habilidad favorita para usar?", "¿Cómo te mantienes motivado en tu trabajo?"],
+                background: ["¿Cuáles son tus principales habilidades?", "Háblame de tu educación", "¿En qué industrias has trabajado?", "¿Qué te inspiró a entrar en la tecnología?", "¿Cómo ha sido tu trayectoria profesional?", "¿Algún mentor que te haya influido?"],
+                projects: ["¿Puedes mostrarme tu código?", "¿Qué tecnologías usaste?", "¿Cuánto tiempo tomó construirlo?", "¿Qué desafíos superaste?", "¿Trabajaste con un equipo?", "¿Cuáles son tus planes futuros para este proyecto?"],
+                contact: ["¿Estás disponible para trabajo freelance?", "¿Cuál es tu tiempo típico de respuesta?", "¿Trabajas de forma remota?", "¿Cómo puedo contactarte mejor?", "¿Cuál es tu forma preferida de comunicación?", "¿Estás abierto a colaboraciones?"],
+                education: ["¿Qué certificaciones tienes?", "¿Cuál es tu lenguaje de programación favorito?", "¿Cómo te mantienes actualizado con la tecnología?", "¿Cuál fue tu curso más desafiante?", "¿Cómo ha moldeado tu educación tu carrera?", "¿Algún curso en línea o autoaprendizaje?"],
+                projectResponse: ["¿Puedes contarme más sobre ese proyecto?", "¿Qué desafíos enfrentaste?", "¿Qué aprendiste de ello?", "¿Cuál fue la parte más interesante?", "¿Cómo lo probaste?", "¿Harías algo diferente ahora?"],
+                skillResponse: ["¿Cómo aprendiste eso?", "¿Lo has usado en proyectos?", "¿Cuál es tu nivel de competencia?", "¿Cuál es tu forma favorita de aplicar esta habilidad?", "¿Algún consejo para principiantes?", "¿Cómo ha evolucionado esta habilidad para ti?"],
+                early: ["¿Cuáles son tus principales habilidades?", "Háblame de tu experiencia", "¿De qué proyectos estás orgulloso?", "¿Qué hay de único en ti?", "¿Por qué elegiste este campo?", "¿Cuál es tu mayor logro?"]
             },
             ar: {
-                skills: ["ما هي المشاريع التي عملت عليها؟", "أخبرني عن تجربتك", "ماذا تتعلم حالياً؟"],
-                background: ["ما هي مهاراتك الرئيسية؟", "أخبرني عن تعليمك", "في أي صناعات عملت؟"],
-                projects: ["هل يمكنك إظهار كودك؟", "ما هي التقنيات التي استخدمتها؟", "كم من الوقت استغرق بناؤه؟"],
-                contact: ["هل أنت متاح للعمل الحر؟", "ما هو وقت ردك المعتاد؟", "هل تعمل عن بعد؟"],
-                education: ["ما هي الشهادات التي لديك؟", "ما هو لغة البرمجة المفضلة لديك؟", "كيف تحافظ على تحديث نفسك بالتكنولوجيا؟"],
-                projectResponse: ["هل يمكنك إخباري المزيد عن هذا المشروع؟", "ما هي التحديات التي واجهتها؟", "ماذا تعلمت منه؟"],
-                skillResponse: ["كيف تعلمت ذلك؟", "هل استخدمته في مشاريع؟", "ما هو مستوى مهارتك؟"],
-                early: ["ما هي مهاراتك الرئيسية؟", "أخبرني عن خلفيتك", "ما هي المشاريع التي تفخر بها؟"]
+                skills: ["ما هي المشاريع التي عملت عليها؟", "أخبرني عن تجربتك", "ماذا تتعلم حالياً؟", "كيف تتعامل مع حل المشكلات؟", "ما هي مهارتك المفضلة لاستخدامها؟", "كيف تحافظ على دافعك في عملك؟"],
+                background: ["ما هي مهاراتك الرئيسية؟", "أخبرني عن تعليمك", "في أي صناعات عملت؟", "ما الذي ألهمك للدخول في مجال التكنولوجيا؟", "كيف كانت رحلتك المهنية؟", "أي مرشدين أثروا عليك؟"],
+                projects: ["هل يمكنك إظهار كودك؟", "ما هي التقنيات التي استخدمتها؟", "كم من الوقت استغرق بناؤه؟", "ما هي التحديات التي تغلبت عليها؟", "هل عملت مع فريق؟", "ما هي خططك المستقبلية لهذا المشروع؟"],
+                contact: ["هل أنت متاح للعمل الحر؟", "ما هو وقت ردك المعتاد؟", "هل تعمل عن بعد؟", "كيف يمكنني التواصل معك بشكل أفضل؟", "ما هي طريقة التواصل المفضلة لديك؟", "هل أنت مفتوح للتعاون؟"],
+                education: ["ما هي الشهادات التي لديك؟", "ما هو لغة البرمجة المفضلة لديك؟", "كيف تحافظ على تحديث نفسك بالتكنولوجيا؟", "ما كان أكثر دورة تحدياً لك؟", "كيف شكلت تعليمك مسيرتك المهنية؟", "أي دورات عبر الإنترنت أو تعلم ذاتي؟"],
+                projectResponse: ["هل يمكنك إخباري المزيد عن هذا المشروع؟", "ما هي التحديات التي واجهتها؟", "ماذا تعلمت منه؟", "ما كانت الجزء الأكثر إثارة للاهتمام؟", "كيف اختبرته؟", "هل ستفعل شيئاً مختلفاً الآن؟"],
+                skillResponse: ["كيف تعلمت ذلك؟", "هل استخدمته في مشاريع؟", "ما هو مستوى مهارتك؟", "ما هي طريقتك المفضلة لتطبيق هذه المهارة؟", "أي نصائح للمبتدئين؟", "كيف تطورت هذه المهارة بالنسبة لك؟"],
+                early: ["ما هي مهاراتك الرئيسية؟", "أخبرني عن خلفيتك", "ما هي المشاريع التي تفخر بها؟", "ما الشيء الفريد فيك؟", "لماذا اخترت هذا المجال؟", "ما هو أكبر إنجاز لك؟"]
             }
         }
     }
