@@ -1,0 +1,422 @@
+﻿<!DOCTYPE html>
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+        }
+        .lightbox-nav:hover { background: rgba(0,0,0,0.8); }
+        .lightbox-prev { left: 1rem; }
+        .lightbox-next { right: 1rem; }
+        .gallery-carousel {
+            position: relative;
+            overflow: hidden;
+        }
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-out;
+            gap: 1rem;
+        }
+        .carousel-slide {
+            flex: 0 0 calc(50% - 0.5rem);
+            aspect-ratio: 1;
+        }
+        @media (min-width: 768px) {
+            .carousel-slide { flex: 0 0 calc(33.333% - 0.667rem); }
+        }
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background: rgba(33, 40, 66, 0.9);
+            color: white;
+            border: none;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .carousel-btn:hover {
+            background: rgba(33, 40, 66, 1);
+            transform: translateY(-50%) scale(1.1);
+        }
+        .carousel-btn-prev { left: 0.5rem; }
+        .carousel-btn-next { right: 0.5rem; }
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .carousel-dot {
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            background: rgba(33, 40, 66, 0.3);
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .carousel-dot.active {
+            background: rgba(33, 40, 66, 1);
+            transform: scale(1.3);
+        }
+        .gallery-card {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .gallery-card:hover { transform: scale(1.02); }
+    </style>
+</head>
+<body class="bg-beige text-chocolate font-sans antialiased">
+    
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox-overlay" aria-hidden="true">
+        <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
+        <button class="lightbox-nav lightbox-prev" aria-label="Previous image">←</button>
+        <img src="" alt="" class="lightbox-content" id="lightbox-image">
+        <button class="lightbox-nav lightbox-next" aria-label="Next image">→</button>
+    </div>
+    
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
+    
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-8 flex items-center justify-between gap-2">
+            <a href="/en/" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
+                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
+                <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
+            </a>
+            
+            <!-- Main Navigation -->
+            <ul class="hidden md:flex items-center space-x-8">
+                <li><a href="/en/overview" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Overview</a></li>
+                <li><a href="/en/deep-dive" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Deep Dive</a></li>
+                <li><a href="/en/about" class="text-sm text-chocolate hover:text-indigodeep transition-colors">About</a></li>
+                <li><a href="/en/projects/" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Projects</a></li>
+                <li><a href="/en/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors">Contact</a></li>
+            </ul>
+            
+            <!-- Language Switcher -->
+            <div id="lang-switcher" class="flex items-center space-x-3 shrink-0" style="z-index: 20;">
+                <a href="/en/hobbies/cooking.html" class="text-xs font-semibold text-indigodeep underline">EN</a>
+                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors">ES</a>
+                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors">AR</a>
+            </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button id="mobile-menu-toggle" class="md:hidden text-chocolate p-2" aria-label="Toggle mobile menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
+            <ul class="px-6 py-4 space-y-3">
+                <li><a href="/en/overview" class="block text-sm text-chocolate hover:text-indigodeep py-2">Overview</a></li>
+                <li><a href="/en/deep-dive" class="block text-sm text-chocolate hover:text-indigodeep py-2">Deep Dive</a></li>
+                <li><a href="/en/about" class="block text-sm text-chocolate hover:text-indigodeep py-2">About</a></li>
+                <li><a href="/en/projects/" class="block text-sm text-chocolate hover:text-indigodeep py-2">Projects</a></li>
+                <li><a href="/en/contact" class="block text-sm font-medium text-beige bg-indigodeep px-5 py-2 rounded-full text-center">Contact</a></li>
+            </ul>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="pt-24">
+        
+        <!-- Breadcrumb -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
+            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+                <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
+                    <li><a href="/en/" class="hover:text-indigodeep transition-colors">Home</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li><a href="/en/hobbies/index.html" class="hover:text-indigodeep transition-colors">Hobbies</a></li>
+                    <li><span class="text-chocolate/40">/</span></li>
+                    <li class="text-indigodeep font-medium">Cooking</li>
+                </ol>
+            </nav>
+        </section>
+        
+        <!-- Hero Section -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+            <div class="space-y-6">
+                <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Practical</span>
+                    <span class="text-xs text-ink/60">Performance</span>
+                </div>
+                <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
+                    Cooking
+                </h1>
+                <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
+                    Not about fancy recipes or Instagram-worthy plates. It's about fueling a body that trains hard, on a student budget, with minimal waste of time or ingredients.
+                </p>
+            </div>
+        </section>
+        
+        <!-- Content Grid -->
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
+            <div class="grid lg:grid-cols-3 gap-12">
+                
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-12">
+                    
+                    <!-- How I Plan Meals -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">How I Plan Meals</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>I treat the kitchen like a lab. Inputs and outputs. Protein targets, calorie ranges, prep time. Everything has a number attached, and I optimize for the best ratio of nutrition to effort.</p>
+                            <p>Sunday is prep day. I cook in bulk for the week. Proteins get portioned. Rice gets made. Vegetables get prepped. During the week, I'm assembling, not cooking from scratch. That saves hours.</p>
+                            <p>I track macros loosely. Not obsessively, but enough to know I'm hitting my protein targets. When you're trying to build muscle on a student schedule, you can't leave nutrition to chance. The gym is only half the equation.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Staple Meals -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Staple Meals</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>My rotation is simple because consistency beats variety when the goal is performance. Chicken thighs (cheaper and more flavorful than breast), ground beef, eggs, rice, potatoes, and whatever vegetables are on sale.</p>
+                            <p>Breakfast is usually eggs and toast, or Greek yogurt with oats. Quick, high protein, minimal cleanup. Lunch is whatever I prepped on Sunday. Dinner is where I might actually cook something fresh.</p>
+                            <p>I've learned to make a few things really well instead of being mediocre at many. A good stir fry. A solid rice bowl. Grilled meat that's actually seasoned properly. These basics, executed consistently, beat fancy recipes I'll never make twice.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- The Kitchen as a System -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">The Kitchen as a System</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>Cooking taught me about mise en place - having everything ready before you start. That principle applies everywhere. Preparation reduces friction. When everything is in place, execution becomes smooth.</p>
+                            <p>It also taught me about timing and parallel processing. While the rice cooks, prep the vegetables. While the meat rests, plate the sides. Finding those overlaps and using dead time is how you cook a full meal in 30 minutes.</p>
+                            <p>And cleanup as you go. Never let dishes pile up. The same discipline that keeps a kitchen functional keeps everything else functional too.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Photo Gallery -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Gallery</h2>
+                        <p class="text-chocolate mb-6 text-sm">Click any image to view larger. Use arrows or swipe to browse.</p>
+                        
+                        <div class="gallery-carousel" id="galleryCarousel">
+                            <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">←</button>
+                            <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">→</button>
+                            
+                            <div class="carousel-track" id="carouselTrack">
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/avocado_steak_eggs_smoothie.jpg" alt="High protein breakfast - steak with eggs, avocado, and a smoothie on the side" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/steaks.jpg" alt="Perfectly seared steaks - high heat, good crust, juicy inside" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/steak_mac_potatoes.jpg" alt="Steak with mac and cheese and potatoes - a hearty meal for gains" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/chicken_alfredo_pasta.jpg" alt="Creamy chicken alfredo pasta - comfort food done right" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/vodka_pasta.jpg" alt="Vodka pasta with a rich tomato cream sauce" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/burrito.jpg" alt="Loaded burrito - protein packed and ready to eat" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/burrrito_cut_in_half.jpg" alt="Burrito cut in half showing all the fillings inside" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/charcuterie_board.jpg" alt="Charcuterie board - meats, cheeses, and accompaniments for hosting" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/chicken.jpg" alt="Seasoned chicken ready for the grill or oven" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/pasta_chicken.jpg" alt="Pasta with grilled chicken - simple, high protein, satisfying" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
+                                </figure>
+                            </div>
+                            
+                            <div class="carousel-dots" id="carouselDots"></div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="space-y-8">
+                    
+                    <!-- Weekly Staples -->
+                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Weekly Staples</h3>
+                        <ul class="space-y-3 text-sm text-chocolate">
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">•</span>
+                                <span>Chicken thighs or breast</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">•</span>
+                                <span>Ground beef 80/20</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">•</span>
+                                <span>Eggs (lots of eggs)</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">•</span>
+                                <span>Rice and potatoes</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">•</span>
+                                <span>Greek yogurt</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">•</span>
+                                <span>Seasonal vegetables</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Principles -->
+                    <div class="bg-indigodeep/5 border border-indigodeep/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Principles</h3>
+                        <ul class="space-y-3 text-sm text-chocolate">
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">1.</span>
+                                <span>Protein first, always</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">2.</span>
+                                <span>Prep in bulk on Sunday</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">3.</span>
+                                <span>Clean as you go</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">4.</span>
+                                <span>Simple, repeatable meals</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Back to Hobbies -->
+                    <div class="bg-indigodeep rounded-xl p-6 text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                        <p class="text-beige/90 text-sm mb-4">Explore more hobbies</p>
+                        <a href="/hobbies.html#hobby-cooking-card" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
+                            ← Back to All Hobbies
+                        </a>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Footer -->
+<footer class="bg-indigodeep text-beige py-12">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid md:grid-cols-3 gap-12 mb-12">
+                <!-- Column 1: Brand -->
+                <div class="space-y-4">
+                    <a href="/en/" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
+                        <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
+                        <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
+                    </a>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                </div>
+                
+                <!-- Column 2: Quick Links -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/en/overview" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/en/deep-dive" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/en/projects/" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
+                        <li><a href="/en/about" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3: Connect -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
+                    <ul class="space-y-2">
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
+                        <li><a href="/en/contact" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
+                        <li><a href="/en/privacy" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-beige/20 pt-8 text-center">
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <!-- Scroll to Top Button -->
+    <button id="scroll-to-top" class="scroll-to-top-btn" type="button" title="Back to top" aria-label="Back to top" aria-describedby="scroll-to-top-tooltip">
+        <svg class="scroll-progress-ring" viewBox="0 0 47 47" width="47" height="47" aria-hidden="true" focusable="false">
+            <circle class="scroll-progress-track" cx="23.5" cy="23.5" r="22" fill="none" stroke="currentColor" stroke-width="3"></circle>
+            <circle class="scroll-progress-circle" cx="23.5" cy="23.5" r="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></circle>
+        </svg>
+        <svg class="scroll-to-top-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M18 15l-6-6-6 6"></path>
+        </svg>
+        <div id="scroll-to-top-tooltip" class="scroll-to-top-btn-tooltip" role="tooltip">Back to top</div>
+    </button>
+<!-- Savonie AI Chat Widget -->
+    <div id="chat-widget" class="fixed bottom-6 z-50 font-sans" style="z-index: 9999;" role="region" aria-label="AI Chat Assistant">
+        <!-- Chat Window (independently positioned when dragging) -->
+        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);" role="dialog" aria-modal="true" aria-labelledby="chat-title">
+            <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
+                <h3 id="chat-title" class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
+                    <img src="/assets/img/savonie-thumb.webp" alt="Savonie chatbot avatar" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64" loading="lazy" decoding="async">
+                    Savonie AI
+                </h3>
+                <button type="button" id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer" aria-label="Close chat">&times;</button>
+            </div>
+            
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white/50" role="log" aria-live="polite" aria-label="Chat messages"></div>
+
+            <!-- Dynamic Suggestion Chips Container -->
+            <div id="chat-chips" data-chat-suggestions="container" class="p-2 bg-white/80 border-t border-[#362017]/5 flex gap-2 overflow-x-auto whitespace-nowrap" role="group" aria-label="Suggested questions"></div>
+
+            <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white dark:bg-[#362017] border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
+                <button type="button" id="suggestions-btn" data-chat-suggestions-toggle="button" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors">
+                    💡
+                </button>
+                <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] dark:text-[#e1d4c2] dark:placeholder-[#e1d4c2]/60 focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
+                <button type="button" id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Welcome Bubble (anchored above toggle button) -->
+        <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+        </div>
+
+        <!-- Toggle Button (always stays in bottom-right corner) -->
+        <button type="button" id="chat-toggle" class="absolute bottom-0 right-0 bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 overflow-hidden" aria-label="Open Chat">
+            <img src="/assets/img/savonie-thumb.webp" alt="Savonie chat UI" class="w-full h-full object-cover" width="64" height="64" loading="lazy" decoding="async">
+        </button>
+    </div>
+    
+    <script src="/assets/js/site.min.js" defer></script>
+    <script src="/assets/js/lazy-loader.js" defer></script>
+</body>
+</html>
+
+
+
+

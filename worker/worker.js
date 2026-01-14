@@ -1,4 +1,4 @@
-// ============================================================================
+﻿// ============================================================================
 // SAVONIE AI - ESTIVAN'S PORTFOLIO CHATBOT
 // Cloudflare Worker with Rate Limiting, Smart Signals, & Auto-Healing
 // ============================================================================
@@ -43,20 +43,20 @@ async function getSiteFacts(env) {
   // Fallback: minimal embedded facts (should never be needed after KV upload)
   const fallbackFacts = {
     projects: [
-      { id: "portfolio", title: "This Website (Every Line)", summary: "Hand-coded portfolio with no templates.", url: "/projects/portfolio", fullUrl: "https://www.estivanayramia.com/projects/portfolio" },
-      { id: "loreal", title: "L'Oréal Cell BioPrint MAPS Campaign", summary: "Campaign strategy deck.", url: "/projects/logistics", fullUrl: "https://www.estivanayramia.com/projects/logistics" },
-      { id: "franklin", title: "Franklin Templeton Class Concept", summary: "17-page concept deck.", url: "/projects/discipline", fullUrl: "https://www.estivanayramia.com/projects/discipline" },
-      { id: "endpoint-linkedin", title: "EndPoint LinkedIn Campaign", summary: "Retargeting campaign deck.", url: "/projects/documentation", fullUrl: "https://www.estivanayramia.com/projects/documentation" },
-      { id: "elosity", title: "Endpoint Elosity Launch Video", summary: "Motion storyboard and voiceover.", url: "/projects/multilingual", fullUrl: "https://www.estivanayramia.com/projects/multilingual" },
-      { id: "competitive", title: "Taking Down Endpoint", summary: "Competitive strategy deck.", url: "/projects/competitive-strategy", fullUrl: "https://www.estivanayramia.com/projects/competitive-strategy" }
+      { id: "portfolio", title: "This Website (Every Line)", summary: "Hand-coded portfolio with no templates.", url: "/en/projects/portfolio", fullUrl: "https://www.estivanayramia.com/projects/portfolio" },
+      { id: "loreal", title: "L'Oréal Cell BioPrint MAPS Campaign", summary: "Campaign strategy deck.", url: "/en/projects/logistics", fullUrl: "https://www.estivanayramia.com/projects/logistics" },
+      { id: "franklin", title: "Franklin Templeton Class Concept", summary: "17-page concept deck.", url: "/en/projects/discipline", fullUrl: "https://www.estivanayramia.com/projects/discipline" },
+      { id: "endpoint-linkedin", title: "EndPoint LinkedIn Campaign", summary: "Retargeting campaign deck.", url: "/en/projects/documentation", fullUrl: "https://www.estivanayramia.com/projects/documentation" },
+      { id: "elosity", title: "Endpoint Elosity Launch Video", summary: "Motion storyboard and voiceover.", url: "/en/projects/multilingual", fullUrl: "https://www.estivanayramia.com/projects/multilingual" },
+      { id: "competitive", title: "Taking Down Endpoint", summary: "Competitive strategy deck.", url: "/en/projects/competitive-strategy", fullUrl: "https://www.estivanayramia.com/projects/competitive-strategy" }
     ],
     hobbies: [
-      { id: "gym", title: "Gym & Strength Training", summary: "Progressive overload and consistency.", url: "/hobbies/gym", fullUrl: "https://www.estivanayramia.com/hobbies/gym" },
-      { id: "photography", title: "Photography", summary: "iPhone shots with good timing.", url: "/hobbies/photography", fullUrl: "https://www.estivanayramia.com/hobbies/photography" },
-      { id: "car", title: "Car Enthusiasm", summary: "First car, maintenance pride.", url: "/hobbies/car", fullUrl: "https://www.estivanayramia.com/hobbies/car" },
-      { id: "cooking", title: "Cooking", summary: "Good ingredients, no compromises.", url: "/hobbies/cooking", fullUrl: "https://www.estivanayramia.com/hobbies/cooking" },
-      { id: "whispers", title: "Whispers (Sticky Notes)", summary: "Low-tech brain dump on sticky notes.", url: "/hobbies/whispers", fullUrl: "https://www.estivanayramia.com/hobbies/whispers" },
-      { id: "reading", title: "Reading", summary: "Compressed experience from books.", url: "/hobbies/reading", fullUrl: "https://www.estivanayramia.com/hobbies/reading" }
+      { id: "gym", title: "Gym & Strength Training", summary: "Progressive overload and consistency.", url: "/en/hobbies/gym", fullUrl: "https://www.estivanayramia.com/hobbies/gym" },
+      { id: "photography", title: "Photography", summary: "iPhone shots with good timing.", url: "/en/hobbies/photography", fullUrl: "https://www.estivanayramia.com/hobbies/photography" },
+      { id: "car", title: "Car Enthusiasm", summary: "First car, maintenance pride.", url: "/en/hobbies/car", fullUrl: "https://www.estivanayramia.com/hobbies/car" },
+      { id: "cooking", title: "Cooking", summary: "Good ingredients, no compromises.", url: "/en/hobbies/cooking", fullUrl: "https://www.estivanayramia.com/hobbies/cooking" },
+      { id: "whispers", title: "Whispers (Sticky Notes)", summary: "Low-tech brain dump on sticky notes.", url: "/en/hobbies/whispers", fullUrl: "https://www.estivanayramia.com/hobbies/whispers" },
+      { id: "reading", title: "Reading", summary: "Compressed experience from books.", url: "/en/hobbies/reading", fullUrl: "https://www.estivanayramia.com/hobbies/reading" }
     ]
   };
   
@@ -776,7 +776,7 @@ export default {
       // Project inquiries - use actual project from siteFacts
       // Match by URL to avoid id mismatches
       if (lowerMsg.includes("logistics") || lowerMsg.includes("loreal") || lowerMsg.includes("l'oréal") || lowerMsg.includes("bioprint") || lowerMsg.includes("maps campaign")) {
-        const project = siteFacts.projects.find(p => p.url === "/projects/logistics");
+        const project = siteFacts.projects.find(p => p.url === "/en/projects/logistics");
         
         // Null check to prevent crashes if project not found
         if (project) {

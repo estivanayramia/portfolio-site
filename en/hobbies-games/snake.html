@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snake | Arcade Zone</title>
+  <meta name="description" content="Play Snake in Arcade Zone. Eat, grow, and chase achievements." />
+  <link rel="canonical" href="https://www.estivanayramia.com/hobbies-games/snake" />
+
+  <meta property="og:title" content="Snake | Arcade Zone" />
+  <meta property="og:description" content="Play Snake in Arcade Zone. Eat, grow, and chase achievements." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.estivanayramia.com/hobbies-games/snake" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Snake | Arcade Zone" />
+  <meta name="twitter:description" content="Play Snake in Arcade Zone. Eat, grow, and chase achievements." />
+
+  <link rel="stylesheet" href="/assets/css/style.css" />
+  <link rel="stylesheet" href="/assets/css/theme.css" />
+  <link rel="stylesheet" href="/assets/css/arcade.css" />
+</head>
+<body>
+  <header></header>
+  <main class="container mx-auto px-4" style="padding-top:80px;">
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <a class="btn-back" href="/en/hobbies-games" aria-label="Back to Arcade Zone">← Arcade Zone</a>
+        <div class="score-display py-2 px-4 text-lg">Score: <span id="snake-score">0</span> | Level: <span id="snake-level">1</span></div>
+        <button type="button" id="snake-sound" class="btn-back" title="Toggle Sound" aria-pressed="false">🔊</button>
+      </div>
+
+      <section class="game-container" aria-label="Snake game">
+        <canvas id="snake-canvas" width="400" height="400"></canvas>
+        <div class="touch-controls" aria-label="Touch controls">
+          <button class="touch-btn up" data-snake-dir="up" type="button">↑</button>
+          <button class="touch-btn left" data-snake-dir="left" type="button">←</button>
+          <button class="touch-btn right" data-snake-dir="right" type="button">→</button>
+          <button class="touch-btn down" data-snake-dir="down" type="button">↓</button>
+        </div>
+        <div class="flex gap-2 mt-4 justify-center">
+          <button type="button" id="snake-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
+          <button type="button" id="snake-restart" class="px-6 py-2 bg-green-600 rounded-lg font-medium game-action">Restart</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/assets/js/site.min.js" defer></script>
+  <script type="module" src="/assets/js/arcade/games/snake.js"></script>
+        <!-- Scroll to Top Button -->
+        <button id="scroll-to-top" class="scroll-to-top-btn" type="button" title="Back to top" aria-label="Back to top" aria-describedby="scroll-to-top-tooltip">
+            <svg class="scroll-progress-ring" viewBox="0 0 47 47" width="47" height="47" aria-hidden="true" focusable="false">
+                <circle class="scroll-progress-track" cx="23.5" cy="23.5" r="22" fill="none" stroke="currentColor" stroke-width="3"></circle>
+                <circle class="scroll-progress-circle" cx="23.5" cy="23.5" r="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></circle>
+            </svg>
+            <svg class="scroll-to-top-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M18 15l-6-6-6 6"></path>
+            </svg>
+            <div id="scroll-to-top-tooltip" class="scroll-to-top-btn-tooltip" role="tooltip">Back to top</div>
+        </button>
+<!-- Savonie AI Chat Widget -->
+    <div id="chat-widget" class="fixed bottom-6 z-50 font-sans" style="z-index: 9999;" role="region" aria-label="AI Chat Assistant">
+        <!-- Chat Window (independently positioned when dragging) -->
+        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);" role="dialog" aria-modal="true" aria-labelledby="chat-title">
+            <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
+                <h3 id="chat-title" class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
+                    <img src="/assets/img/savonie-thumb.webp" alt="Savonie chatbot avatar" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64" loading="lazy" decoding="async">
+                    Savonie AI
+                </h3>
+                <button type="button" id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer" aria-label="Close chat">&times;</button>
+            </div>
+            
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white/50" role="log" aria-live="polite" aria-label="Chat messages"></div>
+
+            <!-- Dynamic Suggestion Chips Container -->
+            <div id="chat-chips" data-chat-suggestions="container" class="p-2 bg-white/80 border-t border-[#362017]/5 flex gap-2 overflow-x-auto whitespace-nowrap" role="group" aria-label="Suggested questions"></div>
+
+            <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white dark:bg-[#362017] border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
+                <button type="button" id="suggestions-btn" data-chat-suggestions-toggle="button" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors">
+                    💡
+                </button>
+                <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] dark:text-[#e1d4c2] dark:placeholder-[#e1d4c2]/60 focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
+                <button type="button" id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Welcome Bubble (anchored above toggle button) -->
+        <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+        </div>
+
+        <!-- Toggle Button (always stays in bottom-right corner) -->
+        <button type="button" id="chat-toggle" class="absolute bottom-0 right-0 bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 overflow-hidden" aria-label="Open Chat">
+            <img src="/assets/img/savonie-thumb.webp" alt="Savonie chat UI" class="w-full h-full object-cover" width="64" height="64" loading="lazy" decoding="async">
+        </button>
+    </div>
+    
+    <script src="/assets/js/lazy-loader.js" defer></script>
+</body>
+</html>
+
