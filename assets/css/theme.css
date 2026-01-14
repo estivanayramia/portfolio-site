@@ -339,6 +339,22 @@ header {
     background-color: #212842 !important;
 }
 
+/* Ensure a consistent small gap before the footer across pages so content
+   doesn't look abruptly cut off. This adds a little breathing room between
+   the last section and the footer on all pages. */
+section:last-of-type,
+body > section:last-of-type,
+main > section:last-of-type {
+    margin-bottom: 2.5rem !important;
+}
+
+/* For pages that use smaller containers, ensure the container itself also
+   keeps a small gap before footer when it's the last element. */
+.max-w-2xl:last-child,
+.max-w-7xl:last-child {
+    margin-bottom: 2.5rem !important;
+}
+
 /* Sticky section headers (e.g., game/hobby lists) */
 /* In dark mode: use the site's indigo and beige colors for better contrast */
 [data-theme="dark"] h3.sticky {
