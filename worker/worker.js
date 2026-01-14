@@ -249,10 +249,109 @@ function buildDebugInfo(isDebug, lowerMsg, source = "buildChips") {
 }
 
 /**
+ * Local fallback mode - grounded responses using siteFacts only
+ * Used when upstream AI is busy or unavailable
+ */
+function generateLocalFallback(lowerMsg, siteFacts) {
+  const intent = detectIntent(lowerMsg);
+  
+  // Only handle simple, grounded queries
+  // Anything complex returns a "not available" message
+  
+  if (intent === "greeting") {
+    return {
+      reply: `Hello! I'm currently in offline mode, but I can still help you navigate Estivan's portfolio. 
+
+Estivan is a Business graduate from SDSU specializing in operations and strategic execution.
+
+Quick links:
+- [View Projects](/projects/)
+- [Download Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)
+- [Contact Estivan](/contact)`,
+      chips: siteFacts.projects.slice(0, 3).map(p => p.title)
+    };
+  }
+  
+  if (intent === "projects") {
+    const projectList = siteFacts.projects.slice(0, 4).map(p => 
+      `- **[${p.title}](${p.url})**: ${p.summary}`
+    ).join('\n');
+    
+    return {
+      reply: `Here are Estivan's projects:
+
+${projectList}
+
+[Explore all projects →](/projects/)`,
+      chips: siteFacts.projects.slice(4, 7).map(p => p.title).filter(Boolean)
+    };
+  }
+  
+  if (intent === "hobbies") {
+    const hobbyList = siteFacts.hobbies.slice(0, 4).map(h => 
+      `- **[${h.title}](${h.url})**: ${h.summary}`
+    ).join('\n');
+    
+    return {
+      reply: `Here are Estivan's hobbies:
+
+${hobbyList}
+
+[Explore all hobbies →](/hobbies/)`,
+      chips: siteFacts.hobbies.slice(4, 7).map(h => h.title).filter(Boolean)
+    };
+  }
+  
+  if (intent === "summary") {
+    return {
+      reply: `Estivan Ayramia is a Business graduate from SDSU based in San Diego, specializing in operations and strategic execution.
+
+**Background**: Born in Baghdad/Syria (2004), SDSU General Business (3.8 GPA). 3 years coaching experience.
+
+**Focus Areas**: Supply Chain, Logistics, Operations, Project Execution.
+
+**Key Projects**: ${siteFacts.projects.slice(0, 3).map(p => p.title).join(', ')}.
+
+[View full resume →](/assets/docs/Estivan-Ayramia-Resume.pdf)`,
+      chips: ["View Projects", "Download Resume", "Contact Estivan"]
+    };
+  }
+  
+  if (intent === "contact") {
+    return {
+      reply: `You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact). He usually responds within 24 hours.`,
+      chips: ["View Projects", "Download Resume"]
+    };
+  }
+  
+  if (intent === "recruiter" || intent === "salary") {
+    return {
+      reply: `I'm currently in offline mode and can't provide detailed information about availability or compensation. 
+
+Please reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact) to discuss opportunities.`,
+      chips: ["View Projects", "Download Resume", "Contact Estivan"]
+    };
+  }
+  
+  // Default fallback for complex queries
+  return {
+    reply: `I'm currently in offline mode and can only provide basic information. 
+
+**Quick Options**:
+- [Projects](/projects/) - Browse his work
+- [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) - Download his CV
+- [Contact](/contact) - Reach out directly at hello@estivanayramia.com
+
+For detailed questions, please try again in a few minutes when the AI service is back online.`,
+    chips: siteFacts.projects.slice(0, 3).map(p => p.title)
+  };
+}
+
+/**
  * Guardrail validation - prevent hallucinated projects
  * Validates that any project mentioned exists in site-facts
  */
-function validateProjectMentions(text) {
+function validateProjectMentions(text, siteFacts) {
   if (!text) return { isValid: true, violations: [] };
   
   // Check for specific fake projects we know about
@@ -262,7 +361,10 @@ function validateProjectMentions(text) {
     "whispers app",
     "whispers application",
     "messaging app",
-    "discipline system"
+    "discipline system",
+    "conflict playbook",
+    "sticky note app",
+    "chat app"
   ];
   
   const lowerText = text.toLowerCase();
@@ -272,6 +374,30 @@ function validateProjectMentions(text) {
   for (const fake of knownFakeProjects) {
     if (lowerText.includes(fake)) {
       violations.push(fake);
+    }
+  }
+  
+  // Additional validation: Check if text mentions "project" followed by a title that's not in siteFacts
+  // This catches dynamically generated fake project names
+  const validProjectTitles = siteFacts.projects.map(p => p.title.toLowerCase());
+  const validProjectIds = siteFacts.projects.map(p => p.id.toLowerCase());
+  
+  // Extract potential project mentions (simplified pattern)
+  // Look for patterns like "project called X" or "X project" where X might be fake
+  const projectMentionPattern = /(?:project|work on|built|created|developed)\s+(?:called|named)?\s*([a-z0-9\s\-']+)/gi;
+  let match;
+  while ((match = projectMentionPattern.exec(lowerText)) !== null) {
+    const mentionedTitle = match[1].trim().toLowerCase();
+    // Skip short matches (< 3 words likely not a full project title)
+    if (mentionedTitle.split(' ').length < 2) continue;
+    
+    // Check if this title exists in our projects
+    const isValid = validProjectTitles.some(validTitle => 
+      validTitle.includes(mentionedTitle) || mentionedTitle.includes(validTitle)
+    );
+    
+    if (!isValid && mentionedTitle.length > 5) {
+      violations.push(`unrecognized project: "${mentionedTitle}"`);
     }
   }
   
@@ -886,7 +1012,7 @@ If asked about page-specific content you don't have info about:
         sanitizedReply = linkifyPages(sanitizedReply);
 
         // 4. Guardrail validation - prevent hallucinated projects
-        const validation = validateProjectMentions(sanitizedReply);
+        const validation = validateProjectMentions(sanitizedReply, siteFacts);
         if (!validation.isValid) {
           console.log(`Guardrail triggered: hallucinated projects detected - ${validation.violations.join(', ')}`);
           // Replace with corrected reply and show real project chips
@@ -956,15 +1082,20 @@ If asked about page-specific content you don't have info about:
         
         // Determine response based on upstream error
         if (upstreamCode === 429) {
+          // Use local fallback instead of just returning error
+          console.log("Upstream busy (429), using local fallback mode");
+          const fallback = generateLocalFallback(lowerMsg, siteFacts);
+          
           return jsonReply(
             {
               errorType: "UpstreamBusy",
-              reply: "The AI service is experiencing high demand. Please try again in a moment.",
-              chips: ["Retry", "Projects", "Resume", "Contact"],
+              reply: fallback.reply,
+              chips: fallback.chips,
+              fallback_mode: true,
               debug: debugInfo
             },
-            503,
-            { ...corsHeaders, "Retry-After": "30" }
+            200,  // Return 200 since we're providing a valid response
+            corsHeaders
           );
         } else if (upstreamCode === 401 || upstreamCode === 403) {
           return jsonReply(

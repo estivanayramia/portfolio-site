@@ -4405,11 +4405,23 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // For OfflineMode, still render the reply and chips even though errorType is set
             if (data.errorType !== 'OfflineMode') {
-                // Handle chips for error states - update dynamic chips if provided
-                if (data.chips && Array.isArray(data.chips) && els.chipsContainer) {
-                    renderChips(data.chips);
+                // Handle chips for error states - PRESERVE dynamic chips, only add Retry temporarily
+                if (els.chipsContainer) {
+                    // For error responses, keep existing dynamic chips and just add "Retry" chip
+                    const errorChips = ["Retry"];
+                    
+                    // Preserve existing dynamic chips by not overwriting them
+                    // Just ensure the Retry chip is visible alongside current context
+                    if (dynamicChips.length > 0 && !dynamicChips.includes("Retry")) {
+                        // Add Retry to beginning of existing dynamic chips temporarily
+                        const tempChips = ["Retry", ...dynamicChips];
+                        renderChips(tempChips);
+                    } else {
+                        // No dynamic chips yet, just add Retry
+                        renderChips(errorChips);
+                    }
                 } else {
-                    // Keep current dynamic chips, just re-render to show pinned
+                    // No chips container, just re-render
                     renderChips();
                 }
                 
