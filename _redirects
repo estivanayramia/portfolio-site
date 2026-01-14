@@ -40,6 +40,8 @@
 # Legacy Project Pages (project-*.html → /en/projects/*)
 /project-competitive-strategy.html   /en/projects/competitive-strategy   301!
 /project-competitive-strategy        /en/projects/competitive-strategy   301!
+/project-conflict.html               /en/projects/competitive-strategy   301!
+/project-conflict                    /en/projects/competitive-strategy   301!
 /project-discipline.html             /en/projects/discipline             301!
 /project-discipline                  /en/projects/discipline             301!
 /project-documentation.html          /en/projects/documentation          301!
@@ -167,5 +169,15 @@
 /en/hobbies-games/triangle-back-to-home.html /en/hobbies-games/triangle-back-to-home 301!
 /en/hobbies-games/xx142-b2exe.html           /en/hobbies-games/xx142-b2exe           301!
 
-# ===== 7. 404 Fallback =====
+# ===== 7. Standalone Game Pages (Root → /en/hobbies-games/) =====
+/2048.html                   /en/hobbies-games/2048           301!
+/2048                        /en/hobbies-games/2048           301!
+/snake.html                  /en/hobbies-games/snake          301!
+/snake                       /en/hobbies-games/snake          301!
+/invaders.html               /en/hobbies-games/space-invaders 301!
+/invaders                    /en/hobbies-games/space-invaders 301!
+/breaker.html                /en/hobbies-games/block-breaker  301!
+/breaker                     /en/hobbies-games/block-breaker  301!
+
+# ===== 8. 404 Fallback =====
 /404.html                    404

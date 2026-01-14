@@ -13,7 +13,9 @@
         "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push",
         "dev:worker": "cd worker && npx wrangler dev",
         "deploy:worker": "cd worker && npx wrangler deploy",
-        "test:facts": "node scripts/test-chat-grounding.js"
+        "test:facts": "node scripts/test-chat-grounding.js",
+        "test:links": "node scripts/test-links.js",
+        "test": "npm run test:facts && npm run test:links"
     },
     "keywords": [
         "portfolio",
