@@ -87,10 +87,10 @@ if (siteFacts) {
     test(`No banned term: "${term}"`, !siteFactsText.includes(term.toLowerCase()));
   });
   
-  // Check all URLs use explicit .html format (site policy)
+  // Check all URLs use canonical clean format (no .html)
   const allItems = [...(siteFacts.projects || []), ...(siteFacts.hobbies || [])];
   allItems.forEach(item => {
-    test(`${item.title} URL uses .html`, item.url.endsWith('.html'), item.url);
+    test(`${item.title} URL is canonical (no .html)`, !item.url.endsWith('.html'), item.url);
   });
 }
 
@@ -125,9 +125,9 @@ if (workerContent) {
   });
   
   // Check that worker DOES have correct /en/ URLs
-  test('Has correct /en/projects/ URLs', noComments.includes('/en/projects/'));
-  test('Has correct /en/hobbies/ URLs', noComments.includes('/en/hobbies/'));
-  test('Has correct /en/contact.html URL', noComments.includes('/en/contact.html'));
+  test('Has correct /en/projects/ URLs', noComments.includes('/en/projects/') || noComments.includes('/en/projects)'));
+  test('Has correct /en/hobbies/ URLs', noComments.includes('/en/hobbies/') || noComments.includes('/en/hobbies)'));
+  test('Has correct /en/contact URL (canonical)', noComments.includes('/en/contact)') || noComments.includes('/en/contact '));
   
   // Check siteFacts is embedded
   test('siteFacts is embedded', workerContent.includes('const siteFacts') || workerContent.includes('fallbackFacts'));
@@ -168,10 +168,10 @@ if (llmsTxt) {
 
 console.log('\n🔧 Test Group: L\'Oréal Handler');
 
-// Check that the L'Oréal project exists with correct URL
+// Check that the L'Oréal project exists with correct canonical URL
 if (siteFacts?.projects) {
-  const lorealProject = siteFacts.projects.find(p => p.url === '/en/projects/logistics.html');
-  test('L\'Oréal project exists with URL /en/projects/logistics.html', !!lorealProject, lorealProject?.url);
+  const lorealProject = siteFacts.projects.find(p => p.url === '/en/projects/logistics');
+  test('L\'Oréal project exists with canonical URL', !!lorealProject, lorealProject?.url || '/en/projects/logistics');
   
   if (lorealProject) {
     test('L\'Oréal project has title', !!lorealProject.title);
@@ -184,10 +184,10 @@ if (siteFacts?.projects) {
     );
   }
   
-  // Verify worker embeds siteFacts correctly
+  // Verify worker embeds siteFacts correctly with canonical URLs (no .html)
   const workerContents = fs.readFileSync(WORKER_PATH, 'utf-8');
-  test('Worker has L\'Oréal in embedded siteFacts', 
-    workerContents.includes('/en/projects/logistics.html')
+  test('Worker has L\'Oréal in embedded siteFacts with canonical URL', 
+    workerContents.includes('/en/projects/logistics"') || workerContents.includes('/en/projects/logistics\'')
   );
 }
 

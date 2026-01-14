@@ -81,10 +81,10 @@ function generateId(title) {
     .slice(0, 50);
 }
 
-// Convert file path to canonical URL path (WITH .html)
+// Convert file path to canonical URL path (clean URLs without .html)
 function toCanonicalPath(filePath) {
-  // Keep .html extensions - no clean URLs
-  return filePath;
+  // Remove .html extension for canonical URLs
+  return filePath.replace(/\.html$/, '');
 }
 
 // Parse projects from index page
