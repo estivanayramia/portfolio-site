@@ -16,27 +16,27 @@
   
   <!-- English Pages -->
   <url>
-    <loc>https://www.estivanayramia.com/en/about</loc>
+    <loc>https://www.estivanayramia.com/en/about.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/contact</loc>
+    <loc>https://www.estivanayramia.com/en/contact.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/overview</loc>
+    <loc>https://www.estivanayramia.com/en/overview.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/deep-dive</loc>
+    <loc>https://www.estivanayramia.com/en/deep-dive.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/privacy</loc>
+    <loc>https://www.estivanayramia.com/en/privacy.html</loc>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games.html</loc>
     <priority>0.7</priority>
   </url>
   
@@ -46,27 +46,27 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/projects/portfolio</loc>
+    <loc>https://www.estivanayramia.com/en/projects/portfolio.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/projects/logistics</loc>
+    <loc>https://www.estivanayramia.com/en/projects/logistics.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/projects/discipline</loc>
+    <loc>https://www.estivanayramia.com/en/projects/discipline.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/projects/documentation</loc>
+    <loc>https://www.estivanayramia.com/en/projects/documentation.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/projects/multilingual</loc>
+    <loc>https://www.estivanayramia.com/en/projects/multilingual.html</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/projects/competitive-strategy</loc>
+    <loc>https://www.estivanayramia.com/en/projects/competitive-strategy.html</loc>
     <priority>0.8</priority>
   </url>
   
@@ -76,89 +76,89 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies/gym</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/gym.html</loc>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies/photography</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/photography.html</loc>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies/car</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/car.html</loc>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies/cooking</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/cooking.html</loc>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies/whispers</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/whispers.html</loc>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies/reading</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies/reading.html</loc>
     <priority>0.6</priority>
   </url>
   
   <!-- English Mini-Games -->
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/1024-moves</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/1024-moves.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/2048</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/2048.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/back-attacker</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/back-attacker.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/block-breaker</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/block-breaker.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/nano-wirebot</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/nano-wirebot.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/off-the-line</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/off-the-line.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/oh-flip</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/oh-flip.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/onoff</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/onoff.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/pizza-undelivery</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/pizza-undelivery.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/racer</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/racer.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/snake</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/snake.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/space-invaders</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/space-invaders.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/the-matr13k</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/the-matr13k.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/triangle-back-to-home</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/triangle-back-to-home.html</loc>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/xx142-b2exe</loc>
+    <loc>https://www.estivanayramia.com/en/hobbies-games/xx142-b2exe.html</loc>
     <priority>0.4</priority>
   </url>
 </urlset>

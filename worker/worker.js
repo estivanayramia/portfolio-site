@@ -43,20 +43,20 @@ async function getSiteFacts(env) {
   // Fallback: minimal embedded facts (should never be needed after KV upload)
   const fallbackFacts = {
     projects: [
-      { id: "portfolio", title: "This Website (Every Line)", summary: "Hand-coded portfolio with no templates.", url: "/en/projects/portfolio", fullUrl: "https://www.estivanayramia.com/projects/portfolio" },
-      { id: "loreal", title: "L'Oréal Cell BioPrint MAPS Campaign", summary: "Campaign strategy deck.", url: "/en/projects/logistics", fullUrl: "https://www.estivanayramia.com/projects/logistics" },
-      { id: "franklin", title: "Franklin Templeton Class Concept", summary: "17-page concept deck.", url: "/en/projects/discipline", fullUrl: "https://www.estivanayramia.com/projects/discipline" },
-      { id: "endpoint-linkedin", title: "EndPoint LinkedIn Campaign", summary: "Retargeting campaign deck.", url: "/en/projects/documentation", fullUrl: "https://www.estivanayramia.com/projects/documentation" },
-      { id: "elosity", title: "Endpoint Elosity Launch Video", summary: "Motion storyboard and voiceover.", url: "/en/projects/multilingual", fullUrl: "https://www.estivanayramia.com/projects/multilingual" },
-      { id: "competitive", title: "Taking Down Endpoint", summary: "Competitive strategy deck.", url: "/en/projects/competitive-strategy", fullUrl: "https://www.estivanayramia.com/projects/competitive-strategy" }
+      { id: "portfolio", title: "This Website (Every Line)", summary: "Hand-coded portfolio with no templates.", url: "/en/projects/portfolio.html", fullUrl: "https://www.estivanayramia.com/en/projects/portfolio.html" },
+      { id: "loreal", title: "L'Oréal Cell BioPrint MAPS Campaign", summary: "Campaign strategy deck.", url: "/en/projects/logistics.html", fullUrl: "https://www.estivanayramia.com/en/projects/logistics.html" },
+      { id: "franklin", title: "Franklin Templeton Class Concept", summary: "17-page concept deck.", url: "/en/projects/discipline.html", fullUrl: "https://www.estivanayramia.com/en/projects/discipline.html" },
+      { id: "endpoint-linkedin", title: "EndPoint LinkedIn Campaign", summary: "Retargeting campaign deck.", url: "/en/projects/documentation.html", fullUrl: "https://www.estivanayramia.com/en/projects/documentation.html" },
+      { id: "elosity", title: "Endpoint Elosity Launch Video", summary: "Motion storyboard and voiceover.", url: "/en/projects/multilingual.html", fullUrl: "https://www.estivanayramia.com/en/projects/multilingual.html" },
+      { id: "competitive", title: "Taking Down Endpoint", summary: "Competitive strategy deck.", url: "/en/projects/competitive-strategy.html", fullUrl: "https://www.estivanayramia.com/en/projects/competitive-strategy.html" }
     ],
     hobbies: [
-      { id: "gym", title: "Gym & Strength Training", summary: "Progressive overload and consistency.", url: "/en/hobbies/gym", fullUrl: "https://www.estivanayramia.com/hobbies/gym" },
-      { id: "photography", title: "Photography", summary: "iPhone shots with good timing.", url: "/en/hobbies/photography", fullUrl: "https://www.estivanayramia.com/hobbies/photography" },
-      { id: "car", title: "Car Enthusiasm", summary: "First car, maintenance pride.", url: "/en/hobbies/car", fullUrl: "https://www.estivanayramia.com/hobbies/car" },
-      { id: "cooking", title: "Cooking", summary: "Good ingredients, no compromises.", url: "/en/hobbies/cooking", fullUrl: "https://www.estivanayramia.com/hobbies/cooking" },
-      { id: "whispers", title: "Whispers (Sticky Notes)", summary: "Low-tech brain dump on sticky notes.", url: "/en/hobbies/whispers", fullUrl: "https://www.estivanayramia.com/hobbies/whispers" },
-      { id: "reading", title: "Reading", summary: "Compressed experience from books.", url: "/en/hobbies/reading", fullUrl: "https://www.estivanayramia.com/hobbies/reading" }
+      { id: "gym", title: "Gym & Strength Training", summary: "Progressive overload and consistency.", url: "/en/hobbies/gym.html", fullUrl: "https://www.estivanayramia.com/en/hobbies/gym.html" },
+      { id: "photography", title: "Photography", summary: "iPhone shots with good timing.", url: "/en/hobbies/photography.html", fullUrl: "https://www.estivanayramia.com/en/hobbies/photography.html" },
+      { id: "car", title: "Car Enthusiasm", summary: "First car, maintenance pride.", url: "/en/hobbies/car.html", fullUrl: "https://www.estivanayramia.com/en/hobbies/car.html" },
+      { id: "cooking", title: "Cooking", summary: "Good ingredients, no compromises.", url: "/en/hobbies/cooking.html", fullUrl: "https://www.estivanayramia.com/en/hobbies/cooking.html" },
+      { id: "whispers", title: "Whispers (Sticky Notes)", summary: "Low-tech brain dump on sticky notes.", url: "/en/hobbies/whispers.html", fullUrl: "https://www.estivanayramia.com/en/hobbies/whispers.html" },
+      { id: "reading", title: "Reading", summary: "Compressed experience from books.", url: "/en/hobbies/reading.html", fullUrl: "https://www.estivanayramia.com/en/hobbies/reading.html" }
     ]
   };
   
@@ -154,10 +154,10 @@ function linkifyPages(text) {
   // Note: This is best-effort. The prompt instructions are the primary defense.
   
   const map = [
-    { word: "Overview", link: "[Overview](/overview)" },    // Canonical URL
-    { word: "Projects", link: "[Projects](/projects/)" },   // Canonical URL
-    { word: "Hobbies", link: "[Hobbies](/hobbies/)" },      // Canonical URL
-    { word: "Contact", link: "[Contact](/contact)" },       // Canonical URL
+    { word: "Overview", link: "[Overview](/en/overview.html)" },
+    { word: "Projects", link: "[Projects](/en/projects/index.html)" },
+    { word: "Hobbies", link: "[Hobbies](/en/hobbies/index.html)" },
+    { word: "Contact", link: "[Contact](/en/contact.html)" },
     { word: "Resume", link: "[Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)" }
   ];
 
@@ -265,9 +265,9 @@ function generateLocalFallback(lowerMsg, siteFacts) {
 Estivan is a Business graduate from SDSU specializing in operations and strategic execution.
 
 Quick links:
-- [View Projects](/projects/)
+- [View Projects](/en/projects/index.html)
 - [Download Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)
-- [Contact Estivan](/contact)`,
+- [Contact Estivan](/en/contact.html)`,
       chips: siteFacts.projects.slice(0, 3).map(p => p.title)
     };
   }
@@ -282,7 +282,7 @@ Quick links:
 
 ${projectList}
 
-[Explore all projects →](/projects/)`,
+[Explore all projects →](/en/projects/index.html)`,
       chips: siteFacts.projects.slice(4, 7).map(p => p.title).filter(Boolean)
     };
   }
@@ -297,7 +297,7 @@ ${projectList}
 
 ${hobbyList}
 
-[Explore all hobbies →](/hobbies/)`,
+[Explore all hobbies →](/en/hobbies/index.html)`,
       chips: siteFacts.hobbies.slice(4, 7).map(h => h.title).filter(Boolean)
     };
   }
@@ -319,7 +319,7 @@ ${hobbyList}
   
   if (intent === "contact") {
     return {
-      reply: `You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact). He usually responds within 24 hours.`,
+      reply: `You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/en/contact.html). He usually responds within 24 hours.`,
       chips: ["View Projects", "Download Resume"]
     };
   }
@@ -328,7 +328,7 @@ ${hobbyList}
     return {
       reply: `I'm currently in offline mode and can't provide detailed information about availability or compensation. 
 
-Please reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact) to discuss opportunities.`,
+Please reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/en/contact.html) to discuss opportunities.`,
       chips: ["View Projects", "Download Resume", "Contact Estivan"]
     };
   }
@@ -852,7 +852,7 @@ USER LANGUAGE: ${language || "English"} (Reply in this language!)
 *** YOUR MISSION (TRUTH-FIRST CONCIERGE) ***
 1. Answer the visitor's question directly and accurately
 2. Keep responses SHORT (2-4 sentences) and information-dense
-3. NEVER invent information you don't have - if you don't know, say so and redirect to [Contact](/contact) or hello@estivanayramia.com
+3. NEVER invent information you don't have - if you don't know, say so and redirect to [Contact](/en/contact.html) or hello@estivanayramia.com
 4. NO mailto: links - just show the email address or contact page link
 5. Always end with a clear next action or question
 6. Speak in THIRD PERSON by default ("Estivan is...", "He does...")
@@ -861,13 +861,13 @@ USER LANGUAGE: ${language || "English"} (Reply in this language!)
 *** CRITICAL: WHISPERS IS A HOBBY, NOT A PROJECT ***
 - "Whispers" / "Whispers (Sticky Notes)" = HOBBY (capturing thoughts on sticky notes)
 - "getWispers" / "get Wispers" = DOES NOT EXIST (never mention this)
-- If asked about whispers, clarify it's a hobby and link to /hobbies/whispers
-- If asked about getWispers, say it's not listed and link to /projects/
+- If asked about whispers, clarify it's a hobby and link to /en/hobbies/whispers.html
+- If asked about getWispers, say it's not listed and link to /en/projects/index.html
 
 *** BOUNDARIES (FAMILY-SAFE & PROFESSIONAL) ***
 ✅ CAN discuss: Projects, skills, education, hobbies, career goals, personality, values
 ❌ NEVER discuss: Sexual content, health diagnoses, family drama, exact addresses, political debates
-If asked inappropriate questions: "Professional inquiries only. Check out [Projects](/projects/) or [Contact](/contact) instead."
+If asked inappropriate questions: "Professional inquiries only. Check out [Projects](/en/projects/index.html) or [Contact](/en/contact.html) instead."
 
 *** WHO ESTIVAN IS ***
 - **Name**: Estivan Ayramia (He/Him), 21 years old
@@ -914,12 +914,12 @@ ${siteFacts.hobbies.map(h => `- **${h.title}**: ${h.summary}`).join('\n')}
 *** SMART ACTIONS (TRIGGER THESE) ***
 When visitor mentions these keywords, suggest these actions:
 - "resume" / "CV" / "download" → Point to [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)
-- "contact" / "email" / "hire" / "reach out" → Point to [Contact](/contact) or hello@estivanayramia.com
+- "contact" / "email" / "hire" / "reach out" → Point to [Contact](/en/contact.html) or hello@estivanayramia.com
 - "LinkedIn" → Mention professional networking
 - "logistics" / "supply chain" → Highlight the relevant project from site-facts
-- "whispers" / "sticky notes" → Clarify this is a HOBBY (not a project), link to /hobbies/whispers
+- "whispers" / "sticky notes" → Clarify this is a HOBBY (not a project), link to /en/hobbies/whispers.html
 - "conflict" / "workplace" → Highlight the relevant project from site-facts
-- "projects" → Link to [Projects](/projects/) to see all work
+- "projects" → Link to [Projects](/en/projects/index.html) to see all work
 
 *** OUTPUT RULES ***
 - Write in clean Markdown only
@@ -945,7 +945,7 @@ If visitor says "hi"/"hello":
 Current page: ${pageContent || "Home"}
 If asked about page-specific content you don't have info about:
 - Say "I don't have that specific information right now"
-- Offer: "Check out [Contact](/contact) or email hello@estivanayramia.com and Estivan will answer directly"
+- Offer: "Check out [Contact](/en/contact.html) or email hello@estivanayramia.com and Estivan will answer directly"
 - NEVER make up page details
 `.trim();
 

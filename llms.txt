@@ -24,43 +24,43 @@ It is designed to help recruiters, hiring managers, and collaborators learn abou
 ## Projects (6 total)
 
 1. This Website (Every Line)
-   - URL: https://www.estivanayramia.com/projects/portfolio
+   - URL: https://www.estivanayramia.com/en/projects/portfolio.html
    - Type: Web Development
    - Description: Hand-coded portfolio with no templates or CMS. Features include service worker, AI chatbot, and Lighthouse 90+ scores.
 
 2. L'Oréal Cell BioPrint MAPS Campaign
-   - URL: https://www.estivanayramia.com/projects/logistics
+   - URL: https://www.estivanayramia.com/en/projects/logistics.html
    - Type: Campaign Strategy
    - Description: Class concept campaign deck mapping three personas and their touchpoints across the funnel.
 
 3. Franklin Templeton Class Concept
-   - URL: https://www.estivanayramia.com/projects/discipline
+   - URL: https://www.estivanayramia.com/en/projects/discipline.html
    - Type: Content Strategy
    - Description: 17-page class concept deck for a 'Voice of Progress' campaign.
 
 4. EndPoint LinkedIn Campaign
-   - URL: https://www.estivanayramia.com/projects/documentation
+   - URL: https://www.estivanayramia.com/en/projects/documentation.html
    - Type: Retargeting Strategy
    - Description: 15-page deck outlining Phase 2A and Phase 2B of a LinkedIn retargeting campaign.
 
 5. Endpoint Elosity Launch Video
-   - URL: https://www.estivanayramia.com/projects/multilingual
+   - URL: https://www.estivanayramia.com/en/projects/multilingual.html
    - Type: Video Concept
    - Description: Motion storyboard and voiceover script for product launch.
 
 6. Taking Down Endpoint (Almac Group + 4G Clinical)
-   - URL: https://www.estivanayramia.com/projects/competitive-strategy
+   - URL: https://www.estivanayramia.com/en/projects/competitive-strategy.html
    - Type: Competitive Strategy
    - Description: Marketing strategy deck for competitive positioning.
 
 ## Hobbies (6 total)
 
-1. Gym & Strength Training - https://www.estivanayramia.com/hobbies/gym
-2. Photography - https://www.estivanayramia.com/hobbies/photography
-3. Car Enthusiasm - https://www.estivanayramia.com/hobbies/car
-4. Cooking - https://www.estivanayramia.com/hobbies/cooking
-5. Whispers (Sticky Notes) - https://www.estivanayramia.com/hobbies/whispers
-6. Reading - https://www.estivanayramia.com/hobbies/reading
+1. Gym & Strength Training - https://www.estivanayramia.com/en/hobbies/gym.html
+2. Photography - https://www.estivanayramia.com/en/hobbies/photography.html
+3. Car Enthusiasm - https://www.estivanayramia.com/en/hobbies/car.html
+4. Cooking - https://www.estivanayramia.com/en/hobbies/cooking.html
+5. Whispers (Sticky Notes) - https://www.estivanayramia.com/en/hobbies/whispers.html
+6. Reading - https://www.estivanayramia.com/en/hobbies/reading.html
 
 ## Important Clarifications
 
@@ -70,14 +70,14 @@ It is designed to help recruiters, hiring managers, and collaborators learn abou
 
 ## Key Pages
 
-- Home: https://www.estivanayramia.com/
-- Projects: https://www.estivanayramia.com/projects/
-- Hobbies: https://www.estivanayramia.com/hobbies/
-- About: https://www.estivanayramia.com/about
-- Contact: https://www.estivanayramia.com/contact
+- Home: https://www.estivanayramia.com/en/index.html
+- Projects: https://www.estivanayramia.com/en/projects/index.html
+- Hobbies: https://www.estivanayramia.com/en/hobbies/index.html
+- About: https://www.estivanayramia.com/en/about.html
+- Contact: https://www.estivanayramia.com/en/contact.html
 - Resume: https://www.estivanayramia.com/assets/docs/Estivan-Ayramia-Resume.pdf
-- Overview: https://www.estivanayramia.com/overview
-- Deep Dive: https://www.estivanayramia.com/deep-dive
+- Overview: https://www.estivanayramia.com/en/overview.html
+- Deep Dive: https://www.estivanayramia.com/en/deep-dive.html
 
 ## Skills & Focus Areas
 

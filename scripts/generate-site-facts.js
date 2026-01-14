@@ -81,11 +81,10 @@ function generateId(title) {
     .slice(0, 50);
 }
 
-// Convert file path to canonical URL path (no .html)
+// Convert file path to canonical URL path (WITH .html)
 function toCanonicalPath(filePath) {
-  // /projects/logistics.html → /projects/logistics
-  // /hobbies/gym.html → /hobbies/gym
-  return filePath.replace(/\.html$/, '');
+  // Keep .html extensions - no clean URLs
+  return filePath;
 }
 
 // Parse projects from index page
