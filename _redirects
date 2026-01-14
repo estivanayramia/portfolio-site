@@ -2,6 +2,26 @@
 # Language Structure: /en/ for English, /es/ for Spanish, /ar/ for Arabic
 # All old English URLs redirect to /en/ with 301 (permanent)
 
+# ===== 0. Clean URL Rewrites (MUST come first to avoid loops) =====
+# These rewrite extensionless URLs to serve .html files (200 status = no redirect)
+
+# Generic patterns (fallback for all pages)
+/en/:page                           /en/:page.html                          200
+/en/projects/:slug                  /en/projects/:slug.html                 200
+/en/hobbies/:slug                   /en/hobbies/:slug.html                  200
+/en/hobbies-games/:slug             /en/hobbies-games/:slug.html            200
+
+# Explicit mini-game rewrites (for clarity and guaranteed routing)
+/en/hobbies-games/2048              /en/hobbies-games/2048.html             200
+/en/hobbies-games/snake             /en/hobbies-games/snake.html            200
+/en/hobbies-games/space-invaders    /en/hobbies-games/space-invaders.html   200
+/en/hobbies-games/block-breaker     /en/hobbies-games/block-breaker.html    200
+
+# Explicit hobby rewrites (for the previously broken pages)
+/en/hobbies/whispers                /en/hobbies/whispers.html               200
+/en/hobbies/cooking                 /en/hobbies/cooking.html                200
+/en/hobbies/car                     /en/hobbies/car.html                    200
+
 # ===== 1. Language Default =====
 /                            /en/                         302
 /index.html                  /en/                         301!

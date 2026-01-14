@@ -245,6 +245,46 @@ function runLinkIntegrityTests() {
     }
   });
   
+  // Test hobby pages have proper HTML structure
+  console.log(`\n${colors.cyan}🔍 Test Group: HTML Structure${colors.reset}`);
+  
+  const hobbyPages = ['whispers.html', 'cooking.html', 'car.html'];
+  hobbyPages.forEach(hobbyFile => {
+    const hobbyPath = path.join(ROOT_DIR, 'en', 'hobbies', hobbyFile);
+    if (fs.existsSync(hobbyPath)) {
+      const hobbyContent = fs.readFileSync(hobbyPath, 'utf-8');
+      const hasHead = /<head[\s>]/.test(hobbyContent);
+      const hasBody = /<body[\s>]/.test(hobbyContent);
+      
+      if (hasHead && hasBody) {
+        pass(`${hobbyFile} has proper HTML structure (head + body)`);
+      } else {
+        fail(`${hobbyFile} missing proper HTML structure (head: ${hasHead}, body: ${hasBody})`);
+      }
+    }
+  });
+  
+  // Test mini-game pages don't link to old root game URLs
+  console.log(`\n${colors.cyan}🎮 Test Group: Mini-Game Links${colors.reset}`);
+  
+  const gameTestPath = path.join(ROOT_DIR, 'en', 'hobbies-games', 'xx142-b2exe.html');
+  if (fs.existsSync(gameTestPath)) {
+    const gameContent = fs.readFileSync(gameTestPath, 'utf-8');
+    const badLinks = ['/2048.html', '/invaders.html', '/breaker.html', '/snake.html'];
+    let hasBadLinks = false;
+    
+    badLinks.forEach(badLink => {
+      if (gameContent.includes(`href="${badLink}"`)) {
+        hasBadLinks = true;
+        fail(`xx142-b2exe.html contains legacy link: ${badLink}`);
+      }
+    });
+    
+    if (!hasBadLinks) {
+      pass('xx142-b2exe.html does not contain legacy game links');
+    }
+  }
+  
   // Print summary
   console.log(`\n${'='.repeat(80)}`);
   if (failedTests === 0) {

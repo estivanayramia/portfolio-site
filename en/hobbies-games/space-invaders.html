@@ -1,16 +1,16 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Space Invaders | Arcade Zone</title>
   <meta name="description" content="Play Space Invaders in Arcade Zone. Move and shoot together, survive waves, and unlock achievements." />
-  <link rel="canonical" href="https://www.estivanayramia.com/hobbies-games/space-invaders" />
+  <link rel="canonical" href="https://www.estivanayramia.com/en/hobbies-games/space-invaders" />
 
   <meta property="og:title" content="Space Invaders | Arcade Zone" />
   <meta property="og:description" content="Play Space Invaders in Arcade Zone. Move and shoot together, survive waves, and unlock achievements." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.estivanayramia.com/hobbies-games/space-invaders" />
+  <meta property="og:url" content="https://www.estivanayramia.com/en/hobbies-games/space-invaders" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Space Invaders | Arcade Zone" />
@@ -25,17 +25,17 @@
   <main class="container mx-auto px-4" style="padding-top:80px;">
     <div class="max-w-4xl mx-auto">
       <div class="flex items-center justify-between mb-4">
-        <a class="btn-back" href="/en/hobbies-games" aria-label="Back to Arcade Zone">← Arcade Zone</a>
+        <a class="btn-back" href="/en/hobbies-games" aria-label="Back to Arcade Zone">? Arcade Zone</a>
         <div class="score-display py-2 px-4 text-lg">Score: <span id="invaders-score">0</span> | Wave: <span id="invaders-wave">1</span></div>
-        <button type="button" id="invaders-sound" class="btn-back" title="Toggle Sound" aria-pressed="false">🔊</button>
+        <button type="button" id="invaders-sound" class="btn-back" title="Toggle Sound" aria-pressed="false">??</button>
       </div>
 
       <section class="game-container" aria-label="Space Invaders game">
         <canvas id="invaders-canvas" width="400" height="500"></canvas>
         <div class="touch-controls horizontal" aria-label="Touch controls">
-          <button class="touch-btn" data-invaders="left" type="button">←</button>
-          <button class="touch-btn" data-invaders="shoot" type="button">🔥</button>
-          <button class="touch-btn" data-invaders="right" type="button">→</button>
+          <button class="touch-btn" data-invaders="left" type="button">?</button>
+          <button class="touch-btn" data-invaders="shoot" type="button">??</button>
+          <button class="touch-btn" data-invaders="right" type="button">?</button>
         </div>
         <div class="flex gap-2 mt-4 justify-center">
           <button type="button" id="invaders-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
@@ -77,7 +77,7 @@
 
             <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white dark:bg-[#362017] border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
                 <button type="button" id="suggestions-btn" data-chat-suggestions-toggle="button" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors">
-                    💡
+                    ??
                 </button>
                 <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] dark:text-[#e1d4c2] dark:placeholder-[#e1d4c2]/60 focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
                 <button type="button" id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
@@ -88,7 +88,7 @@
 
         <!-- Welcome Bubble (anchored above toggle button) -->
         <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
-            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? ??</p>
         </div>
 
         <!-- Toggle Button (always stays in bottom-right corner) -->
