@@ -7,17 +7,17 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v1767850000';
+const CACHE_VERSION = 'v1737676800';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/about.html',
-    '/overview.html',
-    '/deep-dive.html',
-    '/projects.html',
-    '/contact.html',
-    '/privacy.html',
+    '/en/index.html',
+    '/en/about.html',
+    '/en/overview.html',
+    '/en/deep-dive.html',
+    '/en/projects/index.html',
+    '/en/hobbies/index.html',
+    '/en/contact.html',
+    '/en/privacy.html',
     '/404.html',
     '/assets/css/theme.css',
     '/assets/css/style.css',

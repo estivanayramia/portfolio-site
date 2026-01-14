@@ -109,10 +109,7 @@
     <loc>https://www.estivanayramia.com/en/hobbies-games/2048.html</loc>
     <priority>0.4</priority>
   </url>
-  <url>
-    <loc>https://www.estivanayramia.com/en/hobbies-games/back-attacker.html</loc>
-    <priority>0.4</priority>
-  </url>
+  <!-- back-attacker.html removed - game assets missing from /assets/MiniGames/ -->
   <url>
     <loc>https://www.estivanayramia.com/en/hobbies-games/block-breaker.html</loc>
     <priority>0.4</priority>
