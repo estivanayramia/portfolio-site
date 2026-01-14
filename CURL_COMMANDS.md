@@ -87,7 +87,8 @@ Chips are now **contextual and dynamic** based on the user's question. The backe
 - **Greeting**: `["What does Estivan do?", "Show me top skills", "View best projects"]`
 - **Summary**: `["What are his key skills?", "Recent work experience", "Top projects", "Education background"]`
 - **Skills**: `["What's his tech stack?", "Operations experience", "Any certifications?", "Programming languages", "Tools and frameworks"]`
-- **Projects**: `["Logistics Management System", "Whispers App", "Conflict Resolution Playbook", "Portfolio website"]`
+- **Projects**: `["This Website (Every Line)", "L'Oréal Cell BioPrint MAPS Campaign", "Franklin Templeton Class Concept", "EndPoint LinkedIn Campaign"]`
+- **Hobbies**: `["Gym & Strength Training", "Photography", "Car Enthusiasm", "Cooking"]`
 - **Default**: `["What does Estivan do?", "Key skills overview", "Top projects showcase"]`
 
 ### Rate Limited

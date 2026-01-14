@@ -333,16 +333,67 @@ Please reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivan
     };
   }
   
-  // Default fallback for complex queries
+  // Default: keyword search for relevant content
+  // Extract keywords from user message
+  const keywords = lowerMsg
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 3); // Only words longer than 3 chars
+  
+  if (keywords.length === 0) {
+    return {
+      reply: `I'm currently in offline mode. Try asking about:
+- Projects (e.g., "L'Oréal campaign")
+- Hobbies (e.g., "photography")
+- Skills or background
+- Contact information
+
+[Explore Projects](/projects/) | [Download Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)`,
+      chips: siteFacts.projects.slice(0, 3).map(p => p.title)
+    };
+  }
+  
+  // Search projects and hobbies for keyword matches
+  const allItems = [
+    ...siteFacts.projects.map(p => ({ ...p, type: 'project' })),
+    ...siteFacts.hobbies.map(h => ({ ...h, type: 'hobby' }))
+  ];
+  
+  const matches = allItems
+    .map(item => {
+      const searchText = `${item.title} ${item.summary}`.toLowerCase();
+      const matchCount = keywords.filter(kw => searchText.includes(kw)).length;
+      return { item, score: matchCount };
+    })
+    .filter(m => m.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3); // Top 3 matches
+  
+  if (matches.length > 0) {
+    const resultList = matches.map(m => 
+      `- **[${m.item.title}](${m.item.url})**: ${m.item.summary}`
+    ).join('\n');
+    
+    return {
+      reply: `I'm in offline mode, but here's what I found based on your question:
+
+${resultList}
+
+[Explore all ${matches[0].item.type}s →](/${matches[0].item.type}s/)`,
+      chips: matches.map(m => m.item.title)
+    };
+  }
+  
+  // No matches found
   return {
-    reply: `I'm currently in offline mode and can only provide basic information. 
+    reply: `I'm currently in offline mode and couldn't find specific matches for your question.
 
-**Quick Options**:
-- [Projects](/projects/) - Browse his work
-- [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) - Download his CV
-- [Contact](/contact) - Reach out directly at hello@estivanayramia.com
+**Available topics**:
+- **Projects**: ${siteFacts.projects.slice(0, 2).map(p => p.title).join(', ')}
+- **Hobbies**: ${siteFacts.hobbies.slice(0, 2).map(h => h.title).join(', ')}
 
-For detailed questions, please try again in a few minutes when the AI service is back online.`,
+[Explore Projects](/projects/) | [Download Resume](/assets/docs/Estivan-Ayramia-Resume.pdf)`,
     chips: siteFacts.projects.slice(0, 3).map(p => p.title)
   };
 }
@@ -723,20 +774,26 @@ export default {
       }
 
       // Project inquiries - use actual project from siteFacts
+      // Match by URL to avoid id mismatches
       if (lowerMsg.includes("logistics") || lowerMsg.includes("loreal") || lowerMsg.includes("l'oréal") || lowerMsg.includes("bioprint") || lowerMsg.includes("maps campaign")) {
-        const project = siteFacts.projects.find(p => p.id === "loreal-cell-bioprint");
-        return jsonReply(
-          {
-            errorType: null,
-            reply: `The [${project.title}](${project.url}) is one of Estivan's projects - ${project.summary}`,
-            chips: buildChips(lowerMsg, siteFacts),
-            card: "loreal",
-            action: null,
-            debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_loreal")
-          },
-          200,
-          corsHeaders
-        );
+        const project = siteFacts.projects.find(p => p.url === "/projects/logistics");
+        
+        // Null check to prevent crashes if project not found
+        if (project) {
+          return jsonReply(
+            {
+              errorType: null,
+              reply: `The [${project.title}](${project.url}) is one of Estivan's projects - ${project.summary}`,
+              chips: buildChips(lowerMsg, siteFacts),
+              card: "loreal",
+              action: null,
+              debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_loreal")
+            },
+            200,
+            corsHeaders
+          );
+        }
+        // Fallthrough to general handler if not found
       }
 
       // Handle Whispers clarification - it's a HOBBY, not a project

@@ -163,7 +163,44 @@ if (llmsTxt) {
 }
 
 // ============================================================================
-// Test 4: File existence checks
+// Test 4: L'Oréal Handler Logic
+// ============================================================================
+
+console.log('\n🔧 Test Group: L\'Oréal Handler');
+
+// Check that the L'Oréal project exists with correct URL
+if (siteFacts?.projects) {
+  const lorealProject = siteFacts.projects.find(p => p.url === '/projects/logistics');
+  test('L\'Oréal project exists with URL /projects/logistics', !!lorealProject);
+  
+  if (lorealProject) {
+    test('L\'Oréal project has title', !!lorealProject.title);
+    test('L\'Oréal project has summary', !!lorealProject.summary);
+    test('L\'Oréal project title matches expected pattern', 
+      lorealProject.title.toLowerCase().includes('loreal') || 
+      lorealProject.title.toLowerCase().includes('l\'oréal') ||
+      lorealProject.title.toLowerCase().includes('bioprint'),
+      lorealProject.title
+    );
+  }
+  
+  // Verify worker uses URL-based lookup, not hardcoded id
+  const workerContents = fs.readFileSync(WORKER_PATH, 'utf-8');
+  test('Worker uses URL lookup for L\'Oréal (p.url === "/projects/logistics")', 
+    workerContents.includes('p.url === "/projects/logistics"')
+  );
+  test('Worker does not use old broken id lookup',
+    !workerContents.includes('p.id === "loreal-cell-bioprint"')
+  );
+  
+  // Check for null safety
+  test('Worker has null check for L\'Oréal project', 
+    workerContents.match(/if\s*\(\s*project\s*\)/i) !== null
+  );
+}
+
+// ============================================================================
+// Test 5: File Existence
 // ============================================================================
 
 console.log('\n📁 Test Group: File Existence');
