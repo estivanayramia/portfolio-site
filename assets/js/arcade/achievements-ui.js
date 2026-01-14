@@ -22,7 +22,7 @@ function ensureModalExists() {
                         <div class="p-4 border-b border-chocolate/10 dark:border-beige/10 bg-beige dark:bg-indigodeep">
                             <div class="flex items-center justify-between">
                                 <h2 class="text-base font-bold text-chocolate dark:text-beige" id="slide-over-title">🏆 Achievements</h2>
-                                <button type="button" id="achievements-close" class="rounded-md text-chocolate/60 hover:text-chocolate dark:text-beige/60 dark:hover:text-beige focus:outline-none">
+                                <button type="button" id="achievements-close" class="rounded-md text-chocolate/60 hover:text-chocolate dark:text-beige/60 dark:hover:text-beige focus:outline-none flex items-center gap-1">
                                     <span class="sr-only">Close panel</span>
                                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -56,7 +56,7 @@ function ensureModalExists() {
                 <div class="p-4 border-b border-chocolate/10 dark:border-beige/10 bg-beige dark:bg-indigodeep">
                     <div class="flex items-center justify-between">
                         <h2 class="text-base font-bold text-chocolate dark:text-beige" id="slide-over-title">🏆 Achievements</h2>
-                        <button type="button" id="achievements-close" class="rounded-md text-chocolate/60 hover:text-chocolate dark:text-beige/60 dark:hover:text-beige focus:outline-none">
+                        <button type="button" id="achievements-close" class="rounded-md text-chocolate/60 hover:text-chocolate dark:text-beige/60 dark:hover:text-beige focus:outline-none flex items-center gap-1">
                             <span class="sr-only">Close panel</span>
                             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
