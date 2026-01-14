@@ -1369,14 +1369,14 @@ select.border-red-500 {
     right: 30px;
     background: var(--color-primary);
     color: white;
-    padding: 16px 20px;
-    border-radius: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     z-index: 10001;
-    max-width: 350px;
+    max-width: 280px;
     opacity: 0;
     transform: translateX(400px);
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -1388,7 +1388,7 @@ select.border-red-500 {
 }
 
 .achievement-icon {
-    font-size: 32px;
+    font-size: 24px;
     flex-shrink: 0;
 }
 
@@ -1397,21 +1397,21 @@ select.border-red-500 {
 }
 
 .achievement-title {
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 1px;
     opacity: 0.8;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .achievement-name {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .achievement-desc {
-    font-size: 13px;
+    font-size: 12px;
     opacity: 0.9;
 }
 
@@ -1419,11 +1419,11 @@ select.border-red-500 {
     background: none;
     border: none;
     color: white;
-    font-size: 20px;
+    font-size: 16px;
     cursor: pointer;
     padding: 0;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1454,6 +1454,26 @@ select.border-red-500 {
         right: 20px;
         left: 20px;
         max-width: none;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .achievement-icon {
+        font-size: 20px;
+    }
+
+    .achievement-name {
+        font-size: 13px;
+    }
+
+    .achievement-desc {
+        font-size: 11px;
+    }
+
+    .achievement-close {
+        font-size: 14px;
+        width: 18px;
+        height: 18px;
     }
 }
 
