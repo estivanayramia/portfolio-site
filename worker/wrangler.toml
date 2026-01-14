@@ -16,3 +16,7 @@ persist = true
 
 # Environment variables
 # Add GEMINI_API_KEY as a secret via: wrangler secret put GEMINI_API_KEY
+
+[[kv_namespaces]]
+binding = "SAVONIE_KV"
+id = "e723b1dbdc9a40a6b6ccd04764108d6c"

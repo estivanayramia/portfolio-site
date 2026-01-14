@@ -4055,7 +4055,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => {
                 // Handle pinned chip actions
                 if (projectLabels.includes(chipText)) {
-                    window.location.href = "/projects.html";
+                    window.location.href = "/projects/";
                     // Update dynamic chips with project-related follow-ups
                     const followUps = translations.chat.pinnedFollowUps[currentLanguage]?.projects || 
                                      translations.chat.pinnedFollowUps.en.projects;
@@ -4073,7 +4073,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 if (contactLabels.includes(chipText)) {
-                    window.location.href = "/contact.html";
+                    window.location.href = "/contact";
                     // Update dynamic chips with contact-related follow-ups
                     const followUps = translations.chat.pinnedFollowUps[currentLanguage]?.contact || 
                                      translations.chat.pinnedFollowUps.en.contact;

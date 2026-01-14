@@ -1,0 +1,120 @@
+# llms.txt - AI-Readable Site Information
+# https://www.estivanayramia.com/llms.txt
+# Last updated: 2026-01-14
+
+## About This Site
+
+This is the personal portfolio website of Estivan Ayramia.
+
+## Owner Information
+
+- Name: Estivan Ayramia
+- Role: General Business Student at San Diego State University (SDSU)
+- Location: El Cajon, CA (San Diego area)
+- Email: hello@estivanayramia.com
+- LinkedIn: https://www.linkedin.com/in/estivanayramia/
+- Expected Graduation: December 18, 2025
+- GPA: 3.8
+
+## Site Purpose
+
+This portfolio showcases Estivan's projects, skills, and professional background.
+It is designed to help recruiters, hiring managers, and collaborators learn about his work.
+
+## Projects (6 total)
+
+1. This Website (Every Line)
+   - URL: https://www.estivanayramia.com/projects/portfolio
+   - Type: Web Development
+   - Description: Hand-coded portfolio with no templates or CMS. Features include service worker, AI chatbot, and Lighthouse 90+ scores.
+
+2. L'Oréal Cell BioPrint MAPS Campaign
+   - URL: https://www.estivanayramia.com/projects/logistics
+   - Type: Campaign Strategy
+   - Description: Class concept campaign deck mapping three personas and their touchpoints across the funnel.
+
+3. Franklin Templeton Class Concept
+   - URL: https://www.estivanayramia.com/projects/discipline
+   - Type: Content Strategy
+   - Description: 17-page class concept deck for a 'Voice of Progress' campaign.
+
+4. EndPoint LinkedIn Campaign
+   - URL: https://www.estivanayramia.com/projects/documentation
+   - Type: Retargeting Strategy
+   - Description: 15-page deck outlining Phase 2A and Phase 2B of a LinkedIn retargeting campaign.
+
+5. Endpoint Elosity Launch Video
+   - URL: https://www.estivanayramia.com/projects/multilingual
+   - Type: Video Concept
+   - Description: Motion storyboard and voiceover script for product launch.
+
+6. Taking Down Endpoint (Almac Group + 4G Clinical)
+   - URL: https://www.estivanayramia.com/projects/competitive-strategy
+   - Type: Competitive Strategy
+   - Description: Marketing strategy deck for competitive positioning.
+
+## Hobbies (6 total)
+
+1. Gym & Strength Training - https://www.estivanayramia.com/hobbies/gym
+2. Photography - https://www.estivanayramia.com/hobbies/photography
+3. Car Enthusiasm - https://www.estivanayramia.com/hobbies/car
+4. Cooking - https://www.estivanayramia.com/hobbies/cooking
+5. Whispers (Sticky Notes) - https://www.estivanayramia.com/hobbies/whispers
+6. Reading - https://www.estivanayramia.com/hobbies/reading
+
+## Important Clarifications
+
+- "Whispers" is a HOBBY (capturing thoughts on sticky notes), NOT a project
+- "getWispers" is NOT a real project and does not exist
+- The "Conflict Resolution Playbook" does NOT exist on this site
+
+## Key Pages
+
+- Home: https://www.estivanayramia.com/
+- Projects: https://www.estivanayramia.com/projects/
+- Hobbies: https://www.estivanayramia.com/hobbies/
+- About: https://www.estivanayramia.com/about
+- Contact: https://www.estivanayramia.com/contact
+- Resume: https://www.estivanayramia.com/assets/docs/Estivan-Ayramia-Resume.pdf
+- Overview: https://www.estivanayramia.com/overview
+- Deep Dive: https://www.estivanayramia.com/deep-dive
+
+## Skills & Focus Areas
+
+- Supply Chain & Logistics
+- Operations Management
+- Project Execution
+- Documentation Systems
+- Web Development (HTML, CSS, JavaScript)
+- DevOps concepts
+- Strategic Analysis
+
+## Background
+
+- Born in Baghdad, Iraq (2004)
+- Refugee in Syria
+- Immigrated to USA in 2008
+- Languages: English (primary), Chaldean (spoken), Spanish & Arabic (conversational)
+
+## Chatbot Information
+
+This site features an AI chatbot named "Savonie" that can answer questions about Estivan.
+The chatbot is grounded in the actual site content and cannot provide information not present on the site.
+
+## Contact
+
+For inquiries, reach out at hello@estivanayramia.com
+Estivan typically responds within 24 hours.
+
+## Site Technical Details
+
+- Hosting: Cloudflare Pages
+- Framework: Static HTML with Tailwind CSS
+- Chatbot Backend: Cloudflare Workers with Gemini AI
+- No CMS or templating - hand-coded
+- PWA-enabled with service worker
+- Lighthouse scores: 90+
+
+## License
+
+Content © Estivan Ayramia. All rights reserved.

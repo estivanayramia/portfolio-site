@@ -6,3 +6,7 @@ Disallow: /ar/
 Allow: /
 
 Sitemap: https://www.estivanayramia.com/sitemap.xml
+
+# AI/LLM readable site information
+# See https://llmstxt.org/ for specification
+LLMsTxt: https://www.estivanayramia.com/llms.txt
