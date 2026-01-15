@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Car enthusiasm hobby - Ownership, maintenance, and tuning. Learning systems through hardware and software.">
-    <link rel="canonical" href="https://www.estivanayramia.com/hobbies/car">
-    <title>Car Enthusiasm | Hobbies</title>
+    <meta name="description" content="Cooking experiments - trying recipes, learning techniques, and enjoying the process of making food from scratch.">
+    <link rel="canonical" href="https://www.estivanayramia.com/en/hobbies/cooking.html">
+    <title>Cooking | Hobbies</title>
     
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Car Enthusiasm | Estivan Ayramia">
-    <meta property="og:description" content="Ownership, maintenance, and tuning. Learning systems through hardware and software.">
-    <meta property="og:url" content="https://www.estivanayramia.com/hobbies/car">
+    <meta property="og:title" content="Cooking | Estivan Ayramia">
+    <meta property="og:description" content="Learning through experimentation in the kitchen">
+    <meta property="og:url" content="https://www.estivanayramia.com/en/hobbies/cooking.html">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Car Enthusiasm | Estivan Ayramia">
-    <meta name="twitter:description" content="Ownership, maintenance, and tuning. Learning systems through hardware and software.">
+    <meta name="twitter:title" content="Cooking | Estivan Ayramia">
+    <meta name="twitter:description" content="Learning through experimentation in the kitchen">
     
     <!-- Google Fonts: Inter (non-render-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" data-media="(min-width: 769px)">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
     
-    <!-- Preload Critical LCP (Largest Contentful Paint) Image -->
+    <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
     <link rel="stylesheet" href="/assets/css/style.css">
@@ -31,12 +31,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
     <script src="/assets/js/site.min.js" defer></script>
+    <!-- Theme CSS - loads reliably for all viewports -->
+    <link rel="stylesheet" href="/assets/css/theme.css">
     
-    <!-- Custom Theme CSS -->
-    <link rel="stylesheet" href="/assets/css/theme.css" media="(max-width: 768px)">
-    <link rel="stylesheet" href="/assets/css/theme.css" media="print" data-media="(min-width: 769px)">
-    <noscript><link rel="stylesheet" href="/assets/css/theme.css"></noscript>
-    
+    <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
+
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
@@ -50,7 +49,6 @@
     
     <!-- Carousel and Lightbox styles -->
     <style>
-        /* Lightbox (your page has the modal markup, but your CSS was missing) */
         .lightbox-overlay {
             position: fixed;
             inset: 0;
@@ -90,13 +88,9 @@
             padding: 1rem 1.5rem;
             border-radius: 0.5rem;
             transition: background 0.2s;
-            display: block;
         }
         .lightbox-nav:hover { background: rgba(0,0,0,0.8); }
         .lightbox-prev { left: 1rem; }
-        .lightbox-next { right: 1rem; }
-
-        /* Your existing carousel CSS continues below */
         .lightbox-next { right: 1rem; }
         .gallery-carousel {
             position: relative;
@@ -109,10 +103,22 @@
         }
         .carousel-slide {
             flex: 0 0 calc(50% - 0.5rem);
-            aspect-ratio: 16/9;
+            aspect-ratio: 1;
+        }
+        @media (min-width: 640px) {
+            .carousel-slide {
+                flex: 0 0 calc(33.333% - 0.667rem);
+            }
         }
         @media (min-width: 768px) {
-            .carousel-slide { flex: 0 0 calc(33.333% - 0.667rem); }
+            .carousel-slide {
+                flex: 0 0 calc(25% - 0.75rem);
+            }
+        }
+        @media (min-width: 1024px) {
+            .carousel-slide {
+                flex: 0 0 calc(20% - 0.8rem);
+            }
         }
         .carousel-btn {
             position: absolute;
@@ -137,13 +143,17 @@
             background: rgba(33, 40, 66, 1);
             transform: translateY(-50%) scale(1.1);
         }
+        .carousel-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
         .carousel-btn-prev { left: 0.5rem; }
         .carousel-btn-next { right: 0.5rem; }
         .carousel-dots {
             display: flex;
             justify-content: center;
             gap: 0.5rem;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
         .carousel-dot {
             width: 0.5rem;
@@ -158,21 +168,22 @@
             background: rgba(33, 40, 66, 1);
             transform: scale(1.3);
         }
-        .gallery-card {
+        .note-card, .dish-card, .car-card {
             cursor: pointer;
             transition: transform 0.2s ease;
         }
-        .gallery-card:hover { transform: scale(1.02); }
+        .note-card:hover, .dish-card:hover, .car-card:hover {
+            transform: scale(1.02);
+        }
     </style>
-</head>
-<body class="bg-beige text-chocolate font-sans antialiased">
+</head><body class="bg-beige text-chocolate font-sans antialiased">
     
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox-overlay" aria-hidden="true">
         <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
-        <button class="lightbox-nav lightbox-prev" aria-label="Previous image">←</button>
+        <button class="lightbox-nav lightbox-prev" aria-label="Previous image">?</button>
         <img src="" alt="" class="lightbox-content" id="lightbox-image">
-        <button class="lightbox-nav lightbox-next" aria-label="Next image">→</button>
+        <button class="lightbox-nav lightbox-next" aria-label="Next image">?</button>
     </div>
     
     <!-- Skip to main content for accessibility -->
@@ -181,29 +192,29 @@
     <!-- Navigation Header -->
     <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
         <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-8 flex items-center justify-between gap-2">
-            <a href="/" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
+            <a href="/en/index.html" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
                 <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
                 <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
             </a>
             
             <!-- Main Navigation -->
             <ul class="hidden md:flex items-center space-x-8">
-                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Overview</a></li>
-                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Deep Dive</a></li>
-                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">About</a></li>
-                <li><a href="/projects.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Projects</a></li>
-                <li><a href="/contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors">Contact</a></li>
+                <li><a href="/en/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Overview</a></li>
+                <li><a href="/en/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Deep Dive</a></li>
+                <li><a href="/en/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">About</a></li>
+                <li><a href="/en/projects/index.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Projects</a></li>
+                <li><a href="/en/contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors">Contact</a></li>
             </ul>
             
             <!-- Language Switcher -->
             <div id="lang-switcher" class="flex items-center space-x-3 shrink-0" style="z-index: 20;">
-                <a href="/hobbies/car.html" class="text-xs font-semibold text-indigodeep underline">EN</a>
+                <a href="/en/hobbies/cooking.html" class="text-xs font-semibold text-indigodeep underline">EN</a>
                 <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors">ES</a>
                 <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors">AR</a>
             </div>
             
             <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span style="color: #e1d4c2">??</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -216,11 +227,11 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
             <ul class="px-6 py-4 space-y-3">
-                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Overview</a></li>
-                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Deep Dive</a></li>
-                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">About</a></li>
-                <li><a href="/projects.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Projects</a></li>
-                <li><a href="/contact.html" class="block text-sm font-medium text-beige bg-indigodeep px-5 py-2 rounded-full text-center">Contact</a></li>
+                <li><a href="/en/overview.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Overview</a></li>
+                <li><a href="/en/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Deep Dive</a></li>
+                <li><a href="/en/about.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">About</a></li>
+                <li><a href="/en/projects/index.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Projects</a></li>
+                <li><a href="/en/contact.html" class="block text-sm font-medium text-beige bg-indigodeep px-5 py-2 rounded-full text-center">Contact</a></li>
             </ul>
         </div>
     </header>
@@ -232,11 +243,11 @@
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
             <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
                 <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
-                    <li><a href="/" class="hover:text-indigodeep transition-colors">Home</a></li>
+                    <li><a href="/en/index.html" class="hover:text-indigodeep transition-colors">Home</a></li>
                     <li><span class="text-chocolate/40">/</span></li>
-                    <li><a href="/hobbies/index.html" class="hover:text-indigodeep transition-colors">Hobbies</a></li>
+                    <li><a href="/en/hobbies/index.html" class="hover:text-indigodeep transition-colors">Hobbies</a></li>
                     <li><span class="text-chocolate/40">/</span></li>
-                    <li class="text-indigodeep font-medium">Car</li>
+                    <li class="text-indigodeep font-medium">Cooking</li>
                 </ol>
             </nav>
         </section>
@@ -245,39 +256,15 @@
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
             <div class="space-y-6">
                 <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
-                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Mechanical</span>
-                    <span class="text-xs text-ink/60">Daily Driver</span>
+                    <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Practical</span>
+                    <span class="text-xs text-ink/60">Performance</span>
                 </div>
                 <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
-                    2017 BMW 540i
+                    Cooking
                 </h1>
                 <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
-                    Not about speed for its own sake. It's about understanding a system, then making it sharper and more "me." The car is a way to think about how hardware and software interact.
+                    Not about fancy recipes or Instagram-worthy plates. It's about fueling a body that trains hard, on a student budget, with minimal waste of time or ingredients.
                 </p>
-            </div>
-        </section>
-        
-        <!-- Specs Banner -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8">
-            <div class="bg-indigodeep/5 border border-indigodeep/10 rounded-2xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                    <div>
-                        <div class="text-2xl font-bold text-indigodeep">B58</div>
-                        <div class="text-sm text-chocolate">Engine</div>
-                    </div>
-                    <div>
-                        <div class="text-2xl font-bold text-indigodeep">MHD Stage 2</div>
-                        <div class="text-sm text-chocolate">Tune</div>
-                    </div>
-                    <div>
-                        <div class="text-2xl font-bold text-indigodeep">Catless DP</div>
-                        <div class="text-sm text-chocolate">Downpipe</div>
-                    </div>
-                    <div>
-                        <div class="text-2xl font-bold text-indigodeep">Muffler Delete</div>
-                        <div class="text-sm text-chocolate">Exhaust</div>
-                    </div>
-                </div>
             </div>
         </section>
         
@@ -288,35 +275,33 @@
                 <!-- Main Content -->
                 <div class="lg:col-span-2 space-y-12">
                     
-                    <!-- Current Setup -->
+                    <!-- How I Plan Meals -->
+                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">How I Plan Meals</h2>
+                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
+                            <p>I treat the kitchen like a lab. Inputs and outputs. Protein targets, calorie ranges, prep time. Everything has a number attached, and I optimize for the best ratio of nutrition to effort.</p>
+                            <p>Sunday is prep day. I cook in bulk for the week. Proteins get portioned. Rice gets made. Vegetables get prepped. During the week, I'm assembling, not cooking from scratch. That saves hours.</p>
+                            <p>I track macros loosely. Not obsessively, but enough to know I'm hitting my protein targets. When you're trying to build muscle on a student schedule, you can't leave nutrition to chance. The gym is only half the equation.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Staple Meals -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
-                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Current Setup</h2>
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">Staple Meals</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>The 540i runs the B58 engine, which is BMW's turbocharged inline-six. It's a solid platform with a lot of tuning potential. I'm running an MHD Stage 2 tune, which adjusts boost pressure, fueling, and timing for more aggressive power delivery.</p>
-                            <p>Hardware side: catless downpipe and a muffler delete. The downpipe removes the catalytic converter, reducing backpressure and letting the turbo spool faster. The muffler delete opens up the exhaust note. It's louder, but not obnoxious. You can actually hear the engine breathe.</p>
-                            <p>The result is sharper throttle response, more immediate turbo spool, and a sound that matches the performance. The car feels more alive, more connected to my inputs.</p>
+                            <p>My rotation is simple because consistency beats variety when the goal is performance. Chicken thighs (cheaper and more flavorful than breast), ground beef, eggs, rice, potatoes, and whatever vegetables are on sale.</p>
+                            <p>Breakfast is usually eggs and toast, or Greek yogurt with oats. Quick, high protein, minimal cleanup. Lunch is whatever I prepped on Sunday. Dinner is where I might actually cook something fresh.</p>
+                            <p>I've learned to make a few things really well instead of being mediocre at many. A good stir fry. A solid rice bowl. Grilled meat that's actually seasoned properly. These basics, executed consistently, beat fancy recipes I'll never make twice.</p>
                         </div>
                     </div>
                     
-                    <!-- What I Learned -->
+                    <!-- The Kitchen as a System -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
-                        <h2 class="text-2xl font-bold text-indigodeep mb-4">What I Learned from Modifying This Car</h2>
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">The Kitchen as a System</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>Cars are systems. Every component affects something else. Change the exhaust flow, and you change how the turbo behaves. Change the tune, and you change how the engine responds to every input. Understanding those relationships teaches you to think about consequences and trade-offs.</p>
-                            <p>I learned to research before spending money. Forums, dyno charts, real-world reviews from people who actually drive these cars. Not just marketing. Not just YouTube hype. Actual data from people who track their results.</p>
-                            <p>I also learned patience. You don't bolt on everything at once. You make one change, live with it, understand what it did. Then decide if the next change is worth it. Incremental improvement, just like everything else worth doing.</p>
-                            <p>The car also taught me about ownership. Taking care of something, maintaining it properly, keeping it clean. It's a daily reminder that the things you own require attention and respect.</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Video Section -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.65">
-                        <h2 class="text-2xl font-bold text-indigodeep mb-4">In Action</h2>
-                        <div class="aspect-video rounded-xl overflow-hidden shadow-lg border border-chocolate/10 bg-black">
-                            <video controls class="w-full h-full object-contain" preload="metadata">
-                                <source src="/assets/img/Portolio-Media/Portfolio Media/car-/best_for_last_vid.mp4" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
+                            <p>Cooking taught me about mise en place - having everything ready before you start. That principle applies everywhere. Preparation reduces friction. When everything is in place, execution becomes smooth.</p>
+                            <p>It also taught me about timing and parallel processing. While the rice cooks, prep the vegetables. While the meat rests, plate the sides. Finding those overlaps and using dead time is how you cook a full meal in 30 minutes.</p>
+                            <p>And cleanup as you go. Never let dishes pile up. The same discipline that keeps a kitchen functional keeps everything else functional too.</p>
                         </div>
                     </div>
                     
@@ -326,36 +311,39 @@
                         <p class="text-chocolate mb-6 text-sm">Click any image to view larger. Use arrows or swipe to browse.</p>
                         
                         <div class="gallery-carousel" id="galleryCarousel">
-                            <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">←</button>
-                            <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">→</button>
+                            <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">?</button>
+                            <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">?</button>
                             
                             <div class="carousel-track" id="carouselTrack">
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio Media/car-/car_front.jpg" alt="2017 BMW 540i front view showing the iconic kidney grilles and LED headlights" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/avocado_steak_eggs_smoothie.jpg" alt="High protein breakfast - steak with eggs, avocado, and a smoothie on the side" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio Media/car-/car_back.jpg" alt="2017 BMW 540i rear view showing quad exhaust tips after muffler delete" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/steaks.jpg" alt="Perfectly seared steaks - high heat, good crust, juicy inside" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio Media/car-/car_byOceanONE.jpg" alt="BMW 540i parked by the ocean with waves in the background" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450" style="transform: rotate(-90deg);">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/steak_mac_potatoes.jpg" alt="Steak with mac and cheese and potatoes - a hearty meal for gains" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio Media/car-/car_by_sunset.jpg" alt="540i silhouette against a California sunset" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450" style="transform: rotate(-90deg);">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/chicken_alfredo_pasta.jpg" alt="Creamy chicken alfredo pasta - comfort food done right" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio Media/car-/car_by370z.jpg" alt="BMW 540i parked next to a Nissan 370Z - car meet vibes" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/vodka_pasta.jpg" alt="Vodka pasta with a rich tomato cream sauce" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio Media/car-/car_mormon_chapel.jpg" alt="540i parked near a chapel - clean lines and architecture" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/burrito.jpg" alt="Loaded burrito - protein packed and ready to eat" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio Media/car-/me_and_car.jpg" alt="Estivan with his BMW 540i - the daily driver" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450" style="transform: rotate(-90deg);">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/burrrito_cut_in_half.jpg" alt="Burrito cut in half showing all the fillings inside" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio Media/car-/bmws.jpg" alt="BMW lineup - multiple Bimmers in one shot" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/charcuterie_board.jpg" alt="Charcuterie board - meats, cheeses, and accompaniments for hosting" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio Media/car-/CarByOcean2.jpg" alt="BMW 540i oceanside - another angle by the water" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/chicken.jpg" alt="Seasoned chicken ready for the grill or oven" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
+                                </figure>
+                                <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
+                                    <img src="/assets/img/Portolio-Media/Portfolio Media/cooking-/pasta_chicken.jpg" alt="Pasta with grilled chicken - simple, high protein, satisfying" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="800">
                                 </figure>
                             </div>
                             
@@ -368,21 +356,56 @@
                 <!-- Sidebar -->
                 <div class="space-y-8">
                     
-                    <!-- Quick Facts -->
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
-                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Mod List</h3>
+                    <!-- Weekly Staples -->
+                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Weekly Staples</h3>
                         <ul class="space-y-3 text-sm text-chocolate">
                             <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
-                                <span>MHD Stage 2 Tune</span>
+                                <span class="text-indigodeep mr-2">🍗</span>
+                                <span>Chicken thighs or breast</span>
                             </li>
                             <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
-                                <span>Catless Downpipe</span>
+                                <span class="text-indigodeep mr-2">🥩</span>
+                                <span>Ground beef 80/20</span>
                             </li>
                             <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
-                                <span>Muffler Delete</span>
+                                <span class="text-indigodeep mr-2">🥚</span>
+                                <span>Eggs (lots of eggs)</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">🍚</span>
+                                <span>Rice and potatoes</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">🥣</span>
+                                <span>Greek yogurt</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">🥦</span>
+                                <span>Seasonal vegetables</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Principles -->
+                    <div class="bg-indigodeep/5 border border-indigodeep/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Principles</h3>
+                        <ul class="space-y-3 text-sm text-chocolate">
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">1.</span>
+                                <span>Protein first, always</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">2.</span>
+                                <span>Prep in bulk on Sunday</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">3.</span>
+                                <span>Clean as you go</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-indigodeep mr-2">4.</span>
+                                <span>Simple, repeatable meals</span>
                             </li>
                         </ul>
                     </div>
@@ -390,8 +413,8 @@
                     <!-- Back to Hobbies -->
                     <div class="bg-indigodeep rounded-xl p-6 text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
                         <p class="text-beige/90 text-sm mb-4">Explore more hobbies</p>
-                        <a href="/hobbies.html#hobby-car-card" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
-                            ← Back to All Hobbies
+                        <a href="/en/hobbies/#hobby-cooking-card" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
+                            ? Back to All Hobbies
                         </a>
                     </div>
                     
@@ -407,7 +430,7 @@
             <div class="grid md:grid-cols-3 gap-12 mb-12">
                 <!-- Column 1: Brand -->
                 <div class="space-y-4">
-                    <a href="/" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
+                    <a href="/en/index.html" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
                         <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
@@ -418,10 +441,10 @@
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
-                        <li><a href="/deep-dive.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
-                        <li><a href="/projects.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
-                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                        <li><a href="/en/overview.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/en/deep-dive.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/en/projects/index.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
+                        <li><a href="/en/about.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
                     </ul>
                 </div>
                 
@@ -429,11 +452,11 @@
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
                     <ul class="space-y-2">
-                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
-                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
-                        <li><a href="/contact.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ?</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ?</a></li>
+                        <li><a href="/en/contact.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
                         <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
-                        <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                        <li><a href="/en/privacy.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -473,7 +496,7 @@
 
             <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white dark:bg-[#362017] border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
                 <button type="button" id="suggestions-btn" data-chat-suggestions-toggle="button" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors">
-                    💡
+                    ??
                 </button>
                 <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] dark:text-[#e1d4c2] dark:placeholder-[#e1d4c2]/60 focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
                 <button type="button" id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
@@ -484,7 +507,7 @@
 
         <!-- Welcome Bubble (anchored above toggle button) -->
         <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
-            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? ??</p>
         </div>
 
         <!-- Toggle Button (always stays in bottom-right corner) -->
@@ -494,10 +517,7 @@
     </div>
     
     <script src="/assets/js/site.min.js" defer></script>
-    <script src="/assets/js/lazy-loader.min.js" defer></script>
+    <script src="/assets/js/lazy-loader.js" defer></script>
 </body>
 </html>
-
-
-
 

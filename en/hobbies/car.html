@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Car enthusiasm hobby - Ownership, maintenance, and tuning. Learning systems through hardware and software.">
-    <link rel="canonical" href="https://www.estivanayramia.com/hobbies/car">
+    <meta name="description" content="Car enthusiasm - appreciating automotive design, following motorsports, and learning about vehicle mechanics.">
+    <link rel="canonical" href="https://www.estivanayramia.com/en/hobbies/car.html">
     <title>Car Enthusiasm | Hobbies</title>
     
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="article">
     <meta property="og:title" content="Car Enthusiasm | Estivan Ayramia">
-    <meta property="og:description" content="Ownership, maintenance, and tuning. Learning systems through hardware and software.">
-    <meta property="og:url" content="https://www.estivanayramia.com/hobbies/car">
+    <meta property="og:description" content="Following automotive culture and motorsports">
+    <meta property="og:url" content="https://www.estivanayramia.com/en/hobbies/car.html">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Car Enthusiasm | Estivan Ayramia">
-    <meta name="twitter:description" content="Ownership, maintenance, and tuning. Learning systems through hardware and software.">
+    <meta name="twitter:description" content="Following automotive culture and motorsports">
     
     <!-- Google Fonts: Inter (non-render-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,7 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" data-media="(min-width: 769px)">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
     
-    <!-- Preload Critical LCP (Largest Contentful Paint) Image -->
+    <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
     <link rel="stylesheet" href="/assets/css/style.css">
@@ -31,12 +31,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js" defer></script>
     <script src="/assets/js/site.min.js" defer></script>
+    <!-- Theme CSS - loads reliably for all viewports -->
+    <link rel="stylesheet" href="/assets/css/theme.css">
     
-    <!-- Custom Theme CSS -->
-    <link rel="stylesheet" href="/assets/css/theme.css" media="(max-width: 768px)">
-    <link rel="stylesheet" href="/assets/css/theme.css" media="print" data-media="(min-width: 769px)">
-    <noscript><link rel="stylesheet" href="/assets/css/theme.css"></noscript>
-    
+    <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
+
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
@@ -50,7 +49,6 @@
     
     <!-- Carousel and Lightbox styles -->
     <style>
-        /* Lightbox (your page has the modal markup, but your CSS was missing) */
         .lightbox-overlay {
             position: fixed;
             inset: 0;
@@ -95,9 +93,6 @@
         .lightbox-nav:hover { background: rgba(0,0,0,0.8); }
         .lightbox-prev { left: 1rem; }
         .lightbox-next { right: 1rem; }
-
-        /* Your existing carousel CSS continues below */
-        .lightbox-next { right: 1rem; }
         .gallery-carousel {
             position: relative;
             overflow: hidden;
@@ -109,10 +104,22 @@
         }
         .carousel-slide {
             flex: 0 0 calc(50% - 0.5rem);
-            aspect-ratio: 16/9;
+            aspect-ratio: 1;
+        }
+        @media (min-width: 640px) {
+            .carousel-slide {
+                flex: 0 0 calc(33.333% - 0.667rem);
+            }
         }
         @media (min-width: 768px) {
-            .carousel-slide { flex: 0 0 calc(33.333% - 0.667rem); }
+            .carousel-slide {
+                flex: 0 0 calc(25% - 0.75rem);
+            }
+        }
+        @media (min-width: 1024px) {
+            .carousel-slide {
+                flex: 0 0 calc(20% - 0.8rem);
+            }
         }
         .carousel-btn {
             position: absolute;
@@ -137,13 +144,17 @@
             background: rgba(33, 40, 66, 1);
             transform: translateY(-50%) scale(1.1);
         }
+        .carousel-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
         .carousel-btn-prev { left: 0.5rem; }
         .carousel-btn-next { right: 0.5rem; }
         .carousel-dots {
             display: flex;
             justify-content: center;
             gap: 0.5rem;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
         .carousel-dot {
             width: 0.5rem;
@@ -158,14 +169,15 @@
             background: rgba(33, 40, 66, 1);
             transform: scale(1.3);
         }
-        .gallery-card {
+        .note-card, .dish-card, .car-card {
             cursor: pointer;
             transition: transform 0.2s ease;
         }
-        .gallery-card:hover { transform: scale(1.02); }
+        .note-card:hover, .dish-card:hover, .car-card:hover {
+            transform: scale(1.02);
+        }
     </style>
-</head>
-<body class="bg-beige text-chocolate font-sans antialiased">
+</head><body class="bg-beige text-chocolate font-sans antialiased">
     
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox-overlay" aria-hidden="true">
@@ -181,29 +193,29 @@
     <!-- Navigation Header -->
     <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
         <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-8 flex items-center justify-between gap-2">
-            <a href="/" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
+            <a href="/en/index.html" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
                 <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
                 <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
             </a>
             
             <!-- Main Navigation -->
             <ul class="hidden md:flex items-center space-x-8">
-                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Overview</a></li>
-                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Deep Dive</a></li>
-                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">About</a></li>
-                <li><a href="/projects.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Projects</a></li>
-                <li><a href="/contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors">Contact</a></li>
+                <li><a href="/en/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Overview</a></li>
+                <li><a href="/en/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Deep Dive</a></li>
+                <li><a href="/en/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">About</a></li>
+                <li><a href="/en/projects/index.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors">Projects</a></li>
+                <li><a href="/en/contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors">Contact</a></li>
             </ul>
             
             <!-- Language Switcher -->
             <div id="lang-switcher" class="flex items-center space-x-3 shrink-0" style="z-index: 20;">
-                <a href="/hobbies/car.html" class="text-xs font-semibold text-indigodeep underline">EN</a>
+                <a href="/en/hobbies/car.html" class="text-xs font-semibold text-indigodeep underline">EN</a>
                 <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors">ES</a>
                 <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors">AR</a>
             </div>
             
             <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span style="color: #e1d4c2">??</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -216,11 +228,11 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
             <ul class="px-6 py-4 space-y-3">
-                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Overview</a></li>
-                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Deep Dive</a></li>
-                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">About</a></li>
-                <li><a href="/projects.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Projects</a></li>
-                <li><a href="/contact.html" class="block text-sm font-medium text-beige bg-indigodeep px-5 py-2 rounded-full text-center">Contact</a></li>
+                <li><a href="/en/overview.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Overview</a></li>
+                <li><a href="/en/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Deep Dive</a></li>
+                <li><a href="/en/about.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">About</a></li>
+                <li><a href="/en/projects/index.html" class="block text-sm text-chocolate hover:text-indigodeep py-2">Projects</a></li>
+                <li><a href="/en/contact.html" class="block text-sm font-medium text-beige bg-indigodeep px-5 py-2 rounded-full text-center">Contact</a></li>
             </ul>
         </div>
     </header>
@@ -232,9 +244,9 @@
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
             <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
                 <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
-                    <li><a href="/" class="hover:text-indigodeep transition-colors">Home</a></li>
+                    <li><a href="/en/index.html" class="hover:text-indigodeep transition-colors">Home</a></li>
                     <li><span class="text-chocolate/40">/</span></li>
-                    <li><a href="/hobbies/index.html" class="hover:text-indigodeep transition-colors">Hobbies</a></li>
+                    <li><a href="/en/hobbies/index.html" class="hover:text-indigodeep transition-colors">Hobbies</a></li>
                     <li><span class="text-chocolate/40">/</span></li>
                     <li class="text-indigodeep font-medium">Car</li>
                 </ol>
@@ -326,8 +338,8 @@
                         <p class="text-chocolate mb-6 text-sm">Click any image to view larger. Use arrows or swipe to browse.</p>
                         
                         <div class="gallery-carousel" id="galleryCarousel">
-                            <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">←</button>
-                            <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">→</button>
+                            <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">?</button>
+                            <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">?</button>
                             
                             <div class="carousel-track" id="carouselTrack">
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
@@ -373,15 +385,15 @@
                         <h3 class="text-lg font-semibold text-indigodeep mb-4">Mod List</h3>
                         <ul class="space-y-3 text-sm text-chocolate">
                             <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
+                                <span class="text-indigodeep mr-2">🔧</span>
                                 <span>MHD Stage 2 Tune</span>
                             </li>
                             <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
+                                <span class="text-indigodeep mr-2">🛠️</span>
                                 <span>Catless Downpipe</span>
                             </li>
                             <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
+                                <span class="text-indigodeep mr-2">🛠️</span>
                                 <span>Muffler Delete</span>
                             </li>
                         </ul>
@@ -390,7 +402,7 @@
                     <!-- Back to Hobbies -->
                     <div class="bg-indigodeep rounded-xl p-6 text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
                         <p class="text-beige/90 text-sm mb-4">Explore more hobbies</p>
-                        <a href="/hobbies.html#hobby-car-card" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
+                        <a href="/en/hobbies/#hobby-car-card" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
                             ← Back to All Hobbies
                         </a>
                     </div>
@@ -407,7 +419,7 @@
             <div class="grid md:grid-cols-3 gap-12 mb-12">
                 <!-- Column 1: Brand -->
                 <div class="space-y-4">
-                    <a href="/" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
+                    <a href="/en/index.html" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
                         <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
@@ -418,10 +430,10 @@
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
-                        <li><a href="/deep-dive.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
-                        <li><a href="/projects.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
-                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                        <li><a href="/en/overview.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/en/deep-dive.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/en/projects/index.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
+                        <li><a href="/en/about.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
                     </ul>
                 </div>
                 
@@ -429,11 +441,11 @@
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
                     <ul class="space-y-2">
-                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
-                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
-                        <li><a href="/contact.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ?</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ?</a></li>
+                        <li><a href="/en/contact.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
                         <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
-                        <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                        <li><a href="/en/privacy.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -473,7 +485,7 @@
 
             <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white dark:bg-[#362017] border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
                 <button type="button" id="suggestions-btn" data-chat-suggestions-toggle="button" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors">
-                    💡
+                    ??
                 </button>
                 <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] dark:text-[#e1d4c2] dark:placeholder-[#e1d4c2]/60 focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
                 <button type="button" id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
@@ -484,7 +496,7 @@
 
         <!-- Welcome Bubble (anchored above toggle button) -->
         <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
-            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? ??</p>
         </div>
 
         <!-- Toggle Button (always stays in bottom-right corner) -->
@@ -494,10 +506,7 @@
     </div>
     
     <script src="/assets/js/site.min.js" defer></script>
-    <script src="/assets/js/lazy-loader.min.js" defer></script>
+    <script src="/assets/js/lazy-loader.js" defer></script>
 </body>
 </html>
-
-
-
 

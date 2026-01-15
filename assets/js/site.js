@@ -1991,6 +1991,9 @@ const initScrollToTop = () => {
     const scrollBtn = document.getElementById('scroll-to-top');
     if (!scrollBtn) return;
 
+    // Skip on pages that disable floating UI (e.g., arcade games)
+    if (document.body.hasAttribute('data-disable-floating-ui')) return;
+
     const progressCircle = scrollBtn.querySelector('.scroll-progress-circle');
     const radius = progressCircle ? parseFloat(progressCircle.getAttribute('r') || '22') : 0;
     const circumference = radius > 0 ? (radius * 2 * Math.PI) : 0;
@@ -3419,6 +3422,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const RESUME_URL = '/assets/docs/Estivan-Ayramia-Resume.pdf';
     const LINKEDIN_URL = 'https://www.linkedin.com/in/estivanayramia';
     const WELCOME_DELAY = 2500;
+
+    // Skip chat initialization on pages that disable floating UI (e.g., arcade games)
+    if (document.body.hasAttribute('data-disable-floating-ui')) return;
 
     // Project Data Mapping
     const projectData = {

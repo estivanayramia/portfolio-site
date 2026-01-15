@@ -2801,3 +2801,8 @@ footer, .section-below-fold {
     }
 }
 
+/* Consistent footer gap across all pages */
+footer {
+  margin-top: 5rem !important;
+}
+
