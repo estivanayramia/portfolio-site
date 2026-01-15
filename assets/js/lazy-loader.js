@@ -31,6 +31,23 @@
 (function() {
     'use strict';
 
+    // Avoid delaying the window load event by injecting new subresources
+    // (analytics/CDN scripts) before the page has finished loading.
+    let pageLoaded = document.readyState === 'complete';
+    if (!pageLoaded) {
+        window.addEventListener('load', function() {
+            pageLoaded = true;
+        }, { once: true });
+    }
+
+    function runAfterLoad(callback) {
+        if (pageLoaded) {
+            callback();
+            return;
+        }
+        window.addEventListener('load', callback, { once: true });
+    }
+
     // ========================================================================
     // ANALYTICS CONFIGURATION
     // Edit these values to update tracking IDs site-wide
@@ -236,26 +253,30 @@
         });
         
         console.log('[LazyLoader] 🚀 User interaction detected - initializing analytics...');
-        
-        // Load Marked.js first (lightweight, needed for chat)
-        loadMarkedJS();
-        
-        // Use requestIdleCallback for analytics to minimize performance impact
-        // This tells the browser to run these when it has spare cycles
-        if ('requestIdleCallback' in window) {
-            requestIdleCallback(function() {
-                console.log('[LazyLoader] Browser idle - loading analytics...');
-                loadGoogleAnalytics();
-                loadClarity();
-            }, { timeout: 3000 });  // Force load after 3s even if not idle
-        } else {
-            // Fallback for browsers without requestIdleCallback (older Safari)
-            setTimeout(function() {
-                console.log('[LazyLoader] Using setTimeout fallback for analytics...');
-                loadGoogleAnalytics();
-                loadClarity();
-            }, 100);
-        }
+
+        // To avoid delaying `window.load` (and to keep Lighthouse stable),
+        // only inject new external scripts after the page has finished loading.
+        runAfterLoad(function() {
+            // Load Marked.js (needed for chat)
+            loadMarkedJS();
+
+            // Use requestIdleCallback for analytics to minimize performance impact
+            // This tells the browser to run these when it has spare cycles
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(function() {
+                    console.log('[LazyLoader] Browser idle - loading analytics...');
+                    loadGoogleAnalytics();
+                    loadClarity();
+                }, { timeout: 3000 });  // Force load after 3s even if not idle
+            } else {
+                // Fallback for browsers without requestIdleCallback (older Safari)
+                setTimeout(function() {
+                    console.log('[LazyLoader] Using setTimeout fallback for analytics...');
+                    loadGoogleAnalytics();
+                    loadClarity();
+                }, 100);
+            }
+        });
     }
 
     // ========================================================================
