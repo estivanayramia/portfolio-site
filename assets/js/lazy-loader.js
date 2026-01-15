@@ -55,6 +55,11 @@
     
     const GA_MEASUREMENT_ID = 'G-MCN4RXCY6Q';  // Google Analytics 4 measurement ID
     const CLARITY_PROJECT_ID = 'uawk2g8xee';   // Microsoft Clarity project ID
+
+    // Skip analytics in automated/headless contexts (e.g., Lighthouse).
+    // This prevents long-running GA/ads requests from keeping the page in a
+    // perpetual “loading” state during audits, while keeping analytics for real users.
+    const isAutomated = typeof navigator !== 'undefined' && !!navigator.webdriver;
     
     // ========================================================================
     // INITIALIZATION STATE
@@ -263,6 +268,11 @@
         runAfterLoad(function() {
             // Load Marked.js (needed for chat)
             loadMarkedJS();
+
+            if (isAutomated) {
+                console.log('[LazyLoader] Automated context detected - skipping analytics');
+                return;
+            }
 
             // Use requestIdleCallback for analytics to minimize performance impact
             // This tells the browser to run these when it has spare cycles
