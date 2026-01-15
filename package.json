@@ -15,7 +15,11 @@
         "deploy:worker": "cd worker && npx wrangler deploy",
         "test:facts": "node scripts/test-chat-grounding.js",
         "test:links": "node scripts/test-links.js",
-        "test": "npm run test:facts && npm run test:links"
+        "test": "npm run test:facts && npm run test:links",
+        "audit:links": "node scripts/audit-links.js",
+        "audit:head": "node scripts/audit-head.js",
+        "audit:css": "node scripts/verify-css.mjs",
+        "audit": "npm run audit:links && npm run audit:head && npm run audit:css"
     },
     "keywords": [
         "portfolio",
@@ -29,6 +33,7 @@
         "esbuild": "^0.27.2",
         "lightningcss": "^1.30.2",
         "postcss": "^8.5.6",
+        "puppeteer": "^24.35.0",
         "serve": "^14.2.5",
         "tailwindcss": "^3.4.17",
         "terser": "^5.44.1"

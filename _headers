@@ -35,3 +35,9 @@
 
 /assets/css/style.css
   Cache-Control: no-cache, no-store, must-revalidate
+
+/assets/css/theme.css
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/assets/css/theme.min.css
+  Cache-Control: no-cache, no-store, must-revalidate
