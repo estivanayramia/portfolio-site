@@ -1146,6 +1146,11 @@ const initAnimations = () => {
         return;
     }
 
+    // Mobile: keep content stable and skip ScrollTrigger animations
+    if (isMobile) {
+        return;
+    }
+
     // Register ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
 
@@ -1156,6 +1161,7 @@ const initAnimations = () => {
         const delay = element.getAttribute('data-gsap-delay') || 0;
 
         gsap.from(element, {
+            immediateRender: false,
             opacity: 0,
             y: 20,
             duration: 0.4,
@@ -1218,19 +1224,13 @@ const loadGSAPAndInit = () => {
     };
 
     if (isMobile) {
-        // Mobile: Reveal content immediately (static)
+        // Mobile: reveal content immediately and skip GSAP entirely
         initAnimations();
-        
-        // Load GSAP on interaction
-        const onInteraction = () => {
-            ['scroll', 'touchstart', 'mousemove'].forEach(ev => window.removeEventListener(ev, onInteraction));
-            loadScripts();
-        };
-        ['scroll', 'touchstart', 'mousemove'].forEach(ev => window.addEventListener(ev, onInteraction, { once: true, passive: true }));
-    } else {
-        // Desktop: Load GSAP immediately (content stays hidden until loaded)
-        loadScripts();
+        return;
     }
+
+    // Desktop: load GSAP for richer scroll animations
+    loadScripts();
 };
 
 // ==========================================================================

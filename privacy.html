@@ -18,12 +18,10 @@
     <meta name="twitter:description" content="Privacy policy for estivanayramia.com: what data is collected, how it is used, and how it is protected.">
     
     <!-- Google Fonts: Inter -->
-    <!-- Google Fonts: Inter (non-render-blocking) -->
+    <!-- Google Fonts: Inter (load immediately to avoid CLS) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="(max-width: 768px)">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" data-media="(min-width: 769px)">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
@@ -393,7 +391,7 @@
         </button>
     </div>
     
-    <script src="/assets/js/lazy-loader.js" defer></script>
+    <script src="/assets/js/lazy-loader.min.js" defer></script>
 </body>
 </html>
 

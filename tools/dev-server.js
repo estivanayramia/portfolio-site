@@ -2,7 +2,16 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 5500;
+function getPort() {
+  const argvPortIndex = process.argv.findIndex((arg) => arg === '--port' || arg === '-p');
+  const argvPort = argvPortIndex >= 0 ? Number(process.argv[argvPortIndex + 1]) : undefined;
+  const envPort = process.env.PORT ? Number(process.env.PORT) : undefined;
+  const port = argvPort || envPort || 5500;
+
+  return Number.isFinite(port) ? port : 5500;
+}
+
+const PORT = getPort();
 const ROOT = path.resolve(__dirname, '..');
 
 const MIME_TYPES = {
@@ -10,10 +19,14 @@ const MIME_TYPES = {
   '.js': 'text/javascript',
   '.css': 'text/css',
   '.json': 'application/json',
+  '.txt': 'text/plain',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
+  '.webp': 'image/webp',
   '.ico': 'image/x-icon',
   '.svg': 'image/svg+xml',
+  '.woff2': 'font/woff2',
+  '.woff': 'font/woff',
   '.md': 'text/markdown'
 };
 

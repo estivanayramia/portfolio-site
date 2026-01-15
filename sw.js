@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v1767850000';
+const CACHE_VERSION = 'v20260115-2';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -20,10 +20,12 @@ const ASSETS_TO_CACHE = [
     '/privacy.html',
     '/404.html',
     '/assets/css/theme.css',
+    '/assets/css/theme.min.css',
     '/assets/css/style.css',
+    '/assets/fonts/inter/inter-latin.woff2',
     '/assets/js/site.js',
     '/assets/js/site.min.js',
-    '/assets/js/lazy-loader.js',
+    '/assets/js/lazy-loader.min.js',
     '/assets/js/cache-refresh.js',
     '/assets/js/contact-form.js',
     '/assets/img/headshot.webp',

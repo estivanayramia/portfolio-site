@@ -17,12 +17,10 @@
     <meta name="twitter:title" content="Estivan Ayramia | Overview">
     <meta name="twitter:description" content="Quick overview of Estivan Ayramia: focus areas, strengths, and highlights across operations, systems building, and execution.">
     
-    <!-- Google Fonts: Inter (non-render-blocking) -->
+    <!-- Google Fonts: Inter (load immediately to avoid CLS) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="(max-width: 768px)">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" data-media="(min-width: 769px)">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
@@ -363,7 +361,7 @@
         </button>
     </div>
     
-    <script src="/assets/js/lazy-loader.js" defer></script>
+    <script src="/assets/js/lazy-loader.min.js" defer></script>
 </body>
 </html>
 

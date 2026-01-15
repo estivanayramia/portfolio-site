@@ -21,6 +21,12 @@ audit.js
 /.lighthouse/
 /.lighthouse/**
 
+# Lighthouse reports (generated in-repo during local audits)
+lighthouse-results/
+
+# Local server logs
+tmp-serve*.log
+
 
 
 # Restore tool artifacts
