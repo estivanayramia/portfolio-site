@@ -134,6 +134,10 @@
         gtag('config', GA_MEASUREMENT_ID, {
             'send_page_view': true,  // Automatically track page views
             'anonymize_ip': true,    // Privacy: anonymize IP addresses
+            // Reduce ad/remarketing requests and improve privacy/perf.
+            // Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/config
+            'allow_google_signals': false,
+            'allow_ad_personalization_signals': false,
             'cookie_flags': 'SameSite=None;Secure'  // Cookie security for Cloudflare Pages
         });
         
