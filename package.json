@@ -14,7 +14,12 @@
         "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push",
         "dev:worker": "cd worker && npx wrangler dev",
         "deploy:worker": "cd worker && npx wrangler deploy",
-        "test:facts": "node scripts/test-chat-grounding.js"
+        "test:facts": "node scripts/test-chat-grounding.js",
+        "audit:links": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/link-check.ps1",
+        "audit:head": "node scripts/audit-head.js",
+        "audit:seo": "node tools/seo-check.mjs",
+        "audit:lighthouse": "node scripts/lighthouse-audit.mjs https://www.estivanayramia.com",
+        "audit:psi": "node scripts/psi-audit.mjs https://www.estivanayramia.com"
     },
     "keywords": [
         "portfolio",

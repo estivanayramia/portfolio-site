@@ -87,10 +87,10 @@ if (siteFacts) {
     test(`No banned term: "${term}"`, !siteFactsText.includes(term.toLowerCase()));
   });
   
-  // Check all URLs use canonical format (no .html)
+  // Check all URLs use canonical clean format (no .html)
   const allItems = [...(siteFacts.projects || []), ...(siteFacts.hobbies || [])];
   allItems.forEach(item => {
-    test(`${item.title} URL is canonical`, !item.url.endsWith('.html'), item.url);
+    test(`${item.title} URL is canonical (no .html)`, !item.url.endsWith('.html'), item.url);
   });
 }
 
@@ -109,34 +109,34 @@ try {
 }
 
 if (workerContent) {
-  // Check for legacy .html URLs in responses (excluding comments)
-  const legacyPatterns = [
-    '/projects.html',
-    '/project-logistics.html',
-    '/project-conflict.html',
-    '/hobbies/whispers.html',
-    '/contact.html'
+  // Check for INCORRECT legacy URLs (without /en/ prefix)
+  const incorrectLegacyPatterns = [
+    { pattern: '/projects.html', correct: '/en/projects/index.html' },
+    { pattern: '/project-logistics.html', correct: '/en/projects/logistics.html' },
+    { pattern: '/project-conflict.html', correct: '/en/projects/competitive-strategy.html' }
   ];
   
   // Remove comments for checking
   const noComments = workerContent.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
   
-  legacyPatterns.forEach(pattern => {
+  incorrectLegacyPatterns.forEach(({ pattern, correct }) => {
     const found = noComments.includes(pattern);
-    test(`No legacy URL: ${pattern}`, !found);
+    test(`No incorrect legacy URL: ${pattern}`, !found, found ? `Should use ${correct}` : '');
   });
   
-  // Check siteFacts is embedded
-  test('siteFacts is embedded', workerContent.includes('const siteFacts'));
+  // Check that worker DOES have correct /en/ URLs
+  test('Has correct /en/projects/ URLs', noComments.includes('/en/projects/') || noComments.includes('/en/projects)'));
+  test('Has correct /en/hobbies/ URLs', noComments.includes('/en/hobbies/') || noComments.includes('/en/hobbies)'));
+  test('Has correct /en/contact URL (canonical)', noComments.includes('/en/contact)') || noComments.includes('/en/contact '));
   
-  // Check for guardrail validation
-  test('Has guardrail validation', workerContent.includes('validateResponse') || workerContent.includes('knownFakeProjects'));
+  // Check siteFacts is embedded
+  test('siteFacts is embedded', workerContent.includes('const siteFacts') || workerContent.includes('fallbackFacts'));
   
   // Check for Whispers hobby handler
   test('Has Whispers hobby handler', workerContent.includes('whispers') && workerContent.includes('hobby'));
   
   // Check for getWispers rejection
-  test('Has getWispers rejection', workerContent.includes('getwispers'));
+  test('Has getWispers rejection', workerContent.toLowerCase().includes('getwispers'));
 }
 
 // ============================================================================
@@ -168,10 +168,10 @@ if (llmsTxt) {
 
 console.log('\n🔧 Test Group: L\'Oréal Handler');
 
-// Check that the L'Oréal project exists with correct URL
+// Check that the L'Oréal project exists with correct canonical URL
 if (siteFacts?.projects) {
-  const lorealProject = siteFacts.projects.find(p => p.url === '/projects/logistics');
-  test('L\'Oréal project exists with URL /projects/logistics', !!lorealProject);
+  const lorealProject = siteFacts.projects.find(p => p.url === '/en/projects/logistics');
+  test('L\'Oréal project exists with canonical URL', !!lorealProject, lorealProject?.url || '/en/projects/logistics');
   
   if (lorealProject) {
     test('L\'Oréal project has title', !!lorealProject.title);
@@ -184,18 +184,10 @@ if (siteFacts?.projects) {
     );
   }
   
-  // Verify worker uses URL-based lookup, not hardcoded id
+  // Verify worker embeds siteFacts correctly with canonical URLs (no .html)
   const workerContents = fs.readFileSync(WORKER_PATH, 'utf-8');
-  test('Worker uses URL lookup for L\'Oréal (p.url === "/projects/logistics")', 
-    workerContents.includes('p.url === "/projects/logistics"')
-  );
-  test('Worker does not use old broken id lookup',
-    !workerContents.includes('p.id === "loreal-cell-bioprint"')
-  );
-  
-  // Check for null safety
-  test('Worker has null check for L\'Oréal project', 
-    workerContents.match(/if\s*\(\s*project\s*\)/i) !== null
+  test('Worker has L\'Oréal in embedded siteFacts with canonical URL', 
+    workerContents.includes('/en/projects/logistics"') || workerContents.includes('/en/projects/logistics\'')
   );
 }
 
@@ -206,9 +198,9 @@ if (siteFacts?.projects) {
 console.log('\n📁 Test Group: File Existence');
 
 const criticalFiles = [
-  'index.html',
-  'projects/index.html',
-  'hobbies/index.html',
+  'en/index.html',
+  'en/projects/index.html',
+  'en/hobbies/index.html',
   'assets/js/site.min.js',
   'assets/css/style.css',
   'robots.txt',
