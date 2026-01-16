@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v20260115-3';
+const CACHE_VERSION = 'v20260115-4';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -62,6 +62,16 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
+    const requestUrl = new URL(event.request.url);
+
+    // Never cache API or health checks
+    if (requestUrl.origin === self.location.origin) {
+        if (requestUrl.pathname.startsWith('/api/') || requestUrl.pathname === '/health') {
+            event.respondWith(fetch(event.request));
+            return;
+        }
+    }
+
     // Skip non-GET requests
     if (event.request.method !== 'GET') return;
 

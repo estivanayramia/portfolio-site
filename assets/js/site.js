@@ -3418,7 +3418,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configuration
     // ======================================================================
     
-    const CHAT_ENDPOINT = 'https://portfolio-chat.eayramia.workers.dev/chat';
+    const CHAT_ENDPOINT = '/api/chat';
     const RESUME_URL = '/assets/docs/Estivan-Ayramia-Resume.pdf';
     const LINKEDIN_URL = 'https://www.linkedin.com/in/estivanayramia';
     const WELCOME_DELAY = 2500;

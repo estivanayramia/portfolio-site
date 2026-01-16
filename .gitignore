@@ -44,3 +44,5 @@ worker/.wrangler/
 worker/node_modules/
 .vscode_restore_backup/
 .vscode/
+.env
+.env.*

@@ -1,6 +1,14 @@
 name = "portfolio-chat"
 main = "worker.js"
 compatibility_date = "2025-01-10"
+routes = [
+	{ pattern = "estivanayramia.com/api/*", zone_name = "estivanayramia.com" },
+	{ pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" },
+	{ pattern = "www.estivanayramia.com/api/*", zone_name = "estivanayramia.com" },
+	{ pattern = "www.estivanayramia.com/health", zone_name = "estivanayramia.com" }
+]
+workers_dev = true
+preview_urls = true
 
 # Observability settings
 [observability.logs]

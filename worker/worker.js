@@ -479,8 +479,7 @@ function getCorsHeaders(request) {
   
   // Production origins
   const allowedOrigins = [
-    "https://estivanayramia.com",
-    "https://www.estivanayramia.com"
+    "https://estivanayramia.com"
   ];
   
   // Allow all localhost and 127.0.0.1 origins for development (any port)
@@ -495,7 +494,7 @@ function getCorsHeaders(request) {
   
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Access-Control-Max-Age": "86400"
   };
@@ -642,6 +641,15 @@ export default {
       return jsonReply(
         { errorType: "BadRequest", reply: "Method not allowed." },
         405,
+        corsHeaders
+      );
+    }
+
+    const isChatPath = url.pathname === "/api/chat" || url.pathname === "/chat";
+    if (!isChatPath) {
+      return jsonReply(
+        { errorType: "BadRequest", reply: "Not found." },
+        404,
         corsHeaders
       );
     }
