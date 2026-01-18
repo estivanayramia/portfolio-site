@@ -25,5 +25,3 @@ jobs:
       - run: npx playwright install --with-deps chromium
 
       - run: npm run test:contact
-        env:
-          MOCK_FORMSPREE: "1"
