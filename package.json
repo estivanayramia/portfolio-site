@@ -22,8 +22,8 @@
         "audit:lighthouse": "node scripts/lighthouse-audit.mjs https://www.estivanayramia.com",
         "audit:psi": "node scripts/psi-audit.mjs https://www.estivanayramia.com",
         "check:csp": "node scripts/check-csp.cjs",
-        "test:contact": "MOCK_FORMSPREE=1 node scripts/test-contact-form-playwright.cjs",
-        "test:contact:live": "node scripts/test-contact-form-playwright.cjs"
+        "test:contact": "cross-env MOCK_FORMSPREE=1 node scripts/test-contact-form-playwright.cjs",
+        "test:contact:live": "cross-env MOCK_FORMSPREE=0 node scripts/test-contact-form-playwright.cjs"
     },
     "keywords": [
         "portfolio",
@@ -34,6 +34,7 @@
     "license": "MIT",
     "devDependencies": {
         "autoprefixer": "^10.4.22",
+        "cross-env": "^10.1.0",
         "esbuild": "^0.27.2",
         "lightningcss": "^1.30.2",
         "playwright": "^1.57.0",
