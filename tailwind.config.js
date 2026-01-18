@@ -18,7 +18,7 @@ module.exports = {
         ink: '#0a0a0a' 
       },
       fontFamily: { 
-        sans: ['Inter', 'Helvetica', 'Arial', 'sans-serif'] 
+        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', 'sans-serif'] 
       },
       // Add extra-small breakpoint for mobile
       screens: {

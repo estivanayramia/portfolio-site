@@ -155,7 +155,6 @@ breaker.html
 hobbies-games.html
 hobbies-games/1024-moves.html
 hobbies-games/2048.html
-hobbies-games/back-attacker.html
 hobbies-games/block-breaker.html
 hobbies-games/nano-wirebot.html
 hobbies-games/off-the-line.html

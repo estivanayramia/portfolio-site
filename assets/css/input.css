@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+    /* Only hide elements when JS is enabled - if JS fails, content stays visible */
+    html.js .reveal,
+    html.js [data-gsap] {
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 500ms ease, transform 500ms ease;
+        will-change: opacity, transform;
+    }
+
+    html.js .reveal.is-visible,
+    html.js [data-gsap].is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html.js .reveal,
+        html.js [data-gsap] {
+            transition: none;
+            opacity: 1;
+            transform: none;
+        }
+    }
+}
+
 @layer base {
     /* Global fix for fixed header overlap */
     body {

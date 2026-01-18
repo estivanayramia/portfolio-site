@@ -15,6 +15,7 @@
         "dev:worker": "cd worker && npx wrangler dev",
         "deploy:worker": "cd worker && npx wrangler deploy",
         "test:facts": "node scripts/test-chat-grounding.js",
+        "check:banned": "node scripts/check-banned-patterns.mjs",
         "audit:links": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/link-check.ps1",
         "audit:head": "node scripts/audit-head.js",
         "audit:seo": "node tools/seo-check.mjs",
