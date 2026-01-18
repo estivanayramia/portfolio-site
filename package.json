@@ -20,7 +20,8 @@
         "audit:head": "node scripts/audit-head.js",
         "audit:seo": "node tools/seo-check.mjs",
         "audit:lighthouse": "node scripts/lighthouse-audit.mjs https://www.estivanayramia.com",
-        "audit:psi": "node scripts/psi-audit.mjs https://www.estivanayramia.com"
+        "audit:psi": "node scripts/psi-audit.mjs https://www.estivanayramia.com",
+        "test:contact": "node scripts/test-contact-form-playwright.cjs"
     },
     "keywords": [
         "portfolio",
@@ -33,6 +34,7 @@
         "autoprefixer": "^10.4.22",
         "esbuild": "^0.27.2",
         "lightningcss": "^1.30.2",
+        "playwright": "^1.57.0",
         "postcss": "^8.5.6",
         "serve": "^14.2.5",
         "tailwindcss": "^3.4.17",
