@@ -108,14 +108,23 @@ function generateRedirects() {
     }
 
     const generatedLines = [];
-    // Add 301 redirects from no-trailing-slash -> trailing-slash for directory routes
-    generatedLines.push('# Trailing slash normalization (301!)');
-    for (const [canonical] of [...canonicalToEnFile.entries()].sort(([a], [b]) => a.localeCompare(b))) {
-      if (canonical !== '/' && canonical.endsWith('/')) {
-        const noSlash = canonical.slice(0, -1);
-        generatedLines.push(`${noSlash}    ${canonical}    301!`);
-      }
+    // URL normalization (301) so /x and /x/ both resolve to the canonical route
+    generatedLines.push('# URL normalization (301)');
+
+    const canonicals = [...canonicalToEnFile.keys()].sort((a, b) => a.localeCompare(b));
+    for (const canonical of canonicals) {
+        if (canonical === '/') continue;
+
+        if (canonical.endsWith('/')) {
+            // Canonical is directory-style: /projects/ => redirect /projects -> /projects/
+            const noSlash = canonical.slice(0, -1);
+            generatedLines.push(`${noSlash}    ${canonical}    301`);
+        } else {
+            // Canonical is file-style: /about => redirect /about/ -> /about
+            generatedLines.push(`${canonical}/    ${canonical}    301`);
+        }
     }
+
     generatedLines.push('');
     generatedLines.push('# Clean URL rewrites (200) -> serve from /EN/');
     for (const [canonical, enFile] of [...canonicalToEnFile.entries()].sort(([a], [b]) => a.localeCompare(b))) {
@@ -123,10 +132,10 @@ function generateRedirects() {
     }
 
     generatedLines.push('');
-    generatedLines.push('# Prevent indexing /EN/* directly (301!)');
+    generatedLines.push('# Prevent indexing /EN/* directly (301)');
     for (const [canonical, enFile] of [...canonicalToEnFile.entries()].sort(([, a], [, b]) => a.localeCompare(b))) {
         const enUrlPath = '/' + enFile;
-        generatedLines.push(`${enUrlPath}    ${canonical}    301!`);
+        generatedLines.push(`${enUrlPath}    ${canonical}    301`);
     }
 
     const replacement = `${BEGIN}\n${generatedLines.join('\n')}\n${END}`;
@@ -142,7 +151,11 @@ function generateRedirects() {
 
 // 3 & 4. Update HTML Content (Links, Canonical, Meta, JSON-LD)
 function updateHtmlContent() {
-    const filesToProcess = [...enIndexableFiles, ...localeFiles];
+    const extraFiles = [];
+    const en404 = 'EN/404.html';
+    if (fs.existsSync(path.join(rootDir, en404))) extraFiles.push(en404);
+
+    const filesToProcess = [...enIndexableFiles, ...extraFiles, ...localeFiles];
 
     // Build canonical map for HTML normalization (directory routes)
     const canonicalToEnFile = new Map();

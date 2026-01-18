@@ -86,9 +86,9 @@ function buildRedirects(rootHtmlFiles) {
   lines.push("");
 
   // explicit index redirects
-  lines.push("/index.html / 301!");
-  lines.push("/es/index.html /es/ 301!");
-  lines.push("/ar/index.html /ar/ 301!");
+  lines.push("/index.html / 301");
+  lines.push("/es/index.html /es/ 301");
+  lines.push("/ar/index.html /ar/ 301");
   lines.push("");
 
   // per-page rules
@@ -98,7 +98,7 @@ function buildRedirects(rootHtmlFiles) {
     .map((f) => f.replace(/\.html$/i, ""));
 
   for (const slug of slugs) {
-    lines.push(`/${slug}.html /${slug} 301!`);
+    lines.push(`/${slug}.html /${slug} 301`);
     lines.push(`/${slug} /${slug}.html 200`);
     lines.push("");
   }

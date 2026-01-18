@@ -101,7 +101,7 @@ function checkRedirects() {
         const slug = file.replace('.html', '');
         
         // Check 301: /file.html -> /slug
-        if (!content.includes(`/${file}                   /${slug}                       301!`)) {
+            if (!content.includes(`/${file}                   /${slug}                       301`)) {
              error(`_redirects: Missing 301 redirect for ${file}`);
         }
 
