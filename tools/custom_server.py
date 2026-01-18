@@ -28,6 +28,17 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
             
         # If still not found, maybe it's a rewrite rule from _redirects (simplified)
         # For now, just try to serve 404.html if it exists, or let default 404 happen
+        # Special-case clean overview route to EN/overview.html if present
+        if path == "/overview" and os.path.exists(os.path.join("EN", "overview.html")):
+            self.path = "/EN/overview.html"
+            super().do_GET()
+            return
+
+        # Prefer EN/404.html as the fallback if it exists, otherwise fall back to root 404.html
+        if os.path.exists(os.path.join("EN", "404.html")):
+            self.path = "/EN/404.html"
+            super().do_GET()
+            return
         if os.path.exists("404.html"):
             self.path = "/404.html"
             super().do_GET()

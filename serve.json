@@ -6,6 +6,7 @@
     { "source": "/contact", "destination": "/EN/contact.html" },
     { "source": "/hobbies-games", "destination": "/EN/hobbies-games.html" },
     { "source": "/deep-dive", "destination": "/EN/deep-dive.html" },
+    { "source": "/overview", "destination": "/EN/overview.html" },
     { "source": "/privacy", "destination": "/EN/privacy.html" },
     { "source": "/projects", "destination": "/EN/projects/index.html" },
     { "source": "/projects/:slug", "destination": "/EN/projects/:slug.html" },

@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v20260118-3';
+const CACHE_VERSION = 'v20260118-4';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -18,7 +18,8 @@ const ASSETS_TO_CACHE = [
     '/hobbies/',
     '/hobbies-games',
     '/privacy',
-    '/404.html',
+    '/overview',
+    '/EN/404.html',
     '/assets/css/theme.css',
     '/assets/css/theme.min.css',
     '/assets/css/style.css',
@@ -95,7 +96,7 @@ self.addEventListener('fetch', (event) => {
                 })
                 .catch(async () => {
                     const cached = await caches.match(request);
-                    return cached || caches.match('/404.html');
+                    return cached || caches.match('/EN/404.html');
                 })
         );
         return;

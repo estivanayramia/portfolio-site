@@ -120,7 +120,12 @@
 /EN/privacy.html            /privacy                     301!
 
 # 404 Fallback
-/404.html                    404
+/EN/overview.html            /overview                    301!
 
+# Project conflict redirects (kept above 404 fallback)
 /project-conflict.html /projects/conflict 301!
 /project-conflict /projects/conflict 301!
+
+# 404 Fallback
+/404.html                    /EN/404.html                404
+/*                           /EN/404.html                404
