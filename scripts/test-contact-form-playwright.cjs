@@ -19,10 +19,6 @@ function fail(msg) {
   // Block SW (Service Worker) so stale caches cannot “help” you
   const context = await browser.newContext({
     serviceWorkers: 'block',
-    extraHTTPHeaders: {
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache',
-    },
   });
 
   const page = await context.newPage();
@@ -50,14 +46,47 @@ function fail(msg) {
 
   // CI mode: mock Formspree so you do not spam yourself
   if (MOCK_FORMSPREE) {
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'accept, content-type, cache-control, pragma',
+      'Access-Control-Max-Age': '86400',
+    };
+
     await page.route('https://formspree.io/**', async (route) => {
       const req = route.request();
+
+      if (req.url().includes('formspree.io')) {
+        console.log(`MOCK Formspree: ${req.method()} ${req.url()}`);
+      }
+
+      // Preflight support (in case any header changes trigger it)
+      if (req.method() === 'OPTIONS') {
+        await route.fulfill({ status: 204, headers: corsHeaders, body: '' });
+        return;
+      }
+
       if (req.url().includes(FORMSPREE_URL_PART) && req.method() === 'POST') {
         formspreeRequestSeen = true;
       }
+
       await route.fulfill({
         status: 200,
-        headers: { 'content-type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+
+    // Optional coverage if Formspree ever uses api.formspree.io
+    await page.route('https://api.formspree.io/**', async (route) => {
+      const req = route.request();
+      if (req.method() === 'OPTIONS') {
+        await route.fulfill({ status: 204, headers: corsHeaders, body: '' });
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ ok: true }),
       });
     });
@@ -86,16 +115,28 @@ function fail(msg) {
 
     await page.click('#contact-form button[type="submit"]');
 
-    // Success UI: #contact-status includes “Sent”
+    // Ensure the submit handler actually ran (it will set data-status quickly)
     await page.waitForFunction(() => {
       const el = document.querySelector('#contact-status');
       if (!el) return false;
-      const t = (el.textContent || '').toLowerCase();
-      return t.includes('sent');
-    }, { timeout: 20000 });
+      const s = (el.getAttribute('data-status') || '').toLowerCase();
+      return s && s !== 'idle';
+    }, { timeout: 5000 });
 
-    const statusText = await page.textContent('#contact-status');
-    console.log(`contact-status: ${statusText && statusText.trim()}`);
+    {
+      const statusText = await page.textContent('#contact-status');
+      const statusType = await page.getAttribute('#contact-status', 'data-status');
+      console.log(`contact-status(after-submit): [${statusType}] ${statusText && statusText.trim()}`);
+    }
+
+    // Success path opens the modal; status text may be overwritten by cooldown timer.
+    await page.waitForSelector('#contact-success-modal:not(.hidden)', { timeout: 30000 });
+
+    {
+      const statusText = await page.textContent('#contact-status');
+      const statusType = await page.getAttribute('#contact-status', 'data-status');
+      console.log(`contact-status: [${statusType}] ${statusText && statusText.trim()}`);
+    }
 
     if (MOCK_FORMSPREE) {
       if (!formspreeRequestSeen) fail('MOCK_FORMSPREE=1 but no POST to Formspree endpoint was observed.');
@@ -105,6 +146,21 @@ function fail(msg) {
       else console.log(`Formspree response: ${formspreeResponse.status} ok=${formspreeResponse.ok}`);
     }
   } catch (e) {
+    try {
+      const statusText = await page.textContent('#contact-status');
+      const statusType = await page.getAttribute('#contact-status', 'data-status');
+      console.log(`contact-status(at-fail): [${statusType}] ${statusText && statusText.trim()}`);
+    } catch (e2) {
+      // ignore
+    }
+    if (MOCK_FORMSPREE) {
+      console.log(`MOCK_FORMSPREE=1 formspreeRequestSeen=${formspreeRequestSeen}`);
+      if (formspreeResponse) {
+        console.log(`Formspree response(at-fail): ${formspreeResponse.status} ok=${formspreeResponse.ok}`);
+      }
+    } else if (formspreeResponse) {
+      console.log(`Formspree response(at-fail): ${formspreeResponse.status} ok=${formspreeResponse.ok}`);
+    }
     fail(String(e));
   } finally {
     if (requestFailures.length) {
