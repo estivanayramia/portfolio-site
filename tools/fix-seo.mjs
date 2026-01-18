@@ -108,6 +108,15 @@ function generateRedirects() {
     }
 
     const generatedLines = [];
+    // Add 301 redirects from no-trailing-slash -> trailing-slash for directory routes
+    generatedLines.push('# Trailing slash normalization (301!)');
+    for (const [canonical] of [...canonicalToEnFile.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+      if (canonical !== '/' && canonical.endsWith('/')) {
+        const noSlash = canonical.slice(0, -1);
+        generatedLines.push(`${noSlash}    ${canonical}    301!`);
+      }
+    }
+    generatedLines.push('');
     generatedLines.push('# Clean URL rewrites (200) -> serve from /EN/');
     for (const [canonical, enFile] of [...canonicalToEnFile.entries()].sort(([a], [b]) => a.localeCompare(b))) {
         generatedLines.push(`${canonical}    /${enFile}    200`);
@@ -135,6 +144,22 @@ function generateRedirects() {
 function updateHtmlContent() {
     const filesToProcess = [...enIndexableFiles, ...localeFiles];
 
+    // Build canonical map for HTML normalization (directory routes)
+    const canonicalToEnFile = new Map();
+    for (const enFile of enIndexableFiles) {
+        canonicalToEnFile.set(mapToCanonicalRoute(enFile), enFile);
+    }
+
+    const directoryNoSlashSet = new Set([
+        ...[...canonicalToEnFile.keys()]
+            .filter((c) => c !== '/' && c.endsWith('/'))
+            .map((c) => c.slice(0, -1))
+    ]);
+
+    function escapeRegExpFor(value) {
+        return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
     filesToProcess.forEach(relativePath => {
         const filePath = path.join(rootDir, relativePath);
         let content = fs.readFileSync(filePath, 'utf8');
@@ -157,6 +182,12 @@ function updateHtmlContent() {
             
             return `href=${quote}${url}${quote}`;
         });
+
+        // A.5 Normalize directory links (no-trailing-slash -> trailing-slash)
+        for (const noSlash of directoryNoSlashSet) {
+            const re = new RegExp(`href=(['"])${escapeRegExpFor(noSlash)}\\1`, 'g');
+            content = content.replace(re, (match, quote) => `href=${quote}${noSlash}/${quote}`);
+        }
 
         // B. Update data-print-url
         content = content.replace(/data-print-url=(["'])([^"']+)\.html\1/g, (match, quote, url) => {

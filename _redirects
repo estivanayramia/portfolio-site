@@ -11,6 +11,10 @@
 /ar/                         /ar/index.html               200
 
 # BEGIN GENERATED (fix-seo)
+# Trailing slash normalization (301!)
+/hobbies    /hobbies/    301!
+/projects    /projects/    301!
+
 # Clean URL rewrites (200) -> serve from /EN/
 /    /EN/index.html    200
 /about    /EN/about.html    200
