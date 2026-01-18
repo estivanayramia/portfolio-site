@@ -34,15 +34,9 @@ tmp-serve*.log
 .vscode_restore_reports/
 dryrun-transcript*.txt
 
-# Restore tool artifacts
-.vscode_restore_backup/
-.vscode_restore_reports/
-dryrun-transcript*.txt
-
 worker/.wrangler/
 .wrangler/
 worker/node_modules/
-.vscode_restore_backup/
 .vscode/
 .env
 .env.*
