@@ -3244,7 +3244,6 @@ const __GAME_CATALOG = [
     { id: 'oh-flip', href: '/hobbies-games/oh-flip', emoji: '🤸', title: 'Oh Flip', subtitle: 'Timing + tricks' },
     { id: 'onoff', href: '/hobbies-games/onoff', emoji: '⚡', title: 'ON/OFF', subtitle: 'Switch-based puzzle' },
     { id: '1024-moves', href: '/hobbies-games/1024-moves', emoji: '🧠', title: '1024 Moves', subtitle: 'Move-limited strategy' },
-    { id: 'back-attacker', href: '/hobbies-games/back-attacker', emoji: '🛡️', title: 'Back Attacker', subtitle: 'Survive the attacks' },
     { id: 'nano-wirebot', href: '/hobbies-games/nano-wirebot', emoji: '🤖', title: 'Nano Wirebot', subtitle: 'Precision platforming' },
     { id: 'off-the-line', href: '/hobbies-games/off-the-line', emoji: '🧷', title: 'Off The Line', subtitle: 'Don’t cross the line' },
     { id: 'pizza-undelivery', href: '/hobbies-games/pizza-undelivery', emoji: '🍕', title: 'Pizza Undelivery', subtitle: 'Fast food chaos' },

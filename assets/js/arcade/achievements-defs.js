@@ -514,38 +514,6 @@ export const ACHIEVEMENTS = {
         difficulty: 'Hard',
         icon: '🏁'
     },
-    mini_back_attacker_visit: {
-        id: 'mini_back_attacker_visit',
-        game: 'mini_back_attacker',
-        title: 'Ready, Aim…',
-        description: 'Open Back Attacker',
-        difficulty: 'Easy',
-        icon: '🎯'
-    },
-    mini_back_attacker_stay_60: {
-        id: 'mini_back_attacker_stay_60',
-        game: 'mini_back_attacker',
-        title: 'Hold The Line',
-        description: 'Stay on Back Attacker for 60 seconds',
-        difficulty: 'Easy',
-        icon: '⏳'
-    },
-    mini_back_attacker_stay_180: {
-        id: 'mini_back_attacker_stay_180',
-        game: 'mini_back_attacker',
-        title: 'Locked Target',
-        description: 'Stay on Back Attacker for 3 minutes',
-        difficulty: 'Medium',
-        icon: '⏱️'
-    },
-    mini_back_attacker_stay_300: {
-        id: 'mini_back_attacker_stay_300',
-        game: 'mini_back_attacker',
-        title: 'Unbroken',
-        description: 'Stay on Back Attacker for 5 minutes',
-        difficulty: 'Hard',
-        icon: '🛡️'
-    },
     mini_nano_wirebot_visit: {
         id: 'mini_nano_wirebot_visit',
         game: 'mini_nano_wirebot',
