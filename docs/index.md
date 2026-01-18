@@ -106,7 +106,7 @@ Available project cards:
 
 These changes were made to finalize branding and PWA/favicon support before you commit and deploy. Follow the short checklist below before pushing to `main`.
 
-- Added comprehensive favicon references across pages (`index.html`, `about.html`, `projects.html`, `contact.html`, `privacy.html`, `deep-dive.html`, `overview.html`, `404.html`).
+- Added comprehensive favicon references across pages (`index.html`, `about.html`, `projects.html`, `contact.html`, `privacy.html`, `deep-dive.html`, `/overview`, `/404.html` served from `/EN/404.html`).
 - Created `docs/assets/img-readme.md` with instructions on required icon files.
 - Created `assets/img/safari-pinned-tab.svg` (monochrome mask-ready pinned tab for Safari).
 - Replaced header home icon / "Portfolio" text with `logo-ea.png` references across pages (place the real `logo-ea.png` in `/assets/img/`).
@@ -157,13 +157,13 @@ Notes:
 ```
 /
 ├── index.html           # English home page
-├── overview.html        # 1-minute overview
+├── /overview            # 1-minute overview (served from /EN/overview.html)
 ├── deep-dive.html       # 5-minute deep dive
 ├── about.html           # About page
 ├── projects.html        # Projects showcase
 ├── contact.html         # Contact form (Formspree)
 ├── privacy.html         # Privacy policy
-├── 404.html             # Custom error page
+├── /404.html            # Custom error page (served from /EN/404.html)
 ├── manifest.json        # PWA manifest
 ├── sw.js                # Service worker (caching)
 ├── _headers             # Cloudflare security headers

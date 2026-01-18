@@ -97,11 +97,11 @@ With files:
 / (index.html)
 /about.html
 /projects.html
-/overview.html
 /deep-dive.html
 /contact.html
+/overview
 /privacy.html
-/404.html
+/404.html (served from /EN/404.html)
 /assets/css/theme.css
 /assets/js/site.js
 ```
