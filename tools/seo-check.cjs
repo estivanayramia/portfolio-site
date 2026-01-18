@@ -45,7 +45,7 @@ const expected = {
       desc: 'Privacy policy for estivanayramia.com: what data is collected, how it is used, and how it is protected.',
     },
   ],
-  noindex: ['index-critical.html', '404.html'],
+  noindex: ['404.html'],
 };
 
 function getMatch(re, html) {

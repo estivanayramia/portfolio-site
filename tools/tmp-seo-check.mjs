@@ -62,7 +62,7 @@ async function main() {
   const localized = ['es/index.html', 'ar/index.html'];
   const allRelPaths = [...rootHtml, ...localized];
 
-  const noindexRelPaths = new Set(['404.html', 'index-critical.html', ...localized]);
+  const noindexRelPaths = new Set(['404.html', ...localized]);
 
   const indexableRelPaths = [];
   for (const rel of allRelPaths) {

@@ -20,7 +20,6 @@ const ignoreDirs = new Set([
 ]);
 
 const ignoreFiles = new Set([
-    'index-critical.html',
     'hobby-car.html',
     'hobby-cooking.html',
     'hobby-whispers.html'
