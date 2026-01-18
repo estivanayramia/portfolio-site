@@ -10,6 +10,7 @@ const rootDir = path.join(__dirname, '..');
 const siteUrl = 'https://www.estivanayramia.com';
 const excludeFiles = ['index.html', '404.html'];
 const localeDirs = ['es', 'ar'];
+const GENERATE_REDIRECTS = process.argv.includes('--redirects');
 
 // 1. Inventory Routes
 function getHtmlFiles(dir) {
@@ -83,7 +84,9 @@ function generateRedirects() {
 
 // 3 & 4. Update HTML Content (Links, Canonical, Meta, JSON-LD)
 function updateHtmlContent() {
-    const filesToProcess = [...indexableFiles, 'index.html', '404.html', ...localeFiles];
+    const mustExist = ['index.html', '404.html'];
+    const existingRootFiles = mustExist.filter(f => fs.existsSync(path.join(rootDir, f)));
+    const filesToProcess = [...indexableFiles, ...existingRootFiles, ...localeFiles];
 
     filesToProcess.forEach(relativePath => {
         const filePath = path.join(rootDir, relativePath);
@@ -189,6 +192,11 @@ function updateSitemap() {
 }
 
 // Run
-generateRedirects();
+if (GENERATE_REDIRECTS) {
+    generateRedirects();
+} else {
+    console.log('Skipping _redirects generation (run with --redirects to enable)');
+}
+
 updateHtmlContent();
 updateSitemap();
