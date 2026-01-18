@@ -6,43 +6,37 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
 
-const HTML_GLOBS = [
-    { dir: ROOT_DIR, pattern: /\.html$/ },
-    { dir: path.join(ROOT_DIR, 'EN'), pattern: /\.html$/ },
-    { dir: path.join(ROOT_DIR, 'ar'), pattern: /\.html$/ },
-    { dir: path.join(ROOT_DIR, 'es'), pattern: /\.html$/ },
-    { dir: path.join(ROOT_DIR, 'hobbies'), pattern: /\.html$/ }, // Legacy check
-    { dir: path.join(ROOT_DIR, 'projects'), pattern: /\.html$/ }, // Legacy check
-];
+const EN_DIR = path.join(ROOT_DIR, 'EN');
 
-const IGNORE_URL_PREFIXES = ['http://', 'https://', 'mailto:', 'tel:', '#', 'data:'];
+// Only audit the pages the user asked for: root ./*.html and ./EN/**/*.html
+const IGNORE_URL_PREFIXES = ['http://', 'https://', 'mailto:', 'tel:', '#', 'data:', '//'];
 
 function getAllHtmlFiles() {
-    let results = [];
-    
-    function walk(dir) {
-        if (!fs.existsSync(dir)) return;
-        const list = fs.readdirSync(dir);
-        list.forEach(file => {
-            const filePath = path.join(dir, file);
-            const stat = fs.statSync(filePath);
-            if (stat && stat.isDirectory()) {
-                if (file === 'node_modules' || file === '.git') return;
-                walk(filePath);
-            } else {
-                if (file.endsWith('.html')) {
-                    results.push(filePath);
-                }
-            }
-        });
+    const results = [];
+
+    // Root HTML files only (no recursive scan from repo root)
+    for (const entry of fs.readdirSync(ROOT_DIR)) {
+        const entryPath = path.join(ROOT_DIR, entry);
+        if (!entry.endsWith('.html')) continue;
+        if (!fs.statSync(entryPath).isFile()) continue;
+        results.push(entryPath);
     }
 
-    // Start from known roots to avoid scanning node_modules deeply if we just used recursive from root
-    // But since we have a specific structure, let's just specific dirs or root
-    // The user asked for ./EN/**/*.html and root ./*.html specifically, but a full scan is safer.
-    // Let's just walk the root but skip node_modules
-    walk(ROOT_DIR);
-    return results;
+    function walkEn(dir) {
+        if (!fs.existsSync(dir)) return;
+        for (const file of fs.readdirSync(dir)) {
+            const filePath = path.join(dir, file);
+            const stat = fs.statSync(filePath);
+            if (stat.isDirectory()) {
+                walkEn(filePath);
+                continue;
+            }
+            if (file.endsWith('.html')) results.push(filePath);
+        }
+    }
+
+    walkEn(EN_DIR);
+    return results.sort();
 }
 
 function resolveAssetPath(htmlFilePath, assetUrl) {
@@ -55,7 +49,7 @@ function resolveAssetPath(htmlFilePath, assetUrl) {
     let absolutePath;
     if (cleanUrl.startsWith('/')) {
         // Root relative
-        absolutePath = path.join(ROOT_DIR, cleanUrl);
+        absolutePath = path.join(ROOT_DIR, cleanUrl.replace(/^\/+/, ''));
     } else {
         // Relative to file
         absolutePath = path.resolve(path.dirname(htmlFilePath), cleanUrl);
@@ -73,9 +67,19 @@ function scanFile(filePath) {
     const errors = [];
     const glyphs = [];
 
-    // Regex for attributes
-    // src, href, poster, data-src
-    const attrRegex = /(src|href|poster|data-src)=["']([^"']+)["']/g;
+    // Require UTF-8 meta charset on audited pages
+    const charsetOk = /<meta\s+charset\s*=\s*"utf-8"\s*\/?\s*>/i.test(content);
+    if (!charsetOk) {
+        errors.push({
+            file: path.relative(ROOT_DIR, filePath),
+            attr: 'meta',
+            value: '<meta charset="utf-8">',
+            resolvedPath: '(missing)'
+        });
+    }
+
+    // Regex for common asset-bearing attributes
+    const attrRegex = /(src|href|poster|data-src|imagesrcset)=["']([^"']+)["']/g;
     let match;
     while ((match = attrRegex.exec(content)) !== null) {
         const [full, attr, url] = match;
@@ -132,7 +136,9 @@ function scanFile(filePath) {
         { pattern: /LinkedIn \?/, name: 'LinkedIn ?' },
         { pattern: /GitHub \?/, name: 'GitHub ?' },
         { pattern: /\? Back/, name: '? Back' },
-        { pattern: />\?<\/a>/, name: 'Question Mark Link' } 
+        { pattern: />\?<\/a>/, name: 'Question Mark Link' },
+        { pattern: /\uFFFD/, name: 'Unicode Replacement Character (�)' },
+        { pattern: /ðŸ/, name: 'Mojibake (likely emoji encoding issue)' }
     ];
 
     const lines = content.split('\n');

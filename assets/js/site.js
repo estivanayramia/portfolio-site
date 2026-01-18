@@ -1096,6 +1096,43 @@ const initAriaCurrent = () => {
 // GSAP Animations
 // ==========================================================================
 
+const initRevealOnViewFallback = () => {
+    try {
+        const prefersReducedMotion = (typeof window !== 'undefined')
+            && (typeof window.matchMedia === 'function')
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        const targets = Array.from(document.querySelectorAll('[data-gsap], [data-reveal], .reveal'));
+        if (!targets.length) return;
+
+        targets.forEach((el) => {
+            try { el.classList.add('reveal'); } catch (e) {}
+        });
+
+        const show = (el) => {
+            try { el.classList.add('is-visible'); } catch (e) {}
+            try { el.classList.remove('opacity-0', 'translate-y-8'); } catch (e) {}
+        };
+
+        if (prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
+            targets.forEach(show);
+            return;
+        }
+
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                show(entry.target);
+                try { obs.unobserve(entry.target); } catch (e) {}
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+
+        targets.forEach((el) => {
+            try { observer.observe(el); } catch (e) { show(el); }
+        });
+    } catch (e) {}
+};
+
 /**
  * Initialize GSAP ScrollTrigger Animations
  * 
@@ -1127,19 +1164,11 @@ const initAnimations = () => {
         && (typeof window.matchMedia === 'function')
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Always unhide elements first to avoid blank screens
-    const allAnimated = document.querySelectorAll('[data-gsap]');
-    allAnimated.forEach(el => {
-        el.classList.remove('opacity-0', 'translate-y-8');
-        el.style.opacity = '1';
-        el.style.transform = 'none';
-    });
+    // Always ensure a non-GSAP reveal path exists (covers GSAP load failures)
+    initRevealOnViewFallback();
 
-    // If GSAP unavailable, keep content visible and exit
-    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-        console.warn('GSAP or ScrollTrigger not loaded; revealing content without animations.');
-        return;
-    }
+    // If GSAP unavailable, the fallback handles visibility
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
     // Reduced motion: keep layout stable (no transform-based entrance/scroll animations)
     if (prefersReducedMotion) {
@@ -1160,13 +1189,19 @@ const initAnimations = () => {
     fadeElements.forEach(element => {
         const delay = element.getAttribute('data-gsap-delay') || 0;
 
-        gsap.from(element, {
-            immediateRender: false,
-            opacity: 0,
-            y: 20,
-            duration: 0.4,
+        // Remove fallback styling so GSAP owns the animation.
+        try { element.classList.remove('reveal', 'is-visible'); } catch (e) {}
+
+        // Start hidden until the trigger point is reached.
+        gsap.set(element, { autoAlpha: 0, y: 12, willChange: 'opacity, transform' });
+
+        gsap.to(element, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.5,
             delay: parseFloat(delay) * 0.5,
             ease: 'power2.out',
+            clearProps: 'willChange',
             scrollTrigger: {
                 trigger: element,
                 start: 'top 92%',
