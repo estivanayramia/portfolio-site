@@ -11,9 +11,23 @@ const siteUrl = 'https://www.estivanayramia.com';
 const excludeFiles = ['index.html', '404.html'];
 const localeDirs = ['es', 'ar'];
 const GENERATE_REDIRECTS = process.argv.includes('--redirects');
+const UPDATE_HTML = process.argv.includes('--html');
+const UPDATE_SITEMAP = process.argv.includes('--sitemap');
+const UPDATE_ALL = process.argv.includes('--all');
 
-// 1. Inventory Routes
-function getHtmlFiles(dir) {
+// CLI flags
+if (!GENERATE_REDIRECTS && !UPDATE_HTML && !UPDATE_SITEMAP && !UPDATE_ALL) {
+    console.log('Usage: node tools/fix-seo.mjs [flags]');
+    console.log('Flags:');
+    console.log('  --redirects  Generate _redirects');
+    console.log('  --html       Update HTML files (links, canonical, meta)');
+    console.log('  --sitemap    Update sitemap.xml');
+    console.log('  --all        Run all updates');
+    process.exit(0);
+}
+
+// 1. Inventory Routes (EN-aware)
+function getHtmlFiles(dir, relativePath = '') {
     let results = [];
     const list = fs.readdirSync(dir);
     list.forEach(file => {
@@ -23,12 +37,20 @@ function getHtmlFiles(dir) {
             if (localeDirs.includes(file)) {
                 // Check for index.html in locale dir
                 if (fs.existsSync(path.join(filePath, 'index.html'))) {
-                    results.push(path.join(file, 'index.html'));
+                    results.push(path.join(relativePath, file, 'index.html'));
                 }
+            } else if (file === 'EN') {
+                // Recursively scan EN for English pages
+                const enFiles = getHtmlFiles(filePath, 'EN');
+                results.push(...enFiles);
+            } else if (relativePath === 'EN') {
+                // Recurse into subdirs like projects/
+                const subFiles = getHtmlFiles(filePath, path.join(relativePath, file));
+                results.push(...subFiles);
             }
         } else {
             if (file.endsWith('.html')) {
-                results.push(file);
+                results.push(path.join(relativePath, file));
             }
         }
     });
@@ -39,7 +61,23 @@ const allHtmlFiles = getHtmlFiles(rootDir);
 const indexableFiles = allHtmlFiles.filter(f => !excludeFiles.includes(f) && !localeDirs.some(d => f.startsWith(d + path.sep)));
 const localeFiles = allHtmlFiles.filter(f => localeDirs.some(d => f.startsWith(d + path.sep)));
 
-console.log('Indexable Root Files:', indexableFiles);
+// Map EN files to canonical routes
+function mapToCanonicalRoute(filePath) {
+    const normalized = filePath.replace(/\\/g, '/'); // Normalize to forward slashes
+    if (normalized.startsWith('EN/')) {
+        const enPath = normalized.replace('EN/', '');
+        if (enPath === 'index.html') return '/';
+        if (enPath.endsWith('/index.html')) return '/' + enPath.replace('/index.html', '/');
+        return '/' + enPath.replace('.html', '');
+    }
+    // For locales, keep as is
+    if (normalized.startsWith('es/') || normalized.startsWith('ar/')) {
+        return '/' + normalized.replace('.html', '');
+    }
+    return '/' + normalized.replace('.html', '');
+}
+
+console.log('Indexable Files:', indexableFiles);
 console.log('Locale Files:', localeFiles);
 
 // 2. Fix _redirects
@@ -68,8 +106,9 @@ function generateRedirects() {
     content += `/ar/                         /ar/index.html               200\n`;
 
     indexableFiles.forEach(file => {
-        const slug = file.replace('.html', '');
-        content += `/${slug}                       /${file}                       200\n`;
+        const canonical = mapToCanonicalRoute(file);
+        const normalizedFile = file.replace(/\\/g, '/');
+        content += `${canonical}                       /${normalizedFile}                       200\n`;
     });
 
     // 404 Fallback (optional but good practice)
@@ -84,9 +123,7 @@ function generateRedirects() {
 
 // 3 & 4. Update HTML Content (Links, Canonical, Meta, JSON-LD)
 function updateHtmlContent() {
-    const mustExist = ['index.html', '404.html'];
-    const existingRootFiles = mustExist.filter(f => fs.existsSync(path.join(rootDir, f)));
-    const filesToProcess = [...indexableFiles, ...existingRootFiles, ...localeFiles];
+    const filesToProcess = [...indexableFiles, ...localeFiles];
 
     filesToProcess.forEach(relativePath => {
         const filePath = path.join(rootDir, relativePath);
@@ -94,12 +131,10 @@ function updateHtmlContent() {
         let originalContent = content;
 
         // Determine clean URL for this page
-        let cleanPath = '';
-        if (relativePath === 'index.html') cleanPath = '/';
-        else if (relativePath.endsWith('/index.html')) cleanPath = '/' + relativePath.replace('/index.html', '/');
-        else cleanPath = '/' + relativePath.replace('.html', '');
+        let cleanPath = mapToCanonicalRoute(relativePath);
+        if (cleanPath === '/') cleanPath = '';
 
-        const fullUrl = siteUrl + (cleanPath === '/' ? '' : cleanPath);
+        const fullUrl = siteUrl + cleanPath;
 
         // A. Update Internal Links (strip trailing .html)
         // Regex to find internal href values ending with .html
@@ -172,10 +207,10 @@ function updateSitemap() {
         urls.push(siteUrl + '/' + dir + '/');
     });
 
-    // Pages
+    // Pages from indexableFiles, mapped to canonical
     indexableFiles.forEach(file => {
-        const slug = file.replace('.html', '');
-        urls.push(siteUrl + '/' + slug);
+        const canonical = mapToCanonicalRoute(file);
+        urls.push(siteUrl + canonical);
     });
 
     urls.forEach(url => {
@@ -192,11 +227,14 @@ function updateSitemap() {
 }
 
 // Run
-if (GENERATE_REDIRECTS) {
+if (GENERATE_REDIRECTS || UPDATE_ALL) {
     generateRedirects();
-} else {
-    console.log('Skipping _redirects generation (run with --redirects to enable)');
 }
 
-updateHtmlContent();
-updateSitemap();
+if (UPDATE_HTML || UPDATE_ALL) {
+    updateHtmlContent();
+}
+
+if (UPDATE_SITEMAP || UPDATE_ALL) {
+    updateSitemap();
+}
