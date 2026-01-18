@@ -16,7 +16,8 @@ function fixCSS() {
     console.log('Fixing CSS Loading Patterns');
     console.log('='.repeat(60));
     
-    const enDir = path.join(rootDir, 'en');
+    // Prefer uppercase EN folder when present (case-sensitive filesystems)
+    const enDir = fs.existsSync(path.join(rootDir, 'EN')) ? path.join(rootDir, 'EN') : path.join(rootDir, 'en');
     let fixed = 0;
     
     // Fix all HTML files in /en

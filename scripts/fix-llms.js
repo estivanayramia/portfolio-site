@@ -4,16 +4,19 @@ const path = require('path');
 const llmsPath = path.join(__dirname, '..', 'llms.txt');
 let content = fs.readFileSync(llmsPath, 'utf8');
 
-console.log('Updating llms.txt URLs to include /en/ prefix and .html extensions...');
+console.log('Updating llms.txt URLs to include /EN/ or /en/ prefix and .html extensions...');
+
+// Prefer uppercase 'EN' folder if present on disk (Cloudflare Pages is case-sensitive)
+const enDirName = fs.existsSync(path.join(__dirname, '..', 'EN')) ? '/EN' : '/en';
 
 // Update project URLs
 const projectReplacements = [
-  ['/projects/portfolio', '/en/projects/portfolio.html'],
-  ['/projects/logistics', '/en/projects/logistics.html'],
-  ['/projects/discipline', '/en/projects/discipline.html'],
-  ['/projects/documentation', '/en/projects/documentation.html'],
-  ['/projects/multilingual', '/en/projects/multilingual.html'],
-  ['/projects/competitive-strategy', '/en/projects/competitive-strategy.html']
+  ['/projects/portfolio', `${enDirName}/projects/portfolio.html`],
+  ['/projects/logistics', `${enDirName}/projects/logistics.html`],
+  ['/projects/discipline', `${enDirName}/projects/discipline.html`],
+  ['/projects/documentation', `${enDirName}/projects/documentation.html`],
+  ['/projects/multilingual', `${enDirName}/projects/multilingual.html`],
+  ['/projects/competitive-strategy', `${enDirName}/projects/competitive-strategy.html`]
 ];
 
 projectReplacements.forEach(([oldUrl, newUrl]) => {
@@ -23,12 +26,12 @@ projectReplacements.forEach(([oldUrl, newUrl]) => {
 
 // Update hobby URLs
 const hobbyReplacements = [
-  ['/hobbies/gym', '/en/hobbies/gym.html'],
-  ['/hobbies/photography', '/en/hobbies/photography.html'],
-  ['/hobbies/car', '/en/hobbies/car.html'],
-  ['/hobbies/cooking', '/en/hobbies/cooking.html'],
-  ['/hobbies/whispers', '/en/hobbies/whispers.html'],
-  ['/hobbies/reading', '/en/hobbies/reading.html']
+  ['/hobbies/gym', `${enDirName}/hobbies/gym.html`],
+  ['/hobbies/photography', `${enDirName}/hobbies/photography.html`],
+  ['/hobbies/car', `${enDirName}/hobbies/car.html`],
+  ['/hobbies/cooking', `${enDirName}/hobbies/cooking.html`],
+  ['/hobbies/whispers', `${enDirName}/hobbies/whispers.html`],
+  ['/hobbies/reading', `${enDirName}/hobbies/reading.html`]
 ];
 
 hobbyReplacements.forEach(([oldUrl, newUrl]) => {
@@ -37,13 +40,13 @@ hobbyReplacements.forEach(([oldUrl, newUrl]) => {
 });
 
 // Update key pages - be more careful with these to avoid double-replacing
-content = content.replace('https://www.estivanayramia.com/\n', 'https://www.estivanayramia.com/en/index.html\n');
-content = content.replace('https://www.estivanayramia.com/projects/\n', 'https://www.estivanayramia.com/en/projects/index.html\n');
-content = content.replace('https://www.estivanayramia.com/hobbies/\n', 'https://www.estivanayramia.com/en/hobbies/index.html\n');
-content = content.replace('https://www.estivanayramia.com/about\n', 'https://www.estivanayramia.com/en/about.html\n');
-content = content.replace('https://www.estivanayramia.com/contact\n', 'https://www.estivanayramia.com/en/contact.html\n');
-content = content.replace('https://www.estivanayramia.com/overview\n', 'https://www.estivanayramia.com/en/overview.html\n');
-content = content.replace('https://www.estivanayramia.com/deep-dive\n', 'https://www.estivanayramia.com/en/deep-dive.html\n');
+content = content.replace('https://www.estivanayramia.com/\n', `https://www.estivanayramia.com${enDirName}/index.html\n`);
+content = content.replace('https://www.estivanayramia.com/projects/\n', `https://www.estivanayramia.com${enDirName}/projects/index.html\n`);
+content = content.replace('https://www.estivanayramia.com/hobbies/\n', `https://www.estivanayramia.com${enDirName}/hobbies/index.html\n`);
+content = content.replace('https://www.estivanayramia.com/about\n', `https://www.estivanayramia.com${enDirName}/about.html\n`);
+content = content.replace('https://www.estivanayramia.com/contact\n', `https://www.estivanayramia.com${enDirName}/contact.html\n`);
+content = content.replace('https://www.estivanayramia.com/overview\n', `https://www.estivanayramia.com${enDirName}/overview.html\n`);
+content = content.replace('https://www.estivanayramia.com/deep-dive\n', `https://www.estivanayramia.com${enDirName}/deep-dive.html\n`);
 
 fs.writeFileSync(llmsPath, content, 'utf8');
 

@@ -84,8 +84,28 @@
 /breaker                             /hobbies-games/block-breaker             301!
 
 # 2. Rewrites (200) - Serve content for clean URLs
-# Cloudflare Pages automatically handles extensionless URLs (e.g. /about -> about.html)
-# so explicit rewrites are not needed and can cause redirect loops.
+# Explicit rewrites to serve English pages from the /EN/ source-of-truth
+/                           /EN/index.html              200
+/about                      /EN/about.html              200
+/contact                    /EN/contact.html            200
+/deep-dive                  /EN/deep-dive.html          200
+/hobbies-games              /EN/hobbies-games.html      200
+/privacy                    /EN/privacy.html            200
+
+# Canonical redirects (keep these to avoid duplicate-indexing of .html paths)
+/about.html                 /about                       301!
+/contact.html               /contact                     301!
+/deep-dive.html             /deep-dive                   301!
+/hobbies-games.html         /hobbies-games               301!
+/privacy.html               /privacy                     301!
+
+# Optional: prevent /EN/* pages from being indexed directly (canonical to clean URLs)
+/EN/index.html              /                           301!
+/EN/about.html              /about                       301!
+/EN/contact.html            /contact                     301!
+/EN/deep-dive.html          /deep-dive                   301!
+/EN/hobbies-games.html      /hobbies-games               301!
+/EN/privacy.html            /privacy                     301!
 
 # 404 Fallback
 /404.html                    404

@@ -1,12 +1,13 @@
 {
   "cleanUrls": true,
   "rewrites": [
-    { "source": "/about", "destination": "/about.html" },
-    { "source": "/contact", "destination": "/contact.html" },
+    { "source": "/", "destination": "/EN/index.html" },
+    { "source": "/about", "destination": "/EN/about.html" },
+    { "source": "/contact", "destination": "/EN/contact.html" },
     { "source": "/projects", "destination": "/projects.html" },
-    { "source": "/hobbies-games", "destination": "/hobbies-games.html" },
-    { "source": "/deep-dive", "destination": "/deep-dive.html" },
-    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/hobbies-games", "destination": "/EN/hobbies-games.html" },
+    { "source": "/deep-dive", "destination": "/EN/deep-dive.html" },
+    { "source": "/privacy", "destination": "/EN/privacy.html" },
     { "source": "/hobbies/car", "destination": "/hobbies/car.html" },
     { "source": "/hobbies/cooking", "destination": "/hobbies/cooking.html" },
     { "source": "/hobbies/gym", "destination": "/hobbies/gym.html" },

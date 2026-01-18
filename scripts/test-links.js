@@ -162,10 +162,10 @@ function checkLinkExists(link) {
 function runLinkIntegrityTests() {
   console.log(`${colors.cyan}🔗 Testing Link Integrity...${colors.reset}\n`);
   
-  // Get all HTML files in /en/
-  const enDir = path.join(ROOT_DIR, 'en');
+  // Get all HTML files in /en/ or /EN/ (prefer EN when present)
+  const enDir = fs.existsSync(path.join(ROOT_DIR, 'EN')) ? path.join(ROOT_DIR, 'EN') : path.join(ROOT_DIR, 'en');
   if (!fs.existsSync(enDir)) {
-    fail('/en/ directory does not exist');
+    fail('/en/ or /EN/ directory does not exist');
     return;
   }
   
@@ -250,7 +250,7 @@ function runLinkIntegrityTests() {
   
   const hobbyPages = ['whispers.html', 'cooking.html', 'car.html'];
   hobbyPages.forEach(hobbyFile => {
-    const hobbyPath = path.join(ROOT_DIR, 'en', 'hobbies', hobbyFile);
+    const hobbyPath = path.join(enDir, 'hobbies', hobbyFile);
     if (fs.existsSync(hobbyPath)) {
       const hobbyContent = fs.readFileSync(hobbyPath, 'utf-8');
       const hasHead = /<head[\s>]/.test(hobbyContent);
@@ -267,7 +267,7 @@ function runLinkIntegrityTests() {
   // Test mini-game pages don't link to old root game URLs
   console.log(`\n${colors.cyan}🎮 Test Group: Mini-Game Links${colors.reset}`);
   
-  const gameTestPath = path.join(ROOT_DIR, 'en', 'hobbies-games', 'xx142-b2exe.html');
+  const gameTestPath = path.join(enDir, 'hobbies-games', 'xx142-b2exe.html');
   if (fs.existsSync(gameTestPath)) {
     const gameContent = fs.readFileSync(gameTestPath, 'utf-8');
     const badLinks = ['/2048.html', '/invaders.html', '/breaker.html', '/snake.html'];
