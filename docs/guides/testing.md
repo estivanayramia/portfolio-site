@@ -11,6 +11,26 @@ Service workers require HTTPS or localhost. Since you're testing locally, you ca
 
 ---
 
+## ✉️ Contact Form Smoke Tests (Playwright)
+
+These commands run on Windows and in CI.
+
+```powershell
+# CSP sanity check (reads /_headers and validates key directives)
+npm run check:csp
+
+# Mocked contact submission (safe; does NOT send a real Formspree message)
+npm run test:contact
+
+# Live contact submission (sends a real Formspree message; use sparingly)
+npm run test:contact:live
+```
+
+CI note: the mocked test runs against a local server (not production) to avoid
+flaky bot/cooldown behavior.
+
+---
+
 ## Option 1: Python HTTP Server (Built-in)
 
 ### Steps:
