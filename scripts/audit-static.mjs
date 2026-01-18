@@ -199,12 +199,20 @@ function runAudit() {
     }
 
     const reportPath = path.join(ROOT_DIR, 'docs', 'notes', 'en-move-regression-audit.md');
-    // Ensure dir exists
-    const reportDir = path.dirname(reportPath);
-    if (!fs.existsSync(reportDir)) fs.mkdirSync(reportDir, { recursive: true });
     
-    fs.writeFileSync(reportPath, report);
-    console.log(`Report written to ${reportPath}`);
+    // Check for write flag (CLI arg --write or env var WRITE_NOTES=1)
+    const shouldWrite = process.argv.includes('--write') || process.env.WRITE_NOTES === '1';
+
+    if (shouldWrite) {
+        // Ensure dir exists
+        const reportDir = path.dirname(reportPath);
+        if (!fs.existsSync(reportDir)) fs.mkdirSync(reportDir, { recursive: true });
+        
+        fs.writeFileSync(reportPath, report);
+        console.log(`Report written to ${reportPath}`);
+    } else {
+        console.log('Report generation skipped (use --write or WRITE_NOTES=1 to save to file).');
+    }
 
     if (allErrors.length > 0 || allGlyphs.length > 0) {
         console.error('Audit FAILED: Found issues.');
