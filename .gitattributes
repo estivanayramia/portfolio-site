@@ -1,0 +1,4 @@
+_redirects text eol=lf
+_headers text eol=lf
+tools/*.mjs text eol=lf
+EN/*.html text eol=lf
