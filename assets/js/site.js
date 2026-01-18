@@ -4043,7 +4043,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Define action labels for special handling
-        const projectLabels = ["Projects", "View Projects", "Projects & Case Studies", "View projects", "Proyectos", "Ver proyectos", "مشاريع", "عرض المشاريع"];
+        const projectLabels = ["Projects", "View Projects", "Projects", "View projects", "Proyectos", "Ver proyectos", "مشاريع", "عرض المشاريع"];
         const resumeLabels = ["Resume", "Download Resume", "View Resume", "Get resume", "Currículum", "Descargar currículum", "السيرة الذاتية", "تحميل السيرة"];
         const contactLabels = ["Contact", "Email", "Email Estivan", "Contact Estivan", "Contacto", "Correo electrónico", "اتصال", "البريد الإلكتروني"];
         const linkedinLabels = ["LinkedIn", "Open LinkedIn"];
