@@ -4,16 +4,10 @@
     <loc>https://www.estivanayramia.com/</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/es/</loc>
+    <loc>https://www.estivanayramia.com/about</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/ar/</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/404</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/about</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/contact</loc>
@@ -22,25 +16,10 @@
     <loc>https://www.estivanayramia.com/deep-dive</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies/car</loc>
+    <loc>https://www.estivanayramia.com/es/</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies/cooking</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/gym</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/photography</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/reading</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/whispers</loc>
+    <loc>https://www.estivanayramia.com/hobbies-games</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/hobbies-games/1024-moves</loc>
@@ -85,16 +64,34 @@
     <loc>https://www.estivanayramia.com/hobbies-games/xx142-b2exe</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/hobbies-games</loc>
+    <loc>https://www.estivanayramia.com/hobbies/</loc>
   </url>
   <url>
-    <loc>https://www.estivanayramia.com/</loc>
+    <loc>https://www.estivanayramia.com/hobbies/car</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/cooking</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/gym</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/photography</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/reading</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/whispers</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/overview</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/privacy</loc>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/projects/</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/competitive-strategy</loc>
@@ -107,9 +104,6 @@
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/documentation</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/projects/</loc>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/logistics</loc>

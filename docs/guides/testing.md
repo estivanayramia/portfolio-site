@@ -32,7 +32,7 @@ python -m SimpleHTTPServer 8000
 2. Go to **Application** tab
 3. Check **Manifest**: Should show icon, name, theme color
 4. Check **Service Workers**: Should show "activated and running"
-5. Go to **Cache Storage**: Should see "portfolio-v1" with 12 files
+5. Go to **Cache Storage**: Should see a cache like "portfolio-vYYYYMMDD-N"
 6. Turn on "Offline" mode and reload page
 7. Should still load (from cache)
 
@@ -91,28 +91,40 @@ Should show:
 - Check "Offline" to test offline mode
 
 ### 3. Check Cache Storage (Application > Cache Storage)
-Should show cache: `portfolio-v1`
-With files:
-```
-/ (index.html)
-/about.html
-/projects.html
-/deep-dive.html
-/contact.html
+Should show a cache name like: `portfolio-v<date>-<n>`
+(derived from `CACHE_VERSION` in `sw.js`).
+
+The cached HTML routes match `ASSETS_TO_CACHE` in `sw.js`
+and use clean URLs (not `.html`):
+
+```text
+/
+/about
+/contact
+/deep-dive
+/projects/
+/hobbies/
+/hobbies-games
+/privacy
 /overview
-/privacy.html
-/404.html (served from /EN/404.html)
+/EN/404.html
+```
+
+Plus static assets (CSS/JS/fonts/images) like:
+
+```text
 /assets/css/theme.css
 /assets/js/site.js
 ```
 
 ### 4. Test Offline Mode
+
 1. Load page once (while online)
 2. Check "Offline" checkbox in Service Workers
 3. Reload page (Ctrl+R)
 4. Should load from cache
 5. Navigate to other pages - should work
-6. Try accessing non-cached page - should show 404.html
+6. Try accessing a non-cached page - should fall back to `/EN/404.html`
 
 ---
 
@@ -152,7 +164,7 @@ With files:
 **Symptoms**: Changes not appearing after edit
 
 **Fixes**:
-1. Increment CACHE_NAME in sw.js (e.g., 'portfolio-v2')
+1. Increment `CACHE_VERSION` in `sw.js` (this changes the cache name)
 2. Unregister service worker in DevTools
 3. Clear cache storage
 4. Hard reload page
