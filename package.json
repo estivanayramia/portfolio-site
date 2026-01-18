@@ -21,7 +21,9 @@
         "audit:seo": "node tools/seo-check.mjs",
         "audit:lighthouse": "node scripts/lighthouse-audit.mjs https://www.estivanayramia.com",
         "audit:psi": "node scripts/psi-audit.mjs https://www.estivanayramia.com",
-        "test:contact": "node scripts/test-contact-form-playwright.cjs"
+        "check:csp": "node scripts/check-csp.cjs",
+        "test:contact": "MOCK_FORMSPREE=1 node scripts/test-contact-form-playwright.cjs",
+        "test:contact:live": "node scripts/test-contact-form-playwright.cjs"
     },
     "keywords": [
         "portfolio",

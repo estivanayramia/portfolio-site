@@ -1,8 +1,12 @@
 /* eslint-disable no-console */
+/* eslint-disable no-console */
 const { chromium } = require('playwright');
 
-const CONTACT_URL = `https://www.estivanayramia.com/contact?cb=${Date.now()}`;
+const DEFAULT_CONTACT_URL = `https://www.estivanayramia.com/contact?cb=${Date.now()}`;
+const CONTACT_URL = process.env.CONTACT_URL || DEFAULT_CONTACT_URL;
+
 const FORMSPREE_URL_PART = 'formspree.io/f/mblbnwoy';
+const MOCK_FORMSPREE = process.env.MOCK_FORMSPREE === '1';
 
 function fail(msg) {
   console.error(`FAIL: ${msg}`);
@@ -12,15 +16,21 @@ function fail(msg) {
 (async () => {
   const browser = await chromium.launch({ headless: true });
 
-  // Block SW to avoid stale caches affecting behavior
+  // Block SW (Service Worker) so stale caches cannot “help” you
   const context = await browser.newContext({
-    serviceWorkers: 'block'
+    serviceWorkers: 'block',
+    extraHTTPHeaders: {
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache',
+    },
   });
 
   const page = await context.newPage();
 
   const consoleErrors = [];
   const requestFailures = [];
+  let formspreeRequestSeen = false;
+  let formspreeResponse = null;
 
   page.on('console', (msg) => {
     if (msg.type() === 'error') consoleErrors.push(msg.text());
@@ -38,16 +48,25 @@ function fail(msg) {
     });
   });
 
-  let formspreeResponse = null;
+  // CI mode: mock Formspree so you do not spam yourself
+  if (MOCK_FORMSPREE) {
+    await page.route('https://formspree.io/**', async (route) => {
+      const req = route.request();
+      if (req.url().includes(FORMSPREE_URL_PART) && req.method() === 'POST') {
+        formspreeRequestSeen = true;
+      }
+      await route.fulfill({
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ ok: true }),
+      });
+    });
+  }
 
   page.on('response', async (res) => {
     const url = res.url();
     if (url.includes(FORMSPREE_URL_PART)) {
-      formspreeResponse = {
-        url,
-        status: res.status(),
-        ok: res.ok(),
-      };
+      formspreeResponse = { url, status: res.status(), ok: res.ok() };
     }
   });
 
@@ -57,7 +76,7 @@ function fail(msg) {
 
     await page.waitForSelector('#contact-form', { state: 'visible', timeout: 15000 });
 
-    // Wait out anti-bot timer (2.7s)
+    // Anti-bot: wait it out
     await page.waitForTimeout(2700);
 
     const stamp = Date.now();
@@ -67,28 +86,23 @@ function fail(msg) {
 
     await page.click('#contact-form button[type="submit"]');
 
+    // Success UI: #contact-status includes “Sent”
     await page.waitForFunction(() => {
       const el = document.querySelector('#contact-status');
       if (!el) return false;
       const t = (el.textContent || '').toLowerCase();
-      return t.includes('sent') || t.includes('thanks');
+      return t.includes('sent');
     }, { timeout: 20000 });
 
     const statusText = await page.textContent('#contact-status');
     console.log(`contact-status: ${statusText && statusText.trim()}`);
 
-    if (!formspreeResponse) {
-      fail('No network response observed to Formspree endpoint.');
+    if (MOCK_FORMSPREE) {
+      if (!formspreeRequestSeen) fail('MOCK_FORMSPREE=1 but no POST to Formspree endpoint was observed.');
     } else {
-      console.log(`Formspree response: ${formspreeResponse.status} ok=${formspreeResponse.ok}`);
-      if (!formspreeResponse.ok) {
-        fail(`Formspree response not ok (status=${formspreeResponse.status}).`);
-      }
-    }
-
-    const modalExists = await page.$('#contact-success-modal');
-    if (!modalExists) {
-      console.log('Note: #contact-success-modal not found in DOM. If success still works, ignore.');
+      if (!formspreeResponse) fail('No network response observed to Formspree endpoint.');
+      else if (!formspreeResponse.ok) fail(`Formspree response not ok (status=${formspreeResponse.status}).`);
+      else console.log(`Formspree response: ${formspreeResponse.status} ok=${formspreeResponse.ok}`);
     }
   } catch (e) {
     fail(String(e));
