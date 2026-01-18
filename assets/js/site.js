@@ -2236,17 +2236,17 @@ const translations = {
         },
         pinnedFollowUps: {
             en: {
-                projects: ["Show me your top project", "What tech stack do you use most?", "Any case studies?"],
+                projects: ["Show me your top project", "What tech stack do you use most?", "Any detailed examples?"],
                 resume: ["Summarize your experience", "What roles are you targeting?", "What are your strongest skills?"],
                 contact: ["Email", "LinkedIn", "Best way to reach you?"]
             },
             es: {
-                projects: ["Muéstrame tu mejor proyecto", "¿Qué stack tecnológico usas más?", "¿Algún caso de estudio?"],
+                projects: ["Muéstrame tu mejor proyecto", "¿Qué stack tecnológico usas más?", "¿Algún ejemplo detallado?"],
                 resume: ["Resume tu experiencia", "¿Qué roles buscas?", "¿Cuáles son tus habilidades más fuertes?"],
                 contact: ["Email", "LinkedIn", "¿Mejor forma de contactarte?"]
             },
             ar: {
-                projects: ["أرني أفضل مشروع لك", "ما هي التقنيات الأكثر استخداماً؟", "أي دراسات حالة؟"],
+                projects: ["أرني أفضل مشروع لك", "ما هي التقنيات الأكثر استخداماً؟", "أي أمثلة مفصلة؟"],
                 resume: ["لخص خبرتك", "ما هي الأدوار المستهدفة؟", "ما هي أقوى مهاراتك؟"],
                 contact: ["البريد الإلكتروني", "LinkedIn", "أفضل طريقة للتواصل؟"]
             }

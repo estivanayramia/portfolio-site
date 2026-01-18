@@ -118,7 +118,7 @@ Analytics are included on all HTML pages via:
 ```
 
 **Pages with analytics:**
-- All main pages (index, overview, deep-dive, about, projects, contact, case-studies, etc.)
+- All main pages (index, overview, deep-dive, about, projects, contact, etc.)
 - All project detail pages
 - All hobby pages
 - Language variants (es/index.html, ar/index.html)

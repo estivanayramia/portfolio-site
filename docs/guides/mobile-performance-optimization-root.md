@@ -186,7 +186,7 @@ Get-ChildItem -Include *.html -Recurse | ForEach-Object {
 - Main: index, about, overview, deep-dive, projects, contact
 - Hobbies: hobbies, hobby-car, hobby-cooking, hobby-gym, hobby-photography, hobby-reading, hobby-whispers
 - Projects: project-conflict, project-discipline, project-documentation, project-logistics, project-multilingual, project-portfolio
-- Special: hobbies-games, case-studies, privacy, 404
+- Special: hobbies-games, privacy, 404
 - Language variants: es/index.html, ar/index.html
 
 ---
@@ -392,7 +392,7 @@ Animating properties that trigger **paint** or **layout** instead of compositor-
 - Main: index, about, overview, deep-dive, projects, contact (6)
 - Hobbies: hobbies, hobby-* (7)
 - Projects: project-* (6)
-- Special: hobbies-games, case-studies, privacy, 404 (4)
+- Special: hobbies-games, privacy, 404 (4)
 - Language: es/index, ar/index (2)
 - Backup: hobbies-games-backup* (3 - updated for consistency)
 

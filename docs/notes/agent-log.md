@@ -113,7 +113,6 @@ Notes:
 404.html
 about.html
 ar/index.html
-case-studies.html
 contact.html
 deep-dive.html
 es/index.html
