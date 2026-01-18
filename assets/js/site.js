@@ -3031,26 +3031,26 @@ const __ensureStandardEnglishChrome = () => {
             header.className = 'fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10';
             header.innerHTML = `
         <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between gap-2">
-            <a href="/index.html" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
+            <a href="/" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
                 <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
                 <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
             </a>
             
             <!-- Main Navigation -->
             <ul class="hidden md:flex items-center space-x-8">
-                <li><a href="/index.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="home">Home</a></li>
-                <li><a href="/projects.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="projects">Projects</a></li>
-                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="overview">Overview</a></li>
-                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="deep-dive">Deep Dive</a></li>
-                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="about">About</a></li>
-                <li><a href="/contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
+                <li><a href="/" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="home">Home</a></li>
+                <li><a href="/projects" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="projects">Projects</a></li>
+                <li><a href="/overview" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="overview">Overview</a></li>
+                <li><a href="/deep-dive" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="deep-dive">Deep Dive</a></li>
+                <li><a href="/about" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="about">About</a></li>
+                <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
             </ul>
             
             <!-- Language Switcher -->
             <div id="lang-switcher" class="flex items-center space-x-3 shrink-0" style="z-index: 20;">
                 <a href="#" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-lang-key="en">EN</a>
-                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
-                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
+                <a href="/es/" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
+                <a href="/ar/" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
             </div>
             
             <!-- Dark Mode Toggle -->
@@ -3067,12 +3067,12 @@ const __ensureStandardEnglishChrome = () => {
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
             <ul class="px-6 py-4 space-y-3">
-                <li><a href="/index.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="home">Home</a></li>
-                <li><a href="/projects.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="projects">Projects</a></li>
-                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="overview">Overview</a></li>
-                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="deep-dive">Deep Dive</a></li>
-                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="about">About</a></li>
-                <li><a href="/contact.html" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
+                <li><a href="/" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="home">Home</a></li>
+                <li><a href="/projects" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="projects">Projects</a></li>
+                <li><a href="/overview" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="overview">Overview</a></li>
+                <li><a href="/deep-dive" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="deep-dive">Deep Dive</a></li>
+                <li><a href="/about" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="about">About</a></li>
+                <li><a href="/contact" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
             </ul>
         </div>
             `;
@@ -3092,7 +3092,7 @@ const __ensureStandardEnglishChrome = () => {
                 const enLink = header.querySelector('[data-lang-key="en"]');
                 if (enLink) {
                     const p = window.location.pathname || '/';
-                    enLink.href = (p === '/' ? '/index.html' : p);
+                    enLink.href = (p === '/' ? '/' : p.replace(/\/index\.html$/i, '/').replace(/\.html$/i, ''));
                 }
             } catch (e) {}
         }
@@ -3117,10 +3117,10 @@ const __ensureStandardEnglishChrome = () => {
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
-                        <li><a href="/deep-dive.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/overview" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/deep-dive" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
                         <li><a href="/projects/" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
-                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                        <li><a href="/about" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
                     </ul>
                 </div>
                 <div class="space-y-4">
@@ -3128,9 +3128,9 @@ const __ensureStandardEnglishChrome = () => {
                     <ul class="space-y-2">
                         <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
                         <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
-                        <li><a href="/contact.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="/contact" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
                         <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
-                        <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                        <li><a href="/privacy" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -3236,21 +3236,21 @@ const __shuffleInPlace = (arr, rnd) => {
 };
 
 const __GAME_CATALOG = [
-    { id: 'snake', href: '/snake.html', emoji: '🐍', title: 'Snake', subtitle: 'Classic growth game' },
-    { id: 'breaker', href: '/breaker.html', emoji: '🧱', title: 'Block Breaker', subtitle: 'Smash the bricks' },
-    { id: '2048', href: '/2048.html', emoji: '🧩', title: '2048', subtitle: 'Merge the numbers' },
-    { id: 'invaders', href: '/invaders.html', emoji: '👾', title: 'Space Invaders', subtitle: 'Defend the earth' },
-    { id: 'racer', href: '/hobbies-games/racer.html', emoji: '🏎️', title: 'Racer', subtitle: 'Fast reflex racing' },
-    { id: 'oh-flip', href: '/hobbies-games/oh-flip.html', emoji: '🤸', title: 'Oh Flip', subtitle: 'Timing + tricks' },
-    { id: 'onoff', href: '/hobbies-games/onoff.html', emoji: '⚡', title: 'ON/OFF', subtitle: 'Switch-based puzzle' },
-    { id: '1024-moves', href: '/hobbies-games/1024-moves.html', emoji: '🧠', title: '1024 Moves', subtitle: 'Move-limited strategy' },
-    { id: 'back-attacker', href: '/hobbies-games/back-attacker.html', emoji: '🛡️', title: 'Back Attacker', subtitle: 'Survive the attacks' },
-    { id: 'nano-wirebot', href: '/hobbies-games/nano-wirebot.html', emoji: '🤖', title: 'Nano Wirebot', subtitle: 'Precision platforming' },
-    { id: 'off-the-line', href: '/hobbies-games/off-the-line.html', emoji: '🧷', title: 'Off The Line', subtitle: 'Don’t cross the line' },
-    { id: 'pizza-undelivery', href: '/hobbies-games/pizza-undelivery.html', emoji: '🍕', title: 'Pizza Undelivery', subtitle: 'Fast food chaos' },
-    { id: 'the-matr13k', href: '/hobbies-games/the-matr13k.html', emoji: '🧬', title: 'The Matr13k', subtitle: 'Pattern puzzle' },
-    { id: 'triangle-back-to-home', href: '/hobbies-games/triangle-back-to-home.html', emoji: '🔺', title: 'Triangle: Back to Home', subtitle: 'Geometry adventure' },
-    { id: 'xx142-b2exe', href: '/hobbies-games/xx142-b2exe.html', emoji: '🧪', title: 'XX142-B2EXE', subtitle: 'Experimental arcade' }
+    { id: 'snake', href: '/hobbies-games/snake', emoji: '🐍', title: 'Snake', subtitle: 'Classic growth game' },
+    { id: 'breaker', href: '/hobbies-games/block-breaker', emoji: '🧱', title: 'Block Breaker', subtitle: 'Smash the bricks' },
+    { id: '2048', href: '/hobbies-games/2048', emoji: '🧩', title: '2048', subtitle: 'Merge the numbers' },
+    { id: 'invaders', href: '/hobbies-games/space-invaders', emoji: '👾', title: 'Space Invaders', subtitle: 'Defend the earth' },
+    { id: 'racer', href: '/hobbies-games/racer', emoji: '🏎️', title: 'Racer', subtitle: 'Fast reflex racing' },
+    { id: 'oh-flip', href: '/hobbies-games/oh-flip', emoji: '🤸', title: 'Oh Flip', subtitle: 'Timing + tricks' },
+    { id: 'onoff', href: '/hobbies-games/onoff', emoji: '⚡', title: 'ON/OFF', subtitle: 'Switch-based puzzle' },
+    { id: '1024-moves', href: '/hobbies-games/1024-moves', emoji: '🧠', title: '1024 Moves', subtitle: 'Move-limited strategy' },
+    { id: 'back-attacker', href: '/hobbies-games/back-attacker', emoji: '🛡️', title: 'Back Attacker', subtitle: 'Survive the attacks' },
+    { id: 'nano-wirebot', href: '/hobbies-games/nano-wirebot', emoji: '🤖', title: 'Nano Wirebot', subtitle: 'Precision platforming' },
+    { id: 'off-the-line', href: '/hobbies-games/off-the-line', emoji: '🧷', title: 'Off The Line', subtitle: 'Don’t cross the line' },
+    { id: 'pizza-undelivery', href: '/hobbies-games/pizza-undelivery', emoji: '🍕', title: 'Pizza Undelivery', subtitle: 'Fast food chaos' },
+    { id: 'the-matr13k', href: '/hobbies-games/the-matr13k', emoji: '🧬', title: 'The Matr13k', subtitle: 'Pattern puzzle' },
+    { id: 'triangle-back-to-home', href: '/hobbies-games/triangle-back-to-home', emoji: '🔺', title: 'Triangle: Back to Home', subtitle: 'Geometry adventure' },
+    { id: 'xx142-b2exe', href: '/hobbies-games/xx142-b2exe', emoji: '🧪', title: 'XX142-B2EXE', subtitle: 'Experimental arcade' }
 ];
 
 const __renderSuggestionGrid = (gridEl, opts) => {

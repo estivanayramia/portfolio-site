@@ -73,9 +73,22 @@
 /hobbies-games/triangle-back-to-home.html /hobbies-games/triangle-back-to-home     301!
 /hobbies-games/xx142-b2exe.html           /hobbies-games/xx142-b2exe               301!
 
+# Consolidate Root Games to Hobbies-Games
+/snake.html                          /hobbies-games/snake                     301!
+/snake                               /hobbies-games/snake                     301!
+/2048.html                           /hobbies-games/2048                      301!
+/2048                                /hobbies-games/2048                      301!
+/invaders.html                       /hobbies-games/space-invaders            301!
+/invaders                            /hobbies-games/space-invaders            301!
+/breaker.html                        /hobbies-games/block-breaker             301!
+/breaker                             /hobbies-games/block-breaker             301!
+
 # 2. Rewrites (200) - Serve content for clean URLs
 # Cloudflare Pages automatically handles extensionless URLs (e.g. /about -> about.html)
 # so explicit rewrites are not needed and can cause redirect loops.
 
 # 404 Fallback
 /404.html                    404
+
+/project-conflict.html /projects/conflict 301!
+/project-conflict /projects/conflict 301!
