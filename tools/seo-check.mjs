@@ -11,7 +11,7 @@ function readUtf8(p) {
 function listAllHtml(dir) {
   const out = [];
   for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (ent.name === "node_modules" || ent.name === ".git" || ent.name === "tools") continue;
+    if (ent.name === "node_modules" || ent.name === ".git" || ent.name === "tools" || ent.name === ".vscode_restore_backup") continue;
     const p = path.join(dir, ent.name);
     if (ent.isDirectory()) out.push(...listAllHtml(p));
     else if (ent.isFile() && ent.name.endsWith(".html")) out.push(p);

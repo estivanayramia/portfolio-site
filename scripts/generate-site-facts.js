@@ -107,11 +107,8 @@ function parseProjectsIndex(indexPath) {
     const tags = extractCardTags(cardHtml);
     
     if (title && link) {
-      // Prepend /en/ to the canonical path if not already present
+      // Use clean URL path
       let canonicalPath = toCanonicalPath(link);
-      if (!canonicalPath.startsWith('/en/')) {
-        canonicalPath = '/en' + canonicalPath;
-      }
       
       projects.push({
         id: generateId(title),
@@ -119,7 +116,7 @@ function parseProjectsIndex(indexPath) {
         summary: summary || title,
         url: canonicalPath,
         fullUrl: `${BASE_URL}${canonicalPath}`,
-        filePath: link.startsWith('/en/') ? link : '/en' + link,
+        filePath: link,
         tags
       });
     }
@@ -147,11 +144,8 @@ function parseHobbiesIndex(indexPath) {
     const link = extractCardLink(cardHtml);
     
     if (title && link) {
-      // Prepend /en/ to the canonical path if not already present
+      // Use clean URL path
       let canonicalPath = toCanonicalPath(link);
-      if (!canonicalPath.startsWith('/en/')) {
-        canonicalPath = '/en' + canonicalPath;
-      }
       
       hobbies.push({
         id: generateId(title),
@@ -159,7 +153,7 @@ function parseHobbiesIndex(indexPath) {
         summary: summary || title,
         url: canonicalPath,
         fullUrl: `${BASE_URL}${canonicalPath}`,
-        filePath: link.startsWith('/en/') ? link : '/en' + link
+        filePath: link,
       });
     }
   }
@@ -208,7 +202,8 @@ function validateFacts(siteFacts, rootDir) {
   const allItems = [...siteFacts.projects, ...siteFacts.hobbies];
   for (const item of allItems) {
     const filePath = path.join(rootDir, item.filePath);
-    if (!fs.existsSync(filePath)) {
+    // Check for file as-is, or with .html extension (for clean URLs)
+    if (!fs.existsSync(filePath) && !fs.existsSync(filePath + '.html')) {
       errors.push(`HTML file not found: ${item.filePath} (for "${item.title}")`);
     }
   }
@@ -229,14 +224,14 @@ function generateSiteFacts() {
   
   // Parse projects
   console.log('📁 Parsing projects...');
-  const projectsIndexPath = path.join(ROOT_DIR, 'en', 'projects', 'index.html');
+  const projectsIndexPath = path.join(ROOT_DIR, 'projects', 'index.html');
   const projects = parseProjectsIndex(projectsIndexPath);
   projects.forEach(p => console.log(`   → ${p.title}`));
   console.log(`✅ Found ${projects.length} projects\n`);
   
   // Parse hobbies
   console.log('🎨 Parsing hobbies...');
-  const hobbiesIndexPath = path.join(ROOT_DIR, 'en', 'hobbies', 'index.html');
+  const hobbiesIndexPath = path.join(ROOT_DIR, 'hobbies', 'index.html');
   const hobbies = parseHobbiesIndex(hobbiesIndexPath);
   hobbies.forEach(h => console.log(`   → ${h.title}`));
   console.log(`✅ Found ${hobbies.length} hobbies\n`);

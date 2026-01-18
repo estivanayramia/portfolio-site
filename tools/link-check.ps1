@@ -15,7 +15,9 @@ $knownRoutes = @(
     "/privacy.html"
 )
 
-$files = Get-ChildItem -Path $RootPath -Filter *.html -File | Where-Object { $_.DirectoryName -eq $RootPath }
+$files = Get-ChildItem -Path $RootPath -Filter *.html -File -Recurse | Where-Object { 
+    $_.FullName -notmatch "node_modules|tools|\.git|\.vscode" 
+}
 
 $missing = @()
 

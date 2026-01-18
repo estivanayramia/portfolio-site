@@ -98,9 +98,8 @@ function updateHtmlContent() {
 
         const fullUrl = siteUrl + (cleanPath === '/' ? '' : cleanPath);
 
-        // A. Update Internal Links (href="foo.html" -> href="foo")
-        // Regex to find .html links that are likely internal
-        // Matches href="/foo.html", href="foo.html"
+        // A. Update Internal Links (strip trailing .html)
+        // Regex to find internal href values ending with .html
         content = content.replace(/href=(["'])([^"']+)\.html\1/g, (match, quote, url) => {
             // Don't touch external links
             if (url.startsWith('http')) return match;
@@ -139,7 +138,7 @@ function updateHtmlContent() {
         }
 
         // F. Update JSON-LD "url"
-        // Look for "url": "https://www.estivanayramia.com/foo.html"
+        // Look for JSON-LD url values that end with .html for the known domain
         // We'll use a specific regex for the known domain to be safe
         const jsonLdUrlRegex = /"url":\s*"https:\/\/www\.estivanayramia\.com\/([^"]+)\.html"/g;
         content = content.replace(jsonLdUrlRegex, (match, slug) => {
