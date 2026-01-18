@@ -10,7 +10,7 @@
         "upload:facts": "cd worker && wrangler kv key put --remote --binding SAVONIE_KV site-facts:v1 --path ../assets/data/site-facts.json",
         "build": "npm run build:facts && npm run build:css && npm run build:js && npm run build:lazy && npm run upload:facts",
         "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
-        "start": "serve . -p 5500",
+        "start": "node scripts/local-serve.js",
         "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push",
         "dev:worker": "cd worker && npx wrangler dev",
         "deploy:worker": "cd worker && npx wrangler deploy",

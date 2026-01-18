@@ -19,6 +19,17 @@ const SITE_FACTS_PATH = path.join(ROOT_DIR, 'assets', 'data', 'site-facts.json')
 const WORKER_PATH = path.join(ROOT_DIR, 'worker', 'worker.js');
 const LLMS_TXT_PATH = path.join(ROOT_DIR, 'llms.txt');
 
+function normalizeRepoRelativePath(maybeAbsolutePath) {
+  return String(maybeAbsolutePath || '').replace(/^\/+/, '');
+}
+
+function getContentPath(relPath) {
+  const normalized = normalizeRepoRelativePath(relPath);
+  const enCandidate = path.join(ROOT_DIR, 'EN', normalized);
+  if (fs.existsSync(enCandidate)) return enCandidate;
+  return path.join(ROOT_DIR, normalized);
+}
+
 // Test results tracker
 let passed = 0;
 let failed = 0;
@@ -111,9 +122,9 @@ try {
 if (workerContent) {
   // Check for INCORRECT legacy URLs (without /en/ prefix)
   const incorrectLegacyPatterns = [
-    { pattern: '/projects.html', correct: '/en/projects/index.html' },
-    { pattern: '/project-logistics.html', correct: '/en/projects/logistics.html' },
-    { pattern: '/project-conflict.html', correct: '/en/projects/competitive-strategy.html' }
+    { pattern: '/projects.html', correct: '/projects/' },
+    { pattern: '/project-logistics.html', correct: '/projects/logistics' },
+    { pattern: '/project-conflict.html', correct: '/projects/competitive-strategy' }
   ];
   
   // Remove comments for checking
@@ -124,10 +135,10 @@ if (workerContent) {
     test(`No incorrect legacy URL: ${pattern}`, !found, found ? `Should use ${correct}` : '');
   });
   
-  // Check that worker DOES have correct /en/ URLs
-  test('Has correct /en/projects/ URLs', noComments.includes('/en/projects/') || noComments.includes('/en/projects)'));
-  test('Has correct /en/hobbies/ URLs', noComments.includes('/en/hobbies/') || noComments.includes('/en/hobbies)'));
-  test('Has correct /en/contact URL (canonical)', noComments.includes('/en/contact)') || noComments.includes('/en/contact '));
+  // Check that worker DOES have correct canonical URLs
+  test('Has canonical /projects/ URLs', noComments.includes('/projects/') || noComments.includes('/projects)'));
+  test('Has canonical /hobbies/ URLs', noComments.includes('/hobbies/') || noComments.includes('/hobbies)'));
+  test('Has canonical /contact URL', noComments.includes('/contact)') || noComments.includes('/contact '));
   
   // Check siteFacts is embedded
   test('siteFacts is embedded', workerContent.includes('const siteFacts') || workerContent.includes('fallbackFacts'));
@@ -170,8 +181,8 @@ console.log('\n🔧 Test Group: L\'Oréal Handler');
 
 // Check that the L'Oréal project exists with correct canonical URL
 if (siteFacts?.projects) {
-  const lorealProject = siteFacts.projects.find(p => p.url === '/en/projects/logistics');
-  test('L\'Oréal project exists with canonical URL', !!lorealProject, lorealProject?.url || '/en/projects/logistics');
+  const lorealProject = siteFacts.projects.find(p => p.url === '/projects/logistics');
+  test('L\'Oréal project exists with canonical URL', !!lorealProject, lorealProject?.url || '/projects/logistics');
   
   if (lorealProject) {
     test('L\'Oréal project has title', !!lorealProject.title);
@@ -187,7 +198,7 @@ if (siteFacts?.projects) {
   // Verify worker embeds siteFacts correctly with canonical URLs (no .html)
   const workerContents = fs.readFileSync(WORKER_PATH, 'utf-8');
   test('Worker has L\'Oréal in embedded siteFacts with canonical URL', 
-    workerContents.includes('/en/projects/logistics"') || workerContents.includes('/en/projects/logistics\'')
+    workerContents.includes('/projects/logistics"') || workerContents.includes('/projects/logistics\'')
   );
 }
 
@@ -198,9 +209,9 @@ if (siteFacts?.projects) {
 console.log('\n📁 Test Group: File Existence');
 
 const criticalFiles = [
-  'en/index.html',
-  'en/projects/index.html',
-  'en/hobbies/index.html',
+  'EN/index.html',
+  'EN/projects/index.html',
+  'EN/hobbies/index.html',
   'assets/js/site.min.js',
   'assets/css/style.css',
   'robots.txt',
@@ -219,7 +230,7 @@ if (siteFacts?.projects) {
   siteFacts.projects.forEach(p => {
     const filePath = p.filePath || p.path;
     if (filePath) {
-      const exists = fs.existsSync(path.join(ROOT_DIR, filePath));
+      const exists = fs.existsSync(getContentPath(filePath));
       test(`Project file: ${filePath}`, exists);
     }
   });
@@ -230,7 +241,7 @@ if (siteFacts?.hobbies) {
   siteFacts.hobbies.forEach(h => {
     const filePath = h.filePath || h.path;
     if (filePath) {
-      const exists = fs.existsSync(path.join(ROOT_DIR, filePath));
+      const exists = fs.existsSync(getContentPath(filePath));
       test(`Hobby file: ${filePath}`, exists);
     }
   });

@@ -92,6 +92,18 @@
 /hobbies-games              /EN/hobbies-games.html      200
 /privacy                    /EN/privacy.html            200
 
+# Sections served from /EN source-of-truth
+/projects/                  /EN/projects/index.html                 200
+/projects/*                 /EN/projects/:splat.html                200
+
+/hobbies/                   /EN/hobbies/index.html                  200
+/hobbies/*                  /EN/hobbies/:splat.html                 200
+
+# /hobbies-games is the arcade page (already rewritten to /EN/hobbies-games.html)
+# But /hobbies-games/ should not 404
+/hobbies-games/             /hobbies-games                          301!
+/hobbies-games/*            /EN/hobbies-games/:splat.html           200
+
 # Canonical redirects (keep these to avoid duplicate-indexing of .html paths)
 /about.html                 /about                       301!
 /contact.html               /contact                     301!

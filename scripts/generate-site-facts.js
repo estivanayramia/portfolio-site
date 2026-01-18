@@ -18,6 +18,17 @@ const ROOT_DIR = path.join(__dirname, '..');
 const OUTPUT_PATH = path.join(ROOT_DIR, 'assets', 'data', 'site-facts.json');
 const BASE_URL = 'https://www.estivanayramia.com';
 
+function normalizeRepoRelativePath(maybeAbsolutePath) {
+  return String(maybeAbsolutePath || '').replace(/^\/+/, '');
+}
+
+function getContentPath(relPath) {
+  const normalized = normalizeRepoRelativePath(relPath);
+  const enCandidate = path.join(ROOT_DIR, 'EN', normalized);
+  if (fs.existsSync(enCandidate)) return enCandidate;
+  return path.join(ROOT_DIR, normalized);
+}
+
 // Banned terms that should NEVER appear in generated facts
 // If these are found, the build fails
 const BANNED_TERMS = [
@@ -201,7 +212,7 @@ function validateFacts(siteFacts, rootDir) {
   // 4. Verify all file paths exist
   const allItems = [...siteFacts.projects, ...siteFacts.hobbies];
   for (const item of allItems) {
-    const filePath = path.join(rootDir, item.filePath);
+    const filePath = getContentPath(item.filePath);
     // Check for file as-is, or with .html extension (for clean URLs)
     if (!fs.existsSync(filePath) && !fs.existsSync(filePath + '.html')) {
       errors.push(`HTML file not found: ${item.filePath} (for "${item.title}")`);
@@ -224,14 +235,14 @@ function generateSiteFacts() {
   
   // Parse projects
   console.log('📁 Parsing projects...');
-  const projectsIndexPath = path.join(ROOT_DIR, 'projects', 'index.html');
+  const projectsIndexPath = getContentPath(path.join('projects', 'index.html'));
   const projects = parseProjectsIndex(projectsIndexPath);
   projects.forEach(p => console.log(`   → ${p.title}`));
   console.log(`✅ Found ${projects.length} projects\n`);
   
   // Parse hobbies
   console.log('🎨 Parsing hobbies...');
-  const hobbiesIndexPath = path.join(ROOT_DIR, 'hobbies', 'index.html');
+  const hobbiesIndexPath = getContentPath(path.join('hobbies', 'index.html'));
   const hobbies = parseHobbiesIndex(hobbiesIndexPath);
   hobbies.forEach(h => console.log(`   → ${h.title}`));
   console.log(`✅ Found ${hobbies.length} hobbies\n`);
