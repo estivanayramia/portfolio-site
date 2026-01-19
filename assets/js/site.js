@@ -2639,7 +2639,7 @@ const initPWA = () => {
         });
 
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
+            navigator.serviceWorker.register('/sw.js?v=v20260119-5')
                 .then((registration) => {
 
                     // Best-effort: check for updates at most once per session.
