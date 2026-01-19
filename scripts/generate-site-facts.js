@@ -25,8 +25,16 @@ function normalizeRepoRelativePath(maybeAbsolutePath) {
 function getContentPath(relPath) {
   const normalized = normalizeRepoRelativePath(relPath);
   const enCandidate = path.join(ROOT_DIR, 'EN', normalized);
-  if (fs.existsSync(enCandidate)) return enCandidate;
-  return path.join(ROOT_DIR, normalized);
+  if (
+    fs.existsSync(enCandidate) ||
+    fs.existsSync(enCandidate + '.html') ||
+    fs.existsSync(path.join(enCandidate, 'index.html'))
+  ) {
+    return enCandidate;
+  }
+
+  const candidate = path.join(ROOT_DIR, normalized);
+  return candidate;
 }
 
 // Banned terms that should NEVER appear in generated facts
