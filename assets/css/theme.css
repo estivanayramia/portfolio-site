@@ -823,6 +823,20 @@ select {
     color: #e1d4c2 !important;
 }
 
+/* Contact form: ensure inquiry type select stays readable in dark mode */
+[data-theme="dark"] #inquiry-type {
+    color: #362017 !important; /* chocolate brown */
+    -webkit-text-fill-color: #362017 !important;
+    background-color: #e1d4c2 !important;
+    border-color: rgba(54, 32, 23, 0.25) !important;
+}
+
+/* Best-effort option theming (browser/OS may override native menus) */
+[data-theme="dark"] #inquiry-type option {
+    color: #362017;
+    background-color: #e1d4c2;
+}
+
 [data-theme="dark"] input::placeholder,
 [data-theme="dark"] textarea::placeholder {
     color: rgba(225, 212, 194, 0.5) !important;
