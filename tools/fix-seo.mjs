@@ -128,7 +128,17 @@ function generateRedirects() {
     generatedLines.push('');
     generatedLines.push('# Clean URL rewrites (200) -> serve from /EN/');
     for (const [canonical, enFile] of [...canonicalToEnFile.entries()].sort(([a], [b]) => a.localeCompare(b))) {
-        generatedLines.push(`${canonical}    /${enFile}    200`);
+        // For directory canonicals (ending with /), rewrite to directory path, not index.html
+        // This avoids Cloudflare Pages rewrite failures with explicit index.html targets
+        let target;
+        if (canonical !== '/' && canonical.endsWith('/') && enFile.endsWith('/index.html')) {
+            // Directory route: /hobbies/ -> /EN/hobbies/ (not /EN/hobbies/index.html)
+            target = '/' + enFile.replace('/index.html', '/');
+        } else {
+            // File route or root: use literal file path
+            target = '/' + enFile;
+        }
+        generatedLines.push(`${canonical}    ${target}    200`);
     }
 
     generatedLines.push('');

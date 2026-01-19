@@ -26,6 +26,31 @@ if (!rootRewriteRe.test(redirects)) {
   );
 }
 
+// Check directory routes rewrite to directory paths (not index.html)
+// This prevents Cloudflare Pages rewrite failures
+const hobbiesRewriteRe = /^\/hobbies\/\s+\/EN\/hobbies\/\s+200\s*$/m;
+const projectsRewriteRe = /^\/projects\/\s+\/EN\/projects\/\s+200\s*$/m;
+
+if (!hobbiesRewriteRe.test(redirects)) {
+  fail(
+    "_redirects does not include '/hobbies/  /EN/hobbies/  200' (must rewrite to directory, not index.html).",
+  );
+}
+
+if (!projectsRewriteRe.test(redirects)) {
+  fail(
+    "_redirects does not include '/projects/  /EN/projects/  200' (must rewrite to directory, not index.html).",
+  );
+}
+
+// Fail if any directory canonical rewrites to index.html (regression guard)
+const badDirectoryRewriteRe = /^\/[^/]+\/\s+\/EN\/[^/]+\/index\.html\s+200\s*$/m;
+if (badDirectoryRewriteRe.test(redirects)) {
+  fail(
+    "_redirects contains directory route rewriting to index.html (should rewrite to directory path).",
+  );
+}
+
 console.log(
-  `[verify-pages-output] OK. Found _redirects in "${outDir}" with expected root rewrite.`,
+  `[verify-pages-output] OK. Found _redirects in "${outDir}" with expected rewrites (root + directory routes).`,
 );
