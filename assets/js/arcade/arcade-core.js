@@ -205,9 +205,9 @@ window.ArcadeAchievements = {
 
             return `
                 <div class="mb-8 last:mb-0">
-                    <h3 class="font-bold text-lg mb-3 sticky top-0 bg-indigodeep text-beige dark:bg-[#212842] py-2 z-10 border-b border-black/5 dark:border-white/5 flex items-center gap-2">
+                    <h3 class="font-bold text-lg mb-3 sticky top-0 bg-indigodeep text-beige py-2 z-10 border-b border-white/10 dark:border-white/5 flex items-center gap-2">
                         ${title}
-                        <span class="text-xs font-normal opacity-50 bg-white/10 dark:bg-white/10 px-2 py-0.5 rounded-full">${achievements.filter(a => unlocked.includes(a.id)).length}/${achievements.length}</span>
+                        <span class="text-xs font-normal text-beige/90 bg-white/10 px-2 py-0.5 rounded-full">${achievements.filter(a => unlocked.includes(a.id)).length}/${achievements.length}</span>
                     </h3>
                     ${difficultySections}
                 </div>
