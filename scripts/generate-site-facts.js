@@ -106,6 +106,33 @@ function toCanonicalPath(filePath) {
   return filePath.replace(/\.html$/, '');
 }
 
+// Convert a canonical route (e.g. "/projects/portfolio") to a real content file path
+// (e.g. "/projects/portfolio.html" or "/projects/index.html") for repo verification.
+function toContentFilePath(routePath) {
+  const link = String(routePath || '');
+  const normalized = normalizeRepoRelativePath(link);
+  const enCandidate = path.join(ROOT_DIR, 'EN', normalized);
+
+  // If the link already points at a concrete file that exists (rare), keep it.
+  if (fs.existsSync(enCandidate)) {
+    return link;
+  }
+
+  // Most pages are served as clean URLs but stored as .html in EN/
+  if (fs.existsSync(enCandidate + '.html')) {
+    return link.endsWith('.html') ? link : (link + '.html');
+  }
+
+  // Directory-based routes
+  if (fs.existsSync(path.join(enCandidate, 'index.html'))) {
+    const withSlash = link.endsWith('/') ? link : (link + '/');
+    return withSlash + 'index.html';
+  }
+
+  // Fallback: keep original (validation will catch missing files)
+  return link;
+}
+
 // Parse projects from index page
 function parseProjectsIndex(indexPath) {
   const html = fs.readFileSync(indexPath, 'utf-8');
@@ -135,7 +162,7 @@ function parseProjectsIndex(indexPath) {
         summary: summary || title,
         url: canonicalPath,
         fullUrl: `${BASE_URL}${canonicalPath}`,
-        filePath: link,
+        filePath: toContentFilePath(canonicalPath),
         tags
       });
     }
@@ -172,7 +199,7 @@ function parseHobbiesIndex(indexPath) {
         summary: summary || title,
         url: canonicalPath,
         fullUrl: `${BASE_URL}${canonicalPath}`,
-        filePath: link,
+        filePath: toContentFilePath(canonicalPath),
       });
     }
   }

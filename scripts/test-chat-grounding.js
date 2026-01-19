@@ -25,9 +25,25 @@ function normalizeRepoRelativePath(maybeAbsolutePath) {
 
 function getContentPath(relPath) {
   const normalized = normalizeRepoRelativePath(relPath);
-  const enCandidate = path.join(ROOT_DIR, 'EN', normalized);
-  if (fs.existsSync(enCandidate)) return enCandidate;
-  return path.join(ROOT_DIR, normalized);
+
+  const enBase = path.join(ROOT_DIR, "EN", normalized);
+  const rootBase = path.join(ROOT_DIR, normalized);
+
+  const candidates = [
+    enBase,
+    `${enBase}.html`,
+    path.join(enBase, "index.html"),
+    rootBase,
+    `${rootBase}.html`,
+    path.join(rootBase, "index.html"),
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+
+  // Return the most likely path for debugging output
+  return enBase;
 }
 
 // Test results tracker

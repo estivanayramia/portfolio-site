@@ -12,6 +12,7 @@
 
 // In-memory cache for site facts (expires after 1 hour)
 let cachedSiteFacts = null;
+let cachedSiteFactsSource = "unknown"; // "kv" | "fallback" | "unknown"
 let cacheTimestamp = 0;
 const CACHE_TTL_MS = 3600000; // 1 hour
 
@@ -32,6 +33,7 @@ async function getSiteFacts(env) {
     const kvData = await env.SAVONIE_KV.get("site-facts:v1", { type: "json" });
     if (kvData && kvData.projects && kvData.hobbies) {
       cachedSiteFacts = kvData;
+      cachedSiteFactsSource = "kv";
       cacheTimestamp = now;
       console.log(`✅ Loaded site facts from KV (${kvData.projects.length} projects, ${kvData.hobbies.length} hobbies)`);
       return cachedSiteFacts;
@@ -40,27 +42,112 @@ async function getSiteFacts(env) {
     console.error("⚠️ KV fetch failed, using fallback:", error.message);
   }
   
-  // Fallback: minimal embedded facts (should never be needed after KV upload)
+  // Fallback: embedded facts (must stay in sync with assets/data/site-facts.json)
   const fallbackFacts = {
     projects: [
-      { id: "portfolio", title: "This Website (Every Line)", summary: "Hand-coded portfolio with no templates.", url: "/projects/portfolio", fullUrl: "https://www.estivanayramia.com/projects/portfolio" },
-      { id: "loreal", title: "L'Oréal Cell BioPrint MAPS Campaign", summary: "Campaign strategy deck.", url: "/projects/logistics", fullUrl: "https://www.estivanayramia.com/projects/logistics" },
-      { id: "franklin", title: "Franklin Templeton Class Concept", summary: "17-page concept deck.", url: "/projects/discipline", fullUrl: "https://www.estivanayramia.com/projects/discipline" },
-      { id: "endpoint-linkedin", title: "EndPoint LinkedIn Campaign", summary: "Retargeting campaign deck.", url: "/projects/documentation", fullUrl: "https://www.estivanayramia.com/projects/documentation" },
-      { id: "elosity", title: "Endpoint Elosity Launch Video", summary: "Motion storyboard and voiceover.", url: "/projects/multilingual", fullUrl: "https://www.estivanayramia.com/projects/multilingual" },
-      { id: "competitive", title: "Taking Down Endpoint", summary: "Competitive strategy deck.", url: "/projects/competitive-strategy", fullUrl: "https://www.estivanayramia.com/projects/competitive-strategy" }
+      {
+        id: "this-website-every-line",
+        title: "This Website (Every Line)",
+        summary:
+          "No templates, no CMS. Just hand-written HTML/CSS/JS, service worker, Savonie chat, and Lighthouse 90+ scores. The repo is the proof.",
+        url: "/projects/portfolio",
+        fullUrl: "https://www.estivanayramia.com/projects/portfolio",
+      },
+      {
+        id: "loral-cell-bioprint-maps-campaign",
+        title: "L'Oréal Cell BioPrint MAPS Campaign",
+        summary:
+          "Class concept campaign deck for L'Oréal Cell BioPrint that maps three personas and their touchpoints across the funnel.",
+        url: "/projects/logistics",
+        fullUrl: "https://www.estivanayramia.com/projects/logistics",
+      },
+      {
+        id: "franklin-templeton-class-concept",
+        title: "Franklin Templeton Class Concept",
+        summary:
+          "17-page class concept deck for a Franklin Templeton 'Voice of Progress' campaign.",
+        url: "/projects/discipline",
+        fullUrl: "https://www.estivanayramia.com/projects/discipline",
+      },
+      {
+        id: "endpoint-linkedin-campaign",
+        title: "EndPoint LinkedIn Campaign",
+        summary:
+          "15-page deck outlining Phase 2A and Phase 2B of an EndPoint LinkedIn retargeting campaign.",
+        url: "/projects/documentation",
+        fullUrl: "https://www.estivanayramia.com/projects/documentation",
+      },
+      {
+        id: "endpoint-elosity-launch-video",
+        title: "Endpoint Elosity Launch Video",
+        summary:
+          "Motion storyboard and full voiceover script showing bottlenecks shattering into a clean trial timeline. Built for silent autoplay with bold typography.",
+        url: "/projects/multilingual",
+        fullUrl: "https://www.estivanayramia.com/projects/multilingual",
+      },
+      {
+        id: "taking-down-endpoint-almac-group-4g-clinical",
+        title: "Taking Down Endpoint (Almac Group + 4G Clinical)",
+        summary:
+          "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.",
+        url: "/projects/competitive-strategy",
+        fullUrl: "https://www.estivanayramia.com/projects/competitive-strategy",
+      },
     ],
     hobbies: [
-      { id: "gym", title: "Gym & Strength Training", summary: "Progressive overload and consistency.", url: "/hobbies/gym", fullUrl: "https://www.estivanayramia.com/hobbies/gym" },
-      { id: "photography", title: "Photography", summary: "iPhone shots with good timing.", url: "/hobbies/photography", fullUrl: "https://www.estivanayramia.com/hobbies/photography" },
-      { id: "car", title: "Car Enthusiasm", summary: "First car, maintenance pride.", url: "/hobbies/car", fullUrl: "https://www.estivanayramia.com/hobbies/car" },
-      { id: "cooking", title: "Cooking", summary: "Good ingredients, no compromises.", url: "/hobbies/cooking", fullUrl: "https://www.estivanayramia.com/hobbies/cooking" },
-      { id: "whispers", title: "Whispers (Sticky Notes)", summary: "Low-tech brain dump on sticky notes.", url: "/hobbies/whispers", fullUrl: "https://www.estivanayramia.com/hobbies/whispers" },
-      { id: "reading", title: "Reading", summary: "Compressed experience from books.", url: "/hobbies/reading", fullUrl: "https://www.estivanayramia.com/hobbies/reading" }
-    ]
+      {
+        id: "gym-strength-training",
+        title: "Gym & Strength Training",
+        summary:
+          "Building discipline through progressive overload. Tracking PRs, optimizing recovery, and proving that consistency beats intensity every time.",
+        url: "/hobbies/gym",
+        fullUrl: "https://www.estivanayramia.com/hobbies/gym",
+      },
+      {
+        id: "photography",
+        title: "Photography",
+        summary:
+          "Capturing moments worth remembering. iPhone shots that tell stories; no DSLR needed, just good lighting and better timing.",
+        url: "/hobbies/photography",
+        fullUrl: "https://www.estivanayramia.com/hobbies/photography",
+      },
+      {
+        id: "car-enthusiasm",
+        title: "Car Enthusiasm",
+        summary:
+          "First car, first freedom. Not about speed; about ownership, maintenance, and the pride of keeping something running clean.",
+        url: "/hobbies/car",
+        fullUrl: "https://www.estivanayramia.com/hobbies/car",
+      },
+      {
+        id: "cooking",
+        title: "Cooking",
+        summary:
+          "Steak, pasta, and everything in between. Not a chef; just someone who refuses to eat mediocre food when good ingredients are available.",
+        url: "/hobbies/cooking",
+        fullUrl: "https://www.estivanayramia.com/hobbies/cooking",
+      },
+      {
+        id: "whispers-sticky-notes",
+        title: "Whispers (Sticky Notes)",
+        summary:
+          "Random thoughts captured on sticky notes. Ideas, observations, reminders. Low-tech brain dump that keeps the mental clutter organized.",
+        url: "/hobbies/whispers",
+        fullUrl: "https://www.estivanayramia.com/hobbies/whispers",
+      },
+      {
+        id: "reading",
+        title: "Reading",
+        summary:
+          "Books are compressed experience. Reading is the cheapest way to access decades of wisdom without making the same mistakes yourself.",
+        url: "/hobbies/reading",
+        fullUrl: "https://www.estivanayramia.com/hobbies/reading",
+      },
+    ],
   };
   
   cachedSiteFacts = fallbackFacts;
+  cachedSiteFactsSource = "fallback";
   cacheTimestamp = now;
   console.warn("⚠️ Using fallback site facts - KV unavailable");
   return fallbackFacts;
@@ -313,14 +400,14 @@ ${hobbyList}
 **Key Projects**: ${siteFacts.projects.slice(0, 3).map(p => p.title).join(', ')}.
 
 [View full resume →](/assets/docs/Estivan-Ayramia-Resume.pdf)`,
-      chips: ["View Projects", "Download Resume", "Contact Estivan"]
+  chips: ["Projects", "Resume", "Contact"]
     };
   }
   
   if (intent === "contact") {
     return {
       reply: `You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact). He usually responds within 24 hours.`,
-      chips: ["View Projects", "Download Resume"]
+      chips: ["Projects", "Resume"]
     };
   }
   
@@ -329,7 +416,7 @@ ${hobbyList}
       reply: `I'm currently in offline mode and can't provide detailed information about availability or compensation. 
 
 Please reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact) to discuss opportunities.`,
-      chips: ["View Projects", "Download Resume", "Contact Estivan"]
+  chips: ["Projects", "Resume", "Contact"]
     };
   }
   
@@ -631,8 +718,17 @@ export default {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/health") {
       const hasKey = !!(env.GEMINI_API_KEY && env.GEMINI_API_KEY.length > 10);
+      const factsCacheAgeMs = cachedSiteFacts ? Math.max(0, Date.now() - cacheTimestamp) : null;
       return jsonReply(
-        { ok: true, version: VERSION_TAG, hasKey, kv: !!env.SAVONIE_KV },
+        {
+          ok: true,
+          version: VERSION_TAG,
+          hasKey,
+          kv: !!env.SAVONIE_KV,
+          factsKey: "site-facts:v1",
+          factsSource: cachedSiteFactsSource,
+          factsCacheAgeMs
+        },
         200,
         corsHeaders
       );

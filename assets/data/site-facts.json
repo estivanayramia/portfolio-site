@@ -1,5 +1,5 @@
 {
-  "generated": "2026-01-19T02:51:59.069Z",
+  "generated": "2026-01-19T10:07:54.315Z",
   "version": "v2",
   "baseUrl": "https://www.estivanayramia.com",
   "projects": [
@@ -9,7 +9,7 @@
       "summary": "No templates, no CMS. Just hand-written HTML/CSS/JS, service worker, Savonie chat, and Lighthouse 90+ scores. The repo is the proof.",
       "url": "/projects/portfolio",
       "fullUrl": "https://www.estivanayramia.com/projects/portfolio",
-      "filePath": "/projects/portfolio",
+      "filePath": "/projects/portfolio.html",
       "tags": [
         "Build"
       ]
@@ -20,7 +20,7 @@
       "summary": "Class concept campaign deck for L'Oréal Cell BioPrint that maps three personas and their touchpoints across the funnel.",
       "url": "/projects/logistics",
       "fullUrl": "https://www.estivanayramia.com/projects/logistics",
-      "filePath": "/projects/logistics",
+      "filePath": "/projects/logistics.html",
       "tags": [
         "Campaign Strategy"
       ]
@@ -31,7 +31,7 @@
       "summary": "17-page class concept deck for a Franklin Templeton 'Voice of Progress' campaign.",
       "url": "/projects/discipline",
       "fullUrl": "https://www.estivanayramia.com/projects/discipline",
-      "filePath": "/projects/discipline",
+      "filePath": "/projects/discipline.html",
       "tags": [
         "Content Strategy"
       ]
@@ -42,7 +42,7 @@
       "summary": "15-page deck outlining Phase 2A and Phase 2B of an EndPoint LinkedIn retargeting campaign.",
       "url": "/projects/documentation",
       "fullUrl": "https://www.estivanayramia.com/projects/documentation",
-      "filePath": "/projects/documentation",
+      "filePath": "/projects/documentation.html",
       "tags": [
         "Retargeting"
       ]
@@ -53,7 +53,7 @@
       "summary": "Motion storyboard and full voiceover script showing bottlenecks shattering into a clean trial timeline. Built for silent autoplay with bold typography.",
       "url": "/projects/multilingual",
       "fullUrl": "https://www.estivanayramia.com/projects/multilingual",
-      "filePath": "/projects/multilingual",
+      "filePath": "/projects/multilingual.html",
       "tags": [
         "Video Concept"
       ]
@@ -64,7 +64,7 @@
       "summary": "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.",
       "url": "/projects/competitive-strategy",
       "fullUrl": "https://www.estivanayramia.com/projects/competitive-strategy",
-      "filePath": "/projects/competitive-strategy",
+      "filePath": "/projects/competitive-strategy.html",
       "tags": [
         "Strategy"
       ]
@@ -77,7 +77,7 @@
       "summary": "Building discipline through progressive overload. Tracking PRs, optimizing recovery, and proving that consistency beats intensity every time.",
       "url": "/hobbies/gym",
       "fullUrl": "https://www.estivanayramia.com/hobbies/gym",
-      "filePath": "/hobbies/gym"
+      "filePath": "/hobbies/gym.html"
     },
     {
       "id": "photography",
@@ -85,7 +85,7 @@
       "summary": "Capturing moments worth remembering. iPhone shots that tell stories; no DSLR needed, just good lighting and better timing.",
       "url": "/hobbies/photography",
       "fullUrl": "https://www.estivanayramia.com/hobbies/photography",
-      "filePath": "/hobbies/photography"
+      "filePath": "/hobbies/photography.html"
     },
     {
       "id": "car-enthusiasm",
@@ -93,7 +93,7 @@
       "summary": "First car, first freedom. Not about speed; about ownership, maintenance, and the pride of keeping something running clean.",
       "url": "/hobbies/car",
       "fullUrl": "https://www.estivanayramia.com/hobbies/car",
-      "filePath": "/hobbies/car"
+      "filePath": "/hobbies/car.html"
     },
     {
       "id": "cooking",
@@ -101,7 +101,7 @@
       "summary": "Steak, pasta, and everything in between. Not a chef; just someone who refuses to eat mediocre food when good ingredients are available.",
       "url": "/hobbies/cooking",
       "fullUrl": "https://www.estivanayramia.com/hobbies/cooking",
-      "filePath": "/hobbies/cooking"
+      "filePath": "/hobbies/cooking.html"
     },
     {
       "id": "whispers-sticky-notes",
@@ -109,7 +109,7 @@
       "summary": "Random thoughts captured on sticky notes. Ideas, observations, reminders. Low-tech brain dump that keeps the mental clutter organized.",
       "url": "/hobbies/whispers",
       "fullUrl": "https://www.estivanayramia.com/hobbies/whispers",
-      "filePath": "/hobbies/whispers"
+      "filePath": "/hobbies/whispers.html"
     },
     {
       "id": "reading",
@@ -117,7 +117,7 @@
       "summary": "Books are compressed experience. Reading is the cheapest way to access decades of wisdom without making the same mistakes yourself.",
       "url": "/hobbies/reading",
       "fullUrl": "https://www.estivanayramia.com/hobbies/reading",
-      "filePath": "/hobbies/reading"
+      "filePath": "/hobbies/reading.html"
     }
   ],
   "meta": {
