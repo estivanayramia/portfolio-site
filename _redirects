@@ -9,6 +9,7 @@
 # Locale rewrites (manual)
 /es/                         /es/index.html               200
 /ar/                         /ar/index.html               200
+/                            /EN/index.html               200
 
 # BEGIN GENERATED (fix-seo)
 # URL normalization (301)

@@ -479,7 +479,8 @@ function getCorsHeaders(request) {
   
   // Production origins
   const allowedOrigins = [
-    "https://estivanayramia.com"
+    "https://estivanayramia.com",
+    "https://www.estivanayramia.com"
   ];
   
   // Allow all localhost and 127.0.0.1 origins for development (any port)
