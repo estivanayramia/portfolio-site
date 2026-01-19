@@ -20,7 +20,7 @@ const ASSETS_TO_CACHE = [
     '/privacy',
     '/overview',
     '/EN/404.html',
-    `/assets/css/theme.css?v=${CACHE_VERSION}`,
+    `/theme.css?v=${CACHE_VERSION}`,
     '/assets/css/theme.min.css',
     '/assets/css/style.css',
     '/assets/fonts/inter/inter-latin.woff2',

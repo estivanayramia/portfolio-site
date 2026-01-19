@@ -13,6 +13,10 @@
   ! Cache-Control
   Cache-Control: no-cache, no-store, must-revalidate
 
+/theme.css
+  ! Cache-Control
+  Cache-Control: no-cache, no-store, must-revalidate
+
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
