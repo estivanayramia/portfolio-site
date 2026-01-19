@@ -13,6 +13,9 @@
   ! Cache-Control
   Cache-Control: no-cache, no-store, must-revalidate
 
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /assets/css/theme.css
   ! Cache-Control
   Cache-Control: no-cache, no-store, must-revalidate
@@ -21,8 +24,13 @@
   ! Cache-Control
   Cache-Control: no-cache, no-store, must-revalidate
 
-/assets/*
-  Cache-Control: public, max-age=31536000, immutable
+/assets/css/style.css
+  ! Cache-Control
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/assets/js/site.min.js
+  ! Cache-Control
+  Cache-Control: no-cache, no-store, must-revalidate
 
 /*.jpg
   Cache-Control: public, max-age=2592000
@@ -41,11 +49,3 @@
 
 /*.woff
   Cache-Control: public, max-age=31536000, immutable
-
-/assets/js/site.min.js
-  ! Cache-Control
-  Cache-Control: no-cache, no-store, must-revalidate
-
-/assets/css/style.css
-  ! Cache-Control
-  Cache-Control: no-cache, no-store, must-revalidate
