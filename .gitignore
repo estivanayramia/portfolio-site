@@ -34,6 +34,9 @@ tmp-serve*.log
 .vscode_restore_reports/
 dryrun-transcript*.txt
 
+# Local verification artifacts
+.reports/
+
 worker/.wrangler/
 .wrangler/
 worker/node_modules/

@@ -21,7 +21,6 @@ const ASSETS_TO_CACHE = [
     '/overview',
     '/EN/404.html',
     `/theme.css?v=${CACHE_VERSION}`,
-    '/assets/css/theme.min.css',
     '/assets/css/style.css',
     '/assets/fonts/inter/inter-latin.woff2',
     '/assets/js/site.js',
