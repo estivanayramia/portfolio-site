@@ -1,5 +1,9 @@
 import { ACHIEVEMENTS, GAME_ORDER, GAME_LABELS, buildAchievementIndex } from './achievements-defs.js';
 
+// ACHIEVEMENTS is authored as an id-keyed object for the Arcade hub.
+// Game helper utilities below expect an array, so normalize once.
+const DEFS_LIST = Array.isArray(ACHIEVEMENTS) ? ACHIEVEMENTS : Object.values(ACHIEVEMENTS);
+
 const STORAGE_KEY = 'ea.arcade.achievements.v1';
 const byId = buildAchievementIndex();
 
@@ -121,7 +125,7 @@ function escapeHtml(str) {
 
 export const Achievements = {
   STORAGE_KEY,
-  defs: ACHIEVEMENTS,
+  defs: DEFS_LIST,
   games: GAME_ORDER,
   labels: GAME_LABELS,
 
@@ -186,14 +190,14 @@ export const Achievements = {
   },
 
   getProgressByGame(game) {
-    const defs = ACHIEVEMENTS.filter(a => a.game === game);
+    const defs = DEFS_LIST.filter(a => a.game === game);
     const st = loadState();
     const unlockedCount = defs.reduce((acc, a) => acc + (st.unlocked && st.unlocked[a.id] ? 1 : 0), 0);
     return { unlocked: unlockedCount, total: defs.length };
   },
 
   listByGame(game) {
-    return ACHIEVEMENTS.filter(a => a.game === game);
+    return DEFS_LIST.filter(a => a.game === game);
   },
 
   listUnlocked(gameOrFilter) {
@@ -218,15 +222,15 @@ export const Achievements = {
   _filterDefs(gameOrFilter) {
     // Back-compat: listUnlocked('snake') still works.
     if (typeof gameOrFilter === 'string') {
-      return ACHIEVEMENTS.filter(a => a.game === gameOrFilter);
+      return DEFS_LIST.filter(a => a.game === gameOrFilter);
     }
 
     if (!gameOrFilter || typeof gameOrFilter !== 'object') {
-      return ACHIEVEMENTS;
+      return DEFS_LIST;
     }
 
     const { game, category } = gameOrFilter;
-    return ACHIEVEMENTS.filter(a => {
+    return DEFS_LIST.filter(a => {
       if (game && a.game !== game) return false;
       if (category && a.category !== category) return false;
       return true;
@@ -236,7 +240,7 @@ export const Achievements = {
 
 // Dev sanity check (kept small and safe)
 try {
-  for (const a of ACHIEVEMENTS) {
+  for (const a of DEFS_LIST) {
     console.assert(!!(a && a.title), '[Arcade] achievement missing title', a);
     console.assert(!!(a && a.description), '[Arcade] achievement missing description', a);
   }

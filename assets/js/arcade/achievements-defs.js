@@ -643,3 +643,26 @@ export const ACHIEVEMENTS = {
         icon: '🏅'
     }
 };
+
+// These exports are required by achievements.js (used by the game routes).
+// Failure mode (prod): ESM import aborts with "does not provide an export named ..."
+// which prevents the game modules from running at all.
+export const GAME_ORDER = ['snake', 'breaker', 'merge', 'invaders', 'site'];
+
+export const GAME_LABELS = {
+  snake: 'Snake',
+  breaker: 'Block Breaker',
+  merge: '2048',
+  invaders: 'Space Invaders',
+  site: 'Website'
+};
+
+export function buildAchievementIndex() {
+  // achievements.js expects an id -> definition index for fast lookups.
+  // ACHIEVEMENTS is authored as an object, so build defensively from values.
+  const index = {};
+  for (const def of Object.values(ACHIEVEMENTS)) {
+    if (def && typeof def.id === 'string') index[def.id] = def;
+  }
+  return index;
+}
