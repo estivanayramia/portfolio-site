@@ -9,6 +9,12 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://static.cloudflareinsights.com https://www.youtube.com https://*.youtube.com https://*.ytimg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com https://res-1.cdn.office.net; img-src 'self' data: https: https://*.ytimg.com; connect-src 'self' https://www.google-analytics.com https://stats.g.doubleclick.net https://www.google.com https://region1.google-analytics.com https://www.clarity.ms https://*.clarity.ms https://portfolio-chat.eayramia.workers.dev https://www.youtube.com https://*.youtube.com https://formspree.io https://api.formspree.io; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://*.youtube.com https://*.ytimg.com; frame-ancestors 'self';
   Cache-Control: public, max-age=0, must-revalidate
 
+/assets/css/theme.css
+  Cache-Control: no-cache, no-store, must-revalidate
+
+/assets/css/theme.min.css
+  Cache-Control: no-cache, no-store, must-revalidate
+
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
