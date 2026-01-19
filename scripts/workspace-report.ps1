@@ -89,15 +89,16 @@ if ($LASTEXITCODE -ne 0 -or ($out | Measure-Object).Count -eq 0) {
 } else {
   Run-Cmd -Label "git grep secret scan" -Cmd { $out }
 }
+$global:LASTEXITCODE = 0
 
 Section "H) Line ending config visibility"
 Run-Cmd -Label "git config --get core.autocrlf (or unset)" -Cmd {
   $v = git config --get core.autocrlf 2>&1
-  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace(($v | Out-String))) { "unset" } else { $v }
+  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace(($v | Out-String))) { $global:LASTEXITCODE = 0; "unset" } else { $global:LASTEXITCODE = 0; $v }
 }
 Run-Cmd -Label "git config --get core.eol (or unset)" -Cmd {
   $v = git config --get core.eol 2>&1
-  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace(($v | Out-String))) { "unset" } else { $v }
+  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace(($v | Out-String))) { $global:LASTEXITCODE = 0; "unset" } else { $global:LASTEXITCODE = 0; $v }
 }
 
 Section "I) Docs policy checks"
@@ -113,3 +114,5 @@ Run-Cmd -Label "Root-level .md files" -Cmd {
 Run-Cmd -Label "Root-level dirs ending with .md" -Cmd {
   Get-ChildItem -Path . -Directory | Where-Object { $_.Name -like '*.md' } | Select-Object -ExpandProperty Name
 } -PassEmpty
+
+$global:LASTEXITCODE = 0
