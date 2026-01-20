@@ -24,6 +24,17 @@ audit.js
 # Lighthouse reports (generated in-repo during local audits)
 lighthouse-results/
 
+# Lighthouse report artifacts (explicit)
+lighthouse-results/*.report.json
+lighthouse-results/*.log
+lighthouse-results/terminal.log
+lighthouse-results/run.log
+
+# Visual regression artifacts (local-only)
+visual-baseline/
+visual-current/
+visual-diff/
+
 # Local server logs
 tmp-serve*.log
 
