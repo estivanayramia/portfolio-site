@@ -852,6 +852,18 @@ select {
     cursor: not-allowed;
 }
 
+/* During GSAP setup, suppress CSS transitions on reveal targets to avoid
+   any brief flash when classes/inline styles are changed. */
+.gsap-prep [data-gsap],
+.gsap-prep .reveal {
+    transition: none !important;
+}
+
+.gsap-prep [data-gsap] *,
+.gsap-prep .reveal * {
+    transition: none !important;
+}
+
 /* ==========================================================================
    Card Hover Effects
    ========================================================================== */

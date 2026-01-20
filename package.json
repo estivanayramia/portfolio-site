@@ -26,6 +26,7 @@
         "audit:psi": "node scripts/psi-audit.mjs https://www.estivanayramia.com",
         "visual:baseline": "node scripts/visual-regression.mjs baseline",
         "visual:check": "node scripts/visual-regression.mjs check",
+        "anim:sanity": "node scripts/animation-sanity.mjs",
         "check:csp": "node scripts/check-csp.cjs",
         "test:contact": "cross-env MOCK_FORMSPREE=1 node scripts/test-contact-form-playwright.cjs",
         "test:contact:live": "cross-env MOCK_FORMSPREE=0 node scripts/test-contact-form-playwright.cjs"

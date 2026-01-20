@@ -1164,36 +1164,86 @@ const initAnimations = () => {
         && (typeof window.matchMedia === 'function')
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Always ensure a non-GSAP reveal path exists (covers GSAP load failures)
-    initRevealOnViewFallback();
+    const hasGSAP = (typeof gsap !== 'undefined') && (typeof ScrollTrigger !== 'undefined');
 
-    // If GSAP unavailable, the fallback handles visibility
-    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-
-    // Reduced motion: keep layout stable (no transform-based entrance/scroll animations)
-    if (prefersReducedMotion) {
+    // Fallback reveal path for cases where we intentionally don't run ScrollTrigger.
+    // Important: don't run this when GSAP is present because it can fight with GSAP's
+    // initial set() and cause visible snapping/stutter.
+    if (!hasGSAP || prefersReducedMotion || isMobile) {
+        initRevealOnViewFallback();
         return;
     }
 
-    // Mobile: keep content stable and skip ScrollTrigger animations
-    if (isMobile) {
-        return;
-    }
+    // Hard init-once guard to prevent double-init jitter.
+    if (window.__GSAP_REVEALS_INIT) return;
+    window.__GSAP_REVEALS_INIT = true;
 
     // Register ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
+
+    const root = document.documentElement;
+    let prepTimer;
+
+    // Temporarily suppress CSS transitions on GSAP targets during setup to avoid
+    // a brief flash when classes/inline styles change.
+    root.classList.add('gsap-prep');
+    prepTimer = setTimeout(() => root.classList.remove('gsap-prep'), 2000);
+
+    try {
+        // Stabilize refresh timing for font swaps/layout shifts (prevents surprise reflows).
+        try {
+            if (!window.__gsapScrollTriggerRefreshBound) {
+                window.__gsapScrollTriggerRefreshBound = true;
+                let refreshTimer = null;
+                const scheduleRefresh = () => {
+                    if (refreshTimer) clearTimeout(refreshTimer);
+                    refreshTimer = setTimeout(() => {
+                        try { ScrollTrigger.refresh(); } catch (e) {}
+                    }, 150);
+                };
+
+                window.addEventListener('load', scheduleRefresh, { once: true });
+                window.addEventListener('resize', scheduleRefresh);
+                if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function') {
+                    document.fonts.ready.then(scheduleRefresh).catch(() => {});
+                }
+            }
+        } catch (e) {}
+
+        const isNearViewport = (element) => {
+            try {
+                const rect = element.getBoundingClientRect();
+                const vh = window.innerHeight || document.documentElement.clientHeight || 0;
+                return rect.top < vh * 1.15;
+            } catch (e) {
+                return false;
+            }
+        };
 
     // Fade Up Animations
     const fadeElements = document.querySelectorAll('[data-gsap="fade-up"]');
     
     fadeElements.forEach(element => {
+        try {
+            if (element && element.dataset && element.dataset.gsapInit === '1') return;
+            if (element && element.dataset) element.dataset.gsapInit = '1';
+        } catch (e) {}
+
         const delay = element.getAttribute('data-gsap-delay') || 0;
 
-        // Remove fallback styling so GSAP owns the animation.
+        // Ensure CSS-based fallback doesn't interfere with GSAP.
         try { element.classList.remove('reveal', 'is-visible'); } catch (e) {}
 
+        // Non-destructive init: if it's already in/near the viewport on load, do not
+        // hide/offset it (prevents above-the-fold snapping/jitter).
+        if (isNearViewport(element)) {
+            try { element.classList.remove('opacity-0', 'translate-y-8'); } catch (e) {}
+            gsap.set(element, { autoAlpha: 1, y: 0, clearProps: 'willChange' });
+            return;
+        }
+
         // Start hidden until the trigger point is reached.
-        gsap.set(element, { autoAlpha: 0, y: 12, willChange: 'opacity, transform' });
+        gsap.set(element, { autoAlpha: 0, y: 12, force3D: true, willChange: 'opacity, transform' });
 
         gsap.to(element, {
             autoAlpha: 1,
@@ -1201,14 +1251,22 @@ const initAnimations = () => {
             duration: 0.5,
             delay: parseFloat(delay) * 0.5,
             ease: 'power2.out',
+            overwrite: 'auto',
             clearProps: 'willChange',
             scrollTrigger: {
                 trigger: element,
                 start: 'top 92%',
+                once: true,
+                invalidateOnRefresh: true,
+                fastScrollEnd: true,
                 toggleActions: 'play none none none'
             }
         });
     });
+    } finally {
+        if (prepTimer) clearTimeout(prepTimer);
+        root.classList.remove('gsap-prep');
+    }
 
     // Parallax effect for hero section (if exists)
     const heroSection = document.querySelector('section:first-of-type');
@@ -1265,6 +1323,8 @@ const loadGSAPAndInit = () => {
     }
 
     // Desktop: load GSAP for richer scroll animations
+    // Ensure a non-GSAP reveal path is active while GSAP scripts load.
+    try { initRevealOnViewFallback(); } catch (e) {}
     loadScripts();
 };
 
