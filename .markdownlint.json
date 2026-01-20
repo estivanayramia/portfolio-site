@@ -6,4 +6,8 @@
     "_redirects",
     "**/_redirects"
   ]
+
+  ,"MD013": { "line_length": 120 },
+  "MD033": false,
+  "MD041": false
 }

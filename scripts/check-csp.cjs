@@ -10,14 +10,19 @@ const cspLines = [];
 let cacheLine = null;
 
 for (const line of lines) {
-  if (line.trim() === '/*') { inRootBlock = true; continue; }
-  if (inRootBlock && line.trim().startsWith('/assets/')) break;
+  const trimmed = line.trim();
+  if (trimmed === '/*') { inRootBlock = true; continue; }
 
-  if (inRootBlock) {
-    const trimmed = line.trim();
-    if (trimmed.toLowerCase().startsWith('content-security-policy:')) cspLines.push(trimmed);
-    if (trimmed.toLowerCase().startsWith('cache-control:')) cacheLine = trimmed;
-  }
+  if (!inRootBlock) continue;
+
+  // Skip blank lines inside the block (do not treat them as end markers)
+  if (trimmed === '') continue;
+
+  // Stop when we hit a new path header (starts with "/" but not the root "/*")
+  if (trimmed.startsWith('/') && trimmed !== '/*') break;
+
+  if (trimmed.toLowerCase().startsWith('content-security-policy:')) cspLines.push(trimmed);
+  if (trimmed.toLowerCase().startsWith('cache-control:')) cacheLine = trimmed;
 }
 
 function die(msg) {
