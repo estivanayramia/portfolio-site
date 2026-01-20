@@ -1,4 +1,6 @@
-_redirects text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf_redirects text eol=lf
 _headers text eol=lf
 tools/*.mjs text eol=lf
 EN/*.html text eol=lf
