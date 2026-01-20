@@ -1,5 +1,6 @@
 {
   "cleanUrls": true,
+  "directoryListing": false,
   "rewrites": [
     { "source": "/", "destination": "/EN/index.html" },
     { "source": "/about", "destination": "/EN/about.html" },
@@ -8,10 +9,12 @@
     { "source": "/deep-dive", "destination": "/EN/deep-dive.html" },
     { "source": "/overview", "destination": "/EN/overview.html" },
     { "source": "/privacy", "destination": "/EN/privacy.html" },
-    { "source": "/projects", "destination": "/EN/projects/index.html" },
+    { "source": "/projects", "destination": "/EN/projects/" },
+    { "source": "/projects/", "destination": "/EN/projects/" },
     { "source": "/projects/:slug", "destination": "/EN/projects/:slug.html" },
 
-    { "source": "/hobbies", "destination": "/EN/hobbies/index.html" },
+    { "source": "/hobbies", "destination": "/EN/hobbies/" },
+    { "source": "/hobbies/", "destination": "/EN/hobbies/" },
     { "source": "/hobbies/:slug", "destination": "/EN/hobbies/:slug.html" },
 
     { "source": "/hobbies-games/:slug", "destination": "/EN/hobbies-games/:slug.html" }

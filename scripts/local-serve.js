@@ -33,8 +33,21 @@ const server = http.createServer(async (req, res) => {
   // /hobbies-games is canonical WITHOUT trailing slash
   if (pathname === '/hobbies-games/') return redirect(res, '/hobbies-games');
 
+  // serve-handler does not resolve "directory rewrite" destinations to index.html.
+  // Production serves /EN/<dir>/ by automatically returning /EN/<dir>/index.html.
+  // To keep local behavior aligned without changing visuals, map these explicitly.
+  let handlerConfig = config;
+  if (pathname === '/projects/') {
+    req.url = `/EN/projects/index.html${requestUrl.search}`;
+    handlerConfig = Object.assign({}, config, { cleanUrls: false });
+  }
+  if (pathname === '/hobbies/') {
+    req.url = `/EN/hobbies/index.html${requestUrl.search}`;
+    handlerConfig = Object.assign({}, config, { cleanUrls: false });
+  }
+
   try {
-    await handler(req, res, config);
+    await handler(req, res, handlerConfig);
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);
