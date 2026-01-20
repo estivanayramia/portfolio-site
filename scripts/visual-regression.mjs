@@ -1,6 +1,9 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
+import http from 'node:http';
+import https from 'node:https';
+import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import puppeteer from 'puppeteer';
@@ -25,6 +28,139 @@ const VIEWPORTS = [
   { name: 'mobile', width: 390, height: 844, deviceScaleFactor: 1 },
   { name: 'desktop', width: 1440, height: 900, deviceScaleFactor: 1 },
 ];
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function httpStatus(url, timeoutMs) {
+  return new Promise((resolve) => {
+    const target = new URL(url);
+    const lib = target.protocol === 'https:' ? https : http;
+
+    const req = lib.request(
+      {
+        method: 'GET',
+        hostname: target.hostname,
+        port: target.port,
+        path: `${target.pathname}${target.search}`,
+        headers: {
+          'user-agent': 'visual-regression',
+          accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        },
+      },
+      (res) => {
+        res.resume();
+        resolve(res.statusCode || 0);
+      }
+    );
+
+    req.setTimeout(timeoutMs, () => {
+      req.destroy(new Error('timeout'));
+    });
+    req.on('error', () => resolve(0));
+    req.end();
+  });
+}
+
+async function waitForUrl(url, timeoutMs, intervalMs = 300) {
+  const deadline = Date.now() + timeoutMs;
+  let lastStatus = 0;
+
+  // Retry loop
+  while (Date.now() < deadline) {
+    // Small per-attempt timeout so we can retry quickly
+    // eslint-disable-next-line no-await-in-loop
+    lastStatus = await httpStatus(url, Math.min(1500, Math.max(250, intervalMs * 2)));
+    if (lastStatus >= 200 && lastStatus < 400) return;
+    // eslint-disable-next-line no-await-in-loop
+    await sleep(intervalMs);
+  }
+
+  throw new Error(`Timeout waiting for ${url} (last HTTP status: ${lastStatus || 'unreachable'})`);
+}
+
+async function stopChildProcess(child, timeoutMs = 4_000) {
+  if (!child) return;
+  if (child.exitCode !== null) return;
+
+  const closed = new Promise((resolve) => {
+    child.once('close', resolve);
+    child.once('error', resolve);
+  });
+
+  try {
+    child.kill('SIGTERM');
+  } catch {
+    // ignore
+  }
+
+  const softDeadline = Date.now() + timeoutMs;
+  while (child.exitCode === null && Date.now() < softDeadline) {
+    // eslint-disable-next-line no-await-in-loop
+    await Promise.race([closed, sleep(200)]);
+  }
+
+  if (child.exitCode !== null) return;
+
+  try {
+    child.kill('SIGKILL');
+  } catch {
+    // ignore
+  }
+
+  const hardDeadline = Date.now() + timeoutMs;
+  while (child.exitCode === null && Date.now() < hardDeadline) {
+    // eslint-disable-next-line no-await-in-loop
+    await Promise.race([closed, sleep(200)]);
+  }
+}
+
+async function ensureLocalServerUp(baseUrl) {
+  const normalized = ensureTrailingSlash(baseUrl);
+  const rootUrl = new URL('/', normalized).toString();
+
+  // Short probe retry loop to tolerate brief startup jitter.
+  try {
+    await waitForUrl(rootUrl, 1_200, 300);
+    return { started: false, stop: async () => {} };
+  } catch {
+    // Not up; we'll spawn.
+  }
+
+  const u = new URL(normalized);
+  const port = Number(u.port || (u.protocol === 'https:' ? 443 : 80));
+  const serverScript = path.join(REPO_ROOT, 'scripts', 'local-serve.js');
+
+  // eslint-disable-next-line no-console
+  console.log(`BASE_URL not reachable; starting local server: node ${path.relative(REPO_ROOT, serverScript)} (PORT=${port})`);
+
+  const child = spawn(process.execPath, [serverScript], {
+    cwd: REPO_ROOT,
+    env: {
+      ...process.env,
+      PORT: String(port),
+    },
+    stdio: 'inherit',
+    windowsHide: true,
+  });
+
+  try {
+    await waitForUrl(rootUrl, 15_000, 300);
+  } catch (err) {
+    await stopChildProcess(child);
+    throw err;
+  }
+
+  return {
+    started: true,
+    stop: async () => {
+      // eslint-disable-next-line no-console
+      console.log('Stopping auto-started local server...');
+      await stopChildProcess(child);
+    },
+  };
+}
 
 function parseArgs(argv) {
   const args = { _: [] };
@@ -255,17 +391,23 @@ async function main() {
   const currentDir = path.join(REPO_ROOT, 'visual-current');
   const diffDir = path.join(REPO_ROOT, 'visual-diff');
 
-  if (mode === 'baseline') {
-    await captureScreenshots({ baseUrl, outDir: baselineDir });
-    // eslint-disable-next-line no-console
-    console.log(`Baseline written to: ${path.relative(REPO_ROOT, baselineDir)}`);
-    return;
-  }
+  const server = await ensureLocalServerUp(baseUrl);
 
-  if (mode === 'check') {
-    await captureScreenshots({ baseUrl, outDir: currentDir });
-    await diffScreenshots({ baselineDir, currentDir, diffDir, thresholdRatio });
-    return;
+  try {
+    if (mode === 'baseline') {
+      await captureScreenshots({ baseUrl, outDir: baselineDir });
+      // eslint-disable-next-line no-console
+      console.log(`Baseline written to: ${path.relative(REPO_ROOT, baselineDir)}`);
+      return;
+    }
+
+    if (mode === 'check') {
+      await captureScreenshots({ baseUrl, outDir: currentDir });
+      await diffScreenshots({ baselineDir, currentDir, diffDir, thresholdRatio });
+      return;
+    }
+  } finally {
+    await server.stop();
   }
 
   // eslint-disable-next-line no-console
