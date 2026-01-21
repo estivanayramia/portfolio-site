@@ -4,6 +4,7 @@
  */
 
 import puppeteer from 'puppeteer';
+import { getBrowserLaunchConfig } from './browser-path.mjs';
 
 const BASE_URL = process.argv[2] || 'https://www.estivanayramia.com';
 const PAGES = [
@@ -15,9 +16,11 @@ const PAGES = [
 ];
 
 async function runLighthouse(url) {
+    const launchConfig = getBrowserLaunchConfig();
     const browser = await puppeteer.launch({
         headless: 'new',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        executablePath: launchConfig.executablePath,
+        args: [...launchConfig.args, '--no-sandbox', '--disable-setuid-sandbox']
     });
     
     try {

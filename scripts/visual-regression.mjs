@@ -6,6 +6,7 @@ import https from 'node:https';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
+import { getBrowserLaunchConfig } from './browser-path.mjs';
 import puppeteer from 'puppeteer';
 import pixelmatch from 'pixelmatch';
 import pngjs from 'pngjs';
@@ -208,10 +209,12 @@ function makeShotName(viewportName, routeName) {
 async function captureScreenshots({ baseUrl, outDir }) {
   await ensureDir(outDir);
 
+  const launchConfig = getBrowserLaunchConfig();
   const browser = await puppeteer.launch({
     headless: 'new',
     defaultViewport: null,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    executablePath: launchConfig.executablePath,
+    args: [...launchConfig.args, ...['--no-sandbox', '--disable-setuid-sandbox']],
   });
 
   try {
