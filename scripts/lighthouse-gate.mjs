@@ -45,7 +45,31 @@ async function main() {
     process.exit(1);
   }
 
-  // Thresholds
+  // Thresholds with warnings for misconfig
+  function warnEnv(name, value, def, type) {
+    if (value == null || String(value).trim() === '') {
+      console.warn(`Warning: ${name} is not set. Defaulting to ${def}.`);
+      return;
+    }
+    if (type === 'score') {
+      const n = Number(value);
+      if (!Number.isFinite(n) || n < 0 || n > 100) {
+        console.warn(`Warning: ${name} is not a valid number (0-1 or 0-100). Defaulting to ${def}.`);
+      }
+    } else if (type === 'bool') {
+      const s = String(value).trim().toLowerCase();
+      if (!["1","true","yes","y","on","0","false","no","n","off",""].includes(s)) {
+        console.warn(`Warning: ${name} is not a recognized boolean. Defaulting to ${def}.`);
+      }
+    }
+  }
+
+  warnEnv('LH_MIN_PERF', process.env.LH_MIN_PERF, 1.0, 'score');
+  warnEnv('LH_MIN_A11Y', process.env.LH_MIN_A11Y, 1.0, 'score');
+  warnEnv('LH_MIN_BP', process.env.LH_MIN_BP, 1.0, 'score');
+  warnEnv('LH_MIN_SEO', process.env.LH_MIN_SEO, 1.0, 'score');
+  warnEnv('LH_ENFORCE_PERF', process.env.LH_ENFORCE_PERF, false, 'bool');
+
   const minPerf = parseMinScore(process.env.LH_MIN_PERF, 1.0);
   const minA11y = parseMinScore(process.env.LH_MIN_A11Y, 1.0);
   const minBP = parseMinScore(process.env.LH_MIN_BP, 1.0);
