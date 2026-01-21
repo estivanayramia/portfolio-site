@@ -5,7 +5,7 @@
     "scripts": {
         "build:facts": "node scripts/generate-site-facts.js",
         "build:css": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --minify",
-        "build:js": "esbuild assets/js/site.js --minify --outfile=assets/js/site.min.js",
+        "build:js": "esbuild assets/js/site.js --bundle --minify --platform=browser --format=iife --target=es2018 --outfile=assets/js/site.min.js",
         "build:lazy": "esbuild assets/js/lazy-loader.js --minify --outfile=assets/js/lazy-loader.min.js",
         "upload:facts": "node scripts/upload-site-facts.mjs",
         "verify:pages": "node tools/verify-pages-output.mjs",
@@ -69,5 +69,9 @@
     "bugs": {
         "url": "https://github.com/estivanayramia/portfolio-site/issues"
     },
-    "homepage": "https://github.com/estivanayramia/portfolio-site#readme"
+    "homepage": "https://github.com/estivanayramia/portfolio-site#readme",
+    "dependencies": {
+        "gsap": "^3.14.2",
+        "marked": "^17.0.1"
+    }
 }

@@ -216,7 +216,7 @@
         analyticsInitialized.marked = true;
         
         injectScript(
-            'https://cdn.jsdelivr.net/npm/marked/marked.min.js',
+            '/assets/vendor/marked.min.js',
             true,
             function() {
                 console.log('[LazyLoader] ✓ Marked.js loaded for chat markdown parsing');

@@ -47,6 +47,14 @@ console.log('[Savonie DEBUG] site.js loaded');
  * @license MIT
  */
 
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+// bridge for any old code that expects globals
+window.gsap = gsap;
+window.ScrollTrigger = ScrollTrigger;
+
 // ============================================================================
 // CORE UTILITIES - User Interaction Tracking
 // ============================================================================
@@ -1297,35 +1305,15 @@ const initAnimations = () => {
 
 const loadGSAPAndInit = () => {
     const isMobile = (typeof window !== 'undefined') && (typeof window.matchMedia === 'function') && window.matchMedia('(max-width: 768px)').matches;
-    
-    const loadScripts = () => {
-        if (window.gsap && window.ScrollTrigger) {
-            initAnimations();
-            return;
-        }
-        const gsapScript = document.createElement('script');
-        gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
-        gsapScript.onload = () => {
-            const stScript = document.createElement('script');
-            stScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
-            stScript.onload = () => {
-                initAnimations();
-            };
-            document.body.appendChild(stScript);
-        };
-        document.body.appendChild(gsapScript);
-    };
-
     if (isMobile) {
         // Mobile: reveal content immediately and skip GSAP entirely
         initAnimations();
         return;
     }
-
     // Desktop: load GSAP for richer scroll animations
     // Ensure a non-GSAP reveal path is active while GSAP scripts load.
     try { initRevealOnViewFallback(); } catch (e) {}
-    loadScripts();
+    initAnimations();
 };
 
 // ==========================================================================
