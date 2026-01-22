@@ -52,6 +52,9 @@ dryrun-transcript*.txt
 assets/css/style.1.css
 assets/css/style.2.css
 
+# backup artifacts
+*.bak
+
 worker/.wrangler/
 .wrangler/
 worker/node_modules/
