@@ -1,0 +1,113 @@
+name: Quality Gates
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "fix-ci-404" ]
+
+jobs:
+
+  quality-check:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+        id: setup-chrome
+
+      - name: Print Chrome Path
+        run: |
+          echo "Chrome Path: ${{ steps.setup-chrome.outputs.chrome-path }}"
+          echo "PUPPETEER_EXECUTABLE_PATH=${{ steps.setup-chrome.outputs.chrome-path }}" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build JS
+        run: npm run build:js
+
+      - name: Route Smoke Test
+        run: npm run route:smoke
+
+      - name: Performance Budget
+        run: npm run perf:budget
+
+      - name: Visual Regression Check
+        run: npm run visual:check
+
+      - name: Animation Sanity Check
+        run: npm run anim:sanity
+
+      - name: Animation Jank Check
+        run: npm run anim:jank
+
+      - name: Lighthouse Gate
+        run: npm run audit:lighthouse:gate
+
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-artifacts
+          path: |
+            visual-current/**
+            visual-diff/**
+            lighthouse-results/**
+          retention-days: 5
+
+  nightly-strict-perf:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      LH_ENFORCE_PERF: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+        id: setup-chrome
+      - name: Print Chrome Path
+        run: |
+          echo "Chrome Path: ${{ steps.setup-chrome.outputs.chrome-path }}"
+          echo "PUPPETEER_EXECUTABLE_PATH=${{ steps.setup-chrome.outputs.chrome-path }}" >> $GITHUB_ENV
+      - name: Install dependencies
+        run: npm ci
+      - name: Build JS
+        run: npm run build:js
+      - name: Route Smoke Test
+        run: npm run route:smoke
+      - name: Performance Budget
+        run: npm run perf:budget
+      - name: Visual Regression Check
+        run: npm run visual:check
+      - name: Animation Sanity Check
+        run: npm run anim:sanity
+      - name: Animation Jank Check
+        run: npm run anim:jank
+      - name: Lighthouse Gate (Strict Perf)
+        run: npm run audit:lighthouse:gate
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: error-artifacts
+          path: |
+            visual-current/**
+            visual-diff/**
+            lighthouse-results/**
+          retention-days: 5

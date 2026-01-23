@@ -78,19 +78,7 @@ p, span, a, button, input, textarea, select, label {
 /* CSS-only fallback for critical content - will be visible even if JS fails
    GSAP targets elements with data-gsap, but if GSAP doesn't load, this ensures
    elements are visible after a reasonable delay for page load */
-@media (prefers-reduced-motion: no-preference) {
-    /* Animation fallback - show after 3 seconds if GSAP hasn't run */
-    .opacity-0[data-gsap] {
-        animation: reveal-fallback 0.5s ease-out 3s forwards;
-    }
-    
-    @keyframes reveal-fallback {
-        to {
-            opacity: 1;
-            transform: none;
-        }
-    }
-}
+
 
 /**
  * Portfolio Theme CSS
@@ -850,6 +838,18 @@ select {
     opacity: 0.6;
     pointer-events: none;
     cursor: not-allowed;
+}
+
+/* During GSAP setup, suppress CSS transitions on reveal targets to avoid
+   any brief flash when classes/inline styles are changed. */
+.gsap-prep [data-gsap],
+.gsap-prep .reveal {
+    transition: none !important;
+}
+
+.gsap-prep [data-gsap] *,
+.gsap-prep .reveal * {
+    transition: none !important;
 }
 
 /* ==========================================================================

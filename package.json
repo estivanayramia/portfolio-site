@@ -5,11 +5,15 @@
     "scripts": {
         "build:facts": "node scripts/generate-site-facts.js",
         "build:css": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --minify",
-        "build:js": "esbuild assets/js/site.js --minify --outfile=assets/js/site.min.js",
+        "build:theme": "node scripts/build-theme.cjs",
+        "build:js": "esbuild assets/js/site.js --bundle --minify --platform=browser --format=iife --target=es2018 --outfile=assets/js/site.min.js",
         "build:lazy": "esbuild assets/js/lazy-loader.js --minify --outfile=assets/js/lazy-loader.min.js",
         "upload:facts": "node scripts/upload-site-facts.mjs",
         "verify:pages": "node tools/verify-pages-output.mjs",
-        "build": "npm run build:facts && npm run build:css && npm run build:js && npm run build:lazy && npm run upload:facts && npm run verify:pages",
+        "route:smoke": "node scripts/route-smoke.mjs",
+        "perf:budget": "node scripts/perf-budget.mjs",
+        "anim:jank": "node scripts/animation-sanity.mjs --jank",
+        "build": "npm run build:facts && npm run build:css && npm run build:theme && npm run build:js && npm run build:lazy && npm run upload:facts && npm run verify:pages",
         "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
         "start": "node scripts/local-serve.js",
         "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push",
@@ -17,11 +21,21 @@
         "deploy:worker": "cd worker && npx wrangler deploy",
         "test:facts": "node scripts/test-chat-grounding.js",
         "check:banned": "node scripts/check-banned-patterns.mjs",
+        "apply:versioning": "node tools/apply-versioning.mjs",
+        "verify:versioning": "node tools/verify-versioning.mjs",
+        "check:cache": "node tools/cache-policy-check.mjs --headers _headers",
         "audit:links": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/link-check.ps1",
+        "audit:links:node": "node tools/link-check.mjs --inventory .reports/_latest --outDir .reports/_latest",
         "audit:head": "node scripts/audit-head.js",
         "audit:seo": "node tools/seo-check.mjs",
-        "audit:lighthouse": "node scripts/lighthouse-audit.mjs https://www.estivanayramia.com",
+        "audit:lighthouse": "node scripts/lighthouse-runner.mjs",
+        "audit:lighthouse:gate": "node scripts/lighthouse-gate.mjs",
+        "audit:lighthouse:prod": "node scripts/lighthouse-runner.mjs https://www.estivanayramia.com",
+        "audit:lighthouse:local": "node scripts/lighthouse-runner.mjs http://localhost:5500",
         "audit:psi": "node scripts/psi-audit.mjs https://www.estivanayramia.com",
+        "visual:baseline": "node scripts/visual-regression.mjs baseline",
+        "visual:check": "node scripts/visual-regression.mjs check",
+        "anim:sanity": "node scripts/animation-sanity.mjs",
         "check:csp": "node scripts/check-csp.cjs",
         "test:contact": "cross-env MOCK_FORMSPREE=1 node scripts/test-contact-form-playwright.cjs",
         "test:contact:live": "cross-env MOCK_FORMSPREE=0 node scripts/test-contact-form-playwright.cjs"
@@ -37,9 +51,13 @@
         "autoprefixer": "^10.4.22",
         "cross-env": "^10.1.0",
         "esbuild": "^0.27.2",
+        "lighthouse": "^11.0.0",
         "lightningcss": "^1.30.2",
+        "pixelmatch": "^7.1.0",
         "playwright": "^1.57.0",
+        "pngjs": "^7.0.0",
         "postcss": "^8.5.6",
+        "puppeteer": "^21.4.0",
         "serve": "^14.2.5",
         "tailwindcss": "^3.4.17",
         "terser": "^5.44.1"
@@ -56,5 +74,9 @@
     "bugs": {
         "url": "https://github.com/estivanayramia/portfolio-site/issues"
     },
-    "homepage": "https://github.com/estivanayramia/portfolio-site#readme"
+    "homepage": "https://github.com/estivanayramia/portfolio-site#readme",
+    "dependencies": {
+        "gsap": "^3.14.2",
+        "marked": "^17.0.1"
+    }
 }
