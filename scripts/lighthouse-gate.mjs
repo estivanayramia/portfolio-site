@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RESULTS_DIR = path.join(__dirname, '..', 'lighthouse-results');
@@ -35,14 +36,39 @@ function score01(report, catKey) {
 }
 
 async function main() {
-  if (!fs.existsSync(RESULTS_DIR)) {
-    console.error(`Error: ${RESULTS_DIR} missing. Run npm run audit:lighthouse:local first.`);
-    process.exit(1);
-  }
-  const files = fs.readdirSync(RESULTS_DIR).filter(f => f.endsWith('.report.json'));
+  const ensureReports = () => {
+    if (!fs.existsSync(RESULTS_DIR)) return [];
+    return fs.readdirSync(RESULTS_DIR).filter(f => f.endsWith('.report.json'));
+  };
+
+  let files = ensureReports();
   if (files.length === 0) {
-    console.error('Error: No report JSON files found.');
-    process.exit(1);
+    console.log('No lighthouse reports found; generating fresh reports...');
+    try {
+      fs.rmSync(RESULTS_DIR, { recursive: true, force: true });
+    } catch {}
+
+    const runnerPath = path.join(__dirname, 'lighthouse-runner.mjs');
+    const baseUrl = process.env.LH_BASE_URL || process.env.BASE_URL;
+    const args = [runnerPath];
+    if (baseUrl) args.push(baseUrl);
+
+    const res = spawnSync(process.execPath, args, {
+      stdio: 'inherit',
+      env: process.env,
+      windowsHide: true,
+    });
+
+    if (res.status !== 0) {
+      console.error(`Error: lighthouse runner failed (exit=${res.status}).`);
+      process.exit(res.status || 1);
+    }
+
+    files = ensureReports();
+    if (files.length === 0) {
+      console.error(`Error: No report JSON files found after running lighthouse.`);
+      process.exit(1);
+    }
   }
 
   // Thresholds with warnings for misconfig
