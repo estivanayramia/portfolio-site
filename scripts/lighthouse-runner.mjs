@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import net from 'node:net';
 import puppeteer from 'puppeteer';
 import lighthouse from 'lighthouse';
 import { getBrowserLaunchConfig } from './browser-path.mjs';
@@ -18,6 +19,22 @@ const PAGES = [
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function getFreePort() {
+  return await new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.unref();
+    server.on('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      const address = server.address();
+      const port = typeof address === 'object' && address ? address.port : null;
+      server.close(() => {
+        if (typeof port === 'number') resolve(port);
+        else reject(new Error('Failed to allocate a free port'));
+      });
+    });
+  });
+}
 
 async function fetchStatus(url, timeoutMs = 1500) {
   const controller = new AbortController();
@@ -80,14 +97,14 @@ async function runAudit() {
   
   // Launch Chrome via Puppeteer to ensure we use the correct binary
   const launchConfig = getBrowserLaunchConfig();
-  const PORT = 9222;
+  const debugPort = await getFreePort();
   
   const browser = await puppeteer.launch({
     headless: 'new',
     executablePath: launchConfig.executablePath,
     args: [
         ...launchConfig.args, 
-        `--remote-debugging-port=${PORT}`,
+        `--remote-debugging-port=${debugPort}`,
         '--no-sandbox', 
         '--disable-setuid-sandbox'
     ]
@@ -97,7 +114,7 @@ async function runAudit() {
 
   try {
     const options = {
-        port: PORT,
+      port: debugPort,
         output: 'json',
         logLevel: 'error',
         onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'],
