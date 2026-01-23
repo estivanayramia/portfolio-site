@@ -54,13 +54,19 @@ async function ensureLocalServer(baseUrl) {
     windowsHide: true,
   });
 
+  let exitInfo = null;
+  child.once('exit', (code, signal) => {
+    exitInfo = { code, signal };
+  });
+
   child.stdout?.on('data', () => {});
   child.stderr?.on('data', () => {});
 
   const ready = await waitForUrl(baseUrl);
   if (!ready) {
     try { child.kill(); } catch {}
-    throw new Error(`Local server did not become ready at ${baseUrl}`);
+    const exitMsg = exitInfo ? ` (server exited early: code=${exitInfo.code} signal=${exitInfo.signal})` : '';
+    throw new Error(`Local server did not become ready at ${baseUrl}${exitMsg}`);
   }
 
   return {
@@ -74,7 +80,7 @@ async function ensureLocalServer(baseUrl) {
 
 // Original Sanity Check
 async function checkRoute(page, url) {
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.goto(url, { waitUntil: 'networkidle2', timeout: IS_CI ? 45000 : 30000 });
 
   await page.evaluate(async () => {
     if (document.fonts?.ready) await document.fonts.ready;
@@ -83,20 +89,23 @@ async function checkRoute(page, url) {
   try {
     await page.waitForFunction(
       () => !document.documentElement.classList.contains('gsap-prep'),
-      { timeout: IS_CI ? 15000 : 6000 }
+      { timeout: IS_CI ? 20000 : 6000 }
     );
   } catch {}
 
   const stuck = await page.evaluate(() => document.documentElement.classList.contains('gsap-prep'));
   if (stuck) {
-    throw new Error(`gsap-prep still present after 3s: ${url}`);
+    throw new Error(`gsap-prep still present: ${url}`);
   }
 
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight * 0.5));
-  await sleep(1200);
+  try {
+    await page.waitForNetworkIdle({ idleTime: 500, timeout: IS_CI ? 10000 : 3000 });
+  } catch {}
+  await sleep(IS_CI ? 1800 : 1000);
 
   let result;
-  const attempts = IS_CI ? 8 : 1;
+  const attempts = IS_CI ? 12 : 2;
   for (let attempt = 0; attempt < attempts; attempt++) {
     result = await page.evaluate(() => {
     const els = Array.from(document.querySelectorAll('[data-gsap]'));
@@ -111,6 +120,11 @@ async function checkRoute(page, url) {
           const parts = m[1].split(',').map((s) => parseFloat(s.trim()));
           return parts.length === 6 ? parts[5] : 0;
         }
+        const m3d = transform.match(/^matrix3d\(([^)]+)\)$/);
+        if (m3d) {
+          const parts = m3d[1].split(',').map((s) => parseFloat(s.trim()));
+          return parts.length === 16 ? parts[13] : 0;
+        }
         return 0;
       } catch { return 0; }
     };
@@ -120,17 +134,29 @@ async function checkRoute(page, url) {
     
     for (const el of els) {
       const rect = el.getBoundingClientRect();
-      const nearViewport = rect.top < vh * 1.15;
+      const nearViewport = rect.bottom > 0 && rect.top < vh * 1.15;
       if (!nearViewport) continue;
       
       const cs = getComputedStyle(el);
       const opacity = parseFloat(cs.opacity || '1');
       const ty = parseTy(cs.transform);
+      const hiddenByStyle = cs.display === 'none' || cs.visibility === 'hidden';
 
-      const hidden = opacity <= 0.01 || (opacity <= 0.01 && Math.abs(ty) > 1);
+      const hidden = hiddenByStyle || opacity <= 0.01;
       if (hidden) {
           hiddenNear += 1;
-          samples.push({ tag: el.tagName, top: rect.top, opacity, transform: cs.transform });
+          samples.push({
+            tag: el.tagName,
+            id: el.id || null,
+            className: el.className || null,
+            top: rect.top,
+            bottom: rect.bottom,
+            opacity,
+            transform: cs.transform,
+            ty,
+            display: cs.display,
+            visibility: cs.visibility,
+          });
       }
     }
     return { hiddenNear, total: els.length, samples };
@@ -138,7 +164,7 @@ async function checkRoute(page, url) {
 
     if (result.hiddenNear === 0) break;
     if (attempt < attempts - 1) {
-      await sleep(750);
+      await sleep(IS_CI ? 1000 : 500);
     }
   }
 
