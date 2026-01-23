@@ -35,6 +35,181 @@ function tryReadText(filePath) {
   }
 }
 
+function normalizeArgPath(p) {
+  return String(p ?? '')
+    .trim()
+    .replace(/\\/g, '/')
+    .replace(/^\.\//, '');
+}
+
+function ensureDir(dirPath) {
+  fs.mkdirSync(dirPath, { recursive: true });
+}
+
+function writeTextFile(filePath, content) {
+  ensureDir(path.dirname(filePath));
+  fs.writeFileSync(filePath, content, 'utf8');
+}
+
+function computeRunIdUtc() {
+  const d = new Date();
+  const pad2 = (n) => String(n).padStart(2, '0');
+  return (
+    String(d.getUTCFullYear()) +
+    pad2(d.getUTCMonth() + 1) +
+    pad2(d.getUTCDate()) +
+    '-' +
+    pad2(d.getUTCHours()) +
+    pad2(d.getUTCMinutes()) +
+    pad2(d.getUTCSeconds()) +
+    'Z'
+  );
+}
+
+function stripQueryAndHash(p) {
+  return String(p ?? '').split('#')[0].split('?')[0];
+}
+
+function isExternalUrl(s) {
+  return /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(String(s ?? ''));
+}
+
+function normalizeGitPath(p) {
+  return String(p ?? '').replace(/\\/g, '/').replace(/^\.\//, '');
+}
+
+function isConcreteHtmlTarget(p) {
+  const clean = stripQueryAndHash(String(p ?? ''));
+  if (!clean.toLowerCase().endsWith('.html')) return false;
+  if (clean.includes(':')) return false;
+  if (clean.includes('*')) return false;
+  return true;
+}
+
+function generateInventory(outDirAbs) {
+  const repoRoot = process.cwd();
+
+  const sourcesUsed = [];
+  const servedRoutes = [];
+  const redirects = [];
+
+  const serveJsonPath = path.join(repoRoot, 'serve.json');
+  const redirectsPath = path.join(repoRoot, '_redirects');
+
+  if (fs.existsSync(serveJsonPath)) {
+    sourcesUsed.push('serve.json');
+    const raw = fs.readFileSync(serveJsonPath, 'utf8');
+    const cfg = JSON.parse(raw);
+    const rewrites = Array.isArray(cfg?.rewrites) ? cfg.rewrites : [];
+    for (const r of rewrites) {
+      if (!r || typeof r !== 'object') continue;
+      const source = typeof r.source === 'string' ? r.source : undefined;
+      const destination = typeof r.destination === 'string' ? r.destination : undefined;
+      if (!source || !destination) continue;
+      if (isExternalUrl(destination)) continue;
+      if (!isConcreteHtmlTarget(destination)) continue;
+
+      const destClean = stripQueryAndHash(destination);
+      servedRoutes.push({
+        route: source,
+        target: normalizeGitPath(destClean.replace(/^\//, '')),
+      });
+    }
+  }
+
+  if (fs.existsSync(redirectsPath)) {
+    sourcesUsed.push('_redirects');
+    const raw = fs.readFileSync(redirectsPath, 'utf8');
+    const lines = raw.split(/\r?\n/);
+    for (const lineRaw of lines) {
+      const line = String(lineRaw ?? '').trim();
+      if (!line || line.startsWith('#')) continue;
+
+      const parts = line.split(/\s+/);
+      const from = parts[0];
+      const to = parts[1];
+      const statusToken = parts[2];
+      if (!from || !to) continue;
+
+      let status = 301;
+      if (statusToken && /^\d{3}!?$/.test(statusToken)) {
+        status = parseInt(statusToken.replace('!', ''), 10);
+      }
+
+      if (status === 200) {
+        if (isExternalUrl(to)) continue;
+        if (!isConcreteHtmlTarget(to)) continue;
+        const toClean = stripQueryAndHash(to);
+        servedRoutes.push({ route: from, target: normalizeGitPath(toClean.replace(/^\//, '')) });
+        continue;
+      }
+
+      if (status === 301 || status === 302) {
+        redirects.push({ from, to, status });
+      }
+    }
+  }
+
+  const generatedAtUtc = new Date().toISOString();
+
+  if (!sourcesUsed.length) {
+    const inventory = {
+      meta: { generatedAtUtc, sourcesUsed: [] },
+      servedRoutes: [],
+      redirects: [],
+      servedHtmlTargets: [],
+      missingTargets: [],
+      error: 'Neither serve.json nor _redirects exists; inventory cannot be generated without a source.',
+    };
+    writeTextFile(path.join(outDirAbs, 'inventory.json'), JSON.stringify(inventory, null, 2) + '\n');
+    writeTextFile(path.join(outDirAbs, 'inventory.txt'), 'ERROR: No routing source found (serve.json or _redirects).\n');
+    return { ok: false, inventory };
+  }
+
+  const servedHtmlTargetsSet = new Set();
+  const missingTargets = [];
+
+  for (const r of servedRoutes) {
+    const target = normalizeGitPath(r.target);
+    const abs = path.join(repoRoot, target);
+    if (fs.existsSync(abs) && fs.statSync(abs).isFile()) {
+      servedHtmlTargetsSet.add(target);
+    } else {
+      missingTargets.push({ route: r.route, target });
+    }
+  }
+
+  const servedHtmlTargets = Array.from(servedHtmlTargetsSet).sort();
+  const inventory = {
+    meta: { generatedAtUtc, sourcesUsed },
+    servedRoutes,
+    redirects,
+    servedHtmlTargets,
+    missingTargets,
+  };
+
+  writeTextFile(path.join(outDirAbs, 'inventory.json'), JSON.stringify(inventory, null, 2) + '\n');
+
+  const summaryLines = [];
+  summaryLines.push(`generatedAtUtc: ${generatedAtUtc}`);
+  summaryLines.push(`sourcesUsed: ${sourcesUsed.join(', ')}`);
+  summaryLines.push(`servedRoutes: ${servedRoutes.length}`);
+  summaryLines.push(`redirects: ${redirects.length}`);
+  summaryLines.push(`servedHtmlTargets: ${servedHtmlTargets.length}`);
+  summaryLines.push(`missingTargets: ${missingTargets.length}`);
+  summaryLines.push('');
+  if (missingTargets.length) {
+    summaryLines.push('MISSING TARGETS:');
+    for (const m of missingTargets) {
+      summaryLines.push(`- ${m.route} -> ${m.target}`);
+    }
+    summaryLines.push('');
+  }
+  writeTextFile(path.join(outDirAbs, 'inventory.txt'), summaryLines.join('\n') + '\n');
+
+  return { ok: missingTargets.length === 0, inventory };
+}
+
 function resolveInventoryPath(input) {
   const p = String(input ?? '').trim();
   if (!p) return null;
@@ -283,32 +458,98 @@ function main() {
     process.exit(4);
   }
 
-  const resolvedInventory = resolveInventoryPath(inventoryArg);
-  if (!resolvedInventory) {
-    process.stderr.write('STOP: cannot resolve inventory input\n');
-    process.exit(4);
-  }
-  if (typeof resolvedInventory === 'object' && resolvedInventory.error) {
-    process.stderr.write(`${resolvedInventory.error}\n`);
-    process.exit(4);
+  const repoRoot = process.cwd();
+  const invNorm = normalizeArgPath(inventoryArg);
+  const outNorm = normalizeArgPath(outDirArg);
+
+  let inventoryPath = null;
+  let outDir = null;
+  let autoBootstrappedRunId = null;
+
+  // CI-safe behavior: only auto-bootstrap when invoked exactly with `.reports/_latest`.
+  if (invNorm === '.reports/_latest') {
+    const latestAbs = path.resolve(repoRoot, inventoryArg);
+    const reportsDirAbs = path.dirname(latestAbs);
+
+    if (!fs.existsSync(latestAbs)) {
+      // Bootstrap
+      ensureDir(reportsDirAbs);
+      const runId = computeRunIdUtc();
+      autoBootstrappedRunId = runId;
+      const runDirAbs = path.join(reportsDirAbs, runId);
+      ensureDir(runDirAbs);
+      writeTextFile(latestAbs, runId);
+
+      // Generate inventory inside the run dir.
+      try {
+        generateInventory(runDirAbs);
+      } catch (e) {
+        process.stderr.write(`STOP: auto-bootstrap inventory generation failed: ${e?.message ?? String(e)}\n`);
+        process.exit(4);
+      }
+
+      inventoryPath = path.join(runDirAbs, 'inventory.json');
+      outDir = outNorm === '.reports/_latest' ? runDirAbs : path.resolve(repoRoot, outDirArg);
+    } else {
+      const txt = tryReadText(latestAbs);
+      const runId = String(txt ?? '').trim();
+      if (!runId) {
+        process.stderr.write(`STOP: inventory pointer file is empty: ${inventoryArg}\n`);
+        process.exit(4);
+      }
+      const runDirAbs = path.join(reportsDirAbs, runId);
+      const invAbs = path.join(runDirAbs, 'inventory.json');
+
+      // If pointer exists but inventory missing, generate it.
+      if (!existsSyncFile(invAbs)) {
+        try {
+          ensureDir(runDirAbs);
+          generateInventory(runDirAbs);
+        } catch (e) {
+          process.stderr.write(`STOP: inventory.json missing and generation failed: ${e?.message ?? String(e)}\n`);
+          process.exit(4);
+        }
+      }
+
+      inventoryPath = invAbs;
+      outDir = outNorm === '.reports/_latest' ? runDirAbs : path.resolve(repoRoot, outDirArg);
+    }
+  } else {
+    const resolvedInventory = resolveInventoryPath(inventoryArg);
+    if (!resolvedInventory) {
+      process.stderr.write('STOP: cannot resolve inventory input\n');
+      process.exit(4);
+    }
+    if (typeof resolvedInventory === 'object' && resolvedInventory.error) {
+      process.stderr.write(`${resolvedInventory.error}\n`);
+      process.exit(4);
+    }
+
+    const resolvedOutDir = resolveOutDir(outDirArg, inventoryArg);
+    if (!resolvedOutDir) {
+      process.stderr.write('STOP: cannot resolve outDir input\n');
+      process.exit(4);
+    }
+    if (typeof resolvedOutDir === 'object' && resolvedOutDir.error) {
+      process.stderr.write(`${resolvedOutDir.error}\n`);
+      process.exit(4);
+    }
+
+    inventoryPath = path.resolve(repoRoot, resolvedInventory);
+    outDir = path.resolve(repoRoot, resolvedOutDir);
   }
 
-  const resolvedOutDir = resolveOutDir(outDirArg, inventoryArg);
-  if (!resolvedOutDir) {
-    process.stderr.write('STOP: cannot resolve outDir input\n');
-    process.exit(4);
-  }
-  if (typeof resolvedOutDir === 'object' && resolvedOutDir.error) {
-    process.stderr.write(`${resolvedOutDir.error}\n`);
-    process.exit(4);
-  }
+  // Receipt-friendly startup diagnostics.
+  const relInv = normalizeSlash(path.relative(repoRoot, inventoryPath));
+  const relOut = normalizeSlash(path.relative(repoRoot, outDir));
+  const invPrint = relInv && !relInv.startsWith('..') ? relInv : normalizeSlash(inventoryPath);
+  const outPrint = relOut && !relOut.startsWith('..') ? relOut : normalizeSlash(outDir);
 
-  const inventoryPath = resolvedInventory;
-  const outDir = resolvedOutDir;
-
-  // Minimal, stable diagnostics for receipt/proofing.
-  process.stdout.write(`resolvedInventory=${normalizeSlash(path.resolve(process.cwd(), inventoryPath))}\n`);
-  process.stdout.write(`resolvedOutDir=${normalizeSlash(path.resolve(process.cwd(), outDir))}\n`);
+  process.stdout.write(`RESOLVED_INVENTORY=${invPrint}\n`);
+  process.stdout.write(`RESOLVED_OUTDIR=${outPrint}\n`);
+  if (autoBootstrappedRunId) {
+    process.stdout.write(`AUTO_BOOTSTRAP_RUN_ID=${autoBootstrappedRunId}\n`);
+  }
 
   let inv;
   try {
@@ -355,8 +596,6 @@ function main() {
     const from = r?.from;
     if (typeof from === 'string') addRouteCandidate(from);
   }
-
-  const repoRoot = process.cwd();
 
   const internalMissing = [];
   const externalRelErrors = [];
