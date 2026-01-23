@@ -338,7 +338,9 @@ async function ensureBaselineScreenshots({ baselineDir, baselineRef, baselinePor
     const refName = m ? m[2] : baselineRef;
     try {
       // Keep it shallow; we only need the tip.
-      await runGit(['fetch', remote, refName, '--depth=1']);
+      // NOTE: `git fetch <remote> <branch>` may only update FETCH_HEAD in some setups.
+      // Use an explicit refspec so refs/remotes/<remote>/<branch> is updated deterministically.
+      await runGit(['fetch', remote, `${refName}:refs/remotes/${remote}/${refName}`, '--depth=1']);
     } catch (err) {
       // eslint-disable-next-line no-console
       console.warn(`git fetch failed for ${baselineRef}; continuing (ref may already exist): ${err?.message || err}`);
@@ -439,6 +441,16 @@ async function captureScreenshots({ baseUrl, outDir }) {
               }
             `;
             document.head.appendChild(style);
+
+            // Some pages use a "reveal" / GSAP prep state that intentionally hides content
+            // until animations are ready. For screenshot determinism we force it visible.
+            document.documentElement?.classList?.remove('gsap-prep');
+            document.body?.classList?.remove('gsap-prep');
+            for (const el of document.querySelectorAll('.reveal, [data-gsap]')) {
+              el.classList?.add('is-visible');
+              el.style.opacity = '1';
+              el.style.transform = 'none';
+            }
           } catch {
             // ignore
           }
