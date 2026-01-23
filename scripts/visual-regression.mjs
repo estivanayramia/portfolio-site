@@ -3,6 +3,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import http from 'node:http';
 import https from 'node:https';
+import net from 'node:net';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
@@ -117,6 +118,44 @@ async function stopChildProcess(child, timeoutMs = 4_000) {
   }
 }
 
+async function findFreePort(startPort, maxTries = 30) {
+  for (let i = 0; i < maxTries; i++) {
+    const port = startPort + i;
+    // eslint-disable-next-line no-await-in-loop
+    const ok = await new Promise((resolve) => {
+      const server = net.createServer();
+      server.unref();
+      server.once('error', () => resolve(false));
+      // Match local-serve.js default binding (no host => all interfaces, incl IPv6).
+      server.listen(port, () => {
+        server.close(() => resolve(true));
+      });
+    });
+    if (ok) return port;
+  }
+
+  throw new Error(`Unable to find a free port starting at ${startPort}`);
+}
+
+async function findFreePortAvoid(startPort, avoidPort, maxTries = 30) {
+  for (let i = 0; i < maxTries; i++) {
+    const port = startPort + i;
+    if (port === avoidPort) continue;
+    // eslint-disable-next-line no-await-in-loop
+    const ok = await new Promise((resolve) => {
+      const server = net.createServer();
+      server.unref();
+      server.once('error', () => resolve(false));
+      server.listen(port, () => {
+        server.close(() => resolve(true));
+      });
+    });
+    if (ok) return port;
+  }
+
+  throw new Error(`Unable to find a free port starting at ${startPort} (avoiding ${avoidPort})`);
+}
+
 async function ensureLocalServerUp(baseUrl) {
   const normalized = ensureTrailingSlash(baseUrl);
   const rootUrl = new URL('/', normalized).toString();
@@ -174,6 +213,14 @@ function parseArgs(argv) {
       args.baseUrl = raw.split('=')[1];
       continue;
     }
+    if (raw.startsWith('--baselineRef=')) {
+      args.baselineRef = raw.split('=')[1];
+      continue;
+    }
+    if (raw.startsWith('--baselinePort=')) {
+      args.baselinePort = Number(raw.split('=')[1]);
+      continue;
+    }
     args._.push(raw);
   }
   return args;
@@ -181,6 +228,148 @@ function parseArgs(argv) {
 
 function ensureTrailingSlash(url) {
   return url.endsWith('/') ? url : `${url}/`;
+}
+
+function isHexCommitish(ref) {
+  return /^[0-9a-f]{7,40}$/i.test(ref);
+}
+
+async function runGit(args, { cwd = REPO_ROOT } = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn('git', args, {
+      cwd,
+      stdio: 'inherit',
+      windowsHide: true,
+    });
+
+    child.once('error', reject);
+    child.once('close', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`git ${args.join(' ')} exited with code ${code}`));
+    });
+  });
+}
+
+async function removeWorktree(worktreePath) {
+  if (!fs.existsSync(worktreePath)) return;
+
+  // Only call `git worktree remove` if it looks like a linked worktree.
+  const gitMarker = path.join(worktreePath, '.git');
+  if (fs.existsSync(gitMarker)) {
+    try {
+      await runGit(['worktree', 'remove', '-f', worktreePath]);
+    } catch {
+      // ignore
+    }
+  }
+
+  try {
+    await fsp.rm(worktreePath, { recursive: true, force: true });
+  } catch {
+    // ignore
+  }
+}
+
+async function startLocalServerForRepoRoot(repoRoot, port) {
+  const chosenPort = Number.isFinite(port) && port > 0 ? port : await findFreePort(5500);
+  const serverScript = path.join(repoRoot, 'scripts', 'local-serve.js');
+  const child = spawn(process.execPath, [serverScript], {
+    cwd: repoRoot,
+    env: {
+      ...process.env,
+      PORT: String(chosenPort),
+    },
+    stdio: 'inherit',
+    windowsHide: true,
+  });
+
+  const closed = new Promise((resolve) => {
+    child.once('close', (code) => resolve(code));
+    child.once('error', () => resolve(-1));
+  });
+
+  const baseUrl = `http://localhost:${chosenPort}/`;
+  try {
+    const winner = await Promise.race([waitForUrl(baseUrl, 15_000, 300).then(() => 'ready'), closed.then(() => 'closed')]);
+    if (winner !== 'ready' || child.exitCode !== null) {
+      throw new Error(`Local server failed to start on port ${chosenPort}`);
+    }
+  } catch (err) {
+    await stopChildProcess(child);
+    throw err;
+  }
+
+  return {
+    baseUrl,
+    stop: async () => {
+      await stopChildProcess(child);
+    },
+  };
+}
+
+function expectedScreenshotFiles() {
+  const files = [];
+  for (const viewport of VIEWPORTS) {
+    for (const route of ROUTES) {
+      files.push(makeShotName(viewport.name, route.name));
+    }
+  }
+  return files;
+}
+
+async function ensureBaselineScreenshots({ baselineDir, baselineRef, baselinePort, avoidPort }) {
+  const expected = expectedScreenshotFiles();
+  const missing = expected.filter((fileName) => !fs.existsSync(path.join(baselineDir, fileName)));
+  if (missing.length === 0) return { generated: false };
+
+  const tmpRoot = path.join(REPO_ROOT, '.tmp');
+  const baselineWorktreeDir = path.join(tmpRoot, 'visual-baseline-worktree');
+
+  // eslint-disable-next-line no-console
+  console.log(`Baseline missing (${missing.length}/${expected.length}); generating from ${baselineRef}...`);
+
+  await ensureDir(tmpRoot);
+  await removeWorktree(baselineWorktreeDir);
+
+  // Ensure the baseline ref exists locally (important for CI shallow checkouts).
+  if (!isHexCommitish(baselineRef) && String(baselineRef).toUpperCase() !== 'HEAD') {
+    const m = baselineRef.match(/^([^/]+)\/(.+)$/);
+    const remote = m ? m[1] : 'origin';
+    const refName = m ? m[2] : baselineRef;
+    try {
+      // Keep it shallow; we only need the tip.
+      await runGit(['fetch', remote, refName, '--depth=1']);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn(`git fetch failed for ${baselineRef}; continuing (ref may already exist): ${err?.message || err}`);
+    }
+  }
+
+  await runGit(['worktree', 'add', '--detach', baselineWorktreeDir, baselineRef]);
+
+  const requestedBaselinePort = Number.isFinite(baselinePort) ? baselinePort : 0;
+  const baselinePortResolved =
+    requestedBaselinePort > 0 && requestedBaselinePort !== avoidPort
+      ? requestedBaselinePort
+      : await findFreePortAvoid(5501, Number.isFinite(avoidPort) ? avoidPort : -1);
+
+  const baselineServer = await startLocalServerForRepoRoot(baselineWorktreeDir, baselinePortResolved);
+  try {
+    await fsp.rm(baselineDir, { recursive: true, force: true });
+    await captureScreenshots({ baseUrl: baselineServer.baseUrl, outDir: baselineDir });
+    // eslint-disable-next-line no-console
+    console.log(`Baseline generated at: ${path.relative(REPO_ROOT, baselineDir)} (from ${baselineRef})`);
+  } finally {
+    await baselineServer.stop();
+    await removeWorktree(baselineWorktreeDir);
+    try {
+      await runGit(['worktree', 'prune']);
+    } catch {
+      // ignore
+    }
+  }
+
+  return { generated: true };
 }
 
 function pct(n) {
@@ -385,27 +574,45 @@ async function main() {
   const mode = process.argv[2];
   const args = parseArgs(process.argv.slice(3));
 
-  const baseUrl = args.baseUrl || process.env.BASE_URL || 'http://localhost:5500';
+  const baseUrlExplicit = args.baseUrl || process.env.BASE_URL;
+  const baseUrl = baseUrlExplicit || 'http://localhost:5500';
   const thresholdRatio = Number.isFinite(args.threshold)
     ? args.threshold
     : Number(process.env.VISUAL_THRESHOLD || 0.003);
+
+  const baselineRef =
+    args.baselineRef ||
+    process.env.VISUAL_BASE_REF ||
+    (process.env.GITHUB_BASE_REF ? `origin/${process.env.GITHUB_BASE_REF}` : 'HEAD');
+
+  const baselinePort = Number.isFinite(args.baselinePort)
+    ? args.baselinePort
+    : Number(process.env.VISUAL_BASELINE_PORT || 5501);
 
   const baselineDir = path.join(REPO_ROOT, 'visual-baseline');
   const currentDir = path.join(REPO_ROOT, 'visual-current');
   const diffDir = path.join(REPO_ROOT, 'visual-diff');
 
-  const server = await ensureLocalServerUp(baseUrl);
+  // If BASE_URL isn't explicitly provided, always use a controlled local server
+  // (avoid accidentally talking to some other process already bound to localhost:5500).
+  const server = baseUrlExplicit
+    ? await ensureLocalServerUp(baseUrl)
+    : await startLocalServerForRepoRoot(REPO_ROOT, await findFreePort(5500));
+
+  const effectiveBaseUrl = server.baseUrl || baseUrl;
+  const avoidPort = Number(new URL(effectiveBaseUrl).port || 80);
 
   try {
     if (mode === 'baseline') {
-      await captureScreenshots({ baseUrl, outDir: baselineDir });
+      await captureScreenshots({ baseUrl: effectiveBaseUrl, outDir: baselineDir });
       // eslint-disable-next-line no-console
       console.log(`Baseline written to: ${path.relative(REPO_ROOT, baselineDir)}`);
       return;
     }
 
     if (mode === 'check') {
-      await captureScreenshots({ baseUrl, outDir: currentDir });
+      await ensureBaselineScreenshots({ baselineDir, baselineRef, baselinePort, avoidPort });
+      await captureScreenshots({ baseUrl: effectiveBaseUrl, outDir: currentDir });
       await diffScreenshots({ baselineDir, currentDir, diffDir, thresholdRatio });
       return;
     }
