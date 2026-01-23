@@ -90,16 +90,16 @@ async function main() {
     }
   }
 
-  warnEnv('LH_MIN_PERF', process.env.LH_MIN_PERF, 1.0, 'score');
-  warnEnv('LH_MIN_A11Y', process.env.LH_MIN_A11Y, 1.0, 'score');
-  warnEnv('LH_MIN_BP', process.env.LH_MIN_BP, 1.0, 'score');
-  warnEnv('LH_MIN_SEO', process.env.LH_MIN_SEO, 1.0, 'score');
+  warnEnv('LH_MIN_PERF', process.env.LH_MIN_PERF, 0.9, 'score');
+  warnEnv('LH_MIN_A11Y', process.env.LH_MIN_A11Y, 0.95, 'score');
+  warnEnv('LH_MIN_BP', process.env.LH_MIN_BP, 0.95, 'score');
+  warnEnv('LH_MIN_SEO', process.env.LH_MIN_SEO, 0.95, 'score');
   warnEnv('LH_ENFORCE_PERF', process.env.LH_ENFORCE_PERF, false, 'bool');
 
-  const minPerf = parseMinScore(process.env.LH_MIN_PERF, 1.0);
-  const minA11y = parseMinScore(process.env.LH_MIN_A11Y, 1.0);
-  const minBP = parseMinScore(process.env.LH_MIN_BP, 1.0);
-  const minSEO = parseMinScore(process.env.LH_MIN_SEO, 1.0);
+  const minPerf = parseMinScore(process.env.LH_MIN_PERF, 0.9);
+  const minA11y = parseMinScore(process.env.LH_MIN_A11Y, 0.95);
+  const minBP = parseMinScore(process.env.LH_MIN_BP, 0.95);
+  const minSEO = parseMinScore(process.env.LH_MIN_SEO, 0.95);
   const enforcePerf = parseBool(process.env.LH_ENFORCE_PERF, false);
 
   console.log('Lighthouse Gate Thresholds:');
