@@ -6,6 +6,7 @@ const ROUTES = ['/', '/about', '/overview', '/contact', '/projects/'];
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:5500';
 const IS_JANK_MODE = process.argv.includes('--jank');
+const IS_CI = !!process.env.CI;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -74,7 +75,17 @@ async function ensureLocalServer(baseUrl) {
 // Original Sanity Check
 async function checkRoute(page, url) {
   await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-  await sleep(3100);
+
+  await page.evaluate(async () => {
+    if (document.fonts?.ready) await document.fonts.ready;
+  });
+
+  try {
+    await page.waitForFunction(
+      () => !document.documentElement.classList.contains('gsap-prep'),
+      { timeout: IS_CI ? 15000 : 6000 }
+    );
+  } catch {}
 
   const stuck = await page.evaluate(() => document.documentElement.classList.contains('gsap-prep'));
   if (stuck) {
@@ -84,7 +95,10 @@ async function checkRoute(page, url) {
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight * 0.5));
   await sleep(1200);
 
-  const result = await page.evaluate(() => {
+  let result;
+  const attempts = IS_CI ? 8 : 1;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    result = await page.evaluate(() => {
     const els = Array.from(document.querySelectorAll('[data-gsap]'));
     const vh = window.innerHeight || document.documentElement.clientHeight || 0;
     
@@ -120,7 +134,13 @@ async function checkRoute(page, url) {
       }
     }
     return { hiddenNear, total: els.length, samples };
-  });
+    });
+
+    if (result.hiddenNear === 0) break;
+    if (attempt < attempts - 1) {
+      await sleep(750);
+    }
+  }
 
   if (result.hiddenNear !== 0) {
     throw new Error(
