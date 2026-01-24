@@ -439,6 +439,15 @@ async function captureScreenshots({ baseUrl, outDir }) {
                 transition-delay: 0s !important;
                 caret-color: transparent !important;
               }
+
+              /* Hide dynamic/floating UI that can cause flaky diffs */
+              #chat-widget,
+              #chat-window,
+              #welcome-bubble,
+              #scroll-to-top,
+              #scroll-to-top-tooltip {
+                display: none !important;
+              }
             `;
             document.head.appendChild(style);
 
