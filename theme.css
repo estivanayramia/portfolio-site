@@ -1257,7 +1257,6 @@ select {
 }
 
 #scroll-to-top .scroll-progress-circle {
-    transition: stroke-dashoffset 0.1s linear;
     transform: rotate(-90deg);
     transform-origin: 50% 50%;
 }

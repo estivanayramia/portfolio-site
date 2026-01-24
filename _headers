@@ -10,6 +10,7 @@
   Cache-Control: max-age=0
 
 /sw.js
+  Cache-Control: max-age=0
 
 
 

@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v20260119-5';
+const CACHE_VERSION = 'v0';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -31,6 +31,14 @@ const ASSETS_TO_CACHE = [
     '/assets/img/headshot.webp',
     '/assets/img/savonie-thumb.webp'
 ];
+
+// Allow the page to trigger immediate activation when a new SW is waiting.
+self.addEventListener('message', (event) => {
+    if (!event?.data || typeof event.data !== 'object') return;
+    if (event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
 
 // Install event - cache assets
 self.addEventListener('install', (event) => {
@@ -57,6 +65,7 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             ))
+            .then(() => self.clients.claim())
     );
 });
 

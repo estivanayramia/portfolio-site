@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
     <script>document.documentElement.classList.add('js')</script>
@@ -13,30 +13,8 @@
   <meta property="og:url" content="https://www.estivanayramia.com/hobbies-games/nano-wirebot">
   <link rel="stylesheet" href="/assets/css/style.css?v=20260120">
   <link rel="stylesheet" href="/theme.css?v=v20260119-5">
+  <link rel="stylesheet" href="/assets/css/arcade-embed.css?v=20260120">
   <link rel="icon" href="/assets/img/icon-192.png" type="image/png">
-  <style>
-    body { margin: 0; padding: 0; background: #212842; overflow-y: auto; }
-    .game-wrapper { display: flex; flex-direction: column; min-height: 100vh; }
-    .game-header { padding: 16px 24px; display: flex; align-items: center; gap: 16px; background: rgba(33,40,66,0.95); border-bottom: 1px solid rgba(225,212,194,0.1); }
-    .back-link { color: #e1d4c2; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-    .back-link:hover { opacity: 0.8; }
-    .game-title { color: #e1d4c2; font-size: 1.25rem; font-weight: 700; margin: 0; }
-    .pc-warning { margin-left: auto; color: #e1d4c2; font-size: 0.85rem; font-weight: 600; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(225,212,194,0.2); background: rgba(0,0,0,0.15); white-space: nowrap; }
-    .game-frame-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; }
-    .game-frame { width: 100%; max-width: 960px; height: 70vh; border: none; border-radius: 12px; background: #000; }
-
-    @media (max-width: 640px) {
-      .game-header { flex-wrap: wrap; row-gap: 8px; }
-      .pc-warning { margin-left: 0; }
-    }
-  
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: rgba(33, 40, 66, 0.1); }
-    ::-webkit-scrollbar-thumb { background: rgba(54, 32, 23, 0.5); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(54, 32, 23, 0.8); }
-
-  </style>
 </head>
 <body data-arcade-achievements-filter="mini_nano_wirebot">
   <div class="game-wrapper">
@@ -118,9 +96,9 @@
             <div id="scroll-to-top-tooltip" class="scroll-to-top-btn-tooltip" role="tooltip">Back to top</div>
         </button>
 <!-- Savonie AI Chat Widget -->
-    <div id="chat-widget" class="fixed bottom-6 z-50 font-sans" style="z-index: 9999;" role="region" aria-label="AI Chat Assistant">
+    <div id="chat-widget" class="fixed bottom-6 z-[9999] font-sans" role="region" aria-label="AI Chat Assistant">
         <!-- Chat Window (independently positioned when dragging) -->
-        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);" role="dialog" aria-modal="true" aria-labelledby="chat-title">
+        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col max-w-[calc(100vw-48px)] max-h-[calc(100vh-120px)]" role="dialog" aria-modal="true" aria-labelledby="chat-title">
             <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
                 <h3 id="chat-title" class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
                     <img src="/assets/img/savonie-thumb.webp" alt="Savonie chatbot avatar" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64" loading="lazy" decoding="async">
@@ -146,7 +124,7 @@
         </div>
 
         <!-- Welcome Bubble (anchored above toggle button) -->
-        <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
+        <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none bottom-[5.625rem]">
             <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
         </div>
 
