@@ -53,7 +53,6 @@
 /projects/portfolio/    /projects/portfolio    301
 
 # Clean URL rewrites (200) -> serve from /EN/
-/    /EN/index.html    200
 /about    /EN/about.html    200
 /contact    /EN/contact.html    200
 /deep-dive    /EN/deep-dive.html    200
