@@ -32,7 +32,42 @@
     if (!('serviceWorker' in navigator)) return;
     const registration = await navigator.serviceWorker.getRegistration();
     if (!registration) return;
+
+    const reloadGuardKey = 'swReloadedOnce';
+    const onControllerChange = () => {
+      try {
+        if (sessionStorage.getItem(reloadGuardKey)) return;
+        sessionStorage.setItem(reloadGuardKey, '1');
+      } catch (e) {
+        // If sessionStorage is unavailable, still avoid reload loops by doing nothing.
+        return;
+      }
+      window.location.reload();
+    };
+
+    // If a new SW takes control, reload once to pick up latest JS/CSS.
+    navigator.serviceWorker.addEventListener('controllerchange', onControllerChange, { once: true });
+
+    const trySkipWaiting = () => {
+      const waiting = registration.waiting;
+      if (!waiting) return;
+      try {
+        waiting.postMessage({ type: 'SKIP_WAITING' });
+      } catch (e) {
+        // Best-effort only
+      }
+    };
+
+    // Trigger the browser to check for an update.
     await registration.update();
+    trySkipWaiting();
+
+    // If an update was found and is installing, wait until it's installed (waiting).
+    if (registration.installing) {
+      registration.installing.addEventListener('statechange', () => {
+        if (registration.waiting) trySkipWaiting();
+      });
+    }
   };
 
   (async () => {
