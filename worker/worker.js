@@ -12,34 +12,137 @@
 
 // In-memory cache for site facts (expires after 1 hour)
 let cachedSiteFacts = null;
-let cachedSiteFactsSource = "unknown"; // "kv" | "fallback" | "unknown"
+let cachedSiteFactsSource = "unknown"; // "memory" | "cache" | "url" | "kv" | "fallback" | "unknown"
 let cacheTimestamp = 0;
-const CACHE_TTL_MS = 3600000; // 1 hour
+const FACTS_CACHE_TTL_SECONDS = 3600;
+const CACHE_TTL_MS = FACTS_CACHE_TTL_SECONDS * 1000;
+let lastFactsFallbackLogAt = 0;
+
+function isLocalHost(host) {
+  if (!host) return false;
+  const h = String(host).toLowerCase();
+  return h === "localhost" || h.startsWith("localhost:") || h === "127.0.0.1" || h.startsWith("127.0.0.1:");
+}
+
+function getFactsUrl(request, env) {
+  const override = env?.SITE_FACTS_URL;
+  if (override && typeof override === "string" && override.trim()) return override.trim();
+  const host = new URL(request.url).host;
+  return `https://${host}/assets/data/site-facts.json`;
+}
+
+function isValidFactsObject(obj) {
+  return !!(
+    obj &&
+    typeof obj === "object" &&
+    Array.isArray(obj.projects) &&
+    Array.isArray(obj.hobbies)
+  );
+}
+
+function normalizeFacts(obj) {
+  return {
+    projects: Array.isArray(obj?.projects) ? obj.projects : [],
+    hobbies: Array.isArray(obj?.hobbies) ? obj.hobbies : []
+  };
+}
 
 /**
- * Load site facts from KV with caching
- * Falls back to embedded default if KV fails
+ * Load site facts with caching.
+ * Default source: https://{request.host}/assets/data/site-facts.json
+ * Override: env.SITE_FACTS_URL
+ * Cache layers: in-memory -> caches.default -> fetch -> KV (optional) -> embedded fallback
  */
-async function getSiteFacts(env) {
+async function getSiteFacts({ request, env, ctx }) {
   const now = Date.now();
-  
+  const requestHost = new URL(request.url).host;
+  const factsUrl = getFactsUrl(request, env);
+  const cacheKey = new Request(factsUrl, { method: "GET" });
+  const staleFacts = cachedSiteFacts;
+
   // Return cached facts if still valid
   if (cachedSiteFacts && (now - cacheTimestamp) < CACHE_TTL_MS) {
+    cachedSiteFactsSource = cachedSiteFactsSource === "unknown" ? "memory" : cachedSiteFactsSource;
     return cachedSiteFacts;
   }
-  
-  // Try loading from KV
-  try {
-    const kvData = await env.SAVONIE_KV.get("site-facts:v1", { type: "json" });
-    if (kvData && kvData.projects && kvData.hobbies) {
-      cachedSiteFacts = kvData;
-      cachedSiteFactsSource = "kv";
-      cacheTimestamp = now;
-      console.log(`✅ Loaded site facts from KV (${kvData.projects.length} projects, ${kvData.hobbies.length} hobbies)`);
-      return cachedSiteFacts;
+
+  // Try Cache API first (best-effort)
+  const cache = (typeof caches !== "undefined" && caches?.default) ? caches.default : null;
+  if (cache) {
+    try {
+      const cached = await cache.match(cacheKey);
+      if (cached) {
+        const cachedJson = await cached.json();
+        if (isValidFactsObject(cachedJson)) {
+          cachedSiteFacts = normalizeFacts(cachedJson);
+          cachedSiteFactsSource = "cache";
+          cacheTimestamp = now;
+          return cachedSiteFacts;
+        }
+      }
+    } catch {
+      // Ignore cache parse failures; fall back.
     }
-  } catch (error) {
-    console.error("⚠️ KV fetch failed, using fallback:", error.message);
+  }
+
+  // Fetch from the deployed site (best-effort)
+  try {
+    const res = await fetchWithTimeout(
+      factsUrl,
+      {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        cf: { cacheTtl: FACTS_CACHE_TTL_SECONDS, cacheEverything: true }
+      },
+      8000
+    );
+
+    if (res.ok) {
+      const text = await res.text();
+      const parsed = JSON.parse(text);
+      if (isValidFactsObject(parsed)) {
+        cachedSiteFacts = normalizeFacts(parsed);
+        cachedSiteFactsSource = "url";
+        cacheTimestamp = now;
+
+        if (cache && typeof cache.put === "function" && ctx?.waitUntil) {
+          const cacheRes = new Response(text, {
+            status: 200,
+            headers: {
+              "Content-Type": "application/json",
+              "Cache-Control": `public, max-age=${FACTS_CACHE_TTL_SECONDS}`
+            }
+          });
+          ctx.waitUntil(cache.put(cacheKey, cacheRes));
+        }
+
+        return cachedSiteFacts;
+      }
+    }
+  } catch {
+    // Ignore; fall back.
+  }
+
+  // Try KV (optional fallback)
+  const kvConfigured = !!(env?.SAVONIE_KV && typeof env.SAVONIE_KV.get === "function");
+  if (kvConfigured) {
+    try {
+      const kvData = await env.SAVONIE_KV.get("site-facts:v1", { type: "json" });
+      if (isValidFactsObject(kvData)) {
+        cachedSiteFacts = normalizeFacts(kvData);
+        cachedSiteFactsSource = "kv";
+        cacheTimestamp = now;
+        return cachedSiteFacts;
+      }
+    } catch {
+      // Ignore; fall back.
+    }
+  }
+
+  // If we have stale in-memory facts, use them as last-known-good.
+  if (staleFacts && isValidFactsObject(staleFacts)) {
+    cachedSiteFactsSource = "memory";
+    return staleFacts;
   }
   
   // Fallback: embedded facts (must stay in sync with assets/data/site-facts.json)
@@ -149,7 +252,12 @@ async function getSiteFacts(env) {
   cachedSiteFacts = fallbackFacts;
   cachedSiteFactsSource = "fallback";
   cacheTimestamp = now;
-  console.warn("⚠️ Using fallback site facts - KV unavailable");
+
+  const shouldLogFallback = !isLocalHost(requestHost) && now - lastFactsFallbackLogAt > 10 * 60 * 1000;
+  if (shouldLogFallback) {
+    lastFactsFallbackLogAt = now;
+    console.warn("⚠️ Using fallback site facts");
+  }
   return fallbackFacts;
 }
 
@@ -260,14 +368,29 @@ function linkifyPages(text) {
   return linked;
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function hasWord(textLower, wordLower) {
+  if (!textLower || !wordLower) return false;
+  const re = new RegExp(`\\b${escapeRegExp(wordLower)}\\b`, "i");
+  return re.test(textLower);
+}
+
+function hasAnyWord(textLower, wordsLower) {
+  if (!Array.isArray(wordsLower)) return false;
+  return wordsLower.some((w) => hasWord(textLower, String(w).toLowerCase()));
+}
+
 /**
  * Detect user intent from message
  */
 function detectIntent(lowerMsg) {
   if (/(^|\b)(hi|hello|hey|yo|good morning|good afternoon|good evening)(\b|!|\.)/.test(lowerMsg)) return "greeting";
   if (/(recruiter|hiring manager|interview|role|position|opportunity|availability|available|start date)/.test(lowerMsg)) return "recruiter";
-  if (/(email|contact|reach|message|connect)/.test(lowerMsg)) return "contact";
-  if (/(salary|compensation|rate|pay|wage|range)/.test(lowerMsg)) return "salary";
+  if (/(\bemail\b|\bcontact\b|\breach\b|\breach out\b|\bconnect\b|\bmessage\b)/.test(lowerMsg)) return "contact";
+  if (/(\bsalary\b|\bcompensation\b|\brate\b|\bpay\b|\bwage\b|\brange\b)/.test(lowerMsg)) return "salary";
   if (/(project|projects|case study|portfolio|work samples)/.test(lowerMsg)) return "projects";
   // Detect "What does Estivan do?" and similar summary questions
   if (/(what does (he|estivan) do|what is (he|estivan)|who is (he|estivan)|who are you|about you|about estivan|summary|tell me about|elevator pitch|quick summary|bio|background|experience|his background)/.test(lowerMsg)) return "summary";
@@ -331,6 +454,7 @@ function buildDebugInfo(isDebug, lowerMsg, source = "buildChips") {
   return {
     intent: intent,
     chips_source: source,
+    facts_source: cachedSiteFactsSource,
     message_lower: lowerMsg.slice(0, 100)
   };
 }
@@ -406,7 +530,7 @@ ${hobbyList}
   
   if (intent === "contact") {
     return {
-      reply: `You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact). He usually responds within 24 hours.`,
+      reply: `You can reach Estivan directly at hello@estivanayramia.com or visit the [Contact Page](/contact). He usually responds within 24 hours.`,
       chips: ["Projects", "Resume"]
     };
   }
@@ -415,7 +539,7 @@ ${hobbyList}
     return {
       reply: `I'm currently in offline mode and can't provide detailed information about availability or compensation. 
 
-Please reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact) to discuss opportunities.`,
+Please reach Estivan directly at hello@estivanayramia.com or visit the [Contact Page](/contact) to discuss opportunities.`,
   chips: ["Projects", "Resume", "Contact"]
     };
   }
@@ -588,6 +712,32 @@ function getCorsHeaders(request) {
   };
 }
 
+function normalizeReplyText(text, requestHost) {
+  if (typeof text !== "string" || !text) return text;
+
+  let out = text;
+
+  // Strip any mailto: links.
+  out = out.replace(/\[([^\]]+)\]\(mailto:[^)]+\)/gi, "$1");
+  out = out.replace(/mailto:/gi, "");
+
+  // Convert relative markdown links to absolute https URLs.
+  if (requestHost) {
+    const origin = `https://${requestHost}`;
+    out = out.replace(/\]\((\/[^)]+)\)/g, `](${origin}$1)`);
+  }
+
+  return out;
+}
+
+function normalizeResponseBody(body, requestHost) {
+  if (!body || typeof body !== "object") return body;
+  if (typeof body.reply === "string") {
+    return { ...body, reply: normalizeReplyText(body.reply, requestHost) };
+  }
+  return body;
+}
+
 /**
  * Send consistent JSON responses
  */
@@ -703,11 +853,16 @@ function checkLocalRateLimit(clientIP) {
 // MAIN HANDLER
 // ============================================================================
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const corsHeaders = getCorsHeaders(request);
+    const requestUrl = new URL(request.url);
+    const requestHost = requestUrl.host;
+
+    const respond = (body, status) =>
+      jsonReply(normalizeResponseBody(body, requestHost), status, corsHeaders);
     
-    // Load site facts from KV (cached, fast after first call)
-    const siteFacts = await getSiteFacts(env);
+    // Load site facts (cached, auto-refreshing)
+    const siteFacts = await getSiteFacts({ request, env, ctx });
 
     // --- CORS PREFLIGHT ---
     if (request.method === "OPTIONS") {
@@ -715,11 +870,10 @@ export default {
     }
 
     // --- HEALTH CHECK ---
-    const url = new URL(request.url);
-    if (request.method === "GET" && url.pathname === "/health") {
+    if (request.method === "GET" && requestUrl.pathname === "/health") {
       const hasKey = !!(env.GEMINI_API_KEY && env.GEMINI_API_KEY.length > 10);
       const factsCacheAgeMs = cachedSiteFacts ? Math.max(0, Date.now() - cacheTimestamp) : null;
-      return jsonReply(
+      return respond(
         {
           ok: true,
           version: VERSION_TAG,
@@ -729,25 +883,22 @@ export default {
           factsSource: cachedSiteFactsSource,
           factsCacheAgeMs
         },
-        200,
-        corsHeaders
+        200
       );
     }
 
     if (request.method !== "POST") {
-      return jsonReply(
+      return respond(
         { errorType: "BadRequest", reply: "Method not allowed." },
-        405,
-        corsHeaders
+        405
       );
     }
 
-    const isChatPath = url.pathname === "/api/chat" || url.pathname === "/chat";
+    const isChatPath = requestUrl.pathname === "/api/chat" || requestUrl.pathname === "/chat";
     if (!isChatPath) {
-      return jsonReply(
+      return respond(
         { errorType: "BadRequest", reply: "Not found." },
-        404,
-        corsHeaders
+        404
       );
     }
 
@@ -758,24 +909,21 @@ export default {
         body = await request.json();
       } catch (e) {
         console.error("Invalid JSON:", e.message);
-        return jsonReply(
+        return respond(
           { errorType: "BadRequest", reply: "Invalid JSON body." },
-          400,
-          corsHeaders
+          400
         );
       }
 
       const { message, pageContent, language, previousContext } = body || {};
 
       // Check for debug mode
-      const url = new URL(request.url);
-      const isDebug = url.searchParams.get('debug') === '1' || request.headers.get('X-Savonie-Debug') === '1';
+      const isDebug = requestUrl.searchParams.get('debug') === '1' || request.headers.get('X-Savonie-Debug') === '1';
 
       if (typeof message !== "string" || !message.trim()) {
-        return jsonReply(
+        return respond(
           { errorType: "BadRequest", reply: "Missing or empty 'message'." },
-          400,
-          corsHeaders
+          400
         );
       }
 
@@ -793,15 +941,14 @@ export default {
         );
 
         if (targetProject?.title && targetProject?.url) {
-          return jsonReply(
+          return respond(
             {
               errorType: null,
               reply: `The exact title is **${targetProject.title}**. View it here: [${targetProject.title}](${targetProject.url})`,
               chips: ["Projects", "Resume", "Contact"],
               debug: buildDebugInfo(isDebug, lowerMsg, "hardcoded_taking_down_endpoint")
             },
-            200,
-            corsHeaders
+            200
           );
         }
       }
@@ -822,14 +969,13 @@ export default {
           const { success } = await env.RATE_LIMITER.limit({ key: `ip:${clientIP}` });
           
           if (!success) {
-            return jsonReply(
+            return respond(
               {
                 errorType: "RateLimit",
                 reply: "Whoa, too fast! Give me a minute to catch up. ⏱️",
                 chips: ["Wait a moment", "What can you help with?"]
               },
-              429,
-              corsHeaders
+              429
             );
           }
         } catch (err) {
@@ -839,14 +985,13 @@ export default {
       } else {
         // Fallback: local in-memory rate limiting
         if (!checkLocalRateLimit(clientIP)) {
-          return jsonReply(
+          return respond(
             {
               errorType: "RateLimit",
               reply: "Whoa, too fast! Give me a minute to catch up. ⏱️",
               chips: ["Wait a moment", "What can you help with?"]
             },
-            429,
-            corsHeaders
+            429
           );
         }
       }
@@ -854,40 +999,38 @@ export default {
       // --- SMART CANNED RESPONSES ---
       
       // Salary inquiry
-      if (lowerMsg.includes("salary") || lowerMsg.includes("compensation") || lowerMsg.includes("rate")) {
-        return jsonReply(
+      if (hasAnyWord(lowerMsg, ["salary", "compensation", "rate", "pay", "wage"])) {
+        return respond(
           {
             errorType: null,
-            reply: "I'm open to market-aligned compensation for operations roles. If you share the range, I can confirm fit. You can also reach Estivan at [hello@estivanayramia.com](mailto:hello@estivanayramia.com).",
+            reply: "I'm open to market-aligned compensation for operations roles. If you share the range, I can confirm fit. You can also reach Estivan at hello@estivanayramia.com or via [Contact](/contact).",
             chips: buildChips(lowerMsg, siteFacts),
             action: "email_link",
             card: null,
             debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_salary")
           },
-          200,
-          corsHeaders
+          200
         );
       }
 
       // Contact inquiry
-      if (lowerMsg.includes("email") || lowerMsg.includes("contact") || lowerMsg.includes("reach")) {
-        return jsonReply(
+      if (lowerMsg.includes("reach out") || hasAnyWord(lowerMsg, ["email", "contact", "reach", "connect"])) {
+        return respond(
           {
             errorType: null,
-            reply: "You can reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivanayramia.com) or visit the [Contact Page](/contact). He usually responds within 24 hours.",
+            reply: "You can reach Estivan directly at hello@estivanayramia.com or visit the [Contact Page](/contact). He usually responds within 24 hours.",
             chips: buildChips(lowerMsg, siteFacts),
             action: "email_link",
             card: null,
             debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_contact")
           },
-          200,
-          corsHeaders
+          200
         );
       }
 
       // Resume request
-      if (lowerMsg.includes("resume") || lowerMsg.includes("cv") || lowerMsg.includes("download")) {
-        return jsonReply(
+      if (hasAnyWord(lowerMsg, ["resume", "cv", "download"])) {
+        return respond(
           {
             errorType: null,
             reply: "Here's Estivan's resume! Click below to download the [PDF](/assets/docs/Estivan-Ayramia-Resume.pdf).",
@@ -896,8 +1039,7 @@ export default {
             card: null,
             debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_resume")
           },
-          200,
-          corsHeaders
+          200
         );
       }
 
@@ -908,7 +1050,7 @@ export default {
         
         // Null check to prevent crashes if project not found
         if (project) {
-          return jsonReply(
+          return respond(
             {
               errorType: null,
               reply: `The [${project.title}](${project.url}) is one of Estivan's projects - ${project.summary}`,
@@ -917,8 +1059,7 @@ export default {
               action: null,
               debug: buildDebugInfo(isDebug, lowerMsg, "smart_canned_loreal")
             },
-            200,
-            corsHeaders
+            200
           );
         }
         // Fallthrough to general handler if not found
@@ -928,38 +1069,34 @@ export default {
       if (lowerMsg.includes("whispers") || lowerMsg.includes("getwispers") || lowerMsg.includes("get wispers")) {
         if (lowerMsg.includes("getwispers") || lowerMsg.includes("get wispers")) {
           // getWispers is not a real project
-          return jsonReply(
+          return respond(
             {
               errorType: null,
               reply: "That project is not listed on the portfolio site. Check out [Projects](/projects/) to see Estivan's actual work, or reach out at [Contact](/contact) for more information.",
               chips: siteFacts.projects.slice(0, 3).map(p => p.title),
               debug: buildDebugInfo(isDebug, lowerMsg, "getwispers_correction")
             },
-            200,
-            corsHeaders
+            200
           );
         } else {
           // Whispers is a hobby
-          return jsonReply(
+          return respond(
             {
               errorType: null,
               reply: "[Whispers (Sticky Notes)](/hobbies/whispers) is one of Estivan's hobbies - a low-tech way to capture random thoughts and ideas on sticky notes. It's not a project. Check out [Hobbies](/hobbies/) for more.",
               chips: siteFacts.hobbies.slice(0, 4).map(h => h.title),
               debug: buildDebugInfo(isDebug, lowerMsg, "whispers_hobby_clarification")
             },
-            200,
-            corsHeaders
+            200
           );
         }
       }
 
       // --- VALIDATE API KEY ---
       if (!env.GEMINI_API_KEY) {
-        console.error("GEMINI_API_KEY missing");
-        return jsonReply(
+        return respond(
           { errorType: "ConfigError", reply: "Service temporarily unavailable. Please try again later." },
-          503,
-          corsHeaders
+          503
         );
       }
 
@@ -1178,10 +1315,9 @@ If asked about page-specific content you don't have info about:
           .trim();
 
         if (!cleaned) {
-          return jsonReply(
+          return respond(
             { errorType: "EmptyResponse", reply: "I couldn't generate a response.", chips: ["Projects", "Contact"] },
-            502, 
-            corsHeaders
+            502
           );
         }
 
@@ -1202,7 +1338,7 @@ If asked about page-specific content you don't have info about:
           console.log(`Guardrail triggered: hallucinated projects detected - ${validation.violations.join(', ')}`);
           // Replace with corrected reply and show real project chips
           sanitizedReply = validation.correctedReply;
-          return jsonReply(
+          return respond(
             {
               errorType: null,
               reply: sanitizedReply,
@@ -1211,12 +1347,11 @@ If asked about page-specific content you don't have info about:
               violations: validation.violations,
               debug: buildDebugInfo(isDebug, lowerMsg, "guardrail_correction")
             },
-            200,
-            corsHeaders
+            200
           );
         }
 
-        return jsonReply(
+        return respond(
           {
             errorType: null,
             reply: sanitizedReply,
@@ -1228,8 +1363,7 @@ If asked about page-specific content you don't have info about:
             card: null,
             debug: buildDebugInfo(isDebug, lowerMsg, "gemini_ai")
           },
-          200,
-          corsHeaders
+          200
         );
 
       } catch (err) {
@@ -1271,7 +1405,7 @@ If asked about page-specific content you don't have info about:
           console.log("Upstream busy (429), using local fallback mode");
           const fallback = generateLocalFallback(lowerMsg, siteFacts);
           
-          return jsonReply(
+          return respond(
             {
               errorType: "UpstreamBusy",
               reply: fallback.reply,
@@ -1279,41 +1413,37 @@ If asked about page-specific content you don't have info about:
               fallback_mode: true,
               debug: debugInfo
             },
-            200,  // Return 200 since we're providing a valid response
-            corsHeaders
+            200  // Return 200 since we're providing a valid response
           );
         } else if (upstreamCode === 401 || upstreamCode === 403) {
-          return jsonReply(
+          return respond(
             {
               errorType: "AuthError",
               reply: "The AI service is misconfigured. Please try contacting support or explore Estivan's [Projects](/projects/) and [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) directly.",
               chips: ["Projects", "Resume", "Contact"],
               debug: debugInfo
             },
-            503,
-            corsHeaders
+            503
           );
         } else if (upstreamCode === 504 || upstreamStatus === "TIMEOUT") {
-          return jsonReply(
+          return respond(
             {
               errorType: "Timeout",
               reply: "The AI service timed out. Please try again with a shorter question or explore Estivan's [Projects](/projects/) directly.",
               chips: ["Retry", "Projects", "Resume", "Contact"],
               debug: debugInfo
             },
-            504,
-            corsHeaders
+            504
           );
         } else if ([500, 502, 503].includes(upstreamCode) || upstreamStatus === "NETWORK_ERROR") {
-          return jsonReply(
+          return respond(
             {
               errorType: "UpstreamError",
               reply: "The AI service is temporarily unavailable. Please try again later or explore Estivan's [Projects](/projects/) and [Resume](/assets/docs/Estivan-Ayramia-Resume.pdf) directly.",
               chips: ["Retry", "Projects", "Resume", "Contact"],
               debug: debugInfo
             },
-            503,
-            corsHeaders
+            503
           );
         }
         
@@ -1325,7 +1455,7 @@ If asked about page-specific content you don't have info about:
         if (intent === "greeting") {
           fallbackReply = `Hello! I'm currently offline, but I can still help you navigate Estivan's portfolio. 
 
-Estivan is a Software Engineer specializing in operations and infrastructure. He has experience with cloud platforms, DevOps, and full-stack development.
+      Estivan is a Business graduate specializing in operations and strategic execution.
 
 Quick links:
 - [View Projects](/projects/)
@@ -1362,7 +1492,7 @@ ${projectList}
 Estivan is a Business graduate specializing in operations and strategic execution with experience in supply chain, logistics, and project management.`;
         }
         
-        return jsonReply(
+        return respond(
           {
             errorType: "OfflineMode",
             reply: fallbackReply,
@@ -1374,22 +1504,20 @@ Estivan is a Business graduate specializing in operations and strategic executio
             card: null,
             debug: debugInfo
           },
-          200, // Return 200 for fallback to keep UI functional
-          corsHeaders
+          200 // Return 200 for fallback to keep UI functional
         );
       }
 
     } catch (error) {
       console.error("Worker error:", error.message, error.stack);
       
-      return jsonReply(
+      return respond(
         {
           errorType: "SystemError",
           reply: "An unexpected error occurred. Please try again.",
           chips: ["View Projects", "Contact Support"]
         },
-        500,
-        corsHeaders
+        500
       );
     }
   }

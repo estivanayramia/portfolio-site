@@ -46,7 +46,8 @@ tmp-serve*.log
 dryrun-transcript*.txt
 
 # Local verification artifacts
-.reports/
+.reports/*
+!.reports/init-redirect-receipts.ps1
 
 # determinism test artifacts
 assets/css/style.1.css

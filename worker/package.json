@@ -1,0 +1,5 @@
+{
+  "name": "portfolio-site-worker",
+  "private": true,
+  "type": "module"
+}

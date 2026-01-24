@@ -20,16 +20,6 @@
     
     <!-- Inter (self-hosted to avoid render-blocking Google Fonts CSS) -->
     <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter/inter-latin.woff2" crossorigin>
-    <style>
-    @font-face{
-        font-family:'Inter';
-        font-style:normal;
-        font-weight:300 700;
-                font-display: optional;
-        src:url('/assets/fonts/inter/inter-latin.woff2') format('woff2');
-        unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
-    }
-    </style>
     
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp" fetchpriority="high">
@@ -105,7 +95,7 @@
             </div>
             
             <!-- Dark Mode Toggle -->
-            <button id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            <button id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span class="theme-toggle-icon" aria-hidden="true">🔆</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -132,7 +122,7 @@
     <main id="main-content" class="pt-24">
         <figure class="w-48 mx-auto mb-8 text-center">
             <img src="/assets/img/headshot.webp" alt="Headshot of Estivan Ayramia" class="w-48 h-48 rounded-full object-cover shadow-xl border-4 border-white" width="600" height="800" loading="lazy">
-            <figcaption class="mt-2 text-xs text-chocolate/70" style="color: var(--color-text);">
+            <figcaption class="mt-2 text-xs text-chocolate/70 text-[color:var(--color-text)]">
                 Estivan Ayramia – General Business graduate focused on systems thinking, pattern recognition, and efficient workflows.
             </figcaption>
         </figure>
@@ -546,9 +536,9 @@
         <div id="scroll-to-top-tooltip" class="scroll-to-top-btn-tooltip" role="tooltip">Back to top</div>
     </button>
 <!-- Savonie AI Chat Widget -->
-    <div id="chat-widget" class="fixed bottom-6 z-50 font-sans" style="z-index: 9999;" role="region" aria-label="AI Chat Assistant">
+    <div id="chat-widget" class="fixed bottom-6 z-[9999] font-sans" role="region" aria-label="AI Chat Assistant">
         <!-- Chat Window (independently positioned when dragging) -->
-        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);" role="dialog" aria-modal="true" aria-labelledby="chat-title">
+        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col max-w-[calc(100vw-48px)] max-h-[calc(100vh-120px)]" role="dialog" aria-modal="true" aria-labelledby="chat-title">
             <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
                 <h3 id="chat-title" class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
                     <img src="/assets/img/savonie-thumb.webp" alt="Savonie chatbot avatar" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64" loading="lazy" decoding="async">
@@ -574,7 +564,7 @@
         </div>
 
         <!-- Welcome Bubble (anchored above toggle button) -->
-        <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
+        <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none bottom-[5.625rem]">
             <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
         </div>
 
