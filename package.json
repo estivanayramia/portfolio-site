@@ -21,6 +21,7 @@
         "dev:worker": "cd worker && npx wrangler dev",
         "deploy:worker": "cd worker && npx wrangler deploy",
         "test:facts": "node scripts/test-chat-grounding.js",
+        "test:intents": "node tools/test-intents.mjs",
         "check:banned": "node scripts/check-banned-patterns.mjs",
         "apply:versioning": "node tools/apply-versioning.mjs",
         "verify:versioning": "node tools/verify-versioning.mjs",
