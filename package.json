@@ -10,10 +10,11 @@
         "build:lazy": "esbuild assets/js/lazy-loader.js --minify --outfile=assets/js/lazy-loader.min.js",
         "upload:facts": "node scripts/upload-site-facts.mjs",
         "verify:pages": "node tools/verify-pages-output.mjs",
+        "sync:index": "node tools/sync-root-index.mjs",
         "route:smoke": "node scripts/route-smoke.mjs",
         "perf:budget": "node scripts/perf-budget.mjs",
         "anim:jank": "node scripts/animation-sanity.mjs --jank",
-        "build": "npm run build:facts && npm run build:css && npm run build:theme && npm run build:js && npm run build:lazy && npm run upload:facts && npm run verify:pages",
+        "build": "npm run sync:index && npm run build:facts && npm run build:css && npm run build:theme && npm run build:js && npm run build:lazy && npm run upload:facts && npm run verify:pages",
         "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
         "start": "node scripts/local-serve.js",
         "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push",
@@ -38,7 +39,8 @@
         "anim:sanity": "node scripts/animation-sanity.mjs",
         "check:csp": "node scripts/check-csp.cjs",
         "test:contact": "cross-env MOCK_FORMSPREE=1 node scripts/test-contact-form-playwright.cjs",
-        "test:contact:live": "cross-env MOCK_FORMSPREE=0 node scripts/test-contact-form-playwright.cjs"
+        "test:contact:live": "cross-env MOCK_FORMSPREE=0 node scripts/test-contact-form-playwright.cjs",
+        "audit:redirect-loop": "node tools/audit-redirect-loop.mjs"
     },
     "keywords": [
         "portfolio",

@@ -128,6 +128,8 @@ function generateRedirects() {
     generatedLines.push('');
     generatedLines.push('# Clean URL rewrites (200) -> serve from /EN/');
     for (const [canonical, enFile] of [...canonicalToEnFile.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+        // Do not proxy the site root. Root should serve /index.html directly.
+        if (canonical === '/') continue;
         // For directory canonicals (ending with /), rewrite to directory path, not index.html
         // This avoids Cloudflare Pages rewrite failures with explicit index.html targets
         let target;
