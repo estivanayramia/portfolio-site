@@ -470,6 +470,16 @@ async function captureScreenshots({ baseUrl, outDir }) {
           }
         });
 
+        // Ensure critical CSS is actually applied before capturing.
+        // When cache is cold (or query-busted), CSS can land slightly later than networkidle2.
+        await page.waitForFunction(
+          () => {
+            const styleLink = document.querySelector("link[rel='stylesheet'][href*='/assets/css/style']");
+            return Boolean(styleLink && styleLink.sheet);
+          },
+          { timeout: 10_000 }
+        );
+
         // Small settle time for layout/paint completion
         await sleep(250);
 
