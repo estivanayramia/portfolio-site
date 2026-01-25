@@ -161,9 +161,9 @@ function generateRedirects() {
     const footerLines = [
         '',
         '# 404 Fallback (Pages does not support 404 rewrites; use 200 proxy)',
-        '/404.html                    /EN/404                      301',
-        '/EN/404                      /EN/404                      200',
-        '/*                           /EN/404                      200',
+        '/404.html                    /EN/404.html                301',
+        '/EN/404                      /EN/404.html                200',
+        '/*                           /EN/404.html                200',
         '',
     ];
 
