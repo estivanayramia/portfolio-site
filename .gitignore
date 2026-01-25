@@ -53,6 +53,12 @@ dryrun-transcript*.txt
 assets/css/style.1.css
 assets/css/style.2.css
 
+# stamped versioned assets (generated during build)
+assets/js/site.min.*.js
+assets/js/lazy-loader.min.*.js
+assets/css/style.*.css
+assets/data/deploy-stamp.json
+
 # backup artifacts
 *.bak
 
