@@ -99,7 +99,11 @@ $followPaths = @(
   '/projects/',
   '/hobbies/',
   '/overview',
-  '/EN/404.html'
+  '/EN/404.html',
+  '/assets/js/site.min.js?cachebust=1',
+  '/assets/css/style.css?cachebust=1',
+  '/theme.css?cachebust=1',
+  '/assets/js/lazy-loader.min.js?cachebust=1'
 )
 
 Write-Line $receipt ("RUN_ID=$runId")

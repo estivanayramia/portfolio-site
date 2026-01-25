@@ -130,6 +130,16 @@
 /EN/projects/multilingual.html    /projects/multilingual    301
 /EN/projects/portfolio.html    /projects/portfolio    301
 # END GENERATED (fix-seo)
+# Static assets passthrough (prevents 404 capture)
+/assets/*                    /assets/:splat              200
+/theme.css                   /theme.css                  200
+/sw.js                       /sw.js                      200
+/robots.txt                  /robots.txt                 200
+/sitemap.xml                 /sitemap.xml                200
+/llms.txt                    /llms.txt                   200
+/manifest.json               /manifest.json              200
+/humans.txt                  /humans.txt                 200
+
 # 404 Fallback (Pages does not support 404 rewrites; use 200 proxy)
 # Use the clean URL (/EN/404) as the canonical 404 target.
 # Cloudflare Pages may redirect *.html -> clean URL (308), which can loop
