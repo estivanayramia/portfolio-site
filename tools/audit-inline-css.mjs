@@ -36,11 +36,13 @@ function scan() {
 
     for (let i = 0; i < lines.length; i++) {
       const text = lines[i];
-      if (text.includes('style="')) {
+      // Regex check for style attribute
+      if (/\sstyle\s*=\s*["']/.test(text)) {
         styleAttr++;
         offenders.push({ file: rel, line: i + 1, text: text.trim(), kind: 'style-attr' });
       }
-      if (text.includes('<style')) {
+      // Regex check for style tag
+      if (/<style/i.test(text)) {
         styleTag++;
         offenders.push({ file: rel, line: i + 1, text: text.trim(), kind: 'style-tag' });
       }
