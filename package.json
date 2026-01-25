@@ -16,7 +16,7 @@
         "route:smoke": "node scripts/route-smoke.mjs",
         "perf:budget": "node scripts/perf-budget.mjs",
         "anim:jank": "node scripts/animation-sanity.mjs --jank",
-        "build": "npm run sync:index && npm run build:sw && npm run build:facts && npm run build:css && npm run build:theme && npm run build:js && npm run build:lazy && npm run build:stamp && npm run upload:facts && npm run verify:pages",
+        "build": "npm run sync:index && npm run build:sw && npm run build:facts && npm run build:css && npm run build:theme && npm run build:js && npm run build:lazy && npm run upload:facts && npm run verify:pages",
         "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
         "start": "node scripts/local-serve.js",
         "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push",

@@ -1,89 +1,100 @@
-# Deployment Verification Script
-# Run this after merging the PR and deploying to production
+# Deployment Verification Script (Dynamic)
+# - Fetches live HTML from both domains
+# - Extracts core asset URLs with ?v=... cache busting
+# - HEADs those assets and prints key headers
 
-Write-Host "=== DEPLOYMENT VERIFICATION ===" -ForegroundColor Cyan
+$ErrorActionPreference = 'Continue'
+
+function Get-FirstMatch {
+    param(
+        [Parameter(Mandatory = $true)][string]$Text,
+        [Parameter(Mandatory = $true)][string]$Pattern
+    )
+
+    $m = [regex]::Match($Text, $Pattern)
+    if ($m.Success) { return $m.Value }
+    return $null
+}
+
+function Fetch-Html {
+    param(
+        [Parameter(Mandatory = $true)][string]$Url
+    )
+
+    try {
+        $resp = Invoke-WebRequest -Uri $Url -UseBasicParsing -TimeoutSec 15 -ErrorAction Stop
+        return $resp.Content
+    } catch {
+        Write-Host "✗ HTML fetch failed: $Url" -ForegroundColor Red
+        Write-Host "  Error: $($_.Exception.Message)" -ForegroundColor Red
+        return $null
+    }
+}
+
+function Head-Url {
+    param(
+        [Parameter(Mandatory = $true)][string]$Url
+    )
+
+    try {
+        $resp = Invoke-WebRequest -Uri $Url -Method Head -UseBasicParsing -TimeoutSec 15 -ErrorAction Stop
+
+        $headers = $resp.Headers
+        Write-Host "✓ $Url" -ForegroundColor Green
+        Write-Host "  Status: $($resp.StatusCode)"
+        Write-Host "  Content-Type: $($headers['Content-Type'])"
+        Write-Host "  Cache-Control: $($headers['Cache-Control'])"
+        if ($headers['CF-Cache-Status']) { Write-Host "  CF-Cache-Status: $($headers['CF-Cache-Status'])" }
+        if ($headers['Age']) { Write-Host "  Age: $($headers['Age'])" }
+        if ($headers['ETag']) { Write-Host "  ETag: $($headers['ETag'])" }
+        return $headers
+    } catch {
+        Write-Host "✗ $Url" -ForegroundColor Red
+        Write-Host "  Error: $($_.Exception.Message)" -ForegroundColor Red
+        return $null
+    } finally {
+        Write-Host ""
+    }
+}
+
+Write-Host "=== DEPLOYMENT VERIFICATION (DYNAMIC) ===" -ForegroundColor Cyan
 Write-Host ""
 
-# Test assets on preview domain
-Write-Host "Testing preview domain (portfolio-site-t6q.pages.dev)..." -ForegroundColor Yellow
-$previewAssets = @(
-    "https://portfolio-site-t6q.pages.dev/assets/css/style.20260125-local.css",
-    "https://portfolio-site-t6q.pages.dev/assets/js/site.min.20260125-local.js",
-    "https://portfolio-site-t6q.pages.dev/assets/js/lazy-loader.min.20260125-local.js"
+$domains = @(
+    @{ name = 'pages.dev'; html = 'https://portfolio-site-t6q.pages.dev/' },
+    @{ name = 'www'; html = 'https://www.estivanayramia.com/' }
 )
 
-foreach ($url in $previewAssets) {
-    try {
-        $response = Invoke-WebRequest -Uri $url -Method Head -ErrorAction Stop
-        $contentType = $response.Headers['Content-Type']
-        $cacheControl = $response.Headers['Cache-Control']
-        Write-Host "✓ $url" -ForegroundColor Green
-        Write-Host "  Content-Type: $contentType"
-        Write-Host "  Cache-Control: $cacheControl"
-    } catch {
-        Write-Host "✗ $url - FAILED" -ForegroundColor Red
-        Write-Host "  Error: $($_.Exception.Message)"
-    }
-    Write-Host ""
+$assetPatterns = @{
+    style = '/assets/css/style\.css\?v=[0-9]+';
+    site = '/assets/js/site\.min\.js\?v=[0-9]+';
+    lazy = '/assets/js/lazy-loader\.min\.js\?v=[0-9]+';
 }
 
-# Test assets on production domain
-Write-Host "Testing production domain (www.estivanayramia.com)..." -ForegroundColor Yellow
-$prodAssets = @(
-    "https://www.estivanayramia.com/assets/css/style.20260125-local.css",
-    "https://www.estivanayramia.com/assets/js/site.min.20260125-local.js",
-    "https://www.estivanayramia.com/assets/js/lazy-loader.min.20260125-local.js"
-)
+foreach ($d in $domains) {
+    Write-Host "--- $($d.name) ---" -ForegroundColor Yellow
+    Write-Host "HTML: $($d.html)" -ForegroundColor Gray
 
-foreach ($url in $prodAssets) {
-    try {
-        $response = Invoke-WebRequest -Uri $url -Method Head -ErrorAction Stop
-        $contentType = $response.Headers['Content-Type']
-        $cacheControl = $response.Headers['Cache-Control']
-        $cfCacheStatus = $response.Headers['CF-Cache-Status']
-        Write-Host "✓ $url" -ForegroundColor Green
-        Write-Host "  Content-Type: $contentType"
-        Write-Host "  Cache-Control: $cacheControl"
-        Write-Host "  CF-Cache-Status: $cfCacheStatus"
-    } catch {
-        Write-Host "✗ $url - FAILED" -ForegroundColor Red
-        Write-Host "  Error: $($_.Exception.Message)"
+    $html = Fetch-Html -Url $d.html
+    if (-not $html) {
+        Write-Host "Skipping asset checks for $($d.name) (no HTML)" -ForegroundColor Red
+        Write-Host ""
+        continue
     }
-    Write-Host ""
-}
 
-# Test non-stamped assets (should have short cache)
-Write-Host "Testing non-stamped assets (short cache)..." -ForegroundColor Yellow
-$shortCacheAssets = @(
-    "https://www.estivanayramia.com/assets/js/site.min.js",
-    "https://www.estivanayramia.com/assets/js/lazy-loader.min.js",
-    "https://www.estivanayramia.com/assets/css/style.css"
-)
+    $stylePath = Get-FirstMatch -Text $html -Pattern $assetPatterns.style
+    $sitePath = Get-FirstMatch -Text $html -Pattern $assetPatterns.site
+    $lazyPath = Get-FirstMatch -Text $html -Pattern $assetPatterns.lazy
 
-foreach ($url in $shortCacheAssets) {
-    try {
-        $response = Invoke-WebRequest -Uri $url -Method Head -ErrorAction Stop
-        $cacheControl = $response.Headers['Cache-Control']
-        Write-Host "✓ $url" -ForegroundColor Green
-        Write-Host "  Cache-Control: $cacheControl"
-        
-        if ($cacheControl -match "max-age=0") {
-            Write-Host "  ✓ Short cache confirmed" -ForegroundColor Green
-        } else {
-            Write-Host "  ✗ WARNING: Expected max-age=0" -ForegroundColor Red
-        }
-    } catch {
-        Write-Host "✗ $url - FAILED" -ForegroundColor Red
-        Write-Host "  Error: $($_.Exception.Message)"
-    }
+    Write-Host "Discovered asset refs:" -ForegroundColor Gray
+    Write-Host "  style: $stylePath"
+    Write-Host "  site:  $sitePath"
+    Write-Host "  lazy:  $lazyPath"
     Write-Host ""
+
+    if ($stylePath) { Head-Url -Url ("{0}{1}" -f ($d.html.TrimEnd('/')), $stylePath) }
+    if ($sitePath) { Head-Url -Url ("{0}{1}" -f ($d.html.TrimEnd('/')), $sitePath) }
+    if ($lazyPath) { Head-Url -Url ("{0}{1}" -f ($d.html.TrimEnd('/')), $lazyPath) }
 }
 
 Write-Host "=== VERIFICATION COMPLETE ===" -ForegroundColor Cyan
-Write-Host ""
-Write-Host "Expected results:" -ForegroundColor Yellow
-Write-Host "- Stamped assets: Content-Type should be text/css or application/javascript"
-Write-Host "- Stamped assets: Cache-Control should have max-age=31536000, immutable"
-Write-Host "- Non-stamped assets: Cache-Control should have max-age=0, must-revalidate"
-Write-Host ""
-Write-Host "If all tests pass, the cache poison issue is fixed!" -ForegroundColor Green

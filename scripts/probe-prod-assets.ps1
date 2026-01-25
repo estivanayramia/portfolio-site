@@ -39,12 +39,13 @@ foreach ($base in $bases) {
             $headers = @{
                 'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
-            $response = Invoke-WebRequest -Uri $url -Method Head -Headers $headers -MaximumRedirection 0 -ErrorAction Stop
+            $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing -Headers $headers -MaximumRedirection 0 -ErrorAction Stop
             Write-Output "Status: $($response.StatusCode)"
             Write-Output "Content-Type: $($response.Headers['Content-Type'])"
             Write-Output "Cache-Control: $($response.Headers['Cache-Control'])"
             Write-Output "CF-Cache-Status: $($response.Headers['CF-Cache-Status'])"
             Write-Output "Age: $($response.Headers['Age'])"
+            Write-Output "ETag: $($response.Headers['ETag'])"
         } catch {
             Write-Output "ERROR: $($_.Exception.Message)"
         }
@@ -59,11 +60,13 @@ foreach ($base in $bases) {
                 'Pragma' = 'no-cache'
                 'User-Agent' = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
-            $response = Invoke-WebRequest -Uri $url -Method Head -Headers $headers -MaximumRedirection 0 -ErrorAction Stop
+            $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing -Headers $headers -MaximumRedirection 0 -ErrorAction Stop
             Write-Output "Status: $($response.StatusCode)"
             Write-Output "Content-Type: $($response.Headers['Content-Type'])"
             Write-Output "Cache-Control: $($response.Headers['Cache-Control'])"
             Write-Output "CF-Cache-Status: $($response.Headers['CF-Cache-Status'])"
+            Write-Output "Age: $($response.Headers['Age'])"
+            Write-Output "ETag: $($response.Headers['ETag'])"
         } catch {
             Write-Output "ERROR: $($_.Exception.Message)"
         }
