@@ -66,9 +66,9 @@ $domains = @(
 )
 
 $assetPatterns = @{
-    style = '/assets/css/style\.css\?v=[0-9]+';
-    site = '/assets/js/site\.min\.js\?v=[0-9]+';
-    lazy = '/assets/js/lazy-loader\.min\.js\?v=[0-9]+';
+    style = '/assets/css/style\.css\?v=[A-Za-z0-9_-]+';
+    site = '/assets/js/site\.min\.js\?v=[A-Za-z0-9_-]+';
+    lazy = '/assets/js/lazy-loader\.min\.js\?v=[A-Za-z0-9_-]+';
 }
 
 foreach ($d in $domains) {
