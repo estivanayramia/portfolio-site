@@ -21,13 +21,13 @@ function getStamp() {
   if (sha && String(sha).trim()) {
     const stamp = String(sha).trim().slice(0, 8);
     log(`Using commit SHA stamp: ${stamp}`);
-    return stamp;
+    return { stamp, mode: 'commit' };
   }
   
   const dateStamp = new Date().toISOString().split('T')[0].replace(/-/g, '');
   const localStamp = `${dateStamp}-local`;
   log(`Using local date stamp: ${localStamp}`);
-  return localStamp;
+  return { stamp: localStamp, mode: 'local' };
 }
 
 // Assets to stamp
@@ -53,7 +53,7 @@ const HTML_FILES = [
 ];
 
 function main() {
-  const stamp = getStamp();
+  const { stamp, mode } = getStamp();
   
   // Step 1: Verify source assets exist
   log('Verifying source assets...');
@@ -86,38 +86,43 @@ function main() {
   }
   
   // Step 3: Rewrite HTML files
-  log('Rewriting HTML references...');
-  let totalReplacements = 0;
-  
-  for (const htmlFile of HTML_FILES) {
-    const htmlPath = path.join(ROOT, htmlFile);
-    if (!fs.existsSync(htmlPath)) {
-      log(`  ⚠ Skipping missing: ${htmlFile}`);
-      continue;
-    }
-    
-    let content = fs.readFileSync(htmlPath, 'utf8');
-    let fileReplacements = 0;
-    
-    for (const asset of stampedAssets) {
-      const replacement = `/${asset.stamped}`;
-      const matches = content.match(asset.pattern);
-      if (matches) {
-        content = content.replace(asset.pattern, replacement);
-        fileReplacements += matches.length;
+  // Guardrail: local builds should not rewrite tracked HTML to a local stamp.
+  if (mode === 'commit') {
+    log('Rewriting HTML references...');
+    let totalReplacements = 0;
+
+    for (const htmlFile of HTML_FILES) {
+      const htmlPath = path.join(ROOT, htmlFile);
+      if (!fs.existsSync(htmlPath)) {
+        log(`  ⚠ Skipping missing: ${htmlFile}`);
+        continue;
+      }
+
+      let content = fs.readFileSync(htmlPath, 'utf8');
+      let fileReplacements = 0;
+
+      for (const asset of stampedAssets) {
+        const replacement = `/${asset.stamped}`;
+        const matches = content.match(asset.pattern);
+        if (matches) {
+          content = content.replace(asset.pattern, replacement);
+          fileReplacements += matches.length;
+        }
+      }
+
+      if (fileReplacements > 0) {
+        fs.writeFileSync(htmlPath, content, 'utf8');
+        log(`  ✓ ${htmlFile} (${fileReplacements} replacements)`);
+        totalReplacements += fileReplacements;
+      } else {
+        log(`  - ${htmlFile} (no matches)`);
       }
     }
-    
-    if (fileReplacements > 0) {
-      fs.writeFileSync(htmlPath, content, 'utf8');
-      log(`  ✓ ${htmlFile} (${fileReplacements} replacements)`);
-      totalReplacements += fileReplacements;
-    } else {
-      log(`  - ${htmlFile} (no matches)`);
-    }
+
+    log(`Total replacements: ${totalReplacements}`);
+  } else {
+    log('Skipping HTML reference rewriting (local stamp mode).');
   }
-  
-  log(`Total replacements: ${totalReplacements}`);
   
   // Step 4: Write deploy stamp metadata
   const stampData = {
