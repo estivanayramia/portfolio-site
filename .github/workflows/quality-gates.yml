@@ -33,6 +33,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: "Guardrails: SW cache bump"
+        run: npm run audit:sw-cache
+
+      - name: "Guardrails: Secrets scan"
+        run: npm run audit:secrets
+
       - name: Build JS
         run: npm run build:js
 
@@ -87,6 +93,12 @@ jobs:
           echo "PUPPETEER_EXECUTABLE_PATH=${{ steps.setup-chrome.outputs.chrome-path }}" >> $GITHUB_ENV
       - name: Install dependencies
         run: npm ci
+
+      - name: "Guardrails: SW cache bump"
+        run: npm run audit:sw-cache
+
+      - name: "Guardrails: Secrets scan"
+        run: npm run audit:secrets
       - name: Build JS
         run: npm run build:js
       - name: Route Smoke Test
