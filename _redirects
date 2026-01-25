@@ -19,10 +19,6 @@
 
 # BEGIN GENERATED (fix-seo)
 # URL normalization (301)
-/about/    /about    301
-/contact/    /contact    301
-/deep-dive/    /deep-dive    301
-/hobbies-games/    /hobbies-games    301
 /hobbies-games/1024-moves/    /hobbies-games/1024-moves    301
 /hobbies-games/2048/    /hobbies-games/2048    301
 /hobbies-games/block-breaker/    /hobbies-games/block-breaker    301
@@ -44,8 +40,6 @@
 /hobbies/photography/    /hobbies/photography    301
 /hobbies/reading/    /hobbies/reading    301
 /hobbies/whispers/    /hobbies/whispers    301
-/overview/    /overview    301
-/privacy/    /privacy    301
 /projects    /projects/    301
 /projects/competitive-strategy/    /projects/competitive-strategy    301
 /projects/conflict/    /projects/conflict    301
@@ -56,10 +50,14 @@
 /projects/portfolio/    /projects/portfolio    301
 
 # Clean URL rewrites (200) -> serve from /EN/
-/about    /EN/about.html    200
-/contact    /EN/contact.html    200
-/deep-dive    /EN/deep-dive.html    200
-/hobbies-games    /EN/hobbies-games.html    200
+/about     /EN/about     200
+/about/    /EN/about     200
+/contact     /EN/contact     200
+/contact/    /EN/contact     200
+/deep-dive     /EN/deep-dive     200
+/deep-dive/    /EN/deep-dive     200
+/hobbies-games     /EN/hobbies-games     200
+/hobbies-games/    /EN/hobbies-games     200
 /hobbies-games/1024-moves    /EN/hobbies-games/1024-moves.html    200
 /hobbies-games/2048    /EN/hobbies-games/2048.html    200
 /hobbies-games/block-breaker    /EN/hobbies-games/block-breaker.html    200
@@ -81,8 +79,10 @@
 /hobbies/photography    /EN/hobbies/photography.html    200
 /hobbies/reading    /EN/hobbies/reading.html    200
 /hobbies/whispers    /EN/hobbies/whispers.html    200
-/overview    /EN/overview.html    200
-/privacy    /EN/privacy.html    200
+/overview     /EN/overview     200
+/overview/    /EN/overview     200
+/privacy     /EN/privacy     200
+/privacy/    /EN/privacy     200
 /projects/    /EN/projects/    200
 /projects/competitive-strategy    /EN/projects/competitive-strategy.html    200
 /projects/conflict    /EN/projects/conflict.html    200
