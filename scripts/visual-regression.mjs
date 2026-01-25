@@ -29,6 +29,9 @@ const ROUTES = [
 const ROUTE_THRESHOLD_OVERRIDES = {
   // Integration branch changes the /projects/ layout; keep other pages strict.
   projects: 0.04,
+  // Temporary tolerance: hotfix can restore missing CSS/JS on mobile home,
+  // causing a larger diff vs a broken baseline.
+  home: 0.05,
 };
 
 const VIEWPORTS = [
