@@ -146,6 +146,9 @@ function generateRedirects() {
         '',
         '# 1. Canonical Redirects (301) - Enforce clean URLs',
         '/index.html                  /                            301',
+        '# Root serve (200) - prevents "/" from hitting the 404 catch-all',
+        '/                            /index.html                  200',
+        '',
         '/es/index.html               /es/                         301',
         '/ar/index.html               /ar/                         301',
         '',
@@ -158,8 +161,9 @@ function generateRedirects() {
     const footerLines = [
         '',
         '# 404 Fallback (Pages does not support 404 rewrites; use 200 proxy)',
-        '/404.html                    /EN/404.html                301',
-        '/*                           /EN/404.html                200',
+        '/404.html                    /EN/404                      301',
+        '/EN/404                      /EN/404                      200',
+        '/*                           /EN/404                      200',
         '',
     ];
 
