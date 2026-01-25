@@ -161,9 +161,12 @@ function generateRedirects() {
     const footerLines = [
         '',
         '# 404 Fallback (Pages does not support 404 rewrites; use 200 proxy)',
-        '/404.html                    /EN/404.html                301',
-        '/EN/404                      /EN/404.html                200',
-        '/*                           /EN/404.html                200',
+        '# Use the clean URL (/EN/404) as the canonical 404 target.',
+        '# Cloudflare Pages may redirect *.html -> clean URL (308), which can loop',
+        '# if we rewrite /EN/404 back to /EN/404.html.',
+        '/404.html                    /EN/404                     301',
+        '/EN/404.html                 /EN/404                     301',
+        '/*                           /EN/404                     200',
         '',
     ];
 
