@@ -22,12 +22,9 @@ function getAllHtmlFiles(dir, fileList = []) {
 }
 
 const allHtmlFiles = getAllHtmlFiles(rootDir);
-const relevantFiles = allHtmlFiles.filter(f => {
-    const relPath = path.relative(rootDir, f).replace(/\\/g, '/');
-    return relPath.startsWith('EN/');
-});
+const relevantFiles = allHtmlFiles;
 
-console.log(`Scanning ${relevantFiles.length} HTML files in EN/ for sanity checks...`);
+console.log(`Scanning ${relevantFiles.length} HTML files for sanity checks...`);
 
 let failures = 0;
 
@@ -73,6 +70,13 @@ relevantFiles.forEach(file => {
          // This is common in text content, but in attributes?
          // Let's search specifically for things that look like errors.
     }
+
+    // Check 4: Guardrail against committing local-stamped asset URLs
+    // Example: /assets/css/style.20260125-local.css
+    if (content.match(/\/assets\/(?:css|js)\/[^"'\s>]+\.\d{8}-local\.(?:css|js)/i)) {
+        console.error(`[FAIL] ${relPath}: Found local-stamped asset URL (\\d{8}-local).`);
+        fileFailures++;
+    }
     
     if (fileFailures > 0) failures++;
 });
@@ -81,6 +85,6 @@ if (failures > 0) {
     console.log(`\nFound issues in ${failures} files.`);
     process.exit(1);
 } else {
-    console.log(`\nPASS: No malformed HTML patterns found in EN/**.`);
+    console.log(`\nPASS: No malformed HTML patterns found.`);
     process.exit(0);
 }
