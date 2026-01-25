@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v0';
+const CACHE_VERSION = 'v1769316387465';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -38,6 +38,14 @@ self.addEventListener('message', (event) => {
     if (event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
     }
+});
+
+let isRefreshing = false;
+self.addEventListener('controllerchange', () => {
+    if (isRefreshing) return;
+    isRefreshing = true;
+    // Clients will reload themselves if they are monitoring controllerchange,
+    // but the SW itself usually doesn't force reload unless via postMessage logic handled in client.
 });
 
 // Install event - cache assets
@@ -116,10 +124,22 @@ self.addEventListener('fetch', (event) => {
             .then((cachedResponse) => {
                 const networkFetch = fetch(request)
                     .then((response) => {
-                        if (response && response.status === 200) {
-                            const responseClone = response.clone();
-                            caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
+                        // Guard: Don't cache if response is not 200 OK
+                        if (!response || response.status !== 200) {
+                            return response;
                         }
+
+                        // Guard: Don't cache HTML 404s served as 200s for non-HTML requests
+                        // (Cloudflare Pages catch-all returns 200 OK with HTML for missing assets)
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('text/html')) {
+                            // If we expected an asset but got HTML, do not cache it.
+                            return response;
+                        }
+
+                        const responseClone = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
+                        
                         return response;
                     })
                     .catch(() => undefined);

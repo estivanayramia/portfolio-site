@@ -1,0 +1,115 @@
+
+> portfolio-site@2.0.0 build
+> npm run sync:index && npm run build:sw && npm run build:facts && npm run build:css && npm run build:theme && npm run build:js && npm run build:lazy && npm run upload:facts && npm run verify:pages
+
+
+> portfolio-site@2.0.0 sync:index
+> node tools/sync-root-index.mjs
+
+Synced index.html from EN\index.html
+
+> portfolio-site@2.0.0 build:sw
+> node tools/stamp-sw-version.mjs
+
+OK: stamped CACHE_VERSION=v1769316387465 into sw.js
+
+> portfolio-site@2.0.0 build:facts
+> node scripts/generate-site-facts.js
+
+🔍 Generating site-facts.json from actual HTML content...
+
+📁 Parsing projects...
+   → This Website (Every Line)
+   → L'Oréal Cell BioPrint MAPS Campaign
+   → Franklin Templeton Class Concept
+   → EndPoint LinkedIn Campaign
+   → Endpoint Elosity Launch Video
+   → Taking Down Endpoint (Almac Group + 4G Clinical)
+✅ Found 6 projects
+
+🎨 Parsing hobbies...
+   → Gym & Strength Training
+   → Photography
+   → Car Enthusiasm
+   → Cooking
+   → Whispers (Sticky Notes)
+   → Reading
+✅ Found 6 hobbies
+
+🔒 Validating facts...
+✅ Validation passed
+
+📄 Output written to: C:\Users\estiv\portfolio-site\assets\data\site-facts.json
+
+✨ Site facts generated successfully!
+   - 6 projects
+   - 6 hobbies
+
+📋 Projects:
+   - This Website (Every Line) → /projects/portfolio
+   - L'Oréal Cell BioPrint MAPS Campaign → /projects/logistics
+   - Franklin Templeton Class Concept → /projects/discipline
+   - EndPoint LinkedIn Campaign → /projects/documentation
+   - Endpoint Elosity Launch Video → /projects/multilingual
+   - Taking Down Endpoint (Almac Group + 4G Clinical) → /projects/competitive-strategy
+
+🎨 Hobbies:
+   - Gym & Strength Training → /hobbies/gym
+   - Photography → /hobbies/photography
+   - Car Enthusiasm → /hobbies/car
+   - Cooking → /hobbies/cooking
+   - Whispers (Sticky Notes) → /hobbies/whispers
+   - Reading → /hobbies/reading
+
+> portfolio-site@2.0.0 build:css
+> npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --minify
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+
+Rebuilding...
+
+Done in 1822ms.
+
+> portfolio-site@2.0.0 build:theme
+> node scripts/build-theme.cjs
+
+[build-theme] warning: {
+  message: 'Invalid empty selector',
+  type: 'SelectorError',
+  value: { type: 'EmptySelector' },
+  loc: {
+    filename: 'C:\\Users\\estiv\\portfolio-site\\assets\\css\\theme.css',
+    line: 1928,
+    column: 1
+  }
+}
+[build-theme] Wrote assets\css\theme.min.css
+
+> portfolio-site@2.0.0 build:js
+> esbuild assets/js/site.js --bundle --minify --platform=browser --format=iife --target=es2018 --outfile=assets/js/site.min.js
+
+
+  assets\js\site.min.js  227.0kb
+
+Done in 54ms
+
+> portfolio-site@2.0.0 build:lazy
+> esbuild assets/js/lazy-loader.js --minify --outfile=assets/js/lazy-loader.min.js
+
+
+  assets\js\lazy-loader.min.js  2.7kb
+
+Done in 8ms
+
+> portfolio-site@2.0.0 upload:facts
+> node scripts/upload-site-facts.mjs
+
+[upload-site-facts] Skipping upload (no CLOUDFLARE_API_TOKEN/CF_API_TOKEN). Set FORCE_KV_UPLOAD=1 to override.
+
+> portfolio-site@2.0.0 verify:pages
+> node tools/verify-pages-output.mjs
+
+[verify-pages-output] OK. Found _redirects in "." with expected directory rewrites and no forbidden root rewrite.

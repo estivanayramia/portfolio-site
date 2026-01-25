@@ -1,0 +1,12 @@
+POSTFLIGHT CSS COUNTS
+=====================
+Scanned 40 HTML files.
+
+Inline 'style="..."' attributes: 0
+Internal '<style>' blocks:       0
+External '<link rel="stylesheet">: 145
+
+Offenders:
+
+
+timestamp: 2026-01-25T04:50:48.516Z
