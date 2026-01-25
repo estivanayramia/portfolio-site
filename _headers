@@ -12,9 +12,28 @@
 /sw.js
   Cache-Control: max-age=0
 
+# Critical non-fingerprinted assets - SHORT cache to prevent poison
+/assets/js/site.min.js
+  Cache-Control: public, max-age=0, must-revalidate
 
+/assets/js/lazy-loader.min.js
+  Cache-Control: public, max-age=0, must-revalidate
 
-/assets/*
+/assets/css/style.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Fingerprinted assets (with stamp in filename) - long cache safe
+/assets/js/*.*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/css/*.*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Safe static assets - long cache OK
+/assets/img/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
 
