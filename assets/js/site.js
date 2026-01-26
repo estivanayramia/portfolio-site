@@ -825,22 +825,84 @@ if (__collectLogsEnabled) {
      * 
      * @param {number} maxWaitMs - Maximum time to wait for user to idle (default: 5000ms)
      */
-                    setTimeout(attempt, RETRY);
-                    return;
-                }
-                // Timed out - fallback
-                if (fallback) {
-                    try { fallback(); } catch (e) { try { window.location.reload(); } catch(_) {} }
-                } else {
-                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
-                }
-            } catch (e) {
-                if (fallback) { try { fallback(); } catch(_) { try { window.location.reload(); } catch(_) {} } }
-                else { try { window.location.reload(); } catch(_) {} }
+    const guardedReload = (maxWaitMs = 5000) => {
+        const startTime = Date.now();
+        const attemptReload = () => {
+            if (!__userInteracting) {
+                try { location.reload(); } catch (e) {}
+                return;
             }
-        })();
+            if (Date.now() - startTime >= maxWaitMs) {
+                try { location.reload(); } catch (e) {}
+                return;
+            }
+            setTimeout(attemptReload, 250);
+        };
+        attemptReload();
     };
+    window.guardedReload = guardedReload;
 }
+
+// ============================================================================
+// DEBUGGER HUD LOADER
+// ============================================================================
+
+/**
+ * Debugger HUD Dynamic Loader
+ * 
+ * Loads full debugger UI when enabled via:
+ * - ?debug=1 (enables and persists to localStorage)
+ * - ?debug=0 (disables and clears localStorage)
+ * - localStorage.site_debugger_enabled = "1"
+ * 
+ * Backwards compatible with ?collect-logs=1 (still works independently)
+ * 
+ * The debugger UI is loaded separately to keep main bundle small when disabled.
+ */
+(function() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const debugParam = params.get('debug');
+        
+        // Handle ?debug=1 or ?debug=0
+        if (debugParam === '1') {
+            localStorage.setItem('site_debugger_enabled', '1');
+        } else if (debugParam === '0') {
+            localStorage.removeItem('site_debugger_enabled');
+        }
+        
+        // Check if debugger should be enabled
+        const isEnabled = debugParam === '1' || localStorage.getItem('site_debugger_enabled') === '1';
+        
+        if (!isEnabled) return;
+        
+        // Get cache-busting version
+        const getVersion = () => {
+            // 1. Try meta tag
+            const metaTag = document.querySelector('meta[name="build-version"]');
+            if (metaTag && metaTag.content) return metaTag.content;
+            
+            // 2. Try localStorage siteVersion
+            const lsVersion = localStorage.getItem('siteVersion');
+            if (lsVersion) return lsVersion;
+            
+            // 3. Fallback to date-based
+            return 'v' + new Date().toISOString().split('T')[0].replace(/-/g, '');
+        };
+        
+        // Inject debugger script
+        const script = document.createElement('script');
+        script.src = `/assets/js/debugger.min.js?v=${getVersion()}`;
+        script.defer = true;
+        script.onerror = () => {
+            console.warn('[Debugger] Failed to load debugger.min.js');
+        };
+        document.head.appendChild(script);
+        
+    } catch (e) {
+        console.error('[Debugger] Loader error:', e);
+    }
+})();
 
 // ============================================================================
 // FEATURE MODULES
