@@ -89,55 +89,54 @@
       <style>
         #error-reporting-consent {
           position: fixed;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          background: linear-gradient(135deg, #212842 0%, #362017 100%);
+          bottom: 20px;
+          left: 20px;
+          width: 380px;
+          max-width: calc(100vw - 40px);
+          background: rgba(33, 40, 66, 0.95);
           color: #e1d4c2;
-          padding: 20px;
-          box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+          padding: 16px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.3);
           z-index: 999998;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-          font-size: 14px;
-          line-height: 1.6;
+          font-size: 13px;
+          line-height: 1.5;
+          border-radius: 12px;
+          border: 1px solid rgba(225, 212, 194, 0.1);
           animation: slideUp 0.3s ease-out;
           -webkit-backdrop-filter: blur(10px);
           backdrop-filter: blur(10px);
         }
         
         @keyframes slideUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
         }
         
         #error-reporting-consent .consent-content {
-          max-width: 900px;
-          margin: 0 auto;
           display: flex;
-          align-items: center;
-          gap: 20px;
-          flex-wrap: wrap;
+          flex-direction: column;
+          gap: 12px;
         }
         
         #error-reporting-consent .consent-text {
-          flex: 1;
-          min-width: 300px;
+          width: 100%;
         }
         
         #error-reporting-consent .consent-title {
           font-weight: 600;
-          margin-bottom: 6px;
-          font-size: 15px;
+          margin-bottom: 4px;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
         }
-        
-        #error-reporting-consent .consent-desc {
-          opacity: 0.85;
-          font-size: 13px;
-        }
-        
+
         #error-reporting-consent .consent-actions {
           display: flex;
-          gap: 12px;
+          gap: 8px;
+          justify-content: flex-end;
+          width: 100%;
         }
         
         #error-reporting-consent button {
