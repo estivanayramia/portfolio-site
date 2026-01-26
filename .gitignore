@@ -52,3 +52,5 @@ visual-baseline/
 visual-current/
 visual-diff/
 .reports.bak/
+.reports/
+history.txt
