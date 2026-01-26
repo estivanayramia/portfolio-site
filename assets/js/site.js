@@ -799,44 +799,32 @@ if (__collectLogsEnabled) {
      * where a reload during scrolling causes the viewport to jump to an unexpected
      * position, often losing the user's place.
      * 
-     * How it works:
-     * 1. Checks if user is currently interacting (scrolling, touching)
-     * 2. If idle, reloads immediately
-     * 3. If active, waits and retries after RETRY milliseconds
-     * 4. After MAX milliseconds, forces reload regardless (timeout)
+     * Mobile Safari Quirk:
+     * ---------------------
+     * Mobile Safari (and other mobile browsers) are aggressive about restoring
+     * scroll position after reload. However, if a reload happens DURING user
+     * interaction (especially scrolling), the browser can't accurately capture
+     * the intended scroll position. This leads to a jarring "jump" where the
+     * user ends up somewhere they didn't expect.
      * 
-     * @param {Object} opts - Configuration options
-     * @param {number} [opts.MAX=30000] - Maximum milliseconds to wait before forcing reload
-     * @param {number} [opts.RETRY=500] - Milliseconds between retry attempts
-     * @param {Function} [opts.fallback] - Fallback function if reload fails
+     * Solution:
+     * ---------
+     * We track user interaction state (__userInteracting flag) and only reload
+     * when the user is idle. This gives the browser time to properly capture
+     * scroll position before reload, resulting in smooth position restoration.
      * 
-     * @example
-     * // Standard usage
-     * window.tryGuardedReload({ MAX: 30000, RETRY: 500 });
+     * Usage:
+     * ------
+     * Instead of: location.reload()
+     * Use:        guardedReload()
      * 
-     * @example
-     * // With custom fallback
-     * window.tryGuardedReload({ 
-     *   MAX: 30000, 
-     *   RETRY: 500, 
-     *   fallback: () => window.location.href = window.location.href 
-     * });
+     * The function will either:
+     * 1. Reload immediately if user is idle
+     * 2. Wait for user to finish interacting, then reload
+     * 3. Give up after 5 seconds and reload anyway (safety timeout)
+     * 
+     * @param {number} maxWaitMs - Maximum time to wait for user to idle (default: 5000ms)
      */
-    window.tryGuardedReload = function(opts) {
-        opts = opts || {};
-        const MAX = (typeof opts.MAX === 'number') ? opts.MAX : 30000;
-        const RETRY = (typeof opts.RETRY === 'number') ? opts.RETRY : 500;
-        const fallback = (opts && typeof opts.fallback === 'function') ? opts.fallback : null;
-        const start = Date.now();
-
-        (function attempt() {
-            try {
-                const interacting = (typeof window.__userInteracting !== 'undefined') ? window.__userInteracting : false;
-                if (!interacting) {
-                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
-                    return;
-                }
-                if (Date.now() - start < MAX) {
                     setTimeout(attempt, RETRY);
                     return;
                 }
