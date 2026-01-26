@@ -235,12 +235,20 @@
   
   // Initialize
   function init() {
+    console.log('[Error Reporting] Initializing...', {
+      hasConsent: hasConsent(),
+      hasBeenAsked: hasBeenAsked()
+    });
+    
     if (hasConsent()) {
       enableErrorReporting();
       console.log('[Error Reporting] Active');
     } else if (!hasBeenAsked()) {
       // Show banner after 3 seconds to not be intrusive
+      console.log('[Error Reporting] Will show banner in 3 seconds...');
       setTimeout(showConsentBanner, 3000);
+    } else {
+      console.log('[Error Reporting] User already declined or accepted');
     }
   }
   

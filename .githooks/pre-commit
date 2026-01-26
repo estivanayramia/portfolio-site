@@ -1,0 +1,3 @@
+#!/bin/sh
+# Pre-commit hook wrapper for Windows
+node .githooks/pre-commit.mjs
