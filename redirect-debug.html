@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirect Debugger</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #4ec9b0;
+            border-bottom: 2px solid #4ec9b0;
+            padding-bottom: 10px;
+        }
+        .log {
+            background: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .error {
+            color: #f48771;
+            font-weight: bold;
+        }
+        .success {
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+        .warning {
+            color: #dcdcaa;
+            font-weight: bold;
+        }
+        .info {
+            color: #9cdcfe;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 4px solid;
+        }
+        .test-pass {
+            border-color: #4ec9b0;
+            background: rgba(78, 201, 176, 0.1);
+        }
+        .test-fail {
+            border-color: #f48771;
+            background: rgba(244, 135, 113, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Redirect Debugger for estivanayramia.com</h1>
+        
+        <div class="log">
+            <pre id="log"></pre>
+        </div>
+
+        <div>
+            <button onclick="runDiagnostics()">🔄 Run Full Diagnostics</button>
+            <button onclick="testRootPath()">Test Root Path (/)</button>
+            <button onclick="testENPath()">Test /EN/index.html</button>
+            <button onclick="clearLog()">🗑️ Clear Log</button>
+        </div>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const log = (message, type = 'info') => {
+            const logEl = document.getElementById('log');
+            const timestamp = new Date().toISOString().split('T')[1].substring(0, 12);
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info';
+            logEl.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        };
+
+        const clearLog = () => {
+            document.getElementById('log').innerHTML = '';
+            document.getElementById('results').innerHTML = '';
+        };
+
+        const testPath = async (path, expectedStatus, description) => {
+            log(`Testing: ${path}`, 'info');
+            try {
+                const response = await fetch(path, {
+                    method: 'HEAD',
+                    redirect: 'manual'
+                });
+                
+                const info = {
+                    url: path,
+                    status: response.status,
+                    statusText: response.statusText,
+                    redirected: response.redirected,
+                    type: response.type,
+                    headers: {}
+                };
+
+                // Collect relevant headers
+                const headersList = ['location', 'content-type', 'cf-ray', 'x-robots-tag'];
+                headersList.forEach(header => {
+                    const value = response.headers.get(header);
+                    if (value) info.headers[header] = value;
+                });
+
+                log(`✓ ${path} → Status: ${info.status} ${info.statusText}`, 
+                    info.status === expectedStatus ? 'success' : 'warning');
+                
+                if (info.headers.location) {
+                    log(`  Redirects to: ${info.headers.location}`, 'info');
+                }
+
+                return info;
+            } catch (error) {
+                log(`✗ ${path} → Error: ${error.message}`, 'error');
+                return { error: error.message, url: path };
+            }
+        };
+
+        const runDiagnostics = async () => {
+            clearLog();
+            log('🔍 Starting comprehensive redirect diagnostics...', 'info');
+            log('─'.repeat(60), 'info');
+
+            const results = [];
+
+            // Current page info
+            log('\n📍 Current Page Information:', 'info');
+            log(`  URL: ${window.location.href}`, 'info');
+            log(`  Hostname: ${window.location.hostname}`, 'info');
+            log(`  Pathname: ${window.location.pathname}`, 'info');
+            log(`  Protocol: ${window.location.protocol}`, 'info');
+            log('─'.repeat(60), 'info');
+
+            // Test critical paths
+            log('\n🧪 Testing Critical Paths:', 'info');
+
+            const tests = [
+                { path: '/', expected: 200, desc: 'Root path (should serve EN/index.html via rewrite)' },
+                { path: '/EN/index.html', expected: 301, desc: 'Direct EN/index.html (should redirect to /)' },
+                { path: '/index.html', expected: 301, desc: 'Root index.html (should redirect to /)' },
+                { path: '/about', expected: 200, desc: 'About page (clean URL rewrite)' },
+                { path: '/EN/about.html', expected: 301, desc: 'Direct EN/about.html (should redirect)' },
+                { path: '/nonexistent-page', expected: 200, desc: '404 page (catch-all)' }
+            ];
+
+            for (const test of tests) {
+                const result = await testPath(test.path, test.expected, test.desc);
+                results.push({ test, result });
+                await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between tests
+            }
+
+            // Display results summary
+            log('\n📊 Test Results Summary:', 'info');
+            log('─'.repeat(60), 'info');
+
+            let passed = 0;
+            let failed = 0;
+
+            const resultsHTML = results.map(({ test, result }) => {
+                const isPass = !result.error && result.status === test.expected;
+                if (isPass) passed++;
+                else failed++;
+
+                return `
+                    <div class="test-result ${isPass ? 'test-pass' : 'test-fail'}">
+                        <strong>${isPass ? '✓ PASS' : '✗ FAIL'}</strong>: ${test.desc}<br>
+                        <strong>Path:</strong> ${test.path}<br>
+                        <strong>Expected:</strong> ${test.expected}<br>
+                        <strong>Got:</strong> ${result.status || 'Error'} ${result.statusText || ''}<br>
+                        ${result.headers?.location ? `<strong>Location:</strong> ${result.headers.location}<br>` : ''}
+                        ${result.error ? `<strong>Error:</strong> ${result.error}` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('results').innerHTML = resultsHTML;
+
+            log(`\n✓ Passed: ${passed}`, 'success');
+            log(`✗ Failed: ${failed}`, failed > 0 ? 'error' : 'info');
+            log('\n🔍 Diagnostics complete!', 'success');
+
+            // Redirect loop detection
+            log('\n⚠️ Checking for redirect loops...', 'warning');
+            const rootResult = results.find(r => r.test.path === '/');
+            const enResult = results.find(r => r.test.path === '/EN/index.html');
+
+            if (rootResult?.result?.headers?.location?.includes('/EN')) {
+                log('⚠️ WARNING: Root (/) redirects to /EN path - possible loop!', 'error');
+            }
+            if (enResult?.result?.headers?.location === '/') {
+                log('⚠️ WARNING: /EN/index.html redirects to / - circular redirect detected!', 'error');
+            }
+        };
+
+        const testRootPath = () => testPath('/', 200, 'Testing root path');
+        const testENPath = () => testPath('/EN/index.html', 301, 'Testing /EN/index.html');
+
+        // Auto-run on page load
+        window.addEventListener('load', () => {
+            log('Redirect Debugger initialized', 'success');
+            log('Click "Run Full Diagnostics" to start testing', 'info');
+        });
+    </script>
+</body>
+</html>
