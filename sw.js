@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v20260127-3-FORCE';
+const CACHE_VERSION = 'v20260127-4-FIXED';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -61,17 +61,6 @@ self.addEventListener('activate', (event) => {
                 })
             );
         }).then(() => self.clients.claim()) // Take control immediately
-    );
-});
-        caches.keys()
-            .then((cacheNames) => Promise.all(
-                cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) {
-                        console.log('Service Worker: Deleting old cache:', cache);
-                        return caches.delete(cache);
-                    }
-                })
-            ))
     );
 });
 
