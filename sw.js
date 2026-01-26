@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v20260119-5';
+const CACHE_VERSION = 'v20260127-1';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -25,6 +25,8 @@ const ASSETS_TO_CACHE = [
     '/assets/fonts/inter/inter-latin.woff2',
     '/assets/js/site.js',
     '/assets/js/site.min.js',
+    '/assets/js/debugger.min.js',
+    '/assets/js/error-reporting.min.js',
     '/assets/js/lazy-loader.min.js',
     '/assets/js/cache-refresh.js',
     '/assets/js/contact-form.js',
