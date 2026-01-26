@@ -22,7 +22,7 @@
 /about/    /about    301
 /contact/    /contact    301
 /deep-dive/    /deep-dive    301
-/hobbies-games/    /hobbies-games    301
+/hobbies-games    /hobbies-games/    301
 /hobbies-games/1024-moves/    /hobbies-games/1024-moves    301
 /hobbies-games/2048/    /hobbies-games/2048    301
 /hobbies-games/block-breaker/    /hobbies-games/block-breaker    301
@@ -59,7 +59,7 @@
 /about    /EN/about.html    200
 /contact    /EN/contact.html    200
 /deep-dive    /EN/deep-dive.html    200
-/hobbies-games    /EN/hobbies-games.html    200
+/hobbies-games/    /EN/hobbies-games/    200
 /hobbies-games/1024-moves    /EN/hobbies-games/1024-moves.html    200
 /hobbies-games/2048    /EN/hobbies-games/2048.html    200
 /hobbies-games/block-breaker    /EN/hobbies-games/block-breaker.html    200
@@ -96,10 +96,10 @@
 /EN/about.html    /about    301
 /EN/contact.html    /contact    301
 /EN/deep-dive.html    /deep-dive    301
-/EN/hobbies-games.html    /hobbies-games    301
 /EN/hobbies-games/1024-moves.html    /hobbies-games/1024-moves    301
 /EN/hobbies-games/2048.html    /hobbies-games/2048    301
 /EN/hobbies-games/block-breaker.html    /hobbies-games/block-breaker    301
+/EN/hobbies-games/index.html    /hobbies-games/    301
 /EN/hobbies-games/nano-wirebot.html    /hobbies-games/nano-wirebot    301
 /EN/hobbies-games/off-the-line.html    /hobbies-games/off-the-line    301
 /EN/hobbies-games/oh-flip.html    /hobbies-games/oh-flip    301
@@ -129,6 +129,7 @@
 /EN/projects/logistics.html    /projects/logistics    301
 /EN/projects/multilingual.html    /projects/multilingual    301
 /EN/projects/portfolio.html    /projects/portfolio    301
+/EN/hobbies-games/    /hobbies-games/    301
 # END GENERATED (fix-seo)
 # Static assets passthrough (prevents 404 capture)
 /assets/*                    /assets/:splat              200
