@@ -177,17 +177,15 @@
       
       <div class="consent-content">
         <div class="consent-text">
-          <div class="consent-title">🛠️ Help me fix bugs?</div>
+          <div class="consent-title">🐛 Psst... wanna help me squash bugs?</div>
           <div class="consent-desc">
-            Hey! I'm just one person trying to make this site better. If you're okay with it, I'd love to collect 
-            <strong>anonymous error reports</strong> (crashes, broken links, etc.) to help me fix issues faster. 
-            <strong>I'm not selling your data</strong> or tracking you—just trying to improve the site. 
-            Promise. <a href="/privacy" target="_blank">Privacy Policy</a>
+            If something breaks, I'd love to know! Click "Sure!" to send me anonymous crash reports. 
+            <strong>Zero tracking, zero selling your data</strong> — just me trying to make this site less janky. 😅
           </div>
         </div>
         <div class="consent-actions">
-          <button class="accept-btn" id="consent-accept">Sure, help out</button>
-          <button class="decline-btn" id="consent-decline">No thanks</button>
+          <button class="accept-btn" id="consent-accept">Sure! 👍</button>
+          <button class="decline-btn" id="consent-decline">Nah</button>
         </div>
       </div>
     `;
@@ -216,14 +214,6 @@
   
   // Initialize
   function init() {
-    const debugParam = new URLSearchParams(window.location.search).get('debug');
-    
-    // Always show if ?debug=1 is present (for testing)
-    if (debugParam === '1' && !hasConsent()) {
-       showConsentBanner();
-       return;
-    }
-
     if (hasConsent()) {
       enableErrorReporting();
       console.log('[Error Reporting] Active');

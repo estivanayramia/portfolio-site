@@ -864,17 +864,17 @@ if (__collectLogsEnabled) {
         const params = new URLSearchParams(window.location.search);
         const debugParam = params.get('debug');
         
-        // Handle ?debug=1 or ?debug=0
-        if (debugParam === '1') {
+        // Handle ?debug=0 to disable
+        if (debugParam === '0') {
+            localStorage.setItem('site_debugger_enabled', '0');
+        } else if (debugParam === '1') {
             localStorage.setItem('site_debugger_enabled', '1');
-        } else if (debugParam === '0') {
-            localStorage.removeItem('site_debugger_enabled');
         }
         
-        // Check if debugger should be enabled
-        const isEnabled = debugParam === '1' || localStorage.getItem('site_debugger_enabled') === '1';
+        // Check if debugger should be enabled (enabled by default unless explicitly disabled)
+        const isDisabled = localStorage.getItem('site_debugger_enabled') === '0';
         
-        if (!isEnabled) return;
+        if (isDisabled) return;
         
         // Get cache-busting version
         const getVersion = () => {
