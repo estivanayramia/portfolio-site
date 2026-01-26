@@ -592,6 +592,52 @@
   // Initialize (wait for body to exist)
   function init() {
     console.log('[Debugger] Initializing HUD...');
+    
+    // Intercept console methods
+    const originalLog = console.log;
+    const originalWarn = console.warn;
+    const originalError = console.error;
+    
+    console.log = function(...args) {
+      addEvent('console', { level: 'log', msg: args.join(' ') });
+      originalLog.apply(console, args);
+    };
+    
+    console.warn = function(...args) {
+      add Event('console', { level: 'warn', msg: args.join(' ') });
+      originalWarn.apply(console, args);
+    };
+    
+    console.error = function(...args) {
+      addEvent('console', { level: 'error', msg: args.join(' ') });
+      originalError.apply(console, args);
+    };
+    
+    // Intercept fetch
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      const url = args[0];
+      const startTime = performance.now();
+      
+      addEvent('network', { method: 'FETCH', url, status: 'pending' });
+      
+      return originalFetch.apply(this, args)
+        .then(response => {
+          const duration = performance.now() - startTime;
+          addEvent('network', { 
+            method: 'FETCH', 
+            url, 
+            status: response.status, 
+            duration: Math.round(duration) + 'ms' 
+          });
+          return response;
+        })
+        .catch(err => {
+          addEvent('network', { method: 'FETCH', url, status: 'error', error: err.message });
+          throw err;
+        });
+    };
+    
     createUI();
     document.getElementById('debugger-hud').classList.add('collapsed');
     console.log('[Debugger] HUD ready. Press Alt+Shift+D to toggle.');
