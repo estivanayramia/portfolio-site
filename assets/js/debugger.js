@@ -505,15 +505,26 @@
     });
   }
   
-  // Desktop hotkey (Ctrl+Shift+D / Cmd+Shift+D)
+  // Desktop hotkey (Alt+Shift+D)
   document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
+    if (e.altKey && e.shiftKey && e.key === 'D') {
       e.preventDefault();
       toggleExpanded();
     }
   });
   
-  // Initialize
-  createUI();
-  document.getElementById('debugger-hud').classList.add('collapsed');
+  
+  // Initialize (wait for body to exist)
+  function init() {
+    console.log('[Debugger] Initializing HUD...');
+    createUI();
+    document.getElementById('debugger-hud').classList.add('collapsed');
+    console.log('[Debugger] HUD ready. Press Alt+Shift+D to toggle.');
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
