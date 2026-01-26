@@ -217,6 +217,14 @@
   
   // Initialize
   function init() {
+    const debugParam = new URLSearchParams(window.location.search).get('debug');
+    
+    // Always show if ?debug=1 is present (for testing)
+    if (debugParam === '1' && !hasConsent()) {
+       showConsentBanner();
+       return;
+    }
+
     if (hasConsent()) {
       enableErrorReporting();
       console.log('[Error Reporting] Active');

@@ -426,7 +426,82 @@
   }
   
   function renderLayout() {
-    return `<p>Layout scanner coming soon...</p>`;
+    // Run scans
+    const issues = [];
+    
+    // 1. Image Check
+    document.querySelectorAll('img').forEach(img => {
+      if (!img.alt) issues.push({ type: 'error', msg: 'Missing ALT text', el: img });
+      if (img.loading !== 'lazy' && checkInViewport(img)) { /* ok */ }
+      else if (img.loading !== 'lazy') issues.push({ type: 'warn', msg: 'Missing loading="lazy"', el: img });
+    });
+    
+    // 2. Link Check
+    document.querySelectorAll('a').forEach(a => {
+      if (!a.href || a.href === '#' || a.getAttribute('href').startsWith('javascript')) {
+        issues.push({ type: 'warn', msg: 'Empty/Invalid Link', el: a });
+      }
+      const rect = a.getBoundingClientRect();
+      if (rect.width > 0 && (rect.width < 44 || rect.height < 44)) {
+        issues.push({ type: 'warn', msg: 'Small Touch Target (<44px)', el: a });
+      }
+    });
+
+    // 3. Overflow Check
+    const docWidth = document.documentElement.clientWidth;
+    document.querySelectorAll('*').forEach(el => {
+      if (el.offsetWidth > docWidth) {
+        issues.push({ type: 'error', msg: 'Horizontal Overflow', el: el });
+      }
+    });
+    
+    // 4. Heading Hierarchy
+    const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+    let lastLevel = 0;
+    headings.forEach(h => {
+      const level = parseInt(h.tagName[1]);
+      if (level > lastLevel + 1) {
+        issues.push({ type: 'warn', msg: `Skipped heading level (H${lastLevel} -> H${level})`, el: h });
+      }
+      lastLevel = level;
+    });
+
+    if (issues.length === 0) return '<p>✅ No layout issues found!</p>';
+
+    // Render Table
+    window.dbgHighlight = (index) => {
+        const issue = window.dbgIssues[index];
+        if (issue && issue.el) {
+            issue.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const originalOutline = issue.el.style.outline;
+            issue.el.style.outline = '4px solid #ff00ff';
+            issue.el.style.zIndex = 999999;
+            setTimeout(() => issue.el.style.outline = originalOutline, 2000);
+        }
+    };
+    window.dbgIssues = issues;
+
+    return `
+      <div class="dbg-stat"><span class="dbg-stat-label">Issues Found</span><span class="dbg-stat-value">${issues.length}</span></div>
+      <table class="dbg-table">
+        <thead><tr><th>Type</th><th>Issue</th><th>Element</th><th>Action</th></tr></thead>
+        <tbody>
+          ${issues.map((issue, i) => `
+            <tr>
+              <td><span style="color:${issue.type==='error'?'#ff5555':'#ffaa00'}">●</span> ${issue.type}</td>
+              <td>${issue.msg}</td>
+              <td>${issue.el.tagName.toLowerCase()}${issue.el.id ? '#'+issue.el.id : ''}.${Array.from(issue.el.classList).slice(0,1).join('.')}</td>
+              <td><button class="dbg-btn" style="padding:2px 8px;min-height:24px;" onclick="window.dbgHighlight(${i})">Find</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function checkInViewport(el) {
+    const rect = el.getBoundingClientRect();
+    return rect.top < window.innerHeight && rect.bottom >= 0;
   }
   
   function renderStorage(logs) {
