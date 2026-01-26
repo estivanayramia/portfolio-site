@@ -24,17 +24,6 @@ audit.js
 # Lighthouse reports (generated in-repo during local audits)
 lighthouse-results/
 
-# Lighthouse report artifacts (explicit)
-lighthouse-results/*.report.json
-lighthouse-results/*.log
-lighthouse-results/terminal.log
-lighthouse-results/run.log
-
-# Visual regression artifacts (local-only)
-visual-baseline/
-visual-current/
-visual-diff/
-
 # Local server logs
 tmp-serve*.log
 
@@ -45,20 +34,21 @@ tmp-serve*.log
 .vscode_restore_reports/
 dryrun-transcript*.txt
 
-# Local verification artifacts
-.reports/
-
-# determinism test artifacts
-assets/css/style.1.css
-assets/css/style.2.css
-
-# backup artifacts
-*.bak
+# Restore tool artifacts
+.vscode_restore_backup/
+.vscode_restore_reports/
+dryrun-transcript*.txt
 
 worker/.wrangler/
 .wrangler/
 worker/node_modules/
+.vscode_restore_backup/
 .vscode/
 .env
 .env.*
 
+# Visual Regression Artifacts
+visual-baseline/
+visual-current/
+visual-diff/
+.reports.bak/
