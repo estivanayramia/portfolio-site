@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v20260127-2';
+const CACHE_VERSION = 'v20260127-3-FORCE';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -37,6 +37,7 @@ const ASSETS_TO_CACHE = [
 // Install event - cache assets
 self.addEventListener('install', (event) => {
     console.log('Service Worker: Installing...');
+    self.skipWaiting(); // Force greedy update
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
@@ -50,6 +51,18 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
     console.log('Service Worker: Activating...');
     event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    if (cacheName !== CACHE_NAME) {
+                        console.log('Service Worker: Clearing old cache', cacheName);
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        }).then(() => self.clients.claim()) // Take control immediately
+    );
+});
         caches.keys()
             .then((cacheNames) => Promise.all(
                 cacheNames.map((cache) => {
