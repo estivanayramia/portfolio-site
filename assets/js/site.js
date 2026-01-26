@@ -799,60 +799,110 @@ if (__collectLogsEnabled) {
      * where a reload during scrolling causes the viewport to jump to an unexpected
      * position, often losing the user's place.
      * 
-     * How it works:
-     * 1. Checks if user is currently interacting (scrolling, touching)
-     * 2. If idle, reloads immediately
-     * 3. If active, waits and retries after RETRY milliseconds
-     * 4. After MAX milliseconds, forces reload regardless (timeout)
+     * Mobile Safari Quirk:
+     * ---------------------
+     * Mobile Safari (and other mobile browsers) are aggressive about restoring
+     * scroll position after reload. However, if a reload happens DURING user
+     * interaction (especially scrolling), the browser can't accurately capture
+     * the intended scroll position. This leads to a jarring "jump" where the
+     * user ends up somewhere they didn't expect.
      * 
-     * @param {Object} opts - Configuration options
-     * @param {number} [opts.MAX=30000] - Maximum milliseconds to wait before forcing reload
-     * @param {number} [opts.RETRY=500] - Milliseconds between retry attempts
-     * @param {Function} [opts.fallback] - Fallback function if reload fails
+     * Solution:
+     * ---------
+     * We track user interaction state (__userInteracting flag) and only reload
+     * when the user is idle. This gives the browser time to properly capture
+     * scroll position before reload, resulting in smooth position restoration.
      * 
-     * @example
-     * // Standard usage
-     * window.tryGuardedReload({ MAX: 30000, RETRY: 500 });
+     * Usage:
+     * ------
+     * Instead of: location.reload()
+     * Use:        guardedReload()
      * 
-     * @example
-     * // With custom fallback
-     * window.tryGuardedReload({ 
-     *   MAX: 30000, 
-     *   RETRY: 500, 
-     *   fallback: () => window.location.href = window.location.href 
-     * });
+     * The function will either:
+     * 1. Reload immediately if user is idle
+     * 2. Wait for user to finish interacting, then reload
+     * 3. Give up after 5 seconds and reload anyway (safety timeout)
+     * 
+     * @param {number} maxWaitMs - Maximum time to wait for user to idle (default: 5000ms)
      */
-    window.tryGuardedReload = function(opts) {
-        opts = opts || {};
-        const MAX = (typeof opts.MAX === 'number') ? opts.MAX : 30000;
-        const RETRY = (typeof opts.RETRY === 'number') ? opts.RETRY : 500;
-        const fallback = (opts && typeof opts.fallback === 'function') ? opts.fallback : null;
-        const start = Date.now();
-
-        (function attempt() {
-            try {
-                const interacting = (typeof window.__userInteracting !== 'undefined') ? window.__userInteracting : false;
-                if (!interacting) {
-                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
-                    return;
-                }
-                if (Date.now() - start < MAX) {
-                    setTimeout(attempt, RETRY);
-                    return;
-                }
-                // Timed out - fallback
-                if (fallback) {
-                    try { fallback(); } catch (e) { try { window.location.reload(); } catch(_) {} }
-                } else {
-                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
-                }
-            } catch (e) {
-                if (fallback) { try { fallback(); } catch(_) { try { window.location.reload(); } catch(_) {} } }
-                else { try { window.location.reload(); } catch(_) {} }
+    const guardedReload = (maxWaitMs = 5000) => {
+        const startTime = Date.now();
+        const attemptReload = () => {
+            if (!__userInteracting) {
+                try { location.reload(); } catch (e) {}
+                return;
             }
-        })();
+            if (Date.now() - startTime >= maxWaitMs) {
+                try { location.reload(); } catch (e) {}
+                return;
+            }
+            setTimeout(attemptReload, 250);
+        };
+        attemptReload();
     };
+    window.guardedReload = guardedReload;
 }
+
+// ============================================================================
+// DEBUGGER HUD LOADER
+// ============================================================================
+
+/**
+ * Debugger HUD Dynamic Loader
+ * 
+ * Loads full debugger UI when enabled via:
+ * - ?debug=1 (enables and persists to localStorage)
+ * - ?debug=0 (disables and clears localStorage)
+ * - localStorage.site_debugger_enabled = "1"
+ * 
+ * Backwards compatible with ?collect-logs=1 (still works independently)
+ * 
+ * The debugger UI is loaded separately to keep main bundle small when disabled.
+ */
+(function() {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        const debugParam = params.get('debug');
+        
+        // Handle ?debug=1 or ?debug=0
+        if (debugParam === '1') {
+            localStorage.setItem('site_debugger_enabled', '1');
+        } else if (debugParam === '0') {
+            localStorage.removeItem('site_debugger_enabled');
+        }
+        
+        // Check if debugger should be enabled
+        const isEnabled = debugParam === '1' || localStorage.getItem('site_debugger_enabled') === '1';
+        
+        if (!isEnabled) return;
+        
+        // Get cache-busting version
+        const getVersion = () => {
+            // 1. Try meta tag
+            const metaTag = document.querySelector('meta[name="build-version"]');
+            if (metaTag && metaTag.content) return metaTag.content;
+            
+            // 2. Try localStorage siteVersion
+            const lsVersion = localStorage.getItem('siteVersion');
+            if (lsVersion) return lsVersion;
+            
+            // 3. Fallback to date-based
+            return 'v' + new Date().toISOString().split('T')[0].replace(/-/g, '');
+        };
+        
+        // Inject debugger script
+        const script = document.createElement('script');
+        script.src = `/assets/js/debugger.min.js?v=${getVersion()}`;
+        script.defer = true;
+        script.onerror = () => {
+            console.warn('[Debugger] Failed to load debugger.min.js');
+        };
+        document.head.appendChild(script);
+        
+    } catch (e) {
+        console.error('[Debugger] Loader error:', e);
+    }
+})();
 
 // ============================================================================
 // FEATURE MODULES
