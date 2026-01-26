@@ -39,6 +39,9 @@
     updateUI();
   }
   
+  // Expose globally so error-reporting.js can send events
+  window.__debuggerAddEvent = addEvent;
+  
   // Create UI
   function createUI() {
     const container = document.createElement('div');
@@ -604,7 +607,7 @@
     };
     
     console.warn = function(...args) {
-      add Event('console', { level: 'warn', msg: args.join(' ') });
+      addEvent('console', { level: 'warn', msg: args.join(' ') });
       originalWarn.apply(console, args);
     };
     
