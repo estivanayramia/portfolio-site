@@ -3,9 +3,6 @@
 
 # /EN and /EN/ hard redirects removed to prevent infinite loops
 
-# Root rewrite (200 = transparent proxy, not a redirect)
-/    /EN/index.html    200
-
 # 1. Canonical Redirects (301) - Enforce clean URLs
 /index.html                  /                            301
 /es/index.html               /es/                         301
@@ -15,14 +12,11 @@
 /es/                         /es/index.html               200
 /ar/                         /ar/index.html               200
 
-# Dashboard (password protected page)
-/dashboard                   /EN/dashboard.html           200
-/dashboard/                  /dashboard                   301
-
 # BEGIN GENERATED (fix-seo)
 # URL normalization (301)
 /about/    /about    301
 /contact/    /contact    301
+/dashboard/    /dashboard    301
 /deep-dive/    /deep-dive    301
 /hobbies-games/    /hobbies-games    301
 /hobbies-games/1024-moves/    /hobbies-games/1024-moves    301
@@ -60,6 +54,7 @@
 # Clean URL rewrites (200) -> serve from /EN/
 /about    /EN/about.html    200
 /contact    /EN/contact.html    200
+/dashboard    /EN/dashboard.html    200
 /deep-dive    /EN/deep-dive.html    200
 /hobbies-games    /EN/hobbies-games.html    200
 /hobbies-games/1024-moves    /EN/hobbies-games/1024-moves.html    200
@@ -97,6 +92,7 @@
 # Prevent indexing /EN/* directly (301)
 /EN/about.html    /about    301
 /EN/contact.html    /contact    301
+/EN/dashboard.html    /dashboard    301
 /EN/deep-dive.html    /deep-dive    301
 /EN/hobbies-games.html    /hobbies-games    301
 /EN/hobbies-games/1024-moves.html    /hobbies-games/1024-moves    301
@@ -131,6 +127,6 @@
 /EN/projects/multilingual.html    /projects/multilingual    301
 /EN/projects/portfolio.html    /projects/portfolio    301
 # END GENERATED (fix-seo)
-
-# Note: Cloudflare Pages automatically serves /EN/404.html for 404s
-# No catch-all needed - explicit rewrites above handle all valid paths
+# 404 Fallback (Pages does not support 404 rewrites; use 200 proxy)
+/404.html                    /EN/404.html                301
+/*                           /EN/404.html                200
