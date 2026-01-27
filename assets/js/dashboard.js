@@ -3,6 +3,56 @@
  * Handles authentication, error fetching, filtering, and management
  */
 
+// DEMO MODE - set to false when API backend is deployed
+const DEMO_MODE = true;
+const DEMO_PASSWORD = 'savonie21';
+
+// Mock error data for demo mode
+const MOCK_ERRORS = [
+  {
+    id: 1,
+    type: 'TypeError',
+    message: 'Cannot read property "map" of undefined',
+    url: 'https://www.estivanayramia.com/projects/',
+    filename: 'site.min.js',
+    line: 247,
+    stack: 'TypeError: Cannot read property "map" of undefined\n  at renderProjects (site.min.js:247)\n  at HTMLDocument.<anonymous> (site.min.js:15)',
+    category: 'code_bug',
+    status: 'new',
+    user_agent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0',
+    is_bot: false,
+    timestamp: Date.now() - 3600000
+  },
+  {
+    id: 2,
+    type: 'ReferenceError',
+    message: 'gsap is not defined',
+    url: 'https://www.estivanayramia.com/',
+    filename: 'site.min.js',
+    line: 89,
+    stack: 'ReferenceError: gsap is not defined\n  at initAnimations (site.min.js:89)',
+    category: 'async_bug',
+    status: 'investigating',
+    user_agent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) Safari/604.1',
+    is_bot: false,
+    timestamp: Date.now() - 7200000
+  },
+  {
+    id: 3,
+    type: 'NetworkError',
+    message: 'Failed to fetch /api/chat',
+    url: 'https://www.estivanayramia.com/contact',
+    filename: null,
+    line: null,
+    stack: 'Error: Failed to fetch /api/chat\n  at fetch (native)',
+    category: 'connectivity',
+    status: 'resolved',
+    user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1.15',
+    is_bot: false,
+    timestamp: Date.now() - 86400000
+  }
+];
+
 let authToken = null;
 let currentPage = 0;
 const pageSize = 50;
@@ -42,6 +92,20 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   const password = document.getElementById('password-input').value;
   const errorMsg = document.getElementById('login-error');
   
+  if (DEMO_MODE) {
+    // Demo mode - check password locally
+    if (password === DEMO_PASSWORD) {
+      authToken = 'demo-token-' + Date.now();
+      localStorage.setItem('dashboard_token', authToken);
+      showDashboard();
+      loadErrors();
+    } else {
+      errorMsg.textContent = 'Invalid password (hint: savonie21)';
+      errorMsg.style.display = 'block';
+    }
+    return;
+  }
+  
   try {
     const response = await fetch('/api/auth', {
       method: 'POST',
@@ -75,6 +139,23 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 
 // Load errors from API
 async function loadErrors() {
+  if (DEMO_MODE) {
+    // Demo mode - use mock data
+    const filtered = MOCK_ERRORS.filter(error => {
+      if (currentFilters.status && error.status !== currentFilters.status) return false;
+      if (currentFilters.category && error.category !== currentFilters.category) return false;
+      return true;
+    });
+    
+    const start = currentPage * pageSize;
+    const pageErrors = filtered.slice(start, start + pageSize);
+    
+    renderErrors(pageErrors);
+    updateStats(pageErrors, filtered.length);
+    updatePagination(filtered.length);
+    return;
+  }
+  
   try {
     const params = new URLSearchParams({
       limit: pageSize,
