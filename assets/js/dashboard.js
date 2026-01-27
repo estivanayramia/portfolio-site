@@ -4,7 +4,7 @@
  */
 
 // DEMO MODE - set to false when API backend is deployed
-const DEMO_MODE = true;
+const DEMO_MODE = false;
 const DEMO_PASSWORD = 'savonie21';
 
 // Mock error data for demo mode
@@ -242,25 +242,44 @@ window.viewError = async function(errorId) {
   currentErrorId = errorId;
   
   try {
-    const response = await fetch(`/api/errors?limit=1&offset=${errorId - 1}`, {
+    // NEW: Fetch by ID directly to avoid offset bugs
+    const response = await fetch(`/api/errors/${errorId}`, {
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
     
+    if (!response.ok) throw new Error('Failed to fetch error details');
     const data = await response.json();
-    const error = data.errors.find(e => e.id === errorId);
-    
-    if (!error) throw new Error('Error not found');
+    const error = data.error; // API returns { error: object }
     
     // Populate modal
+    const breadcrumbsHtml = error.breadcrumbs ? renderBreadcrumbs(error.breadcrumbs) : '<p class="no-data">No interaction history available</p>';
+
     document.getElementById('error-details').innerHTML = `
-      <p><strong>ID:</strong> ${error.id}</p>
-      <p><strong>Type:</strong> ${error.type}</p>
-      <p><strong>Message:</strong> ${escapeHtml(error.message)}</p>
-      <p><strong>File:</strong> ${escapeHtml(error.filename || 'N/A')} (Line ${error.line || 'N/A'})</p>
-      <p><strong>URL:</strong> <a href="${error.url}" target="_blank">${escapeHtml(error.url)}</a></p>
-      <p><strong>User Agent:</strong> ${escapeHtml(error.user_agent)}</p>
-      <p><strong>Timestamp:</strong> ${new Date(error.timestamp).toLocaleString()}</p>
-      <p><strong>Bot:</strong> ${error.is_bot ? 'Yes 🤖' : 'No 👤'}</p>
+      <div class="detail-group">
+        <label>ID</label> <span>${error.id}</span>
+      </div>
+      <div class="detail-group">
+        <label>Type</label> <span class="type-badge">${error.type}</span>
+      </div>
+      <div class="detail-group full-width">
+        <label>Message</label> <div class="code-block">${escapeHtml(error.message)}</div>
+      </div>
+      <div class="detail-group full-width">
+        <label>Interaction History</label>
+        <div class="breadcrumbs-container">${breadcrumbsHtml}</div>
+      </div>
+      <div class="detail-group">
+        <label>Location</label> 
+        <span><a href="${error.url}" target="_blank">${truncate(error.url, 50)}</a></span>
+        <span class="sub-text">${escapeHtml(error.filename || '')}:${error.line || '?'}</span>
+      </div>
+      <div class="detail-group">
+        <label>User Agent</label> <span class="sub-text">${escapeHtml(error.user_agent)}</span>
+      </div>
+      <div class="detail-group">
+        <label>Time</label> <span>${new Date(error.timestamp).toLocaleString()}</span>
+      </div>
+      
       <details>
         <summary><strong>Stack Trace</strong></summary>
         <pre>${escapeHtml(error.stack || 'No stack trace')}</pre>
@@ -276,6 +295,23 @@ window.viewError = async function(errorId) {
     alert('Failed to load error details');
   }
 };
+
+function renderBreadcrumbs(jsonString) {
+  try {
+    const crumbs = JSON.parse(jsonString);
+    if (!crumbs || !crumbs.length) return '';
+    
+    return crumbs.map(c => `
+      <div class="breadcrumb-item ${c.type}">
+        <span class="time">${new Date(c.timestamp).toLocaleTimeString()}</span>
+        <span class="badg">${c.type}</span>
+        <span class="desc">${escapeHtml(c.message || c.selector || c.url)}</span>
+      </div>
+    `).join('');
+  } catch (e) {
+    return 'Invalid breadcrumb data';
+  }
+}
 
 // Save error changes
 document.getElementById('save-error').addEventListener('click', async () => {
@@ -371,9 +407,12 @@ document.getElementById('refresh-btn').addEventListener('click', () => {
 // Export CSV
 document.getElementById('export-btn').addEventListener('click', async () => {
   try {
+    // Fetch all errors for export
     const response = await fetch('/api/errors?limit=1000', {
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
+    
+    if (!response.ok) throw new Error('Export fetch failed');
     
     const data = await response.json();
     const csv = errorsToCSV(data.errors);
@@ -385,8 +424,9 @@ document.getElementById('export-btn').addEventListener('click', async () => {
   }
 });
 
-// Helper functions
+// Helper functions (kept as is)
 function escapeHtml(text) {
+  if (!text) return '';
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
@@ -409,11 +449,12 @@ function formatTime(timestamp) {
 }
 
 function errorsToCSV(errors) {
+  if (!errors || !Array.isArray(errors)) return '';
   const headers = ['ID', 'Type', 'Message', 'URL', 'Category', 'Status', 'Bot', 'Timestamp'];
   const rows = errors.map(e => [
     e.id,
     e.type,
-    e.message.replace(/"/g, '""'),
+    (e.message || '').replace(/"/g, '""'),
     e.url,
     e.category,
     e.status,

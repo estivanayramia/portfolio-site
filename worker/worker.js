@@ -157,7 +157,7 @@ let cachedModel = "gemini-2.5-flash";
 const GEMINI_TIMEOUT = 35000; // Increased to account for larger tokens/retries
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_REPLY_CHARS = 8000; // Increased from 3000
-const VERSION_TAG = "v2026.01.19-grounding-hotfix";
+const VERSION_TAG = "v2026.01.26-error-collection-FIX2";
 
 // Optional local rate limiter (fallback if env.RATE_LIMITER not configured)
 const localRateLimiter = new Map();
@@ -705,18 +705,48 @@ function checkLocalRateLimit(clientIP) {
 export default {
   async fetch(request, env) {
     const corsHeaders = getCorsHeaders(request);
-    
-    // Load site facts from KV (cached, fast after first call)
-    const siteFacts = await getSiteFacts(env);
+    const url = new URL(request.url);
 
     // --- CORS PREFLIGHT ---
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
     }
 
+    // --- ERROR MONITORING ROUTES (Top Priority) ---
+    // POST /api/error-report
+    if (url.pathname.startsWith("/api/error-report")) {
+      if (request.method !== "POST") return methodNotAllowed(corsHeaders, request.method);
+      const { apiHandleErrorReport } = await import('./error-api.js').catch(() => ({})); 
+      // Fallback if import fails (should rely on appended version, but keeping appended calls)
+      // Actually we are using appended functions, so just call them directly
+      return apiHandleErrorReport(request, env, corsHeaders);
+    }
+    
+    // POST /api/auth
+    if (url.pathname.startsWith("/api/auth")) {
+      if (request.method !== "POST") return methodNotAllowed(corsHeaders, request.method);
+      return apiHandleAuth(request, env, corsHeaders);
+    }
+    
+    // GET /api/errors
+    if (url.pathname === "/api/errors" || url.pathname === "/api/errors/") {
+      if (request.method !== "GET") return methodNotAllowed(corsHeaders, request.method);
+      return apiHandleGetErrors(request, env, corsHeaders);
+    }
+    
+    // GET/PATCH/DELETE /api/errors/:id
+    if (url.pathname.startsWith("/api/errors/")) {
+      const errorId = parseInt(url.pathname.split('/')[3]);
+      if (request.method === "GET") return apiHandleGetErrorById(request, env, corsHeaders, errorId);
+      if (request.method === "PATCH") return apiHandleUpdateError(request, env, corsHeaders, errorId);
+      if (request.method === "DELETE") return apiHandleDeleteError(request, env, corsHeaders, errorId);
+      return methodNotAllowed(corsHeaders, request.method);
+    }
+
     // --- HEALTH CHECK ---
-    const url = new URL(request.url);
-    if (request.method === "GET" && url.pathname === "/health") {
+    if (request.method === "GET" && (url.pathname === "/health" || url.pathname === "/api/health")) {
+      // Load facts eagerly only for health/chat
+      const siteFacts = await getSiteFacts(env); 
       const hasKey = !!(env.GEMINI_API_KEY && env.GEMINI_API_KEY.length > 10);
       const factsCacheAgeMs = cachedSiteFacts ? Math.max(0, Date.now() - cacheTimestamp) : null;
       return jsonReply(
@@ -727,55 +757,15 @@ export default {
           kv: !!env.SAVONIE_KV,
           factsKey: "site-facts:v1",
           factsSource: cachedSiteFactsSource,
-          factsCacheAgeMs
+          factsCacheAgeMs,
+          errorApi: true
         },
         200,
         corsHeaders
       );
     }
 
-    if (request.method !== "POST") {
-      return jsonReply(
-        { errorType: "BadRequest", reply: "Method not allowed." },
-        405,
-        corsHeaders
-      );
-    }
-
-    // --- ERROR MONITORING ROUTES ---
-    // POST /api/error-report - Public endpoint for error collection
-    if (url.pathname === "/api/error-report") {
-      // Import and call error handler
-      const { handleErrorReport } = await import('./error-api.js');
-      return handleErrorReport(request, env, corsHeaders);
-    }
-    
-    // POST /api/auth - Authentication endpoint
-    if (url.pathname === "/api/auth") {
-      const { handleAuth } = await import('./error-api.js');
-      return handleAuth(request, env, corsHeaders);
-    }
-    
-    // GET /api/errors - Fetch errors (auth required)
-    if (request.method === "GET" && url.pathname === "/api/errors") {
-      const { handleGetErrors } = await import('./error-api.js');
-      return handleGetErrors(request, env, corsHeaders);
-    }
-    
-    // PATCH /api/errors/:id - Update error (auth required)
-    if (request.method === "PATCH" && url.pathname.startsWith("/api/errors/")) {
-      const errorId = url.pathname.split('/')[3];
-      const { handleUpdateError } = await import('./error-api.js');
-      return handleUpdateError(request, env, corsHeaders, errorId);
-    }
-    
-    // DELETE /api/errors/:id - Delete error (auth required)
-    if (request.method === "DELETE" && url.pathname.startsWith("/api/errors/")) {
-      const errorId = url.pathname.split('/')[3];
-      const { handleDeleteError } = await import('./error-api.js');
-      return handleDeleteError(request, env, corsHeaders, errorId);
-    }
-
+    // --- CHATBOT ROUTES below this line require POST ---
     const isChatPath = url.pathname === "/api/chat" || url.pathname === "/chat";
     if (!isChatPath) {
       return jsonReply(
@@ -784,6 +774,13 @@ export default {
         corsHeaders
       );
     }
+    
+    if (request.method !== "POST") {
+      return methodNotAllowed(corsHeaders, request.method);
+    }
+
+    // Load site facts for chat
+    const siteFacts = await getSiteFacts(env);
 
     try {
       // --- PARSE & VALIDATE REQUEST ---
@@ -1504,4 +1501,189 @@ async function callGemini(modelName, context, userMessage, apiKey, maxTokens = 5
   }
 
   return json;
+}
+
+// ============================================================================
+// ERROR API HELPER FUNCTIONS
+// Appended from error-api.js with naming conflict resolution
+// ============================================================================
+
+function methodNotAllowed(corsHeaders, receivedMethod) {
+  return new Response(JSON.stringify({ error: "Method not allowed", received: receivedMethod }), {
+    status: 405,
+    headers: { ...corsHeaders, "Content-Type": "application/json" }
+  });
+}
+
+function apiIsBot(userAgent) {
+  if (!userAgent) return true;
+  const ua = userAgent.toLowerCase();
+  const botPatterns = [
+    'bot', 'crawler', 'spider', 'scraper', 'headless', 'phantom', 'slurp', 'curl',
+    'wget', 'python', 'java', 'go-http', 'googlebot', 'bingbot', 'yahoo', 'baidu'
+  ];
+  return botPatterns.some(pattern => ua.includes(pattern));
+}
+
+// Renamed from checkRateLimit to avoid conflict with local vars
+async function apiCheckRateLimit(ip, env) {
+  const key = `rate:${ip}`;
+  const maxRequests = parseInt(env.RATE_LIMIT_MAX || '10');
+  const window = parseInt(env.RATE_LIMIT_WINDOW || '60000'); // 60s
+  
+  try {
+    const data = await env.SAVONIE_KV.get(key, 'json');
+    const now = Date.now();
+    
+    if (!data) {
+      await env.SAVONIE_KV.put(key, JSON.stringify({ count: 1, firstRequest: now }), { expirationTtl: Math.ceil(window / 1000) });
+      return true;
+    }
+    if (now - data.firstRequest > window) {
+      await env.SAVONIE_KV.put(key, JSON.stringify({ count: 1, firstRequest: now }), { expirationTtl: Math.ceil(window / 1000) });
+      return true;
+    }
+    if (data.count >= maxRequests) return false;
+    
+    data.count++;
+    await env.SAVONIE_KV.put(key, JSON.stringify(data), { expirationTtl: Math.ceil(window / 1000) });
+    return true;
+  } catch (error) {
+    console.error('Rate limit check failed:', error);
+    return true; // Failopen
+  }
+}
+
+function apiVerifyAuth(request, env) {
+  const authHeader = request.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) return false;
+  
+  const token = authHeader.substring(7);
+  try {
+    const decoded = atob(token);
+    const [timestamp, password] = decoded.split(':');
+    if (password !== env.DASHBOARD_PASSWORD_HASH) return false;
+    if ((Date.now() - parseInt(timestamp)) > 86400000) return false; // 24h
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function apiHandleErrorReport(request, env, corsHeaders) {
+  try {
+    const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const userAgent = request.headers.get('User-Agent') || '';
+    
+    // Rate limit
+    if (!(await apiCheckRateLimit(clientIP, env))) {
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    
+    const body = await request.json();
+    const { type, message, filename, line, col, stack, url, viewport, version } = body;
+    
+    if (!type || !message) {
+      return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    
+    // Categorize
+    let category = 'uncategorized';
+    const lowerMsg = (message || '').toLowerCase();
+    if (lowerMsg.includes('404') || lowerMsg.includes('not found')) category = 'navigation';
+    else if (type === 'network_error') category = 'connectivity';
+    else if (type === 'javascript_error') category = 'code_bug';
+    else if (type === 'unhandled_rejection') category = 'async_bug';
+    
+    const isBot = apiIsBot(userAgent);
+
+    const stmt = env.DB.prepare(`
+      INSERT INTO errors (type, message, filename, line, col, stack, url, user_agent, viewport, version, timestamp, category, status, is_bot)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    
+    await stmt.bind(type, message?.slice(0, 1000), filename?.slice(0, 500), line||null, col||null, stack?.slice(0, 2000), url?.slice(0, 500), userAgent?.slice(0, 500), viewport, version, Date.now(), category, 'new', isBot?1:0).run();
+    
+    return new Response(JSON.stringify({ success: true }), { status: 202, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  } catch (error) {
+    console.error('API Error:', error);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+}
+
+async function apiHandleAuth(request, env, corsHeaders) {
+  try {
+    const { password } = await request.json();
+    if (password === env.DASHBOARD_PASSWORD_HASH) {
+      return new Response(JSON.stringify({ success: true, token: btoa(`${Date.now()}:${password}`) }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+    return new Response(JSON.stringify({ error: 'Invalid password' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: 'Bad request' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+}
+
+async function apiHandleGetErrors(request, env, corsHeaders) {
+  if (!apiVerifyAuth(request, env)) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  
+  try {
+    const url = new URL(request.url);
+    const status = url.searchParams.get('status');
+    const category = url.searchParams.get('category');
+    const limit = parseInt(url.searchParams.get('limit') || '50');
+    const offset = parseInt(url.searchParams.get('offset') || '0');
+    
+    let query = 'SELECT * FROM errors WHERE 1=1';
+    const bindings = [];
+    if (status) { query += ' AND status = ?'; bindings.push(status); }
+    if (category) { query += ' AND category = ?'; bindings.push(category); }
+    query += ' ORDER BY timestamp DESC LIMIT ? OFFSET ?';
+    bindings.push(limit, offset);
+    
+    const { results } = await env.DB.prepare(query).bind(...bindings).all();
+    
+    // Count
+    let cQuery = 'SELECT COUNT(*) as total FROM errors WHERE 1=1';
+    const cBindings = [];
+    if (status) { cQuery += ' AND status = ?'; cBindings.push(status); }
+    if (category) { cQuery += ' AND category = ?'; cBindings.push(category); } 
+    
+    const { results: cResults } = await env.DB.prepare(cQuery).bind(...cBindings).all();
+    
+    return new Response(JSON.stringify({ errors: results, total: cResults[0]?.total || 0, limit, offset }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+}
+
+async function apiHandleUpdateError(request, env, corsHeaders, errorId) {
+  if (!apiVerifyAuth(request, env)) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  
+  try {
+    const { category, status } = await request.json();
+    const updates = [];
+    const bindings = [];
+    if (category) { updates.push('category = ?'); bindings.push(category); }
+    if (status) { updates.push('status = ?'); bindings.push(status); }
+    if (updates.length===0) return new Response(JSON.stringify({ error: 'No updates' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    
+    bindings.push(errorId);
+    await env.DB.prepare(`UPDATE errors SET ${updates.join(', ')} WHERE id = ?`).bind(...bindings).run();
+    
+    if (status === 'resolved') await env.DB.prepare('DELETE FROM errors WHERE id = ?').bind(errorId).run();
+    
+    return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
+}
+
+async function apiHandleDeleteError(request, env, corsHeaders, errorId) {
+  if (!apiVerifyAuth(request, env)) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  try {
+    await env.DB.prepare('DELETE FROM errors WHERE id = ?').bind(errorId).run();
+    return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
 }

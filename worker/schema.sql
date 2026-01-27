@@ -1,30 +1,27 @@
 -- Error Monitoring Database Schema
--- Run with: wrangler d1 execute portfolio-errors --file=schema.sql
+-- Creates tables for storing error reports with indexing for efficient queries
 
 CREATE TABLE IF NOT EXISTS errors (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   type TEXT NOT NULL,
-  message TEXT,
+  message TEXT NOT NULL,
+  url TEXT NOT NULL,
   filename TEXT,
   line INTEGER,
-  col INTEGER,
+  column INTEGER,
   stack TEXT,
-  url TEXT,
   user_agent TEXT,
-  viewport TEXT,
-  version TEXT,
-  timestamp INTEGER NOT NULL,
+  ip TEXT,
+  is_bot INTEGER DEFAULT 0,
   category TEXT DEFAULT 'uncategorized',
   status TEXT DEFAULT 'new',
-  is_bot INTEGER DEFAULT 0,
+  timestamp INTEGER NOT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Indexes for performance
+-- Indexes for efficient querying
 CREATE INDEX IF NOT EXISTS idx_timestamp ON errors(timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_status ON errors(status);
 CREATE INDEX IF NOT EXISTS idx_category ON errors(category);
+CREATE INDEX IF NOT EXISTS idx_is_bot ON errors(is_bot);
 CREATE INDEX IF NOT EXISTS idx_created_at ON errors(created_at DESC);
-
--- Auto-categorization helper
--- Errors marked as 'resolved' can be auto-deleted via dashboard
