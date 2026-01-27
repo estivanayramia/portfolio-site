@@ -1,67 +1,79 @@
-import fs from 'fs';
-import { execSync } from 'child_process';
-import path from 'path';
+﻿import { execSync } from 'node:child_process';
+import fs from 'node:fs';
 
-console.log('🛡️  Audit: Service Worker Cache Version Guardrail');
+function sh(cmd) {
+  return execSync(cmd, { stdio: ['ignore', 'pipe', 'pipe'] }).toString('utf8');
+}
 
-const SW_PATH = 'sw.js';
-const CRITICAL_FILES = [
-  'sw.js',
-  'assets/js/site.js',
-  'index.html',
-  '_headers',
-  '_redirects'
-];
+function extractCacheVersion(swText) {
+  const m = swText.match(/CACHE_VERSION\s*=\s*(["'])([^"']+)\1/);
+  return m ? m[2] : null;
+}
 
-try {
-  // 1. Get current CACHE_VERSION from sw.js
-  const swContent = fs.readFileSync(SW_PATH, 'utf8');
-  const versionMatch = swContent.match(/const\s+CACHE_VERSION\s*=\s*['"](.+?)['"]/);
-  
-  if (!versionMatch) {
-    console.error('❌ Error: Could not find CACHE_VERSION in sw.js');
-    process.exit(1);
+function getChangedFiles() {
+  const out = sh('git diff --name-only origin/main...HEAD');
+  return out.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+}
+
+function isCritical(path) {
+  if (path === 'sw.js') return false;
+  if (path.endsWith('.html')) return true;
+  if (path.endsWith('.js')) return true;
+  if (path === '_redirects') return true;
+  if (path === '_headers') return true;
+  return false;
+}
+
+function latestCommitUnixForPaths(paths) {
+  if (!paths.length) return null;
+  const args = paths.map(p => `"${p.replace(/"/g, '\\"')}"`).join(' ');
+  const cmd = `git log -1 --format=%ct origin/main..HEAD -- ${args}`;
+  try {
+    const out = sh(cmd).trim();
+    return out ? Number(out) : null;
+  } catch {
+    return null;
   }
-  
-  const currentVersion = versionMatch[1];
-  console.log(`ℹ️  Current Cache Version: ${currentVersion}`);
+}
 
-  // 2. Check for changes in critical files since last merge to main
-  // Note: This relies on git. If not in git, we skip.
-  const diffCommand = `git diff origin/main --name-only ${CRITICAL_FILES.join(' ')}`;
-  const changedFiles = execSync(diffCommand, { encoding: 'utf8' }).trim().split('\n').filter(Boolean);
+function main() {
+  const changed = getChangedFiles();
+  const critical = changed.filter(isCritical);
 
-  if (changedFiles.length === 0) {
-    console.log('✅ No critical files changed. Guardrail passed.');
+  if (critical.length === 0) {
+    process.stdout.write('OK: no critical changes vs origin/main; no CACHE_VERSION bump required.\n');
     process.exit(0);
   }
 
-  console.log('⚠️  Critical files changed:', changedFiles);
+  const originSw = sh('git show origin/main:sw.js');
+  const currentSw = fs.readFileSync('sw.js', 'utf8');
 
-  // 3. If critical files changed, check if sw.js version was bumped
-  // Simple check: Is sw.js in the changed files?
-  // Ideally, we'd check if the VERSION line specifically changed, but for now, 
-  // if sw.js is modified, we assume the user MIGHT have bumped it. 
-  // If sw.js is NOT modified but other files ARE, that's a failure.
-  
-  if (!changedFiles.includes('sw.js')) {
-    console.error('❌ Error: Critical assets changed but sw.js was not touched to bump version.');
-    console.error('   Please update CACHE_VERSION in sw.js to verify changes.');
+  const originVer = extractCacheVersion(originSw);
+  const currentVer = extractCacheVersion(currentSw);
+
+  if (!originVer || !currentVer) {
+    process.stderr.write('FAIL: Unable to extract CACHE_VERSION from sw.js (origin or current).\n');
     process.exit(1);
   }
-  
-  // 4. Advanced: Check if the specific line changed in the diff
-  const swDiff = execSync(`git diff origin/main sw.js`, { encoding: 'utf8' });
-  if (!swDiff.includes('CACHE_VERSION')) {
-     console.error('❌ Error: sw.js changed, but CACHE_VERSION line was not modified.');
-     process.exit(1);
+
+  if (originVer === currentVer) {
+    process.stderr.write(`FAIL: CACHE_VERSION not bumped. origin/main=${originVer} current=${currentVer}\n`);
+    process.exit(1);
   }
 
-  console.log('✅ CACHE_VERSION bumped. Guardrail passed.');
-  process.exit(0);
+  // Additional safety: ensure sw.js update is at least as recent as the newest critical change.
+  const latestCritical = latestCommitUnixForPaths(critical);
+  const latestSw = latestCommitUnixForPaths(['sw.js']);
+  if (latestCritical && latestSw && latestCritical > latestSw) {
+    process.stderr.write('FAIL: Critical files changed after the last sw.js update; bump CACHE_VERSION again.\n');
+    process.stderr.write(`Latest critical commit time=${latestCritical}, latest sw.js commit time=${latestSw}\n`);
+    process.exit(1);
+  }
 
-} catch (error) {
-  // If we prefer fail-open on git errors (e.g. no origin/main), log warning but pass
-  console.warn('⚠️  Warning: Guardrail execution failed (likely no git context). Skipping.', error.message);
+  process.stdout.write('OK: CACHE_VERSION bumped appropriately for critical changes.\n');
+  process.stdout.write(`Critical files (${critical.length}):\n`);
+  for (const p of critical) process.stdout.write(`- ${p}\n`);
   process.exit(0);
 }
+
+main();
