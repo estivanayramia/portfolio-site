@@ -16,13 +16,21 @@ if (!fs.existsSync(redirectsPath)) {
 const redirects = fs.readFileSync(redirectsPath, "utf8");
 
 // Whitespace-insensitive check for the repo's required root rewrite:
-//   /  /EN/index.html  200
+//   /  /EN/  200
 // Cloudflare Pages ignores whitespace differences, so we do too.
-const rootRewriteRe = /^\/\s+\/EN\/index\.html\s+200\s*$/m;
+const rootRewriteRe = /^\/\s+\/EN\/\s+200\s*$/m;
 
 if (!rootRewriteRe.test(redirects)) {
   fail(
-    "_redirects does not include the root rewrite '/  /EN/index.html  200' (whitespace-insensitive check).",
+    "_redirects does not include the root rewrite '/  /EN/  200' (whitespace-insensitive check).",
+  );
+}
+
+// Locale rewrites must not target index.html (Cloudflare Pages may ignore them)
+const badLocaleRewriteRe = /^\/(es|ar)\/\s+\/\1\/index\.html\s+200\s*$/m;
+if (badLocaleRewriteRe.test(redirects)) {
+  fail(
+    "_redirects contains locale rewrite to index.html (e.g. '/es/  /es/index.html  200'). Use directory rewrites or rely on static index.",
   );
 }
 

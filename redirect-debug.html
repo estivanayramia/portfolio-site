@@ -165,8 +165,8 @@
             log('\n🧪 Testing Critical Paths:', 'info');
 
             const tests = [
-                { path: '/', expected: 200, desc: 'Root path (should serve EN/index.html via rewrite)' },
-                { path: '/EN/index.html', expected: 301, desc: 'Direct EN/index.html (should redirect to /)' },
+                { path: '/', expected: 200, desc: 'Root path (should serve EN/ via rewrite)' },
+                { path: '/EN/index.html', expected: 200, desc: 'Direct EN/index.html (should be served, no redirect loop)' },
                 { path: '/index.html', expected: 301, desc: 'Root index.html (should redirect to /)' },
                 { path: '/about', expected: 200, desc: 'About page (clean URL rewrite)' },
                 { path: '/EN/about.html', expected: 301, desc: 'Direct EN/about.html (should redirect)' },
@@ -215,15 +215,15 @@
             const enResult = results.find(r => r.test.path === '/EN/index.html');
 
             if (rootResult?.result?.headers?.location?.includes('/EN')) {
-                log('⚠️ WARNING: Root (/) redirects to /EN path - possible loop!', 'error');
+                log('⚠️ WARNING: Root (/) redirected to /EN path - possible loop!', 'error');
             }
             if (enResult?.result?.headers?.location === '/') {
-                log('⚠️ WARNING: /EN/index.html redirects to / - circular redirect detected!', 'error');
+                log('⚠️ WARNING: /EN/index.html redirected to / - circular redirect detected!', 'error');
             }
         };
 
         const testRootPath = () => testPath('/', 200, 'Testing root path');
-        const testENPath = () => testPath('/EN/index.html', 301, 'Testing /EN/index.html');
+        const testENPath = () => testPath('/EN/index.html', 200, 'Testing /EN/index.html');
 
         // Auto-run on page load
         window.addEventListener('load', () => {

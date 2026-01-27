@@ -148,16 +148,12 @@ function generateRedirects() {
         // '/EN/   /    301',
         '',
         '# Root rewrite (200 = transparent proxy, not a redirect)',
-        '/    /EN/index.html    200',
+        '/    /EN/    200',
         '',
         '# 1. Canonical Redirects (301) - Enforce clean URLs',
         '/index.html                  /                            301',
         '/es/index.html               /es/                         301',
         '/ar/index.html               /ar/                         301',
-        '',
-        '# Locale rewrites',
-        '/es/                         /es/index.html               200',
-        '/ar/                         /ar/index.html               200',
         '',
     ];
 
