@@ -157,7 +157,7 @@ async function handleAuth(request, env, corsHeaders) {
     
     if (password === env.DASHBOARD_PASSWORD_HASH) {
       // Generate simple session token (timestamp-based)
-      const token = Buffer.from(`${Date.now()}:${password}`).toString('base64');
+      const token = btoa(`${Date.now()}:${password}`);
       
       return new Response(JSON.stringify({ success: true, token }), {
         status: 200,
@@ -189,7 +189,7 @@ function verifyAuth(request, env) {
   
   const token = authHeader.substring(7);
   try {
-    const decoded = Buffer.from(token, 'base64').toString();
+    const decoded = atob(token);
     const [timestamp, password] = decoded.split(':');
     
     // Check password matches
