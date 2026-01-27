@@ -1,51 +1,57 @@
-import fs from 'fs';
-import { execSync } from 'child_process';
+﻿import { execSync } from 'node:child_process';
+import fs from 'node:fs';
 
-console.log('🔒 Audit: Secrets Scan');
+function listTrackedFiles() {
+  const out = execSync('git ls-files -z', { stdio: ['ignore', 'pipe', 'pipe'] });
+  return out.toString('utf8').split('\0').map(s => s.trim()).filter(Boolean);
+}
 
-const SECRET_PATTERNS = [
-  /AIza[0-9A-Za-z-_]{35}/,
-  /gho_[0-9A-Za-z]{36}/,
-  // Removed variable name checks to avoid false positives in code that uses env vars
-  // /GEMINI_API_KEY/,
-  // /x-goog-api-key/,
-  /Authorization:\s*Bearer\s+[a-zA-Z0-9_\-\.]+/i
-];
+function safeReadText(path) {
+  try {
+    const buf = fs.readFileSync(path);
+    if (buf.length > 2_000_000) return null;
+    const sample = buf.subarray(0, Math.min(buf.length, 8000));
+    for (const b of sample) if (b === 0) return null;
+    return buf.toString('utf8');
+  } catch {
+    return null;
+  }
+}
 
-try {
-  // 1. Scan staged files if in git repo, otherwise scan all tracked files
-  const files = execSync('git ls-files', { encoding: 'utf8' }).split('\n').filter(Boolean);
-  
-  let foundSecrets = false;
+function main() {
+  const files = listTrackedFiles();
 
-  files.forEach(file => {
-    const normalizedFile = file.replace(/\\/g, '/');
-    // Skip binary or trusted files if needed
-    if (normalizedFile.endsWith('.png') || normalizedFile.endsWith('.ico') || normalizedFile.endsWith('.jpg')) return;
-    // Skip the tools directory (where this script lives) and reports
-    if (normalizedFile.startsWith('tools/') || normalizedFile.startsWith('.reports/')) return;
-    // Skip wrangler.toml config files (variable definitions)
-    if (normalizedFile.endsWith('wrangler.toml')) return;
-    
-    const content = fs.readFileSync(file, 'utf8');
-    
-    SECRET_PATTERNS.forEach(pattern => {
-      if (pattern.test(content)) {
-        console.error(`❌ Potential secret found in ${file}: matches ${pattern}`);
-        foundSecrets = true;
-      }
-    });
-  });
+  const placeholder = '__SET_VIA_CLOUDFLARE_SECRETS__';
 
-  if (foundSecrets) {
-    console.error('⛔ Audit FAILED: High-risk strings detected.');
+  // Prefer patterns that indicate an actual secret value, not just a variable name in docs/code.
+  const reGoogleApiKey = /AIza[0-9A-Za-z\-_]{10,}/;
+  const reGithubToken = /gho_[A-Za-z0-9_]{10,}/;
+  const reAuthBearer = /Authorization\s*:\s*Bearer\s+[A-Za-z0-9\-._~+/]+=*/i;
+  const reDashNonPlaceholder = new RegExp(
+    `DASHBOARD_PASSWORD_HASH\\s*=\\s*(["'])(?!${placeholder})[^\\"']+\\1`,
+    'i'
+  );
+
+  const hits = [];
+
+  for (const path of files) {
+    const text = safeReadText(path);
+    if (text == null) continue;
+
+    if (reGoogleApiKey.test(text)) hits.push({ path, rule: 'google-api-key' });
+    if (reGithubToken.test(text)) hits.push({ path, rule: 'github-oauth' });
+    if (reAuthBearer.test(text)) hits.push({ path, rule: 'auth-bearer' });
+    if (reDashNonPlaceholder.test(text)) hits.push({ path, rule: 'dashboard-password-hash-nonplaceholder' });
+  }
+
+  if (hits.length) {
+    process.stderr.write('FAIL: Potential secrets detected in tracked files:\n');
+    for (const h of hits) process.stderr.write(`- ${h.rule}: ${h.path}\n`);
     process.exit(1);
   }
 
-  console.log('✅ No secrets found in tracked files.');
-  process.exit(0);
-
-} catch (error) {
-  console.warn('⚠️  Warning: Secret audit scan failed (git issues?).', error.message);
+  process.stdout.write('OK: No secrets detected in tracked files.\n');
   process.exit(0);
 }
+
+main();

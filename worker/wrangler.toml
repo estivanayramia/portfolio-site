@@ -1,4 +1,4 @@
-name = "portfolio-worker"
+﻿name = "portfolio-worker"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 workers_dev = true
@@ -11,7 +11,7 @@ database_id = "90a1df04-e5b9-48b9-90f4-02e3fb773ca8"
 
 # Environment variables
 [vars]
-DASHBOARD_PASSWORD_HASH = "savonie21"  # In production, use hashed passwords
+DASHBOARD_PASSWORD_HASH = "__SET_VIA_CLOUDFLARE_SECRETS__"  # In production, use hashed passwords
 RATE_LIMIT_MAX = "10"
 RATE_LIMIT_WINDOW = "60000"
 
@@ -41,3 +41,4 @@ persist = true
 [[kv_namespaces]]
 binding = "SAVONIE_KV"
 id = "e723b1dbdc9a40a6b6ccd04764108d6c"
+
