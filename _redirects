@@ -132,5 +132,14 @@
 /EN/projects/portfolio.html    /projects/portfolio    301
 # END GENERATED (fix-seo)
 
+# Legacy MixedCase Redirects (PROMPT 4)
+/projects/Competitive-Strategy.html    /projects/competitive-strategy    301
+/projects/Conflict.html                /projects/conflict                301
+/projects/Discipline.html              /projects/discipline              301
+/projects/Documentation.html           /projects/documentation           301
+/projects/Logistics.html               /projects/logistics               301
+/projects/Multilingual.html            /projects/multilingual            301
+/projects/Portfolio.html               /projects/portfolio               301
+
 # Note: Cloudflare Pages automatically serves /EN/404.html for 404s
 # No catch-all needed - explicit rewrites above handle all valid paths

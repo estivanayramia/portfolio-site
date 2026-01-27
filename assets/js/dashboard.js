@@ -400,13 +400,28 @@ document.getElementById('next-page').addEventListener('click', () => {
 });
 
 // Refresh
-document.getElementById('refresh-btn').addEventListener('click', () => {
-  loadErrors();
+document.getElementById('refresh-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('refresh-btn');
+  btn.style.transition = 'transform 0.5s';
+  btn.style.transform = 'rotate(360deg)';
+  btn.title = "Refreshing...";
+  
+  await loadErrors();
+  
+  setTimeout(() => {
+    btn.style.transform = 'none';
+    btn.title = "Refresh";
+  }, 500);
 });
 
 // Export CSV
 document.getElementById('export-btn').addEventListener('click', async () => {
   try {
+    const btn = document.getElementById('export-btn');
+    const originalText = btn.textContent;
+    btn.textContent = 'Exporting...';
+    btn.disabled = true;
+
     // Fetch all errors for export
     const response = await fetch('/api/errors?limit=1000', {
       headers: { 'Authorization': `Bearer ${authToken}` }
@@ -418,9 +433,13 @@ document.getElementById('export-btn').addEventListener('click', async () => {
     const csv = errorsToCSV(data.errors);
     downloadCSV(csv, `errors-${Date.now()}.csv`);
     
+    btn.textContent = originalText;
+    btn.disabled = false;
   } catch (error) {
     console.error('Export failed:', error);
     alert('Failed to export errors');
+    document.getElementById('export-btn').textContent = 'Export CSV';
+    document.getElementById('export-btn').disabled = false;
   }
 });
 

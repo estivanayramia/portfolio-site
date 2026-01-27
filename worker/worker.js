@@ -1580,8 +1580,7 @@ async function apiHandleErrorReport(request, env, corsHeaders) {
       return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
     
-    const body = await request.json();
-    const { type, message, filename, line, col, stack, url, viewport, version } = body;
+    const { type, message, filename, line, col, stack, url, viewport, version, breadcrumbs } = body;
     
     if (!type || !message) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -1598,11 +1597,11 @@ async function apiHandleErrorReport(request, env, corsHeaders) {
     const isBot = apiIsBot(userAgent);
 
     const stmt = env.DB.prepare(`
-      INSERT INTO errors (type, message, filename, line, col, stack, url, user_agent, viewport, version, timestamp, category, status, is_bot)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO errors (type, message, filename, line, col, stack, url, user_agent, viewport, version, breadcrumbs, timestamp, category, status, is_bot)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
-    await stmt.bind(type, message?.slice(0, 1000), filename?.slice(0, 500), line||null, col||null, stack?.slice(0, 2000), url?.slice(0, 500), userAgent?.slice(0, 500), viewport, version, Date.now(), category, 'new', isBot?1:0).run();
+    await stmt.bind(type, message?.slice(0, 1000), filename?.slice(0, 500), line||null, col||null, stack?.slice(0, 2000), url?.slice(0, 500), userAgent?.slice(0, 500), viewport, version, breadcrumbs ? breadcrumbs.slice(0, 20000) : null, Date.now(), category, 'new', isBot?1:0).run();
     
     return new Response(JSON.stringify({ success: true }), { status: 202, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error) {
@@ -1610,6 +1609,7 @@ async function apiHandleErrorReport(request, env, corsHeaders) {
     return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 }
+
 
 async function apiHandleAuth(request, env, corsHeaders) {
   try {
