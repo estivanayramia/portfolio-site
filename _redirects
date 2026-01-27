@@ -134,3 +134,14 @@
 
 # Note: Cloudflare Pages automatically serves /EN/404.html for 404s
 # No catch-all needed - explicit rewrites above handle all valid paths
+
+# project canonical redirects
+/projects/competitive-strategy.html    /projects/competitive-strategy    301
+/projects/conflict.html    /projects/conflict    301
+/projects/discipline.html    /projects/discipline    301
+/projects/documentation.html    /projects/documentation    301
+/projects/index.html    /projects/index    301
+/projects/logistics.html    /projects/logistics    301
+/projects/multilingual.html    /projects/multilingual    301
+/projects/portfolio.html    /projects/portfolio    301
+
