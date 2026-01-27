@@ -198,15 +198,15 @@
       
       <div class="consent-content">
         <div class="consent-text">
-          <div class="consent-title">🐛 Psst... wanna help me squash bugs?</div>
+          <div class="consent-title">🔧 Help Improve This Site</div>
           <div class="consent-desc">
-            If something breaks, I'd love to know! Click "Sure!" to send me anonymous crash reports. 
-            <strong>Zero tracking, zero selling your data</strong> — just me trying to make this site less janky. 😅
+            This site uses privacy-friendly error reporting to identify and fix technical issues. 
+            <strong>No personal data is collected or shared.</strong> Only anonymous error logs are stored temporarily to improve site stability.
           </div>
         </div>
         <div class="consent-actions">
-          <button class="accept-btn" id="consent-accept">Sure! 👍</button>
-          <button class="decline-btn" id="consent-decline">Nah</button>
+          <button class="accept-btn" id="consent-accept">Accept</button>
+          <button class="decline-btn" id="consent-decline">Decline</button>
         </div>
       </div>
     `;
