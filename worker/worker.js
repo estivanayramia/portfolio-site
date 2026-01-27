@@ -742,6 +742,40 @@ export default {
       );
     }
 
+    // --- ERROR MONITORING ROUTES ---
+    // POST /api/error-report - Public endpoint for error collection
+    if (url.pathname === "/api/error-report") {
+      // Import and call error handler
+      const { handleErrorReport } = await import('./error-api.js');
+      return handleErrorReport(request, env, corsHeaders);
+    }
+    
+    // POST /api/auth - Authentication endpoint
+    if (url.pathname === "/api/auth") {
+      const { handleAuth } = await import('./error-api.js');
+      return handleAuth(request, env, corsHeaders);
+    }
+    
+    // GET /api/errors - Fetch errors (auth required)
+    if (request.method === "GET" && url.pathname === "/api/errors") {
+      const { handleGetErrors } = await import('./error-api.js');
+      return handleGetErrors(request, env, corsHeaders);
+    }
+    
+    // PATCH /api/errors/:id - Update error (auth required)
+    if (request.method === "PATCH" && url.pathname.startsWith("/api/errors/")) {
+      const errorId = url.pathname.split('/')[3];
+      const { handleUpdateError } = await import('./error-api.js');
+      return handleUpdateError(request, env, corsHeaders, errorId);
+    }
+    
+    // DELETE /api/errors/:id - Delete error (auth required)
+    if (request.method === "DELETE" && url.pathname.startsWith("/api/errors/")) {
+      const errorId = url.pathname.split('/')[3];
+      const { handleDeleteError } = await import('./error-api.js');
+      return handleDeleteError(request, env, corsHeaders, errorId);
+    }
+
     const isChatPath = url.pathname === "/api/chat" || url.pathname === "/chat";
     if (!isChatPath) {
       return jsonReply(

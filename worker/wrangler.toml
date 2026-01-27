@@ -1,14 +1,27 @@
-name = "portfolio-chat"
+name = "portfolio-worker"
 main = "worker.js"
-compatibility_date = "2025-01-10"
+compatibility_date = "2024-01-01"
+workers_dev = true
+
+# D1 Database for error monitoring
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-errors"
+database_id = "90a1df04-e5b9-48b9-90f4-02e3fb773ca8"
+
+# Environment variables
+[vars]
+DASHBOARD_PASSWORD_HASH = "savonie21"  # In production, use hashed passwords
+RATE_LIMIT_MAX = "10"
+RATE_LIMIT_WINDOW = "60000"
+
 routes = [
 	{ pattern = "estivanayramia.com/api/*", zone_name = "estivanayramia.com" },
 	{ pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" },
 	{ pattern = "www.estivanayramia.com/api/*", zone_name = "estivanayramia.com" },
 	{ pattern = "www.estivanayramia.com/health", zone_name = "estivanayramia.com" }
 ]
-workers_dev = true
-preview_urls = true
+
 
 # Observability settings
 [observability.logs]

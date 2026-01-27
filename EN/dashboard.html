@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error Dashboard - Estivan Ayramia</title>
+  <link rel="stylesheet" href="/assets/css/dashboard.css">
+  <style>
+    /* Critical CSS for fast initial render */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f1419;
+      color: #e1d4c2;
+      min-height: 100vh;
+    }
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">Loading dashboard...</div>
+  
+  <!-- Login Screen -->
+  <div id="login-screen" style="display: none;">
+    <div class="login-container">
+      <h1>🛡️ Error Dashboard</h1>
+      <p>Protected area - Password required</p>
+      <form id="login-form">
+        <input 
+          type="password" 
+          id="password-input" 
+          placeholder="Enter password" 
+          autocomplete="current-password"
+          required
+        />
+        <button type="submit">Login</button>
+      </form>
+      <p id="login-error" class="error-message" style="display: none;"></p>
+    </div>
+  </div>
+  
+  <!-- Dashboard -->
+  <div id="dashboard" style="display: none;">
+    <header class="dashboard-header">
+      <h1>🐛 Error Monitoring Dashboard</h1>
+      <div class="header-actions">
+        <button id="refresh-btn" class="icon-btn" title="Refresh">🔄</button>
+        <button id="export-btn" class="icon-btn" title="Export CSV">📥</button>
+        <button id="logout-btn" class="icon-btn" title="Logout">🚪</button>
+      </div>
+    </header>
+    
+    <div class="dashboard-container">
+      <!-- Filters -->
+      <div class="filters">
+        <select id="status-filter">
+          <option value="">All Statuses</option>
+          <option value="new">New</option>
+          <option value="investigating">Investigating</option>
+          <option value="resolved">Resolved</option>
+          <option value="ignored">Ignored</option>
+        </select>
+        
+        <select id="category-filter">
+          <option value="">All Categories</option>
+          <option value="code_bug">Code Bug</option>
+          <option value="async_bug">Async Bug</option>
+          <option value="navigation">Navigation</option>
+          <option value="connectivity">Connectivity</option>
+          <option value="uncategorized">Uncategorized</option>
+        </select>
+        
+        <button id="clear-filters">Clear Filters</button>
+      </div>
+      
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat-card">
+          <span class="stat-value" id="total-errors">0</span>
+          <span class="stat-label">Total Errors</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="new-errors">0</span>
+          <span class="stat-label">New</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value" id="investigating-errors">0</span>
+          <span class="stat-label">Investigating</span>
+        </div>
+      </div>
+      
+      <!-- Error Table -->
+      <div class="table-container">
+        <table class="error-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>Message</th>
+              <th>URL</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Bot</th>
+              <th>Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="error-tbody">
+            <!-- Populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="pagination">
+        <button id="prev-page" disabled>← Previous</button>
+        <span id="page-info">Page 1 of 1</span>
+        <button id="next-page" disabled>Next →</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Error Detail Modal -->
+  <div id="error-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" id="close-modal">&times;</span>
+      <h2>Error Details</h2>
+      <div id="error-details"></div>
+      <div class="modal-actions">
+        <select id="modal-category">
+          <option value="code_bug">Code Bug</option>
+          <option value="async_bug">Async Bug</option>
+          <option value="navigation">Navigation</option>
+          <option value="connectivity">Connectivity</option>
+          <option value="spam">Spam/Bot</option>
+          <option value="uncategorized">Uncategorized</option>
+        </select>
+        <select id="modal-status">
+          <option value="new">New</option>
+          <option value="investigating">Investigating</option>
+          <option value="resolved">Resolved (Auto-Delete)</option>
+          <option value="ignored">Ignored</option>
+        </select>
+        <button id="save-error">Save Changes</button>
+        <button id="delete-error" class="danger">Delete</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="/assets/js/dashboard.js"></script>
+</body>
+</html>
