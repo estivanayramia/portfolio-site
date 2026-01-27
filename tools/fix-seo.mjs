@@ -134,6 +134,8 @@ function generateRedirects() {
     for (const [canonical, enFile] of [...canonicalToEnFile.entries()].sort(([, a], [, b]) => a.localeCompare(b))) {
         // Skip redirection for /EN/index.html to avoid loops with Serve.json rewrites or root redirects
         if (enFile === 'EN/index.html') continue;
+        // Skip 404.html to avoid loop: /EN/404.html -> /404 -> catch-all -> /EN/404.html
+        if (enFile === 'EN/404.html') continue;
 
         const enUrlPath = '/' + enFile;
         generatedLines.push(`${enUrlPath}    ${canonical}    301`);
@@ -163,13 +165,13 @@ function generateRedirects() {
 
     const footerLines = [
         '',
-        '# Error page guard (avoid loop on /EN/404)',
+        '# 404 Fallback - serve 404 for all unmatched (including /EN/404 paths)',
         '/EN/404                       /EN/404.html                200',
+        '/EN/404/                      /EN/404.html                200',
         '/EN/404.html                  /EN/404.html                200',
-        '',
-        '# 404 Fallback (Pages does not support 404 rewrites; use 200 proxy)',
-        '/404.html                    /EN/404.html                301',
-        '/*                           /EN/404.html                200',
+        '/404                          /EN/404.html                200',
+        '/404.html                     /EN/404.html                200',
+        '/*                            /EN/404.html                200',
         '',
     ];
 

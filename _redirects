@@ -130,10 +130,10 @@
 /EN/projects/multilingual.html    /projects/multilingual    301
 /EN/projects/portfolio.html    /projects/portfolio    301
 # END GENERATED (fix-seo)
-# Error page guard (avoid loop on /EN/404)
+# 404 Fallback - serve 404 for all unmatched (including /EN/404 paths)
 /EN/404                       /EN/404.html                200
+/EN/404/                      /EN/404.html                200
 /EN/404.html                  /EN/404.html                200
-
-# 404 Fallback (Pages does not support 404 rewrites; use 200 proxy)
-/404.html                    /EN/404.html                301
-/*                           /EN/404.html                200
+/404                          /EN/404.html                200
+/404.html                     /EN/404.html                200
+/*                            /EN/404.html                200
