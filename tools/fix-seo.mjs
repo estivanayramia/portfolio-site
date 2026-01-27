@@ -150,6 +150,10 @@ function generateRedirects() {
         '# Root rewrite (200 = transparent proxy, not a redirect)',
         '/    /EN/    200',
         '',
+        '# Debug routes (avoid catch-all swallowing diagnostics)',
+        '/redirect-debug.html         /redirect-debug.html         200',
+        '/redirect-debug              /redirect-debug.html         200',
+        '',
         '# 1. Canonical Redirects (301) - Enforce clean URLs',
         '/index.html                  /                            301',
         '/es/index.html               /es/                         301',
@@ -158,6 +162,10 @@ function generateRedirects() {
     ];
 
     const footerLines = [
+        '',
+        '# Error page guard (avoid loop on /EN/404)',
+        '/EN/404                       /EN/404.html                200',
+        '/EN/404.html                  /EN/404.html                200',
         '',
         '# 404 Fallback (Pages does not support 404 rewrites; use 200 proxy)',
         '/404.html                    /EN/404.html                301',

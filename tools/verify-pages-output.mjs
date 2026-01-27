@@ -26,6 +26,14 @@ if (!rootRewriteRe.test(redirects)) {
   );
 }
 
+// Root rewrite must not target index.html (Cloudflare Pages loop warning)
+const badRootRewriteRe = /^\/\s+\/EN\/index\.html\s+200\s*$/m;
+if (badRootRewriteRe.test(redirects)) {
+  fail(
+    "_redirects contains root rewrite to /EN/index.html (loop-prone). Use '/  /EN/  200'.",
+  );
+}
+
 // Locale rewrites must not target index.html (Cloudflare Pages may ignore them)
 const badLocaleRewriteRe = /^\/(es|ar)\/\s+\/\1\/index\.html\s+200\s*$/m;
 if (badLocaleRewriteRe.test(redirects)) {
