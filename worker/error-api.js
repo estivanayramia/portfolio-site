@@ -1,381 +1,289 @@
-/**
- * Error Monitoring API Endpoints
- * Handles error collection, storage, retrieval, and management
- */
+﻿/* worker/error-api.js - Hardened backend with opaque sessions */
 
-/**
- * Bot detection using User-Agent and behavioral patterns
- */
-function isBot(userAgent, ip, env) {
-  if (!userAgent) return true;
-  
-  const ua = userAgent.toLowerCase();
-  
-  // Known bot signatures
-  const botPatterns = [
-    'bot', 'crawler', 'spider', 'scraper',
-    'headless', 'phantom', 'slurp', 'curl',
-    'wget', 'python', 'java', 'go-http',
-    'googlebot', 'bingbot', 'yahoo', 'baidu'
-  ];
-  
-  return botPatterns.some(pattern => ua.includes(pattern));
+function json(body, status = 200, extraHeaders = {}) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      ...extraHeaders
+    }
+  });
 }
 
-/**
- * Rate limiting check using KV
- */
-async function checkRateLimit(ip, env) {
-  const key = `rate:${ip}`;
-  const maxRequests = parseInt(env.RATE_LIMIT_MAX || '10');
-  const window = parseInt(env.RATE_LIMIT_WINDOW || '60000'); // 60s
-  
-  try {
-    const data = await env.SAVONIE_KV.get(key, 'json');
-    const now = Date.now();
-    
-    if (!data) {
-      await env.SAVONIE_KV.put(key, JSON.stringify({ count: 1, firstRequest: now }), {
-        expirationTtl: Math.ceil(window / 1000)
-      });
-      return true;
-    }
-    
-    // Reset if window expired
-    if (now - data.firstRequest > window) {
-      await env.SAVONIE_KV.put(key, JSON.stringify({ count: 1, firstRequest: now }), {
-        expirationTtl: Math.ceil(window / 1000)
-      });
-      return true;
-    }
-    
-    // Increment count
-    if (data.count >= maxRequests) {
-      return false; // Rate limit exceeded
-    }
-    
-    data.count++;
-    await env.SAVONIE_KV.put(key, JSON.stringify(data), {
-      expirationTtl: Math.ceil(window / 1000)
-    });
-    return true;
-    
-  } catch (error) {
-    console.error('Rate limit check failed:', error);
-    return true; // Failopen on error
+function getClientIP(request) {
+  return (
+    request.headers.get("cf-connecting-ip") ||
+    request.headers.get("x-forwarded-for") ||
+    "0.0.0.0"
+  );
+}
+
+function timingSafeEqual(a, b) {
+  if (a.length !== b.length) return false;
+  let out = 0;
+  for (let i = 0; i < a.length; i++) out |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return out === 0;
+}
+
+async function sha256Hex(str) {
+  const data = new TextEncoder().encode(str);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  const bytes = new Uint8Array(digest);
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function requireOrigin(request, allowedOrigins) {
+  const origin = request.headers.get("Origin");
+  if (!origin) return false;
+  return allowedOrigins.includes(origin);
+}
+
+async function readJsonWithLimit(request, maxBytes) {
+  const buf = await request.arrayBuffer();
+  if (buf.byteLength > maxBytes) throw new Error("payload_too_large");
+  const txt = new TextDecoder().decode(buf);
+  return JSON.parse(txt);
+}
+
+function redactObject(obj) {
+  const SENSITIVE_KEY_RE = /(token|auth|password|secret|session|cookie|credit|card|ssn|cvv|email)/i;
+  if (!obj || typeof obj !== "object") return obj;
+  if (Array.isArray(obj)) return obj.slice(0, 100).map(redactObject);
+  const out = {};
+  for (const [k, v] of Object.entries(obj)) {
+    if (/authorization/i.test(k) || SENSITIVE_KEY_RE.test(k)) out[k] = "[Redacted]";
+    else out[k] = typeof v === "string" ? (v.length > 500 ? v.slice(0, 500) + "" : v) : redactObject(v);
   }
+  return out;
 }
 
-/**
- * POST /api/error-report - Collect errors from clients
- */
-async function handleErrorReport(request, env, corsHeaders) {
+async function rateLimitKV(kv, key, max, windowMs) {
+  const now = Date.now();
+  const bucket = await kv.get(key, "json");
+  if (!bucket || typeof bucket !== "object") {
+    await kv.put(key, JSON.stringify({ n: 1, start: now }), { expirationTtl: Math.ceil(windowMs / 1000) });
+    return true;
+  }
+  if (now - bucket.start > windowMs) {
+    await kv.put(key, JSON.stringify({ n: 1, start: now }), { expirationTtl: Math.ceil(windowMs / 1000) });
+    return true;
+  }
+  if (bucket.n >= max) return false;
+  await kv.put(key, JSON.stringify({ n: bucket.n + 1, start: bucket.start }), { expirationTtl: Math.ceil(windowMs / 1000) });
+  return true;
+}
+
+function parseBearer(request) {
+  const h = request.headers.get("Authorization") || "";
+  const m = h.match(/^Bearer\s+(.+)$/i);
+  return m ? m[1] : null;
+}
+
+function randomToken() {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  let s = "";
+  for (const b of bytes) s += String.fromCharCode(b);
+  return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+async function requireSession(request, env) {
+  const token = parseBearer(request);
+  if (!token) return { ok: false };
+
+  const key = sess:;
+  const session = await env.SAVONIE_KV.get(key, "json");
+  if (!session) return { ok: false };
+
+  const max = Number(env.RATE_LIMIT_MAX || "10");
+  const windowMs = Number(env.RATE_LIMIT_WINDOW || "60000");
+  const ok = await rateLimitKV(env.SAVONIE_KV, l:sess:, max, windowMs);
+  if (!ok) return { ok: false, status: 429 };
+
+  return { ok: true, token, session };
+}
+
+export async function apiHandleAuth(request, env, allowedOrigins) {
+  if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
+  if (!requireOrigin(request, allowedOrigins)) return json({ error: "bad_origin" }, 403);
+
+  const ct = request.headers.get("Content-Type") || "";
+  if (!ct.toLowerCase().includes("application/json")) return json({ error: "bad_content_type" }, 415);
+
+  const max = Number(env.RATE_LIMIT_MAX || "10");
+  const windowMs = Number(env.RATE_LIMIT_WINDOW || "60000");
+  const ip = getClientIP(request);
+  const ipOK = await rateLimitKV(env.SAVONIE_KV, l:ip:, max, windowMs);
+  if (!ipOK) return json({ error: "rate_limited" }, 429);
+
+  let body;
   try {
-    const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
-    const userAgent = request.headers.get('User-Agent') || '';
-    
-    // Bot detection
-    const isLikelyBot = isBot(userAgent, clientIP, env);
-    
-    // Rate limiting
-    const withinLimit = await checkRateLimit(clientIP, env);
-    if (!withinLimit) {
-      return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
-        status: 429,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-    
-    const body = await request.json();
-    const { type, message, filename, line, col, stack, url, viewport, version } = body;
-    
-    // Validate required fields
-    if (!type || !message) {
-      return new Response(JSON.stringify({ error: 'Missing required fields' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-    
-    // Auto-categorize based on error type
-    let category = 'uncategorized';
-    const lowerMsg = (message || '').toLowerCase();
-    if (lowerMsg.includes('404') || lowerMsg.includes('not found')) {
-      category = 'navigation';
-    } else if (type === 'network_error') {
-      category = 'connectivity';
-    } else if (type === 'javascript_error') {
-      category = 'code_bug';
-    } else if (type === 'unhandled_rejection') {
-      category = 'async_bug';
-    }
-    
-    // Store in D1 database
-    const stmt = env.DB.prepare(`
-      INSERT INTO errors (type, message, filename, line, col, stack, url, user_agent, viewport, version, timestamp, category, status, is_bot)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-    
+    body = await readJsonWithLimit(request, 32 * 1024);
+  } catch {
+    return json({ error: "invalid_json" }, 400);
+  }
+
+  const password = typeof body.password === "string" ? body.password : "";
+  if (!password) return json({ error: "missing_password" }, 400);
+
+  const expected = env.DASHBOARD_PASSWORD_HASH;
+  if (!expected) return json({ error: "server_not_configured" }, 500);
+
+  let ok = false;
+  if (/^[a-f0-9]{64}$/i.test(expected)) {
+    const got = await sha256Hex(password);
+    ok = timingSafeEqual(got, expected.toLowerCase());
+  } else {
+    ok = timingSafeEqual(password, expected);
+  }
+
+  if (!ok) return json({ error: "unauthorized" }, 401);
+
+  const token = randomToken();
+  const sess = {
+    created: Date.now(),
+    ip,
+    ua: request.headers.get("User-Agent") || ""
+  };
+
+  await env.SAVONIE_KV.put(sess:, JSON.stringify(sess), { expirationTtl: 60 * 60 * 24 });
+
+  return json({ token });
+}
+
+export async function apiHandleErrorReport(request, env, allowedOrigins) {
+  if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
+  if (!requireOrigin(request, allowedOrigins)) return json({ error: "bad_origin" }, 403);
+
+  const ct = request.headers.get("Content-Type") || "";
+  if (!ct.toLowerCase().includes("application/json")) return json({ error: "bad_content_type" }, 415);
+
+  const max = Number(env.RATE_LIMIT_MAX || "10");
+  const windowMs = Number(env.RATE_LIMIT_WINDOW || "60000");
+  const ip = getClientIP(request);
+  const ipOK = await rateLimitKV(env.SAVONIE_KV, l:ip:, max * 2, windowMs);
+  if (!ipOK) return json({ error: "rate_limited" }, 429);
+
+  let body;
+  try {
+    body = await readJsonWithLimit(request, 256 * 1024);
+  } catch (e) {
+    const msg = String(e && e.message || "");
+    if (msg.includes("payload_too_large")) return json({ error: "payload_too_large" }, 413);
+    return json({ error: "invalid_json" }, 400);
+  }
+
+  const issues = Array.isArray(body.issues) ? body.issues : [];
+  if (!issues.length) return json({ ok: true, stored: 0 });
+
+  const ua = request.headers.get("User-Agent") || "";
+  const url = typeof body.ctx?.url === "string" ? body.ctx.url : "";
+  const version = typeof body.buildVersion === "string" ? body.buildVersion : "";
+
+  const toStore = issues.slice(0, 20).map((it) => {
+    const kind = typeof it.kind === "string" ? it.kind : "issue";
+    const msg = typeof it.msg === "string" ? it.msg : "issue";
+    const level = typeof it.level === "string" ? it.level : "error";
+
+    const stack = typeof it.stack === "string" ? it.stack.slice(0, 2000) : "";
+    const safeData = redactObject(it.data || {});
+    const safeUrl = typeof it.url === "string" ? it.url : url;
+
+    const message = ${msg} |  |  | ;
+
+    return {
+      type: kind,
+      message,
+      url: safeUrl,
+      stack,
+      user_agent: ua,
+      version
+    };
+  });
+
+  const stmt = env.DB.prepare(
+    INSERT INTO errors (type, message, url, stack, user_agent, timestamp, category, status, is_bot, version)
+     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)
+  );
+
+  let stored = 0;
+  for (const it of toStore) {
     await stmt.bind(
-      type,
-      message?.slice(0, 1000),
-      filename?.slice(0, 500),
-      line || null,
-      col || null,
-      stack?.slice(0, 2000),
-      url?.slice(0, 500),
-      userAgent?.slice(0, 500),
-      viewport,
-      version,
+      it.type,
+      it.message,
+      it.url,
+      it.stack,
+      it.user_agent,
       Date.now(),
-      category,
-      'new',
-      isLikelyBot ? 1 : 0
+      "telemetry",
+      "new",
+      0,
+      it.version
     ).run();
-    
-    return new Response(JSON.stringify({ success: true }), {
-      status: 202,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-    
-  } catch (error) {
-    console.error('Error storing report:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    stored += 1;
   }
+
+  return json({ ok: true, stored });
 }
 
-/**
- * POST /api/auth - Simple password authentication
- */
-async function handleAuth(request, env, corsHeaders) {
+export async function apiHandleGetErrors(request, env, allowedOrigins) {
+  if (!requireOrigin(request, allowedOrigins)) return json({ error: "bad_origin" }, 403);
+
+  const auth = await requireSession(request, env);
+  if (!auth.ok) return json({ error: "unauthorized" }, auth.status || 401);
+
+  const u = new URL(request.url);
+  const limit = Math.min(Number(u.searchParams.get("limit") || "50"), 200);
+  const offset = Math.max(Number(u.searchParams.get("offset") || "0"), 0);
+
+  const rows = await env.DB.prepare(
+    SELECT id, type, message, url, stack, category, status, user_agent, is_bot, timestamp, version
+     FROM errors
+     ORDER BY timestamp DESC
+     LIMIT ?1 OFFSET ?2
+  ).bind(limit, offset).all();
+
+  const total = await env.DB.prepare(SELECT COUNT(*) as c FROM errors).all();
+
+  return json({
+    errors: (rows.results || []).map(redactObject),
+    total: (total.results && total.results[0] && total.results[0].c) ? total.results[0].c : 0
+  });
+}
+
+export async function apiHandleUpdateError(request, env, allowedOrigins, id) {
+  if (!requireOrigin(request, allowedOrigins)) return json({ error: "bad_origin" }, 403);
+
+  const auth = await requireSession(request, env);
+  if (!auth.ok) return json({ error: "unauthorized" }, auth.status || 401);
+
+  const ct = request.headers.get("Content-Type") || "";
+  if (!ct.toLowerCase().includes("application/json")) return json({ error: "bad_content_type" }, 415);
+
+  let body;
   try {
-    const body = await request.json();
-    const { password } = body;
-    
-    if (password === env.DASHBOARD_PASSWORD_HASH) {
-      // Generate simple session token (timestamp-based)
-      const token = btoa(`${Date.now()}:${password}`);
-      
-      return new Response(JSON.stringify({ success: true, token }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-    
-    return new Response(JSON.stringify({ error: 'Invalid password' }), {
-      status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-    
-  } catch (error) {
-    return new Response(JSON.stringify({ error: 'Bad request' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+    body = await readJsonWithLimit(request, 16 * 1024);
+  } catch {
+    return json({ error: "invalid_json" }, 400);
   }
+
+  const category = typeof body.category === "string" ? body.category.slice(0, 40) : null;
+  const status = typeof body.status === "string" ? body.status.slice(0, 40) : null;
+
+  if (!category && !status) return json({ error: "no_changes" }, 400);
+
+  await env.DB.prepare(
+    UPDATE errors SET category = COALESCE(?1, category), status = COALESCE(?2, status) WHERE id = ?3
+  ).bind(category, status, id).run();
+
+  return json({ ok: true });
 }
 
-/**
- * Verify authentication token
- */
-function verifyAuth(request, env) {
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return false;
-  }
-  
-  const token = authHeader.substring(7);
-  try {
-    const decoded = atob(token);
-    const [timestamp, password] = decoded.split(':');
-    
-    // Check password matches
-    if (password !== env.DASHBOARD_PASSWORD_HASH) {
-      return false;
-    }
-    
-    // Check token age (24 hour expiry)
-    const tokenAge = Date.now() - parseInt(timestamp);
-    if (tokenAge > 86400000) { // 24 hours
-      return false;
-    }
-    
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
+export async function apiHandleDeleteError(request, env, allowedOrigins, id) {
+  if (!requireOrigin(request, allowedOrigins)) return json({ error: "bad_origin" }, 403);
 
-/**
- * GET /api/errors - Fetch errors (auth required)
- */
-async function handleGetErrors(request, env, corsHeaders) {
-  if (!verifyAuth(request, env)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  }
-  
-  try {
-    const url = new URL(request.url);
-    const status = url.searchParams.get('status') || null;
-    const category = url.searchParams.get('category') || null;
-    const limit = parseInt(url.searchParams.get('limit') || '50');
-    const offset = parseInt(url.searchParams.get('offset') || '0');
-    
-    let query = 'SELECT * FROM errors WHERE 1=1';
-    const bindings = [];
-    
-    if (status) {
-      query += ' AND status = ?';
-      bindings.push(status);
-    }
-    
-    if (category) {
-      query += ' AND category = ?';
-      bindings.push(category);
-    }
-    
-    query += ' ORDER BY timestamp DESC LIMIT ? OFFSET ?';
-    bindings.push(limit, offset);
-    
-    const stmt = env.DB.prepare(query);
-    const { results } = await stmt.bind(...bindings).all();
-    
-    // Get total count
-    let countQuery = 'SELECT COUNT(*) as total FROM errors WHERE 1=1';
-    const countBindings = [];
-    if (status) {
-      countQuery += ' AND status = ?';
-      countBindings.push(status);
-    }
-    if (category) {
-      countQuery += ' AND category = ?';
-      countBindings.push(category);
-    }
-    
-    const countStmt = env.DB.prepare(countQuery);
-    const { results: countResults } = await countStmt.bind(...countBindings).all();
-    const total = countResults[0]?.total || 0;
-    
-    return new Response(JSON.stringify({
-      errors: results,
-      total,
-      limit,
-      offset
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-    
-  } catch (error) {
-    console.error('Error fetching errors:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  }
-}
+  const auth = await requireSession(request, env);
+  if (!auth.ok) return json({ error: "unauthorized" }, auth.status || 401);
 
-/**
- * PATCH /api/errors/:id - Update error (auth required)
- */
-async function handleUpdateError(request, env, corsHeaders, errorId) {
-  if (!verifyAuth(request, env)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  }
-  
-  try {
-    const body = await request.json();
-    const { category, status } = body;
-    
-    const updates = [];
-    const bindings = [];
-    
-    if (category) {
-      updates.push('category = ?');
-      bindings.push(category);
-    }
-    
-    if (status) {
-      updates.push('status = ?');
-      bindings.push(status);
-    }
-    
-    if (updates.length === 0) {
-      return new Response(JSON.stringify({ error: 'No updates provided' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-    
-    bindings.push(errorId);
-    
-    const query = `UPDATE errors SET ${updates.join(', ')} WHERE id = ?`;
-    const stmt = env.DB.prepare(query);
-    await stmt.bind(...bindings).run();
-    
-    // Auto-delete if marked as resolved
-    if (status === 'resolved') {
-      const deleteStmt = env.DB.prepare('DELETE FROM errors WHERE id = ?');
-      await deleteStmt.bind(errorId).run();
-    }
-    
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-    
-  } catch (error) {
-    console.error('Error updating error:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  }
+  await env.DB.prepare(DELETE FROM errors WHERE id = ?1).bind(id).run();
+  return json({ ok: true });
 }
-
-/**
- * DELETE /api/errors/:id - Delete error (auth required)
- */
-async function handleDeleteError(request, env, corsHeaders, errorId) {
-  if (!verifyAuth(request, env)) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status: 401,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  }
-  
-  try {
-    const stmt = env.DB.prepare('DELETE FROM errors WHERE id = ?');
-    await stmt.bind(errorId).run();
-    
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-    
-  } catch (error) {
-    console.error('Error deleting error:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  }
-}
-
-// Export handlers for integration into main worker
-export {
-  handleErrorReport,
-  handleAuth,
-  handleGetErrors,
-  handleUpdateError,
-  handleDeleteError
-};

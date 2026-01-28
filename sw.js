@@ -1,103 +1,81 @@
-﻿// ==========================================================================
-// Service Worker Configuration
-// ==========================================================================
-// Caching Strategy:
-//   - HTML (navigation): Network-first, fallback to cache, then 404
-//   - Static Assets (CSS/JS/images): Stale-while-revalidate
-//
-// Cache Version: Bump this whenever you deploy changes that affect cached files
-// ==========================================================================
-const CACHE_VERSION = 'v20260127-012110';
-const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
+﻿/* sw.js */
+const CACHE_VERSION = "v20260127-telemetry";
+const CACHE_NAME = `portfolio-cache-${CACHE_VERSION}`;
+
+// Keep this list lean. Do NOT precache HUD or any debug scripts.
 const ASSETS_TO_CACHE = [
-    '/',
-    '/about',
-    '/contact',
-    '/deep-dive',
-    '/projects/',
-    '/hobbies/',
-    '/hobbies-games',
-    '/privacy',
-    '/overview',
-    '/EN/404.html',
-    `/theme.css?v=${CACHE_VERSION}`,
-    '/assets/css/style.css',
-    '/assets/fonts/inter/inter-latin.woff2',
-    '/assets/js/site.js',
-    '/assets/js/site.min.js',
-    '/assets/js/debugger.min.js',
-    '/assets/js/error-reporting.min.js',
-    '/assets/js/lazy-loader.min.js',
-    '/assets/js/cache-refresh.js',
-    '/assets/js/contact-form.js',
-    '/assets/img/headshot.webp',
-    '/assets/img/savonie-thumb.webp'
+  "/",
+  "/index.html",
+  "/manifest.json",
+  "/assets/css/style.css",
+  "/theme.css",
+  "/assets/js/site.min.js",
+  "/assets/js/lazy-loader.min.js",
+  "/assets/js/cache-refresh.js",
+  "/assets/img/logo-ea.webp",
+  "/assets/img/favicon-32x32.png",
+  "/assets/img/favicon-16x16.png",
+  "/assets/img/apple-touch-icon.png",
+  "/assets/img/favicon.ico"
 ];
 
-// Install event - cache assets
-self.addEventListener('install', (event) => {
-    console.log('Service Worker: Installing...');
-    self.skipWaiting(); // Force greedy update
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                console.log('Service Worker: Caching files');
-                return cache.addAll(ASSETS_TO_CACHE);
-            })
-    );
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
+  );
+  self.skipWaiting();
 });
 
-// Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
-    console.log('Service Worker: Activating...');
-    event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (cacheName !== CACHE_NAME) {
-                        console.log('Service Worker: Clearing old cache', cacheName);
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        }).then(() => self.clients.claim()) // Take control immediately
-    );
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) =>
+      Promise.all(
+        cacheNames
+          .filter((name) => name.startsWith("portfolio-cache-") && name !== CACHE_NAME)
+          .map((name) => caches.delete(name))
+      )
+    )
+  );
+  self.clients.claim();
 });
 
-// Fetch event - serve from cache, fallback to network
-self.addEventListener('fetch', (event) => {
-    const requestUrl = new URL(event.request.url);
+function isHTMLRequest(request) {
+  return request.mode === "navigate" || (request.headers.get("accept") || "").includes("text/html");
+}
 
-    // Never cache API or health checks
-    if (requestUrl.origin === self.location.origin) {
-        if (requestUrl.pathname.startsWith('/api/') || requestUrl.pathname === '/health') {
-            event.respondWith(fetch(event.request));
-            return;
-        }
-    }
+function isHUDAsset(url) {
+  return url.pathname === "/assets/js/debugger-hud.min.js";
+}
 
-    // Skip non-GET requests
-    if (event.request.method !== 'GET') return;
+self.addEventListener("fetch", (event) => {
+  const url = new URL(event.request.url);
 
-    // Skip external requests (CDN, APIs, etc.)
-    if (!event.request.url.startsWith(self.location.origin)) return;
+  // Always network-first for HTML and the HUD script (HUD is versioned by query param).
+  if (isHTMLRequest(event.request) || isHUDAsset(url)) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
 
-    const request = event.request;
-    const isHTML = request.destination === 'document' || request.headers.get('accept')?.includes('text/html');
-
-    // Strategy:
-    // - HTML: network-first (ensures latest code after deploy), fallback to cache/404
-    // - Assets (CSS/JS/images): stale-while-revalidate
-    if (isHTML) {
-        event.respondWith(
-            fetch(request)
-                .then((response) => {
-                    // Cache the latest HTML
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-                    return response;
-                })
-                .catch(async () => {
+  // Cache-first for static assets.
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        return response;
+      });
+    })
+  );
+});
                     const cached = await caches.match(request);
                     return cached || caches.match('/EN/404.html');
                 })
@@ -118,16 +96,4 @@ self.addEventListener('fetch', (event) => {
                         return response;
                     })
                     .catch(() => undefined);
-
-                // If cache exists, return it immediately and update in background
-                if (cachedResponse) {
-                    return cachedResponse;
-                }
-
-                // Otherwise, return network response (or fail)
-                return networkFetch;
-            })
-    );
-});
-
 

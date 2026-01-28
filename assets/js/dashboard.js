@@ -198,21 +198,61 @@ function renderErrors(errors) {
     return;
   }
   
-  tbody.innerHTML = errors.map(error => `
-    <tr data-error-id="${error.id}">
-      <td>${error.id}</td>
-      <td><span class="type-badge">${error.type}</span></td>
-      <td class="message-col" title="${escapeHtml(error.message)}">${truncate(error.message, 50)}</td>
-      <td class="url-col" title="${escapeHtml(error.url)}">${truncate(error.url, 30)}</td>
-      <td><span class="category-badge ${error.category}">${error.category}</span></td>
-      <td><span class="status-badge ${error.status}">${error.status}</span></td>
-      <td>${error.is_bot ? '🤖' : '👤'}</td>
-      <td>${formatTime(error.timestamp)}</td>
-      <td>
-        <button class="view-btn" onclick="viewError(${error.id})">View</button>
-      </td>
-    </tr>
-  `).join('');
+  tbody.textContent = '';
+  errors.forEach(error => {
+    const tr = document.createElement('tr');
+    tr.dataset.errorId = error.id;
+
+    const createCell = (content) => { const td = document.createElement('td'); td.textContent = content; return td; };
+    
+    tr.appendChild(createCell(error.id));
+    
+    const typeTd = document.createElement('td');
+    const typeBadge = document.createElement('span');
+    typeBadge.className = 'type-badge';
+    typeBadge.textContent = error.type;
+    typeTd.appendChild(typeBadge);
+    tr.appendChild(typeTd);
+    
+    const msgTd = document.createElement('td');
+    msgTd.className = 'message-col';
+    msgTd.title = error.message;
+    msgTd.textContent = truncate(error.message, 50);
+    tr.appendChild(msgTd);
+    
+    const urlTd = document.createElement('td');
+    urlTd.className = 'url-col';
+    urlTd.title = error.url;
+    urlTd.textContent = truncate(error.url, 30);
+    tr.appendChild(urlTd);
+    
+    const catTd = document.createElement('td');
+    const catBadge = document.createElement('span');
+    catBadge.className = `category-badge ${error.category}`;
+    catBadge.textContent = error.category;
+    catTd.appendChild(catBadge);
+    tr.appendChild(catTd);
+    
+    const stTd = document.createElement('td');
+    const stBadge = document.createElement('span');
+    stBadge.className = `status-badge ${error.status}`;
+    stBadge.textContent = error.status;
+    stTd.appendChild(stBadge);
+    tr.appendChild(stTd);
+    
+    tr.appendChild(createCell(error.is_bot ? '🤖' : '👤'));
+    tr.appendChild(createCell(formatTime(error.timestamp)));
+    
+    const actTd = document.createElement('td');
+    const viewBtn = document.createElement('button');
+    viewBtn.className = 'view-btn';
+    viewBtn.textContent = 'View';
+    viewBtn.onclick = () => viewError(error.id);
+    actTd.appendChild(viewBtn);
+    tr.appendChild(actTd);
+    
+    tbody.appendChild(tr);
+  });
 }
 
 // Update stats
@@ -251,40 +291,68 @@ window.viewError = async function(errorId) {
     const data = await response.json();
     const error = data.error; // API returns { error: object }
     
-    // Populate modal
-    const breadcrumbsHtml = error.breadcrumbs ? renderBreadcrumbs(error.breadcrumbs) : '<p class="no-data">No interaction history available</p>';
+    // Populate modal using DOM APIs
+    const detailsDiv = document.getElementById('error-details');
+    detailsDiv.textContent = '';
 
-    document.getElementById('error-details').innerHTML = `
-      <div class="detail-group">
-        <label>ID</label> <span>${error.id}</span>
-      </div>
-      <div class="detail-group">
-        <label>Type</label> <span class="type-badge">${error.type}</span>
-      </div>
-      <div class="detail-group full-width">
-        <label>Message</label> <div class="code-block">${escapeHtml(error.message)}</div>
-      </div>
-      <div class="detail-group full-width">
-        <label>Interaction History</label>
-        <div class="breadcrumbs-container">${breadcrumbsHtml}</div>
-      </div>
-      <div class="detail-group">
-        <label>Location</label> 
-        <span><a href="${error.url}" target="_blank">${truncate(error.url, 50)}</a></span>
-        <span class="sub-text">${escapeHtml(error.filename || '')}:${error.line || '?'}</span>
-      </div>
-      <div class="detail-group">
-        <label>User Agent</label> <span class="sub-text">${escapeHtml(error.user_agent)}</span>
-      </div>
-      <div class="detail-group">
-        <label>Time</label> <span>${new Date(error.timestamp).toLocaleString()}</span>
-      </div>
-      
-      <details>
-        <summary><strong>Stack Trace</strong></summary>
-        <pre>${escapeHtml(error.stack || 'No stack trace')}</pre>
-      </details>
-    `;
+    const createGroup = (label, content, fullWidth = false) => {
+      const group = document.createElement('div');
+      group.className = fullWidth ? 'detail-group full-width' : 'detail-group';
+      const lbl = document.createElement('label');
+      lbl.textContent = label;
+      group.appendChild(lbl);
+      group.appendChild(content);
+      return group;
+    };
+
+    const span = (text, className = '') => {
+      const s = document.createElement('span');
+      if (className) s.className = className;
+      s.textContent = text;
+      return s;
+    };
+
+    detailsDiv.appendChild(createGroup('ID', span(error.id)));
+    
+    const typeBadge = span(error.type, 'type-badge');
+    detailsDiv.appendChild(createGroup('Type', typeBadge));
+
+    const msgBlock = document.createElement('div');
+    msgBlock.className = 'code-block';
+    msgBlock.textContent = error.message;
+    detailsDiv.appendChild(createGroup('Message', msgBlock, true));
+
+    const breadcrumbsHtml = error.breadcrumbs ? renderBreadcrumbs(error.breadcrumbs) : '<p class="no-data">No interaction history available</p>';
+    const bcDiv = document.createElement('div');
+    bcDiv.className = 'breadcrumbs-container';
+    bcDiv.innerHTML = breadcrumbsHtml;
+    detailsDiv.appendChild(createGroup('Interaction History', bcDiv, true));
+
+    const locSpan = document.createElement('span');
+    const locLink = document.createElement('a');
+    locLink.href = error.url;
+    locLink.target = '_blank';
+    locLink.textContent = truncate(error.url, 50);
+    locSpan.appendChild(locLink);
+    const subText = span(`${error.filename || ''}:${error.line || '?'}`, 'sub-text');
+    const locWrapper = document.createElement('div');
+    locWrapper.appendChild(locSpan);
+    locWrapper.appendChild(subText);
+    detailsDiv.appendChild(createGroup('Location', locWrapper));
+
+    detailsDiv.appendChild(createGroup('User Agent', span(error.user_agent, 'sub-text')));
+    detailsDiv.appendChild(createGroup('Time', span(new Date(error.timestamp).toLocaleString())));
+
+    const details = document.createElement('details');
+    const summary = document.createElement('summary');
+    const strong = document.createElement('strong');
+    strong.textContent = 'Stack Trace';
+    summary.appendChild(strong);
+    details.appendChild(summary);
+    const pre = document.createElement('pre');
+    pre.textContent = error.stack || 'No stack trace';
+    details.appendChild(pre);
+    detailsDiv.appendChild(details);
     
     document.getElementById('modal-category').value = error.category;
     document.getElementById('modal-status').value = error.status;

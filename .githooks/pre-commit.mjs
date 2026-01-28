@@ -12,8 +12,7 @@ import path from 'path';
 const BUILT_FILES = [
   'assets/js/site.min.js',
   'assets/js/lazy-loader.min.js',
-  'assets/js/debugger.min.js',
-  'assets/js/error-reporting.min.js'
+  'assets/js/debugger-hud.min.js'
 ];
 
 console.log('🔨 Pre-commit: Checking built files...');
