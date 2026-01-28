@@ -159,11 +159,12 @@ function generateRedirects() {
         const enUrlPath = '/' + enFile;
         generatedLines.push(`${enUrlPath}    ${canonical}    301`);
 
-        // If Cloudflare Pages "clean URLs" is enabled, /EN/foo.html may be reachable as /EN/foo.
-        // Add a guard so users/bots don't land on /EN/* URLs.
+        // Cloudflare Pages may canonicalize /EN/foo.html -> /EN/foo (308).
+        // Redirecting /EN/foo back to /foo creates an infinite loop for clean URL rewrites.
+        // Instead, serve /EN/foo by rewriting to the underlying /EN/foo.html.
         if (!enFile.endsWith('/index.html')) {
             const enNoExtPath = '/' + enFile.replace(/\.html$/, '');
-            generatedLines.push(`${enNoExtPath}    ${canonical}    301`);
+            generatedLines.push(`${enNoExtPath}    ${enUrlPath}    200`);
         }
     }
 
