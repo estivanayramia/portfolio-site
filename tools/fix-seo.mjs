@@ -141,9 +141,9 @@ function generateRedirects() {
             // Directory route: /hobbies/ -> /EN/hobbies/ (not /EN/hobbies/index.html)
             target = '/' + enFile.replace('/index.html', '/');
         } else {
-            // File route: prefer extensionless target to avoid Pages clean-URL canonicalization redirects
-            // Example: /about -> /EN/about (not /EN/about.html)
-            target = '/' + enFile.replace(/\.html$/, '');
+            // File route: target the real .html file.
+            // Using extensionless targets here causes Cloudflare Pages to 308 to /EN/* (leaking locale paths).
+            target = '/' + enFile;
         }
         generatedLines.push(`${canonical}    ${target}    200`);
     }
@@ -158,6 +158,13 @@ function generateRedirects() {
 
         const enUrlPath = '/' + enFile;
         generatedLines.push(`${enUrlPath}    ${canonical}    301`);
+
+        // If Cloudflare Pages "clean URLs" is enabled, /EN/foo.html may be reachable as /EN/foo.
+        // Add a guard so users/bots don't land on /EN/* URLs.
+        if (!enFile.endsWith('/index.html')) {
+            const enNoExtPath = '/' + enFile.replace(/\.html$/, '');
+            generatedLines.push(`${enNoExtPath}    ${canonical}    301`);
+        }
     }
 
     const headerLines = [
@@ -168,8 +175,7 @@ function generateRedirects() {
         // '/EN    /    301',
         // '/EN/   /    301',
         '',
-        '# Root rewrite (200 = transparent proxy, not a redirect)',
-        '/    /EN/    200',
+        '# Root is served by /index.html; no root rewrite (avoids /about -> /EN/about redirects)',
         '',
         '# 1. Canonical Redirects (301) - Enforce clean URLs',
         '/index.html                  /                            301',

@@ -3,8 +3,7 @@
 
 # /EN and /EN/ hard redirects removed to prevent infinite loops
 
-# Root rewrite (200 = transparent proxy, not a redirect)
-/    /EN/    200
+# Root is served by /index.html; no root rewrite (avoids /about -> /EN/about redirects)
 
 # 1. Canonical Redirects (301) - Enforce clean URLs
 /index.html                  /                            301
@@ -51,79 +50,113 @@
 /projects/portfolio/    /projects/portfolio    301
 
 # Clean URL rewrites (200) -> serve from /EN/
-/about    /EN/about    200
-/contact    /EN/contact    200
-/dashboard    /EN/dashboard    200
-/deep-dive    /EN/deep-dive    200
-/hobbies-games    /EN/hobbies-games    200
-/hobbies-games/1024-moves    /EN/hobbies-games/1024-moves    200
-/hobbies-games/2048    /EN/hobbies-games/2048    200
-/hobbies-games/block-breaker    /EN/hobbies-games/block-breaker    200
-/hobbies-games/nano-wirebot    /EN/hobbies-games/nano-wirebot    200
-/hobbies-games/off-the-line    /EN/hobbies-games/off-the-line    200
-/hobbies-games/oh-flip    /EN/hobbies-games/oh-flip    200
-/hobbies-games/onoff    /EN/hobbies-games/onoff    200
-/hobbies-games/pizza-undelivery    /EN/hobbies-games/pizza-undelivery    200
-/hobbies-games/racer    /EN/hobbies-games/racer    200
-/hobbies-games/snake    /EN/hobbies-games/snake    200
-/hobbies-games/space-invaders    /EN/hobbies-games/space-invaders    200
-/hobbies-games/the-matr13k    /EN/hobbies-games/the-matr13k    200
-/hobbies-games/triangle-back-to-home    /EN/hobbies-games/triangle-back-to-home    200
-/hobbies-games/xx142-b2exe    /EN/hobbies-games/xx142-b2exe    200
+/about    /EN/about.html    200
+/contact    /EN/contact.html    200
+/dashboard    /EN/dashboard.html    200
+/deep-dive    /EN/deep-dive.html    200
+/hobbies-games    /EN/hobbies-games.html    200
+/hobbies-games/1024-moves    /EN/hobbies-games/1024-moves.html    200
+/hobbies-games/2048    /EN/hobbies-games/2048.html    200
+/hobbies-games/block-breaker    /EN/hobbies-games/block-breaker.html    200
+/hobbies-games/nano-wirebot    /EN/hobbies-games/nano-wirebot.html    200
+/hobbies-games/off-the-line    /EN/hobbies-games/off-the-line.html    200
+/hobbies-games/oh-flip    /EN/hobbies-games/oh-flip.html    200
+/hobbies-games/onoff    /EN/hobbies-games/onoff.html    200
+/hobbies-games/pizza-undelivery    /EN/hobbies-games/pizza-undelivery.html    200
+/hobbies-games/racer    /EN/hobbies-games/racer.html    200
+/hobbies-games/snake    /EN/hobbies-games/snake.html    200
+/hobbies-games/space-invaders    /EN/hobbies-games/space-invaders.html    200
+/hobbies-games/the-matr13k    /EN/hobbies-games/the-matr13k.html    200
+/hobbies-games/triangle-back-to-home    /EN/hobbies-games/triangle-back-to-home.html    200
+/hobbies-games/xx142-b2exe    /EN/hobbies-games/xx142-b2exe.html    200
 /hobbies/    /EN/hobbies/    200
-/hobbies/car    /EN/hobbies/car    200
-/hobbies/cooking    /EN/hobbies/cooking    200
-/hobbies/gym    /EN/hobbies/gym    200
-/hobbies/photography    /EN/hobbies/photography    200
-/hobbies/reading    /EN/hobbies/reading    200
-/hobbies/whispers    /EN/hobbies/whispers    200
-/overview    /EN/overview    200
-/privacy    /EN/privacy    200
+/hobbies/car    /EN/hobbies/car.html    200
+/hobbies/cooking    /EN/hobbies/cooking.html    200
+/hobbies/gym    /EN/hobbies/gym.html    200
+/hobbies/photography    /EN/hobbies/photography.html    200
+/hobbies/reading    /EN/hobbies/reading.html    200
+/hobbies/whispers    /EN/hobbies/whispers.html    200
+/overview    /EN/overview.html    200
+/privacy    /EN/privacy.html    200
 /projects/    /EN/projects/    200
-/projects/competitive-strategy    /EN/projects/competitive-strategy    200
-/projects/conflict    /EN/projects/conflict    200
-/projects/discipline    /EN/projects/discipline    200
-/projects/documentation    /EN/projects/documentation    200
-/projects/logistics    /EN/projects/logistics    200
-/projects/multilingual    /EN/projects/multilingual    200
-/projects/portfolio    /EN/projects/portfolio    200
+/projects/competitive-strategy    /EN/projects/competitive-strategy.html    200
+/projects/conflict    /EN/projects/conflict.html    200
+/projects/discipline    /EN/projects/discipline.html    200
+/projects/documentation    /EN/projects/documentation.html    200
+/projects/logistics    /EN/projects/logistics.html    200
+/projects/multilingual    /EN/projects/multilingual.html    200
+/projects/portfolio    /EN/projects/portfolio.html    200
 
 # Prevent indexing /EN/* directly (301)
 /EN/about.html    /about    301
+/EN/about    /about    301
 /EN/contact.html    /contact    301
+/EN/contact    /contact    301
 /EN/dashboard.html    /dashboard    301
+/EN/dashboard    /dashboard    301
 /EN/deep-dive.html    /deep-dive    301
+/EN/deep-dive    /deep-dive    301
 /EN/hobbies-games.html    /hobbies-games    301
+/EN/hobbies-games    /hobbies-games    301
 /EN/hobbies-games/1024-moves.html    /hobbies-games/1024-moves    301
+/EN/hobbies-games/1024-moves    /hobbies-games/1024-moves    301
 /EN/hobbies-games/2048.html    /hobbies-games/2048    301
+/EN/hobbies-games/2048    /hobbies-games/2048    301
 /EN/hobbies-games/block-breaker.html    /hobbies-games/block-breaker    301
+/EN/hobbies-games/block-breaker    /hobbies-games/block-breaker    301
 /EN/hobbies-games/nano-wirebot.html    /hobbies-games/nano-wirebot    301
+/EN/hobbies-games/nano-wirebot    /hobbies-games/nano-wirebot    301
 /EN/hobbies-games/off-the-line.html    /hobbies-games/off-the-line    301
+/EN/hobbies-games/off-the-line    /hobbies-games/off-the-line    301
 /EN/hobbies-games/oh-flip.html    /hobbies-games/oh-flip    301
+/EN/hobbies-games/oh-flip    /hobbies-games/oh-flip    301
 /EN/hobbies-games/onoff.html    /hobbies-games/onoff    301
+/EN/hobbies-games/onoff    /hobbies-games/onoff    301
 /EN/hobbies-games/pizza-undelivery.html    /hobbies-games/pizza-undelivery    301
+/EN/hobbies-games/pizza-undelivery    /hobbies-games/pizza-undelivery    301
 /EN/hobbies-games/racer.html    /hobbies-games/racer    301
+/EN/hobbies-games/racer    /hobbies-games/racer    301
 /EN/hobbies-games/snake.html    /hobbies-games/snake    301
+/EN/hobbies-games/snake    /hobbies-games/snake    301
 /EN/hobbies-games/space-invaders.html    /hobbies-games/space-invaders    301
+/EN/hobbies-games/space-invaders    /hobbies-games/space-invaders    301
 /EN/hobbies-games/the-matr13k.html    /hobbies-games/the-matr13k    301
+/EN/hobbies-games/the-matr13k    /hobbies-games/the-matr13k    301
 /EN/hobbies-games/triangle-back-to-home.html    /hobbies-games/triangle-back-to-home    301
+/EN/hobbies-games/triangle-back-to-home    /hobbies-games/triangle-back-to-home    301
 /EN/hobbies-games/xx142-b2exe.html    /hobbies-games/xx142-b2exe    301
+/EN/hobbies-games/xx142-b2exe    /hobbies-games/xx142-b2exe    301
 /EN/hobbies/car.html    /hobbies/car    301
+/EN/hobbies/car    /hobbies/car    301
 /EN/hobbies/cooking.html    /hobbies/cooking    301
+/EN/hobbies/cooking    /hobbies/cooking    301
 /EN/hobbies/gym.html    /hobbies/gym    301
+/EN/hobbies/gym    /hobbies/gym    301
 /EN/hobbies/index.html    /hobbies/    301
 /EN/hobbies/photography.html    /hobbies/photography    301
+/EN/hobbies/photography    /hobbies/photography    301
 /EN/hobbies/reading.html    /hobbies/reading    301
+/EN/hobbies/reading    /hobbies/reading    301
 /EN/hobbies/whispers.html    /hobbies/whispers    301
+/EN/hobbies/whispers    /hobbies/whispers    301
 /EN/overview.html    /overview    301
+/EN/overview    /overview    301
 /EN/privacy.html    /privacy    301
+/EN/privacy    /privacy    301
 /EN/projects/competitive-strategy.html    /projects/competitive-strategy    301
+/EN/projects/competitive-strategy    /projects/competitive-strategy    301
 /EN/projects/conflict.html    /projects/conflict    301
+/EN/projects/conflict    /projects/conflict    301
 /EN/projects/discipline.html    /projects/discipline    301
+/EN/projects/discipline    /projects/discipline    301
 /EN/projects/documentation.html    /projects/documentation    301
+/EN/projects/documentation    /projects/documentation    301
 /EN/projects/index.html    /projects/    301
 /EN/projects/logistics.html    /projects/logistics    301
+/EN/projects/logistics    /projects/logistics    301
 /EN/projects/multilingual.html    /projects/multilingual    301
+/EN/projects/multilingual    /projects/multilingual    301
 /EN/projects/portfolio.html    /projects/portfolio    301
+/EN/projects/portfolio    /projects/portfolio    301
 # END GENERATED (fix-seo)
 # Note: rely on Cloudflare Pages native 404 behavior; avoid catch-all rewrites that can trigger loop detection.

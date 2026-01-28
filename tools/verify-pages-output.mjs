@@ -36,30 +36,22 @@ if (!fs.existsSync(redirectsPath)) {
 const redirects = fs.readFileSync(redirectsPath, "utf8");
 dbg(`Read _redirects (${redirects.length} chars)`);
 
-// Whitespace-insensitive check for the repo's required root rewrite:
-//   /  /EN/  200
+// Guard against a broad root rewrite. In Cloudflare Pages, this has been observed
+// to redirect clean routes like /about -> /EN/about (leaking locale paths).
 // Cloudflare Pages ignores whitespace differences, so we do too.
-const rootRewriteRe = /^\/\s+\/EN\/\s+200\s*$/m;
+const rootRewriteToEnRe = /^\/\s+\/EN\/\s+200\s*$/m;
+const rootRewriteToEnIndexRe = /^\/\s+\/EN\/index\.html\s+200\s*$/m;
 
-if (!rootRewriteRe.test(redirects)) {
+if (rootRewriteToEnRe.test(redirects) || rootRewriteToEnIndexRe.test(redirects)) {
   if (DEBUG) {
-    const candidates = findMatchingLines(redirects, /^\//m);
-    dbg(`First 15 non-comment candidate lines: ${candidates.filter((l) => l.trim() && !l.trim().startsWith('#')).slice(0, 15).join(' | ')}`);
+    const lines = [
+      ...findMatchingLines(redirects, rootRewriteToEnRe),
+      ...findMatchingLines(redirects, rootRewriteToEnIndexRe),
+    ];
+    dbg(`Root rewrite lines detected: ${lines.join(' | ')}`);
   }
   fail(
-    "_redirects does not include the root rewrite '/  /EN/  200' (whitespace-insensitive check).",
-  );
-}
-
-// Root rewrite must not target index.html (Cloudflare Pages loop warning)
-const badRootRewriteRe = /^\/\s+\/EN\/index\.html\s+200\s*$/m;
-if (badRootRewriteRe.test(redirects)) {
-  if (DEBUG) {
-    const lines = findMatchingLines(redirects, badRootRewriteRe);
-    dbg(`Bad root rewrite lines: ${lines.join(' | ')}`);
-  }
-  fail(
-    "_redirects contains root rewrite to /EN/index.html (loop-prone). Use '/  /EN/  200'.",
+    "_redirects contains a root rewrite to /EN/* (loop/locale-leak prone). Root should be served by /index.html without a root rewrite.",
   );
 }
 
@@ -113,5 +105,5 @@ if (badDirectoryRewriteRe.test(redirects)) {
 }
 
 console.log(
-  `[verify-pages-output] OK. Found _redirects in "${outDir}" with expected rewrites (root + directory routes).`,
+  `[verify-pages-output] OK. Found _redirects in "${outDir}" with expected rewrites (no root rewrite + directory routes).`,
 );
