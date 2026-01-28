@@ -141,9 +141,9 @@ function generateRedirects() {
             // Directory route: /hobbies/ -> /EN/hobbies/ (not /EN/hobbies/index.html)
             target = '/' + enFile.replace('/index.html', '/');
         } else {
-            // File route: target the real .html file.
-            // Using extensionless targets here causes Cloudflare Pages to 308 to /EN/* (leaking locale paths).
-            target = '/' + enFile;
+            // File route: target the extensionless path to avoid Clean URL loops
+            // Cloudflare will handle /EN/foo -> /EN/foo.html via the second-pass rules below or natively
+            target = '/' + enFile.replace(/\.html$/, '');
         }
         generatedLines.push(`${canonical}    ${target}    200`);
     }
@@ -187,7 +187,9 @@ function generateRedirects() {
 
     const footerLines = [
         '',
-        '# Note: rely on Cloudflare Pages native 404 behavior; avoid catch-all rewrites that can trigger loop detection.',
+        '# Catch-all 404',
+        '# Using /EN/404 allows Pages to find /EN/404.html without 308 loops',
+        '/*    /EN/404    404',
         '',
     ];
 
