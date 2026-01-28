@@ -4647,4 +4647,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-import './interactions.js';

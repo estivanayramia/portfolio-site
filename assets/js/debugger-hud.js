@@ -72,6 +72,7 @@
 
   const btnClose = document.createElement("button");
   btnClose.className = "savonie-btn secondary";
+  btnClose.type = "button";
   btnClose.textContent = "Close";
   btnClose.addEventListener("click", close);
 
@@ -104,6 +105,9 @@
 
   function el(tag, props = {}) {
     const n = document.createElement(tag);
+    if (tag === "button" && !(props && Object.prototype.hasOwnProperty.call(props, "type"))) {
+      try { n.type = "button"; } catch {}
+    }
     for (const [k, v] of Object.entries(props)) {
       if (k === "text") n.textContent = v;
       else if (k === "class") n.className = v;
