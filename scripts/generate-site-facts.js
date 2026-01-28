@@ -282,9 +282,17 @@ function generateSiteFacts() {
   hobbies.forEach(h => console.log(`   → ${h.title}`));
   console.log(`✅ Found ${hobbies.length} hobbies\n`);
   
+  // Deterministic output: do not bake timestamps into committed artifacts.
+  // If you want a build timestamp, pass SITE_FACTS_GENERATED_AT in CI.
+  const generatedAt = process.env.SITE_FACTS_GENERATED_AT;
+
+  // Stable ordering for deterministic output.
+  projects.sort((a, b) => a.url.localeCompare(b.url));
+  hobbies.sort((a, b) => a.url.localeCompare(b.url));
+
   // Create site facts object
   const siteFacts = {
-    generated: new Date().toISOString(),
+    ...(generatedAt ? { generated: generatedAt } : {}),
     version: 'v2',
     baseUrl: BASE_URL,
     projects: projects,
@@ -320,7 +328,7 @@ function generateSiteFacts() {
     fs.mkdirSync(outputDir, { recursive: true });
   }
   
-  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(siteFacts, null, 2), 'utf-8');
+  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(siteFacts, null, 2) + '\n', 'utf-8');
   
   console.log(`📄 Output written to: ${OUTPUT_PATH}`);
   console.log(`\n✨ Site facts generated successfully!`);

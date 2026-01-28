@@ -1,28 +1,16 @@
 {
-  "generated": "2026-01-27T04:16:19.574Z",
   "version": "v2",
   "baseUrl": "https://www.estivanayramia.com",
   "projects": [
     {
-      "id": "this-website-every-line",
-      "title": "This Website (Every Line)",
-      "summary": "No templates, no CMS. Just hand-written HTML/CSS/JS, service worker, Savonie chat, and Lighthouse 90+ scores. The repo is the proof.",
-      "url": "/projects/portfolio",
-      "fullUrl": "https://www.estivanayramia.com/projects/portfolio",
-      "filePath": "/projects/portfolio.html",
+      "id": "taking-down-endpoint-almac-group-4g-clinical",
+      "title": "Taking Down Endpoint (Almac Group + 4G Clinical)",
+      "summary": "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.",
+      "url": "/projects/competitive-strategy",
+      "fullUrl": "https://www.estivanayramia.com/projects/competitive-strategy",
+      "filePath": "/projects/competitive-strategy.html",
       "tags": [
-        "Build"
-      ]
-    },
-    {
-      "id": "loral-cell-bioprint-maps-campaign",
-      "title": "L'Oréal Cell BioPrint MAPS Campaign",
-      "summary": "Class concept campaign deck for L'Oréal Cell BioPrint that maps three personas and their touchpoints across the funnel.",
-      "url": "/projects/logistics",
-      "fullUrl": "https://www.estivanayramia.com/projects/logistics",
-      "filePath": "/projects/logistics.html",
-      "tags": [
-        "Campaign Strategy"
+        "Strategy"
       ]
     },
     {
@@ -48,6 +36,17 @@
       ]
     },
     {
+      "id": "loral-cell-bioprint-maps-campaign",
+      "title": "L'Oréal Cell BioPrint MAPS Campaign",
+      "summary": "Class concept campaign deck for L'Oréal Cell BioPrint that maps three personas and their touchpoints across the funnel.",
+      "url": "/projects/logistics",
+      "fullUrl": "https://www.estivanayramia.com/projects/logistics",
+      "filePath": "/projects/logistics.html",
+      "tags": [
+        "Campaign Strategy"
+      ]
+    },
+    {
       "id": "endpoint-elosity-launch-video",
       "title": "Endpoint Elosity Launch Video",
       "summary": "Motion storyboard and full voiceover script showing bottlenecks shattering into a clean trial timeline. Built for silent autoplay with bold typography.",
@@ -59,34 +58,18 @@
       ]
     },
     {
-      "id": "taking-down-endpoint-almac-group-4g-clinical",
-      "title": "Taking Down Endpoint (Almac Group + 4G Clinical)",
-      "summary": "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.",
-      "url": "/projects/competitive-strategy",
-      "fullUrl": "https://www.estivanayramia.com/projects/competitive-strategy",
-      "filePath": "/projects/competitive-strategy.html",
+      "id": "this-website-every-line",
+      "title": "This Website (Every Line)",
+      "summary": "No templates, no CMS. Just hand-written HTML/CSS/JS, service worker, Savonie chat, and Lighthouse 90+ scores. The repo is the proof.",
+      "url": "/projects/portfolio",
+      "fullUrl": "https://www.estivanayramia.com/projects/portfolio",
+      "filePath": "/projects/portfolio.html",
       "tags": [
-        "Strategy"
+        "Build"
       ]
     }
   ],
   "hobbies": [
-    {
-      "id": "gym-strength-training",
-      "title": "Gym & Strength Training",
-      "summary": "Building discipline through progressive overload. Tracking PRs, optimizing recovery, and proving that consistency beats intensity every time.",
-      "url": "/hobbies/gym",
-      "fullUrl": "https://www.estivanayramia.com/hobbies/gym",
-      "filePath": "/hobbies/gym.html"
-    },
-    {
-      "id": "photography",
-      "title": "Photography",
-      "summary": "Capturing moments worth remembering. iPhone shots that tell stories; no DSLR needed, just good lighting and better timing.",
-      "url": "/hobbies/photography",
-      "fullUrl": "https://www.estivanayramia.com/hobbies/photography",
-      "filePath": "/hobbies/photography.html"
-    },
     {
       "id": "car-enthusiasm",
       "title": "Car Enthusiasm",
@@ -104,12 +87,20 @@
       "filePath": "/hobbies/cooking.html"
     },
     {
-      "id": "whispers-sticky-notes",
-      "title": "Whispers (Sticky Notes)",
-      "summary": "Random thoughts captured on sticky notes. Ideas, observations, reminders. Low-tech brain dump that keeps the mental clutter organized.",
-      "url": "/hobbies/whispers",
-      "fullUrl": "https://www.estivanayramia.com/hobbies/whispers",
-      "filePath": "/hobbies/whispers.html"
+      "id": "gym-strength-training",
+      "title": "Gym & Strength Training",
+      "summary": "Building discipline through progressive overload. Tracking PRs, optimizing recovery, and proving that consistency beats intensity every time.",
+      "url": "/hobbies/gym",
+      "fullUrl": "https://www.estivanayramia.com/hobbies/gym",
+      "filePath": "/hobbies/gym.html"
+    },
+    {
+      "id": "photography",
+      "title": "Photography",
+      "summary": "Capturing moments worth remembering. iPhone shots that tell stories; no DSLR needed, just good lighting and better timing.",
+      "url": "/hobbies/photography",
+      "fullUrl": "https://www.estivanayramia.com/hobbies/photography",
+      "filePath": "/hobbies/photography.html"
     },
     {
       "id": "reading",
@@ -118,6 +109,14 @@
       "url": "/hobbies/reading",
       "fullUrl": "https://www.estivanayramia.com/hobbies/reading",
       "filePath": "/hobbies/reading.html"
+    },
+    {
+      "id": "whispers-sticky-notes",
+      "title": "Whispers (Sticky Notes)",
+      "summary": "Random thoughts captured on sticky notes. Ideas, observations, reminders. Low-tech brain dump that keeps the mental clutter organized.",
+      "url": "/hobbies/whispers",
+      "fullUrl": "https://www.estivanayramia.com/hobbies/whispers",
+      "filePath": "/hobbies/whispers.html"
     }
   ],
   "meta": {

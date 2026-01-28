@@ -108,16 +108,21 @@
             document.getElementById('results').innerHTML = '';
         };
 
-        const testPath = async (path, expectedStatus, description) => {
+        const testPath = async (path, expectedStatus, description, options = {}) => {
             log(`Testing: ${path}`, 'info');
             try {
                 const response = await fetch(path, {
-                    method: 'HEAD',
-                    redirect: 'manual'
+                    method: 'GET',
+                    redirect: 'follow'
                 });
+
+                const resolvedUrl = response.url ? new URL(response.url, window.location.origin) : null;
+                const finalPath = resolvedUrl ? resolvedUrl.pathname : path;
+                const initialPath = new URL(path, window.location.origin).pathname;
                 
                 const info = {
                     url: path,
+                    finalPath,
                     status: response.status,
                     statusText: response.statusText,
                     redirected: response.redirected,
@@ -132,11 +137,33 @@
                     if (value) info.headers[header] = value;
                 });
 
+                const statusMatch = expectedStatus == null || info.status === expectedStatus;
+                const expectedFinalPaths = options.expectedFinalPaths || (options.expectedFinalPath ? [options.expectedFinalPath] : null);
+                const pathMatch = !expectedFinalPaths || expectedFinalPaths.includes(finalPath);
+                const didPass = statusMatch && pathMatch;
+
                 log(`✓ ${path} → Status: ${info.status} ${info.statusText}`, 
-                    info.status === expectedStatus ? 'success' : 'warning');
+                    didPass ? 'success' : 'warning');
+
+                if (finalPath && finalPath !== initialPath) {
+                    log(`  Final path: ${finalPath}`, 'info');
+                }
                 
                 if (info.headers.location) {
                     log(`  Redirects to: ${info.headers.location}`, 'info');
+                }
+
+                if (options.checkForLikelyHomepageOn200 && info.status === 200) {
+                    try {
+                        const text = await response.text();
+                        const looksLikeHomepage = /<title>\s*Estivan\s+Ayramia\s*\|\s*Portfolio\s*<\/title>/i.test(text);
+                        if (looksLikeHomepage) {
+                            info.likelyHomepageServed = true;
+                            log(`  ⚠️ Looks like the homepage HTML was served for ${initialPath}`, 'warning');
+                        }
+                    } catch (e) {
+                        // ignore body read issues
+                    }
                 }
 
                 return info;
@@ -165,16 +192,25 @@
             log('\n🧪 Testing Critical Paths:', 'info');
 
             const tests = [
-                { path: '/', expected: 200, desc: 'Root path (should serve EN/index.html via rewrite)' },
-                { path: '/EN/index.html', expected: 301, desc: 'Direct EN/index.html (should redirect to /)' },
-                { path: '/index.html', expected: 301, desc: 'Root index.html (should redirect to /)' },
-                { path: '/about', expected: 200, desc: 'About page (clean URL rewrite)' },
-                { path: '/EN/about.html', expected: 301, desc: 'Direct EN/about.html (should redirect)' },
-                { path: '/nonexistent-page', expected: 200, desc: '404 page (catch-all)' }
+                { path: '/', expected: 200, desc: 'Root path (should load)', expectedFinalPaths: ['/'] },
+                // Cloudflare Pages commonly canonicalizes index.html to the directory.
+                { path: '/EN/index.html', expected: 200, desc: 'Direct EN/index.html (canonicalizes to /EN/)', expectedFinalPaths: ['/EN/index.html', '/EN/'] },
+                { path: '/index.html', expected: 200, desc: 'Root index.html (should canonicalize to /)', expectedFinalPaths: ['/', '/index.html'] },
+                // Cloudflare Pages may expose /EN/* after clean-URL canonicalization of the rewritten target.
+                { path: '/about', expected: 200, desc: 'About page (clean URL; may resolve to /EN/about)', expectedFinalPaths: ['/about', '/EN/about'] },
+                { path: '/EN/about.html', expected: 200, desc: 'Direct EN/about.html (may resolve to /EN/about via /about)', expectedFinalPaths: ['/about', '/EN/about', '/EN/about.html'] },
+                // With clean URLs, /redirect-debug.html may canonicalize to /redirect-debug.
+                { path: '/redirect-debug.html', expected: 200, desc: 'Redirect debugger page (must be reachable)', expectedFinalPaths: ['/redirect-debug.html', '/redirect-debug'] },
+                // Prefer native 404 behavior; warn if a 200 homepage is served instead.
+                { path: '/nonexistent-page', expected: 404, desc: 'Nonexistent page (should 404)', expectedFinalPaths: ['/nonexistent-page'], checkForLikelyHomepageOn200: true }
             ];
 
             for (const test of tests) {
-                const result = await testPath(test.path, test.expected, test.desc);
+                const result = await testPath(test.path, test.expected, test.desc, {
+                    expectedFinalPath: test.expectedFinalPath,
+                    expectedFinalPaths: test.expectedFinalPaths,
+                    checkForLikelyHomepageOn200: test.checkForLikelyHomepageOn200
+                });
                 results.push({ test, result });
                 await new Promise(resolve => setTimeout(resolve, 100)); // Small delay between tests
             }
@@ -187,7 +223,8 @@
             let failed = 0;
 
             const resultsHTML = results.map(({ test, result }) => {
-                const isPass = !result.error && result.status === test.expected;
+                const expectedFinalPaths = test.expectedFinalPaths || (test.expectedFinalPath ? [test.expectedFinalPath] : null);
+                const isPass = !result.error && result.status === test.expected && (!expectedFinalPaths || expectedFinalPaths.includes(result.finalPath));
                 if (isPass) passed++;
                 else failed++;
 
@@ -196,8 +233,11 @@
                         <strong>${isPass ? '✓ PASS' : '✗ FAIL'}</strong>: ${test.desc}<br>
                         <strong>Path:</strong> ${test.path}<br>
                         <strong>Expected:</strong> ${test.expected}<br>
+                        ${expectedFinalPaths ? `<strong>Expected Final Path:</strong> ${expectedFinalPaths.join(' OR ')}<br>` : ''}
                         <strong>Got:</strong> ${result.status || 'Error'} ${result.statusText || ''}<br>
+                        ${result.finalPath ? `<strong>Final Path:</strong> ${result.finalPath}<br>` : ''}
                         ${result.headers?.location ? `<strong>Location:</strong> ${result.headers.location}<br>` : ''}
+                        ${result.likelyHomepageServed ? `<strong>Warning:</strong> 200 OK but looks like homepage HTML served for a missing route<br>` : ''}
                         ${result.error ? `<strong>Error:</strong> ${result.error}` : ''}
                     </div>
                 `;
@@ -215,15 +255,15 @@
             const enResult = results.find(r => r.test.path === '/EN/index.html');
 
             if (rootResult?.result?.headers?.location?.includes('/EN')) {
-                log('⚠️ WARNING: Root (/) redirects to /EN path - possible loop!', 'error');
+                log('⚠️ WARNING: Root (/) redirected to /EN path - possible loop!', 'error');
             }
             if (enResult?.result?.headers?.location === '/') {
-                log('⚠️ WARNING: /EN/index.html redirects to / - circular redirect detected!', 'error');
+                log('⚠️ WARNING: /EN/index.html redirected to / - circular redirect detected!', 'error');
             }
         };
 
-        const testRootPath = () => testPath('/', 200, 'Testing root path');
-        const testENPath = () => testPath('/EN/index.html', 301, 'Testing /EN/index.html');
+        const testRootPath = () => testPath('/', 200, 'Testing root path', { expectedFinalPaths: ['/'] });
+        const testENPath = () => testPath('/EN/index.html', 200, 'Testing /EN/index.html', { expectedFinalPaths: ['/EN/index.html', '/EN/'] });
 
         // Auto-run on page load
         window.addEventListener('load', () => {

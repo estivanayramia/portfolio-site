@@ -16,6 +16,13 @@ const RUN_HTML = process.argv.includes('--html');
 const RUN_SITEMAP = process.argv.includes('--sitemap');
 const RUN_ALL = process.argv.includes('--all');
 
+const DEBUG = process.argv.includes('--debug') || process.env.FIX_SEO_DEBUG === '1';
+
+function dbg(...args) {
+    if (!DEBUG) return;
+    console.error('[fix-seo][debug]', ...args);
+}
+
 // CLI flags
 if (!RUN_REDIRECTS && !RUN_HTML && !RUN_SITEMAP && !RUN_ALL) {
     console.log('Usage: node tools/fix-seo.mjs [flags]');
@@ -24,6 +31,7 @@ if (!RUN_REDIRECTS && !RUN_HTML && !RUN_SITEMAP && !RUN_ALL) {
     console.log('  --html       Update HTML files (links, canonical, meta)');
     console.log('  --sitemap    Update sitemap.xml');
     console.log('  --all        Run all updates');
+    console.log('  --debug      Print debug diagnostics');
     process.exit(0);
 }
 
@@ -63,6 +71,12 @@ const localeFiles = localeDirs
 // Exclusions (canonical non-indexables)
 const enIndexableFiles = enHtmlFiles.filter((f) => f !== 'EN/404.html');
 
+dbg('rootDir:', rootDir);
+dbg('EN dir exists:', fs.existsSync(enDirAbsolute), 'path:', enDirAbsolute);
+dbg('enHtmlFiles:', enHtmlFiles.length);
+dbg('enIndexableFiles:', enIndexableFiles.length);
+dbg('localeFiles:', localeFiles);
+
 // Map EN files to canonical routes
 function mapToCanonicalRoute(filePath) {
     const normalized = filePath.replace(/\\/g, '/'); // Normalize to forward slashes
@@ -79,8 +93,10 @@ function mapToCanonicalRoute(filePath) {
     return '/' + normalized.replace('.html', '');
 }
 
-console.log('Indexable Files:', enIndexableFiles);
-console.log('Locale Files:', localeFiles);
+if (DEBUG) {
+    console.log('Indexable Files:', enIndexableFiles);
+    console.log('Locale Files:', localeFiles);
+}
 
 // 2. Fix _redirects
 function generateRedirects() {
@@ -92,6 +108,8 @@ function generateRedirects() {
     for (const enFile of enIndexableFiles) {
         canonicalToEnFile.set(mapToCanonicalRoute(enFile), enFile);
     }
+
+    dbg('generateRedirects: canonicalToEnFile size:', canonicalToEnFile.size);
 
     const generatedLines = [];
     // URL normalization (301) so /x and /x/ both resolve to the canonical route
@@ -123,8 +141,9 @@ function generateRedirects() {
             // Directory route: /hobbies/ -> /EN/hobbies/ (not /EN/hobbies/index.html)
             target = '/' + enFile.replace('/index.html', '/');
         } else {
-            // File route or root: use literal file path
-            target = '/' + enFile;
+            // File route: target the extensionless path to avoid Clean URL loops
+            // Cloudflare will handle /EN/foo -> /EN/foo.html via the second-pass rules below or natively
+            target = '/' + enFile.replace(/\.html$/, '');
         }
         generatedLines.push(`${canonical}    ${target}    200`);
     }
@@ -134,9 +153,19 @@ function generateRedirects() {
     for (const [canonical, enFile] of [...canonicalToEnFile.entries()].sort(([, a], [, b]) => a.localeCompare(b))) {
         // Skip redirection for /EN/index.html to avoid loops with Serve.json rewrites or root redirects
         if (enFile === 'EN/index.html') continue;
+        // Skip 404.html to avoid loop: /EN/404.html -> /404 -> catch-all -> /EN/404.html
+        if (enFile === 'EN/404.html') continue;
 
         const enUrlPath = '/' + enFile;
         generatedLines.push(`${enUrlPath}    ${canonical}    301`);
+
+        // Cloudflare Pages may canonicalize /EN/foo.html -> /EN/foo (308).
+        // Redirecting /EN/foo back to /foo creates an infinite loop for clean URL rewrites.
+        // Instead, serve /EN/foo by rewriting to the underlying /EN/foo.html.
+        if (!enFile.endsWith('/index.html')) {
+            const enNoExtPath = '/' + enFile.replace(/\.html$/, '');
+            generatedLines.push(`${enNoExtPath}    ${enUrlPath}    200`);
+        }
     }
 
     const headerLines = [
@@ -147,26 +176,73 @@ function generateRedirects() {
         // '/EN    /    301',
         // '/EN/   /    301',
         '',
+        '# Root is served by /index.html; no root rewrite (avoids /about -> /EN/about redirects)',
+        '',
         '# 1. Canonical Redirects (301) - Enforce clean URLs',
         '/index.html                  /                            301',
         '/es/index.html               /es/                         301',
         '/ar/index.html               /ar/                         301',
         '',
-        '# Locale rewrites',
-        '/es/                         /es/index.html               200',
-        '/ar/                         /ar/index.html               200',
-        '',
     ];
 
     const footerLines = [
         '',
-        '# 404 Fallback (Pages does not support 404 rewrites; use 200 proxy)',
-        '/404.html                    /EN/404.html                301',
-        '/*                           /EN/404.html                200',
+        '# Catch-all 404',
+        '/*    /EN/404.html    404',
         '',
     ];
 
     const updated = `${headerLines.join('\n')}\n${BEGIN}\n${generatedLines.join('\n')}\n${END}${footerLines.join('\n')}`;
+
+    if (DEBUG) {
+        /** @type {{from: string, to: string, status: string, raw: string}[]} */
+        const rules = [];
+        for (const line of updated.split(/\r?\n/)) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith('#')) continue;
+            const parts = trimmed.split(/\s+/);
+            if (parts.length < 3) continue;
+            const [from, to, status] = parts;
+            rules.push({ from, to, status, raw: trimmed });
+        }
+
+        const byStatus = new Map();
+        const byFrom = new Map();
+        for (const rule of rules) {
+            byStatus.set(rule.status, (byStatus.get(rule.status) || 0) + 1);
+            byFrom.set(rule.from, (byFrom.get(rule.from) || 0) + 1);
+        }
+
+        const duplicates = [...byFrom.entries()].filter(([, count]) => count > 1);
+        const selfRedirects = rules.filter((r) => r.from === r.to && r.status !== '200');
+        const selfAny = rules.filter((r) => r.from === r.to);
+
+        dbg('generateRedirects: rule count:', rules.length);
+        dbg('generateRedirects: counts by status:', Object.fromEntries([...byStatus.entries()].sort(([a], [b]) => a.localeCompare(b))));
+        if (duplicates.length) {
+            dbg('generateRedirects: duplicate FROM rules (order-sensitive):', duplicates);
+        }
+        if (selfAny.length) {
+            dbg('generateRedirects: self-mapping rules:', selfAny.map((r) => r.raw));
+        }
+        if (selfRedirects.length) {
+            dbg('generateRedirects: SELF-REDIRECT rules detected (likely loop):', selfRedirects.map((r) => r.raw));
+        }
+
+        const expectedDebug200 = rules.filter((r) => (r.from === '/redirect-debug' || r.from === '/redirect-debug.html'));
+        if (!expectedDebug200.length) {
+            dbg('generateRedirects: WARNING missing debug route rules for /redirect-debug(.html)');
+        } else {
+            for (const r of expectedDebug200) {
+                if (r.status !== '200') dbg('generateRedirects: WARNING debug route not 200:', r.raw);
+            }
+        }
+
+        const expected404 = rules.filter((r) => r.from === '/EN/404' || r.from === '/EN/404/' || r.from === '/EN/404.html' || r.from === '/404' || r.from === '/404.html');
+        for (const r of expected404) {
+            if (r.status !== '200') dbg('generateRedirects: WARNING 404 guard not 200:', r.raw);
+        }
+    }
 
     const existing = fs.existsSync(redirectsPath) ? fs.readFileSync(redirectsPath, 'utf8') : '';
     if (updated !== existing) {
@@ -184,6 +260,7 @@ function updateHtmlContent() {
     if (fs.existsSync(path.join(rootDir, en404))) extraFiles.push(en404);
 
     const filesToProcess = [...enIndexableFiles, ...extraFiles, ...localeFiles];
+    let updatedFileCount = 0;
 
     // Build canonical map for HTML normalization (directory routes)
     const canonicalToEnFile = new Map();
@@ -269,8 +346,11 @@ function updateHtmlContent() {
         if (content !== originalContent) {
             fs.writeFileSync(filePath, content);
             console.log(`Updated ${relativePath}`);
+            updatedFileCount++;
         }
     });
+
+    dbg('updateHtmlContent: processed files:', filesToProcess.length, 'updated:', updatedFileCount);
 }
 
 // 5. Update sitemap.xml
@@ -292,6 +372,7 @@ function updateSitemap() {
     }
 
     const urls = [...urlSet].sort((a, b) => a.localeCompare(b));
+    dbg('updateSitemap: url count:', urls.length);
 
     urls.forEach(url => {
         sitemap += `  <url>
