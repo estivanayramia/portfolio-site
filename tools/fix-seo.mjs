@@ -188,8 +188,7 @@ function generateRedirects() {
     const footerLines = [
         '',
         '# Catch-all 404',
-        '# Using /EN/404 allows Pages to find /EN/404.html without 308 loops',
-        '/*    /EN/404    404',
+        '/*    /EN/404.html    404',
         '',
     ];
 
