@@ -143,7 +143,7 @@ export function initDiagnosticsConsent() {
     const body = document.createElement("div");
     body.style.fontSize = "13px";
     body.style.color = "rgba(54,32,23,0.85)";
-    body.textContent = "If you opt in, the site captures errors and performance issues while you browse. Off by default.";
+    body.textContent = "Captures errors and performance data while you browse. Data stays local unless you enable uploads in settings.";
 
     text.appendChild(title);
     text.appendChild(body);
@@ -153,24 +153,6 @@ export function initDiagnosticsConsent() {
     controls.style.flexWrap = "wrap";
     controls.style.gap = "10px";
     controls.style.alignItems = "center";
-
-    const uploadWrap = document.createElement("label");
-    uploadWrap.style.display = "inline-flex";
-    uploadWrap.style.alignItems = "center";
-    uploadWrap.style.gap = "8px";
-    uploadWrap.style.fontSize = "13px";
-    uploadWrap.style.color = "#212842";
-    uploadWrap.style.userSelect = "none";
-
-    const upload = document.createElement("input");
-    upload.type = "checkbox";
-    upload.checked = false;
-
-    const uploadTxt = document.createElement("span");
-    uploadTxt.textContent = "Allow upload of issue reports";
-
-    uploadWrap.appendChild(upload);
-    uploadWrap.appendChild(uploadTxt);
 
     const btnEnable = document.createElement("button");
     btnEnable.type = "button";
@@ -199,7 +181,7 @@ export function initDiagnosticsConsent() {
     btnEnable.addEventListener("click", () => {
       setAsked();
       const ok1 = storage.set(KEYS.consent, "granted");
-      const ok2 = storage.set(KEYS.upload, upload.checked ? "on" : "off");
+      const ok2 = storage.set(KEYS.upload, "off"); // Upload OFF by default
 
       const rb = readConsent();
       const verified = ok1 && ok2 && rb === "granted";
@@ -214,8 +196,8 @@ export function initDiagnosticsConsent() {
       hideBanner(banner);
 
       const mode = (new URLSearchParams(location.search).get("debug") === "1") ? "dev" : "user";
-      tel.enable({ upload: upload.checked, mode });
-      tel.push({ kind: "consent", level: "info", msg: "consent.granted", data: { upload: upload.checked } });
+      tel.enable({ upload: false, mode });
+      tel.push({ kind: "consent", level: "info", msg: "consent.granted", data: { upload: false } });
     });
 
     btnNo.addEventListener("click", () => {
@@ -228,7 +210,6 @@ export function initDiagnosticsConsent() {
       toast("Diagnostics disabled");
     });
 
-    controls.appendChild(uploadWrap);
     controls.appendChild(btnEnable);
     controls.appendChild(btnNo);
 
