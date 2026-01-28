@@ -27,6 +27,10 @@ lighthouse-results/
 # Local server logs
 tmp-serve*.log
 
+# Playwright output (local test artifacts)
+playwright-report/
+test-results/
+
 
 
 # Restore tool artifacts

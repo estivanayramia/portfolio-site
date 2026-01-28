@@ -101,6 +101,7 @@
 
   let activeTab = "Summary";
   let lastActiveEl = null;
+  let layoutScanResults = null;
 
   // ============================================
   // FIX #1: USE EVENT DELEGATION ON PANEL ROOT
@@ -183,8 +184,8 @@
         break;
 
       case "run-layout-scan":
-        const results = runLayoutScan();
-        showLayoutResults(results);
+        layoutScanResults = runLayoutScan();
+        render();
         break;
     }
   });
@@ -432,6 +433,14 @@
     card.appendChild(row);
 
     wrap.appendChild(card);
+
+    if (layoutScanResults) {
+      const resultsCard = el("div", { class: "savonie-card" });
+      const pre = el("div", { class: "savonie-mono" });
+      pre.textContent = JSON.stringify(layoutScanResults, null, 2);
+      resultsCard.appendChild(pre);
+      wrap.appendChild(resultsCard);
+    }
     return wrap;
   }
 
@@ -461,11 +470,8 @@
   }
 
   function showLayoutResults(results) {
-    const card = el("div", { class: "savonie-card" });
-    const pre = el("div", { class: "savonie-mono" });
-    pre.textContent = JSON.stringify(results, null, 2);
-    card.appendChild(pre);
-    body.appendChild(card);
+    layoutScanResults = results;
+    render();
   }
 
   function renderStorage() {
