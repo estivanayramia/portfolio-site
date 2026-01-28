@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 // Service Worker Configuration
 // ==========================================================================
 // Caching Strategy:
@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v20260126-2';
+const CACHE_VERSION = 'v20260127-012110';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -129,4 +129,5 @@ self.addEventListener('fetch', (event) => {
             })
     );
 });
+
 

@@ -1,81 +1,81 @@
 {
-    "name": "portfolio-site",
-    "version": "2.0.0",
-    "description": "Estivan Ayramia's portfolio site with PWA support",
-    "scripts": {
-        "build:sw": "node tools/stamp-sw-version.mjs",
-        "build:facts": "node scripts/generate-site-facts.js",
-        "build:css": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --minify",
-        "build:theme": "node scripts/build-theme.cjs",
-        "build:js": "esbuild assets/js/site.js --bundle --minify --platform=browser --format=iife --target=es2018 --outfile=assets/js/site.min.js",
-        "build:lazy": "esbuild assets/js/lazy-loader.js --minify --outfile=assets/js/lazy-loader.min.js",
-        "build:debugger": "esbuild assets/js/debugger.js --minify --outfile=assets/js/debugger.min.js",
-        "build:error-reporting": "esbuild assets/js/error-reporting.js --minify --outfile=assets/js/error-reporting.min.js",
-        "upload:facts": "node scripts/upload-site-facts.mjs",
-        "verify:pages": "node tools/verify-pages-output.mjs",
-        "sync:index": "node tools/sync-root-index.mjs",
-        "route:smoke": "node scripts/route-smoke.mjs",
-        "perf:budget": "node scripts/perf-budget.mjs",
-        "anim:jank": "node scripts/animation-sanity.mjs --jank",
-        "build": "npm run build:facts && npm run build:css && npm run build:js && npm run build:lazy && npm run build:debugger && npm run build:error-reporting && npm run upload:facts && npm run verify:pages",
-        "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
-        "start": "node scripts/local-serve.js",
-        "setup:hooks": "node tools/install-git-hooks.mjs",
-        "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push",
-        "ship:force": "npm run build && git add -A && git commit --allow-empty -m \"deploy: force update\" && git push",
-        "dev:worker": "cd worker && npx wrangler dev",
-        "deploy:worker": "cd worker && npx wrangler deploy",
-        "test:facts": "node scripts/test-chat-grounding.js",
-        "test:intents": "node tools/test-intents.mjs",
-        "check:banned": "node scripts/check-banned-patterns.mjs",
-        "apply:versioning": "node tools/apply-versioning.mjs",
-        "verify:versioning": "node tools/verify-versioning.mjs",
-        "check:cache": "node tools/cache-policy-check.mjs --headers _headers",
-        "audit:inline-css": "node tools/audit-inline-css.mjs",
-        "audit:css-sync": "node tools/audit-css-sync.mjs",
-        "audit:cf-files": "node tools/audit-cf-files.mjs",
-        "audit:secrets": "node tools/audit-secrets.mjs",
-        "audit:sw-version": "node tools/audit-sw-version.mjs",
-        "audit": "npm run audit:secrets && npm run audit:cf-files && npm run audit:inline-css && npm run audit:css-sync && npm run audit:sw-version"
-    },
-    "keywords": [
-        "portfolio",
-        "pwa",
-        "progressive-web-app"
-    ],
-    "author": "Estivan Ayramia",
-    "license": "MIT",
-    "devDependencies": {
-        "autoprefixer": "^10.4.22",
-        "cross-env": "^10.1.0",
-        "esbuild": "^0.27.2",
-        "lighthouse": "^13.0.1",
-        "lightningcss": "^1.30.2",
-        "pixelmatch": "^7.1.0",
-        "playwright": "^1.57.0",
-        "pngjs": "^7.0.0",
-        "postcss": "^8.5.6",
-        "puppeteer": "^24.36.0",
-        "serve": "^14.2.5",
-        "tailwindcss": "^3.4.17",
-        "terser": "^5.46.0",
-        "wrangler": "^4.60.0"
-    },
-    "main": "postcss.config.js",
-    "directories": {
-        "doc": "docs"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/estivanayramia/portfolio-site.git"
-    },
-    "type": "commonjs",
-    "bugs": {
-        "url": "https://github.com/estivanayramia/portfolio-site/issues"
-    },
-    "homepage": "https://github.com/estivanayramia/portfolio-site#readme",
-    "dependencies": {
-        "gsap": "^3.14.2",
-        "marked": "^17.0.1"
-    }
+  "name": "portfolio-site",
+  "version": "2.0.0",
+  "description": "Estivan Ayramia's portfolio site with PWA support",
+  "scripts": {
+    "build:sw": "node tools/stamp-sw-version.mjs",
+    "build:facts": "node scripts/generate-site-facts.js",
+    "build:css": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --minify",
+    "build:theme": "node scripts/build-theme.cjs",
+    "build:js": "esbuild assets/js/site.js --bundle --minify --platform=browser --format=iife --target=es2018 --outfile=assets/js/site.min.js",
+    "build:lazy": "esbuild assets/js/lazy-loader.js --minify --outfile=assets/js/lazy-loader.min.js",
+    "build:debugger": "esbuild assets/js/debugger.js --minify --outfile=assets/js/debugger.min.js",
+    "build:error-reporting": "esbuild assets/js/error-reporting.js --minify --outfile=assets/js/error-reporting.min.js",
+    "upload:facts": "node scripts/upload-site-facts.mjs",
+    "verify:pages": "node tools/verify-pages-output.mjs",
+    "sync:index": "node tools/sync-root-index.mjs",
+    "route:smoke": "node scripts/route-smoke.mjs",
+    "perf:budget": "node scripts/perf-budget.mjs",
+    "anim:jank": "node scripts/animation-sanity.mjs --jank",
+    "build": "npm run build:facts && npm run build:css && npm run build:js && npm run build:lazy && npm run build:debugger && npm run build:error-reporting && npm run upload:facts && npm run verify:pages",
+    "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
+    "start": "node scripts/local-serve.js",
+    "setup:hooks": "node tools/install-git-hooks.mjs",
+    "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push",
+    "ship:force": "npm run build && git add -A && git commit --allow-empty -m \"deploy: force update\" && git push",
+    "dev:worker": "cd worker && npx wrangler dev",
+    "deploy:worker": "cd worker && npx wrangler deploy",
+    "test:facts": "node scripts/test-chat-grounding.js",
+    "test:intents": "node tools/test-intents.mjs",
+    "check:banned": "node scripts/check-banned-patterns.mjs",
+    "apply:versioning": "node tools/apply-versioning.mjs",
+    "verify:versioning": "node tools/verify-versioning.mjs",
+    "check:cache": "node tools/cache-policy-check.mjs --headers _headers",
+    "audit:inline-css": "node tools/audit-inline-css.mjs",
+    "audit:css-sync": "node tools/audit-css-sync.mjs",
+    "audit:cf-files": "node tools/audit-cf-files.mjs",
+    "audit:secrets": "node tools/audit-secrets.mjs",
+    "audit:sw-version": "node tools/audit-sw-version.mjs",
+    "audit": "npm run audit:secrets && npm run audit:cf-files && npm run audit:inline-css && npm run audit:css-sync && npm run audit:sw-version"
+  },
+  "keywords": [
+    "portfolio",
+    "pwa",
+    "progressive-web-app"
+  ],
+  "author": "Estivan Ayramia",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^10.4.22",
+    "cross-env": "^10.1.0",
+    "esbuild": "^0.27.2",
+    "lighthouse": "^13.0.1",
+    "lightningcss": "^1.30.2",
+    "pixelmatch": "^7.1.0",
+    "playwright": "^1.57.0",
+    "pngjs": "^7.0.0",
+    "postcss": "^8.5.6",
+    "puppeteer": "^24.36.0",
+    "serve": "^14.2.5",
+    "tailwindcss": "^3.4.17",
+    "terser": "^5.46.0",
+    "wrangler": "^4.60.0"
+  },
+  "main": "postcss.config.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/estivanayramia/portfolio-site.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/estivanayramia/portfolio-site/issues"
+  },
+  "homepage": "https://github.com/estivanayramia/portfolio-site#readme",
+  "dependencies": {
+    "gsap": "^3.14.2",
+    "marked": "^17.0.1"
+  }
 }
