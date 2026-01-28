@@ -196,8 +196,9 @@
                 // Cloudflare Pages commonly canonicalizes index.html to the directory.
                 { path: '/EN/index.html', expected: 200, desc: 'Direct EN/index.html (canonicalizes to /EN/)', expectedFinalPaths: ['/EN/index.html', '/EN/'] },
                 { path: '/index.html', expected: 200, desc: 'Root index.html (should canonicalize to /)', expectedFinalPaths: ['/', '/index.html'] },
-                { path: '/about', expected: 200, desc: 'About page (clean URL)', expectedFinalPaths: ['/about'] },
-                { path: '/EN/about.html', expected: 200, desc: 'Direct EN/about.html (should canonicalize to /about)', expectedFinalPaths: ['/about', '/EN/about.html'] },
+                // Cloudflare Pages may expose /EN/* after clean-URL canonicalization of the rewritten target.
+                { path: '/about', expected: 200, desc: 'About page (clean URL; may resolve to /EN/about)', expectedFinalPaths: ['/about', '/EN/about'] },
+                { path: '/EN/about.html', expected: 200, desc: 'Direct EN/about.html (may resolve to /EN/about via /about)', expectedFinalPaths: ['/about', '/EN/about', '/EN/about.html'] },
                 // With clean URLs, /redirect-debug.html may canonicalize to /redirect-debug.
                 { path: '/redirect-debug.html', expected: 200, desc: 'Redirect debugger page (must be reachable)', expectedFinalPaths: ['/redirect-debug.html', '/redirect-debug'] },
                 // Prefer native 404 behavior; warn if a 200 homepage is served instead.
