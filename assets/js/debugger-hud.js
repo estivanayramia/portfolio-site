@@ -1,4 +1,4 @@
-/* assets/js/debugger-hud.js */
+/* assets/js/debugger-hud.js - FIXED VERSION with Event Delegation */
 (function () {
   if (window.__SavonieHUD && window.__SavonieHUD.open) {
     window.__SavonieHUD.open();
@@ -48,8 +48,7 @@
 
   const backdrop = document.createElement("div");
   backdrop.className = "savonie-backdrop";
-  backdrop.addEventListener("click", close);
-
+  
   const panel = document.createElement("div");
   panel.className = "savonie-panel";
   panel.setAttribute("role", "dialog");
@@ -74,7 +73,7 @@
   btnClose.className = "savonie-btn secondary";
   btnClose.type = "button";
   btnClose.textContent = "Close";
-  btnClose.addEventListener("click", close);
+  btnClose.dataset.action = "close";
 
   headerBtns.appendChild(btnClose);
   header.appendChild(title);
@@ -103,15 +102,129 @@
   let activeTab = "Summary";
   let lastActiveEl = null;
 
+  // ============================================
+  // FIX #1: USE EVENT DELEGATION ON PANEL ROOT
+  // ============================================
+  panel.addEventListener("click", (e) => {
+    const target = e.target.closest("button");
+    if (!target) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Handle close button
+    if (target.dataset.action === "close") {
+      close();
+      return;
+    }
+
+    // Handle tab clicks
+    if (target.classList.contains("savonie-tab")) {
+      const tabName = target.textContent.trim();
+      if (TAB_NAMES.includes(tabName)) {
+        activeTab = tabName;
+        render();
+      }
+      return;
+    }
+
+    // Handle action buttons in body
+    const action = target.dataset.action;
+    if (!action) return;
+
+    const st = tel.getState();
+    const c = consent ? consent.get() : { consent: null, upload: false };
+
+    switch (action) {
+      case "export":
+        try {
+          const data = tel.export({ includeAll: false });
+          navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+          showToast("Copied to clipboard");
+        } catch (err) {
+          console.error("Export failed:", err);
+        }
+        break;
+
+      case "toggle-upload":
+        if (consent) {
+          consent.set({ upload: !c.upload });
+          const fresh = consent.get();
+          if (fresh.consent === "granted") {
+            tel.enable({ upload: fresh.upload, mode: "dev" });
+          }
+          render();
+        }
+        break;
+
+      case "disable":
+        if (consent) consent.revoke();
+        render();
+        break;
+
+      case "clear":
+        if (consent) consent.clearData();
+        render();
+        break;
+
+      case "copy-issue":
+        try {
+          const issueIdx = parseInt(target.dataset.issueIndex, 10);
+          const issues = st.issues || [];
+          if (issueIdx >= 0 && issueIdx < issues.length) {
+            const issue = issues[issueIdx];
+            const report = { schema: "savonie.issue.v1", issue, ctx: tel.export({ includeAll: false }).ctx };
+            navigator.clipboard.writeText(JSON.stringify(report, null, 2));
+            showToast("Issue copied");
+          }
+        } catch (err) {
+          console.error("Copy issue failed:", err);
+        }
+        break;
+
+      case "run-layout-scan":
+        const results = runLayoutScan();
+        showLayoutResults(results);
+        break;
+    }
+  });
+
+  backdrop.addEventListener("click", (e) => {
+    if (e.target === backdrop) close();
+  });
+
+  function showToast(message) {
+    const toast = document.createElement("div");
+    toast.style.cssText = `
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      background: rgba(33,40,66,0.95);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      z-index: 999999;
+      font-size: 13px;
+      pointer-events: none;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+  }
+
+  // ============================================
+  // FIX #2: RENDER USES DATA ATTRIBUTES
+  // ============================================
   function el(tag, props = {}) {
     const n = document.createElement(tag);
-    if (tag === "button" && !(props && Object.prototype.hasOwnProperty.call(props, "type"))) {
-      try { n.type = "button"; } catch {}
+    if (tag === "button" && !("type" in props)) {
+      n.type = "button";
     }
     for (const [k, v] of Object.entries(props)) {
       if (k === "text") n.textContent = v;
       else if (k === "class") n.className = v;
-      else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2).toLowerCase(), v);
+      else if (k.startsWith("data-")) n.setAttribute(k, v);
       else n.setAttribute(k, v);
     }
     return n;
@@ -122,21 +235,12 @@
     for (const name of TAB_NAMES) {
       const b = el("button", {
         class: "savonie-tab",
+        type: "button",
         role: "tab",
         "aria-selected": name === activeTab ? "true" : "false",
-        text: name,
-        onclick: () => { activeTab = name; render(); }
+        text: name
       });
       tabs.appendChild(b);
-    }
-  }
-
-  function copy(text) {
-    try {
-      navigator.clipboard.writeText(text);
-      return true;
-    } catch {
-      return false;
     }
   }
 
@@ -171,51 +275,33 @@
     const actions = el("div", { class: "savonie-card" });
     const row = el("div", { class: "savonie-row" });
 
-    const toggleUpload = el("button", {
-      class: "savonie-btn secondary",
-      text: c.upload ? "Turn upload off" : "Turn upload on",
-      onclick: () => {
-        if (!consent) return;
-        consent.set({ upload: !c.upload });
-        const fresh = consent.get();
-        if (fresh.consent === "granted") {
-          tel.enable({ upload: fresh.upload, mode: "dev" });
-        }
-        render();
-      }
-    });
-
-    const disable = el("button", {
-      class: "savonie-btn secondary",
-      text: "Disable diagnostics",
-      onclick: () => {
-        if (consent) consent.revoke();
-        render();
-      }
-    });
-
-    const clear = el("button", {
-      class: "savonie-btn secondary",
-      text: "Delete diagnostics data",
-      onclick: () => {
-        if (consent) consent.clearData();
-        render();
-      }
-    });
-
-    const exportBtn = el("button", {
+    row.appendChild(el("button", {
       class: "savonie-btn",
-      text: "Copy export JSON",
-      onclick: () => {
-        const data = tel.export({ includeAll: false });
-        copy(JSON.stringify(data, null, 2));
-      }
-    });
+      type: "button",
+      "data-action": "export",
+      text: "Copy export JSON"
+    }));
 
-    row.appendChild(exportBtn);
-    row.appendChild(toggleUpload);
-    row.appendChild(disable);
-    row.appendChild(clear);
+    row.appendChild(el("button", {
+      class: "savonie-btn secondary",
+      type: "button",
+      "data-action": "toggle-upload",
+      text: c.upload ? "Turn upload off" : "Turn upload on"
+    }));
+
+    row.appendChild(el("button", {
+      class: "savonie-btn secondary",
+      type: "button",
+      "data-action": "disable",
+      text: "Disable diagnostics"
+    }));
+
+    row.appendChild(el("button", {
+      class: "savonie-btn secondary",
+      type: "button",
+      "data-action": "clear",
+      text: "Delete diagnostics data"
+    }));
 
     actions.appendChild(row);
 
@@ -233,7 +319,7 @@
       return wrap;
     }
 
-    for (const it of issues) {
+    issues.forEach((it, idx) => {
       const card = el("div", { class: "savonie-card" });
       const top = el("div", { class: "savonie-row" });
 
@@ -245,18 +331,13 @@
       msg.textContent = `${it.msg}\n${it.url}\n${it.signature}`;
 
       const btnRow = el("div", { class: "savonie-row" });
-      const btnCopy = el("button", {
+      btnRow.appendChild(el("button", {
         class: "savonie-btn",
-        text: "Copy issue report",
-        onclick: () => {
-          const report = {
-            issue: it,
-            ctx: tel.export({ includeAll: false }).ctx
-          };
-          copy(JSON.stringify(report, null, 2));
-        }
-      });
-      btnRow.appendChild(btnCopy);
+        type: "button",
+        "data-action": "copy-issue",
+        "data-issue-index": String(idx),
+        text: "Copy issue report"
+      }));
 
       card.appendChild(top);
       card.appendChild(msg);
@@ -269,7 +350,7 @@
 
       card.appendChild(btnRow);
       wrap.appendChild(card);
-    }
+    });
 
     return wrap;
   }
@@ -286,7 +367,6 @@
     for (const e of events) {
       const card = el("div", { class: "savonie-card" });
       const d = e.data || {};
-      card.appendChild(el("div", { class: "savonie-row" }));
       card.appendChild(el("div", { class: "savonie-mono", text: `${d.method || ""} ${d.url || ""}\nstatus ${d.status}  dur ${d.dur}ms` }));
       wrap.appendChild(card);
     }
@@ -341,57 +421,51 @@
     const wrap = el("div", { class: "savonie-list" });
     const card = el("div", { class: "savonie-card" });
 
-    const btn = el("button", {
-      class: "savonie-btn",
-      text: "Run scan",
-      onclick: () => {
-        const results = runLayoutScan();
-        showLayoutResults(wrap, results);
-      }
-    });
-
     card.appendChild(el("div", { text: "On-demand scan only. No continuous DOM scanning." }));
-    card.appendChild(el("div", { class: "savonie-row" }));
-    card.appendChild(btn);
+    const row = el("div", { class: "savonie-row" });
+    row.appendChild(el("button", {
+      class: "savonie-btn",
+      type: "button",
+      "data-action": "run-layout-scan",
+      text: "Run scan"
+    }));
+    card.appendChild(row);
 
     wrap.appendChild(card);
     return wrap;
   }
 
   function runLayoutScan() {
-    const results = [];
+    const results = { scannedAt: Date.now(), tinyTargets: [], overflows: [] };
 
-    // Small tap targets
     const interactive = document.querySelectorAll("a,button,[role='button'],input,select,textarea");
     for (const n of interactive) {
       const r = n.getBoundingClientRect();
       if (r.width > 0 && r.height > 0 && (r.width < 44 || r.height < 44)) {
-        results.push({ type: "tiny_tap_target", tag: n.tagName, w: Math.round(r.width), h: Math.round(r.height) });
+        results.tinyTargets.push({ tag: n.tagName, w: Math.round(r.width), h: Math.round(r.height) });
+        if (results.tinyTargets.length >= 20) break;
       }
     }
 
-    // Overflow culprits
     const all = document.querySelectorAll("body *");
     for (let i = 0; i < Math.min(all.length, 1500); i++) {
       const n = all[i];
       const r = n.getBoundingClientRect();
       if (r.right > window.innerWidth + 1) {
-        results.push({ type: "overflow_x", tag: n.tagName, right: Math.round(r.right), vw: window.innerWidth });
+        results.overflows.push({ tag: n.tagName, right: Math.round(r.right), vw: window.innerWidth });
+        if (results.overflows.length >= 20) break;
       }
     }
 
-    return results.slice(0, 100);
+    return results;
   }
 
-  function showLayoutResults(wrap, results) {
-    const out = el("div", { class: "savonie-card" });
-    out.appendChild(el("div", { class: "savonie-title", text: `Results (${results.length})` }));
-
+  function showLayoutResults(results) {
+    const card = el("div", { class: "savonie-card" });
     const pre = el("div", { class: "savonie-mono" });
     pre.textContent = JSON.stringify(results, null, 2);
-
-    out.appendChild(pre);
-    wrap.appendChild(out);
+    card.appendChild(pre);
+    body.appendChild(card);
   }
 
   function renderStorage() {
@@ -484,7 +558,6 @@
     if (ev.key === "Escape") close();
   }
 
-  // Subscribe for live updates without duplicating buffers.
   let raf = 0;
   tel.subscribe(() => {
     if (!panel.isConnected) return;
