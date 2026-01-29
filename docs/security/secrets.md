@@ -14,13 +14,12 @@ Supported options:
 Notes:
 
 - `DASHBOARD_PASSWORD_HASH` also accepts plain text for transitional setups, but prefer sha256 hex.
-- The placeholder `__SET_VIA_CLOUDFLARE_SECRETS__` is expected in repo config and must be replaced
-  by a real secret in Cloudflare for both Preview and Production deployments.
+- Secrets must be configured in Cloudflare (they are not stored in git).
 
 Wrangler CLI (recommended):
 
-- `wrangler secret put DASHBOARD_PASSWORD`
-- or `wrangler secret put DASHBOARD_PASSWORD_HASH`
+- `cd worker && npx wrangler secret put DASHBOARD_PASSWORD --config wrangler.debugger.toml`
+- or `cd worker && npx wrangler secret put DASHBOARD_PASSWORD_HASH --config wrangler.debugger.toml`
 
 Cloudflare Dashboard:
 
@@ -49,6 +48,6 @@ Use this checklist whenever dashboard login shows “server_not_configured” or
   - **Backend Health** = OK
   - **Auth Configured** = Yes
 
-Keep `worker/wrangler.toml` set to the placeholder value:
+To avoid accidental route mixing, always deploy the debugger worker with:
 
-- `__SET_VIA_CLOUDFLARE_SECRETS__`
+- `npx wrangler deploy --config worker/wrangler.debugger.toml`

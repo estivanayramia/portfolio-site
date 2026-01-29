@@ -1,0 +1,56 @@
+name = "portfolio-worker"
+main = "debugger-worker.js"
+compatibility_date = "2024-01-01"
+workers_dev = true
+
+# Debugger/ingestion worker owns ONLY these endpoints.
+# IMPORTANT: do not add broad patterns like /api/* here.
+routes = [
+  { pattern = "estivanayramia.com/api/error-report", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/error-report", zone_name = "estivanayramia.com" },
+
+  { pattern = "estivanayramia.com/api/errors*", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/errors*", zone_name = "estivanayramia.com" },
+
+  { pattern = "estivanayramia.com/api/auth", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/auth", zone_name = "estivanayramia.com" },
+
+  { pattern = "estivanayramia.com/api/health", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/health", zone_name = "estivanayramia.com" },
+
+  { pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/health", zone_name = "estivanayramia.com" }
+]
+
+# D1 Database for error monitoring
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-errors"
+database_id = "90a1df04-e5b9-48b9-90f4-02e3fb773ca8"
+
+# KV storage for sessions + rate limiting
+[[kv_namespaces]]
+binding = "SAVONIE_KV"
+id = "e723b1dbdc9a40a6b6ccd04764108d6c"
+
+[vars]
+# Used for diagnostics/identification when debugging.
+SERVICE_NAME = "portfolio-worker"
+
+# Rate limiting for auth + ingestion + session
+RATE_LIMIT_MAX = "10"
+RATE_LIMIT_WINDOW = "60000"
+
+# Secrets (set via Cloudflare dashboard or `wrangler secret put ... --config ...`):
+# - DASHBOARD_PASSWORD (plain) OR DASHBOARD_PASSWORD_HASH (sha256 hex or plain)
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 1
+persist = true

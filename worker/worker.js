@@ -767,6 +767,7 @@ export default {
       // Load facts eagerly only for health/chat
       const siteFacts = await getSiteFacts(env); 
       const hasKey = !!(env.GEMINI_API_KEY && env.GEMINI_API_KEY.length > 10);
+      const serviceName = typeof env.SERVICE_NAME === "string" ? env.SERVICE_NAME : "unknown";
       const normalizeSecret = (v) => {
         if (typeof v !== "string") return "";
         const s = v.trim();
@@ -792,6 +793,7 @@ export default {
       return jsonReply(
         {
           ok: true,
+          service: serviceName,
           version: VERSION_TAG,
           hasKey,
           kv: !!env.SAVONIE_KV,

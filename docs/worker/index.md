@@ -4,18 +4,27 @@ Cloudflare Worker that powers the Savonie chat widget used on the portfolio site
 
 ## Configuration
 
-- Required secret: `GEMINI_API_KEY`
-- Optional binding: `RATE_LIMITER`
+This repo deploys two Workers:
 
-Set secrets via Cloudflare dashboard, or via Wrangler:
+- `portfolio-chat` (chat only)
+  - Required secret: `GEMINI_API_KEY`
+  - Optional KV (site facts): `SAVONIE_KV`
+- `portfolio-worker` (debugger/error ingestion + dashboard auth + health)
+  - Required secret: `DASHBOARD_PASSWORD` (plain) OR `DASHBOARD_PASSWORD_HASH` (sha256 hex)
+  - Required bindings: `DB` (D1) and `SAVONIE_KV` (sessions/rate limit)
 
-- `cd worker && npx wrangler secret put GEMINI_API_KEY`
+Set secrets via Cloudflare dashboard, or via Wrangler (recommended):
 
-## Development
+- `cd worker && npx wrangler secret put GEMINI_API_KEY --config wrangler.chat.toml`
+- `cd worker && npx wrangler secret put DASHBOARD_PASSWORD --config wrangler.debugger.toml`
 
-- `cd worker && npx wrangler dev`
+## Local development
 
-## Deploy
+- Chat worker: `cd worker && npx wrangler dev --config wrangler.chat.toml`
+- Debugger worker: `cd worker && npx wrangler dev --config wrangler.debugger.toml`
 
-- `cd worker && npx wrangler deploy`
+## Deployment
+
+- Chat worker: `cd worker && npx wrangler deploy --config wrangler.chat.toml`
+- Debugger worker: `cd worker && npx wrangler deploy --config wrangler.debugger.toml`
 

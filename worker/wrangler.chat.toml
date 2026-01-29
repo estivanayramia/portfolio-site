@@ -1,0 +1,39 @@
+name = "portfolio-chat"
+main = "chat-worker.js"
+compatibility_date = "2024-01-01"
+workers_dev = true
+
+# Chat worker owns ONLY the chat endpoints.
+# IMPORTANT: do not add broad patterns like /api/* here.
+routes = [
+  { pattern = "estivanayramia.com/api/chat", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/chat", zone_name = "estivanayramia.com" },
+
+  # Optional: friendly alias for chat
+  { pattern = "estivanayramia.com/chat", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/chat", zone_name = "estivanayramia.com" }
+]
+
+[vars]
+# Used for diagnostics/identification when debugging.
+SERVICE_NAME = "portfolio-chat"
+
+# Secrets (set via Cloudflare dashboard or `wrangler secret put ... --config ...`):
+# - GEMINI_API_KEY
+
+# KV is used to store site-facts (site-facts:v1). If you decide you don't want
+# KV-backed facts, you can remove this binding and the worker will fall back.
+[[kv_namespaces]]
+binding = "SAVONIE_KV"
+id = "e723b1dbdc9a40a6b6ccd04764108d6c"
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 1
+persist = true

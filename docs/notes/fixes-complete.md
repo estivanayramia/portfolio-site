@@ -341,10 +341,10 @@ npm run build
 ### Worker Deploy
 ```bash
 cd worker
-wrangler deploy
+wrangler deploy --config wrangler.chat.toml
 
 # Automatically uses:
-# - wrangler.toml configuration
+# - explicit config (no auto-discovery)
 # - KV binding: SAVONIE_KV
 # - Environment variables
 ```

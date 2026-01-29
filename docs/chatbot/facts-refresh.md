@@ -44,10 +44,10 @@ npx wrangler kv key put --remote --binding SAVONIE_KV site-facts:v1 --path ../as
 ## Verify the worker is reading KV (not fallback)
 
 1. Deploy the worker (if needed):
-   - npm run deploy:worker
+   - npm run deploy:chat-worker
 
 2. Hit the health endpoint:
-   - <https://www.estivanayramia.com/health>
+   - <https://www.estivanayramia.com/api/health>
 
 Expected:
 

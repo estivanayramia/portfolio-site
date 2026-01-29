@@ -74,16 +74,13 @@ The upgrade addresses "AI service is busy" failures by:
 # Navigate to project root
 cd c:\Users\estiv\portfolio-site
 
-# Deploy worker (requires wrangler CLI)
-cd worker
-wrangler publish
-
-# Or if using wrangler.toml in root:
-wrangler publish worker/worker.js
+# Deploy chat worker (requires wrangler CLI)
+npx wrangler deploy --config worker/wrangler.chat.toml
 ```
 
 **Expected Output:**
-```
+
+```text
 ✨ Successfully published your script to
  https://portfolio-chat.eayramia.workers.dev
 ```
@@ -111,6 +108,7 @@ Run the test script:
 ```
 
 **Expected Results:**
+
 - ✅ Health check returns version and `hasKey: true`
 - ✅ Normal requests succeed with `errorType: null`
 - ✅ Empty message returns 400 BadRequest
@@ -166,6 +164,7 @@ curl -X POST https://portfolio-chat.eayramia.workers.dev/chat \
 ### Test Error Scenarios
 
 **Simulate Timeout** (if Gemini is slow):
+
 ```bash
 curl -X POST https://portfolio-chat.eayramia.workers.dev/chat \
   -H "Content-Type: application/json" \
@@ -175,6 +174,7 @@ curl -X POST https://portfolio-chat.eayramia.workers.dev/chat \
 **Expected**: HTTP 504 with `errorType: "Timeout"`
 
 **Simulate Rate Limit**:
+
 ```bash
 # Send 25 requests rapidly
 for i in {1..25}; do
@@ -188,6 +188,7 @@ wait
 **Expected**: HTTP 429 or response with `errorType: "RateLimit"`
 
 **Test BadRequest**:
+
 ```bash
 curl -X POST https://portfolio-chat.eayramia.workers.dev/chat \
   -H "Content-Type: application/json" \
@@ -199,13 +200,15 @@ curl -X POST https://portfolio-chat.eayramia.workers.dev/chat \
 ## 📊 Monitoring
 
 ### Headers to Check
+
 - `X-Savonie-Version`: Should match `VERSION_TAG` in worker.js
 - `Retry-After`: Present on 503 responses for rate limiting
 - `Access-Control-Allow-Origin`: Present for CORS
 
 ### Error Types
+
 | errorType | HTTP Status | Meaning | User Action |
-|-----------|-------------|---------|-------------|
+| --- | --- | --- | --- |
 | `null` | 200 | Success | Normal response |
 | `RateLimit` | 429 | Too many requests | Wait 60s |
 | `BadRequest` | 400 | Invalid input | Fix input |
@@ -220,6 +223,7 @@ curl -X POST https://portfolio-chat.eayramia.workers.dev/chat \
 ### Issue: "AI service is busy" still appears
 
 **Check:**
+
 1. Verify worker deployed: `curl https://portfolio-chat.eayramia.workers.dev/health`
 2. Check version header matches latest
 3. Enable debug mode: `?debug=1`
@@ -228,6 +232,7 @@ curl -X POST https://portfolio-chat.eayramia.workers.dev/chat \
 ### Issue: Frontend not updated
 
 **Check:**
+
 1. Hard refresh browser (Ctrl+Shift+R)
 2. Check network tab for `site.min.js` cache headers
 3. Verify Netlify deployment completed
@@ -236,6 +241,7 @@ curl -X POST https://portfolio-chat.eayramia.workers.dev/chat \
 ### Issue: Rate limiting too aggressive
 
 **Adjust:**
+
 ```javascript
 // In worker.js, line ~12
 const RATE_LIMIT_MAX = 20; // Increase this value
@@ -245,6 +251,7 @@ const RATE_LIMIT_WINDOW = 60000; // Or increase window
 ### Issue: Timeouts occurring frequently
 
 **Adjust:**
+
 ```javascript
 // In worker.js, line ~8
 const GEMINI_TIMEOUT = 35000; // Increase timeout (ms)
@@ -253,12 +260,14 @@ const GEMINI_TIMEOUT = 35000; // Increase timeout (ms)
 ## 📈 Success Metrics
 
 **Before:**
+
 - ❌ "AI service is busy" errors with HTTP 200
 - ❌ No retry logic
 - ❌ No diagnostic tools
 - ❌ Poor error messages
 
 **After:**
+
 - ✅ Proper HTTP status codes
 - ✅ Exponential backoff retry (3 attempts)
 - ✅ Health check + debug mode
@@ -268,9 +277,9 @@ const GEMINI_TIMEOUT = 35000; // Increase timeout (ms)
 
 ## 🔗 Resources
 
-- Worker URL: https://portfolio-chat.eayramia.workers.dev
-- Health Check: https://portfolio-chat.eayramia.workers.dev/health
-- Frontend: https://estivanayramia.com
+- Worker URL: <https://portfolio-chat.eayramia.workers.dev>
+- Health Check: <https://portfolio-chat.eayramia.workers.dev/health>
+- Frontend: <https://estivanayramia.com>
 - Test Script: `test-chat-errors.ps1`
 
 ## 📝 Version History

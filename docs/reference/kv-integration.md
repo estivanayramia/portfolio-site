@@ -1,11 +1,14 @@
 # KV Integration Complete ✅
 
 ## Overview
-The Cloudflare Worker now reads site facts from KV storage instead of embedded JSON, ensuring chatbot responses stay grounded in actual site content.
+
+The Cloudflare Worker now reads site facts from KV storage instead of embedded JSON,
+ensuring chatbot responses stay grounded in actual site content.
 
 ## Changes Made
 
 ### 1. Worker Modification (`worker/worker.js`)
+
 - **Removed**: 106-line embedded `siteFacts` constant
 - **Added**: `getSiteFacts(env)` async function that:
   - Fetches `site-facts:v1` from KV namespace `SAVONIE_KV`
@@ -17,8 +20,10 @@ The Cloudflare Worker now reads site facts from KV storage instead of embedded J
 - **Updated**: `buildChips(lowerMsg, siteFacts)` now accepts siteFacts parameter
 - **Updated**: All 5 buildChips() call sites to pass siteFacts
 
-### 2. Wrangler Configuration (`worker/wrangler.toml`)
+### 2. Wrangler Configuration (`worker/wrangler.chat.toml`)
+
 - Added KV namespace binding:
+
   ```toml
   [[kv_namespaces]]
   binding = "SAVONIE_KV"
@@ -26,11 +31,15 @@ The Cloudflare Worker now reads site facts from KV storage instead of embedded J
   ```
 
 ### 3. Build Automation (`package.json`)
+
 - **Added**: `upload:facts` script that uploads site-facts.json to KV
+
   ```json
   "upload:facts": "cd worker && wrangler kv key put --remote --binding SAVONIE_KV site-facts:v1 --path ../assets/data/site-facts.json"
   ```
+
 - **Updated**: `build` script now runs `upload:facts` after generating site-facts.json
+
   ```json
   "build": "npm run build:facts && npm run build:css && npm run build:js && npm run upload:facts"
   ```
@@ -38,6 +47,7 @@ The Cloudflare Worker now reads site facts from KV storage instead of embedded J
 ## How It Works
 
 ### Request Flow
+
 1. User sends chat message to worker
 2. Worker calls `getSiteFacts(env)` at start of request handler
 3. Function checks if cache is valid (< 1 hour old)
@@ -47,13 +57,16 @@ The Cloudflare Worker now reads site facts from KV storage instead of embedded J
 7. siteFacts used in system prompt for Gemini AI context
 
 ### Cache Behavior
+
 - **Duration**: 1 hour (3600000ms)
 - **Scope**: In-memory per worker instance
 - **Invalidation**: Automatic after TTL expires
 - **Benefit**: KV reads only happen once per hour per worker instance
 
 ### Fallback Strategy
+
 If KV fetch fails, worker uses minimal embedded facts:
+
 ```javascript
 {
   projects: [{ title: "Portfolio Site", summary: "This website!", url: "/projects/portfolio" }],
@@ -64,12 +77,14 @@ If KV fetch fails, worker uses minimal embedded facts:
 ## Deployment
 
 ### Worker Status
-- **URL**: https://portfolio-chat.eayramia.workers.dev
+
+- **URL**: <https://portfolio-chat.eayramia.workers.dev>
 - **Version**: ff8ba8b5-0117-4692-8843-0e5086f4ca56 (v2026.01.13-site-facts)
 - **KV Binding**: ✅ SAVONIE_KV active
 - **Health Check**: `/health` returns `{ kv: true }`
 
 ### KV Namespace
+
 - **ID**: e723b1dbdc9a40a6b6ccd04764108d6c
 - **Binding**: SAVONIE_KV
 - **Key**: site-facts:v1
@@ -78,12 +93,14 @@ If KV fetch fails, worker uses minimal embedded facts:
 ## Testing Results
 
 ### Health Check ✅
+
 ```bash
 curl https://portfolio-chat.eayramia.workers.dev/health
 # Response: { "ok": true, "version": "v2026.01.13-site-facts", "hasKey": true, "kv": true }
 ```
 
 ### Resume Request ✅
+
 ```bash
 curl -X POST https://portfolio-chat.eayramia.workers.dev/ \
   -H "Content-Type: application/json" \
@@ -92,6 +109,7 @@ curl -X POST https://portfolio-chat.eayramia.workers.dev/ \
 ```
 
 ### Whispers Clarification ✅
+
 ```bash
 curl -X POST https://portfolio-chat.eayramia.workers.dev/ \
   -H "Content-Type: application/json" \
@@ -103,12 +121,14 @@ curl -X POST https://portfolio-chat.eayramia.workers.dev/ \
 ## Usage
 
 ### Manual KV Upload
+
 ```bash
 cd worker
 wrangler kv key put --remote --binding SAVONIE_KV site-facts:v1 --path ../assets/data/site-facts.json
 ```
 
 ### Automated Build & Upload
+
 ```bash
 npm run build
 # This will:
@@ -118,9 +138,10 @@ npm run build
 ```
 
 ### Deploy Worker
+
 ```bash
 cd worker
-wrangler deploy
+wrangler deploy --config wrangler.chat.toml
 ```
 
 ## Benefits
@@ -143,16 +164,19 @@ wrangler deploy
 ## Troubleshooting
 
 ### Worker shows kv: false
-- Check wrangler.toml has correct KV binding
+
+- Check the worker config has the correct KV binding (wrangler.chat.toml)
 - Verify namespace ID matches: e723b1dbdc9a40a6b6ccd04764108d6c
-- Redeploy with `wrangler deploy`
+- Redeploy with `wrangler deploy --config wrangler.chat.toml`
 
 ### Chips show wrong projects/hobbies
+
 - Verify site-facts.json is up to date: `npm run build:facts`
 - Upload to KV: `npm run upload:facts`
 - Wait 1 hour for cache to expire (or redeploy worker)
 
 ### KV fetch errors
+
 - Check Cloudflare dashboard for KV namespace status
 - Verify key exists: `wrangler kv key get --remote --binding SAVONIE_KV site-facts:v1`
 - Worker will use fallback facts until KV recovers

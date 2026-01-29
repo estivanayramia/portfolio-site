@@ -41,7 +41,7 @@ export default {
 };
 ```
 
-2. **Deploy**: Add route to `wrangler.toml` or Cloudflare dashboard:
+2. **Deploy**: Add route in `worker/wrangler.debugger.toml` or Cloudflare dashboard:
    - Route pattern: `www.estivanayramia.com/api/error-report`
    - Points to worker: `error-report`
 
