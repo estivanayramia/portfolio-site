@@ -713,6 +713,12 @@ export default {
     const corsHeaders = getCorsHeaders(request);
     const url = new URL(request.url);
 
+    // Some browsers/extensions probe endpoints on every page.
+    // These are unrelated to the site and can create noisy auth/console errors.
+    if (url.pathname.startsWith("/api/browser_extension/")) {
+      return new Response(null, { status: 204, headers: corsHeaders });
+    }
+
     // --- CORS PREFLIGHT ---
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
@@ -754,6 +760,17 @@ export default {
       // Load facts eagerly only for health/chat
       const siteFacts = await getSiteFacts(env); 
       const hasKey = !!(env.GEMINI_API_KEY && env.GEMINI_API_KEY.length > 10);
+      const normalizeSecret = (v) => {
+        if (typeof v !== "string") return "";
+        const s = v.trim();
+        if (!s) return "";
+        if (s === "__SET_VIA_CLOUDFLARE_SECRETS__") return "";
+        return s;
+      };
+      const authPlain = normalizeSecret(env.DASHBOARD_PASSWORD);
+      const authHashOrPlain = normalizeSecret(env.DASHBOARD_PASSWORD_HASH);
+      const authConfigured = !!(authPlain || authHashOrPlain);
+      const authSource = authPlain ? "DASHBOARD_PASSWORD" : (authHashOrPlain ? "DASHBOARD_PASSWORD_HASH" : null);
       const factsCacheAgeMs = cachedSiteFacts ? Math.max(0, Date.now() - cacheTimestamp) : null;
       return jsonReply(
         {
@@ -761,6 +778,8 @@ export default {
           version: VERSION_TAG,
           hasKey,
           kv: !!env.SAVONIE_KV,
+          authConfigured,
+          authSource,
           factsKey: "site-facts:v1",
           factsSource: cachedSiteFactsSource,
           factsCacheAgeMs,

@@ -368,6 +368,16 @@
     if (state.installed.errors) return;
     state.installed.errors = true;
 
+    const isIgnoredResourceUrl = (u) => {
+      const s = String(u || "");
+      if (!s) return false;
+      // Favicon noise (default browser request or icon links)
+      if (/(^|\/)(favicon\.ico|favicon-\d+x\d+\.(png|webp))($|\?)/i.test(s)) return true;
+      // Known external probe path that can return auth errors unrelated to this site
+      if (/\/api\/browser_extension\//i.test(s) || /browser_extension\//i.test(s)) return true;
+      return false;
+    };
+
     window.addEventListener("error", (ev) => {
       // Resource errors bubble here when capture is used.
       const target = ev.target;
@@ -375,6 +385,7 @@
 
       if (isResource) {
         const url = target.src || target.href;
+        if (isIgnoredResourceUrl(url)) return;
         push({
           kind: "resource",
           level: "error",

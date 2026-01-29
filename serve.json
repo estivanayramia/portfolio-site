@@ -10,6 +10,7 @@
     { "source": "/deep-dive", "destination": "/EN/deep-dive.html" },
     { "source": "/overview", "destination": "/EN/overview.html" },
     { "source": "/privacy", "destination": "/EN/privacy.html" },
+    { "source": "/favicon.ico", "destination": "/assets/img/favicon.ico" },
     { "source": "/projects", "destination": "/EN/projects/" },
     { "source": "/projects/", "destination": "/EN/projects/" },
     { "source": "/projects/:slug", "destination": "/EN/projects/:slug.html" },

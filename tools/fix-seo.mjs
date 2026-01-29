@@ -183,6 +183,9 @@ function generateRedirects() {
         '/es/index.html               /es/                         301',
         '/ar/index.html               /ar/                         301',
         '',
+        '# 2. Static asset aliases (200)',
+        '/favicon.ico                 /assets/img/favicon.ico      200',
+        '',
     ];
 
     const footerLines = [

@@ -26,6 +26,29 @@ Cloudflare Dashboard:
 
 - Workers & Pages → your Worker → Settings → Variables → add secret text
 
+## Deployment Checklist
+
+Use this checklist whenever dashboard login shows “server_not_configured” or when a Pages Preview build can’t log in.
+
+1. Set secrets for BOTH environments
+
+- In Cloudflare Dashboard, use the environment switcher/tabs to set the secret for **Production** and **Preview**.
+- Add either:
+  - `DASHBOARD_PASSWORD_HASH` (recommended; sha256 hex)
+  - or `DASHBOARD_PASSWORD` (plain text)
+
+1. Redeploy the Worker
+
+- After changing secrets, redeploy the Worker so the new environment variables apply.
+
+1. Verify auth configuration without revealing secrets
+
+- Call `GET /api/health` (or `GET /health`) on the Worker.
+  - Expect `authConfigured: true` and `authSource` set.
+- In the dashboard, open the **System** tab and confirm:
+  - **Backend Health** = OK
+  - **Auth Configured** = Yes
+
 Keep `worker/wrangler.toml` set to the placeholder value:
 
 - `__SET_VIA_CLOUDFLARE_SECRETS__`

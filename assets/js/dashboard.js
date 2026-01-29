@@ -1014,6 +1014,43 @@ function initSystemTab() {
     if (el) el.textContent = value;
   };
 
+  // Backend health (auth configured / version) — helps diagnose Cloudflare preview/prod env issues.
+  (async () => {
+    if (window.__dashboardBackendHealthLoaded) return;
+    window.__dashboardBackendHealthLoaded = true;
+
+    set('sys-backend-health', 'Checking…');
+    set('sys-auth-configured', '—');
+    set('sys-auth-source', '—');
+    set('sys-worker-version', '—');
+
+    try {
+      const res = await fetch(apiUrl('/api/health'), {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      });
+      const { json } = await readJsonOrText(res);
+
+      if (!res.ok || !json) {
+        set('sys-backend-health', `Unhealthy (HTTP ${res.status})`);
+        return;
+      }
+
+      set('sys-backend-health', json.ok ? 'OK' : 'Unhealthy');
+      if (typeof json.authConfigured === 'boolean') {
+        set('sys-auth-configured', json.authConfigured ? 'Yes' : 'No');
+      }
+      if (typeof json.authSource === 'string' || json.authSource === null) {
+        set('sys-auth-source', json.authSource || '—');
+      }
+      if (typeof json.version === 'string') {
+        set('sys-worker-version', json.version);
+      }
+    } catch {
+      set('sys-backend-health', 'Unavailable');
+    }
+  })();
+
   set('sys-build', document.querySelector('meta[name="build-version"]')?.content || 'dev');
   set('sys-ua', navigator.userAgent);
   set('sys-viewport', `${window.innerWidth} × ${window.innerHeight}`);
