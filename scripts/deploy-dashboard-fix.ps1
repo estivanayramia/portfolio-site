@@ -268,6 +268,7 @@ try {
 		if ($LASTEXITCODE -eq 0) {
 			git push origin feat/unified-diagnostics-10 | Out-Null
 			Write-Host "✅ Committed + pushed deployment report"
+			$commit = git rev-parse --short HEAD
 		}
 	}
 } catch {
