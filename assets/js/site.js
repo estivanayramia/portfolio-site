@@ -381,15 +381,10 @@ try {
       window.__SavonieInitConsent();
     }
 
-    const params = new URLSearchParams(location.search);
+        const params = new URLSearchParams(location.search);
 
-    // Developer mode flag via URL param
-    if (params.get('debug') === '1') {
-      try { localStorage.setItem('site_debugger_enabled', '1'); } catch {}
-    }
-
-    // Backward compatibility: old collector param
-    if (params.has('collect-logs')) {
+        // Backward compatibility: old collector param
+        if (params.has('collect-logs')) {
       tel.setConsentFlags({ sessionOnly: true });
       tel.enable({ upload: false, mode: 'dev' });
       tel.push({ kind: 'consent', level: 'info', msg: 'consent.granted', data: { upload: false, sessionOnly: true, via: 'collect-logs' } });
@@ -421,45 +416,7 @@ try {
       document.head.appendChild(s);
     }
 
-    // URL activation
-    if (params.get('debug') === '1') loadHUD();
-
-    // Desktop hotkey activation
-    window.addEventListener('keydown', (e) => {
-      const key = String(e.key || '').toLowerCase();
-      const isD = key === 'd';
-      const hasShift = e.shiftKey;
-      const hasCtrlOrMeta = e.ctrlKey || e.metaKey;
-      if (isD && hasShift && hasCtrlOrMeta) {
-        e.preventDefault();
-        loadHUD();
-      }
-    }, { capture: true });
-
-    // Mobile/tablet: 3-finger press and hold (600ms)
-    let tHold = 0;
-    let holdTimer = null;
-    window.addEventListener('touchstart', (e) => {
-      if (!e.touches || e.touches.length !== 3) return;
-      tHold = Date.now();
-      holdTimer = setTimeout(() => {
-        loadHUD();
-      }, 600);
-    }, { passive: true });
-
-    window.addEventListener('touchend', () => {
-      if (holdTimer) clearTimeout(holdTimer);
-      holdTimer = null;
-      tHold = 0;
-    }, { passive: true });
-
-    window.addEventListener('touchmove', (e) => {
-      if (!holdTimer) return;
-      if (!e.touches || e.touches.length !== 3) {
-        clearTimeout(holdTimer);
-        holdTimer = null;
-      }
-    }, { passive: true });
+        // HUD activation is now dashboard-only (no URL or hotkey triggers here).
   } catch {}
 })();
 

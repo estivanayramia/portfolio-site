@@ -56,73 +56,228 @@
         <button id="logout-btn" class="icon-btn" title="Logout">🚪</button>
       </div>
     </header>
+
+    <nav class="dashboard-tabs" aria-label="Dashboard tabs">
+      <button class="tab-btn active" data-tab="errors">🐛 Errors</button>
+      <button class="tab-btn" data-tab="console">📝 Console</button>
+      <button class="tab-btn" data-tab="network">🌐 Network</button>
+      <button class="tab-btn" data-tab="performance">⚡ Performance</button>
+      <button class="tab-btn" data-tab="redirects">🔀 Redirects</button>
+      <button class="tab-btn" data-tab="storage">💾 Storage</button>
+      <button class="tab-btn" data-tab="system">🖥️ System</button>
+    </nav>
     
     <div class="dashboard-container">
-      <!-- Filters -->
-      <div class="filters">
-        <select id="status-filter">
-          <option value="">All Statuses</option>
-          <option value="new">New</option>
-          <option value="investigating">Investigating</option>
-          <option value="resolved">Resolved</option>
-          <option value="ignored">Ignored</option>
-        </select>
+
+      <!-- TAB 1: Errors (existing UI preserved) -->
+      <div class="tab-panel active" id="tab-errors">
+        <!-- Filters -->
+        <div class="filters">
+          <select id="status-filter">
+            <option value="">All Statuses</option>
+            <option value="new">New</option>
+            <option value="investigating">Investigating</option>
+            <option value="resolved">Resolved</option>
+            <option value="ignored">Ignored</option>
+          </select>
+          
+          <select id="category-filter">
+            <option value="">All Categories</option>
+            <option value="code_bug">Code Bug</option>
+            <option value="async_bug">Async Bug</option>
+            <option value="navigation">Navigation</option>
+            <option value="connectivity">Connectivity</option>
+            <option value="uncategorized">Uncategorized</option>
+          </select>
+          
+          <button id="clear-filters">Clear Filters</button>
+        </div>
         
-        <select id="category-filter">
-          <option value="">All Categories</option>
-          <option value="code_bug">Code Bug</option>
-          <option value="async_bug">Async Bug</option>
-          <option value="navigation">Navigation</option>
-          <option value="connectivity">Connectivity</option>
-          <option value="uncategorized">Uncategorized</option>
-        </select>
+        <!-- Stats -->
+        <div class="stats">
+          <div class="stat-card">
+            <span class="stat-value" id="total-errors">0</span>
+            <span class="stat-label">Total Errors</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="new-errors">0</span>
+            <span class="stat-label">New</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="investigating-errors">0</span>
+            <span class="stat-label">Investigating</span>
+          </div>
+        </div>
+
+        <!-- Diagnostics Panel -->
+        <section class="diagnostics-panel" aria-label="Diagnostics panel">
+          <div class="diagnostics-header">
+            <h2>Diagnostics</h2>
+            <div class="diagnostics-actions">
+              <button id="open-diagnostics" class="icon-btn">Open diagnostics</button>
+              <button id="close-diagnostics" class="icon-btn" disabled>Close</button>
+            </div>
+          </div>
+          <p class="diagnostics-help">Secure diagnostics are available only after login. Use this panel to inspect telemetry, errors, network, and layout issues.</p>
+          <div id="diagnostics-status" class="diagnostics-status">Diagnostics not loaded.</div>
+          <div id="diagnostics-mount" class="diagnostics-mount"></div>
+        </section>
         
-        <button id="clear-filters">Clear Filters</button>
+        <!-- Error Table -->
+        <div class="table-container">
+          <table class="error-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Message</th>
+                <th>URL</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Bot</th>
+                <th>Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="error-tbody">
+              <!-- Populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination">
+          <button id="prev-page" disabled>← Previous</button>
+          <span id="page-info">Page 1 of 1</span>
+          <button id="next-page" disabled>Next →</button>
+        </div>
       </div>
-      
-      <!-- Stats -->
-      <div class="stats">
-        <div class="stat-card">
-          <span class="stat-value" id="total-errors">0</span>
-          <span class="stat-label">Total Errors</span>
+
+      <!-- TAB 2: Console Logs -->
+      <div class="tab-panel" id="tab-console">
+        <div class="console-controls">
+          <button id="console-clear">🗑️ Clear</button>
+          <input type="text" id="console-filter" placeholder="Filter logs...">
+          <select id="console-level">
+            <option value="">All Levels</option>
+            <option value="log">Log</option>
+            <option value="info">Info</option>
+            <option value="warn">Warn</option>
+            <option value="error">Error</option>
+          </select>
+          <label class="checkbox"><input type="checkbox" id="console-autoscroll" checked> Auto-scroll</label>
         </div>
-        <div class="stat-card">
-          <span class="stat-value" id="new-errors">0</span>
-          <span class="stat-label">New</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-value" id="investigating-errors">0</span>
-          <span class="stat-label">Investigating</span>
-        </div>
+        <div class="console-output" id="console-output"></div>
       </div>
-      
-      <!-- Error Table -->
-      <div class="table-container">
-        <table class="error-table">
+
+      <!-- TAB 3: Network Monitor -->
+      <div class="tab-panel" id="tab-network">
+        <div class="network-controls">
+          <button id="network-clear">🗑️ Clear</button>
+          <button id="network-export-har">📥 Export HAR</button>
+          <select id="network-method">
+            <option value="">All Methods</option>
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+          </select>
+          <select id="network-status">
+            <option value="">All Status</option>
+            <option value="2xx">2xx Success</option>
+            <option value="4xx">4xx Client Error</option>
+            <option value="5xx">5xx Server Error</option>
+          </select>
+        </div>
+        <table class="network-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Type</th>
-              <th>Message</th>
+              <th>Method</th>
               <th>URL</th>
-              <th>Category</th>
               <th>Status</th>
-              <th>Bot</th>
+              <th>Duration</th>
+              <th>Size</th>
               <th>Time</th>
-              <th>Actions</th>
             </tr>
           </thead>
-          <tbody id="error-tbody">
-            <!-- Populated by JavaScript -->
-          </tbody>
+          <tbody id="network-tbody"></tbody>
         </table>
       </div>
-      
-      <!-- Pagination -->
-      <div class="pagination">
-        <button id="prev-page" disabled>← Previous</button>
-        <span id="page-info">Page 1 of 1</span>
-        <button id="next-page" disabled>Next →</button>
+
+      <!-- TAB 4: Performance Metrics -->
+      <div class="tab-panel" id="tab-performance">
+        <div class="perf-grid">
+          <div class="perf-card">
+            <h3>Core Web Vitals</h3>
+            <div class="metric"><span>LCP</span><strong id="perf-lcp">—</strong></div>
+            <div class="metric"><span>FID/INP</span><strong id="perf-inp">—</strong></div>
+            <div class="metric"><span>CLS</span><strong id="perf-cls">—</strong></div>
+          </div>
+          <div class="perf-card">
+            <h3>Timing</h3>
+            <div class="metric"><span>DOM Content Loaded</span><strong id="perf-dcl">—</strong></div>
+            <div class="metric"><span>Load Complete</span><strong id="perf-load">—</strong></div>
+            <div class="metric"><span>First Paint</span><strong id="perf-fp">—</strong></div>
+          </div>
+          <div class="perf-card">
+            <h3>Resources</h3>
+            <div class="metric"><span>JS Heap Used</span><strong id="perf-memory">—</strong></div>
+            <div class="metric"><span>Long Tasks</span><strong id="perf-longtasks">0</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: Redirect Testing -->
+      <div class="tab-panel" id="tab-redirects">
+        <div class="redirect-controls">
+          <button id="redirect-run-diagnostics">🔄 Run Full Diagnostics</button>
+          <button id="redirect-test-root">Test Root (/)</button>
+          <button id="redirect-test-en">Test /EN/</button>
+          <button id="redirect-clear">🗑️ Clear</button>
+        </div>
+        <div class="redirect-log" id="redirect-log"></div>
+        <div class="redirect-results" id="redirect-results"></div>
+      </div>
+
+      <!-- TAB 6: Storage Inspector -->
+      <div class="tab-panel" id="tab-storage">
+        <div class="storage-section">
+          <h3>LocalStorage <button id="storage-ls-refresh" class="icon-btn" title="Refresh">🔄</button></h3>
+          <table id="storage-ls-table" class="storage-table"></table>
+        </div>
+        <div class="storage-section">
+          <h3>SessionStorage <button id="storage-ss-refresh" class="icon-btn" title="Refresh">🔄</button></h3>
+          <table id="storage-ss-table" class="storage-table"></table>
+        </div>
+        <div class="storage-section">
+          <h3>Cookies <button id="storage-cookies-refresh" class="icon-btn" title="Refresh">🔄</button></h3>
+          <table id="storage-cookies-table" class="storage-table"></table>
+        </div>
+        <div class="storage-section">
+          <h3>Service Worker</h3>
+          <div id="storage-sw-status" class="storage-sw-status"></div>
+          <button id="storage-sw-unregister" class="danger">Unregister SW</button>
+        </div>
+      </div>
+
+      <!-- TAB 7: System Info -->
+      <div class="tab-panel" id="tab-system">
+        <table class="system-table">
+          <tr><th>Build Version</th><td id="sys-build">—</td></tr>
+          <tr><th>User Agent</th><td id="sys-ua">—</td></tr>
+          <tr><th>Viewport</th><td id="sys-viewport">—</td></tr>
+          <tr><th>Device Pixel Ratio</th><td id="sys-dpr">—</td></tr>
+          <tr><th>Platform</th><td id="sys-platform">—</td></tr>
+          <tr><th>Language</th><td id="sys-lang">—</td></tr>
+          <tr><th>Connection</th><td id="sys-connection">—</td></tr>
+          <tr><th>Online Status</th><td id="sys-online">—</td></tr>
+          <tr><th>Memory</th><td id="sys-memory">—</td></tr>
+        </table>
+        <div class="system-actions">
+          <button id="sys-export-json">📥 Export All Data (JSON)</button>
+          <button id="sys-copy-report">📋 Copy Debug Report</button>
+          <button id="sys-clear-all" class="danger">🗑️ Clear All Data</button>
+        </div>
       </div>
     </div>
   </div>

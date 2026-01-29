@@ -43,6 +43,14 @@
   @media (min-width: 768px){
     .savonie-panel{right:12px;top:12px;bottom:12px;width:440px;border-radius:16px}
   }
+  .savonie-panel.savonie-embedded{position:relative;inset:auto;right:auto;top:auto;bottom:auto;width:100%;max-width:none;
+    background:#1a1f2e;color:#e1d4c2;border:1px solid #2a2f3e;box-shadow:none}
+  .savonie-panel.savonie-embedded .savonie-header{border-bottom:1px solid #2a2f3e}
+  .savonie-panel.savonie-embedded .savonie-tab{border-color:#2a2f3e;color:#e1d4c2}
+  .savonie-panel.savonie-embedded .savonie-tab[aria-selected="true"]{background:#4a90e2;color:#fff;border-color:#357abd}
+  .savonie-panel.savonie-embedded .savonie-card{background:#111722;border-color:#2a2f3e}
+  .savonie-panel.savonie-embedded .savonie-btn{background:#4a90e2;border-color:#357abd}
+  .savonie-panel.savonie-embedded .savonie-btn.secondary{background:transparent;color:#e1d4c2;border-color:#2a2f3e}
   `;
   document.head.appendChild(style);
 
@@ -102,6 +110,9 @@
   let activeTab = "Summary";
   let lastActiveEl = null;
   let layoutScanResults = null;
+  let mountRoot = document.body;
+  let useBackdrop = true;
+  let embedded = false;
 
   // ============================================
   // FIX #1: USE EVENT DELEGATION ON PANEL ROOT
@@ -534,12 +545,29 @@
     }
   }
 
-  function open() {
-    if (panel.isConnected) return;
+  function open(options = {}) {
+    const opts = options || {};
+    embedded = !!opts.embedded;
+    useBackdrop = embedded ? false : (opts.backdrop !== false);
+    mountRoot = opts.mount || document.body;
+
+    if (embedded) panel.classList.add("savonie-embedded");
+    else panel.classList.remove("savonie-embedded");
+
+    if (panel.isConnected) {
+      if (panel.parentElement !== mountRoot) {
+        mountRoot.appendChild(panel);
+      }
+      if (useBackdrop && !backdrop.isConnected) document.body.appendChild(backdrop);
+      if (!useBackdrop && backdrop.isConnected) backdrop.remove();
+      render();
+      panel.focus();
+      return;
+    }
 
     lastActiveEl = document.activeElement;
-    document.body.appendChild(backdrop);
-    document.body.appendChild(panel);
+    if (useBackdrop) document.body.appendChild(backdrop);
+    mountRoot.appendChild(panel);
 
     render();
     panel.focus();
@@ -575,5 +603,5 @@
   });
 
   window.__SavonieHUD = { open, close };
-  open();
+  if (window.__SavonieHUD_AUTOOPEN === true) open();
 })();

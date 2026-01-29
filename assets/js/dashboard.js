@@ -3,8 +3,9 @@
  * Handles authentication, error fetching, filtering, and management
  */
 
-// DEMO MODE - set to false when API backend is deployed
-const DEMO_MODE = false;
+// DEMO MODE - enabled for localhost or explicit demo param for local testing
+const __dashboardParams = new URLSearchParams(location.search);
+const DEMO_MODE = __dashboardParams.get('demo') === '1' || location.hostname === 'localhost';
 const DEMO_PASSWORD = 'savonie21';
 
 // Mock error data for demo mode
@@ -59,6 +60,151 @@ const pageSize = 50;
 let currentFilters = { status: '', category: '' };
 let currentErrorId = null;
 
+// Unified dashboard tab state
+const dashboardTabs = {
+  initialized: Object.create(null),
+  consoleHooked: false,
+  fetchHooked: false
+};
+
+const consoleLogs = [];
+const networkRequests = [];
+
+// Diagnostics state
+const diagnosticsState = {
+  loaded: false,
+  open: false
+};
+
+function setDiagnosticsStatus(text, tone = 'muted') {
+  const el = document.getElementById('diagnostics-status');
+  if (!el) return;
+  el.textContent = text;
+  el.dataset.tone = tone;
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error(`Failed to load ${src}`));
+    document.head.appendChild(s);
+  });
+}
+
+function ensureDashboardConsent() {
+  if (window.__SavonieDiagnosticsConsent) return;
+  const KEYS = {
+    consent: 'site_diagnostics_consent',
+    upload: 'site_diagnostics_upload',
+    asked: 'site_diagnostics_asked'
+  };
+  const storage = {
+    type: (() => {
+      try {
+        const k = '__ls_test__';
+        localStorage.setItem(k, '1');
+        localStorage.removeItem(k);
+        return 'localStorage';
+      } catch {
+        return 'cookie';
+      }
+    })(),
+    set(k, v) {
+      if (this.type === 'localStorage') {
+        try { localStorage.setItem(k, v); } catch {}
+        return;
+      }
+      try { document.cookie = `${encodeURIComponent(k)}=${encodeURIComponent(v)}; path=/; SameSite=Lax`; } catch {}
+    },
+    get(k) {
+      if (this.type === 'localStorage') {
+        try { return localStorage.getItem(k); } catch { return null; }
+      }
+      try {
+        const m = document.cookie.match(new RegExp(`(?:^|; )${encodeURIComponent(k)}=([^;]*)`));
+        return m ? decodeURIComponent(m[1]) : null;
+      } catch {
+        return null;
+      }
+    }
+  };
+
+  const getState = () => ({
+    consent: storage.get(KEYS.consent),
+    upload: storage.get(KEYS.upload) === 'on',
+    asked: storage.get(KEYS.asked) === '1',
+    storage: storage.type
+  });
+
+  window.__SavonieDiagnosticsConsent = {
+    get: getState,
+    set({ consent, upload }) {
+      if (typeof consent === 'string') storage.set(KEYS.consent, consent);
+      if (typeof upload === 'boolean') storage.set(KEYS.upload, upload ? 'on' : 'off');
+      storage.set(KEYS.asked, '1');
+    },
+    revoke() {
+      storage.set(KEYS.consent, 'denied');
+      storage.set(KEYS.upload, 'off');
+      storage.set(KEYS.asked, '1');
+      window.__SavonieTelemetry?.disable?.();
+    },
+    clearData() {
+      window.__SavonieTelemetry?.clear?.();
+    }
+  };
+
+  // Default to granted for authenticated dashboard usage
+  if (!storage.get(KEYS.consent)) {
+    storage.set(KEYS.consent, 'granted');
+    storage.set(KEYS.upload, 'off');
+    storage.set(KEYS.asked, '1');
+  }
+}
+
+async function loadDiagnosticsAssets() {
+  if (diagnosticsState.loaded) return;
+  setDiagnosticsStatus('Loading diagnostics…', 'loading');
+  await loadScript('/assets/js/telemetry-core.js');
+  ensureDashboardConsent();
+  window.__SavonieTelemetry?.enable?.({ upload: false, mode: 'dev' });
+  await loadScript('/assets/js/debugger-hud.min.js');
+  diagnosticsState.loaded = true;
+  setDiagnosticsStatus('Diagnostics loaded. Ready.', 'ready');
+}
+
+async function openDiagnosticsPanel() {
+  const mount = document.getElementById('diagnostics-mount');
+  const openBtn = document.getElementById('open-diagnostics');
+  const closeBtn = document.getElementById('close-diagnostics');
+  if (!mount) return;
+
+  try {
+    openBtn.disabled = true;
+    await loadDiagnosticsAssets();
+    window.__SavonieHUD?.open?.({ mount, embedded: true, backdrop: false });
+    diagnosticsState.open = true;
+    closeBtn.disabled = false;
+    setDiagnosticsStatus('Diagnostics panel open.', 'ready');
+  } catch (err) {
+    console.error(err);
+    setDiagnosticsStatus('Failed to load diagnostics.', 'error');
+  } finally {
+    openBtn.disabled = false;
+  }
+}
+
+function closeDiagnosticsPanel() {
+  const closeBtn = document.getElementById('close-diagnostics');
+  window.__SavonieHUD?.close?.();
+  diagnosticsState.open = false;
+  if (closeBtn) closeBtn.disabled = true;
+  setDiagnosticsStatus('Diagnostics closed.', 'muted');
+}
+
 // Check if already logged in
 window.addEventListener('DOMContentLoaded', () => {
   authToken = localStorage.getItem('dashboard_token');
@@ -83,6 +229,765 @@ function showDashboard() {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
+  initDiagnosticsPanel();
+  initDashboardTabs();
+}
+
+function initDashboardTabs() {
+  const tabs = Array.from(document.querySelectorAll('.tab-btn'));
+  const panels = Array.from(document.querySelectorAll('.tab-panel'));
+  if (tabs.length === 0 || panels.length === 0) return;
+
+  const activate = (tabName) => {
+    tabs.forEach((btn) => btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName));
+    panels.forEach((p) => p.classList.toggle('active', p.id === `tab-${tabName}`));
+    try { window.location.hash = tabName; } catch {}
+    initializeTab(tabName);
+  };
+
+  if (!document.documentElement.dataset.dashboardTabsBound) {
+    document.documentElement.dataset.dashboardTabsBound = '1';
+    tabs.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tabName = btn.getAttribute('data-tab');
+        if (!tabName) return;
+        activate(tabName);
+      });
+    });
+
+    window.addEventListener('hashchange', () => {
+      const hash = (window.location.hash || '').replace(/^#/, '');
+      if (!hash) return;
+      if (!document.querySelector(`[data-tab="${CSS.escape(hash)}"]`)) return;
+      activate(hash);
+    });
+  }
+
+  const initial = (window.location.hash || '').replace(/^#/, '');
+  if (initial && document.querySelector(`[data-tab="${CSS.escape(initial)}"]`)) {
+    activate(initial);
+  } else {
+    activate('errors');
+  }
+}
+
+function initializeTab(tabName) {
+  if (dashboardTabs.initialized[tabName]) return;
+  dashboardTabs.initialized[tabName] = true;
+
+  switch (tabName) {
+    case 'console':
+      initConsoleTab();
+      break;
+    case 'network':
+      initNetworkTab();
+      break;
+    case 'performance':
+      initPerformanceTab();
+      break;
+    case 'redirects':
+      initRedirectsTab();
+      break;
+    case 'storage':
+      initStorageTab();
+      break;
+    case 'system':
+      initSystemTab();
+      break;
+    default:
+      break;
+  }
+}
+
+// ==================== CONSOLE TAB ====================
+function initConsoleTab() {
+  if (!dashboardTabs.consoleHooked) {
+    dashboardTabs.consoleHooked = true;
+    const levels = ['log', 'info', 'warn', 'error'];
+    const originals = {};
+
+    levels.forEach((level) => {
+      originals[level] = console[level];
+      console[level] = function (...args) {
+        try { originals[level].apply(console, args); } catch {}
+
+        try {
+          const message = args
+            .map((arg) => {
+              if (typeof arg === 'string') return arg;
+              if (arg instanceof Error) return arg.stack || arg.message || String(arg);
+              if (typeof arg === 'object') {
+                try { return JSON.stringify(arg, null, 2); } catch { return '[object]'; }
+              }
+              return String(arg);
+            })
+            .join(' ');
+
+          consoleLogs.push({ level, message, timestamp: Date.now() });
+        } catch {}
+
+        renderConsoleLogs();
+      };
+    });
+  }
+
+  const clearBtn = document.getElementById('console-clear');
+  const filterEl = document.getElementById('console-filter');
+  const levelEl = document.getElementById('console-level');
+
+  if (clearBtn && !clearBtn.dataset.bound) {
+    clearBtn.dataset.bound = '1';
+    clearBtn.addEventListener('click', () => {
+      consoleLogs.length = 0;
+      renderConsoleLogs();
+    });
+  }
+
+  if (filterEl && !filterEl.dataset.bound) {
+    filterEl.dataset.bound = '1';
+    filterEl.addEventListener('input', () => renderConsoleLogs());
+  }
+
+  if (levelEl && !levelEl.dataset.bound) {
+    levelEl.dataset.bound = '1';
+    levelEl.addEventListener('change', () => renderConsoleLogs());
+  }
+
+  renderConsoleLogs();
+}
+
+function renderConsoleLogs() {
+  const output = document.getElementById('console-output');
+  if (!output) return;
+
+  const filter = (document.getElementById('console-filter')?.value || '').toLowerCase();
+  const levelFilter = document.getElementById('console-level')?.value || '';
+
+  const filtered = consoleLogs.filter((log) => {
+    if (levelFilter && log.level !== levelFilter) return false;
+    if (filter && !(log.message || '').toLowerCase().includes(filter)) return false;
+    return true;
+  });
+
+  output.innerHTML = filtered
+    .map((log) => {
+      const time = new Date(log.timestamp).toLocaleTimeString();
+      return `
+        <div class="console-entry ${escapeHtml(log.level)}">
+          <span class="console-time">${escapeHtml(time)}</span>
+          <span class="console-level">[${escapeHtml(log.level.toUpperCase())}]</span>
+          <span class="console-message">${escapeHtml(log.message)}</span>
+        </div>
+      `.trim();
+    })
+    .join('');
+
+  const auto = document.getElementById('console-autoscroll');
+  if (auto && auto.checked) {
+    output.scrollTop = output.scrollHeight;
+  }
+}
+
+// ==================== NETWORK TAB ====================
+function initNetworkTab() {
+  if (!dashboardTabs.fetchHooked) {
+    dashboardTabs.fetchHooked = true;
+    const originalFetch = window.fetch;
+    window.fetch = async function (input, init) {
+      const start = Date.now();
+      const url = typeof input === 'string' ? input : input?.url || String(input);
+      const method = (init && init.method) || (typeof input === 'object' && input && input.method) || 'GET';
+
+      try {
+        const response = await originalFetch(input, init);
+        const duration = Date.now() - start;
+        let size = '—';
+        try {
+          const cl = response.headers.get('content-length');
+          if (cl) size = cl;
+        } catch {}
+
+        networkRequests.push({
+          method: String(method).toUpperCase(),
+          url,
+          status: response.status,
+          duration,
+          size,
+          timestamp: Date.now()
+        });
+        renderNetworkRequests();
+        return response;
+      } catch (error) {
+        networkRequests.push({
+          method: String(method).toUpperCase(),
+          url,
+          status: 'Failed',
+          duration: Date.now() - start,
+          size: '—',
+          timestamp: Date.now(),
+          error: error?.message || String(error)
+        });
+        renderNetworkRequests();
+        throw error;
+      }
+    };
+  }
+
+  const clearBtn = document.getElementById('network-clear');
+  const exportBtn = document.getElementById('network-export-har');
+  const methodEl = document.getElementById('network-method');
+  const statusEl = document.getElementById('network-status');
+
+  if (clearBtn && !clearBtn.dataset.bound) {
+    clearBtn.dataset.bound = '1';
+    clearBtn.addEventListener('click', () => {
+      networkRequests.length = 0;
+      renderNetworkRequests();
+    });
+  }
+
+  if (exportBtn && !exportBtn.dataset.bound) {
+    exportBtn.dataset.bound = '1';
+    exportBtn.addEventListener('click', () => exportNetworkHar());
+  }
+
+  if (methodEl && !methodEl.dataset.bound) {
+    methodEl.dataset.bound = '1';
+    methodEl.addEventListener('change', () => renderNetworkRequests());
+  }
+
+  if (statusEl && !statusEl.dataset.bound) {
+    statusEl.dataset.bound = '1';
+    statusEl.addEventListener('change', () => renderNetworkRequests());
+  }
+
+  renderNetworkRequests();
+}
+
+function renderNetworkRequests() {
+  const tbody = document.getElementById('network-tbody');
+  if (!tbody) return;
+
+  const methodFilter = document.getElementById('network-method')?.value || '';
+  const statusFilter = document.getElementById('network-status')?.value || '';
+
+  const filtered = networkRequests.filter((req) => {
+    if (methodFilter && req.method !== methodFilter) return false;
+    if (statusFilter) {
+      const statusCode = String(req.status);
+      if (statusFilter === '2xx' && !statusCode.startsWith('2')) return false;
+      if (statusFilter === '4xx' && !statusCode.startsWith('4')) return false;
+      if (statusFilter === '5xx' && !statusCode.startsWith('5')) return false;
+    }
+    return true;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color: var(--text-secondary);">No requests captured yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered
+    .slice(-250)
+    .map((req) => {
+      const statusKey = String(req.status);
+      const statusClass = statusKey === 'Failed' ? 'status-5xx' : `status-${statusKey[0]}xx`;
+      return `
+        <tr class="${statusClass}">
+          <td>${escapeHtml(req.method)}</td>
+          <td title="${escapeHtml(req.url)}">${escapeHtml(truncate(req.url, 70))}</td>
+          <td>${escapeHtml(String(req.status))}</td>
+          <td>${escapeHtml(String(req.duration))}ms</td>
+          <td>${escapeHtml(String(req.size))}</td>
+          <td>${escapeHtml(formatClockTime(req.timestamp))}</td>
+        </tr>
+      `.trim();
+    })
+    .join('');
+}
+
+function exportNetworkHar() {
+  const har = {
+    log: {
+      version: '1.2',
+      creator: { name: 'portfolio-site dashboard', version: '1.0' },
+      entries: networkRequests.map((r) => ({
+        startedDateTime: new Date(r.timestamp).toISOString(),
+        time: r.duration,
+        request: {
+          method: r.method,
+          url: r.url,
+          httpVersion: 'HTTP/1.1',
+          headers: [],
+          queryString: [],
+          cookies: [],
+          headersSize: -1,
+          bodySize: -1
+        },
+        response: {
+          status: typeof r.status === 'number' ? r.status : 0,
+          statusText: String(r.status),
+          httpVersion: 'HTTP/1.1',
+          headers: [],
+          cookies: [],
+          content: { size: Number(r.size) || -1, mimeType: '', text: '' },
+          redirectURL: '',
+          headersSize: -1,
+          bodySize: -1
+        },
+        cache: {},
+        timings: { send: 0, wait: r.duration, receive: 0 }
+      }))
+    }
+  };
+
+  window.__lastDashboardExport = { type: 'har', at: Date.now() };
+  const blob = new Blob([JSON.stringify(har, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `network-${Date.now()}.har.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 500);
+}
+
+// ==================== PERFORMANCE TAB ====================
+function initPerformanceTab() {
+  if (!('performance' in window)) return;
+
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = value;
+  };
+
+  // Navigation timing (prefer PerformanceNavigationTiming)
+  try {
+    const nav = performance.getEntriesByType('navigation')[0];
+    if (nav) {
+      setText('perf-dcl', `${Math.round(nav.domContentLoadedEventEnd)}ms`);
+      setText('perf-load', `${Math.round(nav.loadEventEnd)}ms`);
+    } else if (performance.timing) {
+      const t = performance.timing;
+      const dcl = t.domContentLoadedEventEnd - t.navigationStart;
+      const load = t.loadEventEnd - t.navigationStart;
+      if (Number.isFinite(dcl) && dcl > 0) setText('perf-dcl', `${dcl}ms`);
+      if (Number.isFinite(load) && load > 0) setText('perf-load', `${load}ms`);
+    }
+  } catch {}
+
+  // Paint timing
+  try {
+    const paints = performance.getEntriesByType('paint');
+    const fp = paints.find((e) => e.name === 'first-paint' || e.name === 'first-contentful-paint');
+    if (fp) setText('perf-fp', `${Math.round(fp.startTime)}ms`);
+  } catch {}
+
+  if ('PerformanceObserver' in window) {
+    try {
+      // LCP
+      new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const last = entries[entries.length - 1];
+        if (last) setText('perf-lcp', `${Math.round(last.startTime)}ms`);
+      }).observe({ type: 'largest-contentful-paint', buffered: true });
+    } catch {}
+
+    try {
+      // INP proxy via first-input
+      new PerformanceObserver((list) => {
+        const entry = list.getEntries()[0];
+        if (!entry) return;
+        const inp = entry.processingStart - entry.startTime;
+        if (Number.isFinite(inp)) setText('perf-inp', `${Math.round(inp)}ms`);
+      }).observe({ type: 'first-input', buffered: true });
+    } catch {}
+
+    try {
+      // CLS
+      let cls = 0;
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (!entry.hadRecentInput) cls += entry.value;
+        }
+        setText('perf-cls', cls.toFixed(3));
+      }).observe({ type: 'layout-shift', buffered: true });
+    } catch {}
+
+    try {
+      // Long tasks
+      let longTasks = 0;
+      new PerformanceObserver((list) => {
+        longTasks += list.getEntries().length;
+        setText('perf-longtasks', String(longTasks));
+      }).observe({ entryTypes: ['longtask'] });
+    } catch {}
+  }
+
+  // Memory (Chromium only)
+  if (performance.memory) {
+    const tick = () => {
+      try {
+        const used = (performance.memory.usedJSHeapSize / 1048576).toFixed(1);
+        const total = (performance.memory.totalJSHeapSize / 1048576).toFixed(1);
+        setText('perf-memory', `${used} / ${total} MB`);
+      } catch {}
+    };
+    tick();
+    setInterval(tick, 2000);
+  }
+}
+
+// ==================== REDIRECTS TAB ====================
+function initRedirectsTab() {
+  const runBtn = document.getElementById('redirect-run-diagnostics');
+  const rootBtn = document.getElementById('redirect-test-root');
+  const enBtn = document.getElementById('redirect-test-en');
+  const clearBtn = document.getElementById('redirect-clear');
+
+  if (runBtn && !runBtn.dataset.bound) {
+    runBtn.dataset.bound = '1';
+    runBtn.addEventListener('click', () => runRedirectDiagnostics());
+  }
+  if (rootBtn && !rootBtn.dataset.bound) {
+    rootBtn.dataset.bound = '1';
+    rootBtn.addEventListener('click', () => testRedirectPath('/'));
+  }
+  if (enBtn && !enBtn.dataset.bound) {
+    enBtn.dataset.bound = '1';
+    enBtn.addEventListener('click', () => testRedirectPath('/EN/'));
+  }
+  if (clearBtn && !clearBtn.dataset.bound) {
+    clearBtn.dataset.bound = '1';
+    clearBtn.addEventListener('click', () => {
+      const log = document.getElementById('redirect-log');
+      const results = document.getElementById('redirect-results');
+      if (log) log.textContent = '';
+      if (results) results.textContent = '';
+    });
+  }
+
+  logRedirect('Redirect testing initialized', 'success');
+}
+
+function logRedirect(message, type = 'info') {
+  const logEl = document.getElementById('redirect-log');
+  if (!logEl) return;
+  const ts = new Date().toLocaleTimeString();
+  const line = document.createElement('div');
+  line.className = `redirect-log-${type}`;
+  line.textContent = `[${ts}] ${message}`;
+  logEl.appendChild(line);
+  logEl.scrollTop = logEl.scrollHeight;
+}
+
+async function testRedirectPath(path) {
+  logRedirect(`Testing: ${path}`, 'info');
+  const start = Date.now();
+  try {
+    const response = await fetch(path, { method: 'GET', redirect: 'follow' });
+    const finalPath = (() => {
+      try { return new URL(response.url, window.location.origin).pathname; } catch { return path; }
+    })();
+    const duration = Date.now() - start;
+    logRedirect(`Result: ${path} → ${response.status} (${duration}ms) Final: ${finalPath}`, response.status === 200 ? 'success' : 'warning');
+    return { ok: true, status: response.status, finalPath, duration };
+  } catch (error) {
+    logRedirect(`Error: ${path} → ${error?.message || String(error)}`, 'error');
+    return { ok: false, error: error?.message || String(error) };
+  }
+}
+
+async function runRedirectDiagnostics() {
+  const logEl = document.getElementById('redirect-log');
+  const resultsEl = document.getElementById('redirect-results');
+  if (logEl) logEl.textContent = '';
+  if (resultsEl) resultsEl.textContent = '';
+
+  logRedirect('Starting redirect diagnostics…', 'info');
+  const tests = [
+    { path: '/', expected: 200 },
+    { path: '/EN/', expected: 200 },
+    { path: '/EN/index.html', expected: 200 },
+    { path: '/redirect-debug.html', expected: 200 },
+    { path: '/nonexistent-page', expected: 404 }
+  ];
+
+  const results = [];
+  for (const t of tests) {
+    const r = await testRedirectPath(t.path);
+    results.push({ test: t, result: r });
+    await sleep(100);
+  }
+
+  if (resultsEl) {
+    results.forEach(({ test, result }) => {
+      const card = document.createElement('div');
+      const pass = result.ok && result.status === test.expected;
+      card.className = `redirect-test ${pass ? 'pass' : 'fail'}`;
+      card.innerHTML = `
+        <div><strong>${pass ? 'PASS' : 'FAIL'}</strong> ${escapeHtml(test.path)}</div>
+        <div>Expected: ${escapeHtml(String(test.expected))}</div>
+        <div>Got: ${escapeHtml(result.ok ? String(result.status) : 'Error')}</div>
+      `.trim();
+      resultsEl.appendChild(card);
+    });
+  }
+
+  logRedirect('Diagnostics complete', 'success');
+}
+
+// ==================== STORAGE TAB ====================
+function initStorageTab() {
+  const lsBtn = document.getElementById('storage-ls-refresh');
+  const ssBtn = document.getElementById('storage-ss-refresh');
+  const cBtn = document.getElementById('storage-cookies-refresh');
+  const swBtn = document.getElementById('storage-sw-unregister');
+
+  if (lsBtn && !lsBtn.dataset.bound) {
+    lsBtn.dataset.bound = '1';
+    lsBtn.addEventListener('click', () => refreshLocalStorage());
+  }
+  if (ssBtn && !ssBtn.dataset.bound) {
+    ssBtn.dataset.bound = '1';
+    ssBtn.addEventListener('click', () => refreshSessionStorage());
+  }
+  if (cBtn && !cBtn.dataset.bound) {
+    cBtn.dataset.bound = '1';
+    cBtn.addEventListener('click', () => refreshCookies());
+  }
+  if (swBtn && !swBtn.dataset.bound) {
+    swBtn.dataset.bound = '1';
+    swBtn.addEventListener('click', () => unregisterServiceWorker());
+  }
+
+  refreshLocalStorage();
+  refreshSessionStorage();
+  refreshCookies();
+  refreshServiceWorker();
+}
+
+function refreshLocalStorage() {
+  const table = document.getElementById('storage-ls-table');
+  if (!table) return;
+  let items = [];
+  try { items = Object.keys(localStorage).sort().map((k) => [k, localStorage.getItem(k)]); } catch {}
+  renderStorageTable(table, items);
+}
+
+function refreshSessionStorage() {
+  const table = document.getElementById('storage-ss-table');
+  if (!table) return;
+  let items = [];
+  try { items = Object.keys(sessionStorage).sort().map((k) => [k, sessionStorage.getItem(k)]); } catch {}
+  renderStorageTable(table, items);
+}
+
+function refreshCookies() {
+  const table = document.getElementById('storage-cookies-table');
+  if (!table) return;
+  const cookies = (document.cookie || '')
+    .split(';')
+    .map((c) => c.trim())
+    .filter(Boolean)
+    .map((cookie) => {
+      const [name, ...valueParts] = cookie.split('=');
+      return [name, valueParts.join('=')];
+    });
+  renderStorageTable(table, cookies);
+}
+
+function renderStorageTable(table, entries) {
+  if (!entries || entries.length === 0) {
+    table.innerHTML = '<tr><td colspan="2" style="color: var(--text-secondary); padding: 10px;">No items</td></tr>';
+    return;
+  }
+
+  table.innerHTML = `
+    <thead><tr><th>Key</th><th>Value</th></tr></thead>
+    <tbody>
+      ${entries
+        .map(([k, v]) => {
+          const vs = v == null ? '' : String(v);
+          return `
+            <tr>
+              <td>${escapeHtml(String(k))}</td>
+              <td title="${escapeHtml(vs)}">${escapeHtml(truncate(vs, 120))}</td>
+            </tr>
+          `.trim();
+        })
+        .join('')}
+    </tbody>
+  `.trim();
+}
+
+async function refreshServiceWorker() {
+  const statusEl = document.getElementById('storage-sw-status');
+  if (!statusEl) return;
+
+  if (!('serviceWorker' in navigator)) {
+    statusEl.textContent = 'Service Workers not supported.';
+    return;
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.getRegistration();
+    if (!registration) {
+      statusEl.textContent = 'No service worker registered.';
+      return;
+    }
+
+    statusEl.textContent = `Active: ${registration.active ? 'Yes' : 'No'} | Scope: ${registration.scope}`;
+  } catch {
+    statusEl.textContent = 'Unable to query service worker.';
+  }
+}
+
+async function unregisterServiceWorker() {
+  if (!confirm('Unregister service worker? This may clear cached assets.')) return;
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    const registration = await navigator.serviceWorker.getRegistration();
+    if (registration) await registration.unregister();
+    await refreshServiceWorker();
+    alert('Service worker unregistered. Refresh the page.');
+  } catch (e) {
+    alert(`Failed to unregister: ${e?.message || String(e)}`);
+  }
+}
+
+// ==================== SYSTEM TAB ====================
+function initSystemTab() {
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+
+  set('sys-build', document.querySelector('meta[name="build-version"]')?.content || 'dev');
+  set('sys-ua', navigator.userAgent);
+  set('sys-viewport', `${window.innerWidth} × ${window.innerHeight}`);
+  set('sys-dpr', String(window.devicePixelRatio || 1));
+  set('sys-platform', navigator.platform || 'unknown');
+  set('sys-lang', navigator.language || 'unknown');
+  set('sys-online', navigator.onLine ? 'Online' : 'Offline');
+
+  if (navigator.connection && typeof navigator.connection === 'object') {
+    const c = navigator.connection;
+    set('sys-connection', `${c.effectiveType || 'unknown'} (${c.downlink || '?'}Mbps)`);
+  } else {
+    set('sys-connection', 'Unknown');
+  }
+
+  if (performance.memory) {
+    try {
+      const used = (performance.memory.usedJSHeapSize / 1048576).toFixed(1);
+      const limit = (performance.memory.jsHeapSizeLimit / 1048576).toFixed(1);
+      set('sys-memory', `${used} / ${limit} MB`);
+    } catch {
+      set('sys-memory', 'Not available');
+    }
+  } else {
+    set('sys-memory', 'Not available');
+  }
+
+  const exportBtn = document.getElementById('sys-export-json');
+  const copyBtn = document.getElementById('sys-copy-report');
+  const clearBtn = document.getElementById('sys-clear-all');
+  if (exportBtn && !exportBtn.dataset.bound) {
+    exportBtn.dataset.bound = '1';
+    exportBtn.addEventListener('click', () => exportAllDataJSON());
+  }
+  if (copyBtn && !copyBtn.dataset.bound) {
+    copyBtn.dataset.bound = '1';
+    copyBtn.addEventListener('click', () => copyDebugReport());
+  }
+  if (clearBtn && !clearBtn.dataset.bound) {
+    clearBtn.dataset.bound = '1';
+    clearBtn.addEventListener('click', () => clearAllData());
+  }
+}
+
+function exportAllDataJSON() {
+  const data = {
+    timestamp: Date.now(),
+    consoleLogs,
+    networkRequests,
+    system: {
+      userAgent: navigator.userAgent,
+      viewport: `${window.innerWidth}×${window.innerHeight}`,
+      platform: navigator.platform,
+      language: navigator.language,
+      online: navigator.onLine
+    }
+  };
+
+  window.__lastDashboardExport = { type: 'json', at: Date.now() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `dashboard-export-${Date.now()}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 500);
+}
+
+async function copyDebugReport() {
+  const report = [
+    `Debug Report - ${new Date().toLocaleString()}`,
+    '',
+    'System Info:',
+    `- User Agent: ${navigator.userAgent}`,
+    `- Viewport: ${window.innerWidth}×${window.innerHeight}`,
+    `- Platform: ${navigator.platform}`,
+    `- Language: ${navigator.language}`,
+    '',
+    'Recent Console Logs (last 10):',
+    ...consoleLogs.slice(-10).map((l) => `[${l.level.toUpperCase()}] ${l.message}`),
+    '',
+    'Recent Network Requests (last 10):',
+    ...networkRequests
+      .slice(-10)
+      .map((r) => `${r.method} ${r.url} - ${r.status} (${r.duration}ms)`) 
+  ].join('\n');
+
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(report);
+    } else if (window.__testClipboard) {
+      window.__testClipboard.text = report;
+    }
+    window.__lastDashboardExport = { type: 'clipboard', at: Date.now() };
+    alert('Debug report copied to clipboard.');
+  } catch {
+    alert('Failed to copy debug report.');
+  }
+}
+
+function clearAllData() {
+  if (!confirm('Clear all diagnostic data? This cannot be undone.')) return;
+  consoleLogs.length = 0;
+  networkRequests.length = 0;
+  renderConsoleLogs();
+  renderNetworkRequests();
+  try { window.__SavonieTelemetry?.clear?.(); } catch {}
+  alert('All diagnostic data cleared.');
+}
+
+function formatClockTime(ts) {
+  try { return new Date(ts).toLocaleTimeString(); } catch { return ''; }
+}
+
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+function initDiagnosticsPanel() {
+  const openBtn = document.getElementById('open-diagnostics');
+  const closeBtn = document.getElementById('close-diagnostics');
+  if (!openBtn || !closeBtn) return;
+  setDiagnosticsStatus('Diagnostics not loaded.', 'muted');
+  openBtn.addEventListener('click', () => openDiagnosticsPanel());
+  closeBtn.addEventListener('click', () => closeDiagnosticsPanel());
 }
 
 // Login form handler
@@ -134,6 +1039,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 document.getElementById('logout-btn').addEventListener('click', () => {
   authToken = null;
   localStorage.removeItem('dashboard_token');
+  closeDiagnosticsPanel();
   showLogin();
 });
 
