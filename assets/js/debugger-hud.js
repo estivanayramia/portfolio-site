@@ -165,6 +165,7 @@
           if (fresh.consent === "granted") {
             tel.enable({ upload: fresh.upload, mode: "dev" });
           }
+          showToast(fresh.upload ? "Automatic reporting enabled" : "Automatic reporting disabled");
           render();
         }
         break;
@@ -270,7 +271,7 @@
       ["Build", st.buildVersion],
       ["Viewport", `${window.innerWidth}x${window.innerHeight} @${window.devicePixelRatio}`],
       ["Consent", String(c.consent || "unset")],
-      ["Upload", c.upload ? "on" : "off"],
+      ["Automatic reporting", c.upload ? "on" : "off"],
       ["Storage", c.storage],
       ["Enabled", st.enabled ? "true" : "false"],
       ["Last upload", st.lastUploadAt ? new Date(st.lastUploadAt).toLocaleString() : "never"],
@@ -298,7 +299,7 @@
       class: "savonie-btn secondary",
       type: "button",
       "data-action": "toggle-upload",
-      text: c.upload ? "Turn upload off" : "Turn upload on"
+      text: c.upload ? "Disable automatic reporting" : "Enable automatic reporting"
     }));
 
     row.appendChild(el("button", {

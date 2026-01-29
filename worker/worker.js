@@ -1652,14 +1652,31 @@ async function apiHandleAuth(request, env, corsHeaders) {
 
     const { password } = await request.json();
     const provided = typeof password === 'string' ? password : '';
-    const expected = env.DASHBOARD_PASSWORD_HASH;
+
+    const normalizeSecret = (v) => {
+      if (typeof v !== 'string') return '';
+      const s = v.trim();
+      if (!s) return '';
+      if (s === '__SET_VIA_CLOUDFLARE_SECRETS__') return '';
+      return s;
+    };
+
+    const expectedPlain = normalizeSecret(env.DASHBOARD_PASSWORD);
+    const expectedHashOrPlain = normalizeSecret(env.DASHBOARD_PASSWORD_HASH);
+    const expected = expectedPlain || expectedHashOrPlain;
 
     if (!expected) {
-      return new Response(JSON.stringify({ error: 'Server not configured' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      return new Response(
+        JSON.stringify({
+          error: 'Server not configured',
+          message: 'Set DASHBOARD_PASSWORD or DASHBOARD_PASSWORD_HASH in your Cloudflare Worker environment (as a secret).'
+        }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     let ok = false;
-    if (/^[a-f0-9]{64}$/i.test(String(expected))) {
+    if (!expectedPlain && expected === expectedHashOrPlain && /^[a-f0-9]{64}$/i.test(String(expectedHashOrPlain))) {
       const got = await apiSha256Hex(provided);
       ok = apiTimingSafeEqual(got.toLowerCase(), String(expected).toLowerCase());
     } else {

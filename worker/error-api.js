@@ -125,11 +125,30 @@ export async function apiHandleAuth(request, env, allowedOrigins) {
   const password = typeof body.password === "string" ? body.password : "";
   if (!password) return json({ error: "missing_password" }, 400);
 
-  const expected = env.DASHBOARD_PASSWORD_HASH;
-  if (!expected) return json({ error: "server_not_configured" }, 500);
+  const normalizeSecret = (v) => {
+    if (typeof v !== "string") return "";
+    const s = v.trim();
+    if (!s) return "";
+    if (s === "__SET_VIA_CLOUDFLARE_SECRETS__") return "";
+    return s;
+  };
+
+  const expectedPlain = normalizeSecret(env.DASHBOARD_PASSWORD);
+  const expectedHashOrPlain = normalizeSecret(env.DASHBOARD_PASSWORD_HASH);
+  const expected = expectedPlain || expectedHashOrPlain;
+  if (!expected) {
+    return json(
+      {
+        error: "server_not_configured",
+        message: "Dashboard password is not configured.",
+        configure: "Set DASHBOARD_PASSWORD (plain) or DASHBOARD_PASSWORD_HASH (sha256 hex or plain) as a Cloudflare Worker secret / env var."
+      },
+      500
+    );
+  }
 
   let ok = false;
-  if (/^[a-f0-9]{64}$/i.test(expected)) {
+  if (!expectedPlain && expected === expectedHashOrPlain && /^[a-f0-9]{64}$/i.test(expectedHashOrPlain)) {
     const got = await sha256Hex(password);
     ok = timingSafeEqual(got, expected.toLowerCase());
   } else {

@@ -3,6 +3,41 @@ export function initDiagnosticsConsent() {
   const tel = window.__SavonieTelemetry;
   if (!tel) return;
 
+  // Dev ergonomics: force the banner to re-appear for testing.
+  // Usage: append ?diagnostics_reset=1 to the URL.
+  try {
+    const u = new URL(location.href);
+    if (u.searchParams.get("diagnostics_reset") === "1" && !sessionStorage.getItem("site_diagnostics_reset_done")) {
+      sessionStorage.setItem("site_diagnostics_reset_done", "1");
+      const kAsked = "site_diagnostics_asked";
+      const kConsent = "site_diagnostics_consent";
+      const kUpload = "site_diagnostics_upload";
+      try { localStorage.removeItem(kAsked); } catch {}
+      try { localStorage.removeItem(kConsent); } catch {}
+      try { localStorage.removeItem(kUpload); } catch {}
+      try {
+        document.cookie = `${encodeURIComponent(kAsked)}=; path=/; Max-Age=0; SameSite=Lax`;
+        document.cookie = `${encodeURIComponent(kConsent)}=; path=/; Max-Age=0; SameSite=Lax`;
+        document.cookie = `${encodeURIComponent(kUpload)}=; path=/; Max-Age=0; SameSite=Lax`;
+      } catch {}
+      u.searchParams.delete("diagnostics_reset");
+      history.replaceState(null, "", u.toString());
+      location.reload();
+      return;
+    }
+  } catch {}
+
+  // Lightweight styles for consent banner UX (kept self-contained).
+  try {
+    const s = document.createElement("style");
+    s.textContent = `
+      .diagnostics-consent-banner strong{color:#212842}
+      .diagnostics-consent-banner a.diagnostics-privacy-link{color:#3b82f6;text-decoration:underline;font-weight:600}
+      .diagnostics-consent-banner a.diagnostics-privacy-link:hover{color:#2563eb}
+    `;
+    document.head.appendChild(s);
+  } catch {}
+
   const KEYS = {
     consent: "site_diagnostics_consent", // "granted" | "denied"
     upload: "site_diagnostics_upload",   // "on" | "off"
@@ -113,6 +148,7 @@ export function initDiagnosticsConsent() {
     const banner = document.createElement("div");
     banner.setAttribute("role", "dialog");
     banner.setAttribute("aria-label", "Diagnostics consent");
+    banner.className = "diagnostics-consent-banner";
     banner.style.position = "fixed";
     banner.style.left = "12px";
     banner.style.right = "12px";
@@ -138,15 +174,27 @@ export function initDiagnosticsConsent() {
     title.style.fontWeight = "700";
     title.style.color = "#212842";
     title.style.marginBottom = "4px";
-    title.textContent = "Enable diagnostics?";
+    title.textContent = "Help Improve This Site?";
 
     const body = document.createElement("div");
     body.style.fontSize = "13px";
     body.style.color = "rgba(54,32,23,0.85)";
-    body.textContent = "Captures errors and performance data while you browse. Data stays local unless you enable uploads in settings.";
+    body.textContent = "Enable diagnostics to send error reports and performance metrics so I can fix bugs and improve reliability. Reports are used only to improve this site and are never sold. No passwords or payment details are collected. You can disable diagnostics at any time.";
+
+    const links = document.createElement("div");
+    links.style.marginTop = "10px";
+    links.style.fontSize = "13px";
+    const privacyPolicyLink = document.createElement("a");
+    privacyPolicyLink.href = "/privacy";
+    privacyPolicyLink.textContent = "Privacy Policy";
+    privacyPolicyLink.className = "diagnostics-privacy-link";
+    privacyPolicyLink.target = "_blank";
+    privacyPolicyLink.rel = "noopener noreferrer";
+    links.appendChild(privacyPolicyLink);
 
     text.appendChild(title);
     text.appendChild(body);
+    text.appendChild(links);
 
     const controls = document.createElement("div");
     controls.style.display = "flex";
@@ -156,7 +204,7 @@ export function initDiagnosticsConsent() {
 
     const btnEnable = document.createElement("button");
     btnEnable.type = "button";
-    btnEnable.textContent = "Enable diagnostics";
+    btnEnable.textContent = "Enable & Upload";
     btnEnable.style.padding = "10px 12px";
     btnEnable.style.borderRadius = "10px";
     btnEnable.style.border = "1px solid rgba(33,40,66,0.25)";
@@ -181,7 +229,7 @@ export function initDiagnosticsConsent() {
     btnEnable.addEventListener("click", () => {
       setAsked();
       const ok1 = storage.set(KEYS.consent, "granted");
-      const ok2 = storage.set(KEYS.upload, "off"); // Upload OFF by default
+      const ok2 = storage.set(KEYS.upload, "on"); // Upload ON by default when user opts in
 
       const rb = readConsent();
       const verified = ok1 && ok2 && rb === "granted";
@@ -190,14 +238,14 @@ export function initDiagnosticsConsent() {
         tel.setConsentFlags({ sessionOnly: true });
         toast("Enabled for this session only");
       } else {
-        toast("Diagnostics enabled");
+        toast("Thank you — diagnostics enabled with automatic reporting");
       }
 
       hideBanner(banner);
 
       const mode = (new URLSearchParams(location.search).get("debug") === "1") ? "dev" : "user";
-      tel.enable({ upload: false, mode });
-      tel.push({ kind: "consent", level: "info", msg: "consent.granted", data: { upload: false } });
+      tel.enable({ upload: true, mode });
+      tel.push({ kind: "consent", level: "info", msg: "consent.granted", data: { upload: true } });
     });
 
     btnNo.addEventListener("click", () => {

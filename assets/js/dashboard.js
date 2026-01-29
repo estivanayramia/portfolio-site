@@ -1185,8 +1185,17 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
           setLoginError(`Login failed (HTTP ${response.status}). ${snippet ? `Response: ${snippet}` : ''}`.trim());
         }
       } else {
-        errorMsg.textContent = 'Invalid password';
-        errorMsg.style.display = 'block';
+        const errCode = String(json.error || '').toLowerCase();
+
+        if (response.status === 500 && errCode === 'server_not_configured') {
+          setLoginError('Dashboard backend not configured. Set DASHBOARD_PASSWORD or DASHBOARD_PASSWORD_HASH in the Cloudflare Worker environment (Production + Preview) and redeploy.');
+        } else if (response.status === 401) {
+          errorMsg.textContent = 'Invalid password';
+          errorMsg.style.display = 'block';
+        } else {
+          const snippet = String(json.message || json.error || '').replace(/\s+/g, ' ').slice(0, 140);
+          setLoginError(`Login failed (HTTP ${response.status}). ${snippet ? `Response: ${snippet}` : ''}`.trim());
+        }
       }
     }
   } catch (error) {
