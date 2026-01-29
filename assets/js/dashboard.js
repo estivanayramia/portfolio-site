@@ -683,6 +683,7 @@ function initRedirectsTab() {
   const rootBtn = document.getElementById('redirect-test-root');
   const enBtn = document.getElementById('redirect-test-en');
   const clearBtn = document.getElementById('redirect-clear');
+  const testAllBtn = document.getElementById('test-all-features');
 
   if (runBtn && !runBtn.dataset.bound) {
     runBtn.dataset.bound = '1';
@@ -706,7 +707,118 @@ function initRedirectsTab() {
     });
   }
 
+  if (testAllBtn && !testAllBtn.dataset.bound) {
+    testAllBtn.dataset.bound = '1';
+    testAllBtn.addEventListener('click', async () => {
+      await runComprehensiveFeatureTest(testAllBtn);
+    });
+  }
+
   logRedirect('Redirect testing initialized', 'success');
+}
+
+async function runComprehensiveFeatureTest(buttonEl) {
+  const btn = buttonEl;
+  const prevText = btn ? btn.textContent : '';
+  try {
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Running…';
+    }
+
+    logRedirect('=== COMPREHENSIVE TEST STARTED ===', 'info');
+    logRedirect('This will generate console logs, network calls, perf marks, and storage entries.', 'info');
+
+    // 1) Console logging
+    logRedirect('Test 1/10: Console logging', 'info');
+    console.log('Test log message');
+    console.info('Test info message');
+    console.warn('Test warning message');
+    console.error('Test error message');
+    await sleep(250);
+
+    // 2) Network requests (success + fail)
+    logRedirect('Test 2/10: Network requests', 'info');
+    try { await fetch('/'); } catch {}
+    try { await fetch(apiUrl('/api/health')); } catch {}
+    try { await fetch('/nonexistent-endpoint-test-404'); } catch {}
+    await sleep(250);
+
+    // 3) Simulated JS error (caught)
+    logRedirect('Test 3/10: Simulated JS error (caught)', 'warning');
+    try {
+      throw new Error('Synthetic dashboard test error');
+    } catch (e) {
+      console.error('Caught synthetic error:', e);
+    }
+    await sleep(250);
+
+    // 4) Redirect diagnostics
+    logRedirect('Test 4/10: Redirect checks', 'info');
+    await testRedirectPath('/');
+    await testRedirectPath('/EN/');
+    await sleep(250);
+
+    // 5) Performance marks
+    logRedirect('Test 5/10: Performance marks', 'info');
+    try {
+      if ('performance' in window && performance.mark && performance.measure) {
+        performance.mark('dashboard-test-start');
+        await sleep(30);
+        performance.mark('dashboard-test-end');
+        performance.measure('dashboard-test-measure', 'dashboard-test-start', 'dashboard-test-end');
+      }
+    } catch {}
+    await sleep(250);
+
+    // 6) Long task simulation
+    logRedirect('Test 6/10: Long task simulation (~120ms)', 'warning');
+    {
+      const start = Date.now();
+      while (Date.now() - start < 120) {
+        // busy loop
+      }
+    }
+    await sleep(250);
+
+    // 7) Storage ops
+    logRedirect('Test 7/10: Storage operations', 'info');
+    try { localStorage.setItem('dashboard_test_key', `value_${Date.now()}`); } catch {}
+    try { sessionStorage.setItem('dashboard_test_session_key', `value_${Date.now()}`); } catch {}
+    try { refreshLocalStorage(); refreshSessionStorage(); } catch {}
+    await sleep(250);
+
+    // 8) Rapid logs
+    logRedirect('Test 8/10: Rapid console burst', 'info');
+    for (let i = 1; i <= 10; i++) {
+      console.log(`Rapid log ${i}/10`);
+    }
+    await sleep(250);
+
+    // 9) Auth endpoint (invalid password)
+    logRedirect('Test 9/10: Auth endpoint (invalid password)', 'info');
+    try {
+      await fetch(apiUrl('/api/auth'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: 'invalid-password-for-testing' })
+      });
+    } catch {}
+    await sleep(250);
+
+    // 10) Intentional cross-origin request (expected to fail CORS)
+    logRedirect('Test 10/10: Cross-origin request (expect CORS block)', 'warning');
+    try { await fetch('https://example.com/'); } catch {}
+
+    logRedirect('=== COMPREHENSIVE TEST COMPLETE ===', 'success');
+    logRedirect('Check tabs: Console, Network, Performance, Storage.', 'success');
+    try { alert('Comprehensive test complete. Check Console/Network/Performance/Storage tabs.'); } catch {}
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = prevText || 'Test All Features';
+    }
+  }
 }
 
 function logRedirect(message, type = 'info') {

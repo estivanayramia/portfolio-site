@@ -88,6 +88,24 @@ body {
   margin-top: 15px;
 }
 
+.login-help {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: left;
+}
+
+.login-help code {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
 /* Dashboard Header */
 .dashboard-header {
   background: var(--bg-card);
@@ -121,6 +139,21 @@ body {
 .icon-btn:hover {
   background: var(--bg-dark);
   border-color: var(--accent);
+}
+
+/* Click safety: ensure controls stay interactive */
+.dashboard-container button,
+.savonie-btn,
+.tab-btn,
+.icon-btn,
+.view-btn,
+#refresh-btn,
+#logout-btn,
+#export-btn {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative;
+  z-index: 2;
 }
 
 /* Dashboard Container */
@@ -352,6 +385,20 @@ body {
   background: var(--bg-dark);
 }
 
+.test-all-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  font-weight: 700 !important;
+  padding: 12px 18px !important;
+  border: none !important;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.55); }
+  50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+}
+
 .redirect-log {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -557,6 +604,13 @@ button.danger:hover,
 
 .diagnostics-mount {
   min-height: 120px;
+  pointer-events: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.diagnostics-mount * {
+  pointer-events: auto;
 }
 
 .stat-card {
@@ -839,6 +893,19 @@ button.danger:hover,
 
   .table-container {
     font-size: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .error-table td,
+  .network-table td,
+  .storage-table td,
+  .system-table td,
+  .console-entry,
+  .redirect-log {
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    max-width: 100%;
   }
 
   .error-table th,
@@ -849,5 +916,10 @@ button.danger:hover,
   .message-col,
   .url-col {
     max-width: 100px;
+    white-space: normal;
+  }
+
+  .network-table td:nth-child(2) {
+    max-width: 160px;
   }
 }

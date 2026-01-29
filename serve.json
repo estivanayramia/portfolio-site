@@ -5,6 +5,7 @@
     { "source": "/", "destination": "/EN/index.html" },
     { "source": "/about", "destination": "/EN/about.html" },
     { "source": "/contact", "destination": "/EN/contact.html" },
+    { "source": "/dashboard", "destination": "/EN/dashboard.html" },
     { "source": "/hobbies-games", "destination": "/EN/hobbies-games.html" },
     { "source": "/deep-dive", "destination": "/EN/deep-dive.html" },
     { "source": "/overview", "destination": "/EN/overview.html" },

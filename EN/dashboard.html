@@ -43,6 +43,12 @@
         <button type="submit">Login</button>
       </form>
       <p id="login-error" class="error-message" style="display: none;"></p>
+
+      <div class="login-help">
+        <strong>Demo mode</strong>: Add <code>?demo=1</code> to the URL to try the dashboard without API access.
+        <br>
+        Useful for UI testing when the backend is down or while developing offline.
+      </div>
     </div>
   </div>
   
@@ -234,6 +240,7 @@
           <button id="redirect-test-root">Test Root (/)</button>
           <button id="redirect-test-en">Test /EN/</button>
           <button id="redirect-clear">🗑️ Clear</button>
+          <button id="test-all-features" class="test-all-btn">🧪 Test All Features</button>
         </div>
         <div class="redirect-log" id="redirect-log"></div>
         <div class="redirect-results" id="redirect-results"></div>
