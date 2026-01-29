@@ -3,10 +3,28 @@
  * Handles authentication, error fetching, filtering, and management
  */
 
-// DEMO MODE - enabled for localhost or explicit demo param for local testing
+// DEMO MODE
+// - Enabled for localhost/127.0.0.1
+// - Enabled by default on Cloudflare Pages preview builds, unless `?force_real=1`
+// - Always enabled when `?demo=1`
 const __dashboardParams = new URLSearchParams(location.search);
-let DEMO_MODE = __dashboardParams.get('demo') === '1' || location.hostname === 'localhost';
-const DEMO_PASSWORD = 'savonie21';
+
+function isLocalDevHost(hostname) {
+  const host = String(hostname || '').toLowerCase();
+  return host === 'localhost' || host === '127.0.0.1';
+}
+
+function isDashboardDemoMode() {
+  const forceDemo = __dashboardParams.get('demo') === '1';
+  const forceReal = __dashboardParams.get('force_real') === '1';
+  const host = String(location.hostname || '').toLowerCase();
+  if (forceDemo) return true;
+  if (isLocalDevHost(host)) return true;
+  if (isPagesPreviewHost(host) && !forceReal) return true;
+  return false;
+}
+
+let DEMO_MODE = isDashboardDemoMode();
 
 // API routing
 const PROD_API_ORIGIN = 'https://estivanayramia.com';
@@ -45,6 +63,88 @@ function setLoginError(message) {
   if (!errorMsg) return;
   errorMsg.textContent = message;
   errorMsg.style.display = 'block';
+}
+
+function setLoginStatus(fields) {
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = text;
+  };
+
+  if (!fields) return;
+  if ('backendHealth' in fields) setText('login-backend-health', fields.backendHealth);
+  if ('authConfigured' in fields) setText('login-auth-configured', fields.authConfigured);
+  if ('authSource' in fields) setText('login-auth-source', fields.authSource);
+  if ('workerVersion' in fields) setText('login-worker-version', fields.workerVersion);
+}
+
+function setLoginDisabled(disabled) {
+  const btn = document.querySelector('#login-form button[type="submit"]');
+  if (btn) btn.disabled = !!disabled;
+}
+
+let __preLoginHealth = null;
+
+async function checkBackendHealthForLogin() {
+  if (DEMO_MODE) return null;
+
+  setLoginDisabled(true);
+  setLoginStatus({
+    backendHealth: 'Checking…',
+    authConfigured: '—',
+    authSource: '—',
+    workerVersion: '—'
+  });
+
+  try {
+    const res = await fetch(apiUrl('/api/health'), {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' }
+    });
+
+    const { json } = await readJsonOrText(res);
+    if (!res.ok || !json) {
+      __preLoginHealth = { reachable: true, ok: false, authConfigured: null, authSource: null, version: null, httpStatus: res.status };
+      setLoginStatus({ backendHealth: `Unhealthy (HTTP ${res.status})` });
+      setLoginDisabled(false);
+      return __preLoginHealth;
+    }
+
+    const authConfigured = typeof json.authConfigured === 'boolean' ? json.authConfigured : null;
+    const authSource = typeof json.authSource === 'string' ? json.authSource : (json.authSource === null ? null : null);
+    const version = typeof json.version === 'string' ? json.version : null;
+
+    __preLoginHealth = {
+      reachable: true,
+      ok: !!json.ok,
+      authConfigured,
+      authSource,
+      version,
+      httpStatus: res.status
+    };
+
+    setLoginStatus({
+      backendHealth: json.ok ? 'OK' : 'Unhealthy',
+      authConfigured: authConfigured === null ? '—' : (authConfigured ? 'Yes' : 'No'),
+      authSource: authSource || '—',
+      workerVersion: version || '—'
+    });
+
+    if (authConfigured === false) {
+      setLoginError('Dashboard backend not configured. Set DASHBOARD_PASSWORD or DASHBOARD_PASSWORD_HASH in the Cloudflare Worker environment (Production + Preview) and redeploy.');
+      setLoginDisabled(true);
+    } else {
+      setLoginDisabled(false);
+    }
+
+    return __preLoginHealth;
+  } catch {
+    __preLoginHealth = { reachable: false, ok: false, authConfigured: null, authSource: null, version: null, httpStatus: null };
+    setLoginStatus({ backendHealth: 'Unavailable' });
+    setLoginDisabled(false);
+    return __preLoginHealth;
+  }
 }
 
 // Mock error data for demo mode
@@ -246,14 +346,24 @@ function closeDiagnosticsPanel() {
 
 // Check if already logged in
 window.addEventListener('DOMContentLoaded', () => {
+  // Demo is fully offline/self-contained: no password prompt, no API calls.
+  if (DEMO_MODE) {
+    authToken = null;
+    showDashboard();
+    loadErrors();
+    return;
+  }
+
   authToken = localStorage.getItem('dashboard_token');
-  
+
   if (authToken) {
     showDashboard();
     loadErrors();
-  } else {
-    showLogin();
+    return;
   }
+
+  showLogin();
+  checkBackendHealthForLogin();
 });
 
 // Show login screen
@@ -270,6 +380,87 @@ function showDashboard() {
   document.getElementById('dashboard').style.display = 'block';
   initDiagnosticsPanel();
   initDashboardTabs();
+}
+
+function getAuthHeaders(extra) {
+  const headers = Object.assign({ 'Accept': 'application/json' }, extra || {});
+  if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+  return headers;
+}
+
+function findMockErrorById(errorId) {
+  const id = Number(errorId);
+  return MOCK_ERRORS.find((e) => Number(e.id) === id) || null;
+}
+
+function populateErrorModal(error) {
+  if (!error) throw new Error('No error data');
+
+  const detailsDiv = document.getElementById('error-details');
+  detailsDiv.textContent = '';
+
+  const createGroup = (label, content, fullWidth = false) => {
+    const group = document.createElement('div');
+    group.className = fullWidth ? 'detail-group full-width' : 'detail-group';
+    const lbl = document.createElement('label');
+    lbl.textContent = label;
+    group.appendChild(lbl);
+    group.appendChild(content);
+    return group;
+  };
+
+  const span = (text, className = '') => {
+    const s = document.createElement('span');
+    if (className) s.className = className;
+    s.textContent = text;
+    return s;
+  };
+
+  detailsDiv.appendChild(createGroup('ID', span(error.id)));
+
+  const typeBadge = span(error.type, 'type-badge');
+  detailsDiv.appendChild(createGroup('Type', typeBadge));
+
+  const msgBlock = document.createElement('div');
+  msgBlock.className = 'code-block';
+  msgBlock.textContent = error.message;
+  detailsDiv.appendChild(createGroup('Message', msgBlock, true));
+
+  const breadcrumbsHtml = error.breadcrumbs ? renderBreadcrumbs(error.breadcrumbs) : '<p class="no-data">No interaction history available</p>';
+  const bcDiv = document.createElement('div');
+  bcDiv.className = 'breadcrumbs-container';
+  bcDiv.innerHTML = breadcrumbsHtml;
+  detailsDiv.appendChild(createGroup('Interaction History', bcDiv, true));
+
+  const locSpan = document.createElement('span');
+  const locLink = document.createElement('a');
+  locLink.href = error.url;
+  locLink.target = '_blank';
+  locLink.textContent = truncate(error.url, 50);
+  locSpan.appendChild(locLink);
+  const subText = span(`${error.filename || ''}:${error.line || '?'}`, 'sub-text');
+  const locWrapper = document.createElement('div');
+  locWrapper.appendChild(locSpan);
+  locWrapper.appendChild(subText);
+  detailsDiv.appendChild(createGroup('Location', locWrapper));
+
+  detailsDiv.appendChild(createGroup('User Agent', span(error.user_agent, 'sub-text')));
+  detailsDiv.appendChild(createGroup('Time', span(new Date(error.timestamp).toLocaleString())));
+
+  const details = document.createElement('details');
+  const summary = document.createElement('summary');
+  const strong = document.createElement('strong');
+  strong.textContent = 'Stack Trace';
+  summary.appendChild(strong);
+  details.appendChild(summary);
+  const pre = document.createElement('pre');
+  pre.textContent = error.stack || 'No stack trace';
+  details.appendChild(pre);
+  detailsDiv.appendChild(details);
+
+  document.getElementById('modal-category').value = error.category;
+  document.getElementById('modal-status').value = error.status;
+  document.getElementById('error-modal').style.display = 'flex';
 }
 
 function initDashboardTabs() {
@@ -1186,16 +1377,19 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   const errorMsg = document.getElementById('login-error');
   
   if (DEMO_MODE) {
-    // Demo mode - check password locally
-    if (password === DEMO_PASSWORD) {
-      authToken = 'demo-token-' + Date.now();
-      localStorage.setItem('dashboard_token', authToken);
-      showDashboard();
-      loadErrors();
-    } else {
-      errorMsg.textContent = 'Invalid password (hint: savonie21)';
-      errorMsg.style.display = 'block';
-    }
+    showDashboard();
+    loadErrors();
+    return;
+  }
+
+  // Enforce pre-login health check before accepting credentials.
+  if (!__preLoginHealth) await checkBackendHealthForLogin();
+  if (__preLoginHealth && __preLoginHealth.reachable === false) {
+    setLoginError('Backend unreachable. Check Worker routing and try again.');
+    return;
+  }
+  if (__preLoginHealth && __preLoginHealth.authConfigured === false) {
+    setLoginError('Dashboard backend not configured. Set DASHBOARD_PASSWORD or DASHBOARD_PASSWORD_HASH in the Cloudflare Worker environment (Production + Preview) and redeploy.');
     return;
   }
   
@@ -1236,13 +1430,8 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
       }
     }
   } catch (error) {
-    if (isPagesPreviewHost(location.hostname)) {
-      DEMO_MODE = true;
-      setLoginError('Backend unreachable on preview; switched to demo mode.');
-    } else {
-      errorMsg.textContent = 'Connection error';
-      errorMsg.style.display = 'block';
-    }
+    errorMsg.textContent = 'Connection error';
+    errorMsg.style.display = 'block';
   }
 });
 
@@ -1281,7 +1470,7 @@ async function loadErrors() {
     });
     
     const response = await fetch(apiUrl(`/api/errors?${params}`), {
-      headers: { 'Authorization': `Bearer ${authToken}` }
+      headers: getAuthHeaders()
     });
     
     if (!response.ok) {
@@ -1401,81 +1590,20 @@ window.viewError = async function(errorId) {
   currentErrorId = errorId;
   
   try {
-    // NEW: Fetch by ID directly to avoid offset bugs
+    if (DEMO_MODE) {
+      const error = findMockErrorById(errorId);
+      populateErrorModal(error);
+      return;
+    }
+
+    // Fetch by ID directly to avoid offset bugs
     const response = await fetch(apiUrl(`/api/errors/${errorId}`), {
-      headers: { 'Authorization': `Bearer ${authToken}` }
+      headers: getAuthHeaders()
     });
-    
+
     if (!response.ok) throw new Error('Failed to fetch error details');
-    const data = await response.json();
-    const error = data.error; // API returns { error: object }
-    
-    // Populate modal using DOM APIs
-    const detailsDiv = document.getElementById('error-details');
-    detailsDiv.textContent = '';
-
-    const createGroup = (label, content, fullWidth = false) => {
-      const group = document.createElement('div');
-      group.className = fullWidth ? 'detail-group full-width' : 'detail-group';
-      const lbl = document.createElement('label');
-      lbl.textContent = label;
-      group.appendChild(lbl);
-      group.appendChild(content);
-      return group;
-    };
-
-    const span = (text, className = '') => {
-      const s = document.createElement('span');
-      if (className) s.className = className;
-      s.textContent = text;
-      return s;
-    };
-
-    detailsDiv.appendChild(createGroup('ID', span(error.id)));
-    
-    const typeBadge = span(error.type, 'type-badge');
-    detailsDiv.appendChild(createGroup('Type', typeBadge));
-
-    const msgBlock = document.createElement('div');
-    msgBlock.className = 'code-block';
-    msgBlock.textContent = error.message;
-    detailsDiv.appendChild(createGroup('Message', msgBlock, true));
-
-    const breadcrumbsHtml = error.breadcrumbs ? renderBreadcrumbs(error.breadcrumbs) : '<p class="no-data">No interaction history available</p>';
-    const bcDiv = document.createElement('div');
-    bcDiv.className = 'breadcrumbs-container';
-    bcDiv.innerHTML = breadcrumbsHtml;
-    detailsDiv.appendChild(createGroup('Interaction History', bcDiv, true));
-
-    const locSpan = document.createElement('span');
-    const locLink = document.createElement('a');
-    locLink.href = error.url;
-    locLink.target = '_blank';
-    locLink.textContent = truncate(error.url, 50);
-    locSpan.appendChild(locLink);
-    const subText = span(`${error.filename || ''}:${error.line || '?'}`, 'sub-text');
-    const locWrapper = document.createElement('div');
-    locWrapper.appendChild(locSpan);
-    locWrapper.appendChild(subText);
-    detailsDiv.appendChild(createGroup('Location', locWrapper));
-
-    detailsDiv.appendChild(createGroup('User Agent', span(error.user_agent, 'sub-text')));
-    detailsDiv.appendChild(createGroup('Time', span(new Date(error.timestamp).toLocaleString())));
-
-    const details = document.createElement('details');
-    const summary = document.createElement('summary');
-    const strong = document.createElement('strong');
-    strong.textContent = 'Stack Trace';
-    summary.appendChild(strong);
-    details.appendChild(summary);
-    const pre = document.createElement('pre');
-    pre.textContent = error.stack || 'No stack trace';
-    details.appendChild(pre);
-    detailsDiv.appendChild(details);
-    
-    document.getElementById('modal-category').value = error.category;
-    document.getElementById('modal-status').value = error.status;
-    document.getElementById('error-modal').style.display = 'flex';
+    const { json } = await readJsonOrText(response);
+    populateErrorModal(json?.error);
     
   } catch (error) {
     console.error('Error loading error details:', error);
@@ -1504,13 +1632,24 @@ function renderBreadcrumbs(jsonString) {
 document.getElementById('save-error').addEventListener('click', async () => {
   const category = document.getElementById('modal-category').value;
   const status = document.getElementById('modal-status').value;
+
+  if (DEMO_MODE) {
+    const existing = findMockErrorById(currentErrorId);
+    if (existing) {
+      existing.category = category;
+      existing.status = status;
+    }
+
+    document.getElementById('error-modal').style.display = 'none';
+    loadErrors();
+    return;
+  }
   
   try {
     const response = await fetch(apiUrl(`/api/errors/${currentErrorId}`), {
       method: 'PATCH',
       headers: {
-        'Authorization': `Bearer ${authToken}`,
-        'Content-Type': 'application/json'
+        ...getAuthHeaders({ 'Content-Type': 'application/json' })
       },
       body: JSON.stringify({ category, status })
     });
@@ -1529,11 +1668,20 @@ document.getElementById('save-error').addEventListener('click', async () => {
 // Delete error
 document.getElementById('delete-error').addEventListener('click', async () => {
   if (!confirm('Are you sure you want to delete this error?')) return;
+
+  if (DEMO_MODE) {
+    const idx = MOCK_ERRORS.findIndex((e) => Number(e.id) === Number(currentErrorId));
+    if (idx >= 0) MOCK_ERRORS.splice(idx, 1);
+
+    document.getElementById('error-modal').style.display = 'none';
+    loadErrors();
+    return;
+  }
   
   try {
     const response = await fetch(apiUrl(`/api/errors/${currentErrorId}`), {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${authToken}` }
+      headers: getAuthHeaders()
     });
     
     if (!response.ok) throw new Error('Delete failed');
@@ -1609,15 +1757,28 @@ document.getElementById('export-btn').addEventListener('click', async () => {
     btn.textContent = 'Exporting...';
     btn.disabled = true;
 
+    if (DEMO_MODE) {
+      const filtered = MOCK_ERRORS.filter(error => {
+        if (currentFilters.status && error.status !== currentFilters.status) return false;
+        if (currentFilters.category && error.category !== currentFilters.category) return false;
+        return true;
+      });
+      const csv = errorsToCSV(filtered);
+      downloadCSV(csv, `errors-${Date.now()}.csv`);
+      btn.textContent = originalText;
+      btn.disabled = false;
+      return;
+    }
+
     // Fetch all errors for export
     const response = await fetch(apiUrl('/api/errors?limit=1000'), {
-      headers: { 'Authorization': `Bearer ${authToken}` }
+      headers: getAuthHeaders()
     });
     
     if (!response.ok) throw new Error('Export fetch failed');
     
-    const data = await response.json();
-    const csv = errorsToCSV(data.errors);
+    const { json } = await readJsonOrText(response);
+    const csv = errorsToCSV(json?.errors || []);
     downloadCSV(csv, `errors-${Date.now()}.csv`);
     
     btn.textContent = originalText;

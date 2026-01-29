@@ -4,7 +4,7 @@ const { chromium } = require('playwright');
 
 const DEFAULT_DASHBOARD_URL = `http://localhost:5500/dashboard?demo=1&cb=${Date.now()}`;
 const DASHBOARD_URL = process.env.DASHBOARD_URL || DEFAULT_DASHBOARD_URL;
-const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'savonie21';
+const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || '';
 const AUTO_START_SERVER = process.env.START_SERVER !== '0';
 
 function fail(msg) {
@@ -14,6 +14,25 @@ function fail(msg) {
 
 async function expectVisible(page, selector, timeout = 15000) {
   await page.waitForSelector(selector, { state: 'visible', timeout });
+}
+
+async function ensureDashboardVisible(page) {
+  // Demo mode is passwordless and should render #dashboard directly.
+  try {
+    await expectVisible(page, '#dashboard', 5000);
+    return;
+  } catch {
+    // fall through
+  }
+
+  // Real mode may show a login form.
+  await expectVisible(page, '#login-form', 15000);
+  if (!DASHBOARD_PASSWORD) {
+    throw new Error('DASHBOARD_PASSWORD env var is required for real-mode dashboard tests.');
+  }
+  await page.fill('#password-input', DASHBOARD_PASSWORD);
+  await page.click('#login-form button[type="submit"]');
+  await expectVisible(page, '#dashboard');
 }
 
 async function clickTab(page, tabName) {
@@ -130,11 +149,7 @@ async function startLocalServer(port = 5500) {
     console.log(`Visiting: ${DASHBOARD_URL}`);
     await page.goto(DASHBOARD_URL, { waitUntil: 'domcontentloaded' });
 
-    await expectVisible(page, '#login-form');
-    await page.fill('#password-input', DEMO_PASSWORD);
-    await page.click('#login-form button[type="submit"]');
-
-    await expectVisible(page, '#dashboard');
+    await ensureDashboardVisible(page);
 
     // Buttons/tabs must be clickable
     await clickTab(page, 'errors');

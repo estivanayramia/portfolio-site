@@ -748,7 +748,14 @@ export default {
     
     // GET/PATCH/DELETE /api/errors/:id
     if (url.pathname.startsWith("/api/errors/")) {
-      const errorId = parseInt(url.pathname.split('/')[3]);
+      const rawId = url.pathname.split('/')[3];
+      const errorId = Number(rawId);
+      if (!Number.isInteger(errorId) || errorId <= 0) {
+        return new Response(JSON.stringify({ error: 'Not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
       if (request.method === "GET") return apiHandleGetErrorById(request, env, corsHeaders, errorId);
       if (request.method === "PATCH") return apiHandleUpdateError(request, env, corsHeaders, errorId);
       if (request.method === "DELETE") return apiHandleDeleteError(request, env, corsHeaders, errorId);
@@ -772,12 +779,23 @@ export default {
       const authConfigured = !!(authPlain || authHashOrPlain);
       const authSource = authPlain ? "DASHBOARD_PASSWORD" : (authHashOrPlain ? "DASHBOARD_PASSWORD_HASH" : null);
       const factsCacheAgeMs = cachedSiteFacts ? Math.max(0, Date.now() - cacheTimestamp) : null;
+
+      let d1Ok = false;
+      try {
+        if (env.DB) {
+          const { results } = await env.DB.prepare('SELECT 1 as ok').all();
+          d1Ok = Array.isArray(results) && results.length > 0;
+        }
+      } catch {
+        d1Ok = false;
+      }
       return jsonReply(
         {
           ok: true,
           version: VERSION_TAG,
           hasKey,
           kv: !!env.SAVONIE_KV,
+          d1Ok,
           authConfigured,
           authSource,
           factsKey: "site-facts:v1",
@@ -1754,9 +1772,51 @@ async function apiHandleGetErrors(request, env, corsHeaders) {
   }
 }
 
+async function apiHandleGetErrorById(request, env, corsHeaders, errorId) {
+  const auth = await apiVerifyAuth(request, env);
+  if (!auth.ok) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  if (!Number.isInteger(errorId) || errorId <= 0) {
+    return new Response(JSON.stringify({ error: 'Not found' }), {
+      status: 404,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  try {
+    const { results } = await env.DB.prepare('SELECT * FROM errors WHERE id = ?').bind(errorId).all();
+    const error = Array.isArray(results) ? results[0] : null;
+    if (!error) {
+      return new Response(JSON.stringify({ error: 'Not found' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    return new Response(JSON.stringify({ error }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+}
+
 async function apiHandleUpdateError(request, env, corsHeaders, errorId) {
   const auth = await apiVerifyAuth(request, env);
   if (!auth.ok) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+  if (!Number.isInteger(errorId) || errorId <= 0) {
+    return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
   
   try {
     const { category, status } = await request.json();
@@ -1780,6 +1840,10 @@ async function apiHandleUpdateError(request, env, corsHeaders, errorId) {
 async function apiHandleDeleteError(request, env, corsHeaders, errorId) {
   const auth = await apiVerifyAuth(request, env);
   if (!auth.ok) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+  if (!Number.isInteger(errorId) || errorId <= 0) {
+    return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  }
   try {
     await env.DB.prepare('DELETE FROM errors WHERE id = ?').bind(errorId).run();
     return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });

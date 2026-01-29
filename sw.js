@@ -1,99 +1,128 @@
 ﻿/* sw.js */
-const CACHE_VERSION = "v20260127-telemetry";
-const CACHE_NAME = `portfolio-cache-${CACHE_VERSION}`;
+// Service worker caching for public pages only.
+// Strictly bypasses the dashboard + diagnostics + all /api/* routes to avoid preview/prod auth surprises.
 
-// Keep this list lean. Do NOT precache HUD or any debug scripts.
-const ASSETS_TO_CACHE = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/assets/css/style.css",
-  "/theme.css",
-  "/assets/js/site.min.js",
-  "/assets/js/lazy-loader.min.js",
-  "/assets/js/cache-refresh.js",
-  "/assets/img/logo-ea.webp",
-  "/assets/img/favicon-32x32.png",
-  "/assets/img/favicon-16x16.png",
-  "/assets/img/apple-touch-icon.png",
-  "/assets/img/favicon.ico"
+const CACHE_VERSION = 'v20260129-dashboard-bypass';
+const CACHE_PREFIX = 'portfolio-cache-';
+const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
+
+// Keep this list lean. Do NOT precache dashboard or any diagnostics scripts.
+const PRECACHE_URLS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/assets/css/style.css',
+  '/theme.css',
+  '/assets/js/site.min.js',
+  '/assets/js/lazy-loader.min.js',
+  '/assets/js/cache-refresh.js',
+  '/assets/img/favicon.ico'
 ];
 
-self.addEventListener("install", (event) => {
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      await cache.addAll(PRECACHE_URLS);
+    })()
   );
   self.skipWaiting();
 });
 
-self.addEventListener("activate", (event) => {
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
-        cacheNames
-          .filter((name) => name.startsWith("portfolio-cache-") && name !== CACHE_NAME)
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter((name) => name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME)
           .map((name) => caches.delete(name))
-      )
-    )
+      );
+      await self.clients.claim();
+    })()
   );
-  self.clients.claim();
 });
 
+function isSameOrigin(url) {
+  return url.origin === self.location.origin;
+}
+
 function isHTMLRequest(request) {
-  return request.mode === "navigate" || (request.headers.get("accept") || "").includes("text/html");
+  return request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html');
 }
 
-function isHUDAsset(url) {
-  return url.pathname === "/assets/js/debugger-hud.min.js";
+function shouldBypass(url) {
+  const path = url.pathname;
+
+  // Never cache API responses.
+  if (path.startsWith('/api/')) return true;
+
+  // Never cache the dashboard entrypoint (Pages rewrites /dashboard -> /EN/dashboard.html).
+  if (path === '/dashboard' || path === '/dashboard/' || path === '/EN/dashboard.html') return true;
+
+  // Never cache dashboard assets.
+  if (path === '/assets/js/dashboard.js' || path === '/assets/css/dashboard.css') return true;
+
+  // Never cache diagnostics/HUD scripts.
+  if (path.startsWith('/assets/js/telemetry-core')) return true;
+  if (path.startsWith('/assets/js/diagnostics-consent')) return true;
+  if (path.startsWith('/assets/js/debugger-hud')) return true;
+
+  return false;
 }
 
-self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
+async function putInCache(request, response) {
+  if (!response || !response.ok) return;
+  const cache = await caches.open(CACHE_NAME);
+  await cache.put(request, response);
+}
 
-  // Always network-first for HTML and the HUD script (HUD is versioned by query param).
-  if (isHTMLRequest(event.request) || isHUDAsset(url)) {
+async function networkFirst(request) {
+  try {
+    const response = await fetch(request);
+    await putInCache(request, response.clone());
+    return response;
+  } catch (err) {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    throw err;
+  }
+}
+
+async function cacheFirst(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+  const response = await fetch(request);
+  await putInCache(request, response.clone());
+  return response;
+}
+
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  if (!isSameOrigin(url)) return;
+
+  if (shouldBypass(url)) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  if (isHTMLRequest(request)) {
     event.respondWith(
-      fetch(event.request)
-        .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-          return response;
-        })
-        .catch(() => caches.match(event.request))
+      networkFirst(request).catch(() => caches.match('/index.html'))
     );
     return;
   }
 
-  // Cache-first for static assets.
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-        return response;
-      });
-    })
-  );
-});
-                    const cached = await caches.match(request);
-                    return cached || caches.match('/EN/404.html');
-                })
-        );
-        return;
-    }
+  const dest = request.destination;
+  if (dest === 'style' || dest === 'script' || dest === 'image' || dest === 'font') {
+    event.respondWith(cacheFirst(request));
+    return;
+  }
 
-    // Stale-while-revalidate for assets
-    event.respondWith(
-        caches.match(request)
-            .then((cachedResponse) => {
-                const networkFetch = fetch(request)
-                    .then((response) => {
-                        if (response && response.status === 200) {
-                            const responseClone = response.clone();
-                            caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
-                        }
-                        return response;
-                    })
-                    .catch(() => undefined);
+  // Default: don't interfere.
+  event.respondWith(fetch(request));
+});
 

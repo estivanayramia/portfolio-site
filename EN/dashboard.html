@@ -32,6 +32,16 @@
     <div class="login-container">
       <h1>🛡️ Error Dashboard</h1>
       <p>Protected area - Password required</p>
+
+      <div class="login-help" style="margin-top: 10px;">
+        <strong>Backend status</strong>
+        <div style="margin-top: 6px; font-size: 13px; line-height: 1.4; opacity: 0.9;">
+          <div>Health: <span id="login-backend-health">—</span></div>
+          <div>Auth configured: <span id="login-auth-configured">—</span></div>
+          <div>Auth source: <span id="login-auth-source">—</span></div>
+          <div>Worker version: <span id="login-worker-version">—</span></div>
+        </div>
+      </div>
       <form id="login-form">
         <input 
           type="password" 
@@ -45,9 +55,11 @@
       <p id="login-error" class="error-message" style="display: none;"></p>
 
       <div class="login-help">
-        <strong>Demo mode</strong>: Add <code>?demo=1</code> to the URL to try the dashboard without API access.
+        <strong>Demo mode</strong>: On Cloudflare Pages preview builds, the dashboard defaults to demo (offline) mode.
+        Add <code>?force_real=1</code> to use the real backend.
+        You can always force demo with <code>?demo=1</code>.
         <br>
-        Useful for UI testing when the backend is down or while developing offline.
+        Demo mode never prompts for a password and never calls <code>/api/*</code>.
       </div>
     </div>
   </div>
