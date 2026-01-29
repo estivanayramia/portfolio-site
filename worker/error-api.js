@@ -1,4 +1,4 @@
-﻿/* worker/error-api.js - Hardened backend with opaque sessions */
+/* worker/error-api.js - Hardened backend with opaque sessions */
 
 function json(body, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(body), {
@@ -52,7 +52,7 @@ function redactObject(obj) {
   const out = {};
   for (const [k, v] of Object.entries(obj)) {
     if (/authorization/i.test(k) || SENSITIVE_KEY_RE.test(k)) out[k] = "[Redacted]";
-    else out[k] = typeof v === "string" ? (v.length > 500 ? v.slice(0, 500) + "" : v) : redactObject(v);
+    else out[k] = typeof v === "string" ? (v.length > 500 ? v.slice(0, 500) + "…" : v) : redactObject(v);
   }
   return out;
 }
@@ -90,13 +90,13 @@ async function requireSession(request, env) {
   const token = parseBearer(request);
   if (!token) return { ok: false };
 
-  const key = sess:;
+  const key = `sess:${token}`;
   const session = await env.SAVONIE_KV.get(key, "json");
   if (!session) return { ok: false };
 
   const max = Number(env.RATE_LIMIT_MAX || "10");
   const windowMs = Number(env.RATE_LIMIT_WINDOW || "60000");
-  const ok = await rateLimitKV(env.SAVONIE_KV, l:sess:, max, windowMs);
+  const ok = await rateLimitKV(env.SAVONIE_KV, `rl:sess:${token}`, max, windowMs);
   if (!ok) return { ok: false, status: 429 };
 
   return { ok: true, token, session };
@@ -112,7 +112,7 @@ export async function apiHandleAuth(request, env, allowedOrigins) {
   const max = Number(env.RATE_LIMIT_MAX || "10");
   const windowMs = Number(env.RATE_LIMIT_WINDOW || "60000");
   const ip = getClientIP(request);
-  const ipOK = await rateLimitKV(env.SAVONIE_KV, l:ip:, max, windowMs);
+  const ipOK = await rateLimitKV(env.SAVONIE_KV, `rl:ip:${ip}`, max, windowMs);
   if (!ipOK) return json({ error: "rate_limited" }, 429);
 
   let body;
@@ -145,7 +145,7 @@ export async function apiHandleAuth(request, env, allowedOrigins) {
     ua: request.headers.get("User-Agent") || ""
   };
 
-  await env.SAVONIE_KV.put(sess:, JSON.stringify(sess), { expirationTtl: 60 * 60 * 24 });
+  await env.SAVONIE_KV.put(`sess:${token}`, JSON.stringify(sess), { expirationTtl: 60 * 60 * 24 });
 
   return json({ token });
 }
@@ -160,7 +160,7 @@ export async function apiHandleErrorReport(request, env, allowedOrigins) {
   const max = Number(env.RATE_LIMIT_MAX || "10");
   const windowMs = Number(env.RATE_LIMIT_WINDOW || "60000");
   const ip = getClientIP(request);
-  const ipOK = await rateLimitKV(env.SAVONIE_KV, l:ip:, max * 2, windowMs);
+  const ipOK = await rateLimitKV(env.SAVONIE_KV, `rl:ip:${ip}`, max * 2, windowMs);
   if (!ipOK) return json({ error: "rate_limited" }, 429);
 
   let body;
@@ -188,7 +188,7 @@ export async function apiHandleErrorReport(request, env, allowedOrigins) {
     const safeData = redactObject(it.data || {});
     const safeUrl = typeof it.url === "string" ? it.url : url;
 
-    const message = ${msg} |  |  | ;
+    const message = `${msg} | ${level} | ${kind} | ${safeUrl}`;
 
     return {
       type: kind,
@@ -201,8 +201,8 @@ export async function apiHandleErrorReport(request, env, allowedOrigins) {
   });
 
   const stmt = env.DB.prepare(
-    INSERT INTO errors (type, message, url, stack, user_agent, timestamp, category, status, is_bot, version)
-     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)
+    `INSERT INTO errors (type, message, url, stack, user_agent, timestamp, category, status, is_bot, version)
+     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)`
   );
 
   let stored = 0;
@@ -236,13 +236,13 @@ export async function apiHandleGetErrors(request, env, allowedOrigins) {
   const offset = Math.max(Number(u.searchParams.get("offset") || "0"), 0);
 
   const rows = await env.DB.prepare(
-    SELECT id, type, message, url, stack, category, status, user_agent, is_bot, timestamp, version
+    `SELECT id, type, message, url, stack, category, status, user_agent, is_bot, timestamp, version
      FROM errors
      ORDER BY timestamp DESC
-     LIMIT ?1 OFFSET ?2
+     LIMIT ?1 OFFSET ?2`
   ).bind(limit, offset).all();
 
-  const total = await env.DB.prepare(SELECT COUNT(*) as c FROM errors).all();
+  const total = await env.DB.prepare(`SELECT COUNT(*) as c FROM errors`).all();
 
   return json({
     errors: (rows.results || []).map(redactObject),
@@ -272,7 +272,7 @@ export async function apiHandleUpdateError(request, env, allowedOrigins, id) {
   if (!category && !status) return json({ error: "no_changes" }, 400);
 
   await env.DB.prepare(
-    UPDATE errors SET category = COALESCE(?1, category), status = COALESCE(?2, status) WHERE id = ?3
+    `UPDATE errors SET category = COALESCE(?1, category), status = COALESCE(?2, status) WHERE id = ?3`
   ).bind(category, status, id).run();
 
   return json({ ok: true });
@@ -284,6 +284,6 @@ export async function apiHandleDeleteError(request, env, allowedOrigins, id) {
   const auth = await requireSession(request, env);
   if (!auth.ok) return json({ error: "unauthorized" }, auth.status || 401);
 
-  await env.DB.prepare(DELETE FROM errors WHERE id = ?1).bind(id).run();
+  await env.DB.prepare(`DELETE FROM errors WHERE id = ?1`).bind(id).run();
   return json({ ok: true });
 }
