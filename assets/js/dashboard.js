@@ -5,8 +5,47 @@
 
 // DEMO MODE - enabled for localhost or explicit demo param for local testing
 const __dashboardParams = new URLSearchParams(location.search);
-const DEMO_MODE = __dashboardParams.get('demo') === '1' || location.hostname === 'localhost';
+let DEMO_MODE = __dashboardParams.get('demo') === '1' || location.hostname === 'localhost';
 const DEMO_PASSWORD = 'savonie21';
+
+// API routing
+const PROD_API_ORIGIN = 'https://estivanayramia.com';
+
+function isPagesPreviewHost(hostname) {
+  const host = String(hostname || '').toLowerCase();
+  return host.includes('.pages.dev');
+}
+
+function getApiOrigin() {
+  const host = String(location.hostname || '').toLowerCase();
+  if (host === 'estivanayramia.com' || host === 'www.estivanayramia.com') return '';
+  if (host === 'localhost' || host === '127.0.0.1') return '';
+  if (isPagesPreviewHost(host)) return PROD_API_ORIGIN;
+  return '';
+}
+
+const API_ORIGIN = getApiOrigin();
+
+function apiUrl(pathname) {
+  const path = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  return `${API_ORIGIN}${path}`;
+}
+
+async function readJsonOrText(response) {
+  const text = await response.text();
+  try {
+    return { json: JSON.parse(text), text };
+  } catch {
+    return { json: null, text };
+  }
+}
+
+function setLoginError(message) {
+  const errorMsg = document.getElementById('login-error');
+  if (!errorMsg) return;
+  errorMsg.textContent = message;
+  errorMsg.style.display = 'block';
+}
 
 // Mock error data for demo mode
 const MOCK_ERRORS = [
@@ -1012,26 +1051,40 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   }
   
   try {
-    const response = await fetch('/api/auth', {
+    const response = await fetch(apiUrl('/api/auth'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password })
     });
-    
-    const data = await response.json();
-    
-    if (response.ok && data.token) {
-      authToken = data.token;
+
+    const { json, text } = await readJsonOrText(response);
+
+    if (response.ok && json && json.token) {
+      authToken = json.token;
       localStorage.setItem('dashboard_token', authToken);
       showDashboard();
       loadErrors();
     } else {
-      errorMsg.textContent = 'Invalid password';
-      errorMsg.style.display = 'block';
+      if (!json) {
+        if (response.status === 404 && isPagesPreviewHost(location.hostname)) {
+          setLoginError('Backend not available for this preview build.');
+        } else {
+          const snippet = String(text || '').replace(/\s+/g, ' ').slice(0, 140);
+          setLoginError(`Login failed (HTTP ${response.status}). ${snippet ? `Response: ${snippet}` : ''}`.trim());
+        }
+      } else {
+        errorMsg.textContent = 'Invalid password';
+        errorMsg.style.display = 'block';
+      }
     }
   } catch (error) {
-    errorMsg.textContent = 'Connection error';
-    errorMsg.style.display = 'block';
+    if (isPagesPreviewHost(location.hostname)) {
+      DEMO_MODE = true;
+      setLoginError('Backend unreachable on preview; switched to demo mode.');
+    } else {
+      errorMsg.textContent = 'Connection error';
+      errorMsg.style.display = 'block';
+    }
   }
 });
 
@@ -1069,7 +1122,7 @@ async function loadErrors() {
       ...currentFilters
     });
     
-    const response = await fetch(`/api/errors?${params}`, {
+    const response = await fetch(apiUrl(`/api/errors?${params}`), {
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
     
@@ -1084,7 +1137,9 @@ async function loadErrors() {
       throw new Error('Failed to fetch errors');
     }
     
-    const data = await response.json();
+    const { json } = await readJsonOrText(response);
+    const data = json;
+    if (!data) throw new Error('Non-JSON API response');
     renderErrors(data.errors);
     updateStats(data.errors, data.total);
     updatePagination(data.total);
@@ -1189,7 +1244,7 @@ window.viewError = async function(errorId) {
   
   try {
     // NEW: Fetch by ID directly to avoid offset bugs
-    const response = await fetch(`/api/errors/${errorId}`, {
+    const response = await fetch(apiUrl(`/api/errors/${errorId}`), {
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
     
@@ -1293,7 +1348,7 @@ document.getElementById('save-error').addEventListener('click', async () => {
   const status = document.getElementById('modal-status').value;
   
   try {
-    const response = await fetch(`/api/errors/${currentErrorId}`, {
+    const response = await fetch(apiUrl(`/api/errors/${currentErrorId}`), {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${authToken}`,
@@ -1318,7 +1373,7 @@ document.getElementById('delete-error').addEventListener('click', async () => {
   if (!confirm('Are you sure you want to delete this error?')) return;
   
   try {
-    const response = await fetch(`/api/errors/${currentErrorId}`, {
+    const response = await fetch(apiUrl(`/api/errors/${currentErrorId}`), {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
@@ -1397,7 +1452,7 @@ document.getElementById('export-btn').addEventListener('click', async () => {
     btn.disabled = true;
 
     // Fetch all errors for export
-    const response = await fetch('/api/errors?limit=1000', {
+    const response = await fetch(apiUrl('/api/errors?limit=1000'), {
       headers: { 'Authorization': `Bearer ${authToken}` }
     });
     

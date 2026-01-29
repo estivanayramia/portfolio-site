@@ -575,15 +575,19 @@ function getCorsHeaders(request) {
     origin.startsWith("http://localhost:") || 
     origin.startsWith("http://127.0.0.1:")
   );
+
+  // Allow Cloudflare Pages previews (branch/preview deployments)
+  const isPagesDev = origin && /^https:\/\/([a-z0-9-]+\.)+pages\.dev$/i.test(origin);
+  const isWorkersDev = origin && /^https:\/\/([a-z0-9-]+\.)+workers\.dev$/i.test(origin);
   
-  const allowedOrigin = (allowedOrigins.includes(origin) || isLocalhost) 
+  const allowedOrigin = (allowedOrigins.includes(origin) || isLocalhost || isPagesDev || isWorkersDev) 
     ? origin 
     : allowedOrigins[0];
   
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, POST, PATCH, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
     "Access-Control-Max-Age": "86400"
   };
 }
@@ -1554,20 +1558,40 @@ async function apiCheckRateLimit(ip, env) {
   }
 }
 
-function apiVerifyAuth(request, env) {
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) return false;
-  
-  const token = authHeader.substring(7);
-  try {
-    const decoded = atob(token);
-    const [timestamp, password] = decoded.split(':');
-    if (password !== env.DASHBOARD_PASSWORD_HASH) return false;
-    if ((Date.now() - parseInt(timestamp)) > 86400000) return false; // 24h
-    return true;
-  } catch (error) {
-    return false;
-  }
+function apiTimingSafeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length !== b.length) return false;
+  let out = 0;
+  for (let i = 0; i < a.length; i++) out |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return out === 0;
+}
+
+async function apiSha256Hex(str) {
+  const data = new TextEncoder().encode(String(str));
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  const bytes = new Uint8Array(digest);
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+function apiRandomToken() {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  let s = '';
+  for (const b of bytes) s += String.fromCharCode(b);
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+async function apiVerifyAuth(request, env) {
+  const authHeader = request.headers.get('Authorization') || '';
+  const m = authHeader.match(/^Bearer\s+(.+)$/i);
+  if (!m) return { ok: false };
+
+  const token = m[1];
+  if (!env.SAVONIE_KV) return { ok: false };
+
+  const sess = await env.SAVONIE_KV.get(`sess:${token}`, 'json');
+  if (!sess) return { ok: false };
+
+  return { ok: true, token, sess };
 }
 
 async function apiHandleErrorReport(request, env, corsHeaders) {
@@ -1579,8 +1603,15 @@ async function apiHandleErrorReport(request, env, corsHeaders) {
     if (!(await apiCheckRateLimit(clientIP, env))) {
       return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
-    
-    const { type, message, filename, line, col, stack, url, viewport, version, breadcrumbs } = body;
+
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return new Response(JSON.stringify({ error: 'Bad request' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    const { type, message, filename, line, col, stack, url, viewport, version, breadcrumbs } = body || {};
     
     if (!type || !message) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -1613,18 +1644,47 @@ async function apiHandleErrorReport(request, env, corsHeaders) {
 
 async function apiHandleAuth(request, env, corsHeaders) {
   try {
-    const { password } = await request.json();
-    if (password === env.DASHBOARD_PASSWORD_HASH) {
-      return new Response(JSON.stringify({ success: true, token: btoa(`${Date.now()}:${password}`) }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    if (!env.SAVONIE_KV) {
+      return new Response(JSON.stringify({ error: 'Server not configured' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
-    return new Response(JSON.stringify({ error: 'Invalid password' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+    const { password } = await request.json();
+    const provided = typeof password === 'string' ? password : '';
+    const expected = env.DASHBOARD_PASSWORD_HASH;
+
+    if (!expected) {
+      return new Response(JSON.stringify({ error: 'Server not configured' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    let ok = false;
+    if (/^[a-f0-9]{64}$/i.test(String(expected))) {
+      const got = await apiSha256Hex(provided);
+      ok = apiTimingSafeEqual(got.toLowerCase(), String(expected).toLowerCase());
+    } else {
+      ok = apiTimingSafeEqual(provided, String(expected));
+    }
+
+    if (!ok) {
+      return new Response(JSON.stringify({ error: 'Invalid password' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    const token = apiRandomToken();
+    const sess = {
+      created: Date.now(),
+      ip: request.headers.get('CF-Connecting-IP') || 'unknown',
+      ua: request.headers.get('User-Agent') || ''
+    };
+
+    await env.SAVONIE_KV.put(`sess:${token}`, JSON.stringify(sess), { expirationTtl: 60 * 60 * 24 });
+    return new Response(JSON.stringify({ token }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (e) {
     return new Response(JSON.stringify({ error: 'Bad request' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 }
 
 async function apiHandleGetErrors(request, env, corsHeaders) {
-  if (!apiVerifyAuth(request, env)) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  const auth = await apiVerifyAuth(request, env);
+  if (!auth.ok) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   
   try {
     const url = new URL(request.url);
@@ -1657,7 +1717,8 @@ async function apiHandleGetErrors(request, env, corsHeaders) {
 }
 
 async function apiHandleUpdateError(request, env, corsHeaders, errorId) {
-  if (!apiVerifyAuth(request, env)) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  const auth = await apiVerifyAuth(request, env);
+  if (!auth.ok) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   
   try {
     const { category, status } = await request.json();
@@ -1679,7 +1740,8 @@ async function apiHandleUpdateError(request, env, corsHeaders, errorId) {
 }
 
 async function apiHandleDeleteError(request, env, corsHeaders, errorId) {
-  if (!apiVerifyAuth(request, env)) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+  const auth = await apiVerifyAuth(request, env);
+  if (!auth.ok) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   try {
     await env.DB.prepare('DELETE FROM errors WHERE id = ?').bind(errorId).run();
     return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
