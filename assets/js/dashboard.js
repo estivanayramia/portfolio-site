@@ -27,7 +27,7 @@ function isDashboardDemoMode() {
 let DEMO_MODE = isDashboardDemoMode();
 
 // API routing
-const PROD_API_ORIGIN = 'https://estivanayramia.com';
+const PROD_API_ORIGIN = 'https://www.estivanayramia.com';
 
 function isPagesPreviewHost(hostname) {
   const host = String(hostname || '').toLowerCase();
