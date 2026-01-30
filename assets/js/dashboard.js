@@ -311,6 +311,10 @@ async function loadDiagnosticsAssets() {
   ensureDashboardConsent();
   window.__SavonieTelemetry?.enable?.({ upload: false, mode: 'dev' });
   await loadScript('/assets/js/debugger-hud.min.js');
+  if (!window.__SavonieHUD || typeof window.__SavonieHUD.open !== 'function') {
+    throw new Error('Diagnostics HUD failed to initialize (window.__SavonieHUD missing).');
+  }
+  if (!window.Savonie) window.Savonie = window.__SavonieHUD;
   diagnosticsState.loaded = true;
   setDiagnosticsStatus('Diagnostics loaded. Ready.', 'ready');
 }

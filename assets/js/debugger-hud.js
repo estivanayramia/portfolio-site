@@ -7,6 +7,9 @@
 
   const tel = window.__SavonieTelemetry;
   if (!tel) {
+  // Back-compat / easier console debugging.
+  // Some tooling expects `window.Savonie` to exist.
+  if (!window.Savonie) window.Savonie = window.__SavonieHUD;
     try { console.error("[Diagnostics] Telemetry core missing."); } catch {}
     return;
   }
