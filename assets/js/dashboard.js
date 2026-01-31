@@ -1384,21 +1384,35 @@ function initDiagnosticsPanel() {
   closeBtn.disabled = true;
   openBtn.disabled = false;
 
+  // FORCE button clickability with inline styles (nuclear option for desktop overlay issues)
+  openBtn.style.pointerEvents = 'auto';
+  openBtn.style.cursor = 'pointer';
+  openBtn.style.position = 'relative';
+  openBtn.style.zIndex = '9999';
+  closeBtn.style.pointerEvents = 'auto';
+  closeBtn.style.cursor = 'pointer';
+  closeBtn.style.position = 'relative';
+  closeBtn.style.zIndex = '9999';
+
+  console.log('[Dashboard] Diagnostics panel initialized. Open button:', openBtn, 'Close button:', closeBtn);
+
   openBtn.addEventListener('click', async (e) => {
+    console.log('[Dashboard] Open diagnostics clicked!', e);
     try {
       e.preventDefault();
       e.stopPropagation();
     } catch {}
     await openDiagnosticsPanel();
-  });
+  }, { capture: true });
 
   closeBtn.addEventListener('click', (e) => {
+    console.log('[Dashboard] Close diagnostics clicked!', e);
     try {
       e.preventDefault();
       e.stopPropagation();
     } catch {}
     closeDiagnosticsPanel();
-  });
+  }, { capture: true });
 }
 
 // Login form handler
