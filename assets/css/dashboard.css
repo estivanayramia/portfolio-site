@@ -144,6 +144,7 @@ body {
 /* Click safety: ensure controls stay interactive */
 .dashboard-container button,
 .savonie-btn,
+.savonie-tab,
 .tab-btn,
 .icon-btn,
 .view-btn,
