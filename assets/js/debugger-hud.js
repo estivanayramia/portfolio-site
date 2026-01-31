@@ -47,15 +47,42 @@
     .savonie-panel{right:12px;top:12px;bottom:12px;width:440px;border-radius:16px}
   }
   .savonie-panel.savonie-embedded{position:relative;inset:auto;right:auto;top:auto;bottom:auto;width:100%;max-width:none;
-    background:#1a1f2e;color:#e1d4c2;border:1px solid #2a2f3e;box-shadow:none;z-index:1 !important}
+    background:#1a1f2e;color:#e1d4c2;border:1px solid #2a2f3e;box-shadow:none;z-index:2147483647 !important}
   .savonie-panel.savonie-embedded .savonie-header{border-bottom:1px solid #2a2f3e}
   .savonie-panel.savonie-embedded .savonie-tab{border-color:#2a2f3e;color:#e1d4c2}
-  .savonie-panel.savonie-embedded .savonie-tab[aria-selected="true"]{background:#4a90e2;color:#fff;border-color:#357abd}
+  .savonie-panel.savonie-embedded .savonie-tab[aria-selected="true"]{background:#4a90e2 !important;color:#fff !important;border-color:#357abd !important}
   .savonie-panel.savonie-embedded .savonie-card{background:#111722;border-color:#2a2f3e}
   .savonie-panel.savonie-embedded .savonie-btn{background:#4a90e2;border-color:#357abd}
   .savonie-panel.savonie-embedded .savonie-btn.secondary{background:transparent;color:#e1d4c2;border-color:#2a2f3e}
+  `; 
+  
+  /* Widget Suppression */
+  style.textContent += `
+  body.savonie-open #chatbase-bubble-button,
+  body.savonie-open #chatbase-bubble-window,
+  body.savonie-open iframe[id*="chat"],
+  body.savonie-open .chatbase-bubble {
+    display: none !important;
+    pointer-events: none !important;
+  }
+  
+  /* Force Interactivity */
+  .savonie-panel, .savonie-panel * {
+    pointer-events: auto !important;
+  }
   `;
   document.head.appendChild(style);
+
+  // GLOBAL SNIFFER: Debug why clicks aren't reaching usage
+  window.addEventListener('click', (e) => {
+    if (e.target.classList?.contains('savonie-tab') || e.target.closest('.savonie-tab')) {
+      console.log('[GLOBAL SNIFFER] Click detected on Tab!', {
+        target: e.target,
+        path: e.composedPath(),
+        event: e
+      });
+    }
+  }, true); // Capture phase!
 
   const backdrop = document.createElement("div");
   backdrop.className = "savonie-backdrop";
@@ -121,6 +148,7 @@
   // FIX #1: USE EVENT DELEGATION ON PANEL ROOT
   // ============================================
   panel.addEventListener("click", (e) => {
+    // console.log('[HUD] Click intercepted on panel. Target:', e.target);
     const target = e.target.closest("button");
     if (!target) return;
 
@@ -136,9 +164,17 @@
     // Handle tab clicks
     if (target.classList.contains("savonie-tab")) {
       const tabName = target.textContent.trim();
+      console.log(`[HUD] Tab clicked: "${tabName}"`, { 
+        matches: TAB_NAMES.includes(tabName), 
+        current: activeTab 
+      });
+      
       if (TAB_NAMES.includes(tabName)) {
         activeTab = tabName;
+        console.log('[HUD] Setting active tab to:', activeTab);
         render();
+      } else {
+        console.warn('[HUD] Tab name not in whitelist:', tabName);
       }
       return;
     }
@@ -572,6 +608,7 @@
     lastActiveEl = document.activeElement;
     if (useBackdrop) document.body.appendChild(backdrop);
     mountRoot.appendChild(panel);
+    document.body.classList.add("savonie-open"); // Hide widgets
 
     render();
     panel.focus();
@@ -583,6 +620,7 @@
   function close() {
     document.removeEventListener("keydown", onKey, true);
     document.removeEventListener("keydown", trapFocus, true);
+    document.body.classList.remove("savonie-open"); // Restore widgets
 
     if (backdrop.isConnected) backdrop.remove();
     if (panel.isConnected) panel.remove();

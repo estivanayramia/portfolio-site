@@ -310,7 +310,7 @@ async function loadDiagnosticsAssets() {
   await loadScript('/assets/js/telemetry-core.js');
   ensureDashboardConsent();
   window.__SavonieTelemetry?.enable?.({ upload: false, mode: 'dev' });
-  await loadScript('/assets/js/debugger-hud.min.js');
+  await loadScript(`/assets/js/debugger-hud.min.js?v=${Date.now()}`);
   if (!window.__SavonieHUD || typeof window.__SavonieHUD.open !== 'function') {
     throw new Error('Diagnostics HUD failed to initialize (window.__SavonieHUD missing).');
   }

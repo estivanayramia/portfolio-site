@@ -22,13 +22,10 @@ window.debugClickTargets = function(options = {}) {
     }))
   ];
   
-  // Clean up any previous visualization overlays
-  const existingOverlays = document.querySelectorAll('.debug-overlay-rect');
-  existingOverlays.forEach(el => el.remove());
-
+  // Clean
   const results = [];
   
-  buttons.forEach(item => {
+  for (const item of buttons) {
     let btn = item.element;
     const { id, label } = item;
     
@@ -40,13 +37,13 @@ window.debugClickTargets = function(options = {}) {
       if (!id.startsWith('tab-')) { // Don't warn for dynamic tabs if not found
           results.push({ id, label, error: 'Button not found in DOM' });
       }
-      return;
+      continue;
     }
     
     const rect = btn.getBoundingClientRect();
     if (rect.width === 0 && rect.height === 0) {
        results.push({ id, label, error: 'Button is not visible (0x0 dim)' });
-       return;
+       continue;
     }
 
     const centerX = rect.left + rect.width / 2;
@@ -58,36 +55,79 @@ window.debugClickTargets = function(options = {}) {
     // Computed styles
     const computed = window.getComputedStyle(btn);
 
-    const isSameElement = elementAtCenter && (elementAtCenter === btn || btn.contains(elementAtCenter));
-    
-    // Visualize blocking element if requested
-    if (visualize && !isSameElement && elementAtCenter) {
-      const blockRect = elementAtCenter.getBoundingClientRect();
+    // 1. Visualize button center
+    if (visualize) {
       const div = document.createElement('div');
-      div.className = 'debug-overlay-rect';
+      div.className = 'debug-overlay-center';
       div.style.position = 'fixed';
-      div.style.left = `${blockRect.left}px`;
-      div.style.top = `${blockRect.top}px`;
-      div.style.width = `${blockRect.width}px`;
-      div.style.height = `${blockRect.height}px`;
-      div.style.border = '2px solid red';
-      div.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+      div.style.left = (centerX - 5) + 'px';
+      div.style.top = (centerY - 5) + 'px';
+      div.style.width = '10px';
+      div.style.height = '10px';
+      div.style.borderRadius = '50%';
+      div.style.backgroundColor = 'blue';
       div.style.zIndex = '999999';
-      div.style.pointerEvents = 'none'; // Don't interfere with interactions
-      div.style.display = 'flex';
-      div.style.alignItems = 'center';
-      div.style.justifyContent = 'center';
-      div.style.color = 'red';
-      div.style.fontSize = '12px';
-      div.style.fontWeight = 'bold';
-      div.style.textShadow = '0px 0px 2px white';
-      div.textContent = `BLOCKING: <${elementAtCenter.tagName?.toLowerCase()}>.${elementAtCenter.className?.split(' ').join('.')}`;
+      div.style.pointerEvents = 'none';
       document.body.appendChild(div);
-      
-      // Auto-remove after 5 seconds to not be annoying
       setTimeout(() => div.remove(), 5000);
     }
+
+    // 2. Check if elementAtCenter is the button itself or inside it
+    const isSameElement = elementAtCenter && (elementAtCenter === btn || btn.contains(elementAtCenter));
+
+    // 3. Check if pointer-events is none
+    if (computed.pointerEvents === 'none') {
+      console.warn(`⚠️ POINTER-EVENTS:NONE ${label} (${id})`);
+      results.push({ id, label, error: 'pointer-events: none', button: btn });
+      continue;
+    }
     
+    // 4. Check if disabled (application logic, not overlay)
+    if (btn.disabled) {
+      console.warn(`⚠️ DISABLED (Intentional) ${label} (${id})`);
+      results.push({ id, label, error: 'Disabled (Intentional)', button: btn });
+      continue;
+    }
+
+    // 5. Check if off-screen
+    if (rect.bottom < 0 || rect.top > window.innerHeight || rect.right < 0 || rect.left > window.innerWidth) {
+      console.warn(`⚠️ OFF-SCREEN ${label} (${id})`);
+      results.push({ id, label, error: 'Off-screen', button: btn });
+      continue;
+    }
+
+    // 6. Check for blocking overlay
+    if (!isSameElement && elementAtCenter) {
+      console.error(`🚨 BLOCKED ${label} (${id})`);
+      console.log('   Blocking Element:', elementAtCenter);
+      
+      // Visualize blocking element if requested
+      if (visualize) {
+         const div = document.createElement('div');
+         div.className = 'debug-overlay-rect';
+         div.style.position = 'fixed';
+         const blockRect = elementAtCenter.getBoundingClientRect();
+         div.style.left = blockRect.left + 'px';
+         div.style.top = blockRect.top + 'px';
+         div.style.width = blockRect.width + 'px';
+         div.style.height = blockRect.height + 'px';
+         div.style.border = '4px solid red';
+         div.style.zIndex = '999999';
+         div.style.pointerEvents = 'none';
+         div.style.fontSize = '12px';
+         div.style.fontWeight = 'bold';
+         div.style.textShadow = '0px 0px 2px white';
+         div.textContent = `BLOCKING: <${elementAtCenter.tagName?.toLowerCase()}>.${elementAtCenter.className?.replace(/ /g, '.')}`;
+         document.body.appendChild(div);
+         setTimeout(() => div.remove(), 5000);
+      }
+    } else if (!elementAtCenter) {
+       console.warn(`❓ NOT FOUND AT POINT ${label} (${id}) - Likely transparent or zero-size wrapper?`);
+    } else {
+       console.log(`✅ CLICKABLE ${label} (${id})`);
+    }
+
+    // Capture comprehensive result
     results.push({
       id,
       label,
@@ -112,7 +152,7 @@ window.debugClickTargets = function(options = {}) {
         ? (getEventListeners(btn).click?.length || 0) 
         : 'unavailable (DevTools only)'
     });
-  });
+  }
   
   console.group('%c[Debug Click Targets] Results', 'color: lime; font-weight: bold');
   results.forEach(r => {

@@ -1249,7 +1249,7 @@ select {
     height: 100%;
     pointer-events: none;
     display: block;
-    z-index: 0;
+    z-index: 2147483647 !important; /* above chat handles */
 }
 
 #scroll-to-top .scroll-progress-track {
