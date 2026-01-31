@@ -47,7 +47,7 @@
     .savonie-panel{right:12px;top:12px;bottom:12px;width:440px;border-radius:16px}
   }
   .savonie-panel.savonie-embedded{position:relative;inset:auto;right:auto;top:auto;bottom:auto;width:100%;max-width:none;
-    background:#1a1f2e;color:#e1d4c2;border:1px solid #2a2f3e;box-shadow:none}
+    background:#1a1f2e;color:#e1d4c2;border:1px solid #2a2f3e;box-shadow:none;z-index:1 !important}
   .savonie-panel.savonie-embedded .savonie-header{border-bottom:1px solid #2a2f3e}
   .savonie-panel.savonie-embedded .savonie-tab{border-color:#2a2f3e;color:#e1d4c2}
   .savonie-panel.savonie-embedded .savonie-tab[aria-selected="true"]{background:#4a90e2;color:#fff;border-color:#357abd}

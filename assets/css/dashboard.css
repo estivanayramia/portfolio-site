@@ -567,6 +567,8 @@ button.danger:hover,
   border-radius: 10px;
   padding: 20px;
   margin-bottom: 30px;
+  position: relative;
+  z-index: 0;
 }
 
 .diagnostics-header {
@@ -575,6 +577,8 @@ button.danger:hover,
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 10px;
+  position: relative;
+  z-index: 3;
 }
 
 .diagnostics-header h2 {
@@ -591,12 +595,16 @@ button.danger:hover,
   color: var(--text-secondary);
   margin-bottom: 12px;
   font-size: 14px;
+  position: relative;
+  z-index: 2;
 }
 
 .diagnostics-status {
   font-size: 13px;
   color: var(--text-secondary);
   margin-bottom: 12px;
+  position: relative;
+  z-index: 2;
 }
 
 .diagnostics-status[data-tone="loading"] { color: var(--warning); }
