@@ -13,7 +13,7 @@ const __dashboardParams = new URLSearchParams(location.search);
 // Cache-busting for critical diagnostics assets.
 // Some environments (desktop profiles + SW) can hold stale JS/CSS even after deploy.
 // This version should be bumped when diagnosing “frozen buttons” regressions.
-const __DIAGNOSTICS_ASSET_VERSION = '480c817';
+const __DIAGNOSTICS_ASSET_VERSION = '36c2000';
 
 function isLocalDevHost(hostname) {
   const host = String(hostname || '').toLowerCase();
@@ -332,7 +332,7 @@ async function loadDiagnosticsAssets() {
   await loadScript('/assets/js/telemetry-core.js');
   ensureDashboardConsent();
   window.__SavonieTelemetry?.enable?.({ upload: false, mode: 'dev' });
-  await loadScript(`/assets/js/debugger-hud.min.js?v=${Date.now()}`);
+  await loadScript(`/assets/js/debugger-hud.min.js?v=${__DIAGNOSTICS_ASSET_VERSION}`);
   if (!window.__SavonieHUD || typeof window.__SavonieHUD.open !== 'function') {
     throw new Error('Diagnostics HUD failed to initialize (window.__SavonieHUD missing).');
   }
@@ -349,9 +349,26 @@ async function openDiagnosticsPanel() {
 
   try {
     if (openBtn) openBtn.disabled = true;
-    await loadDiagnosticsAssets();
+
+    // Force a clean slate (desktop reports suggest stale HUD globals / DOM references).
     try { mount.innerHTML = ''; } catch {}
-    window.__SavonieHUD?.open?.({ mount, embedded: true, backdrop: false });
+    try { mount.removeAttribute('data-diagnostics-bound'); } catch {}
+
+    // If a previous HUD exists, ensure it is closed and discarded.
+    try { window.__SavonieHUD?.close?.(); } catch {}
+    try { delete window.__SavonieHUD; } catch {}
+    diagnosticsState.loaded = false;
+
+    await loadDiagnosticsAssets();
+
+    // Give the browser a beat to finish executing the injected bundle.
+    await new Promise((r) => setTimeout(r, 100));
+
+    if (!window.__SavonieHUD || typeof window.__SavonieHUD.open !== 'function') {
+      throw new Error('HUD did not initialize (window.__SavonieHUD missing after load).');
+    }
+
+    window.__SavonieHUD.open({ mount, embedded: true, backdrop: false });
     diagnosticsState.open = true;
     if (closeBtn) closeBtn.disabled = false;
     if (openBtn) openBtn.disabled = true;
