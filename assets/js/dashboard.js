@@ -1,6 +1,7 @@
 /**
  * Error Dashboard JavaScript
  * Handles authentication, error fetching, filtering, and management
+ * Build Retry: 2026-01-31 (Force)
  */
 
 // DEMO MODE
