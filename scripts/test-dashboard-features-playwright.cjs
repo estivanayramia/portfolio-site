@@ -164,6 +164,14 @@ async function startLocalServer(port = 5500) {
     await clickTab(page, 'errors');
     await page.click('#open-diagnostics');
 
+    // Validate Savonie HUD is interactive (tabs clickable)
+    await page.waitForSelector('button.savonie-tab', { timeout: 15000 });
+    await page.locator('button.savonie-tab:has-text("Issues")').click();
+    await page.waitForFunction(() => {
+      const selected = document.querySelector('button.savonie-tab[aria-selected="true"]');
+      return !!selected && selected.textContent && selected.textContent.trim() === 'Issues';
+    }, { timeout: 8000 });
+
     // Comprehensive test button should populate redirect log and other tabs
     await clickTab(page, 'redirects');
     await page.click('#test-all-features');

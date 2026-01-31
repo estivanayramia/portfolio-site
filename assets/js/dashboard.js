@@ -326,25 +326,29 @@ async function openDiagnosticsPanel() {
   if (!mount) return;
 
   try {
-    openBtn.disabled = true;
+    if (openBtn) openBtn.disabled = true;
     await loadDiagnosticsAssets();
+    try { mount.innerHTML = ''; } catch {}
     window.__SavonieHUD?.open?.({ mount, embedded: true, backdrop: false });
     diagnosticsState.open = true;
-    closeBtn.disabled = false;
+    if (closeBtn) closeBtn.disabled = false;
+    if (openBtn) openBtn.disabled = true;
     setDiagnosticsStatus('Diagnostics panel open.', 'ready');
   } catch (err) {
     console.error(err);
     setDiagnosticsStatus('Failed to load diagnostics.', 'error');
-  } finally {
-    openBtn.disabled = false;
+    if (closeBtn) closeBtn.disabled = true;
+    if (openBtn) openBtn.disabled = false;
   }
 }
 
 function closeDiagnosticsPanel() {
   const closeBtn = document.getElementById('close-diagnostics');
+  const openBtn = document.getElementById('open-diagnostics');
   window.__SavonieHUD?.close?.();
   diagnosticsState.open = false;
   if (closeBtn) closeBtn.disabled = true;
+  if (openBtn) openBtn.disabled = false;
   setDiagnosticsStatus('Diagnostics closed.', 'muted');
 }
 
@@ -1367,10 +1371,34 @@ function sleep(ms) {
 function initDiagnosticsPanel() {
   const openBtn = document.getElementById('open-diagnostics');
   const closeBtn = document.getElementById('close-diagnostics');
-  if (!openBtn || !closeBtn) return;
+  const mount = document.getElementById('diagnostics-mount');
+  if (!openBtn || !closeBtn || !mount) return;
   setDiagnosticsStatus('Diagnostics not loaded.', 'muted');
-  openBtn.addEventListener('click', () => openDiagnosticsPanel());
-  closeBtn.addEventListener('click', () => closeDiagnosticsPanel());
+
+  // Avoid duplicate bindings if showDashboard() runs multiple times.
+  if (mount.dataset.diagnosticsBound === '1') return;
+  mount.dataset.diagnosticsBound = '1';
+
+  // Ensure a clean mount. HUD renders its own DOM.
+  try { mount.innerHTML = ''; } catch {}
+  closeBtn.disabled = true;
+  openBtn.disabled = false;
+
+  openBtn.addEventListener('click', async (e) => {
+    try {
+      e.preventDefault();
+      e.stopPropagation();
+    } catch {}
+    await openDiagnosticsPanel();
+  });
+
+  closeBtn.addEventListener('click', (e) => {
+    try {
+      e.preventDefault();
+      e.stopPropagation();
+    } catch {}
+    closeDiagnosticsPanel();
+  });
 }
 
 // Login form handler
