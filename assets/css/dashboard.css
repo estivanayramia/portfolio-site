@@ -615,7 +615,7 @@ button.danger:hover,
   min-height: 120px;
   pointer-events: auto;
   position: relative;
-  z-index: 1;
+  z-index: 999;
 }
 
 .diagnostics-mount * {
