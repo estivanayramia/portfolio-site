@@ -1,8 +1,16 @@
 /* assets/js/debugger-hud.js - FIXED VERSION with Event Delegation */
 (function () {
+  // CLEANUP: Remove any existing panels/styles to prevent duplicates
+  document.querySelectorAll('.savonie-panel').forEach(el => el.remove());
+  document.querySelectorAll('.savonie-backdrop').forEach(el => el.remove());
+  if (window.__SavonieHUD && window.__SavonieHUD.close) {
+      try { window.__SavonieHUD.close(); } catch {}
+  }
+
   if (window.__SavonieHUD && window.__SavonieHUD.open) {
-    window.__SavonieHUD.open();
-    return;
+    // If re-loaded, just use the new code but don't auto-open unless intended
+    // window.__SavonieHUD.open(); <--- Removed auto-open on script load
+    // return;
   }
 
   const tel = window.__SavonieTelemetry;

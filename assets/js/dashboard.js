@@ -306,7 +306,10 @@ function ensureDashboardConsent() {
 }
 
 async function loadDiagnosticsAssets() {
-  if (diagnosticsState.loaded) return;
+  if (diagnosticsState.loaded || window.__SavonieHUD) {
+      diagnosticsState.loaded = true;
+      return;
+  }
   setDiagnosticsStatus('Loading diagnostics…', 'loading');
   await loadScript('/assets/js/telemetry-core.js');
   ensureDashboardConsent();
