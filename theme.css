@@ -728,7 +728,7 @@ body {
 /* Overlay resize handles (explicit capture zones) */
 .chatbase-edge-handle, .chatbase-corner-handle {
     position: absolute;
-    z-index: 2147483648; /* above iframe */
+    z-index: 100000; /* above iframe but below diagnostics */
     background: transparent; /* invisible by default */
     pointer-events: auto;
 }

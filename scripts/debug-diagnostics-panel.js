@@ -26,10 +26,12 @@
   }
 
   function safeGetEventListeners(el) {
+    // getEventListeners is a Chrome DevTools Command Line API function.
+    // It is NOT available in standard scripts or other browsers.
     const canInspect = (typeof getEventListeners === 'function');
     if (!canInspect) {
-      warn('[Diagnostics] WARN: getEventListeners() not available in this context (DevTools-only helper). Skipping listener introspection.');
-      return null;
+      // Return a dummy object or null to indicate unavailability without crashing
+      return { note: 'getEventListeners API not available (DevTools only)' };
     }
     try {
       return getEventListeners(el);
@@ -114,7 +116,8 @@
     if (openBtn) {
       log('2) Open button state', {
         disabled: !!openBtn.disabled,
-        pointerEvents: (() => { try { return getComputedStyle(openBtn).pointerEvents; } catch { return 'unknown'; } })(),
+        // safe computed style check
+        pointerEvents: (() => { try { return window.getComputedStyle(openBtn).pointerEvents; } catch { return 'unknown'; } })(),
         elementFromPointIsOpenBtn: (() => {
           try {
             const el = elementAtCenter(openBtn);
@@ -136,8 +139,10 @@
     const hudOpened = await ensureHudOpen();
     log('4) HUD detected in mount:', hudOpened);
 
-    log('window.__SavonieHUD:', window.__SavonieHUD);
-    log('window.Savonie:', window.Savonie);
+    try {
+        log('window.__SavonieHUD:', window.__SavonieHUD);
+        log('window.Savonie:', window.Savonie);
+    } catch (e) { log('Global Savonie objects check failed', e); }
 
     if (!mount) return;
 
@@ -150,7 +155,7 @@
     }
 
     const firstTab = tabs[0];
-    const pe = (() => { try { return getComputedStyle(firstTab).pointerEvents; } catch { return 'unknown'; } })();
+    const pe = (() => { try { return window.getComputedStyle(firstTab).pointerEvents; } catch { return 'unknown'; } })();
     const elAt = elementAtCenter(firstTab);
 
     log('6) First tab clickability snapshot', {
