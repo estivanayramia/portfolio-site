@@ -10,6 +10,11 @@
 // - Always enabled when `?demo=1`
 const __dashboardParams = new URLSearchParams(location.search);
 
+// Cache-busting for critical diagnostics assets.
+// Some environments (desktop profiles + SW) can hold stale JS/CSS even after deploy.
+// This version should be bumped when diagnosing “frozen buttons” regressions.
+const __DIAGNOSTICS_ASSET_VERSION = '480c817';
+
 function isLocalDevHost(hostname) {
   const host = String(hostname || '').toLowerCase();
   return host === 'localhost' || host === '127.0.0.1';
@@ -225,11 +230,24 @@ function setDiagnosticsStatus(text, tone = 'muted') {
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
+    let finalSrc = src;
+    try {
+      const shouldBust =
+        src === '/assets/js/telemetry-core.js' ||
+        src === '/assets/js/debugger-hud.min.js';
+
+      if (shouldBust) {
+        const u = new URL(src, location.origin);
+        if (!u.searchParams.has('v')) u.searchParams.set('v', __DIAGNOSTICS_ASSET_VERSION);
+        finalSrc = `${u.pathname}?${u.searchParams.toString()}`;
+      }
+    } catch {}
+
     const s = document.createElement('script');
-    s.src = src;
+    s.src = finalSrc;
     s.defer = true;
     s.onload = () => resolve();
-    s.onerror = () => reject(new Error(`Failed to load ${src}`));
+    s.onerror = () => reject(new Error(`Failed to load ${finalSrc}`));
     document.head.appendChild(s);
   });
 }
