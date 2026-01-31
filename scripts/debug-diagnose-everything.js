@@ -1,23 +1,60 @@
-window.diagnoseEverything = function() {
-  console.group("🕵️‍♂️ SAVONIE DIAGNOSTICS CT SCAN");
+window.diagnoseEverything = async function() {
+  console.clear();
+  console.group("🕵️‍♂️ SAVONIE DIAGNOSTICS CT SCAN (v2)");
+  
+  // 1. CHECK GLOBAL HUD OBJECT
+  if (!window.__SavonieHUD) {
+    console.error("❌ CRTICAL: window.__SavonieHUD is undefined!");
+    console.log("   This means the 'debugger-hud.js' script failed to load or crashed.");
+    console.groupEnd();
+    return;
+  }
+  console.log("✅ window.__SavonieHUD exists.");
+
+  // 2. FORCE OPEN
+  console.log("🔄 Attempting to force-open HUD...");
+  try {
+    window.__SavonieHUD.open();
+    console.log("   open() function called successfully.");
+  } catch (e) {
+    console.error("❌ CRITICAL: open() threw an error:", e);
+  }
+
+  // 3. WAIT FOR RENDER (Short delay)
+  console.log("⏳ Waiting 500ms for DOM update...");
+  await new Promise(r => setTimeout(r, 500));
+
+  // 4. CHECK PANEL EXISTENCE
+  const panel = document.querySelector('.savonie-panel');
+  if (!panel) {
+    console.error("❌ CRITICAL: .savonie-panel NOT found in DOM after open()!");
+    console.groupEnd();
+    return;
+  }
+  console.log("✅ .savonie-panel found in DOM.");
+  console.log("   Panel Z-Index:", window.getComputedStyle(panel).zIndex);
+  console.log("   Panel Visibility:", window.getComputedStyle(panel).visibility);
+  console.log("   Panel Display:", window.getComputedStyle(panel).display);
+
+  // 5. FIND TABS
   const tabs = document.querySelectorAll('.savonie-tab');
-  console.log(`Found ${tabs.length} tabs.`);
+  console.log(`🔎 Found ${tabs.length} tabs.`);
 
   if (tabs.length === 0) {
-    console.error("❌ No tabs found! passed selector '.savonie-tab'");
+    console.error("❌ CRITICAL: Panel exists but NO TABS found. render() might have failed.");
     console.groupEnd();
     return;
   }
 
+  // 6. HIT TEST TABS
   tabs.forEach((tab, i) => {
     const rect = tab.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     
-    console.group(`👉 Tab "${tab.textContent.trim()}" (#${i})`);
+    console.groupCollapsed(`👉 Tab "${tab.textContent.trim()}" (#${i})`);
     console.log("Position:", `x=${Math.round(centerX)}, y=${Math.round(centerY)}`);
     
-    // 1. VISUAL HIT TEST
     const topEl = document.elementFromPoint(centerX, centerY);
     const isSelf = topEl === tab || tab.contains(topEl);
     
@@ -27,51 +64,16 @@ window.diagnoseEverything = function() {
       console.error("❌ HIT-TEST FAIL: Top element is NOT this tab.");
       console.log("🚨 BLOCKED BY:", topEl);
       if (topEl) {
-        console.log("   Blocker Class:", topEl.className);
-        console.log("   Blocker ID:", topEl.id);
-        console.log("   Blocker Z-Index:", window.getComputedStyle(topEl).zIndex);
-        
-        // Visualize blocker
+        // Highlighting blocker
         topEl.style.outline = "4px solid red";
-        topEl.style.boxShadow = "0 0 20px red";
-        setTimeout(() => { topEl.style.outline = ""; topEl.style.boxShadow = ""; }, 3000);
+        setTimeout(() => topEl.style.outline = "", 1000);
       }
     }
-
-    // 2. POINTER EVENTS ANCESTRY
-    let el = tab;
-    let stuck = false;
-    while (el && el !== document.body) {
-      const style = window.getComputedStyle(el);
-      const pe = style.pointerEvents;
-      if (pe === "none") {
-        console.error(`❌ BLOCKER ANCESTOR:`, el);
-        console.log(`   Reason: pointer-events: none`);
-        stuck = true;
-      }
-      el = el.parentElement;
-    }
-    if (!stuck) console.log("✅ Ancestry Check Pass: No 'pointer-events: none' found in tree.");
-
-    // 3. FORCE CLICK (Sanity Check)
-    console.log("Attempting programmatic click...");
-    try {
-      if (tab.onclick) console.log("   Has onclick handler.");
-      // We can't see addEventListener handlers easily, but we can fire event.
-      tab.click();
-      console.log("   Programmatic click fired.");
-    } catch(e) {
-      console.error("   Click error:", e);
-    }
-    
     console.groupEnd();
   });
   
   console.groupEnd();
+  console.log("✅ Scan Complete.");
 };
 
-console.log("✅ debug-diagnose-everything.js loaded.");
-console.log("👉 Run: window.diagnoseEverything()");
-if (window.confirm("Run full diagnostics scan now?")) {
-    window.diagnoseEverything();
-}
+window.diagnoseEverything();
