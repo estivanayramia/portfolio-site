@@ -292,6 +292,11 @@
 
   function renderTabs() {
     tabs.innerHTML = "";
+    // Force pointer-events and z-index on tabs container for desktop reliability
+    tabs.style.pointerEvents = "auto";
+    tabs.style.position = "relative";
+    tabs.style.zIndex = "2147483647";
+
     for (const name of TAB_NAMES) {
       const b = el("button", {
         class: "savonie-tab",
@@ -300,6 +305,17 @@
         "aria-selected": name === activeTab ? "true" : "false",
         text: name
       });
+      // DIRECT click handler as fallback (delegation sometimes fails on desktop)
+      b.style.pointerEvents = "auto";
+      b.style.cursor = "pointer";
+      b.addEventListener("click", function handleTabClick(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (activeTab !== name) {
+          activeTab = name;
+          render();
+        }
+      }, { capture: true });
       tabs.appendChild(b);
     }
   }
@@ -598,6 +614,10 @@
     embedded = !!opts.embedded;
     useBackdrop = embedded ? false : (opts.backdrop !== false);
     mountRoot = opts.mount || document.body;
+
+    // Force clickability on the panel for desktop
+    panel.style.pointerEvents = "auto";
+    panel.style.zIndex = "2147483647";
 
     if (embedded) panel.classList.add("savonie-embedded");
     else panel.classList.remove("savonie-embedded");

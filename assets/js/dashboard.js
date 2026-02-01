@@ -388,6 +388,11 @@ async function openDiagnosticsPanel() {
       throw new Error('HUD did not initialize (window.__SavonieHUD missing after load).');
     }
 
+    // Force mount container to be click-able on desktop (z-index + pointer-events)
+    mount.style.position = 'relative';
+    mount.style.zIndex = '2147483647';
+    mount.style.pointerEvents = 'auto';
+
     window.__SavonieHUD.open({ mount, embedded: true, backdrop: false });
     diagnosticsState.open = true;
     if (closeBtn) closeBtn.disabled = false;
