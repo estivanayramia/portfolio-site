@@ -172,6 +172,22 @@ async function startLocalServer(port = 5500) {
       return !!selected && selected.textContent && selected.textContent.trim() === 'Issues';
     }, { timeout: 8000 });
 
+    // Regression: close -> reopen should not throw or dead-click on desktop.
+    await page.click('#close-diagnostics');
+    await page.waitForFunction(() => {
+      const openBtn = document.getElementById('open-diagnostics');
+      const closeBtn = document.getElementById('close-diagnostics');
+      return !!openBtn && !openBtn.disabled && !!closeBtn && closeBtn.disabled;
+    }, null, { timeout: 8000 });
+
+    await page.click('#open-diagnostics');
+    await page.waitForSelector('button.savonie-tab', { timeout: 15000 });
+    await page.locator('button.savonie-tab:has-text("Network")').click();
+    await page.waitForFunction(() => {
+      const selected = document.querySelector('button.savonie-tab[aria-selected="true"]');
+      return !!selected && selected.textContent && selected.textContent.trim() === 'Network';
+    }, { timeout: 8000 });
+
     // Comprehensive test button should populate redirect log and other tabs
     await clickTab(page, 'redirects');
     await page.click('#test-all-features');

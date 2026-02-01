@@ -243,10 +243,37 @@ function loadScript(src) {
       }
     } catch {}
 
+    // Avoid injecting duplicate <script> tags for the same URL.
+    // Multiple injections can re-run bootstraps and create hard-to-debug state.
+    try {
+      const scripts = Array.from(document.getElementsByTagName('script'));
+      const existing = scripts.find((el) => {
+        try {
+          const u = new URL(el.src, location.href);
+          return `${u.pathname}${u.search}` === finalSrc;
+        } catch {
+          return false;
+        }
+      });
+
+      if (existing) {
+        if (existing.dataset && existing.dataset.loaded === '1') {
+          resolve();
+          return;
+        }
+        existing.addEventListener('load', () => resolve(), { once: true });
+        existing.addEventListener('error', () => reject(new Error(`Failed to load ${finalSrc}`)), { once: true });
+        return;
+      }
+    } catch {}
+
     const s = document.createElement('script');
     s.src = finalSrc;
     s.defer = true;
-    s.onload = () => resolve();
+    s.onload = () => {
+      try { s.dataset.loaded = '1'; } catch {}
+      resolve();
+    };
     s.onerror = () => reject(new Error(`Failed to load ${finalSrc}`));
     document.head.appendChild(s);
   });
@@ -350,19 +377,12 @@ async function openDiagnosticsPanel() {
   try {
     if (openBtn) openBtn.disabled = true;
 
-    // Force a clean slate (desktop reports suggest stale HUD globals / DOM references).
-    try { mount.innerHTML = ''; } catch {}
-    try { mount.removeAttribute('data-diagnostics-bound'); } catch {}
-
-    // If a previous HUD exists, ensure it is closed and discarded.
+    // Ensure we don't have an already-open instance before opening.
+    // (Close is written to be safe/idempotent, but some browsers can throw
+    // DOMException in edge cases; never let that strand the dashboard UI.)
     try { window.__SavonieHUD?.close?.(); } catch {}
-    try { delete window.__SavonieHUD; } catch {}
-    diagnosticsState.loaded = false;
 
     await loadDiagnosticsAssets();
-
-    // Give the browser a beat to finish executing the injected bundle.
-    await new Promise((r) => setTimeout(r, 100));
 
     if (!window.__SavonieHUD || typeof window.__SavonieHUD.open !== 'function') {
       throw new Error('HUD did not initialize (window.__SavonieHUD missing after load).');
@@ -384,7 +404,7 @@ async function openDiagnosticsPanel() {
 function closeDiagnosticsPanel() {
   const closeBtn = document.getElementById('close-diagnostics');
   const openBtn = document.getElementById('open-diagnostics');
-  window.__SavonieHUD?.close?.();
+  try { window.__SavonieHUD?.close?.(); } catch {}
   diagnosticsState.open = false;
   if (closeBtn) closeBtn.disabled = true;
   if (openBtn) openBtn.disabled = false;
