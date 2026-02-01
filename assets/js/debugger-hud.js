@@ -247,7 +247,7 @@
         render();
         break;
     }
-  });
+  }, { capture: true });
 
   backdrop.addEventListener("click", (e) => {
     if (e.target === backdrop) close();
