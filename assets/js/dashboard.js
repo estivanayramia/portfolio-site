@@ -13,7 +13,23 @@ const __dashboardParams = new URLSearchParams(location.search);
 // Cache-busting for critical diagnostics assets.
 // Some environments (desktop profiles + SW) can hold stale JS/CSS even after deploy.
 // This version should be bumped when diagnosing “frozen buttons” regressions.
-const __DIAGNOSTICS_ASSET_VERSION = '36c2000';
+function getDiagnosticsAssetVersion() {
+  try {
+    const meta = document.querySelector('meta[name="build-version"]');
+    const fromMeta = meta && meta.getAttribute('content');
+    if (fromMeta) return String(fromMeta);
+  } catch {}
+
+  try {
+    const fromLS = localStorage.getItem('siteVersion');
+    if (fromLS) return String(fromLS);
+  } catch {}
+
+  // Fallback: stable dev value.
+  return 'dev';
+}
+
+const __DIAGNOSTICS_ASSET_VERSION = getDiagnosticsAssetVersion();
 
 function isLocalDevHost(hostname) {
   const host = String(hostname || '').toLowerCase();
