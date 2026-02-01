@@ -153,13 +153,27 @@
   let embedded = false;
 
   // ============================================
-  // FIX #1: USE EVENT DELEGATION ON PANEL ROOT
+  // FIX #1: HARDEN HUD INPUT HANDLING
+  // - capture phase
+  // - pointerdown fallback
+  // - de-dupe click after pointerdown
   // ============================================
-  panel.addEventListener("click", (e) => {
-    // console.log('[HUD] Click intercepted on panel. Target:', e.target);
-    const target = e.target.closest("button");
-    if (!target) return;
+  let lastPointerHandledAt = 0;
 
+  function handleHudInteraction(e) {
+    if (e && e.__hudHandled) return;
+    const target = e && e.target && e.target.closest ? e.target.closest("button") : null;
+    if (!target || !panel.contains(target)) return;
+
+    if (e.type === "click" && performance.now() - lastPointerHandledAt < 650) {
+      return;
+    }
+
+    if (e.type === "pointerdown") {
+      lastPointerHandledAt = performance.now();
+    }
+
+    e.__hudHandled = true;
     e.preventDefault();
     e.stopPropagation();
 
@@ -172,17 +186,17 @@
     // Handle tab clicks
     if (target.classList.contains("savonie-tab")) {
       const tabName = target.textContent.trim();
-      console.log(`[HUD] Tab clicked: "${tabName}"`, { 
-        matches: TAB_NAMES.includes(tabName), 
-        current: activeTab 
+      console.log(`[HUD] Tab clicked: "${tabName}"`, {
+        matches: TAB_NAMES.includes(tabName),
+        current: activeTab
       });
-      
+
       if (TAB_NAMES.includes(tabName)) {
         activeTab = tabName;
-        console.log('[HUD] Setting active tab to:', activeTab);
+        console.log("[HUD] Setting active tab to:", activeTab);
         render();
       } else {
-        console.warn('[HUD] Tab name not in whitelist:', tabName);
+        console.warn("[HUD] Tab name not in whitelist:", tabName);
       }
       return;
     }
@@ -247,7 +261,10 @@
         render();
         break;
     }
-  }, { capture: true });
+  }
+
+  panel.addEventListener("pointerdown", handleHudInteraction, { capture: true });
+  panel.addEventListener("click", handleHudInteraction, { capture: true });
 
   backdrop.addEventListener("click", (e) => {
     if (e.target === backdrop) close();
