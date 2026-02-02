@@ -206,8 +206,6 @@
       progressEl.classList.toggle('is-visible', inRange);
       if (navPrev) navPrev.disabled = !inRange;
       if (navNext) navNext.disabled = !inRange;
-      if (navPrev) navPrev.setAttribute('aria-hidden', inRange ? 'false' : 'true');
-      if (navNext) navNext.setAttribute('aria-hidden', inRange ? 'false' : 'true');
     }
 
     function updateDots(idx) {
