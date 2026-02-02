@@ -20,6 +20,8 @@
 
   const lerp = (a, b, t) => a + (b - a) * t;
 
+  const abs = Math.abs;
+
   const prefersReducedMotion = () => {
     try {
       return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -45,6 +47,33 @@
     }, 140);
   }
 
+  function wantsDebug() {
+    try {
+      return new URLSearchParams(window.location.search).has('scroll3dDebug');
+    } catch {
+      return false;
+    }
+  }
+
+  function createFpsOverlay() {
+    const el = document.createElement('div');
+    el.setAttribute('data-scroll3d-fps', '');
+    el.style.position = 'fixed';
+    el.style.right = '12px';
+    el.style.bottom = '12px';
+    el.style.zIndex = '9999';
+    el.style.padding = '6px 8px';
+    el.style.borderRadius = '10px';
+    el.style.font = '12px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif';
+    el.style.color = '#e1d4c2';
+    el.style.background = 'rgba(33, 40, 66, 0.85)';
+    el.style.border = '1px solid rgba(225, 212, 194, 0.18)';
+    el.style.backdropFilter = 'blur(6px)';
+    el.textContent = 'scroll3d: -- fps';
+    document.body.appendChild(el);
+    return el;
+  }
+
   function createController(root) {
     const stage = root.querySelector(SELECTORS.stage);
     const track = root.querySelector(SELECTORS.track);
@@ -58,26 +87,35 @@
     const reducedMotion = prefersReducedMotion();
 
     const CONFIG = {
-      radius: 560,
-      depth: 520,
-      zOffset: -170,
-      waveY: 26,
+      // Tuned for 60fps: fewer expensive effects.
+      radius: 520,
+      depth: 420,
+      zOffset: -150,
+      waveY: 0,
       centerScale: 1.38,
-      sideScale: 0.74,
+      sideScale: 0.80,
       centerOpacity: 1.0,
-      sideOpacity: 0.32,
-      blurPx: 3.0,
-      lerpT: 0.12,
+      sideOpacity: 0.50,
+      blurPx: 0,
+      lerpT: 0.16,
+      updateThreshold: 0.0009,
+      settleEpsilon: 0.0006,
+      cullBackCards: true,
+      cullCosThreshold: -0.72,
       snapStepsOnReducedMotion: true,
       mobile: {
-        radius: 320,
-        depth: 220,
-        zOffset: -110,
-        waveY: 12,
+        radius: 300,
+        depth: 170,
+        zOffset: -105,
+        waveY: 0,
         centerScale: 1.16,
         sideScale: 0.90,
         sideOpacity: 0.70,
-        blurPx: 0
+        blurPx: 0,
+        lerpT: 0.22,
+        updateThreshold: 0.0018,
+        settleEpsilon: 0.0014,
+        cullBackCards: false
       }
     };
 
@@ -85,6 +123,12 @@
     let currentProgress = 0;
     let rafId = 0;
     let activeIndex = 0;
+    let lastPaintedProgress = -1;
+    let bounds = null;
+    let fpsEl = null;
+    let fpsLastT = 0;
+    let fpsAccMs = 0;
+    let fpsFrames = 0;
 
     function getConfig() {
       return isMobile() ? { ...CONFIG, ...CONFIG.mobile } : CONFIG;
@@ -96,15 +140,23 @@
       spacer.style.height = `${vh}vh`;
     }
 
-    function computeProgress() {
+    function updateBounds() {
       const rect = root.getBoundingClientRect();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
       const vh = window.innerHeight || 1;
+      const top = rect.top + scrollTop;
+      const height = rect.height;
 
-      // We want progress=0 when the section starts to "take over".
-      const start = rect.top - vh * 0.15;
-      // progress=1 when we've scrolled through most of the section.
-      const end = rect.bottom - vh * 0.85;
-      const raw = (0 - start) / (end - start || 1);
+      // Map scroll to 0..1 while the section is in control.
+      const start = top - vh * 0.85;
+      const end = top + height - vh * 0.15;
+      bounds = { start, end };
+    }
+
+    function computeProgressFromScrollY() {
+      if (!bounds) updateBounds();
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+      const raw = (scrollTop - bounds.start) / (bounds.end - bounds.start || 1);
       return clamp01(raw);
     }
 
@@ -154,21 +206,38 @@
         const aRad = (info.a * Math.PI) / 180;
         const distance01 = clamp01(info.dist / 180);
 
-        const x = Math.sin(aRad) * cfg.radius;
-        const z = Math.cos(aRad) * cfg.depth + cfg.zOffset;
-        const y = Math.sin(aRad * 2) * cfg.waveY;
+        const sinA = Math.sin(aRad);
+        const cosA = Math.cos(aRad);
+
+        // Optional back-face culling to reduce overdraw.
+        const isCulled = cfg.cullBackCards && cosA < cfg.cullCosThreshold;
+
+        const x = sinA * cfg.radius;
+        const z = cosA * cfg.depth + cfg.zOffset;
+        const y = cfg.waveY ? Math.sin(aRad * 2) * cfg.waveY : 0;
 
         const scale = lerp(cfg.centerScale, cfg.sideScale, distance01);
         const opacity = lerp(cfg.centerOpacity, cfg.sideOpacity, distance01);
-        const blur = reducedMotion ? 0 : distance01 * cfg.blurPx;
+        const blur = 0;
 
         // Rotate the card so it faces the viewer when centered.
         const rotateY = -info.a;
 
-        item.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, ${z.toFixed(2)}px) rotateY(${rotateY.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
-        item.style.opacity = opacity.toFixed(3);
-        item.style.filter = blur > 0 ? `blur(${blur.toFixed(2)}px)` : 'none';
-        item.style.zIndex = String(Math.round(100 - distance01 * 60));
+        if (isCulled) {
+          item.style.visibility = 'hidden';
+          item.style.pointerEvents = 'none';
+          item.style.opacity = '0';
+          item.style.zIndex = '0';
+          item.style.transform = 'translate(-50%, -50%) translate3d(0px, 0px, -999px) rotateY(0deg) scale(0.7)';
+        } else {
+          item.style.visibility = 'visible';
+          item.style.pointerEvents = '';
+          item.style.transform = `translate(-50%, -50%) translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, ${z.toFixed(1)}px) rotateY(${rotateY.toFixed(1)}deg) scale(${scale.toFixed(3)})`;
+          item.style.opacity = opacity.toFixed(3);
+          item.style.zIndex = String(Math.round(100 - distance01 * 60));
+        }
+
+        item.style.filter = 'none';
 
         const isCenter = info.index === activeIndex;
         item.setAttribute('data-is-center', isCenter ? 'true' : 'false');
@@ -177,57 +246,117 @@
       updateHint(progress);
     }
 
-    function tick() {
+    function updateFps(now) {
+      if (!fpsEl) return;
+      if (!fpsLastT) {
+        fpsLastT = now;
+        return;
+      }
+      const dt = now - fpsLastT;
+      fpsLastT = now;
+      fpsAccMs += dt;
+      fpsFrames += 1;
+      if (fpsAccMs >= 500) {
+        const fps = Math.round((fpsFrames * 1000) / fpsAccMs);
+        fpsEl.textContent = `scroll3d: ${fps} fps`;
+        fpsAccMs = 0;
+        fpsFrames = 0;
+      }
+    }
+
+    function stopRaf() {
+      if (!rafId) return;
+      window.cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+
+    function tick(now) {
+      const cfg = getConfig();
+
       // Smooth follow unless reduced-motion.
       if (reducedMotion && CONFIG.snapStepsOnReducedMotion) {
         const total = items.length;
         const step = 1 / (total - 1 || 1);
         currentProgress = Math.round(targetProgress / step) * step;
       } else {
-        currentProgress = lerp(currentProgress, targetProgress, CONFIG.lerpT);
+        currentProgress = lerp(currentProgress, targetProgress, cfg.lerpT);
       }
 
-      applyTransforms(currentProgress);
+      const needsPaint =
+        lastPaintedProgress < 0 ||
+        abs(currentProgress - lastPaintedProgress) >= cfg.updateThreshold;
+
+      if (needsPaint) {
+        applyTransforms(currentProgress);
+        lastPaintedProgress = currentProgress;
+      }
+
+      updateFps(now);
+
+      const settled = abs(currentProgress - targetProgress) <= cfg.settleEpsilon;
+      if (settled && !needsPaint) {
+        stopRaf();
+        return;
+      }
+
       rafId = window.requestAnimationFrame(tick);
     }
 
     function onScroll() {
-      targetProgress = computeProgress();
+      targetProgress = computeProgressFromScrollY();
       setBodyScrollingFlag();
+
+      if (!rafId) {
+        rafId = window.requestAnimationFrame(tick);
+      }
     }
 
     function onResize() {
       tuneSpacerHeight();
-      targetProgress = computeProgress();
+      updateBounds();
+      targetProgress = computeProgressFromScrollY();
       currentProgress = targetProgress;
       applyTransforms(currentProgress);
+      lastPaintedProgress = currentProgress;
     }
 
     function init() {
       tuneSpacerHeight();
-      targetProgress = computeProgress();
+
+      if (wantsDebug()) {
+        fpsEl = createFpsOverlay();
+      }
+
+      updateBounds();
+      targetProgress = computeProgressFromScrollY();
       currentProgress = targetProgress;
       applyTransforms(currentProgress);
+      lastPaintedProgress = currentProgress;
 
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', onResize, { passive: true });
 
-      rafId = window.requestAnimationFrame(tick);
+      // RAF starts lazily on first scroll; avoids burning CPU while idle.
     }
 
     function destroy() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
-      if (rafId) window.cancelAnimationFrame(rafId);
+      stopRaf();
       items.forEach((item) => {
         item.style.transform = '';
         item.style.opacity = '';
         item.style.filter = '';
         item.style.zIndex = '';
+        item.style.visibility = '';
+        item.style.pointerEvents = '';
         item.removeAttribute('data-is-center');
       });
       updateDots(0);
       if (hint) hint.classList.remove('is-hidden');
+
+      if (fpsEl && fpsEl.parentNode) fpsEl.parentNode.removeChild(fpsEl);
+      fpsEl = null;
     }
 
     return { init, destroy };
