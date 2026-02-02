@@ -13,7 +13,10 @@
     spacer: '[data-scroll-spacer]',
     hint: '[data-scroll-hint]',
     item: '.scroll-3d-item',
-    dot: '[data-progress-dot]'
+    dot: '[data-progress-dot]',
+    progress: '[data-scroll-progress]',
+    navPrev: '[data-nav="prev"]',
+    navNext: '[data-nav="next"]'
   };
 
   const clamp01 = (n) => Math.max(0, Math.min(1, n));
@@ -81,6 +84,9 @@
     const hint = root.querySelector(SELECTORS.hint);
     const items = Array.from(root.querySelectorAll(SELECTORS.item));
     const dots = Array.from(root.querySelectorAll(SELECTORS.dot));
+    const progressEl = root.querySelector(SELECTORS.progress);
+    const navPrev = root.querySelector(SELECTORS.navPrev);
+    const navNext = root.querySelector(SELECTORS.navNext);
 
     if (!stage || !track || !spacer || items.length === 0) return null;
 
@@ -88,12 +94,12 @@
 
     const CONFIG = {
       // Tuned for 60fps: fewer expensive effects.
-      radius: 520,
-      depth: 420,
-      zOffset: -150,
+      radius: 450,
+      depth: 360,
+      zOffset: -160,
       waveY: 0,
-      centerScale: 1.38,
-      sideScale: 0.80,
+      centerScale: 1.0,
+      sideScale: 0.72,
       centerOpacity: 1.0,
       sideOpacity: 0.50,
       blurPx: 0,
@@ -108,8 +114,8 @@
         depth: 170,
         zOffset: -105,
         waveY: 0,
-        centerScale: 1.16,
-        sideScale: 0.90,
+        centerScale: 1.0,
+        sideScale: 0.82,
         sideOpacity: 0.70,
         blurPx: 0,
         lerpT: 0.22,
@@ -160,11 +166,60 @@
       return clamp01(raw);
     }
 
+    function progressForIndex(idx) {
+      const total = items.length;
+      if (total <= 1) return 0;
+      return clamp01(idx / (total - 1));
+    }
+
+    function scrollToProgress(p, behavior) {
+      updateBounds();
+      const range = bounds.end - bounds.start || 1;
+      const y = bounds.start + clamp01(p) * range;
+
+      const wantsSmooth = behavior !== 'auto' && behavior !== 'instant';
+      const reduced = prefersReducedMotion();
+      const b = reduced ? 'auto' : (wantsSmooth ? 'smooth' : 'auto');
+
+      window.scrollTo({ top: Math.max(0, y), behavior: b });
+
+      // Ensure the transform loop wakes up even if the browser coalesces scroll events.
+      targetProgress = clamp01(p);
+      if (!rafId) rafId = window.requestAnimationFrame(tick);
+    }
+
+    function scrollToIndex(idx, behavior) {
+      scrollToProgress(progressForIndex(idx), behavior);
+    }
+
+    function stepIndex(delta) {
+      const total = items.length;
+      const next = Math.max(0, Math.min(total - 1, activeIndex + delta));
+      scrollToIndex(next, 'smooth');
+    }
+
+    function updateUiVisibility() {
+      if (!progressEl || !bounds) return;
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+      const inRange = scrollTop >= bounds.start && scrollTop <= bounds.end;
+
+      progressEl.classList.toggle('is-visible', inRange);
+      if (navPrev) navPrev.disabled = !inRange;
+      if (navNext) navNext.disabled = !inRange;
+      if (navPrev) navPrev.setAttribute('aria-hidden', inRange ? 'false' : 'true');
+      if (navNext) navNext.setAttribute('aria-hidden', inRange ? 'false' : 'true');
+    }
+
     function updateDots(idx) {
       if (!dots.length) return;
       dots.forEach((dot, i) => {
         if (String(i) === String(idx)) dot.classList.add('is-active');
         else dot.classList.remove('is-active');
+        try {
+          dot.setAttribute('aria-current', String(i) === String(idx) ? 'true' : 'false');
+        } catch {
+          // ignore
+        }
       });
     }
 
@@ -199,6 +254,7 @@
 
       activeIndex = bestIdx;
       updateDots(activeIndex);
+      updateUiVisibility();
 
       for (const info of perItem) {
         const item = items[info.index];
@@ -305,6 +361,7 @@
     function onScroll() {
       targetProgress = computeProgressFromScrollY();
       setBodyScrollingFlag();
+      updateUiVisibility();
 
       if (!rafId) {
         rafId = window.requestAnimationFrame(tick);
@@ -320,6 +377,90 @@
       lastPaintedProgress = currentProgress;
     }
 
+    function onKeyDown(e) {
+      // Only when the scroll-3D section is active.
+      if (!bounds) return;
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+      const inRange = scrollTop >= bounds.start && scrollTop <= bounds.end;
+      if (!inRange) return;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        stepIndex(-1);
+        return;
+      }
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        stepIndex(1);
+        return;
+      }
+
+      if (e.key === 'Home') {
+        e.preventDefault();
+        scrollToIndex(0, 'smooth');
+        return;
+      }
+
+      if (e.key === 'End') {
+        e.preventDefault();
+        scrollToIndex(items.length - 1, 'smooth');
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        // Snap back to the nearest centered card.
+        scrollToIndex(activeIndex, 'smooth');
+      }
+    }
+
+    function bindInteractions() {
+      if (navPrev) {
+        navPrev.addEventListener('click', (e) => {
+          e.preventDefault();
+          stepIndex(-1);
+        });
+      }
+
+      if (navNext) {
+        navNext.addEventListener('click', (e) => {
+          e.preventDefault();
+          stepIndex(1);
+        });
+      }
+
+      if (dots.length) {
+        dots.forEach((dot) => {
+          dot.addEventListener('click', (e) => {
+            e.preventDefault();
+            const idx = Number(dot.getAttribute('data-progress-dot'));
+            if (Number.isFinite(idx)) scrollToIndex(idx, 'smooth');
+          });
+        });
+      }
+
+      // Click-to-center on cards. If already centered, allow the inner link.
+      items.forEach((item, idx) => {
+        item.addEventListener(
+          'click',
+          (e) => {
+            const isCenter = item.getAttribute('data-is-center') === 'true';
+            if (isCenter) return;
+
+            // Prevent accidental navigation when clicking the card link.
+            const anchor = e.target && e.target.closest ? e.target.closest('a') : null;
+            if (anchor) e.preventDefault();
+
+            scrollToIndex(idx, 'smooth');
+          },
+          true
+        );
+      });
+
+      document.addEventListener('keydown', onKeyDown);
+    }
+
     function init() {
       tuneSpacerHeight();
 
@@ -332,6 +473,9 @@
       currentProgress = targetProgress;
       applyTransforms(currentProgress);
       lastPaintedProgress = currentProgress;
+      updateUiVisibility();
+
+      bindInteractions();
 
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', onResize, { passive: true });
@@ -342,6 +486,7 @@
     function destroy() {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
+      document.removeEventListener('keydown', onKeyDown);
       stopRaf();
       items.forEach((item) => {
         item.style.transform = '';
@@ -354,6 +499,8 @@
       });
       updateDots(0);
       if (hint) hint.classList.remove('is-hidden');
+
+      if (progressEl) progressEl.classList.remove('is-visible');
 
       if (fpsEl && fpsEl.parentNode) fpsEl.parentNode.removeChild(fpsEl);
       fpsEl = null;
