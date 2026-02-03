@@ -1,0 +1,24 @@
+/* Radial Carousel themes (light/dark variants)
+   Uses existing site theme conventions:
+   - default: light
+   - [data-theme="dark"]: dark
+*/
+
+.carousel-radial {
+  --rc-focus: rgba(0, 102, 255, 0.95);
+  --rc-btn-bg: rgba(255, 255, 255, 0.78);
+  --rc-btn-fg: rgba(33, 40, 66, 0.88);
+  --rc-dot: rgba(54, 32, 23, 0.30);
+  --rc-dot-active: rgba(33, 40, 66, 0.92);
+  --rc-status: rgba(54, 32, 23, 0.72);
+}
+
+[data-theme="dark"] .carousel-radial {
+  --rc-focus: rgba(225, 212, 194, 0.85);
+  --rc-btn-bg: rgba(17, 10, 7, 0.62);
+  --rc-btn-fg: rgba(225, 212, 194, 0.90);
+  --rc-dot: rgba(225, 212, 194, 0.28);
+  --rc-dot-active: rgba(225, 212, 194, 0.85);
+  --rc-status: rgba(225, 212, 194, 0.75);
+}
+

@@ -13,6 +13,10 @@
   <meta property="og:url" content="https://www.estivanayramia.com/hobbies-games/nano-wirebot">
   <link rel="stylesheet" href="/assets/css/style.css?v=20260120">
   <link rel="stylesheet" href="/theme.css?v=v20260119-5">
+  <!-- Radial Carousel -->
+  <link rel="stylesheet" href="/assets/css/carousel/carousel-themes.min.css">
+  <link rel="stylesheet" href="/assets/css/carousel/radial-carousel.min.css">
+  <script type="module" src="/assets/js/carousel/RadialCarousel.min.js"></script>
   <link rel="icon" href="/assets/img/icon-192.png" type="image/png">
   <style>
     body { margin: 0; padding: 0; background: #212842; overflow-y: auto; }
@@ -65,38 +69,70 @@
           <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
         </a>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
-          <a href="/hobbies-games/block-breaker" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
-            <div class="text-4xl mb-3 group-hover:scale-110 transition-transform"><svg class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="10" rx="3"></rect><circle cx="8.5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><path d="M16.5 11h.01"></path></svg></div>
-            <div class="font-bold text-sm">Block Breaker</div>
-            <div class="text-xs opacity-60 mt-1">Smash the bricks</div>
-          </a>
-          <a href="/hobbies-games/2048" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
-            <div class="text-4xl mb-3 group-hover:scale-110 transition-transform"><svg class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="10" rx="3"></rect><circle cx="8.5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><path d="M16.5 11h.01"></path></svg></div>
-            <div class="font-bold text-sm">2048</div>
-            <div class="text-xs opacity-60 mt-1">Merge the numbers</div>
-          </a>
-          <a href="/hobbies-games/space-invaders" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
-            <div class="text-4xl mb-3 group-hover:scale-110 transition-transform"><svg class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="10" rx="3"></rect><circle cx="8.5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><path d="M16.5 11h.01"></path></svg></div>
-            <div class="font-bold text-sm">Space Invaders</div>
-            <div class="text-xs opacity-60 mt-1">Defend the earth</div>
-          </a>
-          <a href="/hobbies-games/racer" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
-            <div class="text-4xl mb-3 group-hover:scale-110 transition-transform"><svg class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="10" rx="3"></rect><circle cx="8.5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><path d="M16.5 11h.01"></path></svg></div>
-            <div class="font-bold text-sm">Racer</div>
-            <div class="text-xs opacity-60 mt-1">Fast reflex racing</div>
-          </a>
-          <a href="/hobbies-games/oh-flip" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
-            <div class="text-4xl mb-3 group-hover:scale-110 transition-transform"><svg class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="10" rx="3"></rect><circle cx="8.5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><path d="M16.5 11h.01"></path></svg></div>
-            <div class="font-bold text-sm">Oh Flip</div>
-            <div class="text-xs opacity-60 mt-1">Timing + tricks</div>
-          </a>
-          <a href="/hobbies-games/onoff" class="flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
-            <div class="text-4xl mb-3 group-hover:scale-110 transition-transform"><svg class="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="7" width="20" height="10" rx="3"></rect><circle cx="8.5" cy="12" r="1"></circle><circle cx="12" cy="12" r="1"></circle><path d="M16.5 11h.01"></path></svg></div>
-            <div class="font-bold text-sm">ON/OFF</div>
-            <div class="text-xs opacity-60 mt-1">Switch-based puzzle</div>
-          </a>
+              <h2 class="text-xl font-bold text-center mb-4">More Games</h2>
+      <div class="carousel-radial carousel-radial--compact max-w-2xl mx-auto" data-carousel-radial data-carousel-radius="300" data-carousel-rotation-speed="520" aria-label="More games">
+        <div class="carousel-radial__viewport" role="region" aria-label="More games">
+          <ul class="carousel-radial__track" role="list">
+          <li class="carousel-radial__item" role="listitem" data-index="0">
+            <a href="/hobbies-games/block-breaker" class="carousel-radial__card flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+              <div class="text-4xl mb-3 group-hover:scale-110 transition-transform" aria-hidden="true">🧱</div>
+              <div class="font-bold text-sm">Block Breaker</div>
+              <div class="text-xs opacity-60 mt-1">Smash the bricks</div>
+            </a>
+          </li>
+          <li class="carousel-radial__item" role="listitem" data-index="1">
+            <a href="/hobbies-games/2048" class="carousel-radial__card flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+              <div class="text-4xl mb-3 group-hover:scale-110 transition-transform" aria-hidden="true">🧩</div>
+              <div class="font-bold text-sm">2048</div>
+              <div class="text-xs opacity-60 mt-1">Merge the numbers</div>
+            </a>
+          </li>
+          <li class="carousel-radial__item" role="listitem" data-index="2">
+            <a href="/hobbies-games/space-invaders" class="carousel-radial__card flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+              <div class="text-4xl mb-3 group-hover:scale-110 transition-transform" aria-hidden="true">👾</div>
+              <div class="font-bold text-sm">Space Invaders</div>
+              <div class="text-xs opacity-60 mt-1">Defend the earth</div>
+            </a>
+          </li>
+          <li class="carousel-radial__item" role="listitem" data-index="3">
+            <a href="/hobbies-games/racer" class="carousel-radial__card flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+              <div class="text-4xl mb-3 group-hover:scale-110 transition-transform" aria-hidden="true">🏎️</div>
+              <div class="font-bold text-sm">Racer</div>
+              <div class="text-xs opacity-60 mt-1">Fast reflex racing</div>
+            </a>
+          </li>
+          <li class="carousel-radial__item" role="listitem" data-index="4">
+            <a href="/hobbies-games/oh-flip" class="carousel-radial__card flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+              <div class="text-4xl mb-3 group-hover:scale-110 transition-transform" aria-hidden="true">🌀</div>
+              <div class="font-bold text-sm">Oh Flip</div>
+              <div class="text-xs opacity-60 mt-1">Timing + tricks</div>
+            </a>
+          </li>
+          <li class="carousel-radial__item" role="listitem" data-index="5">
+            <a href="/hobbies-games/onoff" class="carousel-radial__card flex flex-col items-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-all group border border-white/5 hover:border-white/20">
+              <div class="text-4xl mb-3 group-hover:scale-110 transition-transform" aria-hidden="true">🔘</div>
+              <div class="font-bold text-sm">ON/OFF</div>
+              <div class="text-xs opacity-60 mt-1">Switch-based puzzle</div>
+            </a>
+          </li>
+          </ul>
         </div>
+        <div class="carousel-radial__controls" aria-live="polite">
+          <button class="carousel-radial__btn carousel-radial__btn--prev" aria-label="View previous game" type="button">
+            <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <span class="carousel-radial__status" role="status" aria-atomic="true">Item 1 of 6</span>
+          <button class="carousel-radial__btn carousel-radial__btn--next" aria-label="View next game" type="button">
+            <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+        <div class="carousel-radial__indicators" role="tablist" aria-label="Game navigation"></div>
+      </div>
+
       </div>
     </section>
   </div>

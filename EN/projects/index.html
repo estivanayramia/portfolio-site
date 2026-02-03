@@ -37,6 +37,11 @@
     <!-- Theme CSS - loads reliably for all viewports -->
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
 
+    <!-- Radial Carousel -->
+    <link rel="stylesheet" href="/assets/css/carousel/carousel-themes.min.css">
+    <link rel="stylesheet" href="/assets/css/carousel/radial-carousel.min.css">
+    <script type="module" src="/assets/js/carousel/RadialCarousel.min.js"></script>
+
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
@@ -138,11 +143,13 @@
         </section>
         
         <!-- Projects Grid -->
-        <section class="max-w-6xl mx-auto px-6 lg:px-12 py-16">
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <section class="max-w-6xl mx-auto px-6 lg:px-12 py-16 carousel-radial" data-carousel-radial data-carousel-items="6" data-carousel-radius="450" data-carousel-click-to-center="1" data-carousel-link-aware="1" aria-label="Projects carousel">
+            <div class="carousel-radial__viewport" role="region" aria-label="Projects">
+                <ul class="carousel-radial__track" role="list">
                 
                 <!-- This Website (moved to top) -->
-                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.05">
+                <li class="carousel-radial__item" role="listitem" data-index="0">
+                <article class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.05">
                     <div class="aspect-video bg-gradient-to-br from-indigodeep to-chocolate flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
@@ -163,8 +170,11 @@
                     </div>
                 </article>
 
+                </li>
+
                 <!-- L'Oréal Cell BioPrint MAPS Campaign -->
-                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.05">
+                <li class="carousel-radial__item" role="listitem" data-index="1">
+                <article class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.05">
                     <div class="aspect-video bg-gradient-to-br from-[#0f172a] via-[#1e2761] to-[#b84079] flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -185,8 +195,11 @@
                     </div>
                 </article>
 
+                </li>
+
                 <!-- Franklin Templeton Dual-Language Concept -->
-                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.15">
+                <li class="carousel-radial__item" role="listitem" data-index="2">
+                <article class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.15">
                     <div class="aspect-video bg-gradient-to-br from-[#0a1f1c] via-[#134e4a] to-[#d97706] flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -207,8 +220,11 @@
                     </div>
                 </article>
 
+                </li>
+
                 <!-- EndPoint LinkedIn Campaign -->
-                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.25">
+                <li class="carousel-radial__item" role="listitem" data-index="3">
+                <article class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.25">
                     <div class="aspect-video bg-gradient-to-br from-[#005c99] to-[#0a2540] flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/40" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
@@ -229,8 +245,11 @@
                     </div>
                 </article>
 
+                </li>
+
                 <!-- Endpoint Elosity Launch Video -->
-                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.35">
+                <li class="carousel-radial__item" role="listitem" data-index="4">
+                <article class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.35">
                     <div class="aspect-video bg-gradient-to-br from-[#0d1f3c] to-[#1a3a5c] flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -251,8 +270,11 @@
                     </div>
                 </article>
 
+                </li>
+
                 <!-- Endpoint Competitive Playbook -->
-                <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.45">
+                <li class="carousel-radial__item" role="listitem" data-index="5">
+                <article class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.45">
                     <div class="aspect-video bg-gradient-to-br from-[#111827] via-[#1f2937] to-[#f97316] flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7h18M3 12h18M3 17h18" />
@@ -272,10 +294,28 @@
                         </div>
                     </div>
                 </article>
+                </li>
 
                 <!-- Duplicate 'This Website' card removed (kept the moved copy at top) -->
 
+                </ul>
             </div>
+
+            <div class="carousel-radial__controls" aria-live="polite">
+                <button class="carousel-radial__btn carousel-radial__btn--prev" aria-label="View previous project" type="button">
+                    <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <span class="carousel-radial__status" role="status" aria-atomic="true">Item 1 of 6</span>
+                <button class="carousel-radial__btn carousel-radial__btn--next" aria-label="View next project" type="button">
+                    <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="carousel-radial__indicators" role="tablist" aria-label="Project carousel navigation"></div>
         </section>
         
         <!-- CTA Section -->
@@ -388,4 +428,3 @@
     
 </body>
 </html>
-

@@ -37,6 +37,11 @@
     <!-- Theme CSS - loads reliably for all viewports -->
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
 
+    <!-- Radial Carousel -->
+    <link rel="stylesheet" href="/assets/css/carousel/carousel-themes.min.css">
+    <link rel="stylesheet" href="/assets/css/carousel/radial-carousel.min.css">
+    <script type="module" src="/assets/js/carousel/RadialCarousel.min.js"></script>
+
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicon-16x16.png">
@@ -118,11 +123,13 @@
         </section>
         
         <!-- Hobbies Grid -->
-        <section class="max-w-6xl mx-auto px-6 lg:px-12 py-16">
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <section class="max-w-6xl mx-auto px-6 lg:px-12 py-16 carousel-radial" data-carousel-radial data-carousel-items="6" data-carousel-radius="450" aria-label="My hobbies">
+            <div class="carousel-radial__viewport" role="region" aria-label="My hobbies">
+                <ul class="carousel-radial__track" role="list">
                 
                 <!-- Hobby Card 1: Gym -->
-                <article id="hobby-gym-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
+                <li class="carousel-radial__item" role="listitem" data-index="0">
+                <article id="hobby-gym-card" class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
                     <div class="aspect-video bg-gradient-to-br from-indigodeep to-chocolate flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
@@ -141,9 +148,11 @@
                         </div>
                     </div>
                 </article>
+                </li>
                 
                 <!-- Hobby Card 2: Photography -->
-                <article id="hobby-photography-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
+                <li class="carousel-radial__item" role="listitem" data-index="1">
+                <article id="hobby-photography-card" class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
                     <div class="aspect-video bg-gradient-to-br from-chocolate to-indigodeep flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
@@ -163,9 +172,11 @@
                         </div>
                     </div>
                 </article>
+                </li>
                 
                 <!-- Hobby Card 3: Car -->
-                <article id="hobby-car-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
+                <li class="carousel-radial__item" role="listitem" data-index="2">
+                <article id="hobby-car-card" class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
                     <div class="aspect-video bg-gradient-to-br from-indigodeep/80 to-chocolate/80 flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10" stroke-width="1.5" />
@@ -186,9 +197,11 @@
                         </div>
                     </div>
                 </article>
+                </li>
                 
                 <!-- Hobby Card 4: Cooking -->
-                <article id="hobby-cooking-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                <li class="carousel-radial__item" role="listitem" data-index="3">
+                <article id="hobby-cooking-card" class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
                     <div class="aspect-video bg-gradient-to-br from-chocolate/70 to-indigodeep/70 flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -207,9 +220,11 @@
                         </div>
                     </div>
                 </article>
+                </li>
                 
                 <!-- Hobby Card 5: Whispers -->
-                <article id="hobby-whispers-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                <li class="carousel-radial__item" role="listitem" data-index="4">
+                <article id="hobby-whispers-card" class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                     <div class="aspect-video bg-gradient-to-br from-indigodeep/60 to-chocolate/90 flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -228,9 +243,11 @@
                         </div>
                     </div>
                 </article>
+                </li>
                 
                 <!-- Hobby Card 6: Reading -->
-                <article id="hobby-reading-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                <li class="carousel-radial__item" role="listitem" data-index="5">
+                <article id="hobby-reading-card" class="carousel-radial__card bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
                     <div class="aspect-video bg-gradient-to-br from-chocolate/80 to-indigodeep/60 flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
@@ -249,8 +266,26 @@
                         </div>
                     </div>
                 </article>
+                </li>
                 
+                </ul>
             </div>
+
+            <div class="carousel-radial__controls" aria-live="polite">
+                <button class="carousel-radial__btn carousel-radial__btn--prev" aria-label="View previous hobby" type="button">
+                    <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <span class="carousel-radial__status" role="status" aria-atomic="true">Item 1 of 6</span>
+                <button class="carousel-radial__btn carousel-radial__btn--next" aria-label="View next hobby" type="button">
+                    <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="carousel-radial__indicators" role="tablist" aria-label="Hobby carousel navigation"></div>
         </section>
         
         <!-- CTA Section -->
@@ -367,4 +402,3 @@
     <script src="/assets/js/lazy-loader.min.js" defer></script>
 </body>
 </html>
-
