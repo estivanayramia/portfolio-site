@@ -22,10 +22,12 @@
     
     <!-- Stylesheets -->
     <link rel="stylesheet" href="/assets/css/style.css?v=20260120">
+    <link rel="stylesheet" href="/assets/css/apple-carousel.min.css">
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
     
     <!-- Main Site Logic (Chat, Theme, etc.) -->
     <script src="/assets/js/site.min.js?v=20260120" defer></script>
+    <script type="module" src="/assets/js/apple-carousel.min.js"></script>
     <script type="module" src="/assets/js/arcade/arcade-core.js"></script>
     <script type="module" src="/assets/js/arcade/achievements-ui.js"></script>
     
@@ -886,9 +888,30 @@
                     </p>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-4xl mx-auto">
+                <div class="apple-carousel mb-8 max-w-4xl mx-auto" data-apple-carousel aria-label="Games carousel">
+                    <div class="apple-carousel__hint" aria-hidden="true">
+                        <span>Scroll to Explore</span>
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" width="24" height="24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                        </svg>
+                    </div>
+
+                    <button class="apple-carousel__nav apple-carousel__nav--prev" data-apple-carousel-prev aria-label="View previous game" type="button">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    <button class="apple-carousel__nav apple-carousel__nav--next" data-apple-carousel-next aria-label="View next game" type="button">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+
+                    <div class="apple-carousel__viewport" data-apple-carousel-viewport role="region" aria-roledescription="carousel" aria-label="Games">
+                        <div class="apple-carousel__track" data-apple-carousel-track>
                     <!-- Snake -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/snake'">
+                    <div class="apple-carousel__slide game-card bg-white/50 rounded-2xl p-6 text-center" data-apple-carousel-slide onclick="window.location.href='/hobbies-games/snake'">
                         <div class="text-5xl mb-3">🐍</div>
                         <h3 class="text-2xl font-bold mb-2">Snake</h3>
                         <p class="text-sm opacity-70 mb-4">Classic reflex test with growing difficulty. Eat and grow!</p>
@@ -899,7 +922,7 @@
                     </div>
                     
                     <!-- Block Breaker -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/block-breaker'">
+                    <div class="apple-carousel__slide game-card bg-white/50 rounded-2xl p-6 text-center" data-apple-carousel-slide onclick="window.location.href='/hobbies-games/block-breaker'">
                         <div class="text-5xl mb-3">🧱</div>
                         <h3 class="text-2xl font-bold mb-2">Block Breaker</h3>
                         <p class="text-sm opacity-70 mb-4">Smash bricks with increasing speed and power-ups!</p>
@@ -910,7 +933,7 @@
                     </div>
                     
                     <!-- 2048 -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/2048'">
+                    <div class="apple-carousel__slide game-card bg-white/50 rounded-2xl p-6 text-center" data-apple-carousel-slide onclick="window.location.href='/hobbies-games/2048'">
                         <div class="text-5xl mb-3">🧩</div>
                         <h3 class="text-2xl font-bold mb-2">2048</h3>
                         <p class="text-sm opacity-70 mb-4">Combine tiles to reach 2048 with smooth animations!</p>
@@ -921,7 +944,7 @@
                     </div>
 
                     <!-- Space Invaders -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/space-invaders'">
+                    <div class="apple-carousel__slide game-card bg-white/50 rounded-2xl p-6 text-center" data-apple-carousel-slide onclick="window.location.href='/hobbies-games/space-invaders'">
                         <div class="text-5xl mb-3">👾</div>
                         <h3 class="text-2xl font-bold mb-2">Space Invaders</h3>
                         <p class="text-sm opacity-70 mb-4">Defend Earth from alien waves with escalating difficulty!</p>
@@ -930,6 +953,9 @@
                         <div id="invaders-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
                         <div class="inline-block px-4 py-2 bg-red-600 rounded-lg text-sm font-medium game-action">Play Invaders</div>
                     </div>
+                        </div>
+                    </div>
+                    <div class="apple-carousel__dots" data-apple-carousel-dots aria-label="Game navigation"></div>
                 </div>
                 
                 <div class="text-center">
@@ -3861,6 +3887,4 @@
         </button>
 </body>
 </html>
-
-
 

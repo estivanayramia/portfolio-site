@@ -150,6 +150,7 @@ __initPreloadStylesheets();
 // Enables the hobby pages to avoid inline <script> blocks.
 const __initCarouselAndLightbox = () => {
     try {
+        if (document.querySelector('[data-apple-carousel], .apple-carousel')) return;
         const track = document.getElementById('carouselTrack');
         if (!track) return;
         if (track.dataset && track.dataset.carouselInit === '1') return;

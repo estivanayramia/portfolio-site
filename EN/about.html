@@ -35,6 +35,7 @@
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp" fetchpriority="high">
     
     <link rel="stylesheet" href="/assets/css/style.css?v=20260120">
+    <link rel="stylesheet" href="/assets/css/apple-carousel.min.css">
     
     <script src="/assets/js/site.min.js?v=20260120" defer></script>
     <!-- Theme CSS -->
@@ -70,6 +71,7 @@
     </script>
     
     <!-- Markdown Parser loaded via lazy-loader.js -->
+    <script type="module" src="/assets/js/apple-carousel.min.js"></script>
 </head>
 <body class="bg-beige text-chocolate font-sans antialiased" data-print-title="Estivan Ayramia | About" data-print-url="https://www.estivanayramia.com/about">
     
@@ -212,9 +214,30 @@
                 <!-- Core Values -->
                 <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
                     <h2 class="text-2xl lg:text-3xl font-bold text-indigodeep mb-6">Core Values</h2>
-                    <div class="grid md:grid-cols-2 gap-8">
+                    <div class="apple-carousel" data-apple-carousel aria-label="Core values carousel">
+                        <div class="apple-carousel__hint" aria-hidden="true">
+                            <span>Scroll to Explore</span>
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" width="24" height="24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                        </div>
+
+                        <button class="apple-carousel__nav apple-carousel__nav--prev" data-apple-carousel-prev aria-label="View previous value" type="button">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+
+                        <button class="apple-carousel__nav apple-carousel__nav--next" data-apple-carousel-next aria-label="View next value" type="button">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+
+                        <div class="apple-carousel__viewport" data-apple-carousel-viewport role="region" aria-roledescription="carousel" aria-label="Core values">
+                            <div class="apple-carousel__track" data-apple-carousel-track>
                         <!-- Value 1 -->
-                        <div class="space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm">
+                        <div class="apple-carousel__slide space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm" data-apple-carousel-slide>
                             <h3 class="text-lg font-semibold text-indigodeep">Reliability Over Flash</h3>
                             <p class="text-sm text-chocolate leading-relaxed">
                                 Consistency compounds. Showing up on time, delivering what's promised, and building backup systems isn't glamorous; it's what makes operations run and teams trust your word.
@@ -222,7 +245,7 @@
                         </div>
                         
                         <!-- Value 2 -->
-                        <div class="space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm">
+                        <div class="apple-carousel__slide space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm" data-apple-carousel-slide>
                             <h3 class="text-lg font-semibold text-indigodeep">People Are the System</h3>
                             <p class="text-sm text-chocolate leading-relaxed">
                                 The best processes fail if people don't buy in. Cultural sensitivity, clear communication, and conflict resolution frameworks aren't soft skills; they're operational necessities.
@@ -230,7 +253,7 @@
                         </div>
                         
                         <!-- Value 3 -->
-                        <div class="space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm">
+                        <div class="apple-carousel__slide space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm" data-apple-carousel-slide>
                             <h3 class="text-lg font-semibold text-indigodeep">Execution Is Everything</h3>
                             <p class="text-sm text-chocolate leading-relaxed">
                                 Great ideas without follow-through are worthless. Checklists, time blocks, and review loops are unglamorous; they're the difference between projects that ship and projects that stall.
@@ -238,12 +261,15 @@
                         </div>
                         
                         <!-- Value 4 -->
-                        <div class="space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm">
+                        <div class="apple-carousel__slide space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm" data-apple-carousel-slide>
                             <h3 class="text-lg font-semibold text-indigodeep">Growth Through Discomfort</h3>
                             <p class="text-sm text-chocolate leading-relaxed">
                                 Learning happens at the edge of competence. Seek challenges that feel slightly out of reach, document the failures, iterate fast, and build the muscle memory that makes hard things routine.
                             </p>
                         </div>
+                            </div>
+                        </div>
+                        <div class="apple-carousel__dots" data-apple-carousel-dots aria-label="Core value navigation"></div>
                     </div>
                 </div>
             </div>
@@ -587,4 +613,3 @@
     <script src="/assets/js/lazy-loader.min.js" defer></script>
 </body>
 </html>
-
