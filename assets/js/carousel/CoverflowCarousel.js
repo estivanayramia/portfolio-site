@@ -243,7 +243,8 @@ export default class CoverflowCarousel {
       if (!this.isDragging) return;
 
       const deltaPx = this.dragCurrentX - this.dragStartX;
-      const deltaCards = deltaPx / this.stepSize;
+      // FIXED: Use constant 200px spacing instead of dynamic stepSize
+      const deltaCards = deltaPx / 200;
 
       this.virtualIndex = this.dragStartIndex - deltaCards;
       this.render(0, { dragging: true });
@@ -266,14 +267,16 @@ export default class CoverflowCarousel {
     }
 
     const deltaPx = this.dragCurrentX - this.dragStartX;
-    const thresholdPx = Math.max(Number(this.options.dragThreshold) || 0, this.stepSize * 0.12);
+    // FIXED: Use 24px threshold (12% of 200px fixed spacing)
+    const thresholdPx = Math.max(Number(this.options.dragThreshold) || 0, 24);
 
     if (Math.abs(deltaPx) <= thresholdPx) {
       this.goTo(this.dragStartIndex, true);
       return;
     }
 
-    const deltaSteps = Math.round(deltaPx / this.stepSize);
+    // FIXED: Use constant 200px spacing
+    const deltaSteps = Math.round(deltaPx / 200);
     this.goTo(this.dragStartIndex - deltaSteps, true);
   }
 
@@ -407,9 +410,16 @@ export default class CoverflowCarousel {
       }
 
       const pos = this.calculatePosition(offset);
-      const translateX = offset * this.stepSize;
+      // FIXED: Use constant 200px spacing between cards
+      const translateX = offset * 200;
 
-      const transform = `translate3d(${translateX}px, 0, 0) rotateY(${pos.rotateY || 0}deg) translateZ(${pos.translateZ || 0}px) scale(${pos.scale || 1})`;
+      // CRITICAL FIX: Proper Apple Coverflow transform composition
+      // 1. translate(-50%, -50%) centers the card at its anchor point
+      // 2. translateX moves cards horizontally with fixed 200px spacing
+      // 3. rotateY tilts cards (left negative, right positive)
+      // 4. translateZ controls depth
+      // 5. scale sizes appropriately
+      const transform = `translate(-50%, -50%) translateX(${translateX}px) rotateY(${pos.rotateY || 0}deg) translateZ(${pos.translateZ || 0}px) scale(${pos.scale || 1})`;
 
       card.style.transform = transform;
       card.style.opacity = String(pos.opacity ?? 1);
@@ -553,11 +563,13 @@ export default class CoverflowCarousel {
       const card = this.cards[i];
       const offset = i - active;
       const pos = this.calculatePosition(offset);
-      const translateX = offset * this.stepSize;
+      // FIXED: Use constant 200px spacing + proper centering transform
+      const translateX = offset * 200;
       card.style.transition = 'none';
       card.style.transitionDelay = '0ms';
       card.style.opacity = '0';
-      card.style.transform = `translate3d(${translateX}px, 40px, -220px) rotateY(${pos.rotateY || 0}deg) translateZ(${(pos.translateZ || 0) - 120}px) scale(${Math.max(0.92, (pos.scale || 1) - 0.06)})`;
+      // CRITICAL: Match the main render() transform composition
+      card.style.transform = `translate(-50%, -50%) translateX(${translateX}px) translateY(40px) rotateY(${pos.rotateY || 0}deg) translateZ(${(pos.translateZ || 0) - 120}px) scale(${Math.max(0.92, (pos.scale || 1) - 0.06)})`;
     }
 
     window.setTimeout(() => {
