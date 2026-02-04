@@ -413,13 +413,8 @@ export default class CoverflowCarousel {
       // FIXED: Use constant 200px spacing between cards
       const translateX = offset * 200;
 
-      // CRITICAL FIX: Proper Apple Coverflow transform composition
-      // 1. translate(-50%, -50%) centers the card at its anchor point
-      // 2. translateX moves cards horizontally with fixed 200px spacing
-      // 3. rotateY tilts cards (left negative, right positive)
-      // 4. translateZ controls depth
-      // 5. scale sizes appropriately
-      const transform = `translate(-50%, -50%) translateX(${translateX}px) rotateY(${pos.rotateY || 0}deg) translateZ(${pos.translateZ || 0}px) scale(${pos.scale || 1})`;
+      // Updated: let CSS handle centering via margins, JS only handles X position and 3D transforms
+      const transform = `translateX(${translateX}px) rotateY(${pos.rotateY || 0}deg) translateZ(${pos.translateZ || 0}px) scale(${pos.scale || 1})`;
 
       card.style.transform = transform;
       card.style.opacity = String(pos.opacity ?? 1);
@@ -563,13 +558,12 @@ export default class CoverflowCarousel {
       const card = this.cards[i];
       const offset = i - active;
       const pos = this.calculatePosition(offset);
-      // FIXED: Use constant 200px spacing + proper centering transform
+      // FIXED: Use constant 200px spacing, CSS handles centering via margins
       const translateX = offset * 200;
       card.style.transition = 'none';
       card.style.transitionDelay = '0ms';
       card.style.opacity = '0';
-      // CRITICAL: Match the main render() transform composition
-      card.style.transform = `translate(-50%, -50%) translateX(${translateX}px) translateY(40px) rotateY(${pos.rotateY || 0}deg) translateZ(${(pos.translateZ || 0) - 120}px) scale(${Math.max(0.92, (pos.scale || 1) - 0.06)})`;
+      card.style.transform = `translateX(${translateX}px) translateY(40px) rotateY(${pos.rotateY || 0}deg) translateZ(${(pos.translateZ || 0) - 120}px) scale(${Math.max(0.92, (pos.scale || 1) - 0.06)})`;
     }
 
     window.setTimeout(() => {
