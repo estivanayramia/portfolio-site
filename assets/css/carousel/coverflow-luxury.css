@@ -1,5 +1,23 @@
 /* Coverflow Luxury Carousel (progressive enhancement) */
 
+.js .coverflow-carousel:not(.coverflow-ready) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.js .coverflow-carousel.coverflow-ready {
+  animation: coverflowFadeIn 400ms ease-out forwards;
+}
+
+@keyframes coverflowFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .coverflow-carousel {
   position: relative;
   width: 100%;

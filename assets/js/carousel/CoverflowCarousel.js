@@ -152,8 +152,17 @@ export default class CoverflowCarousel {
         (this.viewport && this.viewport.getBoundingClientRect ? this.viewport.getBoundingClientRect().width : 0) ||
         window.innerWidth ||
         1024;
-      const baseStep = viewportWidth < 768 ? r.width * 0.8 : r.width * 0.65;
-      this.stepSize = Math.max(200, Math.min(450, baseStep));
+      const visibleRadius = Math.max(
+        1,
+        Math.floor((Number(this.options.visibleCards) || DEFAULTS.visibleCards) / 2)
+      );
+      const padding = 16;
+      const maxStep = (viewportWidth / 2 - this.cardWidth / 2 - padding) / visibleRadius;
+
+      // Overlap more on desktop so 5 cards can remain visible in typical widths.
+      const baseStep = viewportWidth < 768 ? r.width * 0.8 : r.width * 0.55;
+      const unclamped = clamp(baseStep, 90, 450);
+      this.stepSize = Number.isFinite(maxStep) && maxStep > 0 ? Math.min(unclamped, maxStep) : unclamped;
 
       this.element.style.setProperty('--coverflow-card-w', `${Math.round(this.cardWidth)}px`);
       this.element.style.setProperty('--coverflow-card-h', `${Math.round(this.cardHeight)}px`);
