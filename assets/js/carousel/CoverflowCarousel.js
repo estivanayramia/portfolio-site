@@ -74,6 +74,8 @@ export default class CoverflowCarousel {
     /** @type {number} */
     this.cardWidth = 320;
     /** @type {number} */
+    this.cardHeight = 500;
+    /** @type {number} */
     this.stepSize = 280;
 
     this.onResize = debounce(() => {
@@ -145,12 +147,16 @@ export default class CoverflowCarousel {
     const r = first.getBoundingClientRect();
     if (r && Number.isFinite(r.width) && r.width > 0) {
       this.cardWidth = r.width;
+      if (Number.isFinite(r.height) && r.height > 0) this.cardHeight = r.height;
       const viewportWidth =
         (this.viewport && this.viewport.getBoundingClientRect ? this.viewport.getBoundingClientRect().width : 0) ||
         window.innerWidth ||
         1024;
       const baseStep = viewportWidth < 768 ? r.width * 0.8 : r.width * 0.65;
       this.stepSize = Math.max(200, Math.min(450, baseStep));
+
+      this.element.style.setProperty('--coverflow-card-w', `${Math.round(this.cardWidth)}px`);
+      this.element.style.setProperty('--coverflow-card-h', `${Math.round(this.cardHeight)}px`);
     }
 
     if (this.viewport) {
@@ -394,7 +400,7 @@ export default class CoverflowCarousel {
       const pos = this.calculatePosition(offset);
       const translateX = offset * this.stepSize;
 
-      const transform = `translate3d(-50%, -50%, 0) translate3d(${translateX}px, 0, 0) rotateY(${pos.rotateY || 0}deg) translateZ(${pos.translateZ || 0}px) scale(${pos.scale || 1})`;
+      const transform = `translate3d(${translateX}px, 0, 0) rotateY(${pos.rotateY || 0}deg) translateZ(${pos.translateZ || 0}px) scale(${pos.scale || 1})`;
 
       card.style.transform = transform;
       card.style.opacity = String(pos.opacity ?? 1);
@@ -542,7 +548,7 @@ export default class CoverflowCarousel {
       card.style.transition = 'none';
       card.style.transitionDelay = '0ms';
       card.style.opacity = '0';
-      card.style.transform = `translate3d(-50%, -50%, 0) translate3d(${translateX}px, 40px, -220px) rotateY(${pos.rotateY || 0}deg) translateZ(${(pos.translateZ || 0) - 120}px) scale(${Math.max(0.92, (pos.scale || 1) - 0.06)})`;
+      card.style.transform = `translate3d(${translateX}px, 40px, -220px) rotateY(${pos.rotateY || 0}deg) translateZ(${(pos.translateZ || 0) - 120}px) scale(${Math.max(0.92, (pos.scale || 1) - 0.06)})`;
     }
 
     window.setTimeout(() => {
