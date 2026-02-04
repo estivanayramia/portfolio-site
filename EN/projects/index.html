@@ -31,13 +31,13 @@
     <link rel="stylesheet" href="/assets/css/style.css?v=20260120">
     <link rel="preload" href="/assets/css/style.css?v=20260120" as="style">
     <script src="/assets/js/site.min.js?v=20260120" defer></script>
-    <script src="/assets/js/apple-carousel.min.js?v=20260203" defer></script>
+    <script type="module" src="/assets/js/carousel/CoverflowCarousel.js?v=20260204"></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
     <!-- Theme CSS - loads reliably for all viewports -->
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
-    <link rel="stylesheet" href="/assets/css/apple-carousel.css?v=20260203">
+    <link rel="stylesheet" href="/assets/css/carousel/coverflow-luxury.css?v=20260204">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -139,34 +139,14 @@
             </div>
         </section>
         
-        <!-- Projects Grid -->
+        <!-- Coverflow Carousel: Projects -->
         <section class="max-w-6xl mx-auto px-6 lg:px-12 py-16">
-            <!-- Apple Carousel (scroll-snap baseline + desktop depth enhancement) -->
-            <div class="apple-carousel" data-apple-carousel aria-label="Projects carousel">
-                <div class="apple-carousel__hint" aria-hidden="true">
-                    <span>Scroll to Explore</span>
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" width="24" height="24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                    </svg>
-                </div>
-
-                <button class="apple-carousel__nav apple-carousel__nav--prev" data-apple-carousel-prev aria-label="View previous project" type="button">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-
-                <button class="apple-carousel__nav apple-carousel__nav--next" data-apple-carousel-next aria-label="View next project" type="button">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
-                    </svg>
-                </button>
-
-                <div class="apple-carousel__viewport" data-apple-carousel-viewport role="region" aria-roledescription="carousel" aria-label="Projects">
-                    <div class="apple-carousel__track" data-apple-carousel-track>
+            <div class="coverflow-carousel" data-coverflow-luxury aria-label="Projects showcase">
+                <div class="coverflow-viewport">
+                    <div class="coverflow-track">
                 
                 <!-- This Website (moved to top) -->
-                <article class="apple-carousel__slide bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-apple-carousel-slide data-gsap="fade-up" data-gsap-delay="0.05">
+                <article class="coverflow-card">
                     <div class="aspect-video bg-gradient-to-br from-indigodeep to-chocolate flex items-center justify-center">
                         <img src="/assets/img/projects/previews/portfolio.png" alt="Preview of the portfolio website project" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     </div>
@@ -175,18 +155,18 @@
                             <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Build</span>
                             <span class="text-xs text-ink/60">Live</span>
                         </div>
-                        <h2 class="text-xl font-semibold text-indigodeep">This Website (Every Line)</h2>
-                        <p class="text-sm text-chocolate leading-relaxed">No templates, no CMS. Just hand-written HTML/CSS/JS, service worker, Savonie chat, and Lighthouse 90+ scores. The repo is the proof.</p>
+                        <h2>This Website (Every Line)</h2>
+                        <p class="text-sm">No templates, no CMS. Just hand-written HTML/CSS/JS, service worker, Savonie chat, and Lighthouse 90+ scores. The repo is the proof.</p>
                         <div class="pt-2">
-                            <a href="/projects/portfolio" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
-                                View Details →
+                            <a href="/projects/portfolio" class="inline-flex items-center text-sm font-semibold">
+                                View Details <span aria-hidden="true">→</span>
                             </a>
                         </div>
                     </div>
                 </article>
 
                 <!-- L'Oréal Cell BioPrint MAPS Campaign -->
-                <article class="apple-carousel__slide bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-apple-carousel-slide data-gsap="fade-up" data-gsap-delay="0.05">
+                <article class="coverflow-card">
                     <div class="aspect-video bg-gradient-to-br from-[#0f172a] via-[#1e2761] to-[#b84079] flex items-center justify-center">
                         <img src="/assets/img/projects/previews/loreal-maps-campaign.png" alt="Preview of the L'Oréal Cell BioPrint MAPS campaign deck" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     </div>
@@ -195,18 +175,18 @@
                             <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Campaign Strategy</span>
                             <span class="text-xs text-ink/60">Class Concept</span>
                         </div>
-                        <h2 class="text-xl font-semibold text-indigodeep">L'Oréal Cell BioPrint MAPS Campaign</h2>
-                        <p class="text-sm text-chocolate leading-relaxed">Class concept campaign deck for L'Oréal Cell BioPrint that maps three personas and their touchpoints across the funnel.</p>
+                        <h2>L'Oréal Cell BioPrint MAPS Campaign</h2>
+                        <p class="text-sm">Class concept campaign deck for L'Oréal Cell BioPrint that maps three personas and their touchpoints across the funnel.</p>
                         <div class="pt-2">
-                            <a href="/projects/loreal-maps-campaign" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
-                                View Details →
+                            <a href="/projects/loreal-maps-campaign" class="inline-flex items-center text-sm font-semibold">
+                                View Details <span aria-hidden="true">→</span>
                             </a>
                         </div>
                     </div>
                 </article>
 
                 <!-- Franklin Templeton Dual-Language Concept -->
-                <article class="apple-carousel__slide bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-apple-carousel-slide data-gsap="fade-up" data-gsap-delay="0.15">
+                <article class="coverflow-card">
                     <div class="aspect-video bg-gradient-to-br from-[#0a1f1c] via-[#134e4a] to-[#d97706] flex items-center justify-center">
                         <img src="/assets/img/projects/previews/franklin-templeton-concept.png" alt="Preview of the Franklin Templeton class concept deck" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     </div>
@@ -215,18 +195,18 @@
                             <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Content Strategy</span>
                             <span class="text-xs text-ink/60">EN + AR decks</span>
                         </div>
-                        <h2 class="text-xl font-semibold text-indigodeep">Franklin Templeton Class Concept</h2>
-                        <p class="text-sm text-chocolate leading-relaxed">17-page class concept deck for a Franklin Templeton 'Voice of Progress' campaign.</p>
+                        <h2>Franklin Templeton Class Concept</h2>
+                        <p class="text-sm">17-page class concept deck for a Franklin Templeton 'Voice of Progress' campaign.</p>
                         <div class="pt-2">
-                            <a href="/projects/franklin-templeton-concept" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
-                                View Details →
+                            <a href="/projects/franklin-templeton-concept" class="inline-flex items-center text-sm font-semibold">
+                                View Details <span aria-hidden="true">→</span>
                             </a>
                         </div>
                     </div>
                 </article>
 
                 <!-- EndPoint LinkedIn Campaign -->
-                <article class="apple-carousel__slide bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-apple-carousel-slide data-gsap="fade-up" data-gsap-delay="0.25">
+                <article class="coverflow-card">
                     <div class="aspect-video bg-gradient-to-br from-[#005c99] to-[#0a2540] flex items-center justify-center">
                         <img src="/assets/img/projects/previews/endpoint-linkedin-campaign.png" alt="Preview of the EndPoint LinkedIn campaign deck" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     </div>
@@ -235,18 +215,18 @@
                             <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Retargeting</span>
                             <span class="text-xs text-ink/60">Conceptual</span>
                         </div>
-                        <h2 class="text-xl font-semibold text-indigodeep">EndPoint LinkedIn Campaign</h2>
-                        <p class="text-sm text-chocolate leading-relaxed">15-page deck outlining Phase 2A and Phase 2B of an EndPoint LinkedIn retargeting campaign.</p>
+                        <h2>EndPoint LinkedIn Campaign</h2>
+                        <p class="text-sm">15-page deck outlining Phase 2A and Phase 2B of an EndPoint LinkedIn retargeting campaign.</p>
                         <div class="pt-2">
-                            <a href="/projects/endpoint-linkedin-campaign" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
-                                View Details →
+                            <a href="/projects/endpoint-linkedin-campaign" class="inline-flex items-center text-sm font-semibold">
+                                View Details <span aria-hidden="true">→</span>
                             </a>
                         </div>
                     </div>
                 </article>
 
                 <!-- Endpoint Elosity Launch Video -->
-                <article class="apple-carousel__slide bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-apple-carousel-slide data-gsap="fade-up" data-gsap-delay="0.35">
+                <article class="coverflow-card">
                     <div class="aspect-video bg-gradient-to-br from-[#0d1f3c] to-[#1a3a5c] flex items-center justify-center">
                         <img src="/assets/img/projects/previews/endpoint-elosity-video.png" alt="Preview of the Endpoint Elosity launch video project" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     </div>
@@ -255,18 +235,18 @@
                             <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Video Concept</span>
                             <span class="text-xs text-ink/60">LinkedIn</span>
                         </div>
-                        <h2 class="text-xl font-semibold text-indigodeep">Endpoint Elosity Launch Video</h2>
-                        <p class="text-sm text-chocolate leading-relaxed">Motion storyboard and full voiceover script showing bottlenecks shattering into a clean trial timeline. Built for silent autoplay with bold typography.</p>
+                        <h2>Endpoint Elosity Launch Video</h2>
+                        <p class="text-sm">Motion storyboard and full voiceover script showing bottlenecks shattering into a clean trial timeline. Built for silent autoplay with bold typography.</p>
                         <div class="pt-2">
-                            <a href="/projects/endpoint-elosity-video" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
-                                View Details →
+                            <a href="/projects/endpoint-elosity-video" class="inline-flex items-center text-sm font-semibold">
+                                View Details <span aria-hidden="true">→</span>
                             </a>
                         </div>
                     </div>
                 </article>
 
                 <!-- Endpoint Competitive Playbook -->
-                <article class="apple-carousel__slide bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-apple-carousel-slide data-gsap="fade-up" data-gsap-delay="0.45">
+                <article class="coverflow-card">
                     <div class="aspect-video bg-gradient-to-br from-[#111827] via-[#1f2937] to-[#f97316] flex items-center justify-center">
                         <img src="/assets/img/projects/previews/endpoint-competitive-playbook.png" alt="Preview of the Endpoint competitive playbook deck" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     </div>
@@ -275,22 +255,33 @@
                             <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Strategy</span>
                             <span class="text-xs text-ink/60">Almac + 4G</span>
                         </div>
-                        <h2 class="text-xl font-semibold text-indigodeep">Taking Down Endpoint (Almac Group + 4G Clinical)</h2>
-                        <p class="text-sm text-chocolate leading-relaxed">Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.</p>
+                        <h2>Taking Down Endpoint (Almac Group + 4G Clinical)</h2>
+                        <p class="text-sm">Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.</p>
                         <div class="pt-2">
-                            <a href="/projects/endpoint-competitive-playbook" class="text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-white rounded">
-                                View Details →
+                            <a href="/projects/endpoint-competitive-playbook" class="inline-flex items-center text-sm font-semibold">
+                                View Details <span aria-hidden="true">→</span>
                             </a>
                         </div>
                     </div>
                 </article>
 
-                <!-- Duplicate 'This Website' card removed (kept the moved copy at top) -->
-
                     </div>
                 </div>
 
-                <div class="apple-carousel__dots" data-apple-carousel-dots aria-label="Project navigation"></div>
+                <nav class="coverflow-controls" aria-label="Carousel navigation">
+                    <button class="coverflow-btn coverflow-btn--prev" aria-label="View previous project" type="button">
+                        <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <button class="coverflow-btn coverflow-btn--next" aria-label="View next project" type="button">
+                        <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </nav>
+
+                <div class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
             </div>
         </section>
         
@@ -404,4 +395,3 @@
     
 </body>
 </html>
-
