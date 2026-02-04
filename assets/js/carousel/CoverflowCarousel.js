@@ -3,7 +3,7 @@
  * @module CoverflowCarousel
  */
 
-import { clamp, debounce, prefersReducedMotion, safeMatchMedia } from './carousel-utils.js';
+import { clamp, debounce, haptic, prefersReducedMotion, safeMatchMedia } from './carousel-utils.js';
 
 const DEFAULTS = {
   visibleCards: 5,
@@ -93,10 +93,12 @@ export default class CoverflowCarousel {
     this.measure();
     this.bindEvents();
 
+    this.element.classList.add('coverflow-ready');
+
     this.virtualIndex = this.currentIndex;
     this.render(0);
 
-    this.element.classList.add('coverflow-ready');
+    this.runEntranceAnimation();
   }
 
   buildTrack() {
@@ -143,7 +145,12 @@ export default class CoverflowCarousel {
     const r = first.getBoundingClientRect();
     if (r && Number.isFinite(r.width) && r.width > 0) {
       this.cardWidth = r.width;
-      this.stepSize = Math.max(220, Math.min(420, r.width * 0.72));
+      const viewportWidth =
+        (this.viewport && this.viewport.getBoundingClientRect ? this.viewport.getBoundingClientRect().width : 0) ||
+        window.innerWidth ||
+        1024;
+      const baseStep = viewportWidth < 768 ? r.width * 0.8 : r.width * 0.65;
+      this.stepSize = Math.max(200, Math.min(450, baseStep));
     }
 
     if (this.viewport) {
@@ -197,6 +204,8 @@ export default class CoverflowCarousel {
     } catch {}
 
     this.viewport.style.cursor = 'grabbing';
+    this.viewport.style.filter = 'brightness(0.95)';
+    haptic(10);
     this.render(0);
   }
 
@@ -236,7 +245,10 @@ export default class CoverflowCarousel {
     this.isDragging = false;
     this.pointerId = null;
 
-    if (this.viewport) this.viewport.style.cursor = '';
+    if (this.viewport) {
+      this.viewport.style.cursor = '';
+      this.viewport.style.filter = '';
+    }
 
     const deltaPx = this.dragCurrentX - this.dragStartX;
     const thresholdPx = Math.max(Number(this.options.dragThreshold) || 0, this.stepSize * 0.12);
@@ -353,13 +365,14 @@ export default class CoverflowCarousel {
     if (!this.track) return;
 
     const reduced = prefersReducedMotion();
+    const isEntrance = Boolean(ctx.entrance);
     const finalDuration = reduced || ctx.dragging ? 0 : Math.max(0, Number(duration) || 0);
 
     const center = clamp(this.virtualIndex, 0, Math.max(0, this.totalCards - 1));
     const activeIndex = Math.round(center);
 
     const visibleRadius = Math.max(1, Math.floor((Number(this.options.visibleCards) || DEFAULTS.visibleCards) / 2));
-    const ease = String(this.options.settleEase || DEFAULTS.settleEase);
+    const ease = isEntrance ? 'cubic-bezier(0.34, 1.56, 0.64, 1)' : String(this.options.settleEase || DEFAULTS.settleEase);
 
     for (let i = 0; i < this.cards.length; i++) {
       const card = this.cards[i];
@@ -381,13 +394,14 @@ export default class CoverflowCarousel {
       const pos = this.calculatePosition(offset);
       const translateX = offset * this.stepSize;
 
-      const transform = `translate3d(${translateX}px, 0, 0) rotateY(${pos.rotateY || 0}deg) translateZ(${pos.translateZ || 0}px) scale(${pos.scale || 1})`;
+      const transform = `translate3d(-50%, -50%, 0) translate3d(${translateX}px, 0, 0) rotateY(${pos.rotateY || 0}deg) translateZ(${pos.translateZ || 0}px) scale(${pos.scale || 1})`;
 
       card.style.transform = transform;
       card.style.opacity = String(pos.opacity ?? 1);
       card.style.filter = `blur(${pos.blur || 0}px) brightness(${pos.brightness || 1})`;
       card.style.zIndex = String(pos.zIndex || 0);
       card.style.pointerEvents = 'auto';
+      card.style.transitionDelay = isEntrance ? `${Math.min(240, Math.round(Math.abs(i - activeIndex) * 60))}ms` : '0ms';
       card.style.transition =
         finalDuration > 0
           ? `transform ${finalDuration}ms ${ease}, opacity ${finalDuration}ms ${ease}, filter ${finalDuration}ms ${ease}`
@@ -490,8 +504,9 @@ export default class CoverflowCarousel {
     if (setSize === 0) return 0;
 
     let i = index;
-    if (i < setSize / 2) i += setSize;
-    if (i >= total - setSize / 2) i -= setSize;
+    const pad = Math.min(3, Math.max(1, setSize));
+    if (i < pad) i += setSize;
+    if (i >= total - pad) i -= setSize;
     return clamp(i, 0, total - 1);
   }
 
@@ -511,6 +526,34 @@ export default class CoverflowCarousel {
       this.viewport.replaceWith(this.viewport.cloneNode(true));
     }
     this.cards = [];
+  }
+
+  runEntranceAnimation() {
+    if (prefersReducedMotion()) return;
+    if (!this.cards.length) return;
+
+    // Start from a slightly lowered/soft state, then render into place with a stagger.
+    const active = this.currentIndex;
+    for (let i = 0; i < this.cards.length; i++) {
+      const card = this.cards[i];
+      const offset = i - active;
+      const pos = this.calculatePosition(offset);
+      const translateX = offset * this.stepSize;
+      card.style.transition = 'none';
+      card.style.transitionDelay = '0ms';
+      card.style.opacity = '0';
+      card.style.transform = `translate3d(-50%, -50%, 0) translate3d(${translateX}px, 40px, -220px) rotateY(${pos.rotateY || 0}deg) translateZ(${(pos.translateZ || 0) - 120}px) scale(${Math.max(0.92, (pos.scale || 1) - 0.06)})`;
+    }
+
+    window.setTimeout(() => {
+      this.render(600, { entrance: true });
+      // Clear delays after entrance so later interactions feel instant.
+      window.setTimeout(() => {
+        for (const card of this.cards) {
+          card.style.transitionDelay = '0ms';
+        }
+      }, 900);
+    }, 100);
   }
 }
 
