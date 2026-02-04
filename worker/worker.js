@@ -58,40 +58,40 @@ async function getSiteFacts(env) {
         title: "L'Oréal Cell BioPrint MAPS Campaign",
         summary:
           "Class concept campaign deck for L'Oréal Cell BioPrint that maps three personas and their touchpoints across the funnel.",
-        url: "/projects/logistics",
-        fullUrl: "https://www.estivanayramia.com/projects/logistics",
+        url: "/projects/loreal-maps-campaign",
+        fullUrl: "https://www.estivanayramia.com/projects/loreal-maps-campaign",
       },
       {
         id: "franklin-templeton-class-concept",
         title: "Franklin Templeton Class Concept",
         summary:
           "17-page class concept deck for a Franklin Templeton 'Voice of Progress' campaign.",
-        url: "/projects/discipline",
-        fullUrl: "https://www.estivanayramia.com/projects/discipline",
+        url: "/projects/franklin-templeton-concept",
+        fullUrl: "https://www.estivanayramia.com/projects/franklin-templeton-concept",
       },
       {
         id: "endpoint-linkedin-campaign",
         title: "EndPoint LinkedIn Campaign",
         summary:
           "15-page deck outlining Phase 2A and Phase 2B of an EndPoint LinkedIn retargeting campaign.",
-        url: "/projects/documentation",
-        fullUrl: "https://www.estivanayramia.com/projects/documentation",
+        url: "/projects/endpoint-linkedin-campaign",
+        fullUrl: "https://www.estivanayramia.com/projects/endpoint-linkedin-campaign",
       },
       {
         id: "endpoint-elosity-launch-video",
         title: "Endpoint Elosity Launch Video",
         summary:
           "Motion storyboard and full voiceover script showing bottlenecks shattering into a clean trial timeline. Built for silent autoplay with bold typography.",
-        url: "/projects/multilingual",
-        fullUrl: "https://www.estivanayramia.com/projects/multilingual",
+        url: "/projects/endpoint-elosity-video",
+        fullUrl: "https://www.estivanayramia.com/projects/endpoint-elosity-video",
       },
       {
         id: "taking-down-endpoint-almac-group-4g-clinical",
         title: "Taking Down Endpoint (Almac Group + 4G Clinical)",
         summary:
           "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.",
-        url: "/projects/competitive-strategy",
-        fullUrl: "https://www.estivanayramia.com/projects/competitive-strategy",
+        url: "/projects/endpoint-competitive-playbook",
+        fullUrl: "https://www.estivanayramia.com/projects/endpoint-competitive-playbook",
       },
     ],
     hobbies: [
@@ -865,7 +865,7 @@ export default {
         const targetProject = (siteFacts?.projects || []).find(
           (p) =>
             p?.id === "taking-down-endpoint-almac-group-4g-clinical" ||
-            p?.url === "/projects/competitive-strategy"
+            p?.url === "/projects/endpoint-competitive-playbook"
         );
 
         if (targetProject?.title && targetProject?.url) {
@@ -980,7 +980,7 @@ export default {
       // Project inquiries - use actual project from siteFacts
       // Match by URL to avoid id mismatches
       if (lowerMsg.includes("logistics") || lowerMsg.includes("loreal") || lowerMsg.includes("l'oréal") || lowerMsg.includes("bioprint") || lowerMsg.includes("maps campaign")) {
-        const project = siteFacts.projects.find(p => p.url === "/projects/logistics");
+        const project = siteFacts.projects.find(p => p.url === "/projects/loreal-maps-campaign");
         
         // Null check to prevent crashes if project not found
         if (project) {

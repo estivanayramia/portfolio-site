@@ -8,6 +8,7 @@
     "build:css": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --minify",
     "build:theme": "node scripts/build-theme.cjs",
     "build:js": "esbuild assets/js/site.js --bundle --minify --platform=browser --format=iife --target=es2018 --outfile=assets/js/site.min.js",
+    "build:apple-carousel": "esbuild assets/js/apple-carousel.js --bundle --minify --platform=browser --format=iife --target=es2018 --outfile=assets/js/apple-carousel.min.js",
     "build:lazy": "esbuild assets/js/lazy-loader.js --minify --outfile=assets/js/lazy-loader.min.js",
     "build:hud": "esbuild assets/js/debugger-hud.js --bundle --minify --platform=browser --format=iife --target=es2018 --outfile=assets/js/debugger-hud.min.js",
     "upload:facts": "node scripts/upload-site-facts.mjs",
@@ -16,7 +17,7 @@
     "route:smoke": "node scripts/route-smoke.mjs",
     "perf:budget": "node scripts/perf-budget.mjs",
     "anim:jank": "node scripts/animation-sanity.mjs --jank",
-    "build": "npm run build:facts && npm run build:css && npm run build:js && npm run build:lazy && npm run build:hud && npm run upload:facts && npm run verify:pages",
+    "build": "npm run build:facts && npm run build:css && npm run build:js && npm run build:apple-carousel && npm run build:lazy && npm run build:hud && npm run upload:facts && npm run verify:pages",
     "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
     "start": "node scripts/local-serve.js",
     "setup:hooks": "node tools/install-git-hooks.mjs",
@@ -78,6 +79,7 @@
   },
   "homepage": "https://github.com/estivanayramia/portfolio-site#readme",
   "dependencies": {
+    "framer-motion": "^12.30.0",
     "gsap": "^3.14.2",
     "marked": "^17.0.1"
   }

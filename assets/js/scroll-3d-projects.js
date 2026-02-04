@@ -6,6 +6,10 @@
 (function () {
   'use strict';
 
+  // Hard guard: never attach scroll-3d when the Apple Carousel is present on the page.
+  // This prevents double-binding and transform conflicts.
+  if (document.querySelector('[data-apple-carousel], .apple-carousel')) return;
+
   const SELECTORS = {
     root: '[data-scroll-3d-projects]',
     stage: '[data-scroll-stage]',
@@ -40,6 +44,24 @@
     if (a > 180) a -= 360;
     if (a < -180) a += 360;
     return a;
+  };
+
+  const applyEdgeDeadzone01 = (p, dz) => {
+    const deadzone = Math.max(0, Math.min(0.25, Number(dz) || 0));
+    const v = clamp01(p);
+    if (!deadzone) return v;
+    if (v <= deadzone) return 0;
+    if (v >= 1 - deadzone) return 1;
+    return (v - deadzone) / (1 - deadzone * 2);
+  };
+
+  const invertEdgeDeadzone01 = (p, dz) => {
+    const deadzone = Math.max(0, Math.min(0.25, Number(dz) || 0));
+    const v = clamp01(p);
+    if (!deadzone) return v;
+    if (v <= 0) return 0;
+    if (v >= 1) return 1;
+    return deadzone + v * (1 - deadzone * 2);
   };
 
   function setBodyScrollingFlag() {
@@ -98,6 +120,7 @@
       depth: 360,
       zOffset: -160,
       waveY: 0,
+      edgeDeadzone: 0.035,
       centerScale: 1.0,
       sideScale: 0.72,
       centerOpacity: 1.0,
@@ -114,6 +137,7 @@
         depth: 170,
         zOffset: -105,
         waveY: 0,
+        edgeDeadzone: 0.05,
         centerScale: 1.0,
         sideScale: 0.82,
         sideOpacity: 0.70,
@@ -167,9 +191,11 @@
     }
 
     function progressForIndex(idx) {
+      const cfg = getConfig();
       const total = items.length;
       if (total <= 1) return 0;
-      return clamp01(idx / (total - 1));
+      const desired = clamp01(idx / (total - 1));
+      return invertEdgeDeadzone01(desired, cfg.edgeDeadzone);
     }
 
     function scrollToProgress(p, behavior) {
@@ -195,6 +221,7 @@
     function stepIndex(delta) {
       const total = items.length;
       const next = Math.max(0, Math.min(total - 1, activeIndex + delta));
+      if (next === activeIndex) return;
       scrollToIndex(next, 'smooth');
     }
 
@@ -204,8 +231,11 @@
       const inRange = scrollTop >= bounds.start && scrollTop <= bounds.end;
 
       progressEl.classList.toggle('is-visible', inRange);
-      if (navPrev) navPrev.disabled = !inRange;
-      if (navNext) navNext.disabled = !inRange;
+      const atStart = activeIndex <= 0;
+      const atEnd = activeIndex >= items.length - 1;
+
+      if (navPrev) navPrev.disabled = !inRange || atStart;
+      if (navNext) navNext.disabled = !inRange || atEnd;
     }
 
     function updateDots(idx) {
@@ -232,8 +262,10 @@
       const total = items.length;
       const anglePer = 360 / total;
 
+      const motionProgress = applyEdgeDeadzone01(progress, cfg.edgeDeadzone);
+
       // Spec: scroll 0% => item 0 centered; scroll 100% => last item centered.
-      const baseRotation = progress * (total - 1) * anglePer;
+      const baseRotation = motionProgress * (total - 1) * anglePer;
 
       let bestIdx = 0;
       let bestDist = Infinity;
@@ -417,6 +449,7 @@
       if (navPrev) {
         navPrev.addEventListener('click', (e) => {
           e.preventDefault();
+          if (navPrev.disabled) return;
           stepIndex(-1);
         });
       }
@@ -424,6 +457,7 @@
       if (navNext) {
         navNext.addEventListener('click', (e) => {
           e.preventDefault();
+          if (navNext.disabled) return;
           stepIndex(1);
         });
       }
@@ -508,6 +542,9 @@
   }
 
   function boot() {
+    // Conflict guard: if the Apple carousel is present, do not attach the legacy controller.
+    if (document.querySelector('[data-apple-carousel]')) return;
+
     const root = document.querySelector(SELECTORS.root);
     if (!root) return;
 

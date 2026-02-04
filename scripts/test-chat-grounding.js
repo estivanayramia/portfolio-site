@@ -139,8 +139,8 @@ if (workerContent) {
   // Check for INCORRECT legacy URLs (without /en/ prefix)
   const incorrectLegacyPatterns = [
     { pattern: '/projects.html', correct: '/projects/' },
-    { pattern: '/project-logistics.html', correct: '/projects/logistics' },
-    { pattern: '/project-conflict.html', correct: '/projects/competitive-strategy' }
+    { pattern: '/project-logistics.html', correct: '/projects/loreal-maps-campaign' },
+    { pattern: '/project-conflict.html', correct: '/projects/endpoint-competitive-playbook' }
   ];
   
   // Remove comments for checking
@@ -197,8 +197,8 @@ console.log('\n🔧 Test Group: L\'Oréal Handler');
 
 // Check that the L'Oréal project exists with correct canonical URL
 if (siteFacts?.projects) {
-  const lorealProject = siteFacts.projects.find(p => p.url === '/projects/logistics');
-  test('L\'Oréal project exists with canonical URL', !!lorealProject, lorealProject?.url || '/projects/logistics');
+  const lorealProject = siteFacts.projects.find(p => p.url === '/projects/loreal-maps-campaign');
+  test('L\'Oréal project exists with canonical URL', !!lorealProject, lorealProject?.url || '/projects/loreal-maps-campaign');
   
   if (lorealProject) {
     test('L\'Oréal project has title', !!lorealProject.title);
@@ -214,7 +214,7 @@ if (siteFacts?.projects) {
   // Verify worker embeds siteFacts correctly with canonical URLs (no .html)
   const workerContents = fs.readFileSync(WORKER_PATH, 'utf-8');
   test('Worker has L\'Oréal in embedded siteFacts with canonical URL', 
-    workerContents.includes('/projects/logistics"') || workerContents.includes('/projects/logistics\'')
+    workerContents.includes('/projects/loreal-maps-campaign"') || workerContents.includes('/projects/loreal-maps-campaign\'')
   );
 }
 

@@ -3187,30 +3187,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (document.body.hasAttribute('data-disable-floating-ui')) return;
 
     // Project Data Mapping
+    // Note: Keys are intentionally kept stable (logistics/discipline/conflict/website)
+    // because other chat intent logic may reference them.
     const projectData = {
         logistics: {
-            title: 'Logistics System',
-            summary: 'A systems-focused project centered on execution, coordination, and operational clarity.',
-            img: '/assets/img/project-logistics.jpg',
-            link: '/projects/logistics'
+            title: "L'Oréal Cell BioPrint MAPS Campaign",
+            summary: "Campaign concept deck mapping personas and touchpoints across the funnel.",
+            img: '/assets/img/projects/previews/loreal-maps-campaign.png',
+            link: '/projects/loreal-maps-campaign'
         },
         conflict: {
-            title: 'Conflict Playbook',
-            summary: 'A practical framework for navigating conflict with structure, empathy, and outcomes.',
-            img: '/assets/img/project-conflict.jpg',
-            link: '/deep-dive#conflict'
+            title: 'Endpoint Competitive Playbook',
+            summary: "Strategy deck proposing how Almac + 4G Clinical can pressure Endpoint Clinical's positioning.",
+            img: '/assets/img/projects/previews/endpoint-competitive-playbook.png',
+            link: '/projects/endpoint-competitive-playbook'
         },
         discipline: {
-            title: 'Discipline Routine',
-            summary: 'A repeatable routine and mindset system for sustainable discipline and follow-through.',
-            img: '/assets/img/project-discipline.jpg',
-            link: '/projects/discipline'
+            title: 'Franklin Templeton Class Concept',
+            summary: "17-page concept deck for a 'Voice of Progress' campaign (EN + AR).",
+            img: '/assets/img/projects/previews/franklin-templeton-concept.png',
+            link: '/projects/franklin-templeton-concept'
         },
         website: {
             title: 'Portfolio Website',
-            summary: 'The site you are on, built for speed, clarity, and a clean browsing experience.',
-            img: '/assets/img/og-image.png',
-            link: '/'
+            summary: 'A hand-built, performance-focused static site with a service worker and AI chat.',
+            img: '/assets/img/projects/previews/portfolio.png',
+            link: '/projects/portfolio'
         }
     };
 

@@ -112,6 +112,32 @@ function generateRedirects() {
     dbg('generateRedirects: canonicalToEnFile size:', canonicalToEnFile.size);
 
     const generatedLines = [];
+
+    // Legacy slug migrations (301)
+    // Keep these ABOVE normalization/rewrites so they win in order.
+    generatedLines.push('# Legacy slug migrations (301)');
+    const legacyRedirects = [
+        // Projects: renamed for accuracy
+        { from: '/projects/logistics', to: '/projects/loreal-maps-campaign' },
+        { from: '/projects/discipline', to: '/projects/franklin-templeton-concept' },
+        { from: '/projects/documentation', to: '/projects/endpoint-linkedin-campaign' },
+        { from: '/projects/multilingual', to: '/projects/endpoint-elosity-video' },
+        { from: '/projects/competitive-strategy', to: '/projects/endpoint-competitive-playbook' },
+        { from: '/projects/conflict', to: '/projects/endpoint-competitive-playbook' },
+
+        // Historical legacy single-page routes
+        { from: '/project-logistics.html', to: '/projects/loreal-maps-campaign' },
+        { from: '/project-conflict.html', to: '/projects/endpoint-competitive-playbook' },
+    ];
+
+    for (const { from, to } of legacyRedirects) {
+        generatedLines.push(`${from}    ${to}    301`);
+        // Be robust to trailing slash and explicit .html variants.
+        if (!from.endsWith('/')) generatedLines.push(`${from}/    ${to}    301`);
+        if (!from.endsWith('.html')) generatedLines.push(`${from}.html    ${to}    301`);
+    }
+
+    generatedLines.push('');
     // URL normalization (301) so /x and /x/ both resolve to the canonical route
     generatedLines.push('# URL normalization (301)');
 
