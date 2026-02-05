@@ -1,0 +1,725 @@
+/**
+ * Luxury Coverflow Carousel V4.0 - Responsive Edition
+ * 
+ * V4 FIXES:
+ * - ✅ Floor reflections VISIBLE (::after with !important)
+ * - ✅ Roulette overlay WORKS (forced visibility styles)
+ * - ✅ Responsive at 100%-200% zoom (clamp, rem, vw units)
+ * - ✅ Performance optimized (contain, isolation)
+ */
+
+/* ============================================
+   CSS Variables - Responsive System
+   ============================================ */
+
+:root {
+  /* Responsive card dimensions */
+  --card-width: clamp(260px, 22vw, 400px);
+  --card-height: clamp(390px, 33vw, 600px);
+  
+  /* Responsive spacing */
+  --carousel-padding: clamp(2rem, 5vw, 4rem);
+  
+  /* Gold palette */
+  --luxury-gold: #C9A76D;
+  --luxury-gold-dark: #8A7245;
+  --luxury-gold-light: #E5D4B5;
+  
+  /* Glass morphism */
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================
+   Section Container
+   ============================================ */
+
+.coverflow-section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: var(--carousel-padding) 2rem;
+  background: #000000;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.coverflow-header {
+  text-align: center;
+  margin-bottom: clamp(2rem, 5vw, 4rem);
+  z-index: 10;
+  position: relative;
+}
+
+.coverflow-title {
+  font-size: clamp(1.75rem, 5vw, 4rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.title-main {
+  display: block;
+  background: linear-gradient(135deg, #C9A76D 0%, #A88F5A 50%, #8A7245 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+}
+
+.title-sub {
+  display: block;
+  font-size: 0.4em;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ============================================
+   3D Perspective Container
+   ============================================ */
+
+.coverflow-container {
+  position: relative;
+  width: 100%;
+  height: clamp(450px, 70vh, 800px);
+  overflow: visible;
+}
+
+.coverflow-perspective {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 2500px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+}
+
+/* V4: Floor horizon line */
+.coverflow-perspective::before {
+  content: '';
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(201, 167, 109, 0.1) 20%,
+    rgba(201, 167, 109, 0.2) 50%,
+    rgba(201, 167, 109, 0.1) 80%,
+    transparent 100%
+  );
+  box-shadow: 0 0 30px rgba(201, 167, 109, 0.1);
+  pointer-events: none;
+  z-index: -5;
+}
+
+.coverflow-track {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.coverflow-container.is-dragging {
+  cursor: grabbing;
+}
+
+.coverflow-container:not(.is-dragging) .coverflow-track {
+  cursor: grab;
+}
+
+/* ============================================
+   Coverflow Cards - GPU Optimized
+   ============================================ */
+
+.coverflow-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  
+  width: var(--card-width);
+  height: var(--card-height);
+  
+  margin-left: calc(var(--card-width) / -2);
+  margin-top: calc(var(--card-height) / -2);
+  
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  transform-box: border-box;
+  
+  border-radius: clamp(12px, 1.5vw, 16px);
+  overflow: visible !important;
+  
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  backdrop-filter: blur(12px) saturate(120%);
+  
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 30px 90px rgba(0, 0, 0, 0.7),
+    0 10px 40px rgba(0, 0, 0, 0.5);
+  
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  
+  pointer-events: auto;
+  cursor: pointer;
+  
+  /* V4: GPU optimization */
+  contain: layout style;
+  isolation: isolate;
+  will-change: auto;
+  
+  transition: box-shadow 0.4s ease;
+}
+
+/* ============================================
+   V4: Floor Reflections - GUARANTEED
+   ============================================ */
+
+.coverflow-card::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  
+  top: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: 65% !important;
+  
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  ) !important;
+  border-radius: clamp(12px, 1.5vw, 16px) !important;
+  
+  transform: scaleY(-1) translateY(20px) !important;
+  transform-origin: top center !important;
+  
+  opacity: 0.2 !important;
+  filter: blur(4px) brightness(0.5) !important;
+  
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(0, 0, 0, 0.2) 40%,
+    transparent 80%
+  ) !important;
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(0, 0, 0, 0.2) 40%,
+    transparent 80%
+  ) !important;
+  
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* V4: Brighter reflection for center and adjacent */
+.coverflow-card.is-center::after {
+  opacity: 0.3 !important;
+  filter: blur(3px) brightness(0.6) !important;
+}
+
+.coverflow-card.is-adjacent::after {
+  opacity: 0.22 !important;
+}
+
+/* ============================================
+   Center Card - Gold Glow
+   ============================================ */
+
+.coverflow-card.is-center {
+  border-color: rgba(201, 167, 109, 0.35);
+  overflow: visible;
+  
+  box-shadow: 
+    0 0 50px rgba(201, 167, 109, 0.3),
+    0 0 100px rgba(201, 167, 109, 0.15),
+    0 60px 160px rgba(0, 0, 0, 0.9),
+    inset 0 0 40px rgba(201, 167, 109, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  
+  animation: centerCardPulse 6s ease-in-out infinite;
+  z-index: 100 !important;
+}
+
+@keyframes centerCardPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 50px rgba(201, 167, 109, 0.3),
+      0 0 100px rgba(201, 167, 109, 0.15),
+      0 60px 160px rgba(0, 0, 0, 0.9),
+      inset 0 0 40px rgba(201, 167, 109, 0.08);
+  }
+  50% {
+    box-shadow: 
+      0 0 60px rgba(201, 167, 109, 0.38),
+      0 0 120px rgba(201, 167, 109, 0.2),
+      0 60px 160px rgba(0, 0, 0, 0.9),
+      inset 0 0 50px rgba(201, 167, 109, 0.12);
+  }
+}
+
+.coverflow-card.is-adjacent {
+  box-shadow: 
+    0 0 20px rgba(201, 167, 109, 0.12),
+    0 30px 80px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   Card Content
+   ============================================ */
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.card-image-container {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-bg {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-bg svg {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.coverflow-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+.card-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+  pointer-events: none;
+}
+
+.card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.6) 70%,
+    transparent 100%
+  );
+}
+
+.card-category {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  font-size: clamp(0.6rem, 1vw, 0.7rem);
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #C9A76D;
+  background: rgba(201, 167, 109, 0.08);
+  border: 1px solid rgba(201, 167, 109, 0.2);
+  border-radius: 20px;
+  margin-bottom: 1rem;
+}
+
+.card-title {
+  font-size: clamp(1.1rem, 2.5vw, 1.75rem);
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.card-description {
+  font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  max-height: 3em;
+  overflow: hidden;
+}
+
+.card-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: clamp(0.6rem, 1.5vw, 0.75rem) clamp(1rem, 2vw, 1.5rem);
+  
+  font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+  font-weight: 500;
+  color: #1a1a1a;
+  text-decoration: none;
+  
+  background: linear-gradient(135deg, #C9A76D, #A88F5A);
+  border-radius: 8px;
+  
+  box-shadow: 
+    0 4px 20px rgba(201, 167, 109, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-link:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #D4B57D, #B89F6A);
+  box-shadow: 
+    0 8px 30px rgba(201, 167, 109, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.card-link .link-arrow {
+  transition: transform 0.2s ease;
+}
+
+.card-link:hover .link-arrow {
+  transform: translateX(3px);
+}
+
+/* ============================================
+   Navigation Controls
+   ============================================ */
+
+.coverflow-controls {
+  position: absolute;
+  bottom: clamp(1.5rem, 4vw, 3rem);
+  left: 50%;
+  transform: translateX(-50%);
+  
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
+  
+  z-index: 20;
+}
+
+.coverflow-btn {
+  width: clamp(44px, 6vw, 56px);
+  height: clamp(44px, 6vw, 56px);
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  background: rgba(255, 255, 255, 0.06);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  
+  color: #ffffff;
+  cursor: pointer;
+  
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.coverflow-btn:hover {
+  background: rgba(201, 167, 109, 0.15);
+  border-color: rgba(201, 167, 109, 0.3);
+  transform: scale(1.1);
+  box-shadow: 
+    0 0 20px rgba(201, 167, 109, 0.2),
+    0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.coverflow-btn:focus-visible {
+  outline: 2px solid var(--luxury-gold);
+  outline-offset: 4px;
+}
+
+.coverflow-pagination {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.05em;
+}
+
+.pagination-separator {
+  margin: 0 0.5rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================
+   V4: Roulette Button - Responsive
+   ============================================ */
+
+.roulette-trigger-btn {
+  position: absolute;
+  top: clamp(1rem, 2.5vw, 2rem);
+  right: clamp(1rem, 2.5vw, 2rem);
+  z-index: 50;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.3rem, 1vw, 0.5rem);
+  
+  padding: clamp(0.9rem, 2vw, 1.25rem) clamp(1rem, 2.5vw, 1.5rem);
+  
+  background: linear-gradient(135deg,
+    rgba(201, 167, 109, 0.15) 0%,
+    rgba(168, 143, 90, 0.1) 100%
+  );
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  
+  border: 1px solid rgba(201, 167, 109, 0.3);
+  border-radius: clamp(12px, 1.5vw, 16px);
+  
+  color: #C9A76D;
+  cursor: pointer;
+  
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.roulette-trigger-btn:hover {
+  background: linear-gradient(135deg,
+    rgba(201, 167, 109, 0.25) 0%,
+    rgba(168, 143, 90, 0.15) 100%
+  );
+  border-color: rgba(201, 167, 109, 0.5);
+  transform: translateY(-2px) scale(1.05);
+  
+  box-shadow: 
+    0 0 30px rgba(201, 167, 109, 0.3),
+    0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.roulette-trigger-btn:active {
+  transform: translateY(0) scale(1);
+}
+
+.roulette-icon {
+  width: clamp(24px, 4vw, 32px);
+  height: clamp(24px, 4vw, 32px);
+  color: #C9A76D;
+  animation: rouletteIconSpin 8s linear infinite;
+}
+
+@keyframes rouletteIconSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.roulette-trigger-btn:hover .roulette-icon {
+  animation: rouletteIconSpinFast 1s linear infinite;
+}
+
+@keyframes rouletteIconSpinFast {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.roulette-text {
+  font-size: clamp(0.8rem, 1.5vw, 0.95rem);
+  font-weight: 600;
+  color: #E5D4B5;
+  letter-spacing: 0.02em;
+}
+
+.roulette-subtext {
+  font-size: clamp(0.65rem, 1vw, 0.75rem);
+  font-weight: 500;
+  color: rgba(201, 167, 109, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* ============================================
+   V4: Roulette Overlay - Fallback Styles
+   (Main styles set inline by JS for reliability)
+   ============================================ */
+
+.roulette-ball-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.92);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.roulette-ball-overlay.active {
+  display: flex;
+}
+
+.roulette-ball {
+  position: fixed;
+  width: clamp(30px, 5vmin, 50px);
+  height: clamp(30px, 5vmin, 50px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #E5D4B5 50%, #C9A76D);
+  box-shadow: 
+    0 0 20px rgba(201, 167, 109, 0.8),
+    0 0 40px rgba(201, 167, 109, 0.5),
+    0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+}
+
+.roulette-status {
+  position: fixed;
+  bottom: 4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  font-weight: 600;
+  color: #C9A76D;
+  text-align: center;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 10001;
+}
+
+/* ============================================
+   Accessibility
+   ============================================ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.coverflow-card:focus-visible {
+  outline: 3px solid var(--luxury-gold);
+  outline-offset: 6px;
+  z-index: 101 !important;
+}
+
+/* ============================================
+   Responsive Breakpoints
+   ============================================ */
+
+@media (max-width: 1024px) {
+  :root {
+    --card-width: clamp(240px, 40vw, 320px);
+    --card-height: clamp(360px, 60vw, 480px);
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --card-width: 80vw;
+    --card-height: calc(var(--card-width) * 1.5);
+  }
+  
+  .coverflow-section {
+    padding: 3rem 1rem;
+  }
+  
+  .coverflow-container {
+    height: 60vh;
+    min-height: 400px;
+  }
+  
+  .coverflow-perspective {
+    perspective: 1200px;
+  }
+  
+  /* Hide reflections on mobile for performance */
+  .coverflow-card::after {
+    display: none !important;
+  }
+  
+  .roulette-trigger-btn {
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.75rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --card-width: 400px;
+    --card-height: 600px;
+  }
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .coverflow-card {
+    transition: opacity 0.3s ease !important;
+  }
+  
+  .coverflow-card.is-center {
+    animation: none !important;
+  }
+  
+  .card-image {
+    transition: none !important;
+  }
+  
+  .roulette-icon {
+    animation: none !important;
+  }
+}
