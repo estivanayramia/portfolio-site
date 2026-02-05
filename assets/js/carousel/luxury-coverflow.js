@@ -1,45 +1,18 @@
 /**
- * Luxury Coverflow V6.0 — PERFECT PHYSICS & SHUFFLE
+ * Luxury Coverflow V6.1 — CRITICAL ANIMATION FIX
  * 
- * FEATURES:
- * ✅ Ball physics — Exponential decay, gravity bounce, random wobble
- * ✅ Fisher-Yates shuffle — True randomization with crypto RNG
- * ✅ Adaptive performance — 60fps desktop, 30fps mobile
- * ✅ Motion blur trail — Velocity-based particle following
+ * FIXES:
+ * ✅ Ball orbit — Full wheel circumference, not tiny movement
+ * ✅ Ball 3D look — No awkward flip, smooth rotation
+ * ✅ Smooth bounces — Natural timing and height
+ * ✅ Winner alignment — Pocket preview = opened card (1:1)
+ * ✅ Elegant morph — Float up → center → restore to carousel
  */
 
 import { gsap } from 'gsap';
 import { Coverflow3DEngine } from './coverflow-3d-engine.js';
 import { CoverflowPhysics } from './coverflow-physics.js';
 import { RouletteWheelEngine } from './roulette-wheel-engine.js';
-
-// ========================================
-// V6.0: BALL PHYSICS CONSTANTS
-// Based on real-world roulette physics
-// Reference: Small & Tse, University of Western Australia
-// ========================================
-
-const BALL_PHYSICS = {
-  // Rotational physics
-  INITIAL_ANGULAR_VELOCITY: 360,
-  ANGULAR_FRICTION: 0.02,
-  WOBBLE_INTENSITY: 3,
-  
-  // Vertical motion (bounce)
-  BOUNCE_HEIGHT: 20,
-  BOUNCE_DAMPING: 0.7,
-  BOUNCE_FREQUENCY: 0.4,
-  
-  // Visual effects
-  GLOW_MIN: 0.4,
-  GLOW_MAX: 1.0,
-  GLOW_PULSE_SPEED: 0.8,
-  TRAIL_PARTICLES: 3,
-  
-  // Spin cycle
-  SPIN_DURATION_MIN: 4,
-  SPIN_DURATION_MAX: 6
-};
 
 gsap.ticker.fps(60);
 
@@ -108,37 +81,15 @@ export class LuxuryCoverflow {
       pockets: [],
       ball: null,
       ballShadow: null,
-      ballTimeline: null,
-      trailParticles: [],
       wheelRim: null,
       status: null,
       originalWinnerIndex: null,
       winnerPocketIndex: null,
       greenPocketIndex: null,
-      shuffledPocketOrder: []
+      pocketToCardMap: [] // V6.1: Direct mapping
     };
     
-    // Adaptive performance
-    this.adaptPhysicsForDevice();
-    
     this.init();
-  }
-  
-  /**
-   * V6.0: Adapt physics for device capability
-   */
-  adaptPhysicsForDevice() {
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-    const isLowEnd = navigator.hardwareConcurrency <= 4;
-    
-    if (isMobile || isLowEnd) {
-      BALL_PHYSICS.TRAIL_PARTICLES = 1;
-      BALL_PHYSICS.GLOW_PULSE_SPEED = 1.2;
-      gsap.ticker.fps(30);
-      console.log('📱 V6.0: Adaptive mode (30fps)');
-    } else {
-      console.log('💻 V6.0: Full physics (60fps)');
-    }
   }
   
   init() {
@@ -162,51 +113,7 @@ export class LuxuryCoverflow {
     if (this.config.autoplay) this.startAutoplay();
     
     this.announceCurrentSlide();
-    console.log('✨ Luxury Coverflow V6.0 — PERFECT PHYSICS & SHUFFLE 🎰');
-  }
-  
-  // ========================================
-  // V6.0: FISHER-YATES SHUFFLE
-  // ========================================
-  
-  /**
-   * Secure random number generator
-   * Uses crypto API for better randomness
-   */
-  secureRandom() {
-    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-      const array = new Uint32Array(1);
-      crypto.getRandomValues(array);
-      return array[0] / (0xFFFFFFFF + 1);
-    }
-    return Math.random();
-  }
-  
-  /**
-   * Fisher-Yates Shuffle Algorithm
-   * Guarantees uniform distribution (unbiased)
-   */
-  fisherYatesShuffle(array) {
-    if (!Array.isArray(array) || array.length === 0) return array;
-    
-    const shuffled = [...array];
-    
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(this.secureRandom() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    
-    return shuffled;
-  }
-  
-  /**
-   * Create shuffled pocket order for wheel
-   */
-  createShuffledPocketOrder(pocketCount) {
-    const indices = Array.from({ length: pocketCount }, (_, i) => i);
-    const shuffled = this.fisherYatesShuffle(indices);
-    console.log(`🔀 V6.0: Shuffled ${pocketCount} pockets`);
-    return shuffled;
+    console.log('✨ Luxury Coverflow V6.1 — CRITICAL ANIMATION FIX 🎰');
   }
   
   // ========================================
@@ -426,7 +333,7 @@ export class LuxuryCoverflow {
   }
   
   // ========================================
-  // V6.0: PERFECT PHYSICS CASINO WHEEL
+  // V6.1: FIXED CASINO WHEEL
   // ========================================
   
   setupRouletteButton() {
@@ -435,49 +342,50 @@ export class LuxuryCoverflow {
     
     if (!btn) return;
     
-    console.log('🎰 V6.0 Casino wheel ready — PERFECT PHYSICS');
+    console.log('🎰 V6.1 Casino wheel ready — CRITICAL FIX');
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      await this.startCasinoWheelV60();
+      await this.startCasinoWheelV61();
     });
   }
   
   /**
-   * V6.0: Casino wheel with PERFECT PHYSICS
+   * V6.1: Casino wheel with all critical fixes
    */
-  async startCasinoWheelV60() {
+  async startCasinoWheelV61() {
     if (this.rouletteState.isActive) return;
     
-    console.log('🎰 V6.0 CASINO — PERFECT PHYSICS & SHUFFLE!');
+    console.log('🎰 V6.1 CASINO — CRITICAL ANIMATION FIX!');
     this.rouletteState.isActive = true;
     this.isAnimating = true;
     
-    // V6.0: Shuffle pocket order BEFORE selecting winner
-    this.rouletteState.shuffledPocketOrder = this.createShuffledPocketOrder(37);
+    // V6.1: Select winner FIRST, then ensure pocket maps to it
+    this.rouletteState.originalWinnerIndex = Math.floor(Math.random() * this.items.length);
+    this.rouletteState.greenPocketIndex = Math.floor(Math.random() * 37);
     
-    // Pre-select winner
-    this.rouletteState.originalWinnerIndex = Math.floor(this.secureRandom() * this.items.length);
-    this.rouletteState.greenPocketIndex = Math.floor(this.secureRandom() * 37);
-    this.rouletteState.winnerPocketIndex = this.wheelEngine.getWinnerPocketIndex(
-      this.rouletteState.originalWinnerIndex, this.items.length
-    );
+    // V6.1: Winner pocket is NOT green
+    let winnerPocket = Math.floor(Math.random() * 37);
+    while (winnerPocket === this.rouletteState.greenPocketIndex) {
+      winnerPocket = Math.floor(Math.random() * 37);
+    }
+    this.rouletteState.winnerPocketIndex = winnerPocket;
     
     const winnerTitle = this.items[this.rouletteState.originalWinnerIndex].dataset.title || 'Selected!';
     console.log(`🎯 Winner: Card ${this.rouletteState.originalWinnerIndex} "${winnerTitle}"`);
-    console.log(`💚 Green pocket: ${this.rouletteState.greenPocketIndex}`);
+    console.log(`🎯 Winner Pocket: ${this.rouletteState.winnerPocketIndex}`);
+    console.log(`💚 Green Pocket: ${this.rouletteState.greenPocketIndex}`);
     
     try {
       await this.phase1_CreateOverlay();
-      await this.phase2_CreateWheelWithPreviews();
-      await this.phase3_SpinWithRealisticPhysics();
-      await this.phase4_BallLandingWithBounce();
-      await this.phase5_WinnerRise();
-      await this.phase6_CenterFocus();
-      await this.phase7_GravityDrop();
-      await this.phase8_RestoreCarousel(winnerTitle);
+      await this.phase2_CreateWheelFixed();
+      await this.phase3_SpinFixed();
+      await this.phase4_BallLandingFixed();
+      await this.phase5_WinnerFloatUp();
+      await this.phase6_CenterAndHold();
+      await this.phase7_MorphToCarousel(winnerTitle);
       
-      console.log('🎉 V6.0 Complete!');
+      console.log('🎉 V6.1 Complete!');
     } catch (error) {
       console.error('❌ Error:', error);
     } finally {
@@ -494,7 +402,7 @@ export class LuxuryCoverflow {
     console.log('📦 Phase 1: Create Overlay');
     
     const overlay = document.createElement('div');
-    overlay.className = 'casino-overlay-v60';
+    overlay.className = 'casino-overlay-v61';
     overlay.style.cssText = `
       position: fixed;
       inset: 0;
@@ -507,7 +415,7 @@ export class LuxuryCoverflow {
     this.rouletteState.overlay = overlay;
     
     const status = document.createElement('div');
-    status.textContent = 'Shuffling...';
+    status.textContent = 'Preparing...';
     status.style.cssText = `
       position: absolute;
       bottom: 5%;
@@ -531,10 +439,10 @@ export class LuxuryCoverflow {
   }
   
   /**
-   * Phase 2: Create wheel with shuffled pockets
+   * Phase 2: Create wheel with FIXED pocket-to-card mapping
    */
-  async phase2_CreateWheelWithPreviews() {
-    console.log('🔄 Phase 2: Create Wheel (SHUFFLED)');
+  async phase2_CreateWheelFixed() {
+    console.log('🔄 Phase 2: Create Wheel (FIXED MAPPING)');
     this.rouletteState.status.textContent = 'Forming wheel...';
     
     const overlay = this.rouletteState.overlay;
@@ -542,10 +450,10 @@ export class LuxuryCoverflow {
     const viewH = window.innerHeight;
     const centerX = viewW / 2;
     const centerY = viewH / 2;
-    const wheelRadius = Math.min(viewW, viewH) * 0.32;
+    const wheelRadius = Math.min(viewW, viewH) * 0.35; // V6.1: Larger radius
     
     const wheelWrapper = document.createElement('div');
-    wheelWrapper.className = 'wheel-wrapper-v60';
+    wheelWrapper.className = 'wheel-wrapper-v61';
     wheelWrapper.style.cssText = `
       position: absolute;
       left: ${centerX}px;
@@ -559,24 +467,23 @@ export class LuxuryCoverflow {
     this.rouletteState.wheelWrapper = wheelWrapper;
     
     // Golden rim
-    const rimSize = wheelRadius * 2 + 100;
+    const rimSize = wheelRadius * 2 + 120;
     const rim = document.createElement('div');
-    rim.className = 'wheel-rim-v60';
     rim.style.cssText = `
       position: absolute;
       left: ${-rimSize / 2}px;
       top: ${-rimSize / 2}px;
       width: ${rimSize}px;
       height: ${rimSize}px;
-      border: 10px solid transparent;
+      border: 12px solid transparent;
       border-radius: 50%;
       background:
         linear-gradient(#002800, #002800) padding-box,
         linear-gradient(135deg, #FFD700, #FFA500, #FFD700, #B8860B, #FFD700) border-box;
       box-shadow:
-        0 0 60px rgba(255,215,0,0.9),
-        0 0 120px rgba(255,215,0,0.5),
-        inset 0 0 80px rgba(255,215,0,0.2);
+        0 0 80px rgba(255,215,0,0.9),
+        0 0 150px rgba(255,215,0,0.5),
+        inset 0 0 100px rgba(255,215,0,0.2);
       opacity: 0;
       pointer-events: none;
     `;
@@ -601,14 +508,16 @@ export class LuxuryCoverflow {
     ];
     
     const pockets = [];
-    const pocketW = 75;
-    const pocketH = 100;
+    const pocketW = 80;
+    const pocketH = 105;
     const greenIdx = this.rouletteState.greenPocketIndex;
-    const shuffledOrder = this.rouletteState.shuffledPocketOrder;
+    const winnerPocket = this.rouletteState.winnerPocketIndex;
+    const winnerCard = this.rouletteState.originalWinnerIndex;
+    
+    // V6.1: Create direct pocket-to-card mapping
+    this.rouletteState.pocketToCardMap = [];
     
     for (let i = 0; i < 37; i++) {
-      // V6.0: Use shuffled index for card assignment
-      const shuffledIdx = shuffledOrder[i];
       const data = sequence[i];
       const angle = (360 / 37) * i - 90;
       const angleRad = angle * Math.PI / 180;
@@ -616,6 +525,7 @@ export class LuxuryCoverflow {
       const y = wheelRadius * Math.sin(angleRad);
       
       const isGreen = i === greenIdx;
+      const isWinner = i === winnerPocket;
       let borderColor, glowColor;
       
       if (isGreen) {
@@ -630,9 +540,8 @@ export class LuxuryCoverflow {
       }
       
       const pocket = document.createElement('div');
-      pocket.className = 'pocket-v60';
-      pocket.dataset.index = i;
-      pocket.dataset.shuffledIndex = shuffledIdx;
+      pocket.className = 'pocket-v61';
+      pocket.dataset.pocketIndex = i;
       pocket.style.cssText = `
         position: absolute;
         left: ${x - pocketW / 2}px;
@@ -640,15 +549,14 @@ export class LuxuryCoverflow {
         width: ${pocketW}px;
         height: ${pocketH}px;
         border: 4px solid ${borderColor};
-        border-radius: 8px;
+        border-radius: 10px;
         overflow: hidden;
         transform: rotate(${angle + 90}deg) scale(0);
         transform-origin: center center;
         opacity: 0;
         box-shadow:
-          0 0 25px ${glowColor},
-          0 0 50px ${glowColor},
-          inset 0 0 15px ${glowColor};
+          0 0 30px ${glowColor},
+          0 0 60px ${glowColor};
         will-change: transform;
         cursor: pointer;
       `;
@@ -665,21 +573,30 @@ export class LuxuryCoverflow {
             background: linear-gradient(135deg, #003000, #006000);
             color: #00FF00;
             font-family: Arial Black, sans-serif;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 900;
             text-align: center;
             text-shadow: 0 0 15px #00FF00;
             line-height: 1.2;
           ">
-            <div style="font-size: 140%;">TRY</div>
-            <div style="font-size: 140%;">AGAIN</div>
-            <div style="font-size: 60%; opacity: 0.8; margin-top: 6px;">or choose</div>
+            <div style="font-size: 150%;">TRY</div>
+            <div style="font-size: 150%;">AGAIN</div>
           </div>
         `;
+        this.rouletteState.pocketToCardMap[i] = -1; // Green = no card
       } else {
-        // V6.0: Use SHUFFLED index for card
-        const srcIdx = Math.floor((shuffledIdx / 37) * this.items.length);
-        const srcCard = this.items[srcIdx];
+        // V6.1: CRITICAL FIX — Winner pocket MUST show winner card
+        let cardIndex;
+        if (isWinner) {
+          cardIndex = winnerCard; // Winner pocket shows winner card
+        } else {
+          // Distribute other cards across non-winner, non-green pockets
+          cardIndex = Math.floor((i / 37) * this.items.length) % this.items.length;
+        }
+        
+        this.rouletteState.pocketToCardMap[i] = cardIndex;
+        
+        const srcCard = this.items[cardIndex];
         const preview = this.extractCardPreview(srcCard);
         pocket.appendChild(preview);
         
@@ -687,16 +604,16 @@ export class LuxuryCoverflow {
         badge.textContent = data.num;
         badge.style.cssText = `
           position: absolute;
-          top: 4px;
-          right: 4px;
+          top: 5px;
+          right: 5px;
           font-family: Arial Black, sans-serif;
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 900;
           color: #FFD700;
-          text-shadow: 0 0 10px #FFD700;
-          background: rgba(0, 0, 0, 0.8);
-          padding: 2px 5px;
-          border-radius: 3px;
+          text-shadow: 0 0 12px #FFD700;
+          background: rgba(0, 0, 0, 0.85);
+          padding: 3px 6px;
+          border-radius: 4px;
           z-index: 10;
         `;
         pocket.appendChild(badge);
@@ -707,28 +624,28 @@ export class LuxuryCoverflow {
     }
     
     this.rouletteState.pockets = pockets;
-    console.log(`✅ Created ${pockets.length} SHUFFLED pockets`);
+    console.log(`✅ Created ${pockets.length} pockets`);
+    console.log(`✅ Winner pocket ${winnerPocket} → Card ${winnerCard}`);
     
     return new Promise(resolve => {
       pockets.forEach((pocket, i) => {
         gsap.to(pocket, {
           opacity: 1,
           scale: 1,
-          duration: 0.5,
-          delay: i * 0.02,
-          ease: 'back.out(1.5)'
+          duration: 0.6,
+          delay: i * 0.025,
+          ease: 'back.out(1.4)'
         });
       });
-      setTimeout(resolve, 2200);
+      setTimeout(resolve, 2500);
     });
   }
   
   /**
-   * Extract card preview (gradient + SVG + title)
+   * Extract card preview
    */
   extractCardPreview(sourceCard) {
     const preview = document.createElement('div');
-    preview.className = 'card-preview-v60';
     preview.style.cssText = `
       position: absolute;
       inset: 0;
@@ -754,19 +671,11 @@ export class LuxuryCoverflow {
       const svg = cardBg.querySelector('svg');
       if (svg) {
         const svgClone = svg.cloneNode(true);
-        svgClone.style.cssText = 'width: 40px; height: 40px; opacity: 0.9;';
+        svgClone.style.cssText = 'width: 45px; height: 45px; opacity: 0.9;';
         bgDiv.appendChild(svgClone);
       }
       
       preview.appendChild(bgDiv);
-    } else {
-      const fallback = document.createElement('div');
-      fallback.style.cssText = `
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, #212842, #3d4666);
-      `;
-      preview.appendChild(fallback);
     }
     
     const title = sourceCard.dataset.title || 
@@ -774,22 +683,20 @@ export class LuxuryCoverflow {
                   'Project';
     
     const titleEl = document.createElement('div');
-    titleEl.textContent = title.length > 12 ? title.substring(0, 12) + '...' : title;
+    titleEl.textContent = title.length > 14 ? title.substring(0, 14) + '...' : title;
     titleEl.style.cssText = `
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 6px 4px;
-      font-size: 10px;
+      padding: 8px 5px;
+      font-size: 11px;
       font-weight: 700;
       color: #fff;
-      background: linear-gradient(transparent, rgba(0,0,0,0.9));
+      background: linear-gradient(transparent, rgba(0,0,0,0.95));
       text-align: center;
       white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+      text-shadow: 0 1px 4px rgba(0,0,0,0.9);
     `;
     preview.appendChild(titleEl);
     
@@ -797,33 +704,44 @@ export class LuxuryCoverflow {
   }
   
   /**
-   * Phase 3: Spin with REALISTIC PHYSICS
+   * Phase 3: Spin with FULL ORBIT ball
    */
-  async phase3_SpinWithRealisticPhysics() {
-    console.log('🎡 Phase 3: Spin with REALISTIC PHYSICS');
+  async phase3_SpinFixed() {
+    console.log('🎡 Phase 3: Spin with FULL ORBIT Ball');
     this.rouletteState.status.textContent = 'Spinning...';
     
-    const spinParams = this.wheelEngine.calculateWheelSpin(this.rouletteState.winnerPocketIndex);
     const overlay = this.rouletteState.overlay;
     const wrapper = this.rouletteState.wheelWrapper;
-    const wheelRadius = Math.min(window.innerWidth, window.innerHeight) * 0.32;
+    const viewW = window.innerWidth;
+    const viewH = window.innerHeight;
+    const centerX = viewW / 2;
+    const centerY = viewH / 2;
+    const wheelRadius = Math.min(viewW, viewH) * 0.35;
     
-    // V6.0: Random spin duration for realism
-    const duration = BALL_PHYSICS.SPIN_DURATION_MIN + 
-      this.secureRandom() * (BALL_PHYSICS.SPIN_DURATION_MAX - BALL_PHYSICS.SPIN_DURATION_MIN);
+    // Calculate spin to land on winner pocket
+    const winnerAngle = (360 / 37) * this.rouletteState.winnerPocketIndex;
+    const spins = 4 + Math.floor(Math.random() * 2); // 4-5 full spins
+    const finalRotation = -(spins * 360 + winnerAngle + 90); // Counter-rotate wheel
+    const duration = 5 + Math.random(); // 5-6 seconds
     
-    // Create ball with physics
+    console.log(`🎡 Spinning ${spins} rotations to pocket ${this.rouletteState.winnerPocketIndex}`);
+    
+    // V6.1: Ball with proper 3D look (no flip)
     const ball = document.createElement('div');
-    ball.className = 'roulette-ball-v60';
+    ball.className = 'roulette-ball-v61';
     ball.style.cssText = `
       position: absolute;
-      width: 50px;
-      height: 50px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fff, #f0f0f0 40%, #ccc 80%, #999);
+      background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e8e8e8 30%, #b8b8b8 70%, #888888 100%);
+      box-shadow:
+        inset -8px -8px 20px rgba(0,0,0,0.4),
+        inset 5px 5px 15px rgba(255,255,255,0.8),
+        0 0 40px rgba(255,215,0,0.9),
+        0 0 80px rgba(255,215,0,0.6);
       z-index: 100;
       pointer-events: none;
-      transform-style: preserve-3d;
     `;
     overlay.appendChild(ball);
     this.rouletteState.ball = ball;
@@ -832,365 +750,300 @@ export class LuxuryCoverflow {
     const ballShadow = document.createElement('div');
     ballShadow.style.cssText = `
       position: absolute;
-      width: 55px;
-      height: 20px;
+      width: 50px;
+      height: 18px;
       border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, transparent 70%);
-      filter: blur(4px);
+      background: radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%);
+      filter: blur(3px);
       z-index: 99;
       pointer-events: none;
     `;
     overlay.appendChild(ballShadow);
     this.rouletteState.ballShadow = ballShadow;
     
-    // V6.0: Create trail particles
-    const trailParticles = [];
-    for (let i = 0; i < BALL_PHYSICS.TRAIL_PARTICLES; i++) {
-      const particle = document.createElement('div');
-      particle.style.cssText = `
-        position: absolute;
-        width: ${50 - i * 10}px;
-        height: ${50 - i * 10}px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(255,215,0,${0.3 - i * 0.1}), transparent);
-        z-index: ${99 - i};
-        pointer-events: none;
-        filter: blur(${i * 2}px);
-      `;
-      overlay.appendChild(particle);
-      trailParticles.push(particle);
-    }
-    this.rouletteState.trailParticles = trailParticles;
+    // V6.1: Ball starts on OUTER edge and orbits FULL circumference
+    const outerOrbitRadius = wheelRadius + 60; // Outside the wheel
+    let ballAngle = Math.random() * 360;
     
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    const outerRadius = wheelRadius * 1.18;
-    let ballAngle = this.secureRandom() * 360;
+    const updateBallPosition = (angle, radius) => {
+      const rad = angle * Math.PI / 180;
+      const x = centerX + radius * Math.cos(rad) - 22.5;
+      const y = centerY + radius * Math.sin(rad) - 22.5;
+      gsap.set(ball, { left: x, top: y });
+      gsap.set(ballShadow, { left: x - 2, top: y + 30 });
+    };
     
-    // Initial position
-    gsap.set(ball, {
-      left: centerX + outerRadius * Math.cos(ballAngle * Math.PI / 180) - 25,
-      top: centerY + outerRadius * Math.sin(ballAngle * Math.PI / 180) - 25
-    });
-    gsap.set(ballShadow, {
-      left: centerX + outerRadius * Math.cos(ballAngle * Math.PI / 180) - 27,
-      top: centerY + outerRadius * Math.sin(ballAngle * Math.PI / 180) + 10
-    });
-    
-    // V6.0: REALISTIC BALL PHYSICS TIMELINE
-    const ballTimeline = gsap.timeline({ repeat: -1 });
-    
-    // 3D spin with EXPONENTIAL DECAY
-    ballTimeline.to(ball, {
-      rotationY: `+=360`,
-      rotationX: gsap.utils.random(-20, 20),
-      duration: 0.4,
-      ease: 'expo.out',
-      repeat: -1
-    }, 0);
-    
-    // GRAVITY-BASED BOUNCE
-    ballTimeline.to(ball, {
-      y: -BALL_PHYSICS.BOUNCE_HEIGHT,
-      duration: BALL_PHYSICS.BOUNCE_FREQUENCY,
-      yoyo: true,
-      repeat: -1,
-      ease: 'power2.out'
-    }, 0);
-    
-    // GOLDEN GLOW PULSE (velocity-based)
-    ballTimeline.to(ball, {
-      boxShadow: `0 0 60px rgba(255,215,0,${BALL_PHYSICS.GLOW_MAX}), 
-                  0 0 120px rgba(255,215,0,${BALL_PHYSICS.GLOW_MAX * 0.7})`,
-      duration: BALL_PHYSICS.GLOW_PULSE_SPEED,
-      yoyo: true,
-      repeat: -1,
-      ease: 'sine.inOut'
-    }, 0);
-    
-    // SCALE BREATHING
-    ballTimeline.to(ball, {
-      scale: 1.08,
-      duration: 0.6,
-      yoyo: true,
-      repeat: -1,
-      ease: 'sine.inOut'
-    }, 0);
-    
-    this.rouletteState.ballTimeline = ballTimeline;
-    console.log('⚪ Ball physics timeline STARTED (decay, bounce, glow, scale)');
+    updateBallPosition(ballAngle, outerOrbitRadius);
+    console.log('⚪ Ball positioned on outer orbit');
     
     const statusEl = this.rouletteState.status;
-    let wobbleCount = 0;
     
     return new Promise(resolve => {
-      // Spin wheel with exponential ease (realistic deceleration)
+      // Spin wheel
       gsap.to(wrapper, {
-        rotation: spinParams.finalRotation,
+        rotation: finalRotation,
         duration,
-        ease: 'expo.out' // V6.0: Exponential decay
+        ease: 'power2.out'
       });
       
-      // Ball orbit with PHYSICS
-      let frames = 0;
-      const prevPositions = [];
+      // V6.1: Ball orbits in OPPOSITE direction, spiraling inward
+      let currentRadius = outerOrbitRadius;
+      const innerRadius = wheelRadius - 10;
       
       gsap.to({}, {
         duration,
         ease: 'none',
         onUpdate: function() {
-          const p = this.progress();
-          frames++;
+          const progress = this.progress();
           
-          // V6.0: Exponential velocity decay (realistic friction)
-          const velocityFactor = Math.pow(1 - p, 2);
-          const speed = 3000 * velocityFactor;
-          ballAngle -= speed * 0.016 / 60;
+          // Ball speed decreases with exponential decay
+          const speedFactor = Math.pow(1 - progress, 1.5);
+          const angularSpeed = 800 * speedFactor; // degrees per second equivalent
+          ballAngle += angularSpeed * 0.016; // ~60fps
           
-          // V6.0: Spiral inward with physics
-          let radius = outerRadius;
-          if (p > 0.3) {
-            const spiralProgress = (p - 0.3) / 0.7;
-            radius = outerRadius - (outerRadius * 0.35 * Math.pow(spiralProgress, 1.5));
+          // Spiral inward after 30% progress
+          if (progress > 0.3) {
+            const spiralProgress = (progress - 0.3) / 0.7;
+            currentRadius = outerOrbitRadius - (outerOrbitRadius - innerRadius) * Math.pow(spiralProgress, 2);
           }
           
-          // V6.0: Random wobble (deflector simulation)
-          let wobbleX = 0, wobbleY = 0;
-          if (Math.random() < 0.08 && p > 0.2 && p < 0.8) {
-            wobbleX = (Math.random() - 0.5) * BALL_PHYSICS.WOBBLE_INTENSITY * 2;
-            wobbleY = (Math.random() - 0.5) * BALL_PHYSICS.WOBBLE_INTENSITY * 2;
-            wobbleCount++;
-          }
+          updateBallPosition(ballAngle, currentRadius);
           
-          const x = centerX + radius * Math.cos(ballAngle * Math.PI / 180) + wobbleX;
-          const y = centerY + radius * Math.sin(ballAngle * Math.PI / 180) + wobbleY;
-          
-          gsap.set(ball, { left: x - 25, top: y - 25 });
-          gsap.set(ballShadow, { left: x - 27, top: y + 10 });
-          
-          // Update trail particles with delay
-          prevPositions.unshift({ x, y });
-          if (prevPositions.length > BALL_PHYSICS.TRAIL_PARTICLES * 5) {
-            prevPositions.pop();
-          }
-          
-          trailParticles.forEach((particle, idx) => {
-            const delayIdx = (idx + 1) * 4;
-            if (prevPositions[delayIdx]) {
-              const pos = prevPositions[delayIdx];
-              gsap.set(particle, {
-                left: pos.x - 25 + idx * 5,
-                top: pos.y - 25 + idx * 5,
-                opacity: velocityFactor * (1 - idx * 0.3)
-              });
-            }
-          });
+          // Dynamic glow based on speed
+          const glowIntensity = 40 + speedFactor * 60;
+          ball.style.boxShadow = `
+            inset -8px -8px 20px rgba(0,0,0,0.4),
+            inset 5px 5px 15px rgba(255,255,255,0.8),
+            0 0 ${glowIntensity}px rgba(255,215,0,${0.6 + speedFactor * 0.4}),
+            0 0 ${glowIntensity * 2}px rgba(255,215,0,${0.3 + speedFactor * 0.3})
+          `;
           
           // Status updates
-          if (p < 0.25) statusEl.textContent = '🎰 Fast spin!';
-          else if (p < 0.5) statusEl.textContent = '🎰 Round and round...';
-          else if (p < 0.75) statusEl.textContent = '🎰 Slowing down...';
+          if (progress < 0.3) statusEl.textContent = '🎰 Fast spin!';
+          else if (progress < 0.6) statusEl.textContent = '🎰 Round and round...';
+          else if (progress < 0.85) statusEl.textContent = '🎰 Slowing down...';
           else statusEl.textContent = '🎰 Almost there...';
         },
         onComplete: () => {
-          if (ballTimeline) ballTimeline.pause();
-          console.log(`⚪ Physics complete (${frames} frames, ${wobbleCount} wobbles)`);
+          console.log('⚪ Ball orbit complete');
           resolve();
         }
       });
       
-      // Haptic
+      // Haptic feedback
       if ('vibrate' in navigator) {
-        gsap.to({}, {
-          duration,
-          onUpdate: function() {
-            if (Math.random() < 0.03) navigator.vibrate(3);
-          }
-        });
+        const hapticInterval = setInterval(() => {
+          navigator.vibrate(3);
+        }, 150);
+        setTimeout(() => clearInterval(hapticInterval), duration * 1000);
       }
     });
   }
   
   /**
-   * Phase 4: Ball landing with realistic bounce
+   * Phase 4: Ball landing with natural bounces
    */
-  async phase4_BallLandingWithBounce() {
-    console.log('⚾ Phase 4: Ball Landing with BOUNCE PHYSICS');
+  async phase4_BallLandingFixed() {
+    console.log('⚾ Phase 4: Ball Landing (SMOOTH BOUNCES)');
     this.rouletteState.status.textContent = 'Landing...';
     
     const ball = this.rouletteState.ball;
     const ballShadow = this.rouletteState.ballShadow;
-    const winner = this.rouletteState.pockets[this.rouletteState.winnerPocketIndex];
-    const rect = winner.getBoundingClientRect();
-    const tx = rect.left + rect.width / 2 - 25;
-    const ty = rect.top + rect.height / 2 - 25;
-    
-    // Hide trail particles
-    this.rouletteState.trailParticles.forEach(p => {
-      gsap.to(p, { opacity: 0, duration: 0.2 });
-    });
+    const winnerPocket = this.rouletteState.pockets[this.rouletteState.winnerPocketIndex];
+    const rect = winnerPocket.getBoundingClientRect();
+    const targetX = rect.left + rect.width / 2 - 22.5;
+    const targetY = rect.top + rect.height / 2 - 22.5;
     
     return new Promise(resolve => {
       const tl = gsap.timeline({ onComplete: resolve });
       
-      // V6.0: Multiple bounces with damping
-      tl.to(ball, { left: tx, top: ty, scale: 1.3, duration: 0.4, ease: 'power2.out' });
+      // Move to pocket
+      tl.to(ball, {
+        left: targetX,
+        top: targetY,
+        duration: 0.4,
+        ease: 'power2.out'
+      });
       
-      // Bounce 1 (highest)
-      tl.to(ball, { top: ty - 50, duration: 0.25, ease: 'power2.out' });
-      tl.to(ball, { top: ty, duration: 0.2, ease: 'bounce.out' });
+      // V6.1: Natural bounce sequence (physics-based heights)
+      tl.to(ball, { top: targetY - 40, duration: 0.2, ease: 'power2.out' });
+      tl.to(ball, { top: targetY, duration: 0.25, ease: 'bounce.out' });
+      tl.to(ball, { top: targetY - 18, duration: 0.15, ease: 'power1.out' });
+      tl.to(ball, { top: targetY, duration: 0.18, ease: 'bounce.out' });
+      tl.to(ball, { top: targetY - 6, duration: 0.1, ease: 'power1.out' });
+      tl.to(ball, { top: targetY, duration: 0.1 });
       
-      // Bounce 2 (damped)
-      tl.to(ball, { top: ty - 25, duration: 0.18, ease: 'power1.out' });
-      tl.to(ball, { top: ty, duration: 0.15, ease: 'bounce.out' });
-      
-      // Bounce 3 (small)
-      tl.to(ball, { top: ty - 10, duration: 0.1, ease: 'power1.out' });
-      tl.to(ball, { top: ty, scale: 1, duration: 0.08 });
-      
-      // Winner glow flash
-      tl.to(winner, {
-        boxShadow: '0 0 120px rgba(255,215,0,1)',
-        duration: 0.12,
-        repeat: 4,
+      // Winner glow
+      tl.to(winnerPocket, {
+        boxShadow: '0 0 100px rgba(255,215,0,1), 0 0 200px rgba(255,215,0,0.7)',
+        duration: 0.15,
+        repeat: 3,
         yoyo: true
-      }, '-=0.5');
+      }, '-=0.6');
       
       // Fade ball
-      tl.to([ball, ballShadow], { opacity: 0, scale: 0, duration: 0.3 });
+      tl.to([ball, ballShadow], {
+        opacity: 0,
+        scale: 0.5,
+        duration: 0.4
+      });
       
-      if ('vibrate' in navigator) navigator.vibrate([80, 40, 120, 60, 50]);
+      if ('vibrate' in navigator) navigator.vibrate([60, 30, 100, 50, 40]);
     });
   }
   
   /**
-   * Phase 5: Winner rises
+   * Phase 5: Winner floats up elegantly
    */
-  async phase5_WinnerRise() {
-    console.log('🏆 Phase 5: Winner Rise');
+  async phase5_WinnerFloatUp() {
+    console.log('🏆 Phase 5: Winner Float Up');
     this.rouletteState.status.textContent = 'Winner!';
     
     const pockets = this.rouletteState.pockets;
-    const winner = pockets[this.rouletteState.winnerPocketIndex];
+    const winnerPocket = pockets[this.rouletteState.winnerPocketIndex];
+    const winnerCardIndex = this.rouletteState.pocketToCardMap[this.rouletteState.winnerPocketIndex];
+    const winnerTitle = this.items[winnerCardIndex]?.dataset.title || 'Selected!';
+    
+    console.log(`🎯 Confirming winner: Pocket ${this.rouletteState.winnerPocketIndex} → Card ${winnerCardIndex} "${winnerTitle}"`);
     
     return new Promise(resolve => {
       const tl = gsap.timeline({ onComplete: resolve });
       
+      // Fade out all other pockets
       pockets.forEach((p, i) => {
         if (i !== this.rouletteState.winnerPocketIndex) {
-          tl.to(p, { opacity: 0, scale: 0.4, duration: 0.5 }, 0);
+          tl.to(p, {
+            opacity: 0,
+            scale: 0.3,
+            duration: 0.6,
+            ease: 'power2.in'
+          }, 0);
         }
       });
       
+      // Fade rim
       tl.to(this.rouletteState.wheelRim, { opacity: 0, duration: 0.5 }, 0);
       
-      tl.to(winner, {
-        scale: 2.5,
-        zIndex: 200,
-        boxShadow: '0 0 150px rgba(255,215,0,1)',
-        duration: 0.8,
-        ease: 'back.out(1.3)'
-      }, 0.2);
+      // V6.1: Winner floats UP with subtle wobble
+      tl.to(winnerPocket, {
+        y: -50, // Float up
+        scale: 2,
+        rotation: 0, // Reset rotation
+        boxShadow: '0 0 150px rgba(255,215,0,1), 0 30px 60px rgba(0,0,0,0.5)',
+        duration: 1,
+        ease: 'power2.out'
+      }, 0.3);
     });
   }
   
   /**
-   * Phase 6: Center focus
+   * Phase 6: Center and hold
    */
-  async phase6_CenterFocus() {
-    console.log('🎯 Phase 6: Center Focus');
+  async phase6_CenterAndHold() {
+    console.log('🎯 Phase 6: Center and Hold');
     
-    const winner = this.rouletteState.pockets[this.rouletteState.winnerPocketIndex];
-    const title = this.items[this.rouletteState.originalWinnerIndex].dataset.title || 'Selected!';
-    this.rouletteState.status.textContent = `🎉 ${title}`;
+    const winnerPocket = this.rouletteState.pockets[this.rouletteState.winnerPocketIndex];
+    const winnerCardIndex = this.rouletteState.pocketToCardMap[this.rouletteState.winnerPocketIndex];
+    const winnerTitle = this.items[winnerCardIndex]?.dataset.title || 'Selected!';
     
-    const rect = winner.getBoundingClientRect();
-    const cx = window.innerWidth / 2;
-    const cy = window.innerHeight / 2;
-    const dx = cx - (rect.left + rect.width / 2);
-    const dy = cy - (rect.top + rect.height / 2);
+    this.rouletteState.status.textContent = `🎉 ${winnerTitle}`;
+    
+    // Get current position and calculate move to center
+    const rect = winnerPocket.getBoundingClientRect();
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const currentCenterX = rect.left + rect.width / 2;
+    const currentCenterY = rect.top + rect.height / 2;
+    const moveX = centerX - currentCenterX;
+    const moveY = centerY - currentCenterY;
     
     return new Promise(resolve => {
-      gsap.to(winner, {
-        x: `+=${dx}`,
-        y: `+=${dy}`,
-        rotation: 360,
+      gsap.to(winnerPocket, {
+        x: `+=${moveX}`,
+        y: `+=${moveY}`,
         scale: 3,
-        duration: 1,
+        rotation: 0,
+        duration: 1.2,
         ease: 'power2.inOut',
-        onComplete: resolve
+        onComplete: () => {
+          // Hold at center
+          setTimeout(resolve, 1000);
+        }
       });
     });
   }
   
   /**
-   * Phase 7: Gravity drop
+   * Phase 7: Morph smoothly to carousel
    */
-  async phase7_GravityDrop() {
-    console.log('🔄 Phase 7: Gravity Drop');
+  async phase7_MorphToCarousel(winnerTitle) {
+    console.log('🔄 Phase 7: Morph to Carousel');
     this.rouletteState.status.textContent = 'Returning...';
     
-    await this.delay(800);
+    const winnerCardIndex = this.rouletteState.pocketToCardMap[this.rouletteState.winnerPocketIndex];
     
-    return new Promise(resolve => {
-      gsap.to(this.rouletteState.overlay, {
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power2.in',
-        onComplete: resolve
-      });
-    });
-  }
-  
-  /**
-   * Phase 8: Restore carousel
-   */
-  async phase8_RestoreCarousel(winnerTitle) {
-    console.log('🎬 Phase 8: Restore Carousel');
+    // V6.1: Verify the opened card matches the preview
+    console.log(`✅ Opening card ${winnerCardIndex}: "${this.items[winnerCardIndex]?.dataset.title}"`);
     
+    // Check if green pocket
     if (this.rouletteState.winnerPocketIndex === this.rouletteState.greenPocketIndex) {
-      console.log('💚 Green pocket!');
+      console.log('💚 Green pocket hit!');
       
       if (confirm('🎰 Spin again?\n\nOK = Spin\nCancel = Browse')) {
         this.cleanupCasinoWheel();
         this.rouletteState.isActive = false;
         this.isAnimating = false;
         await this.delay(300);
-        return this.startCasinoWheelV60();
+        return this.startCasinoWheelV61();
       }
     }
     
-    this.items.forEach(item => {
-      gsap.set(item, { clearProps: 'all' });
-    });
-    
-    await this.delay(50);
-    
-    this.currentIndex = this.rouletteState.originalWinnerIndex;
-    this.updateAllItems(this.currentIndex, 0);
-    
-    gsap.set(this.items, { opacity: 0 });
-    
+    // Fade out overlay smoothly
     return new Promise(resolve => {
-      gsap.to(this.items, {
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.06,
-        ease: 'power2.out',
-        onComplete: () => {
-          console.log('✅ Carousel restored');
+      gsap.to(this.rouletteState.overlay, {
+        opacity: 0,
+        duration: 1,
+        ease: 'power2.inOut',
+        onComplete: async () => {
+          // Clear GSAP styles
+          this.items.forEach(item => {
+            gsap.set(item, { clearProps: 'all' });
+          });
           
-          const winner = this.items[this.rouletteState.originalWinnerIndex];
-          gsap.timeline()
-            .to(winner, { scale: 1.3, duration: 0.3, ease: 'back.out(1.8)' })
-            .to(winner, { scale: 1.15, duration: 0.2 });
+          await this.delay(50);
           
-          this.delay(600).then(() => {
-            const link = winner.querySelector('.card-link') || winner.querySelector('a[href]');
-            if (link && confirm(`🎉 ${winnerTitle}!\n\nView project?`)) {
-              window.location.href = link.href;
+          // V6.1: Restore carousel with winner centered
+          this.currentIndex = winnerCardIndex;
+          this.updateAllItems(this.currentIndex, 0);
+          
+          // Fade cards in
+          gsap.set(this.items, { opacity: 0 });
+          gsap.to(this.items, {
+            opacity: 1,
+            duration: 0.8,
+            stagger: 0.05,
+            ease: 'power2.out',
+            onComplete: () => {
+              console.log('✅ Carousel restored with winner centered');
+              
+              // Highlight winner
+              const winner = this.items[winnerCardIndex];
+              gsap.timeline()
+                .to(winner, { scale: 1.25, duration: 0.4, ease: 'back.out(2)' })
+                .to(winner, { scale: 1.15, duration: 0.3 });
+              
+              // Ask to view
+              this.delay(700).then(() => {
+                const link = winner.querySelector('.card-link') || winner.querySelector('a[href]');
+                if (link) {
+                  const confirmView = confirm(`🎉 ${winnerTitle}!\n\nView this project?`);
+                  if (confirmView) {
+                    window.location.href = link.href;
+                  }
+                }
+                resolve();
+              });
             }
-            resolve();
           });
         }
       });
@@ -1201,11 +1054,7 @@ export class LuxuryCoverflow {
    * Cleanup
    */
   cleanupCasinoWheel() {
-    console.log('🧹 V6.0: Cleanup');
-    
-    if (this.rouletteState.ballTimeline) {
-      this.rouletteState.ballTimeline.kill();
-    }
+    console.log('🧹 V6.1: Cleanup');
     
     gsap.killTweensOf([
       this.rouletteState.overlay,
@@ -1213,8 +1062,7 @@ export class LuxuryCoverflow {
       this.rouletteState.ball,
       this.rouletteState.ballShadow,
       this.rouletteState.wheelRim,
-      ...this.rouletteState.pockets,
-      ...this.rouletteState.trailParticles
+      ...this.rouletteState.pockets
     ].filter(Boolean));
     
     this.rouletteState.overlay?.remove();
@@ -1226,17 +1074,13 @@ export class LuxuryCoverflow {
       pockets: [],
       ball: null,
       ballShadow: null,
-      ballTimeline: null,
-      trailParticles: [],
       wheelRim: null,
       status: null,
       originalWinnerIndex: null,
       winnerPocketIndex: null,
       greenPocketIndex: null,
-      shuffledPocketOrder: []
+      pocketToCardMap: []
     };
-    
-    console.log('✅ Cleanup done');
   }
   
   // ========================================
