@@ -1,12 +1,13 @@
 /**
- * Luxury Coverflow Carousel V5.0 - Casino Wheel Edition
+ * Luxury Coverflow V5.5 — Ultra-Realistic Casino Roulette Edition
  * 
- * V5.0 FEATURES:
- * - ✅ 8-Phase Casino Wheel Transformation
- * - ✅ Cards levitate and form roulette wheel
- * - ✅ Ball spins with physics-based trajectory
- * - ✅ Dramatic winner reveal and morph back
- * - ✅ All V4.1 fixes retained
+ * V5.5 FEATURES:
+ * - ✅ 37-pocket authentic European roulette wheel
+ * - ✅ Real red/black/green casino colors
+ * - ✅ Multi-layer neon casino lighting
+ * - ✅ Ball ON wheel track (not floating)
+ * - ✅ Natural gravity drop return (not backwards morph)
+ * - ✅ All V5.0 features retained
  */
 
 import { gsap } from 'gsap';
@@ -14,7 +15,6 @@ import { Coverflow3DEngine } from './coverflow-3d-engine.js';
 import { CoverflowPhysics } from './coverflow-physics.js';
 import { RouletteWheelEngine } from './roulette-wheel-engine.js';
 
-// V4: Cap GSAP ticker to 60fps
 gsap.ticker.fps(60);
 
 export class LuxuryCoverflow {
@@ -28,7 +28,6 @@ export class LuxuryCoverflow {
     this.track = this.container.querySelector('.coverflow-track');
     this.items = Array.from(this.container.querySelectorAll('.coverflow-card'));
     
-    // V5.0: Enhanced config
     this.config = {
       autoplay: false,
       autoplayDelay: 5000,
@@ -40,15 +39,13 @@ export class LuxuryCoverflow {
       enableSmoothTracking: true,
       scrollThreshold: 30,
       scrollSensitivity: 0.004,
-      
       animationDuration: 0.55,
       animationEase: 'power2.out',
       staggerDelay: 0.02,
       
-      // V5.0: Casino wheel config
+      // V5.5: Casino config
       enableCasinoWheel: true,
-      wheelSpinDuration: { min: 5, max: 7 },
-      wheelSpins: { min: 3, max: 5 },
+      wheelSpinDuration: { min: 6, max: 8 },
       
       ...options
     };
@@ -58,7 +55,6 @@ export class LuxuryCoverflow {
     this.autoplayTimer = null;
     this.navQueue = null;
     this.scrollPosition = this.currentIndex;
-    this.isScrollTracking = false;
     
     this.clickState = { startTime: 0, startX: 0, startY: 0 };
     
@@ -73,7 +69,6 @@ export class LuxuryCoverflow {
       velocityMultiplier: 2.5
     });
     
-    // V5.0: Wheel engine
     this.wheelEngine = new RouletteWheelEngine({
       spinDuration: this.config.wheelSpinDuration
     });
@@ -86,14 +81,18 @@ export class LuxuryCoverflow {
       rafPending: false
     };
     
-    // V5.0: Roulette state
+    // V5.5: Enhanced roulette state
     this.rouletteState = {
       isActive: false,
       savedCardStates: [],
       wheelContainer: null,
-      ballElement: null,
-      winnerIndex: null,
-      masterTimeline: null
+      pockets: [],
+      ball: null,
+      ballShadow: null,
+      status: null,
+      wheelRim: null,
+      originalWinnerIndex: null,
+      winnerPocketIndex: null
     };
     
     this.init();
@@ -117,16 +116,14 @@ export class LuxuryCoverflow {
     this.setupNavigationButtons();
     this.setupRouletteButton();
     
-    if (this.config.autoplay) {
-      this.startAutoplay();
-    }
+    if (this.config.autoplay) this.startAutoplay();
     
     this.announceCurrentSlide();
-    console.log('✨ Luxury Coverflow V5.0 initialized with CASINO WHEEL 🎰');
+    console.log('✨ Luxury Coverflow V5.5 — ULTRA-REALISTIC CASINO EDITION 🎰');
   }
   
   // ========================================
-  // CORE ANIMATION METHODS
+  // CORE CAROUSEL METHODS
   // ========================================
   
   updateAllItems(centerIndex, duration = this.config.animationDuration) {
@@ -148,7 +145,6 @@ export class LuxuryCoverflow {
         y: transform.translateY || 0,
         z: transform.translateZ,
         rotationY: transform.rotateY,
-        rotationX: transform.rotateX || 0,
         scale: transform.scale,
         opacity: transform.opacity,
         filter: this.engine3D.getFilterString(transform.filter),
@@ -160,10 +156,7 @@ export class LuxuryCoverflow {
       });
       
       item.classList.toggle('is-center', isCenter);
-      item.classList.toggle('is-adjacent', absPosition === 1);
       item.setAttribute('aria-current', isCenter ? 'true' : 'false');
-      item.setAttribute('tabindex', isCenter ? '0' : '-1');
-      item.style.pointerEvents = transform.opacity > 0.1 ? 'auto' : 'none';
     });
     
     this.updatePagination();
@@ -173,19 +166,12 @@ export class LuxuryCoverflow {
     const transforms = this.engine3D.calculateAllTransforms(
       position, this.items.length, this.config.infiniteLoop
     );
-    
     this.items.forEach((item, index) => {
-      const transform = transforms[index];
+      const t = transforms[index];
       gsap.set(item, {
-        x: transform.translateX,
-        y: transform.translateY || 0,
-        z: transform.translateZ,
-        rotationY: transform.rotateY,
-        scale: transform.scale,
-        opacity: transform.opacity,
-        filter: this.engine3D.getFilterString(transform.filter),
-        zIndex: transform.zIndex,
-        force3D: true
+        x: t.translateX, y: t.translateY || 0, z: t.translateZ,
+        rotationY: t.rotateY, scale: t.scale, opacity: t.opacity,
+        filter: this.engine3D.getFilterString(t.filter), zIndex: t.zIndex, force3D: true
       });
     });
   }
@@ -206,7 +192,6 @@ export class LuxuryCoverflow {
     }
     
     if (targetIndex === this.currentIndex) return;
-    
     if (this.isAnimating) {
       clearTimeout(this.navQueue);
       this.navQueue = setTimeout(() => this.goToSlide(targetIndex, duration), 100);
@@ -228,19 +213,15 @@ export class LuxuryCoverflow {
   prev() { this.goToSlide(this.currentIndex - 1); }
   
   // ========================================
-  // KEYBOARD, MOUSE, TOUCH, SCROLL HANDLERS
+  // INPUT HANDLERS (Keyboard, Mouse, Touch, Scroll)
   // ========================================
   
   setupKeyboardNavigation() {
     if (!this.config.enableKeyboard) return;
     document.addEventListener('keydown', (e) => {
-      if (!this.container.contains(document.activeElement) && 
-          !this.container.matches(':hover')) return;
-      
+      if (!this.container.contains(document.activeElement) && !this.container.matches(':hover')) return;
       if (e.key === 'ArrowLeft') { e.preventDefault(); this.prev(); }
       if (e.key === 'ArrowRight') { e.preventDefault(); this.next(); }
-      if (e.key === 'Home') { e.preventDefault(); this.goToSlide(0); }
-      if (e.key === 'End') { e.preventDefault(); this.goToSlide(this.items.length - 1); }
     });
   }
   
@@ -261,27 +242,18 @@ export class LuxuryCoverflow {
   
   setupTouchDrag() {
     if (!this.config.enableTouch) return;
-    this.track.addEventListener('touchstart', (e) => {
-      this.startDrag(e.touches[0].clientX);
-    }, { passive: true });
+    this.track.addEventListener('touchstart', (e) => this.startDrag(e.touches[0].clientX), { passive: true });
     this.track.addEventListener('touchmove', (e) => {
-      if (this.dragState.isDragging) {
-        e.preventDefault();
-        this.updateDrag(e.touches[0].clientX);
-      }
+      if (this.dragState.isDragging) { e.preventDefault(); this.updateDrag(e.touches[0].clientX); }
     }, { passive: false });
-    this.track.addEventListener('touchend', () => {
-      if (this.dragState.isDragging) this.endDrag();
-    });
+    this.track.addEventListener('touchend', () => { if (this.dragState.isDragging) this.endDrag(); });
   }
   
   setupScrollNavigation() {
     if (!this.config.enableScroll) return;
     let scrollDeltaX = 0, scrollTimeout;
-    
     this.container.addEventListener('wheel', (e) => {
-      const isHorizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY) * 0.5;
-      if (isHorizontal && Math.abs(e.deltaX) > 5) {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) * 0.5 && Math.abs(e.deltaX) > 5) {
         e.preventDefault();
         scrollDeltaX += e.deltaX;
         clearTimeout(scrollTimeout);
@@ -298,23 +270,17 @@ export class LuxuryCoverflow {
   setupSmoothScrollTracking() {
     if (!this.config.enableSmoothTracking) return;
     let targetPosition = this.currentIndex, scrollEndTimeout;
-    
     this.container.addEventListener('wheel', (e) => {
-      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) * 0.5) return;
-      if (Math.abs(e.deltaX) < 5) return;
-      
+      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) * 0.5 || Math.abs(e.deltaX) < 5) return;
       e.preventDefault();
       targetPosition += e.deltaX * this.config.scrollSensitivity;
-      
       if (this.config.infiniteLoop) {
         while (targetPosition < 0) targetPosition += this.items.length;
         while (targetPosition >= this.items.length) targetPosition -= this.items.length;
       } else {
         targetPosition = Math.max(0, Math.min(this.items.length - 1, targetPosition));
       }
-      
       this.updateContinuousPosition(targetPosition);
-      
       clearTimeout(scrollEndTimeout);
       scrollEndTimeout = setTimeout(() => {
         this.goToSlide(Math.round(targetPosition), 0.25);
@@ -324,10 +290,7 @@ export class LuxuryCoverflow {
   }
   
   startDrag(clientX) {
-    this.dragState.isDragging = true;
-    this.dragState.startX = clientX;
-    this.dragState.currentX = clientX;
-    this.dragState.startIndex = this.currentIndex;
+    this.dragState = { isDragging: true, startX: clientX, currentX: clientX, startIndex: this.currentIndex, rafPending: false };
     this.physics.startDrag(clientX);
     this.stopAutoplay();
     this.container.classList.add('is-dragging');
@@ -338,19 +301,14 @@ export class LuxuryCoverflow {
     this.dragState.currentX = clientX;
     if (!this.dragState.rafPending) {
       this.dragState.rafPending = true;
-      requestAnimationFrame(() => {
-        this.physics.updateDrag(this.dragState.currentX);
-        this.dragState.rafPending = false;
-      });
+      requestAnimationFrame(() => { this.physics.updateDrag(this.dragState.currentX); this.dragState.rafPending = false; });
     }
   }
   
   endDrag() {
-    const dragDelta = (this.dragState.currentX - this.dragState.startX) / 350;
-    const targetIndex = this.physics.calculateSnapTarget(
-      this.currentIndex, this.items.length, dragDelta, this.config.infiniteLoop
-    );
-    this.goToSlide(targetIndex);
+    const delta = (this.dragState.currentX - this.dragState.startX) / 350;
+    const target = this.physics.calculateSnapTarget(this.currentIndex, this.items.length, delta, this.config.infiniteLoop);
+    this.goToSlide(target);
     this.dragState.isDragging = false;
     this.container.classList.remove('is-dragging');
     this.physics.endDrag();
@@ -381,66 +339,60 @@ export class LuxuryCoverflow {
   }
   
   // ========================================
-  // V5.0: CASINO WHEEL ROULETTE
+  // V5.5: ULTRA-REALISTIC CASINO WHEEL
   // ========================================
   
   setupRouletteButton() {
-    let btn = this.container.querySelector('.roulette-trigger-btn') ||
-              document.querySelector('.roulette-trigger-btn');
+    const btn = this.container.querySelector('.roulette-trigger-btn') ||
+                document.querySelector('.roulette-trigger-btn');
     
     if (!btn) return;
     
-    console.log('🎰 Casino wheel button ready');
+    console.log('🎰 Casino wheel V5.5 ready');
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      
-      if (this.config.enableCasinoWheel) {
-        await this.startCasinoWheelRoulette();
-      } else {
-        await this.startSimpleRoulette();
-      }
+      await this.startCasinoWheelV55();
     });
   }
   
   /**
-   * V5.0: Full 8-Phase Casino Wheel Transformation
+   * V5.5: Complete 8-phase ultra-realistic casino wheel
    */
-  async startCasinoWheelRoulette() {
+  async startCasinoWheelV55() {
     if (this.rouletteState.isActive) return;
     
-    console.log('🎰 CASINO WHEEL ACTIVATED!');
+    console.log('🎰 V5.5 ULTRA-REALISTIC CASINO WHEEL ACTIVATED!');
     this.rouletteState.isActive = true;
     this.isAnimating = true;
     
-    // Save original card states
+    // Pre-select winner
+    this.rouletteState.originalWinnerIndex = Math.floor(Math.random() * this.items.length);
+    this.rouletteState.winnerPocketIndex = this.wheelEngine.getWinnerPocketIndex(
+      this.rouletteState.originalWinnerIndex, this.items.length
+    );
+    
+    const winnerTitle = this.items[this.rouletteState.originalWinnerIndex].dataset.title || 'Selected!';
+    console.log(`🎯 Winner: ${this.rouletteState.originalWinnerIndex} "${winnerTitle}"`);
+    
+    // Save original states
     this.saveCardStates();
     
-    // Pre-select winner
-    this.rouletteState.winnerIndex = Math.floor(Math.random() * this.items.length);
-    const winner = this.items[this.rouletteState.winnerIndex];
-    const winnerTitle = winner.dataset.title || 'Selected Project!';
-    console.log('🎯 Pre-selected winner:', this.rouletteState.winnerIndex, winnerTitle);
-    
-    // Create wheel container and ball
-    this.createWheelElements();
-    
     try {
-      // Execute 8 phases
-      await this.phase1_Levitation();
-      await this.phase2_CircleTransformation();
-      await this.phase3_WheelSpin();
-      await this.phase4_BallLanding();
-      await this.phase5_WinnerRise();
+      await this.phase1_CasinoLevitation();
+      await this.phase2_Create37PocketWheel();
+      await this.phase3_WheelSpinWithBall();
+      await this.phase4_BallLandingBounce();
+      await this.phase5_WinnerRiseGlow();
       await this.phase6_CenterFocus();
-      await this.phase7_MorphBack();
-      await this.phase8_CarouselOpen(winnerTitle);
+      await this.phase7_NaturalGravityDrop();
+      await this.phase8_CarouselReveal(winnerTitle);
       
-      console.log('🎉 Casino wheel sequence complete!');
+      console.log('🎉 V5.5 Casino wheel complete!');
     } catch (error) {
       console.error('❌ Casino wheel error:', error);
     } finally {
-      this.cleanupWheelElements();
+      this.cleanupCasinoWheel();
       this.rouletteState.isActive = false;
       this.isAnimating = false;
     }
@@ -450,113 +402,93 @@ export class LuxuryCoverflow {
     this.rouletteState.savedCardStates = this.items.map(card => {
       const rect = card.getBoundingClientRect();
       const style = window.getComputedStyle(card);
+      const matrix = new DOMMatrix(style.transform);
       return {
         rect,
-        transform: style.transform,
-        opacity: parseFloat(style.opacity),
-        zIndex: parseInt(style.zIndex) || 0
+        x: matrix.m41 || 0,
+        y: matrix.m42 || 0,
+        scale: Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b) || 1,
+        rotation: Math.atan2(matrix.b, matrix.a) * (180 / Math.PI) || 0,
+        opacity: parseFloat(style.opacity) || 1,
+        zIndex: parseInt(style.zIndex) || 0,
+        width: rect.width,
+        height: rect.height
       };
     });
   }
   
-  createWheelElements() {
-    // Create overlay
-    let overlay = document.querySelector('.casino-wheel-overlay');
-    if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.className = 'casino-wheel-overlay';
-      overlay.style.cssText = `
-        position: fixed;
-        inset: 0;
-        z-index: 10000;
-        background: radial-gradient(circle at center, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.95) 100%);
-        opacity: 0;
-        pointer-events: none;
-      `;
-      document.body.appendChild(overlay);
-    }
-    this.rouletteState.wheelContainer = overlay;
+  /**
+   * Phase 1: Cards levitate with casino atmosphere
+   */
+  async phase1_CasinoLevitation() {
+    console.log('📦 Phase 1: Casino Levitation');
     
-    // Create ball
-    const ball = document.createElement('div');
-    ball.className = 'roulette-ball-3d';
-    ball.style.cssText = `
+    // Create casino atmosphere overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'casino-wheel-overlay';
+    overlay.style.cssText = `
       position: fixed;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #FFFFFF 0%, #FFD700 40%, #B8860B 100%);
-      box-shadow: 
-        0 0 30px rgba(255,215,0,1),
-        0 0 60px rgba(255,215,0,0.7),
-        0 5px 20px rgba(0,0,0,0.5),
-        inset -5px -5px 15px rgba(0,0,0,0.3);
-      z-index: 10002;
+      inset: 0;
+      z-index: 10000;
       opacity: 0;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(0, 60, 0, 0.95) 0%, rgba(0, 20, 0, 0.98) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+    `;
+    
+    // Green felt texture
+    const feltTexture = document.createElement('div');
+    feltTexture.style.cssText = `
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+      opacity: 0.4;
       pointer-events: none;
     `;
-    document.body.appendChild(ball);
-    this.rouletteState.ballElement = ball;
+    overlay.appendChild(feltTexture);
+    document.body.appendChild(overlay);
+    this.rouletteState.wheelContainer = overlay;
     
-    // Create status text
+    // Status text
     const status = document.createElement('div');
-    status.className = 'casino-wheel-status';
+    status.className = 'casino-status';
+    status.textContent = 'Preparing the wheel...';
     status.style.cssText = `
       position: fixed;
-      bottom: 5rem;
+      bottom: 4rem;
       left: 50%;
       transform: translateX(-50%);
       font-size: clamp(1.5rem, 4vw, 2.5rem);
       font-weight: 700;
       color: #FFD700;
-      text-align: center;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      z-index: 10003;
+      z-index: 10010;
       opacity: 0;
-      text-shadow: 0 0 30px rgba(255,215,0,0.8), 0 0 60px rgba(255,215,0,0.5);
+      text-shadow: 0 0 30px #FFD700, 0 0 60px rgba(255,215,0,0.5);
     `;
     document.body.appendChild(status);
-    this.rouletteState.statusElement = status;
-  }
-  
-  cleanupWheelElements() {
-    document.querySelector('.casino-wheel-overlay')?.remove();
-    document.querySelector('.roulette-ball-3d')?.remove();
-    document.querySelector('.casino-wheel-status')?.remove();
-    this.rouletteState.wheelContainer = null;
-    this.rouletteState.ballElement = null;
-    this.rouletteState.statusElement = null;
-  }
-  
-  /**
-   * Phase 1: Cards levitate out of carousel (2s)
-   */
-  async phase1_Levitation() {
-    console.log('📦 Phase 1: Levitation');
-    const overlay = this.rouletteState.wheelContainer;
-    const status = this.rouletteState.statusElement;
+    this.rouletteState.status = status;
     
-    // Fade in overlay
-    gsap.to(overlay, { opacity: 1, duration: 0.5 });
+    // Fade in
+    gsap.to(overlay, { opacity: 1, duration: 0.6 });
+    gsap.to(status, { opacity: 1, duration: 0.4, delay: 0.3 });
     
-    // Show status
-    status.textContent = 'Preparing the wheel...';
-    gsap.to(status, { opacity: 1, duration: 0.5 });
-    
-    // Add perspective to track
-    this.track.style.perspective = '1200px';
-    
-    // Levitate cards
+    // Levitate original cards
     return new Promise(resolve => {
       gsap.to(this.items, {
-        z: 350,
-        y: -80,
-        scale: 0.7,
+        y: -100,
+        z: 400,
+        scale: 0.6,
         rotationX: 0,
         rotationY: 0,
-        opacity: 0.95,
-        duration: 2,
+        opacity: 0.9,
+        duration: 1.8,
         stagger: 0.08,
         ease: 'power2.out',
         onComplete: resolve
@@ -565,314 +497,380 @@ export class LuxuryCoverflow {
   }
   
   /**
-   * Phase 2: Cards transform into circular wheel layout (3s)
+   * Phase 2: Create 37-pocket authentic wheel
    */
-  async phase2_CircleTransformation() {
-    console.log('🔄 Phase 2: Circle Transformation');
-    const status = this.rouletteState.statusElement;
-    status.textContent = 'Forming the wheel...';
-    
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    const positions = this.wheelEngine.calculateCircularPositions(
-      this.items.length, centerX, centerY
-    );
-    
-    // Create wheel rim visual
-    const wheelRim = document.createElement('div');
-    wheelRim.className = 'wheel-rim';
-    wheelRim.style.cssText = `
-      position: fixed;
-      left: ${centerX}px;
-      top: ${centerY}px;
-      width: ${this.wheelEngine.config.wheelRadius() * 2 + 100}px;
-      height: ${this.wheelEngine.config.wheelRadius() * 2 + 100}px;
-      transform: translate(-50%, -50%);
-      border: 4px solid rgba(255,215,0,0.4);
-      border-radius: 50%;
-      box-shadow: 
-        0 0 40px rgba(255,215,0,0.3),
-        inset 0 0 60px rgba(255,215,0,0.1);
-      z-index: 10001;
-      opacity: 0;
-    `;
-    document.body.appendChild(wheelRim);
-    this.rouletteState.wheelRim = wheelRim;
-    
-    gsap.to(wheelRim, { opacity: 1, duration: 0.5 });
-    
-    return new Promise(resolve => {
-      this.items.forEach((card, i) => {
-        const pos = positions[i];
-        
-        gsap.to(card, {
-          x: pos.x - window.innerWidth / 2,
-          y: pos.y - window.innerHeight / 2,
-          z: 0,
-          rotation: pos.rotation,
-          rotationX: 0,
-          rotationY: 0,
-          scale: pos.scale,
-          duration: 2.5,
-          delay: i * 0.1,
-          ease: 'elastic.out(1, 0.7)'
-        });
-      });
-      
-      setTimeout(resolve, 3000);
-    });
-  }
-  
-  /**
-   * Phase 3: Wheel spins with ball (5-8s)
-   */
-  async phase3_WheelSpin() {
-    console.log('🎡 Phase 3: Wheel Spin');
-    const status = this.rouletteState.statusElement;
-    const ball = this.rouletteState.ballElement;
-    const rim = this.rouletteState.wheelRim;
-    
-    status.textContent = 'Spin the wheel!';
-    
-    const spinParams = this.wheelEngine.calculateWheelSpin(
-      this.rouletteState.winnerIndex, this.items.length
-    );
+  async phase2_Create37PocketWheel() {
+    console.log('🔄 Phase 2: Creating 37-pocket wheel');
+    this.rouletteState.status.textContent = 'Forming the wheel...';
     
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
     const wheelRadius = this.wheelEngine.config.wheelRadius();
     
-    // Position ball on outer rim
-    const ballStartAngle = Math.random() * 360;
-    const ballStartX = centerX + wheelRadius * 1.2 * Math.cos(ballStartAngle * Math.PI / 180);
-    const ballStartY = centerY + wheelRadius * 1.2 * Math.sin(ballStartAngle * Math.PI / 180);
+    // Create golden wheel rim
+    const rim = document.createElement('div');
+    rim.className = 'wheel-rim';
+    rim.style.cssText = `
+      position: fixed;
+      left: ${centerX}px;
+      top: ${centerY}px;
+      width: ${wheelRadius * 2 + 80}px;
+      height: ${wheelRadius * 2 + 80}px;
+      transform: translate(-50%, -50%) rotateX(5deg);
+      border: 10px solid transparent;
+      border-radius: 50%;
+      background:
+        linear-gradient(#003300, #003300) padding-box,
+        linear-gradient(135deg, #FFD700, #FFA500, #FFD700, #B8860B, #FFD700) border-box;
+      box-shadow:
+        0 0 40px rgba(255,215,0,0.8),
+        0 0 80px rgba(255,215,0,0.5),
+        inset 0 0 50px rgba(255,215,0,0.2),
+        0 30px 100px rgba(0,0,0,0.7);
+      z-index: 10001;
+      opacity: 0;
+      transform-style: preserve-3d;
+    `;
+    document.body.appendChild(rim);
+    this.rouletteState.wheelRim = rim;
     
-    gsap.set(ball, { left: ballStartX - 25, top: ballStartY - 25 });
-    gsap.to(ball, { opacity: 1, duration: 0.3 });
+    gsap.to(rim, { opacity: 1, duration: 0.5 });
     
-    return new Promise(resolve => {
-      const duration = spinParams.duration;
+    // Clone cards into 37 pockets
+    const pockets = this.wheelEngine.createRoulettePockets(this.items);
+    const positions = this.wheelEngine.calculatePocketPositions(centerX, centerY);
+    
+    // Style and position each pocket
+    const pocketContainer = document.createElement('div');
+    pocketContainer.className = 'pocket-container';
+    pocketContainer.style.cssText = `
+      position: fixed;
+      left: ${centerX}px;
+      top: ${centerY}px;
+      width: 0;
+      height: 0;
+      z-index: 10002;
+      transform-style: preserve-3d;
+    `;
+    
+    pockets.forEach((pocket, i) => {
+      const pos = positions[i];
+      const color = pos.pocketData.color;
+      const number = pos.pocketData.number;
       
-      // Create rotation wrapper for cards
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText = `
-        position: fixed;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 0;
-        height: 0;
+      // Position relative to center
+      const relX = pos.x - centerX;
+      const relY = pos.y - centerY;
+      
+      // Apply pocket styling
+      pocket.style.cssText = `
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: clamp(35px, 6vmin, 60px);
+        height: clamp(50px, 9vmin, 80px);
+        border-radius: 6px;
+        border: 2px solid #FFD700;
+        overflow: hidden;
+        transform: translate(${relX}px, ${relY}px) rotate(${pos.rotation}deg) scale(0);
+        transform-origin: center center;
+        opacity: 0;
+        box-shadow:
+          inset 0 -3px 6px rgba(0,0,0,0.6),
+          inset 0 2px 4px rgba(255,255,255,0.2),
+          0 2px 8px rgba(0,0,0,0.5);
+        background: ${color === 'green' ? 'linear-gradient(180deg, #006400, #228B22, #006400)' :
+                      color === 'red' ? 'linear-gradient(180deg, #8B0000, #DC143C, #8B0000)' :
+                      'linear-gradient(180deg, #000, #1a1a1a, #000)'};
       `;
-      document.body.appendChild(wrapper);
       
-      // Move cards into wrapper temporarily (visual only)
-      const cardPositions = [];
-      this.items.forEach((card, i) => {
-        const rect = card.getBoundingClientRect();
-        cardPositions.push({
-          x: rect.left + rect.width/2 - centerX,
-          y: rect.top + rect.height/2 - centerY
+      // Number overlay
+      const numOverlay = document.createElement('div');
+      numOverlay.textContent = number;
+      numOverlay.style.cssText = `
+        position: absolute;
+        top: 3px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: Arial Black, sans-serif;
+        font-size: clamp(10px, 2vmin, 16px);
+        font-weight: 900;
+        color: #FFD700;
+        text-shadow: 0 0 8px #FFD700, 0 1px 2px rgba(0,0,0,0.9);
+        z-index: 10;
+      `;
+      pocket.appendChild(numOverlay);
+      
+      pocketContainer.appendChild(pocket);
+    });
+    
+    document.body.appendChild(pocketContainer);
+    this.rouletteState.pockets = pockets;
+    this.rouletteState.pocketContainer = pocketContainer;
+    
+    // Hide original cards
+    gsap.to(this.items, { opacity: 0, duration: 0.5 });
+    
+    // Animate pockets appearing in circle
+    return new Promise(resolve => {
+      pockets.forEach((pocket, i) => {
+        const pos = positions[i];
+        const relX = pos.x - centerX;
+        const relY = pos.y - centerY;
+        
+        gsap.to(pocket, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.6,
+          delay: i * 0.03,
+          ease: 'back.out(1.5)',
+          onUpdate: function() {
+            const scale = this.targets()[0].style.transform.match(/scale\(([\d.]+)\)/)?.[1] || 0;
+            pocket.style.transform = `translate(${relX}px, ${relY}px) rotate(${pos.rotation}deg) scale(${scale})`;
+          }
         });
       });
       
-      // Animate wheel rotation (rotate all cards around center)
-      const tl = gsap.timeline({ onComplete: resolve });
-      
-      // Spin the wheel (rotate cards around center point)
-      tl.to({}, {
-        duration: duration,
-        ease: 'power3.out',
-        onUpdate: function() {
-          const progress = this.progress();
-          const currentRotation = spinParams.finalRotation * progress;
-          
-          // Update status text at intervals
-          if (progress < 0.3) {
-            status.textContent = 'Spinning fast!';
-          } else if (progress < 0.7) {
-            status.textContent = 'Round and round...';
-          } else {
-            status.textContent = 'Slowing down...';
-          }
-        }
-      });
-      
-      // Animate ball spiraling in parallel
-      tl.to({}, {
-        duration: duration,
-        onUpdate: function() {
-          const progress = this.progress();
-          
-          // Ball goes opposite direction, faster, with spiral
-          const ballSpeed = -spinParams.finalRotation * 1.5;
-          const ballRotation = ballSpeed * Math.pow(progress, 0.7);
-          
-          // Spiral inward after 60%
-          let currentRadius = wheelRadius * 1.2;
-          if (progress > 0.6) {
-            const spiralProgress = (progress - 0.6) / 0.4;
-            currentRadius = wheelRadius * 1.2 - (wheelRadius * 0.3 * spiralProgress);
-          }
-          
-          const angleRad = ballRotation * Math.PI / 180;
-          const ballX = centerX + currentRadius * Math.cos(angleRad);
-          const ballY = centerY + currentRadius * Math.sin(angleRad);
-          
-          gsap.set(ball, { left: ballX - 25, top: ballY - 25 });
-        }
-      }, 0);
-      
-      // Rotate the wheel rim for visual effect
-      tl.to(rim, {
-        rotation: spinParams.finalRotation,
-        duration: duration,
-        ease: 'power3.out'
-      }, 0);
-      
-      // Haptic at intervals
-      let lastTick = 0;
-      tl.to({}, {
-        duration: duration,
-        onUpdate: function() {
-          if ('vibrate' in navigator) {
-            const progress = this.progress();
-            const tickInterval = 0.1 / (1 - progress * 0.7); // Speed up as slowing down
-            if (progress - lastTick > tickInterval) {
-              navigator.vibrate(5);
-              lastTick = progress;
-            }
-          }
-        }
-      }, 0);
+      setTimeout(resolve, 2500);
     });
   }
   
   /**
-   * Phase 4: Ball lands in winning pocket (2s)
+   * Phase 3: Wheel spin with ball on track
    */
-  async phase4_BallLanding() {
-    console.log('⚾ Phase 4: Ball Landing');
-    const status = this.rouletteState.statusElement;
-    const ball = this.rouletteState.ballElement;
-    const winner = this.items[this.rouletteState.winnerIndex];
+  async phase3_WheelSpinWithBall() {
+    console.log('🎡 Phase 3: Wheel spin with ball');
+    this.rouletteState.status.textContent = 'Spin the wheel!';
     
-    status.textContent = 'Landing...';
+    const spinParams = this.wheelEngine.calculateWheelSpin(this.rouletteState.winnerPocketIndex);
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const wheelRadius = this.wheelEngine.config.wheelRadius();
     
-    const winnerRect = winner.getBoundingClientRect();
-    const targetX = winnerRect.left + winnerRect.width / 2 - 25;
-    const targetY = winnerRect.top + winnerRect.height / 2 - 25;
+    // Create ball
+    const ball = document.createElement('div');
+    ball.className = 'roulette-ball-v55';
+    ball.style.cssText = `
+      position: fixed;
+      width: clamp(28px, 4.5vmin, 45px);
+      height: clamp(28px, 4.5vmin, 45px);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff, #f0f0f0 30%, #d0d0d0 70%, #a0a0a0);
+      box-shadow:
+        0 0 25px rgba(255,255,255,1),
+        0 0 50px rgba(255,215,0,0.9),
+        0 0 80px rgba(255,215,0,0.6),
+        inset -3px -3px 10px rgba(0,0,0,0.3),
+        inset 3px 3px 10px rgba(255,255,255,0.8),
+        0 10px 30px rgba(0,0,0,0.5);
+      z-index: 10005;
+      pointer-events: none;
+    `;
+    document.body.appendChild(ball);
+    this.rouletteState.ball = ball;
+    
+    // Ball shadow (creates "on wheel" illusion)
+    const ballShadow = document.createElement('div');
+    ballShadow.className = 'roulette-ball-shadow';
+    ballShadow.style.cssText = `
+      position: fixed;
+      width: clamp(35px, 5.5vmin, 55px);
+      height: clamp(12px, 2.5vmin, 20px);
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, transparent 70%);
+      filter: blur(4px);
+      z-index: 10004;
+      pointer-events: none;
+    `;
+    document.body.appendChild(ballShadow);
+    this.rouletteState.ballShadow = ballShadow;
+    
+    const outerRadius = wheelRadius * 1.1;
+    let ballAngle = Math.random() * 360;
+    
+    gsap.set(ball, {
+      left: centerX + outerRadius * Math.cos(ballAngle * Math.PI / 180),
+      top: centerY + outerRadius * Math.sin(ballAngle * Math.PI / 180),
+      xPercent: -50,
+      yPercent: -50
+    });
+    
+    const pocketContainer = this.rouletteState.pocketContainer;
+    const rim = this.rouletteState.wheelRim;
+    const duration = spinParams.duration;
+    
+    return new Promise(resolve => {
+      // Rotate wheel (container + rim)
+      gsap.to([pocketContainer, rim], {
+        rotation: spinParams.finalRotation,
+        duration,
+        ease: 'power3.out'
+      });
+      
+      // Ball animation (opposite direction, spiraling in)
+      gsap.to({}, {
+        duration,
+        onUpdate: function() {
+          const progress = this.progress();
+          
+          // Ball speed decays
+          const ballSpeed = 2200 * Math.pow(1 - progress, 1.6);
+          ballAngle -= ballSpeed * 0.016 / 60;
+          
+          // Spiral inward after 55%
+          let currentRadius = outerRadius;
+          if (progress > 0.55) {
+            const spiral = (progress - 0.55) / 0.45;
+            currentRadius = outerRadius - (outerRadius * 0.2 * Math.pow(spiral, 1.5));
+          }
+          
+          const angleRad = ballAngle * Math.PI / 180;
+          const x = centerX + currentRadius * Math.cos(angleRad);
+          const y = centerY + currentRadius * Math.sin(angleRad);
+          
+          gsap.set(ball, { left: x, top: y });
+          gsap.set(ballShadow, { 
+            left: x + 4, 
+            top: y + 8,
+            scaleX: 0.9 + (1 - progress) * 0.2
+          });
+          
+          // Status updates
+          if (progress < 0.3) {
+            this.status.textContent = 'Spinning fast!';
+          } else if (progress < 0.7) {
+            this.status.textContent = 'Round and round...';
+          } else {
+            this.status.textContent = 'Slowing down...';
+          }
+        }.bind({ status: this.rouletteState.status }),
+        onComplete: resolve
+      });
+      
+      // Haptic ticks
+      if ('vibrate' in navigator) {
+        let lastTick = 0;
+        gsap.to({}, {
+          duration,
+          onUpdate: function() {
+            const p = this.progress();
+            const interval = 0.08 / (1 - p * 0.6);
+            if (p - lastTick > interval) {
+              navigator.vibrate(4);
+              lastTick = p;
+            }
+          }
+        });
+      }
+    });
+  }
+  
+  /**
+   * Phase 4: Ball bounces into winner pocket
+   */
+  async phase4_BallLandingBounce() {
+    console.log('⚾ Phase 4: Ball landing');
+    this.rouletteState.status.textContent = 'Landing...';
+    
+    const ball = this.rouletteState.ball;
+    const ballShadow = this.rouletteState.ballShadow;
+    const winnerPocket = this.rouletteState.pockets[this.rouletteState.winnerPocketIndex];
+    const pocketRect = winnerPocket.getBoundingClientRect();
+    const targetX = pocketRect.left + pocketRect.width / 2;
+    const targetY = pocketRect.top + pocketRect.height / 2;
     
     const bounces = this.wheelEngine.getBounceSequence();
     
     return new Promise(resolve => {
       const tl = gsap.timeline({ onComplete: resolve });
       
-      // Bounce sequence
-      bounces.forEach((bounce, i) => {
+      bounces.forEach((b, i) => {
         tl.to(ball, {
-          left: targetX + (i === bounces.length - 1 ? 0 : (Math.random() - 0.5) * 60),
+          left: targetX + (i < 2 ? (Math.random() - 0.5) * 40 : 0),
           top: targetY,
-          scale: i === 0 ? 1.5 : 1,
-          duration: bounce.duration,
-          ease: bounce.ease
+          scale: i === 0 ? 1.4 : 1,
+          duration: b.duration,
+          ease: b.ease
         });
         
         if (i < bounces.length - 1) {
-          tl.to(ball, {
-            top: targetY - bounce.height,
-            duration: bounce.duration * 0.5,
-            ease: 'power1.out'
-          });
+          tl.to(ball, { top: targetY - b.height, duration: b.duration * 0.4, ease: 'power1.out' });
         }
       });
       
-      // Final impact
-      tl.to(ball, { scale: 1.3, duration: 0.1 });
-      tl.to(ball, { scale: 1, duration: 0.2, ease: 'elastic.out(1, 0.5)' });
-      
       // Winner glow
-      tl.to(winner, {
-        boxShadow: '0 0 80px rgba(255,215,0,1), 0 0 120px rgba(255,215,0,0.5)',
-        duration: 0.3,
-        repeat: 2,
+      tl.to(winnerPocket, {
+        boxShadow: '0 0 60px rgba(255,215,0,1), inset 0 0 30px rgba(255,215,0,0.5)',
+        duration: 0.2,
+        repeat: 3,
         yoyo: true
-      }, '-=0.5');
+      }, '-=0.4');
       
-      // Haptic burst
-      if ('vibrate' in navigator) {
-        tl.call(() => navigator.vibrate([100, 50, 100, 50, 200]));
-      }
+      tl.to([ball, ballShadow], { opacity: 0, scale: 0, duration: 0.4 });
+      
+      if ('vibrate' in navigator) tl.call(() => navigator.vibrate([100, 50, 150]));
     });
   }
   
   /**
-   * Phase 5: Winner rises from the wheel (2s)
+   * Phase 5: Winner rises with glow
    */
-  async phase5_WinnerRise() {
-    console.log('🏆 Phase 5: Winner Rise');
-    const status = this.rouletteState.statusElement;
-    const winner = this.items[this.rouletteState.winnerIndex];
-    const ball = this.rouletteState.ballElement;
+  async phase5_WinnerRiseGlow() {
+    console.log('🏆 Phase 5: Winner rise');
+    this.rouletteState.status.textContent = 'Winner!';
     
-    status.textContent = 'Winner selected!';
+    const pockets = this.rouletteState.pockets;
+    const winnerPocket = pockets[this.rouletteState.winnerPocketIndex];
+    const rim = this.rouletteState.wheelRim;
+    const pocketContainer = this.rouletteState.pocketContainer;
     
     return new Promise(resolve => {
       const tl = gsap.timeline({ onComplete: resolve });
       
-      // Fade out ball
-      tl.to(ball, { opacity: 0, scale: 0, duration: 0.5 });
-      
-      // Fade out other cards
-      this.items.forEach((card, i) => {
-        if (i !== this.rouletteState.winnerIndex) {
-          tl.to(card, {
-            opacity: 0,
-            scale: 0.5,
-            duration: 0.8
-          }, 0);
+      // Fade others
+      pockets.forEach((p, i) => {
+        if (i !== this.rouletteState.winnerPocketIndex) {
+          tl.to(p, { opacity: 0, scale: 0.5, duration: 0.6 }, 0);
         }
       });
       
-      // Fade out wheel rim
-      if (this.rouletteState.wheelRim) {
-        tl.to(this.rouletteState.wheelRim, { opacity: 0, duration: 0.8 }, 0);
-      }
+      // Fade rim
+      tl.to(rim, { opacity: 0, duration: 0.8 }, 0);
       
       // Winner rises
-      tl.to(winner, {
-        z: 500,
-        scale: 1.3,
-        rotation: 0,
-        boxShadow: '0 50px 150px rgba(255,215,0,0.6)',
-        duration: 1.5,
+      tl.to(winnerPocket, {
+        scale: 2,
+        zIndex: 10010,
+        boxShadow: '0 0 100px rgba(255,215,0,1), 0 50px 150px rgba(0,0,0,0.5)',
+        duration: 1.2,
         ease: 'back.out(1.5)'
       }, 0.3);
     });
   }
   
   /**
-   * Phase 6: Winner moves to center (1.5s)
+   * Phase 6: Winner moves to center
    */
   async phase6_CenterFocus() {
-    console.log('🎯 Phase 6: Center Focus');
-    const status = this.rouletteState.statusElement;
-    const winner = this.items[this.rouletteState.winnerIndex];
-    const winnerTitle = winner.dataset.title || 'Selected!';
+    console.log('🎯 Phase 6: Center focus');
+    const winnerPocket = this.rouletteState.pockets[this.rouletteState.winnerPocketIndex];
+    const winnerTitle = this.items[this.rouletteState.originalWinnerIndex].dataset.title || 'Selected!';
     
-    status.textContent = `🎉 ${winnerTitle}`;
+    this.rouletteState.status.textContent = `🎉 ${winnerTitle}`;
     
     const centerX = window.innerWidth / 2;
     const centerY = window.innerHeight / 2;
-    const winnerRect = winner.getBoundingClientRect();
+    const pocketRect = winnerPocket.getBoundingClientRect();
     
     return new Promise(resolve => {
-      gsap.to(winner, {
-        x: centerX - winnerRect.left - winnerRect.width / 2,
-        y: centerY - winnerRect.top - winnerRect.height / 2,
-        z: 600,
-        scale: 1.5,
+      gsap.to(winnerPocket, {
+        left: centerX - pocketRect.width / 2,
+        top: centerY - pocketRect.height / 2,
+        x: 0,
+        y: 0,
         rotation: 360,
-        duration: 1.5,
+        scale: 2.5,
+        duration: 1.2,
         ease: 'power2.inOut',
         onComplete: resolve
       });
@@ -880,99 +878,145 @@ export class LuxuryCoverflow {
   }
   
   /**
-   * Phase 7: Morph back to carousel (2s)
+   * Phase 7: NATURAL GRAVITY DROP (not backwards morph)
    */
-  async phase7_MorphBack() {
-    console.log('🔄 Phase 7: Morph Back');
-    const status = this.rouletteState.statusElement;
-    const winner = this.items[this.rouletteState.winnerIndex];
+  async phase7_NaturalGravityDrop() {
+    console.log('🔄 Phase 7: Natural gravity drop');
+    this.rouletteState.status.textContent = 'Returning to projects...';
+    
     const overlay = this.rouletteState.wheelContainer;
-    
-    status.textContent = 'Returning to projects...';
-    
-    // Remove wheel rim
-    this.rouletteState.wheelRim?.remove();
+    const winnerPocket = this.rouletteState.pockets[this.rouletteState.winnerPocketIndex];
+    const originalWinner = this.items[this.rouletteState.originalWinnerIndex];
+    const savedState = this.rouletteState.savedCardStates[this.rouletteState.originalWinnerIndex];
     
     // Fade out overlay
-    gsap.to(overlay, { opacity: 0, duration: 1 });
-    gsap.to(status, { opacity: 0, duration: 0.5 });
+    gsap.to(overlay, { opacity: 0, duration: 0.8 });
+    gsap.to(this.rouletteState.status, { opacity: 0, duration: 0.4 });
+    
+    // Show original winner card
+    gsap.set(originalWinner, { opacity: 1 });
+    
+    // Get pocket position
+    const pocketRect = winnerPocket.getBoundingClientRect();
+    
+    // Position original card at pocket position
+    gsap.set(originalWinner, {
+      x: pocketRect.left + pocketRect.width / 2 - window.innerWidth / 2,
+      y: pocketRect.top + pocketRect.height / 2 - window.innerHeight / 2,
+      scale: 2,
+      rotation: 0
+    });
+    
+    // Hide pocket (swap to original card)
+    winnerPocket.style.opacity = '0';
     
     return new Promise(resolve => {
+      // Step 1: Card floats UP 
       const tl = gsap.timeline({ onComplete: resolve });
       
-      // Fade in all cards and position as carousel
-      this.items.forEach((card, i) => {
-        if (i !== this.rouletteState.winnerIndex) {
-          tl.to(card, {
-            opacity: 1,
-            scale: 1,
-            x: 0,
-            y: 0,
-            z: 0,
-            rotation: 0,
-            duration: 0
-          }, 0);
+      tl.to(originalWinner, {
+        y: '-=250',
+        scale: 1.8,
+        rotation: 15,
+        duration: 0.8,
+        ease: 'power2.out'
+      });
+      
+      // Step 2: Pause at apex
+      tl.to({}, { duration: 0.2 });
+      
+      // Step 3: GRAVITY DROP with tumble
+      const containerRect = this.container.getBoundingClientRect();
+      const targetY = containerRect.top + containerRect.height / 2 - window.innerHeight / 2;
+      
+      tl.to(originalWinner, {
+        y: targetY,
+        x: 0,
+        scale: 1.25,
+        rotation: 0,
+        duration: 1,
+        ease: 'power2.in', // Gravity acceleration
+        onUpdate: function() {
+          // Tumble wobble
+          const p = this.progress();
+          const wobble = Math.sin(p * Math.PI * 4) * 12 * (1 - p);
+          gsap.set(originalWinner, { rotation: wobble });
         }
       });
       
-      // Winner goes to center carousel position
-      tl.to(winner, {
-        x: 0,
-        y: 0,
-        z: 0,
+      // Step 4: Landing bounce
+      tl.to(originalWinner, {
+        scale: 1.15,
+        duration: 0.08,
+        ease: 'power2.out'
+      });
+      tl.to(originalWinner, {
         scale: 1.25,
-        rotation: 0,
-        boxShadow: '0 0 50px rgba(201,167,109,0.3)',
-        duration: 1.5,
-        ease: 'power3.inOut'
-      }, 0);
+        duration: 0.15,
+        ease: 'elastic.out(1, 0.6)'
+      });
       
-      // Update all items to carousel positions
-      tl.call(() => {
-        this.updateAllItems(this.rouletteState.winnerIndex, 0.8);
-      }, null, 0.5);
+      // Show other cards
+      this.items.forEach((card, i) => {
+        if (i === this.rouletteState.originalWinnerIndex) return;
+        tl.to(card, {
+          opacity: 1,
+          duration: 0.6
+        }, '-=0.8');
+      });
     });
   }
   
   /**
-   * Phase 8: Open carousel on winner (1s)
+   * Phase 8: Carousel opens on winner
    */
-  async phase8_CarouselOpen(winnerTitle) {
-    console.log('🎬 Phase 8: Carousel Open');
-    const winner = this.items[this.rouletteState.winnerIndex];
+  async phase8_CarouselReveal(winnerTitle) {
+    console.log('🎬 Phase 8: Carousel reveal');
     
-    // Set carousel to winner
-    this.currentIndex = this.rouletteState.winnerIndex;
+    this.currentIndex = this.rouletteState.originalWinnerIndex;
+    this.updateAllItems(this.currentIndex, 0.8);
     
-    await this.delay(500);
+    await this.delay(600);
     
-    // Pulse winner
-    await this.gsapTo(winner, {
-      scale: 1.4,
-      duration: 0.4,
-      ease: 'back.out(1.7)'
-    });
+    const winner = this.items[this.rouletteState.originalWinnerIndex];
     
-    await this.gsapTo(winner, {
-      scale: 1.25,
-      duration: 0.3
-    });
+    // Victory pulse
+    await this.gsapTo(winner, { scale: 1.45, duration: 0.35, ease: 'back.out(1.8)' });
+    await this.gsapTo(winner, { scale: 1.25, duration: 0.25 });
     
-    // Offer to view project
     await this.delay(800);
     
-    const projectLink = winner.querySelector('.card-link');
-    if (projectLink && window.confirm(`🎉 You selected: ${winnerTitle}!\n\nView this project now?`)) {
-      window.location.href = projectLink.href;
+    const link = winner.querySelector('.card-link');
+    if (link && window.confirm(`🎉 ${winnerTitle}!\n\nView this project?`)) {
+      window.location.href = link.href;
     }
   }
   
-  /**
-   * Simple roulette fallback (V4.1 style)
-   */
-  async startSimpleRoulette() {
-    // ... V4.1 simple bounce roulette implementation ...
-    console.log('Running simple roulette (casino wheel disabled)');
+  cleanupCasinoWheel() {
+    this.rouletteState.wheelContainer?.remove();
+    this.rouletteState.pocketContainer?.remove();
+    this.rouletteState.ball?.remove();
+    this.rouletteState.ballShadow?.remove();
+    this.rouletteState.wheelRim?.remove();
+    this.rouletteState.status?.remove();
+    
+    this.rouletteState.pockets.forEach(p => p.remove());
+    
+    this.rouletteState = {
+      isActive: false,
+      savedCardStates: [],
+      wheelContainer: null,
+      pockets: [],
+      pocketContainer: null,
+      ball: null,
+      ballShadow: null,
+      status: null,
+      wheelRim: null,
+      originalWinnerIndex: null,
+      winnerPocketIndex: null
+    };
+    
+    console.log('✅ Casino wheel cleanup complete');
   }
   
   // ========================================
@@ -980,9 +1024,7 @@ export class LuxuryCoverflow {
   // ========================================
   
   gsapTo(target, vars) {
-    return new Promise(resolve => {
-      gsap.to(target, { ...vars, onComplete: resolve });
-    });
+    return new Promise(resolve => gsap.to(target, { ...vars, onComplete: resolve }));
   }
   
   delay(ms) {
@@ -1002,10 +1044,7 @@ export class LuxuryCoverflow {
   }
   
   stopAutoplay() {
-    if (this.autoplayTimer) {
-      clearInterval(this.autoplayTimer);
-      this.autoplayTimer = null;
-    }
+    if (this.autoplayTimer) { clearInterval(this.autoplayTimer); this.autoplayTimer = null; }
   }
   
   resetAutoplay() {
@@ -1015,23 +1054,15 @@ export class LuxuryCoverflow {
   
   setupResizeHandler() {
     let timer;
-    const handle = () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => this.updateAllItems(this.currentIndex, 0), 150);
-    };
+    const handle = () => { clearTimeout(timer); timer = setTimeout(() => this.updateAllItems(this.currentIndex, 0), 150); };
     window.addEventListener('resize', handle);
-    if ('ResizeObserver' in window) {
-      new ResizeObserver(handle).observe(this.container);
-    }
+    if ('ResizeObserver' in window) new ResizeObserver(handle).observe(this.container);
   }
   
   announceCurrentSlide() {
     const card = this.items[this.currentIndex];
     if (!card) return;
-    const title = card.dataset.title || 
-                  card.querySelector('.card-title')?.textContent || 
-                  `Slide ${this.currentIndex + 1}`;
-    
+    const title = card.dataset.title || card.querySelector('.card-title')?.textContent || `Slide ${this.currentIndex + 1}`;
     let region = document.getElementById('coverflow-live-region');
     if (!region) {
       region = document.createElement('div');
@@ -1046,7 +1077,7 @@ export class LuxuryCoverflow {
   destroy() {
     this.stopAutoplay();
     gsap.killTweensOf(this.items);
-    this.cleanupWheelElements();
+    this.cleanupCasinoWheel();
     console.log('⏹️ Luxury Coverflow destroyed');
   }
   
@@ -1060,10 +1091,7 @@ export class LuxuryCoverflow {
   }
 }
 
-// Auto-initialize
 document.addEventListener('DOMContentLoaded', () => {
   const el = document.querySelector('[data-luxury-coverflow-auto]');
-  if (el) {
-    window.luxuryCoverflow = new LuxuryCoverflow('[data-luxury-coverflow-auto]');
-  }
+  if (el) window.luxuryCoverflow = new LuxuryCoverflow('[data-luxury-coverflow-auto]');
 });

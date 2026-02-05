@@ -1,53 +1,138 @@
 /**
- * Roulette Wheel Engine V1.0
- * Handles circular layout math and wheel physics
+ * Roulette Wheel Engine V5.5 — Ultra-Realistic European Casino Edition
  * 
- * Used by Luxury Coverflow for the 3D casino wheel transformation
+ * Features:
+ * - Authentic 37-pocket European roulette number sequence
+ * - Real red/black/green color mapping
+ * - Card cloning for full wheel
+ * - Ball physics with on-track illusion
  */
 
 export class RouletteWheelEngine {
   constructor(config = {}) {
+    // V5.5: Authentic European roulette wheel sequence
+    // Source: https://www.casino.org/blog/the-roulette-table-explained/
+    this.wheelSequence = [
+      { number: 0, color: 'green' },
+      { number: 32, color: 'red' },
+      { number: 15, color: 'black' },
+      { number: 19, color: 'red' },
+      { number: 4, color: 'black' },
+      { number: 21, color: 'red' },
+      { number: 2, color: 'black' },
+      { number: 25, color: 'red' },
+      { number: 17, color: 'black' },
+      { number: 34, color: 'red' },
+      { number: 6, color: 'black' },
+      { number: 27, color: 'red' },
+      { number: 13, color: 'black' },
+      { number: 36, color: 'red' },
+      { number: 11, color: 'black' },
+      { number: 30, color: 'red' },
+      { number: 8, color: 'black' },
+      { number: 23, color: 'red' },
+      { number: 10, color: 'black' },
+      { number: 5, color: 'red' },
+      { number: 24, color: 'black' },
+      { number: 16, color: 'red' },
+      { number: 33, color: 'black' },
+      { number: 1, color: 'red' },
+      { number: 20, color: 'black' },
+      { number: 14, color: 'red' },
+      { number: 31, color: 'black' },
+      { number: 9, color: 'red' },
+      { number: 22, color: 'black' },
+      { number: 18, color: 'red' },
+      { number: 29, color: 'black' },
+      { number: 7, color: 'red' },
+      { number: 28, color: 'black' },
+      { number: 12, color: 'red' },
+      { number: 35, color: 'black' },
+      { number: 3, color: 'red' },
+      { number: 26, color: 'black' }
+    ];
+    
+    this.pocketCount = 37;
+    
     this.config = {
-      // Wheel dimensions (responsive)
-      wheelRadius: () => Math.min(window.innerWidth, window.innerHeight) * 0.35,
-      pocketScale: 0.45,    // Card scale when in pocket
+      // Wheel sizing
+      wheelRadius: () => Math.min(window.innerWidth, window.innerHeight) * 0.36,
+      pocketScale: 0.35,
       
       // Spin physics
-      minSpins: 3,          // Minimum full rotations
-      maxSpins: 5,          // Maximum full rotations
-      spinDuration: { min: 5, max: 8 }, // Duration in seconds
+      minSpins: 4,
+      maxSpins: 6,
+      spinDuration: { min: 6, max: 8 },
       
       // Ball physics
-      ballRadiusMultiplier: 1.15, // Ball starts outside wheel
-      ballSpeedMultiplier: 1.6,   // Ball faster than wheel initially
-      ballDecayRate: 2.2,         // Ball slows faster than wheel
+      ballRadiusMultiplier: 1.12,
+      ballDecayRate: 1.8,
       
       ...config
     };
   }
   
   /**
-   * Calculate circular positions for cards around wheel center
+   * V5.5: Clone original cards to create 37 authentic roulette pockets
    */
-  calculateCircularPositions(cardCount, centerX = null, centerY = null) {
-    const radius = this.config.wheelRadius();
+  createRoulettePockets(originalCards) {
+    const pockets = [];
+    const cardCount = originalCards.length;
+    
+    for (let i = 0; i < this.pocketCount; i++) {
+      // Distribute cards evenly across 37 pockets
+      const sourceIndex = Math.floor((i / this.pocketCount) * cardCount);
+      const sourceCard = originalCards[sourceIndex];
+      
+      // Deep clone with all children
+      const pocket = sourceCard.cloneNode(true);
+      
+      // Strip old IDs to avoid conflicts
+      pocket.removeAttribute('id');
+      pocket.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+      
+      // Apply pocket identity
+      pocket.classList.add('roulette-pocket');
+      pocket.dataset.pocketIndex = i;
+      pocket.dataset.pocketNumber = this.wheelSequence[i].number;
+      pocket.dataset.pocketColor = this.wheelSequence[i].color;
+      pocket.dataset.originalCardIndex = sourceIndex;
+      
+      pockets.push(pocket);
+    }
+    
+    console.log(`🎰 Created ${this.pocketCount} pockets from ${cardCount} cards`);
+    return pockets;
+  }
+  
+  /**
+   * V5.5: Calculate circular positions for 37 pockets
+   */
+  calculatePocketPositions(centerX = null, centerY = null) {
     centerX = centerX ?? window.innerWidth / 2;
     centerY = centerY ?? window.innerHeight / 2;
     
+    const radius = this.config.wheelRadius();
     const positions = [];
-    const angleStep = (2 * Math.PI) / cardCount;
-    const startAngle = -Math.PI / 2; // Start at top (12 o'clock)
     
-    for (let i = 0; i < cardCount; i++) {
-      const angle = startAngle + (angleStep * i);
+    for (let i = 0; i < this.pocketCount; i++) {
+      // Start at top (-90°), distribute evenly
+      const angle = ((360 / this.pocketCount) * i) - 90;
+      const angleRad = angle * (Math.PI / 180);
+      
+      const x = centerX + radius * Math.cos(angleRad);
+      const y = centerY + radius * Math.sin(angleRad);
+      
+      // Face center (perpendicular to radius)
+      const rotation = angle + 90;
       
       positions.push({
         index: i,
-        angle: angle,
-        angleDeg: angle * (180 / Math.PI),
-        x: centerX + radius * Math.cos(angle),
-        y: centerY + radius * Math.sin(angle),
-        rotation: angle * (180 / Math.PI) + 90, // Face center
+        x, y,
+        rotation,
+        angle,
+        angleRad,
+        pocketData: this.wheelSequence[i],
         scale: this.config.pocketScale
       });
     }
@@ -56,14 +141,38 @@ export class RouletteWheelEngine {
   }
   
   /**
-   * Calculate wheel spin parameters for landing on target
+   * V5.5: Get pocket index that lands on winner
+   * Maps original card index to one of the pockets containing that card
    */
-  calculateWheelSpin(winnerIndex, totalItems) {
-    const pocketAngle = (360 / totalItems) * winnerIndex;
+  getWinnerPocketIndex(originalCardIndex, originalCardCount) {
+    // Find all pockets that contain this card
+    const matchingPockets = [];
+    
+    for (let i = 0; i < this.pocketCount; i++) {
+      const sourceIndex = Math.floor((i / this.pocketCount) * originalCardCount);
+      if (sourceIndex === originalCardIndex) {
+        matchingPockets.push(i);
+      }
+    }
+    
+    // Pick random pocket from matches (more realistic)
+    const winnerPocket = matchingPockets[Math.floor(Math.random() * matchingPockets.length)];
+    const pocketData = this.wheelSequence[winnerPocket];
+    
+    console.log(`🎯 Card ${originalCardIndex} → Pocket ${winnerPocket} (${pocketData.number} ${pocketData.color})`);
+    
+    return winnerPocket;
+  }
+  
+  /**
+   * V5.5: Calculate wheel spin parameters for landing on target pocket
+   */
+  calculateWheelSpin(winnerPocketIndex) {
+    const pocketAngle = (360 / this.pocketCount) * winnerPocketIndex;
     const spins = this.config.minSpins + Math.random() * 
                   (this.config.maxSpins - this.config.minSpins);
     
-    // Final rotation: full spins + landing on winner pocket
+    // Final rotation lands on winner pocket
     const finalRotation = (spins * 360) + (360 - pocketAngle);
     
     // Duration with randomness
@@ -79,93 +188,43 @@ export class RouletteWheelEngine {
   }
   
   /**
-   * Get ball trajectory parameters
+   * V5.5: Ball trajectory with spiral inward
    */
-  getBallTrajectory(wheelDuration, centerX, centerY) {
+  getBallTrajectory(centerX, centerY) {
     const wheelRadius = this.config.wheelRadius();
-    const ballRadius = wheelRadius * this.config.ballRadiusMultiplier;
     
     return {
-      startRadius: ballRadius,
-      endRadius: wheelRadius * 0.9,
-      startX: centerX + ballRadius,
-      startY: centerY,
+      startRadius: wheelRadius * this.config.ballRadiusMultiplier,
+      endRadius: wheelRadius * 0.92,
       centerX,
       centerY,
-      speedMultiplier: this.config.ballSpeedMultiplier,
-      decayRate: this.config.ballDecayRate,
-      spiralStartTime: wheelDuration * 0.6 // Start spiraling at 60%
+      spiralStartProgress: 0.55,
+      decayRate: this.config.ballDecayRate
     };
   }
   
   /**
-   * Calculate ball position at given progress
-   */
-  calculateBallPosition(progress, trajectory, wheelRotation) {
-    let { startRadius, endRadius, centerX, centerY, spiralStartTime } = trajectory;
-    
-    // Ball angle (opposite direction, faster decay)
-    const ballAngle = -wheelRotation * trajectory.speedMultiplier * 
-                      Math.pow(1 - progress, trajectory.decayRate);
-    
-    // Radius spirals inward after spiralStartTime
-    let currentRadius = startRadius;
-    if (progress > spiralStartTime / trajectory.duration) {
-      const spiralProgress = (progress - spiralStartTime / trajectory.duration) / 
-                             (1 - spiralStartTime / trajectory.duration);
-      currentRadius = startRadius + (endRadius - startRadius) * 
-                      this.easeOutCubic(spiralProgress);
-    }
-    
-    const angleRad = ballAngle * (Math.PI / 180);
-    
-    return {
-      x: centerX + currentRadius * Math.cos(angleRad),
-      y: centerY + currentRadius * Math.sin(angleRad),
-      angle: ballAngle,
-      radius: currentRadius
-    };
-  }
-  
-  /**
-   * Get bounce parameters for ball landing
+   * V5.5: Multi-bounce landing sequence
    */
   getBounceSequence() {
     return [
-      { height: 60, duration: 0.4, ease: 'power2.out' },
-      { height: 30, duration: 0.3, ease: 'power2.out' },
-      { height: 10, duration: 0.2, ease: 'power1.out' }
+      { height: 50, duration: 0.35, ease: 'power2.out' },
+      { height: 25, duration: 0.25, ease: 'power2.out' },
+      { height: 8, duration: 0.15, ease: 'power1.out' }
     ];
   }
   
   /**
-   * Calculate roulette pocket colors (casino style)
+   * Get pocket color for styling
    */
-  getPocketColor(index, totalItems) {
-    // Special cases for 0 (green)
-    if (index === 0) return '#0F8A0F'; // Green
-    
-    // Alternate red/black
-    return index % 2 === 0 ? '#DC2626' : '#1A1A1A';
+  getPocketColor(pocketIndex) {
+    return this.wheelSequence[pocketIndex]?.color || 'black';
   }
   
   /**
-   * Create custom easing curve for wheel deceleration
-   * Fast start, dramatic slowdown at end
+   * Get pocket number for display
    */
-  getWheelEasingCurve() {
-    // This creates a curve: fast 0-20%, gradual 20-80%, dramatic 80-100%
-    return 'power3.out';
-  }
-  
-  /**
-   * Easing functions
-   */
-  easeOutCubic(t) {
-    return 1 - Math.pow(1 - t, 3);
-  }
-  
-  easeInOutQuad(t) {
-    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  getPocketNumber(pocketIndex) {
+    return this.wheelSequence[pocketIndex]?.number ?? pocketIndex;
   }
 }
