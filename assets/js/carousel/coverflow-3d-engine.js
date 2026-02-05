@@ -1,6 +1,6 @@
 /**
- * Luxury Coverflow 3D Transform Engine V3.0
- * Performance-optimized transforms with GSAP compatibility
+ * Luxury Coverflow 3D Transform Engine V4.1
+ * Performance-optimized transforms with fractional position support
  */
 
 export class Coverflow3DEngine {
@@ -10,7 +10,6 @@ export class Coverflow3DEngine {
       itemGap: 480,
       depthMultiplier: 200,
       infiniteLoop: true,
-      // V3: Refined positions for smoother visual
       positions: config.positions || this.getDefaultPositions(),
       ...config
     };
@@ -21,7 +20,7 @@ export class Coverflow3DEngine {
   }
   
   /**
-   * V3: Refined position presets for professional look
+   * V4.1: Refined position presets for professional look
    */
   getDefaultPositions() {
     return {
@@ -84,16 +83,37 @@ export class Coverflow3DEngine {
   }
   
   /**
-   * V3: Calculate transform with infinite loop wrapping
+   * V4.1: Interpolate between two position configs for smooth transitions
+   */
+  interpolatePositions(from, to, progress) {
+    const lerp = (a, b, t) => a + (b - a) * t;
+    
+    return {
+      rotateY: lerp(from.rotateY, to.rotateY, progress),
+      rotateX: lerp(from.rotateX || 0, to.rotateX || 0, progress),
+      translateZ: lerp(from.translateZ, to.translateZ, progress),
+      translateX: lerp(from.translateX, to.translateX, progress),
+      scale: lerp(from.scale, to.scale, progress),
+      opacity: lerp(from.opacity, to.opacity, progress),
+      zIndex: lerp(from.zIndex, to.zIndex, progress),
+      blur: lerp(from.blur || 0, to.blur || 0, progress),
+      brightness: lerp(from.brightness || 1, to.brightness || 1, progress),
+      saturate: lerp(from.saturate || 1, to.saturate || 1, progress)
+    };
+  }
+  
+  /**
+   * V4.1: Calculate transform with fractional position support
    */
   calculateItemTransform(itemIndex, centerIndex, totalItems, infiniteLoop = false) {
     let relativePosition = itemIndex - centerIndex;
     
-    // V3: Handle wrapping for infinite loop display
+    // Handle wrapping for infinite loop display
     if (infiniteLoop && totalItems > 1) {
-      if (relativePosition > totalItems / 2) {
+      const halfCount = totalItems / 2;
+      if (relativePosition > halfCount) {
         relativePosition -= totalItems;
-      } else if (relativePosition < -totalItems / 2) {
+      } else if (relativePosition < -halfCount) {
         relativePosition += totalItems;
       }
     }
@@ -101,16 +121,35 @@ export class Coverflow3DEngine {
     const absPosition = Math.abs(relativePosition);
     const direction = relativePosition >= 0 ? 1 : -1;
     
-    // Determine position preset
+    // V4.1: Interpolate between position presets for smooth transitions
     let positionConfig;
-    if (absPosition === 0) {
+    if (absPosition <= 0.01) {
       positionConfig = this.config.positions.center;
-    } else if (absPosition === 1) {
-      positionConfig = this.config.positions.adjacent1;
-    } else if (absPosition === 2) {
-      positionConfig = this.config.positions.adjacent2;
-    } else if (absPosition === 3) {
-      positionConfig = this.config.positions.adjacent3;
+    } else if (absPosition < 1) {
+      // Interpolate between center and adjacent1
+      positionConfig = this.interpolatePositions(
+        this.config.positions.center,
+        this.config.positions.adjacent1,
+        absPosition
+      );
+    } else if (absPosition < 2) {
+      positionConfig = this.interpolatePositions(
+        this.config.positions.adjacent1,
+        this.config.positions.adjacent2,
+        absPosition - 1
+      );
+    } else if (absPosition < 3) {
+      positionConfig = this.interpolatePositions(
+        this.config.positions.adjacent2,
+        this.config.positions.adjacent3,
+        absPosition - 2
+      );
+    } else if (absPosition < 4) {
+      positionConfig = this.interpolatePositions(
+        this.config.positions.adjacent3,
+        this.config.positions.far,
+        absPosition - 3
+      );
     } else {
       positionConfig = this.config.positions.far;
     }
@@ -124,7 +163,7 @@ export class Coverflow3DEngine {
       translateY: 0,
       scale: positionConfig.scale,
       opacity: positionConfig.opacity,
-      zIndex: positionConfig.zIndex - absPosition,
+      zIndex: Math.round(positionConfig.zIndex - absPosition),
       filter: {
         blur: positionConfig.blur || 0,
         brightness: positionConfig.brightness || 1,
@@ -155,7 +194,7 @@ export class Coverflow3DEngine {
   }
   
   /**
-   * V3: Calculate all transforms with infinite loop support
+   * V4.1: Calculate all transforms with fractional position support
    */
   calculateAllTransforms(centerIndex, totalItems, infiniteLoop = false) {
     const transforms = [];

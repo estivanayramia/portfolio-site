@@ -56,17 +56,6 @@
       "tags": [
         "Video Concept"
       ]
-    },
-    {
-      "id": "this-website-every-line",
-      "title": "This Website (Every Line)",
-      "summary": "No templates, no CMS. Just hand-written HTML/CSS/JS, service worker, Savonie chat, and Lighthouse 90+ scores. The repo is the proof.",
-      "url": "/projects/portfolio",
-      "fullUrl": "https://www.estivanayramia.com/projects/portfolio",
-      "filePath": "/projects/portfolio.html",
-      "tags": [
-        "Build"
-      ]
     }
   ],
   "hobbies": [
@@ -120,7 +109,7 @@
     }
   ],
   "meta": {
-    "projectCount": 6,
+    "projectCount": 5,
     "hobbyCount": 6,
     "source": "Generated from HTML content by scripts/generate-site-facts.js"
   }

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Coverflow Carousel | Estivan Ayramia</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Component CSS -->
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Luxury Coverflow Carousel Section -->
+<section 
+    id="luxury-portfolio-carousel" 
+    class="coverflow-section"
+    data-luxury-coverflow
+    aria-label="Portfolio Showcase Carousel"
+    role="region"
+>
+    <!-- Section Header -->
+    <div class="coverflow-header">
+        <h2 class="coverflow-title">
+            <span class="title-main">Portfolio Showcase</span>
+            <span class="title-sub">Selected Work by Estivan Ayramia</span>
+        </h2>
+    </div>
+    
+    <!-- Carousel Container -->
+    <div class="coverflow-container">
+        <!-- 3D Perspective Wrapper -->
+        <div class="coverflow-perspective">
+            <!-- Items Track -->
+            <div class="coverflow-track" role="list">
+                
+                <!-- Card 1: Website -->
+                <article 
+                    class="coverflow-card"
+                    role="listitem"
+                    tabindex="-1"
+                    aria-current="false"
+                    data-index="0"
+                    data-title="This Website"
+                >
+                    <div class="card-inner">
+                        <div class="card-image-container">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#212842,#3d4666);display:flex;align-items:center;justify-content:center;">
+                                <svg width="80" height="80" fill="none" stroke="rgba(255,255,255,0.3)" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                                </svg>
+                            </div>
+                            <div class="card-image-overlay"></div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-category">Web Development</div>
+                            <h3 class="card-title">This Website</h3>
+                            <p class="card-description">Hand-coded HTML/CSS/JS with PWA support, service workers, and Lighthouse 90+ scores.</p>
+                            <div class="card-actions">
+                                <a href="/projects/portfolio" class="card-link">
+                                    <span>View Project</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Card 2: L'Oréal -->
+                <article 
+                    class="coverflow-card"
+                    role="listitem"
+                    tabindex="-1"
+                    aria-current="false"
+                    data-index="1"
+                    data-title="L'Oréal Campaign"
+                >
+                    <div class="card-inner">
+                        <div class="card-image-container">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#0f172a,#b84079);display:flex;align-items:center;justify-content:center;">
+                                <svg width="80" height="80" fill="none" stroke="rgba(255,255,255,0.3)" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                            </div>
+                            <div class="card-image-overlay"></div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-category">Campaign Strategy</div>
+                            <h3 class="card-title">L'Oréal Cell BioPrint</h3>
+                            <p class="card-description">MAPS campaign deck mapping personas and touchpoints across the marketing funnel.</p>
+                            <div class="card-actions">
+                                <a href="/projects/logistics" class="card-link">
+                                    <span>View Project</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Card 3: Franklin Templeton -->
+                <article 
+                    class="coverflow-card"
+                    role="listitem"
+                    tabindex="-1"
+                    aria-current="false"
+                    data-index="2"
+                    data-title="Franklin Templeton"
+                >
+                    <div class="card-inner">
+                        <div class="card-image-container">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#0a1f1c,#d97706);display:flex;align-items:center;justify-content:center;">
+                                <svg width="80" height="80" fill="none" stroke="rgba(255,255,255,0.3)" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                            <div class="card-image-overlay"></div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-category">Content Strategy</div>
+                            <h3 class="card-title">Franklin Templeton</h3>
+                            <p class="card-description">Dual-language investment content strategy for EN + Arabic markets.</p>
+                            <div class="card-actions">
+                                <a href="/projects/documentation" class="card-link">
+                                    <span>View Project</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Card 4: EndPoint -->
+                <article 
+                    class="coverflow-card"
+                    role="listitem"
+                    tabindex="-1"
+                    aria-current="false"
+                    data-index="3"
+                    data-title="EndPoint Playbook"
+                >
+                    <div class="card-inner">
+                        <div class="card-image-container">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#1e3a5f,#4a90a4);display:flex;align-items:center;justify-content:center;">
+                                <svg width="80" height="80" fill="none" stroke="rgba(255,255,255,0.3)" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <div class="card-image-overlay"></div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-category">Sales Strategy</div>
+                            <h3 class="card-title">EndPoint Playbook</h3>
+                            <p class="card-description">LinkedIn retargeting campaign with phases, metrics, and test hypotheses.</p>
+                            <div class="card-actions">
+                                <a href="/projects/documentation" class="card-link">
+                                    <span>View Project</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Card 5: Operations -->
+                <article 
+                    class="coverflow-card"
+                    role="listitem"
+                    tabindex="-1"
+                    aria-current="false"
+                    data-index="4"
+                    data-title="Operations Systems"
+                >
+                    <div class="card-inner">
+                        <div class="card-image-container">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#2d3748,#4a5568);display:flex;align-items:center;justify-content:center;">
+                                <svg width="80" height="80" fill="none" stroke="rgba(255,255,255,0.3)" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+                                </svg>
+                            </div>
+                            <div class="card-image-overlay"></div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-category">Operations</div>
+                            <h3 class="card-title">Operations Systems</h3>
+                            <p class="card-description">Process documentation, checklists, and workflow optimization.</p>
+                            <div class="card-actions">
+                                <a href="/projects/" class="card-link">
+                                    <span>View Project</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Card 6: Logistics -->
+                <article 
+                    class="coverflow-card"
+                    role="listitem"
+                    tabindex="-1"
+                    aria-current="false"
+                    data-index="5"
+                    data-title="Logistics Coordination"
+                >
+                    <div class="card-inner">
+                        <div class="card-image-container">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#1a365d,#2b6cb0);display:flex;align-items:center;justify-content:center;">
+                                <svg width="80" height="80" fill="none" stroke="rgba(255,255,255,0.3)" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                </svg>
+                            </div>
+                            <div class="card-image-overlay"></div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-category">Logistics</div>
+                            <h3 class="card-title">Logistics Coordination</h3>
+                            <p class="card-description">Warehouse operations, team coordination, and supply chain systems.</p>
+                            <div class="card-actions">
+                                <a href="/projects/logistics" class="card-link">
+                                    <span>View Project</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Card 7: Documentation -->
+                <article 
+                    class="coverflow-card"
+                    role="listitem"
+                    tabindex="-1"
+                    aria-current="false"
+                    data-index="6"
+                    data-title="Technical Documentation"
+                >
+                    <div class="card-inner">
+                        <div class="card-image-container">
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#553c9a,#805ad5);display:flex;align-items:center;justify-content:center;">
+                                <svg width="80" height="80" fill="none" stroke="rgba(255,255,255,0.3)" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                            </div>
+                            <div class="card-image-overlay"></div>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-category">Documentation</div>
+                            <h3 class="card-title">Technical Writing</h3>
+                            <p class="card-description">System documentation, SOPs, and knowledge base creation.</p>
+                            <div class="card-actions">
+                                <a href="/projects/documentation" class="card-link">
+                                    <span>View Project</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation Controls -->
+    <div class="coverflow-controls" role="group" aria-label="Carousel controls">
+        <button 
+            type="button" 
+            class="coverflow-btn coverflow-btn-prev"
+            aria-label="Previous slide"
+        >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+        
+        <div class="coverflow-pagination" role="status" aria-live="polite">
+            <span class="pagination-current">1</span>
+            <span class="pagination-separator">/</span>
+            <span class="pagination-total">7</span>
+        </div>
+        
+        <button 
+            type="button" 
+            class="coverflow-btn coverflow-btn-next"
+            aria-label="Next slide"
+        >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+    </div>
+    
+    <!-- Screen Reader Instructions -->
+    <div class="sr-only">
+        Use arrow keys to navigate between portfolio items. Press Enter to view project details.
+    </div>
+</section>
+
+<!-- Initialize Carousel -->
+<script type="module">
+    import LuxuryCoverflow from '/assets/js/carousel/luxury-coverflow.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const carousel = new LuxuryCoverflow('#luxury-portfolio-carousel', {
+            autoplay: false,
+            enableKeyboard: true,
+            enableMouse: true,
+            enableTouch: true,
+            animationDuration: 800
+        });
+        
+        // Expose for debugging
+        window.luxuryCarousel = carousel;
+        console.log('✨ Luxury Coverflow ready!');
+    });
+</script>
+
+</body>
+</html>

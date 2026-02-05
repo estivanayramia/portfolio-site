@@ -1,16 +1,11 @@
 /**
- * Luxury Coverflow Carousel V4.0 - Ultimate Performance Edition
+ * Luxury Coverflow Carousel V4.1 - Ultimate Performance + Visibility Edition
  * 
- * V4 FIXES:
- * - ✅ Roulette button NOW WORKS (fixed Promise awaiting, event binding, overlay visibility)
- * - ✅ Infinite loop SMOOTH wrapping (proper modulo arithmetic)
- * - ✅ Performance: Consistent 60fps (RAF throttling, will-change management)
- * - ✅ Responsive: Works at 100%-200% zoom (viewport-relative positions)
- * 
- * Research Applied:
- * - GSAP 60fps optimization (dev.to/kolonatalie)
- * - Ball bounce physics (gravity + damping)
- * - Infinite carousel modulo wrapping (Stack Overflow)
+ * V4.1 FIXES:
+ * - ✅ Roulette cards VISIBLE through overlay (reduced opacity + card pulse)
+ * - ✅ Directional scroll (↔️ carousel, ↕️ page scroll)
+ * - ✅ Frame-by-frame smooth tracking with GSAP quickTo
+ * - ✅ All V4.0 fixes retained
  */
 
 import { gsap } from 'gsap';
@@ -31,7 +26,7 @@ export class LuxuryCoverflow {
     this.track = this.container.querySelector('.coverflow-track');
     this.items = Array.from(this.container.querySelectorAll('.coverflow-card'));
     
-    // V4: Enhanced config
+    // V4.1: Enhanced config
     this.config = {
       autoplay: false,
       autoplayDelay: 5000,
@@ -40,10 +35,12 @@ export class LuxuryCoverflow {
       enableMouse: true,
       enableTouch: true,
       enableScroll: true,
-      scrollThreshold: 50,
+      enableSmoothTracking: true,   // V4.1: Frame-by-frame tracking
+      scrollThreshold: 30,          // V4.1: More sensitive
+      scrollSensitivity: 0.004,     // V4.1: Continuous tracking sensitivity
       
       // V4: Performance tuning
-      animationDuration: 0.55,      // V4: Even faster
+      animationDuration: 0.55,
       animationEase: 'power2.out',
       staggerDelay: 0.02,
       
@@ -57,6 +54,10 @@ export class LuxuryCoverflow {
     this.isAnimating = false;
     this.autoplayTimer = null;
     this.navQueue = null;
+    
+    // V4.1: Continuous scroll position
+    this.scrollPosition = this.currentIndex;
+    this.isScrollTracking = false;
     
     // V4: Click detection state
     this.clickState = {
@@ -76,7 +77,7 @@ export class LuxuryCoverflow {
       velocityMultiplier: 2.5
     });
     
-    // V4: Enhanced drag state with RAF throttling
+    // V4: Enhanced drag state
     this.dragState = {
       isDragging: false,
       startX: 0,
@@ -101,12 +102,11 @@ export class LuxuryCoverflow {
     this.setupKeyboardNavigation();
     this.setupMouseDrag();
     this.setupTouchDrag();
-    this.setupScrollNavigation();
+    this.setupScrollNavigation();      // V4.1: Directional scroll
+    this.setupSmoothScrollTracking();  // V4.1: Frame-by-frame
     this.setupItemClicks();
     this.setupResizeHandler();
     this.setupNavigationButtons();
-    
-    // V4: Roulette with enhanced binding
     this.setupRouletteButton();
     
     if (this.config.autoplay) {
@@ -114,7 +114,7 @@ export class LuxuryCoverflow {
     }
     
     this.announceCurrentSlide();
-    console.log('✨ Luxury Coverflow V4 initialized with', this.items.length, 'items');
+    console.log('✨ Luxury Coverflow V4.1 initialized with', this.items.length, 'items');
   }
   
   /**
@@ -132,8 +132,8 @@ export class LuxuryCoverflow {
     
     this.items.forEach((item, index) => {
       const transform = transforms[index];
-      const isCenter = index === centerIndex;
-      const absPosition = this.getAbsoluteDistance(index, centerIndex);
+      const isCenter = index === Math.round(centerIndex);
+      const absPosition = this.getAbsoluteDistance(index, Math.round(centerIndex));
       
       // V4: GPU promotion only during animation
       if (duration > 0) {
@@ -161,7 +161,6 @@ export class LuxuryCoverflow {
         force3D: true,
         
         onComplete: () => {
-          // V4: Clear GPU promotion after animation
           item.style.willChange = 'auto';
         }
       });
@@ -175,6 +174,40 @@ export class LuxuryCoverflow {
     });
     
     this.updatePagination();
+  }
+  
+  /**
+   * V4.1: Update to fractional position (for smooth scrolling)
+   */
+  updateContinuousPosition(position) {
+    const transforms = this.engine3D.calculateAllTransforms(
+      position,
+      this.items.length,
+      this.config.infiniteLoop
+    );
+    
+    this.items.forEach((item, index) => {
+      const transform = transforms[index];
+      const isCenter = index === Math.round(position);
+      const absPosition = this.getAbsoluteDistance(index, Math.round(position));
+      
+      // Instant update (no animation)
+      gsap.set(item, {
+        x: transform.translateX,
+        y: transform.translateY || 0,
+        z: transform.translateZ,
+        rotationY: transform.rotateY,
+        rotationX: transform.rotateX || 0,
+        scale: transform.scale,
+        opacity: transform.opacity,
+        filter: this.engine3D.getFilterString(transform.filter),
+        zIndex: transform.zIndex,
+        force3D: true
+      });
+      
+      item.classList.toggle('is-center', isCenter);
+      item.classList.toggle('is-adjacent', absPosition === 1);
+    });
   }
   
   /**
@@ -207,7 +240,7 @@ export class LuxuryCoverflow {
       return;
     }
     
-    // V4: Queue if animating, don't block
+    // V4: Queue if animating
     if (this.isAnimating) {
       clearTimeout(this.navQueue);
       this.navQueue = setTimeout(() => this.goToSlide(targetIndex, duration), 100);
@@ -216,12 +249,12 @@ export class LuxuryCoverflow {
     
     this.isAnimating = true;
     this.currentIndex = targetIndex;
+    this.scrollPosition = targetIndex;
     
     this.updateAllItems(targetIndex, duration);
     this.resetAutoplay();
     this.announceCurrentSlide();
     
-    // Release lock after animation
     setTimeout(() => {
       this.isAnimating = false;
     }, duration * 1000 + 50);
@@ -317,33 +350,107 @@ export class LuxuryCoverflow {
   }
   
   // ========================================
-  // SCROLL NAVIGATION
+  // V4.1: DIRECTIONAL SCROLL NAVIGATION
   // ========================================
   
+  /**
+   * V4.1: Detect scroll direction - only horizontal triggers carousel
+   */
   setupScrollNavigation() {
     if (!this.config.enableScroll) return;
     
-    let scrollDelta = 0;
+    let scrollDeltaX = 0;
     let scrollTimeout;
     
     this.container.addEventListener('wheel', (e) => {
-      e.preventDefault();
+      const absDeltaX = Math.abs(e.deltaX);
+      const absDeltaY = Math.abs(e.deltaY);
       
-      scrollDelta += e.deltaY;
+      // V4.1: Determine scroll direction with 1.5x bias toward horizontal
+      const isHorizontal = absDeltaX > (absDeltaY * 0.5);
       
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        if (Math.abs(scrollDelta) >= this.config.scrollThreshold) {
-          if (scrollDelta > 0) {
-            this.next();
-          } else {
-            this.prev();
+      if (isHorizontal && absDeltaX > 5) {
+        // Horizontal scroll → carousel navigation
+        e.preventDefault();
+        
+        scrollDeltaX += e.deltaX;
+        
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          if (Math.abs(scrollDeltaX) >= this.config.scrollThreshold) {
+            if (scrollDeltaX > 0) {
+              this.next();
+            } else {
+              this.prev();
+            }
           }
-        }
-        scrollDelta = 0;
-      }, 80);
+          scrollDeltaX = 0;
+        }, 80);
+      }
+      // Vertical scroll → allow page scroll (don't preventDefault)
       
     }, { passive: false });
+    
+    console.log('✅ Directional scroll enabled: ↔️ Carousel | ↕️ Page');
+  }
+  
+  // ========================================
+  // V4.1: FRAME-BY-FRAME SMOOTH TRACKING
+  // ========================================
+  
+  /**
+   * V4.1: Continuous smooth carousel tracking with GSAP
+   */
+  setupSmoothScrollTracking() {
+    if (!this.config.enableSmoothTracking) return;
+    
+    let targetPosition = this.currentIndex;
+    let scrollEndTimeout;
+    
+    this.container.addEventListener('wheel', (e) => {
+      const absDeltaX = Math.abs(e.deltaX);
+      const absDeltaY = Math.abs(e.deltaY);
+      
+      // Only for horizontal scroll
+      if (absDeltaX <= (absDeltaY * 0.5)) return;
+      if (absDeltaX < 5) return;
+      
+      e.preventDefault();
+      this.isScrollTracking = true;
+      
+      // Accumulate scroll delta for continuous tracking
+      targetPosition += e.deltaX * this.config.scrollSensitivity;
+      
+      // Wrap or clamp position
+      if (this.config.infiniteLoop) {
+        while (targetPosition < 0) {
+          targetPosition += this.items.length;
+        }
+        while (targetPosition >= this.items.length) {
+          targetPosition -= this.items.length;
+        }
+      } else {
+        targetPosition = Math.max(0, Math.min(this.items.length - 1, targetPosition));
+      }
+      
+      // Update continuously (instant)
+      this.scrollPosition = targetPosition;
+      this.updateContinuousPosition(targetPosition);
+      
+      // Debounced snap on scroll end
+      clearTimeout(scrollEndTimeout);
+      scrollEndTimeout = setTimeout(() => {
+        this.isScrollTracking = false;
+        const nearestIndex = Math.round(targetPosition);
+        
+        // Snap to nearest slide
+        this.goToSlide(nearestIndex, 0.25);
+        targetPosition = nearestIndex;
+      }, 120);
+      
+    }, { passive: false });
+    
+    console.log('✅ Smooth frame-by-frame tracking enabled');
   }
   
   // ========================================
@@ -361,15 +468,11 @@ export class LuxuryCoverflow {
     this.container.classList.add('is-dragging');
   }
   
-  /**
-   * V4: RAF-throttled drag updates
-   */
   updateDrag(clientX) {
     if (!this.dragState.isDragging) return;
     
     this.dragState.currentX = clientX;
     
-    // V4: Throttle visual updates to 60fps
     if (!this.dragState.rafPending) {
       this.dragState.rafPending = true;
       
@@ -455,14 +558,10 @@ export class LuxuryCoverflow {
   }
   
   // ========================================
-  // V4: ROULETTE FEATURE (FIXED)
+  // V4.1: ROULETTE FEATURE (VISIBILITY FIX)
   // ========================================
   
-  /**
-   * V4: Enhanced roulette button binding with fallback search
-   */
   setupRouletteButton() {
-    // Try container first, then document
     let rouletteBtn = this.container.querySelector('.roulette-trigger-btn');
     
     if (!rouletteBtn) {
@@ -476,7 +575,6 @@ export class LuxuryCoverflow {
     
     console.log('🎰 Roulette button found, attaching listener');
     
-    // V4: Use fresh listener (avoid duplicates)
     rouletteBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -488,12 +586,13 @@ export class LuxuryCoverflow {
       } catch (error) {
         console.error('❌ Roulette error:', error);
         this.isAnimating = false;
+        this.stopCardPulsing();
       }
     });
   }
   
   /**
-   * V4: Complete roulette animation sequence
+   * V4.1: Roulette with VISIBLE cards through overlay
    */
   async startRoulette() {
     if (this.isAnimating) {
@@ -513,17 +612,34 @@ export class LuxuryCoverflow {
     const ball = overlay.querySelector('.roulette-ball');
     const status = overlay.querySelector('.roulette-status');
     
-    // V4: Force overlay visible with inline styles (bypasses CSS issues)
+    // V4.1: SEMI-TRANSPARENT overlay so cards are VISIBLE
     overlay.style.cssText = `
       display: flex !important;
       opacity: 0;
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: rgba(0,0,0,0.92);
+      background: rgba(0,0,0,0.5) !important;
       align-items: center;
       justify-content: center;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(4px) !important;
+      pointer-events: none;
+    `;
+    
+    // V4.1: BRIGHTER ball with stronger glow
+    ball.style.cssText = `
+      position: fixed;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff, #FFD700 50%, #FFA500);
+      box-shadow: 
+        0 0 30px rgba(255, 215, 0, 1),
+        0 0 60px rgba(255, 215, 0, 0.8),
+        0 0 90px rgba(255, 215, 0, 0.5),
+        0 15px 40px rgba(0, 0, 0, 0.6);
+      z-index: 10001;
+      pointer-events: none;
     `;
     
     // Fade in overlay
@@ -532,11 +648,32 @@ export class LuxuryCoverflow {
       duration: 0.3
     });
     
-    // Show status
+    // V4.1: PULSE EFFECT on cards during roulette for visibility
+    this.startCardPulsing();
+    
+    // V4.1: BIGGER, GLOWING status text
     status.textContent = 'Spinning the wheel...';
+    status.style.cssText = `
+      position: fixed;
+      bottom: 4rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      font-weight: 700;
+      color: #FFD700;
+      text-align: center;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0;
+      z-index: 10001;
+      text-shadow: 
+        0 0 20px rgba(255, 215, 0, 0.8),
+        0 0 40px rgba(255, 215, 0, 0.5);
+      pointer-events: none;
+    `;
     status.style.opacity = '1';
     
-    // V4: Get FRESH card positions (adapts to zoom)
+    // Get FRESH card positions (adapts to zoom)
     const cardRects = this.items.map(card => {
       const rect = card.getBoundingClientRect();
       return {
@@ -549,6 +686,9 @@ export class LuxuryCoverflow {
       };
     });
     
+    // V4.1: Create ghost card outlines on overlay
+    this.createGhostCards(overlay, cardRects);
+    
     // Phase 1: Ball bounces
     await this.animateRouletteBounce(ball, cardRects, status);
     
@@ -557,40 +697,46 @@ export class LuxuryCoverflow {
     const winnerTitle = this.items[winnerIndex].dataset.title || 'Selected!';
     console.log('🎯 Winner:', winnerIndex, winnerTitle);
     
+    // V4.1: STOP card pulsing
+    this.stopCardPulsing();
+    
     // Phase 3: Land on winner
     status.textContent = 'Landing...';
     await this.animateRouletteLand(ball, cardRects[winnerIndex]);
     
     // Show winner name
     status.textContent = `🎉 ${winnerTitle}`;
-    await this.delay(1000);
+    await this.delay(1200);
+    
+    // Remove ghost cards
+    overlay.querySelectorAll('.roulette-ghost-card').forEach(g => g.remove());
     
     // Fade out overlay
     await this.gsapTo(overlay, {
       opacity: 0,
-      duration: 0.4
+      duration: 0.5
     });
     overlay.style.display = 'none';
     
     // Navigate to winner
     this.isAnimating = false;
-    this.goToSlide(winnerIndex, 0.8);
+    this.goToSlide(winnerIndex, 0.9);
     
     // Wait for navigation, then pulse
-    await this.delay(900);
+    await this.delay(1000);
     
     const winnerCard = this.items[winnerIndex];
     await this.gsapTo(winnerCard, {
-      scale: 1.35,
-      duration: 0.4,
-      ease: 'back.out(1.7)'
+      scale: 1.4,
+      duration: 0.5,
+      ease: 'back.out(1.9)'
     });
     await this.gsapTo(winnerCard, {
-      scale: 1.25,
+      scale: 1.3,
       duration: 0.3
     });
     
-    // Optional: Navigate to project
+    // Navigate to project
     setTimeout(() => {
       const projectLink = winnerCard.querySelector('.card-link');
       if (projectLink && window.confirm(`View ${winnerTitle}?`)) {
@@ -600,45 +746,67 @@ export class LuxuryCoverflow {
   }
   
   /**
+   * V4.1: Start pulsing effect on all cards
+   */
+  startCardPulsing() {
+    this.items.forEach(card => {
+      gsap.to(card, {
+        scale: '+=0.05',
+        boxShadow: '0 0 40px rgba(255, 215, 0, 0.6)',
+        duration: 0.8,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      });
+    });
+  }
+  
+  /**
+   * V4.1: Stop pulsing effect
+   */
+  stopCardPulsing() {
+    this.items.forEach(card => {
+      gsap.killTweensOf(card);
+    });
+  }
+  
+  /**
+   * V4.1: Create ghost card outlines on overlay
+   */
+  createGhostCards(overlay, cardRects) {
+    cardRects.forEach((rect, i) => {
+      const ghost = document.createElement('div');
+      ghost.className = 'roulette-ghost-card';
+      ghost.style.cssText = `
+        position: fixed;
+        left: ${rect.left}px;
+        top: ${rect.top}px;
+        width: ${rect.width}px;
+        height: ${rect.height}px;
+        border: 3px solid rgba(255, 215, 0, 0.4);
+        border-radius: 16px;
+        pointer-events: none;
+        z-index: 10000;
+        box-shadow: 
+          0 0 20px rgba(255, 215, 0, 0.3),
+          inset 0 0 30px rgba(255, 215, 0, 0.1);
+      `;
+      overlay.appendChild(ghost);
+    });
+  }
+  
+  /**
    * V4: Create overlay DOM
    */
   createRouletteOverlay() {
     const overlay = document.createElement('div');
     overlay.className = 'roulette-ball-overlay';
     
-    // Ball with 3D shading
     const ball = document.createElement('div');
     ball.className = 'roulette-ball';
-    ball.style.cssText = `
-      position: fixed;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fff, #E5D4B5 50%, #C9A76D);
-      box-shadow: 
-        0 0 20px rgba(201, 167, 109, 0.8),
-        0 0 40px rgba(201, 167, 109, 0.5),
-        0 10px 30px rgba(0, 0, 0, 0.5);
-      z-index: 10001;
-    `;
     
-    // Status text
     const status = document.createElement('div');
     status.className = 'roulette-status';
-    status.style.cssText = `
-      position: fixed;
-      bottom: 4rem;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #C9A76D;
-      text-align: center;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      opacity: 0;
-      z-index: 10001;
-    `;
     
     overlay.appendChild(ball);
     overlay.appendChild(status);
@@ -656,8 +824,7 @@ export class LuxuryCoverflow {
     
     console.log(`⚾ Bouncing ${bounceCount} times`);
     
-    // Start from top center
-    const startX = window.innerWidth / 2 - 20;
+    const startX = window.innerWidth / 2 - 25;
     const startY = -100;
     
     gsap.set(ball, {
@@ -669,22 +836,18 @@ export class LuxuryCoverflow {
       opacity: 1
     });
     
-    // Create timeline with completion promise
     return new Promise((resolve) => {
       const tl = gsap.timeline({ onComplete: resolve });
       
       for (let i = 0; i < bounceCount; i++) {
-        // Pick random card
         const card = cardRects[Math.floor(Math.random() * cardRects.length)];
-        const targetX = card.centerX - 20;
-        const targetY = card.centerY - 20;
+        const targetX = card.centerX - 25;
+        const targetY = card.centerY - 25;
         
-        // Progressive slowdown
         const progress = i / bounceCount;
         const duration = 0.2 + (progress * 0.25);
         const ease = progress < 0.6 ? 'power2.out' : 'power1.out';
         
-        // Move to card
         tl.to(ball, {
           left: targetX,
           top: targetY,
@@ -692,9 +855,8 @@ export class LuxuryCoverflow {
           ease: ease
         });
         
-        // Impact pulse
         tl.to(ball, {
-          scale: 1.4,
+          scale: 1.5,
           duration: 0.06,
           ease: 'power2.out'
         }, '>-0.02');
@@ -705,13 +867,11 @@ export class LuxuryCoverflow {
           ease: 'power2.in'
         });
         
-        // Haptic (mobile)
         if ('vibrate' in navigator) {
           const vibStrength = Math.max(5, 15 - Math.floor(progress * 10));
           tl.call(() => navigator.vibrate(vibStrength));
         }
         
-        // Update status periodically
         if (i === Math.floor(bounceCount * 0.4)) {
           tl.call(() => { status.textContent = 'Bouncing...'; });
         }
@@ -726,25 +886,24 @@ export class LuxuryCoverflow {
    * V4: Dramatic landing animation
    */
   async animateRouletteLand(ball, winnerRect) {
-    const targetX = winnerRect.centerX - 20;
-    const targetY = winnerRect.centerY - 20;
+    const targetX = winnerRect.centerX - 25;
+    const targetY = winnerRect.centerY - 25;
     
     return new Promise((resolve) => {
       gsap.timeline({ onComplete: resolve })
         .to(ball, {
           left: targetX,
           top: targetY,
-          scale: 2,
+          scale: 2.5,
           duration: 0.7,
           ease: 'back.out(1.8)'
         })
         .to(ball, {
-          scale: 1.3,
+          scale: 1.5,
           duration: 0.35,
           ease: 'elastic.out(1, 0.5)'
         });
         
-      // Strong haptic
       if ('vibrate' in navigator) {
         navigator.vibrate([100, 50, 100]);
       }
@@ -755,18 +914,12 @@ export class LuxuryCoverflow {
   // UTILITY METHODS
   // ========================================
   
-  /**
-   * V4: Promise wrapper for gsap.to
-   */
   gsapTo(target, vars) {
     return new Promise(resolve => {
       gsap.to(target, { ...vars, onComplete: resolve });
     });
   }
   
-  /**
-   * V4: Simple delay promise
-   */
   delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -801,9 +954,6 @@ export class LuxuryCoverflow {
     }
   }
   
-  /**
-   * V4: Debounced resize handler
-   */
   setupResizeHandler() {
     let resizeTimer;
     
@@ -817,7 +967,6 @@ export class LuxuryCoverflow {
     
     window.addEventListener('resize', handleResize);
     
-    // Also use ResizeObserver for container
     if ('ResizeObserver' in window) {
       new ResizeObserver(handleResize).observe(this.container);
     }
@@ -831,7 +980,6 @@ export class LuxuryCoverflow {
                   currentCard.querySelector('.card-title')?.textContent || 
                   `Slide ${this.currentIndex + 1}`;
     
-    // Update aria-live region if exists
     let liveRegion = document.getElementById('coverflow-live-region');
     if (!liveRegion) {
       liveRegion = document.createElement('div');
@@ -866,7 +1014,7 @@ export class LuxuryCoverflow {
   }
 }
 
-// V4: Auto-initialize if data attribute present
+// Auto-initialize if data attribute present
 document.addEventListener('DOMContentLoaded', () => {
   const autoInit = document.querySelector('[data-luxury-coverflow-auto]');
   if (autoInit) {

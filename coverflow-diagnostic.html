@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coverflow Diagnostic Test</title>
+  <link rel="stylesheet" href="/assets/css/carousel/coverflow-luxury.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { height:100%; }
+    body {
+      min-height:100%;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      background:#0a0a0f;
+      color:#f5f5f7;
+      padding:2rem;
+    }
+    
+    .js body {}
+    
+    .diagnostic-header {
+      max-width:1200px;
+      margin:0 auto 2rem;
+      padding:2rem;
+      background:rgba(255,255,255,0.05);
+      border-radius:12px;
+      border:1px solid rgba(212,175,55,0.2);
+    }
+    
+    h1 {
+      font-size:2rem;
+      margin-bottom:1rem;
+      background:linear-gradient(135deg,#d4af37 0%,#f5f5f7 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+    
+    .status-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+      gap:1rem;
+      margin-top:1rem;
+    }
+    
+    .status-item {
+      padding:1rem;
+      background:rgba(0,0,0,0.3);
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.1);
+    }
+    
+    .status-label {
+      font-size:0.75rem;
+      color:rgba(255,255,255,0.6);
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      margin-bottom:0.5rem;
+    }
+    
+    .status-value {
+      font-size:0.875rem;
+      font-family:'SF Mono',Monaco,monospace;
+      color:#d4af37;
+    }
+    
+    .pass { color:#22c55e; }
+    .fail { color:#ef4444; }
+    
+    .test-container {
+      width:100%;
+      max-width:1400px;
+      margin:0 auto;
+    }
+  </style>
+</head>
+<body class="no-js">
+  <div class="diagnostic-header">
+    <h1>🔍 Coverflow Centering Diagnostic</h1>
+    <p>Testing <strong>Strategy 2: Pure JS Centering</strong></p>
+    
+    <div class="status-grid">
+      <div class="status-item">
+        <div class="status-label">JS Transform</div>
+        <div class="status-value" id="js-transform">Checking...</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label">CSS Margins</div>
+        <div class="status-value" id="css-margins">Checking...</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label">Card Positioning</div>
+        <div class="status-value" id="card-position">Checking...</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label">Card Spacing</div>
+        <div class="status-value" id="card-spacing">Checking...</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label">Center Card Rotation</div>
+        <div class="status-value" id="card-rotation">Checking...</div>
+      </div>
+      <div class="status-item">
+        <div class="status-label">Cards Visible</div>
+        <div class="status-value" id="cards-visible">Checking...</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="test-container">
+    <div class="coverflow-carousel" data-coverflow-luxury aria-label="Diagnostic test carousel">
+      <div class="coverflow-viewport">
+        <div class="coverflow-track">
+          <div class="coverflow-card">
+            <div style="padding:3rem;text-align:center;background:linear-gradient(135deg,#0a0a0f,#1a1a2e);border-radius:16px;height:100%;">
+              <div style="font-size:3rem;margin-bottom:1rem;">1</div>
+              <h3>Card One</h3>
+            </div>
+          </div>
+          
+          <div class="coverflow-card">
+            <div style="padding:3rem;text-align:center;background:linear-gradient(135deg,#1a1a2e,#2a2a3e);border-radius:16px;height:100%;">
+              <div style="font-size:3rem;margin-bottom:1rem;">2</div>
+              <h3>Card Two</h3>
+            </div>
+          </div>
+          
+          <div class="coverflow-card">
+            <div style="padding:3rem;text-align:center;background:linear-gradient(135deg,#2a2a3e,#3a3a4e);border-radius:16px;height:100%;">
+              <div style="font-size:3rem;margin-bottom:1rem;">3</div>
+              <h3>Card Three (Center)</h3>
+            </div>
+          </div>
+          
+          <div class="coverflow-card">
+            <div style="padding:3rem;text-align:center;background:linear-gradient(135deg,#3a3a4e,#4a4a5e);border-radius:16px;height:100%;">
+              <div style="font-size:3rem;margin-bottom:1rem;">4</div>
+              <h3>Card Four</h3>
+            </div>
+          </div>
+          
+          <div class="coverflow-card">
+            <div style="padding:3rem;text-align:center;background:linear-gradient(135deg,#4a4a5e,#5a5a6e);border-radius:16px;height:100%;">
+              <div style="font-size:3rem;margin-bottom:1rem;">5</div>
+              <h3>Card Five</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <nav class="coverflow-controls">
+        <button class="coverflow-btn coverflow-btn--prev" aria-label="Previous">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+        <button class="coverflow-btn coverflow-btn--next" aria-label="Next">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+      </nav>
+      
+      <div class="sr-only" role="status"></div>
+    </div>
+  </div>
+  
+  <script>
+    document.documentElement.classList.add('js');
+    document.body.classList.remove('no-js');
+    document.body.classList.add('js');
+  </script>
+  
+  <script type="module">
+    // Capture all console errors
+    const errors = [];
+    const originalError = console.error;
+    console.error = function(...args) {
+      errors.push(args.join(' '));
+      originalError.apply(console, args);
+    };
+    
+    import CoverflowCarousel from './assets/js/carousel/CoverflowCarousel.js';
+    
+    function runDiagnostics() {
+      console.log('==========================================');
+      console.log('COVERFLOW DIAGNOSTIC TEST STARTING');
+      console.log('==========================================');
+      
+      const carousel = document.querySelector('[data-coverflow-luxury]');
+      if (!carousel) {
+        console.error('❌ Carousel element not found');
+        document.getElementById('js-transform').innerHTML = '<span class="fail">✗ Carousel not found</span>';
+        return;
+      }
+      
+      console.log('✓ Carousel element found');
+      
+      try {
+        const instance = new CoverflowCarousel(carousel);
+        console.log('✓ CoverflowCarousel instance created');
+      } catch (err) {
+        console.error('❌ Error creating carousel:', err);
+        document.getElementById('js-transform').innerHTML = `<span class="fail">✗ Init error: ${err.message}</span>`;
+        return;
+      }
+      
+      // Wait longer for initialization
+      setTimeout(() => {
+        console.log('\\n--- DIAGNOSTIC CHECKS ---');
+        
+        const cards = Array.from(carousel.querySelectorAll('.coverflow-card'));
+        const activeCard = carousel.querySelector('.coverflow-card--active');
+        
+        console.log(`Total cards: ${cards.length}`);
+        console.log(`Active card found: ${!!activeCard}`);
+        
+        if (!activeCard) {
+          document.getElementById('js-transform').innerHTML = '<span class="fail">✗ No active card</span>';
+          return;
+        }
+        
+        // Check JS Transform - with detailed logging
+        const transform = activeCard.style.transform;
+        console.log(`\\nActive card transform: "${transform}"`);
+        
+        const hasTranslate = transform?.includes('translate(-50%, -50%)');
+        console.log(`Has translate(-50%, -50%): ${hasTranslate}`);
+        document.getElementById('js-transform').innerHTML = hasTranslate 
+          ? '<span class="pass">✓ Uses translate(-50%, -50%)</span>' 
+          : `<span class="fail">✗ Missing translate(-50%, -50%)<br>Found: ${transform?.substring(0, 50)}...</span>`;
+        
+        // Check CSS Margins
+        const computed = window.getComputedStyle(activeCard);
+        const marginTop = computed.marginTop;
+        const marginLeft = computed.marginLeft;
+        const hasNegMargins = marginTop?.includes('-') || marginLeft?.includes('-');
+        console.log(`\\nCSS Margins: top=${marginTop}, left=${marginLeft}`);
+        console.log(`Has negative margins: ${hasNegMargins}`);
+        document.getElementById('css-margins').innerHTML = hasNegMargins 
+          ? `<span class="fail">✗ Has negative margins (${marginTop}, ${marginLeft})</span>` 
+          : '<span class="pass">✓ No negative margins</span>';
+        
+        // Check Card Position
+        const rect = activeCard.getBoundingClientRect();
+        const viewportCenterX = window.innerWidth / 2;
+        const viewportCenterY = window.innerHeight / 2;
+        const cardCenterX = rect.left + rect.width / 2;
+        const cardCenterY = rect.top + rect.height / 2;
+        const offsetX = Math.abs(cardCenterX - viewportCenterX);
+        const offsetY = Math.abs(cardCenterY - viewportCenterY);
+        console.log(`\\nCard position: center=(${Math.round(cardCenterX)}, ${Math.round(cardCenterY)})`);
+        console.log(`Viewport center: (${Math.round(viewportCenterX)}, ${Math.round(viewportCenterY)})`);
+        console.log(`Offset: X=${Math.round(offsetX)}px, Y=${Math.round(offsetY)}px`);
+        
+        const wellCentered = offsetX < 50;
+        document.getElementById('card-position').innerHTML = wellCentered
+          ? `<span class="pass">✓ Centered (${Math.round(offsetX)}px offset)</span>`
+          : `<span class="fail">✗ Off-center (${Math.round(offsetX)}px offset)</span>`;
+        
+        // Check Card Spacing - improved logic
+        console.log('\\n--- Card Spacing Check ---');
+        const visibleCards = cards.filter(c => parseFloat(c.style.opacity || '1') > 0.1);
+        console.log(`Visible cards: ${visibleCards.length}`);
+        
+        if (visibleCards.length >= 2) {
+          // Sort by horizontal position
+          const sorted = visibleCards.slice().sort((a, b) => {
+            const aX = a.getBoundingClientRect().left;
+            const bX = b.getBoundingClientRect().left;
+            return aX - bX;
+          });
+          
+          // Check spacing between consecutive cards
+          let spacings = [];
+          for (let i = 0; i < sorted.length - 1; i++) {
+            const r1 = sorted[i].getBoundingClientRect();
+            const r2 = sorted[i + 1].getBoundingClientRect();
+            const  c1x = r1.left + r1.width / 2;
+            const c2x = r2.left + r2.width / 2;
+            const spacing = Math.abs(c2x - c1x);
+            spacings.push(spacing);
+            console.log(`Card ${i} to ${i+1}: ${Math.round(spacing)}px`);
+          }
+          
+          const avgSpacing = spacings.reduce((a, b) => a + b, 0) / spacings.length;
+          console.log(`Average spacing: ${Math.round(avgSpacing)}px`);
+          
+          const isCorrect = Math.abs(avgSpacing - 200) < 50;
+          document.getElementById('card-spacing').innerHTML = isCorrect
+            ? `<span class="pass">✓ ~200px (actual: ${Math.round(avgSpacing)}px)</span>`
+            : `<span class="fail">✗ ${Math.round(avgSpacing)}px (expected ~200px)</span>`;
+        } else {
+          document.getElementById('card-spacing').innerHTML = '<span class="fail">✗ Not enough visible cards</span>';
+        }
+        
+        // Check Center Card Rotation
+        console.log('\\n--- Rotation Check ---');
+        console.log(`Full transform: ${transform}`);
+        const rotateMatch = transform?.match(/rotateY\\(([^)]+)\\)/);
+        console.log(`RotateY match: ${rotateMatch}`);
+        const rotation = rotateMatch ? parseFloat(rotateMatch[1]) : null;
+        console.log(`Extracted rotation: ${rotation}°`);
+        
+        const rotationOK = rotation !== null && Math.abs(rotation) < 5;
+        document.getElementById('card-rotation').innerHTML = rotationOK
+          ? `<span class="pass">✓ ${rotation}° (flat)</span>`
+          : `<span class="fail">✗ ${rotation ?? 'null'}° (${rotation === null ? 'missing rotateY' : 'not flat'})</span>`;
+        
+        // Check Cards Visible
+        const visibleCount = visibleCards.length;
+        console.log(`\\nVisible card count: ${visibleCount}`);
+        const correctCount = visibleCount === 5;
+        document.getElementById('cards-visible').innerHTML = correctCount
+          ? `<span class="pass">✓ 5 cards visible</span>`
+          : `<span class="fail">✗ ${visibleCount} cards visible (expected 5)</span>`;
+        
+        // Check for console errors
+        console.log('\\n--- Error Check ---');
+        if (errors.length > 0) {
+          console.error(`Found ${errors.length} error(s):`, errors);
+        } else {
+          console.log('✓ No console errors detected');
+        }
+        
+        console.log('\\n==========================================');
+        console.log('DIAGNOSTIC TEST COMPLETE');
+        console.log('Copy console output and share with developer');
+        console.log('==========================================');
+      }, 2000); // Increased delay to 2 seconds
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', runDiagnostics);
+    } else {
+      runDiagnostics();
+    }
+  </script>
+</body>
+</html>

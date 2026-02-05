@@ -408,10 +408,10 @@ export default class CoverflowCarousel {
       }
 
       const pos = this.calculatePosition(offset);
-      // Coverflow transform order: center anchor → horizontal spread → tilt → depth → scale
-      const translateX = offset * 200; // 200px spacing between adjacent cards (stepSize for Coverflow)
+      // Coverflow transform: horizontal spread → tilt → depth → scale (CSS handles centering via negative margins)
+      const translateX = offset * 200; // 200px spacing between adjacent cards
 
-      const transform = `translate(-50%, -50%) translateX(${translateX}px) rotateY(${pos.rotateY || 0}deg) translateZ(${pos.translateZ || 0}px) scale(${pos.scale || 1})`;
+      const transform = `translateX(${translateX}px) rotateY(${pos.rotateY || 0}deg) translateZ(${pos.translateZ || 0}px) scale(${pos.scale || 1})`;
 
       card.style.transform = transform;
       card.style.opacity = String(pos.opacity ?? 1);
@@ -559,8 +559,8 @@ export default class CoverflowCarousel {
       card.style.transition = 'none';
       card.style.transitionDelay = '0ms';
       card.style.opacity = '0';
-      // Entrance animation: start lowered (translateY: 40px) and further back in Z
-      card.style.transform = `translate(-50%, -50%) translateX(${translateX}px) translateY(40px) rotateY(${pos.rotateY || 0}deg) translateZ(${(pos.translateZ || 0) - 120}px) scale(${Math.max(0.92, (pos.scale || 1) - 0.06)})`;
+      // Entrance animation: start lowered (translateY: 40px) and further back in Z (CSS handles centering)
+      card.style.transform = `translateX(${translateX}px) translateY(40px) rotateY(${pos.rotateY || 0}deg) translateZ(${(pos.translateZ || 0) - 120}px) scale(${Math.max(0.92, (pos.scale || 1) - 0.06)})`;
     }
 
     window.setTimeout(() => {
