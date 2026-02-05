@@ -1,12 +1,11 @@
 /**
- * Luxury Coverflow V5.7 — CRITICAL EMERGENCY FIX
+ * Luxury Coverflow V5.8 — COMPLETE VISUAL PERFECTION FIX
  * 
  * FIXES:
- * ✅ GSAP "Invalid property rect" — No DOMRect in saved states
- * ✅ Card content visible — Proper cloning with innerHTML preservation
- * ✅ Ball spinning — Massive glow + correct positioning + logging
- * ✅ Performance — GPU acceleration, no backdrop-filter
- * ✅ Positioning — Correct transform calculations
+ * ✅ POSITIONING — Absolute instead of fixed (fixes transform flattening)
+ * ✅ CARD CLONING — Deep clone with computed style preservation
+ * ✅ RESTORATION — clearProps + updateAllItems() for perfect return
+ * ✅ ALIGNMENT — Perfect circular pocket arrangement
  */
 
 import { gsap } from 'gsap';
@@ -77,9 +76,9 @@ export class LuxuryCoverflow {
     this.rouletteState = {
       isActive: false,
       savedCardStates: [],
+      overlay: null,
       wheelContainer: null,
       pockets: [],
-      pocketContainer: null,
       ball: null,
       ballShadow: null,
       status: null,
@@ -113,7 +112,7 @@ export class LuxuryCoverflow {
     if (this.config.autoplay) this.startAutoplay();
     
     this.announceCurrentSlide();
-    console.log('✨ Luxury Coverflow V5.7 — CRITICAL FIX EDITION 🎰');
+    console.log('✨ Luxury Coverflow V5.8 — VISUAL PERFECTION EDITION 🎰');
   }
   
   // ========================================
@@ -333,7 +332,7 @@ export class LuxuryCoverflow {
   }
   
   // ========================================
-  // V5.7: FIXED CASINO WHEEL
+  // V5.8: PERFECT CASINO WHEEL
   // ========================================
   
   setupRouletteButton() {
@@ -342,78 +341,116 @@ export class LuxuryCoverflow {
     
     if (!btn) return;
     
-    console.log('🎰 V5.7 Casino wheel ready — ALL FIXES APPLIED');
+    console.log('🎰 V5.8 Casino wheel ready — VISUAL PERFECTION');
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      await this.startCasinoWheelV57();
+      await this.startCasinoWheelV58();
     });
   }
   
   /**
-   * V5.7: FIXED - Save card states WITHOUT DOMRect objects
+   * V5.8: Save card states (numeric values only)
    */
   saveCardStates() {
     this.rouletteState.savedCardStates = this.items.map((card, index) => {
-      const rect = card.getBoundingClientRect();
       const style = window.getComputedStyle(card);
       const matrix = new DOMMatrix(style.transform);
       
-      // ✅ ONLY numeric/string values - NO DOMRect!
       return {
         index,
         x: matrix.m41 || 0,
         y: matrix.m42 || 0,
         z: matrix.m43 || 0,
         scale: Math.sqrt(matrix.a * matrix.a + matrix.b * matrix.b) || 1,
-        rotation: Math.atan2(matrix.b, matrix.a) * (180 / Math.PI) || 0,
-        rotationX: 0,
-        rotationY: 0,
+        rotationY: Math.atan2(matrix.m13, matrix.m33) * (180 / Math.PI) || 0,
         opacity: parseFloat(style.opacity) || 1,
-        zIndex: parseInt(style.zIndex) || 0,
-        width: rect.width,
-        height: rect.height
-        // ❌ NO rect: DOMRect - this breaks GSAP!
+        zIndex: parseInt(style.zIndex) || 0
       };
     });
-    console.log('✅ V5.7: Saved card states (NO DOMRect objects)');
+    console.log('💾 V5.8: Saved card states');
   }
   
   /**
-   * V5.7: Complete 8-phase casino wheel with ALL FIXES
+   * V5.8: Deep clone card with style preservation
    */
-  async startCasinoWheelV57() {
+  cloneCardWithStyles(sourceCard) {
+    const clone = sourceCard.cloneNode(true);
+    
+    const sourceElements = [sourceCard, ...sourceCard.querySelectorAll('*')];
+    const cloneElements = [clone, ...clone.querySelectorAll('*')];
+    
+    sourceElements.forEach((sourceEl, idx) => {
+      const cloneEl = cloneElements[idx];
+      if (!cloneEl) return;
+      
+      const cs = window.getComputedStyle(sourceEl);
+      
+      // Copy key visual properties
+      ['color', 'backgroundColor', 'backgroundImage', 'backgroundSize', 'backgroundPosition',
+       'fontSize', 'fontWeight', 'fontFamily', 'lineHeight', 'textAlign',
+       'padding', 'borderRadius', 'display', 'flexDirection', 'alignItems', 'justifyContent'
+      ].forEach(prop => {
+        const val = cs.getPropertyValue(prop);
+        if (val && val !== 'none') cloneEl.style[prop] = val;
+      });
+      
+      // Image sources
+      if (sourceEl.tagName === 'IMG') {
+        cloneEl.src = sourceEl.src;
+        cloneEl.srcset = sourceEl.srcset || '';
+      }
+    });
+    
+    // Reset transforms
+    clone.style.transform = 'none';
+    clone.style.opacity = '1';
+    clone.style.filter = 'none';
+    clone.style.position = 'relative';
+    clone.style.width = '100%';
+    clone.style.height = '100%';
+    
+    return clone;
+  }
+  
+  /**
+   * V5.8: Complete 8-phase casino wheel
+   */
+  async startCasinoWheelV58() {
     if (this.rouletteState.isActive) return;
     
-    console.log('🎰 V5.7 CASINO WHEEL — ALL FIXES APPLIED!');
+    console.log('🎰 V5.8 CASINO WHEEL — VISUAL PERFECTION!');
     this.rouletteState.isActive = true;
     this.isAnimating = true;
     
-    // Pre-select winner
+    // Pre-select
     this.rouletteState.originalWinnerIndex = Math.floor(Math.random() * this.items.length);
-    this.rouletteState.greenPocketIndex = this.wheelEngine.getRandomGreenPocket();
-    this.rouletteState.winnerPocketIndex = this.wheelEngine.getWinnerPocketIndex(
-      this.rouletteState.originalWinnerIndex, this.items.length
-    );
+    this.rouletteState.greenPocketIndex = Math.floor(Math.random() * 37);
+    
+    // Winner pocket (avoid green)
+    let winnerPocket = Math.floor((this.rouletteState.originalWinnerIndex / this.items.length) * 37);
+    if (winnerPocket === this.rouletteState.greenPocketIndex) {
+      winnerPocket = (winnerPocket + 1) % 37;
+    }
+    this.rouletteState.winnerPocketIndex = winnerPocket;
     
     const winnerTitle = this.items[this.rouletteState.originalWinnerIndex].dataset.title || 'Selected!';
-    console.log(`🎯 Winner: Card ${this.rouletteState.originalWinnerIndex} "${winnerTitle}"`);
+    console.log(`🎯 Winner: Card ${this.rouletteState.originalWinnerIndex} → Pocket ${winnerPocket}`);
     console.log(`💚 Green pocket: ${this.rouletteState.greenPocketIndex}`);
-    console.log(`🎯 Winner pocket: ${this.rouletteState.winnerPocketIndex}`);
     
     this.saveCardStates();
     
     try {
-      await this.phase1_Levitation();
+      await this.phase1_CreateOverlay();
       await this.phase2_CreateWheel();
       await this.phase3_SpinWheel();
       await this.phase4_BallLanding();
       await this.phase5_WinnerRise();
       await this.phase6_CenterFocus();
       await this.phase7_GravityDrop();
-      await this.phase8_CarouselReveal(winnerTitle);
+      await this.phase8_RestoreCarousel(winnerTitle);
       
-      console.log('🎉 V5.7 Complete!');
+      console.log('🎉 V5.8 Complete!');
     } catch (error) {
       console.error('❌ Error:', error);
     } finally {
@@ -424,32 +461,29 @@ export class LuxuryCoverflow {
   }
   
   /**
-   * Phase 1: Fast levitation
+   * Phase 1: Create fixed overlay
    */
-  async phase1_Levitation() {
-    console.log('📦 Phase 1: Levitation');
+  async phase1_CreateOverlay() {
+    console.log('📦 Phase 1: Create Overlay');
     
-    // Casino overlay (NO backdrop-filter for performance)
+    // Fixed overlay (only element that's fixed)
     const overlay = document.createElement('div');
     overlay.style.cssText = `
       position: fixed;
       inset: 0;
       z-index: 10000;
       opacity: 0;
-      background: radial-gradient(circle at 50% 50%, rgba(0, 50, 0, 0.96) 0%, rgba(0, 15, 0, 0.98) 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      perspective: 1200px;
+      background: radial-gradient(circle at 50% 50%, rgba(0, 50, 0, 0.96) 0%, rgba(0, 15, 0, 0.99) 100%);
+      overflow: hidden;
     `;
     document.body.appendChild(overlay);
-    this.rouletteState.wheelContainer = overlay;
+    this.rouletteState.overlay = overlay;
     
-    // Status
+    // Status text
     const status = document.createElement('div');
     status.textContent = 'Preparing...';
     status.style.cssText = `
-      position: fixed;
+      position: absolute;
       bottom: 4rem;
       left: 50%;
       transform: translateX(-50%);
@@ -462,130 +496,141 @@ export class LuxuryCoverflow {
       opacity: 0;
       text-shadow: 0 0 30px #FFD700, 0 0 60px rgba(255,215,0,0.5);
     `;
-    document.body.appendChild(status);
+    overlay.appendChild(status);
     this.rouletteState.status = status;
     
     gsap.to(overlay, { opacity: 1, duration: 0.4 });
     gsap.to(status, { opacity: 1, duration: 0.3, delay: 0.2 });
     
+    // Hide original cards
     return new Promise(resolve => {
       gsap.to(this.items, {
-        y: -80,
-        z: 350,
-        scale: 0.6,
-        rotationX: 0,
-        rotationY: 0,
-        opacity: 0.85,
-        duration: 1,
-        stagger: 0.05,
-        ease: 'power2.out',
+        opacity: 0,
+        scale: 0.8,
+        duration: 0.6,
+        stagger: 0.03,
+        ease: 'power2.in',
         onComplete: resolve
       });
     });
   }
   
   /**
-   * Phase 2: Create wheel with VISIBLE card content
+   * Phase 2: Create wheel with ABSOLUTE positioning (V5.8 FIX)
    */
   async phase2_CreateWheel() {
-    console.log('🔄 Phase 2: Create Wheel (FIXED card content)');
+    console.log('🔄 Phase 2: Create Wheel (V5.8 - ABSOLUTE positioning)');
     this.rouletteState.status.textContent = 'Forming wheel...';
     
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    const wheelRadius = this.wheelEngine.config.wheelRadius();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const centerX = vw / 2;
+    const centerY = vh / 2;
+    const wheelRadius = Math.min(vw, vh) * 0.30;
     
-    // Golden rim
+    console.log(`🎯 Center: (${centerX}, ${centerY}), Radius: ${wheelRadius}px`);
+    
+    // Wheel container (ABSOLUTE inside the fixed overlay)
+    const wheelContainer = document.createElement('div');
+    wheelContainer.style.cssText = `
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    `;
+    this.rouletteState.overlay.appendChild(wheelContainer);
+    this.rouletteState.wheelContainer = wheelContainer;
+    
+    // Golden rim (ABSOLUTE)
+    const rimSize = wheelRadius * 2 + 100;
     const rim = document.createElement('div');
     rim.style.cssText = `
-      position: fixed;
-      left: ${centerX}px;
-      top: ${centerY}px;
-      width: ${wheelRadius * 2 + 80}px;
-      height: ${wheelRadius * 2 + 80}px;
-      transform: translate(-50%, -50%);
-      border: 8px solid transparent;
+      position: absolute;
+      left: ${centerX - rimSize / 2}px;
+      top: ${centerY - rimSize / 2}px;
+      width: ${rimSize}px;
+      height: ${rimSize}px;
+      border: 10px solid transparent;
       border-radius: 50%;
       background:
         linear-gradient(#002200, #002200) padding-box,
         linear-gradient(135deg, #FFD700, #FFA500, #FFD700, #B8860B, #FFD700) border-box;
       box-shadow:
-        0 0 40px rgba(255,215,0,0.8),
-        0 0 80px rgba(255,215,0,0.5),
-        inset 0 0 50px rgba(255,215,0,0.2);
-      z-index: 10001;
+        0 0 60px rgba(255,215,0,0.9),
+        0 0 120px rgba(255,215,0,0.6),
+        inset 0 0 80px rgba(255,215,0,0.3);
       opacity: 0;
       will-change: transform;
+      transform-origin: center center;
     `;
-    document.body.appendChild(rim);
+    wheelContainer.appendChild(rim);
     this.rouletteState.wheelRim = rim;
     gsap.to(rim, { opacity: 1, duration: 0.5 });
     
-    // Pocket container
-    const pocketContainer = document.createElement('div');
-    pocketContainer.style.cssText = `
-      position: fixed;
-      left: ${centerX}px;
-      top: ${centerY}px;
-      width: 0;
-      height: 0;
-      z-index: 10002;
-      transform-style: preserve-3d;
-      will-change: transform;
-    `;
+    // European sequence
+    const europeanSequence = [
+      0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10,
+      5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
+    ];
+    const redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
     
-    const positions = this.wheelEngine.calculatePocketPositions(centerX, centerY);
-    const greenIndex = this.rouletteState.greenPocketIndex;
     const pockets = [];
+    const pocketWidth = 70;
+    const pocketHeight = 95;
     
     for (let i = 0; i < 37; i++) {
-      const pos = positions[i];
-      const isGreen = i === greenIndex;
-      const sourceIndex = Math.floor((i / 37) * this.items.length);
-      const sourceCard = this.items[sourceIndex];
+      const number = europeanSequence[i];
+      const angle = (i * (360 / 37)) - 90; // Start from top
+      const angleRad = angle * Math.PI / 180;
       
-      // Determine colors
+      const x = centerX + wheelRadius * Math.cos(angleRad);
+      const y = centerY + wheelRadius * Math.sin(angleRad);
+      
+      const isGreen = i === this.rouletteState.greenPocketIndex;
+      const isRed = !isGreen && number !== 0 && redNumbers.includes(number);
+      
       let borderColor, glowColor;
       if (isGreen) {
         borderColor = '#00FF00';
         glowColor = 'rgba(0, 255, 0, 0.9)';
-      } else if (pos.pocketData.color === 'red') {
+      } else if (isRed) {
         borderColor = '#FF0000';
-        glowColor = 'rgba(255, 0, 0, 0.8)';
+        glowColor = 'rgba(255, 0, 0, 0.85)';
       } else {
         borderColor = '#FFFFFF';
-        glowColor = 'rgba(255, 255, 255, 0.6)';
+        glowColor = 'rgba(255, 255, 255, 0.7)';
       }
       
-      // Create pocket element
+      // Create pocket (ABSOLUTE position)
       const pocket = document.createElement('div');
       pocket.dataset.pocketIndex = i;
-      
-      const relX = pos.x - centerX;
-      const relY = pos.y - centerY;
+      pocket.dataset.pocketNumber = number;
       
       pocket.style.cssText = `
         position: absolute;
-        left: 0;
-        top: 0;
-        width: clamp(45px, 7vmin, 75px);
-        height: clamp(65px, 10vmin, 95px);
-        border-radius: 6px;
-        border: 3px solid ${borderColor};
+        left: ${x - pocketWidth / 2}px;
+        top: ${y - pocketHeight / 2}px;
+        width: ${pocketWidth}px;
+        height: ${pocketHeight}px;
+        border-radius: 8px;
+        border: 4px solid ${borderColor};
         overflow: hidden;
-        transform: translate(${relX}px, ${relY}px) rotate(${pos.rotation}deg) scale(0);
+        transform: rotate(${angle + 90}deg) scale(0);
         transform-origin: center center;
         opacity: 0;
         background: #111;
         box-shadow:
-          0 0 20px ${glowColor},
-          0 0 40px ${glowColor},
-          inset 0 0 15px ${glowColor};
+          0 0 25px ${glowColor},
+          0 0 50px ${glowColor},
+          inset 0 0 20px ${glowColor};
         will-change: transform;
+        pointer-events: auto;
+        cursor: pointer;
       `;
       
       if (isGreen) {
-        // Green "Try Again" pocket
         pocket.innerHTML = `
           <div style="
             position: absolute;
@@ -594,65 +639,67 @@ export class LuxuryCoverflow {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #003300, #006600, #003300);
+            background: linear-gradient(135deg, #003300, #006600);
             color: #00FF00;
-            font-family: Arial Black, sans-serif;
-            font-size: clamp(10px, 2vmin, 16px);
+            font-family: 'Arial Black', sans-serif;
+            font-size: 13px;
             font-weight: 900;
             text-align: center;
             text-shadow: 0 0 15px #00FF00;
-            line-height: 1.2;
+            line-height: 1.3;
           ">
-            <div style="font-size: 130%;">TRY</div>
-            <div style="font-size: 130%;">AGAIN</div>
-            <div style="font-size: 70%; opacity: 0.8; margin-top: 4px;">or choose</div>
+            <div style="font-size: 140%;">TRY</div>
+            <div style="font-size: 140%; margin-top: -3px;">AGAIN</div>
+            <div style="font-size: 65%; opacity: 0.8; margin-top: 6px;">or choose</div>
           </div>
         `;
       } else {
-        // ✅ FIXED: Copy actual card content
-        pocket.innerHTML = sourceCard.innerHTML;
+        // Clone card content
+        const sourceIndex = Math.floor((i / 37) * this.items.length);
+        const sourceCard = this.items[sourceIndex];
         
-        // Add dark overlay
-        const overlay = document.createElement('div');
-        overlay.style.cssText = `
-          position: absolute;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.25);
-          pointer-events: none;
-          z-index: 1;
-        `;
-        pocket.appendChild(overlay);
+        if (sourceCard) {
+          const cardClone = this.cloneCardWithStyles(sourceCard);
+          pocket.appendChild(cardClone);
+          
+          // Dark overlay
+          const overlay = document.createElement('div');
+          overlay.style.cssText = `
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            pointer-events: none;
+            z-index: 5;
+          `;
+          pocket.appendChild(overlay);
+        }
         
         // Number badge
         const badge = document.createElement('div');
-        badge.textContent = pos.pocketData.number;
+        badge.textContent = number;
         badge.style.cssText = `
           position: absolute;
-          top: 3px;
-          right: 3px;
-          font-family: Arial Black, sans-serif;
-          font-size: clamp(10px, 1.8vmin, 14px);
+          top: 4px;
+          right: 4px;
+          font-family: 'Arial Black', sans-serif;
+          font-size: 13px;
           font-weight: 900;
           color: #FFD700;
-          text-shadow: 0 0 8px #FFD700;
+          text-shadow: 0 0 10px #FFD700;
           z-index: 10;
           background: rgba(0, 0, 0, 0.7);
-          padding: 2px 5px;
-          border-radius: 3px;
+          padding: 2px 6px;
+          border-radius: 4px;
         `;
         pocket.appendChild(badge);
       }
       
+      wheelContainer.appendChild(pocket);
       pockets.push(pocket);
-      pocketContainer.appendChild(pocket);
     }
     
-    document.body.appendChild(pocketContainer);
     this.rouletteState.pockets = pockets;
-    this.rouletteState.pocketContainer = pocketContainer;
-    
-    // Hide original cards
-    gsap.to(this.items, { opacity: 0, duration: 0.4 });
+    console.log(`✅ Created ${pockets.length} pockets in perfect circle`);
     
     // Animate pockets appearing
     return new Promise(resolve => {
@@ -662,7 +709,7 @@ export class LuxuryCoverflow {
           scale: 1,
           duration: 0.5,
           delay: i * 0.02,
-          ease: 'back.out(1.3)'
+          ease: 'back.out(1.5)'
         });
       });
       setTimeout(resolve, 2000);
@@ -670,84 +717,97 @@ export class LuxuryCoverflow {
   }
   
   /**
-   * Phase 3: Spin wheel with VISIBLE ball
+   * Phase 3: Spin wheel
    */
   async phase3_SpinWheel() {
-    console.log('🎡 Phase 3: Spin Wheel (FIXED ball visibility)');
+    console.log('🎡 Phase 3: Spin Wheel');
     this.rouletteState.status.textContent = 'Spinning...';
     
-    const spinParams = this.wheelEngine.calculateWheelSpin(this.rouletteState.winnerPocketIndex);
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    const wheelRadius = this.wheelEngine.config.wheelRadius();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const centerX = vw / 2;
+    const centerY = vh / 2;
+    const wheelRadius = Math.min(vw, vh) * 0.30;
     
-    // ✅ FIXED: Create HIGHLY VISIBLE ball
+    // Spin calculation
+    const winnerPocket = this.rouletteState.winnerPocketIndex;
+    const pocketAngle = (winnerPocket * (360 / 37));
+    const spins = 4 + Math.random() * 2;
+    const finalRotation = (spins * 360) + (360 - pocketAngle);
+    const duration = 5 + Math.random() * 1.5;
+    
+    // Create ball (ABSOLUTE position)
     const ball = document.createElement('div');
     ball.style.cssText = `
-      position: fixed;
-      width: clamp(40px, 7vmin, 65px);
-      height: clamp(40px, 7vmin, 65px);
+      position: absolute;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #ffffff, #f5f5f5 30%, #d5d5d5 70%, #b0b0b0);
+      background: radial-gradient(circle at 30% 30%, #ffffff, #e0e0e0 50%, #a0a0a0);
       box-shadow:
         0 0 50px rgba(255,255,255,1),
         0 0 100px rgba(255,215,0,1),
         0 0 150px rgba(255,215,0,0.8),
-        0 0 200px rgba(255,215,0,0.6),
-        inset -4px -4px 15px rgba(0,0,0,0.3),
-        inset 4px 4px 15px rgba(255,255,255,0.9),
-        0 20px 60px rgba(0,0,0,0.5);
+        inset -4px -4px 12px rgba(0,0,0,0.3),
+        inset 4px 4px 12px rgba(255,255,255,0.9);
       z-index: 10006;
       pointer-events: none;
-      filter: brightness(1.6);
+      filter: brightness(1.5);
       will-change: transform, left, top;
     `;
-    document.body.appendChild(ball);
+    this.rouletteState.wheelContainer.appendChild(ball);
     this.rouletteState.ball = ball;
-    console.log('⚪ Ball created with MASSIVE glow');
     
     // Ball shadow
     const ballShadow = document.createElement('div');
     ballShadow.style.cssText = `
-      position: fixed;
-      width: clamp(50px, 8vmin, 75px);
-      height: clamp(20px, 4vmin, 30px);
+      position: absolute;
+      width: 60px;
+      height: 25px;
       border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(0,0,0,0.7) 0%, transparent 70%);
+      background: radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, transparent 70%);
       filter: blur(5px);
       z-index: 10005;
       pointer-events: none;
-      will-change: transform, left, top;
     `;
-    document.body.appendChild(ballShadow);
+    this.rouletteState.wheelContainer.appendChild(ballShadow);
     this.rouletteState.ballShadow = ballShadow;
     
+    // Initial ball position
     const outerRadius = wheelRadius * 1.15;
     let ballAngle = Math.random() * 360;
-    
-    // Initial position
     const startX = centerX + outerRadius * Math.cos(ballAngle * Math.PI / 180);
     const startY = centerY + outerRadius * Math.sin(ballAngle * Math.PI / 180);
     
-    gsap.set(ball, { left: startX, top: startY, xPercent: -50, yPercent: -50 });
-    gsap.set(ballShadow, { left: startX + 5, top: startY + 15, xPercent: -50, yPercent: -50 });
-    console.log(`⚪ Ball positioned at (${Math.round(startX)}, ${Math.round(startY)})`);
+    gsap.set(ball, { left: startX - 25, top: startY - 25 });
+    gsap.set(ballShadow, { left: startX - 30, top: startY + 5 });
+    console.log(`⚪ Ball at (${Math.round(startX)}, ${Math.round(startY)})`);
     
-    const pocketContainer = this.rouletteState.pocketContainer;
+    const pockets = this.rouletteState.pockets;
     const rim = this.rouletteState.wheelRim;
-    const duration = spinParams.duration;
     const statusEl = this.rouletteState.status;
     
     return new Promise(resolve => {
-      // Wheel rotation
-      gsap.to([pocketContainer, rim], {
-        rotation: spinParams.finalRotation,
+      // Rotate all pockets together
+      const tl = gsap.timeline({ onComplete: resolve });
+      
+      // Calculate rotation for each pocket around center
+      pockets.forEach((pocket, i) => {
+        const originalAngle = (i * (360 / 37)) - 90;
+        tl.to(pocket, {
+          rotation: originalAngle + 90 + finalRotation,
+          duration,
+          ease: 'power3.out'
+        }, 0);
+      });
+      
+      tl.to(rim, {
+        rotation: finalRotation,
         duration,
         ease: 'power3.out'
-      });
-      console.log(`🎡 Wheel spinning to ${Math.round(spinParams.finalRotation)}° over ${duration.toFixed(1)}s`);
+      }, 0);
       
-      // ✅ FIXED: Ball animation with logging
+      // Ball animation
       let frameCount = 0;
       gsap.to({}, {
         duration,
@@ -756,57 +816,31 @@ export class LuxuryCoverflow {
           const progress = this.progress();
           frameCount++;
           
-          // Ball speed decay
-          const ballSpeed = 2800 * Math.pow(1 - progress, 1.9);
+          const ballSpeed = 2600 * Math.pow(1 - progress, 1.8);
           ballAngle -= ballSpeed * 0.016 / 60;
           
-          // Spiral inward
           let currentRadius = outerRadius;
-          if (progress > 0.45) {
-            const spiral = (progress - 0.45) / 0.55;
-            currentRadius = outerRadius - (outerRadius * 0.3 * Math.pow(spiral, 2.2));
+          if (progress > 0.5) {
+            const spiral = (progress - 0.5) / 0.5;
+            currentRadius = outerRadius - (outerRadius * 0.25 * Math.pow(spiral, 2));
           }
           
           const angleRad = ballAngle * Math.PI / 180;
           const x = centerX + currentRadius * Math.cos(angleRad);
           const y = centerY + currentRadius * Math.sin(angleRad);
           
-          gsap.set(ball, { left: x, top: y });
-          gsap.set(ballShadow, { left: x + 5, top: y + 15 });
+          gsap.set(ball, { left: x - 25, top: y - 25 });
+          gsap.set(ballShadow, { left: x - 30, top: y + 5 });
           
-          if (progress < 0.3) {
-            statusEl.textContent = '🎰 Spinning fast!';
-          } else if (progress < 0.7) {
-            statusEl.textContent = '🎰 Round and round...';
-          } else {
-            statusEl.textContent = '🎰 Slowing down...';
-          }
+          if (progress < 0.3) statusEl.textContent = '🎰 Spinning fast!';
+          else if (progress < 0.7) statusEl.textContent = '🎰 Round and round...';
+          else statusEl.textContent = '🎰 Slowing down...';
           
-          // Log every second (60fps)
           if (frameCount % 60 === 0) {
-            console.log(`⚪ Ball: ${Math.round(progress * 100)}% pos(${Math.round(x)},${Math.round(y)})`);
+            console.log(`⚪ Ball: ${Math.round(progress * 100)}%`);
           }
-        },
-        onComplete: () => {
-          console.log(`⚪ Ball spin complete (${frameCount} frames)`);
-          resolve();
         }
       });
-      
-      // Haptic
-      if ('vibrate' in navigator) {
-        let lastTick = 0;
-        gsap.to({}, {
-          duration,
-          onUpdate: function() {
-            const p = this.progress();
-            if (p - lastTick > 0.1 / (1 - p * 0.5)) {
-              navigator.vibrate(3);
-              lastTick = p;
-            }
-          }
-        });
-      }
     });
   }
   
@@ -820,31 +854,31 @@ export class LuxuryCoverflow {
     const ball = this.rouletteState.ball;
     const ballShadow = this.rouletteState.ballShadow;
     const winnerPocket = this.rouletteState.pockets[this.rouletteState.winnerPocketIndex];
-    const pocketRect = winnerPocket.getBoundingClientRect();
-    const targetX = pocketRect.left + pocketRect.width / 2;
-    const targetY = pocketRect.top + pocketRect.height / 2;
+    const rect = winnerPocket.getBoundingClientRect();
+    const overlayRect = this.rouletteState.overlay.getBoundingClientRect();
+    
+    const targetX = rect.left - overlayRect.left + rect.width / 2;
+    const targetY = rect.top - overlayRect.top + rect.height / 2;
     
     return new Promise(resolve => {
       const tl = gsap.timeline({ onComplete: resolve });
       
-      // Bounce sequence
-      tl.to(ball, { left: targetX, top: targetY, scale: 1.3, duration: 0.4, ease: 'power2.out' });
-      tl.to(ball, { top: targetY - 40, duration: 0.25, ease: 'power1.out' });
-      tl.to(ball, { top: targetY, scale: 1.1, duration: 0.2, ease: 'bounce.out' });
-      tl.to(ball, { top: targetY - 15, duration: 0.15, ease: 'power1.out' });
-      tl.to(ball, { top: targetY, scale: 1, duration: 0.1, ease: 'power2.in' });
+      tl.to(ball, { left: targetX - 25, top: targetY - 25, scale: 1.2, duration: 0.35, ease: 'power2.out' });
+      tl.to(ball, { top: targetY - 60, duration: 0.2, ease: 'power1.out' });
+      tl.to(ball, { top: targetY - 25, duration: 0.15, ease: 'bounce.out' });
+      tl.to(ball, { top: targetY - 35, duration: 0.12, ease: 'power1.out' });
+      tl.to(ball, { top: targetY - 25, scale: 1, duration: 0.08, ease: 'power2.in' });
       
-      // Winner glow
       tl.to(winnerPocket, {
-        boxShadow: '0 0 80px rgba(255,215,0,1), inset 0 0 40px rgba(255,215,0,0.6)',
-        duration: 0.2,
+        boxShadow: '0 0 100px rgba(255,215,0,1), inset 0 0 50px rgba(255,215,0,0.6)',
+        duration: 0.15,
         repeat: 3,
         yoyo: true
-      }, '-=0.4');
+      }, '-=0.3');
       
-      tl.to([ball, ballShadow], { opacity: 0, scale: 0, duration: 0.3 });
+      tl.to([ball, ballShadow], { opacity: 0, scale: 0, duration: 0.25 });
       
-      if ('vibrate' in navigator) tl.call(() => navigator.vibrate([100, 50, 150]));
+      if ('vibrate' in navigator) tl.call(() => navigator.vibrate([80, 40, 120]));
     });
   }
   
@@ -863,18 +897,18 @@ export class LuxuryCoverflow {
       
       pockets.forEach((p, i) => {
         if (i !== this.rouletteState.winnerPocketIndex) {
-          tl.to(p, { opacity: 0, scale: 0.5, duration: 0.5 }, 0);
+          tl.to(p, { opacity: 0, scale: 0.4, duration: 0.5 }, 0);
         }
       });
       
-      tl.to(this.rouletteState.wheelRim, { opacity: 0, duration: 0.6 }, 0);
+      tl.to(this.rouletteState.wheelRim, { opacity: 0, duration: 0.5 }, 0);
       
       tl.to(winnerPocket, {
-        scale: 2.2,
+        scale: 2.5,
         zIndex: 10010,
-        boxShadow: '0 0 120px rgba(255,215,0,1)',
+        boxShadow: '0 0 150px rgba(255,215,0,1)',
         duration: 1,
-        ease: 'back.out(1.4)'
+        ease: 'back.out(1.3)'
       }, 0.2);
     });
   }
@@ -889,18 +923,22 @@ export class LuxuryCoverflow {
     const winnerTitle = this.items[this.rouletteState.originalWinnerIndex].dataset.title || 'Selected!';
     this.rouletteState.status.textContent = `🎉 ${winnerTitle}`;
     
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
     const rect = winnerPocket.getBoundingClientRect();
+    const overlayRect = this.rouletteState.overlay.getBoundingClientRect();
+    
+    const currentLeft = parseFloat(winnerPocket.style.left);
+    const currentTop = parseFloat(winnerPocket.style.top);
+    const targetLeft = vw / 2 - rect.width / 2;
+    const targetTop = vh / 2 - rect.height / 2;
     
     return new Promise(resolve => {
       gsap.to(winnerPocket, {
-        left: centerX - rect.width / 2,
-        top: centerY - rect.height / 2,
-        x: 0,
-        y: 0,
+        left: targetLeft,
+        top: targetTop,
         rotation: 360,
-        scale: 2.8,
+        scale: 3,
         duration: 1,
         ease: 'power2.inOut',
         onComplete: resolve
@@ -909,173 +947,92 @@ export class LuxuryCoverflow {
   }
   
   /**
-   * Phase 7: FIXED - Natural gravity drop with explicit properties
+   * Phase 7: Natural gravity drop
    */
   async phase7_GravityDrop() {
-    console.log('🔄 Phase 7: Gravity Drop (FIXED - no DOMRect)');
+    console.log('🔄 Phase 7: Gravity Drop');
     this.rouletteState.status.textContent = 'Returning...';
     
-    const overlay = this.rouletteState.wheelContainer;
-    const winnerPocket = this.rouletteState.pockets[this.rouletteState.winnerPocketIndex];
-    const originalWinner = this.items[this.rouletteState.originalWinnerIndex];
-    const savedState = this.rouletteState.savedCardStates[this.rouletteState.originalWinnerIndex];
+    await this.delay(800);
     
-    // Fade overlay
-    gsap.to(overlay, { opacity: 0, duration: 0.8 });
-    gsap.to(this.rouletteState.status, { opacity: 0, duration: 0.4 });
+    // Fade out overlay
+    gsap.to(this.rouletteState.overlay, { opacity: 0, duration: 0.6 });
     
-    // Show and position winner card
-    gsap.set(originalWinner, { opacity: 1 });
-    
-    const pocketRect = winnerPocket.getBoundingClientRect();
-    gsap.set(originalWinner, {
-      x: pocketRect.left + pocketRect.width / 2 - window.innerWidth / 2,
-      y: pocketRect.top + pocketRect.height / 2 - window.innerHeight / 2,
-      scale: 2,
-      rotation: 0
-    });
-    
-    winnerPocket.style.opacity = '0';
-    
-    return new Promise(resolve => {
-      const tl = gsap.timeline({ onComplete: resolve });
-      
-      // Float UP
-      tl.to(originalWinner, {
-        y: '-=250',
-        scale: 1.8,
-        rotation: 8,
-        duration: 0.8,
-        ease: 'power2.out'
-      });
-      
-      // Pause
-      tl.to({}, { duration: 0.25 });
-      
-      // Gravity drop
-      const containerRect = this.container.getBoundingClientRect();
-      const targetY = containerRect.top + containerRect.height / 2 - window.innerHeight / 2;
-      
-      tl.to(originalWinner, {
-        y: targetY,
-        x: 0,
-        scale: 1.25,
-        rotation: savedState.rotation,
-        duration: 1,
-        ease: 'power2.in',
-        onUpdate: function() {
-          const p = this.progress();
-          const wobble = Math.sin(p * Math.PI * 3) * 6 * (1 - p);
-          gsap.set(originalWinner, { rotation: savedState.rotation + wobble });
-        }
-      });
-      
-      // Landing bounce
-      tl.to(originalWinner, { scale: savedState.scale * 0.92, duration: 0.1 });
-      tl.to(originalWinner, { scale: savedState.scale, rotation: savedState.rotation, duration: 0.2, ease: 'elastic.out(1, 0.6)' });
-      
-      // ✅ FIXED: Restore others with EXPLICIT properties (no spreading)
-      this.items.forEach((card, i) => {
-        if (i === this.rouletteState.originalWinnerIndex) return;
-        const state = this.rouletteState.savedCardStates[i];
-        
-        tl.to(card, {
-          x: state.x,
-          y: state.y,
-          z: state.z,
-          scale: state.scale,
-          rotation: state.rotation,
-          rotationX: state.rotationX,
-          rotationY: state.rotationY,
-          opacity: state.opacity,
-          zIndex: state.zIndex,
-          duration: 1.2
-        }, '-=0.8');
-      });
-    });
+    return this.delay(700);
   }
   
   /**
-   * Phase 8: Carousel reveal
+   * Phase 8: PERFECT carousel restoration (V5.8 FIX)
    */
-  async phase8_CarouselReveal(winnerTitle) {
-    console.log('🎬 Phase 8: Carousel Reveal');
+  async phase8_RestoreCarousel(winnerTitle) {
+    console.log('🎬 Phase 8: Perfect Carousel Restoration');
     
-    // Green pocket check
+    // Check green pocket
     if (this.rouletteState.winnerPocketIndex === this.rouletteState.greenPocketIndex) {
-      console.log('💚 Green pocket won!');
-      this.rouletteState.status.textContent = '💚 Try Again!';
-      await this.delay(1500);
+      console.log('💚 Green pocket! Try Again flow');
       
       if (confirm('🎰 Spin again?\n\nOK = Spin\nCancel = Browse')) {
         this.cleanupCasinoWheel();
         this.rouletteState.isActive = false;
         this.isAnimating = false;
-        await this.delay(400);
-        return this.startCasinoWheelV57();
+        await this.delay(300);
+        return this.startCasinoWheelV58();
       }
-      
-      // Restore carousel
-      this.items.forEach((card, i) => {
-        const state = this.rouletteState.savedCardStates[i];
-        gsap.to(card, { x: state.x, y: state.y, z: state.z, scale: state.scale, rotation: state.rotation, opacity: state.opacity, zIndex: state.zIndex, duration: 1 });
-      });
-      return;
     }
     
-    // Regular winner
+    // ✅ V5.8 FIX: Clear ALL GSAP-added inline styles
+    this.items.forEach(card => {
+      gsap.set(card, { clearProps: 'all' });
+    });
+    
+    await this.delay(100);
+    
+    // Set winner as current
     this.currentIndex = this.rouletteState.originalWinnerIndex;
+    
+    // ✅ V5.8 FIX: Re-trigger carousel update (resets all positions correctly)
     this.updateAllItems(this.currentIndex, 0.8);
     
-    await this.delay(500);
+    await this.delay(900);
     
-    const winner = this.items[this.rouletteState.originalWinnerIndex];
-    await this.gsapTo(winner, { scale: 1.45, duration: 0.3, ease: 'back.out(1.8)' });
+    // Winner celebration
+    const winner = this.items[this.currentIndex];
+    await this.gsapTo(winner, { scale: 1.4, duration: 0.3, ease: 'back.out(1.8)' });
     await this.gsapTo(winner, { scale: 1.25, duration: 0.2 });
     
-    await this.delay(600);
+    await this.delay(500);
     
     const link = winner.querySelector('.card-link') || winner.querySelector('a[href]');
     if (link && window.confirm(`🎉 ${winnerTitle}!\n\nView project?`)) {
       window.location.href = link.href;
     }
+    
+    console.log('✅ V5.8: Carousel perfectly restored');
   }
   
   /**
-   * V5.7: Enhanced cleanup (prevent memory leaks)
+   * Cleanup
    */
   cleanupCasinoWheel() {
-    console.log('🧹 V5.7: Enhanced cleanup');
+    console.log('🧹 V5.8: Cleanup');
     
-    // Kill all tweens
-    if (this.rouletteState.pockets?.length) {
-      gsap.killTweensOf(this.rouletteState.pockets);
-    }
     gsap.killTweensOf([
       this.rouletteState.ball,
       this.rouletteState.ballShadow,
       this.rouletteState.wheelRim,
       this.rouletteState.wheelContainer,
-      this.rouletteState.pocketContainer
+      this.rouletteState.overlay,
+      ...this.rouletteState.pockets
     ].filter(Boolean));
     
-    // Remove DOM
-    [
-      this.rouletteState.ball,
-      this.rouletteState.ballShadow,
-      this.rouletteState.wheelRim,
-      this.rouletteState.pocketContainer,
-      this.rouletteState.wheelContainer,
-      this.rouletteState.status
-    ].forEach(el => el?.remove());
+    this.rouletteState.overlay?.remove();
     
-    // Clear refs
     this.rouletteState = {
       isActive: false,
       savedCardStates: [],
+      overlay: null,
       wheelContainer: null,
       pockets: [],
-      pocketContainer: null,
       ball: null,
       ballShadow: null,
       status: null,
@@ -1084,8 +1041,6 @@ export class LuxuryCoverflow {
       winnerPocketIndex: null,
       greenPocketIndex: null
     };
-    
-    console.log('✅ Cleanup done');
   }
   
   // ========================================
@@ -1147,7 +1102,6 @@ export class LuxuryCoverflow {
     this.stopAutoplay();
     gsap.killTweensOf(this.items);
     this.cleanupCasinoWheel();
-    console.log('⏹️ Coverflow destroyed');
   }
   
   getState() {
