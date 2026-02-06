@@ -386,8 +386,12 @@ export class LuxuryCoverflow {
       await this.phase2_CreateWheelWithMapping();
       await this.phase3_Create3DBall();
       await this.phase4_SpinWithOrbit();
+      
+      // V7.5: Increased settle delay (ensure wheel FULLY stops before ball landing)
+      await this.delay(400);
+      
       await this.phase5_BallLanding();
-      await this.phase6_MorphTransition(winnerTitle);
+      await this.phase6_LiftFeatureSettle(winnerTitle);
       
       console.log('🎉 V7.0 Complete!');
     } catch (error) {
@@ -846,6 +850,11 @@ export class LuxuryCoverflow {
     const innerOrbitRadius = wheelRadius + 5;
     let ballAngle = parseFloat(ball.dataset.angle) || 0;
     
+    // V7.1: Define safe boundaries (ball containment fix)
+    const wheelVisualRadius = wheelRadius + 70; // Max visible extent
+    const minSafeRadius = wheelRadius - 20; // Inner boundary
+    const maxSafeRadius = wheelVisualRadius; // Outer boundary
+    
     const statusEl = this.rouletteState.status;
     
     return new Promise(resolve => {
@@ -880,6 +889,9 @@ export class LuxuryCoverflow {
             currentRadius = outerOrbitRadius - (outerOrbitRadius - innerOrbitRadius) * easedSpiral;
           }
           
+          // V7.1: CRITICAL - Clamp to safe boundaries (prevents ball boundary violation)
+          currentRadius = gsap.utils.clamp(minSafeRadius, maxSafeRadius, currentRadius);
+          
           // Calculate position
           const rad = ballAngle * Math.PI / 180;
           const x = centerX + currentRadius * Math.cos(rad);
@@ -906,6 +918,7 @@ export class LuxuryCoverflow {
           else statusEl.textContent = '🎰 Almost there...';
         },
         onComplete: () => {
+          // V7.2: Ball naturally ends at orbital position (no snap)
           console.log('⚽ Ball orbit complete');
           resolve();
         }
@@ -920,7 +933,8 @@ export class LuxuryCoverflow {
   }
   
   /**
-   * Phase 5: Ball landing with natural bounces
+   * Phase 5: Ball landing - DETECT actual landing pocket
+   * V7.5: Fixed ball jump bug - ball stays where it lands
    */
   async phase5_BallLanding() {
     console.log('⚾ Phase 5: Ball Landing');
@@ -929,29 +943,67 @@ export class LuxuryCoverflow {
     const ball = this.rouletteState.ball;
     const highlight = this.rouletteState.ballHighlight;
     const shadow = this.rouletteState.ballShadow;
-    const winnerPocket = this.rouletteState.pockets[this.rouletteState.winnerPocketIndex];
+    const pockets = this.rouletteState.pockets;
     
-    const rect = winnerPocket.getBoundingClientRect();
-    const targetX = rect.left + rect.width / 2 - 25;
-    const targetY = rect.top + rect.height / 2 - 25;
+    // V7.5: DETECT which pocket ball is actually nearest to
+    const ballRect = ball.getBoundingClientRect();
+    const ballCenterX = ballRect.left + ballRect.width / 2;
+    const ballCenterY = ballRect.top + ballRect.height / 2;
+    
+    let nearestPocketIndex = 0;
+    let nearestDistance = Infinity;
+    
+    pockets.forEach((pocket, i) => {
+      const pocketRect = pocket.getBoundingClientRect();
+      const pocketCenterX = pocketRect.left + pocketRect.width / 2;
+      const pocketCenterY = pocketRect.top + pocketRect.height / 2;
+      
+      const distance = Math.sqrt(
+        Math.pow(ballCenterX - pocketCenterX, 2) + 
+        Math.pow(ballCenterY - pocketCenterY, 2)
+      );
+      
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestPocketIndex = i;
+      }
+    });
+    
+    // V7.5: UPDATE winner to actual landing pocket (no more jump!)
+    console.log(`🎯 Ball landed near pocket ${nearestPocketIndex} (was targeting ${this.rouletteState.winnerPocketIndex})`);
+    this.rouletteState.winnerPocketIndex = nearestPocketIndex;
+    
+    const winnerPocket = pockets[nearestPocketIndex];
     
     return new Promise(resolve => {
       const tl = gsap.timeline({ onComplete: resolve });
       
-      // Move to pocket center
+      // Fine-tune position to center of detected pocket
+      const rect = winnerPocket.getBoundingClientRect();
+      const targetX = rect.left + rect.width / 2 - 25;
+      const targetY = rect.top + rect.height / 2 - 25;
+      
+      // V7.5: Short, subtle adjustment (not a big jump)
       tl.to(ball, {
         left: targetX,
         top: targetY,
-        duration: 0.5,
+        duration: 0.15,
         ease: 'power2.out'
       });
-      tl.to([highlight, shadow], {
+      tl.to(highlight, {
         left: targetX + 3,
-        duration: 0.5,
-        ease: 'power2.out'
+        top: targetY - 22,
+        duration: 0.35,
+        ease: 'expo.out'
+      }, 0);
+      tl.to(shadow, {
+        left: targetX - 2,
+        top: targetY + 35,
+        duration: 0.35,
+        ease: 'expo.out'
       }, 0);
       
-      // Natural bounce sequence (physics-based heights)
+      // Natural bounce sequence - vertical only
       tl.to(ball, { top: targetY - 35, duration: 0.18, ease: 'power2.out' });
       tl.to(ball, { top: targetY, duration: 0.22, ease: 'bounce.out' });
       tl.to(ball, { top: targetY - 15, duration: 0.12, ease: 'power1.out' });
@@ -964,7 +1016,17 @@ export class LuxuryCoverflow {
         boxShadow: '0 0 120px rgba(255,215,0,1), 0 0 200px rgba(255,215,0,0.8)',
         duration: 0.12,
         repeat: 4,
-        yoyo: true
+        yoyo: true,
+        onComplete: () => {
+          // V7.4: Diagnostic logging
+          console.log('🔍 Ball Landing Diagnostics:');
+          console.log('  Winner Pocket Index:', this.rouletteState.winnerPocketIndex);
+          console.log('  Pocket-to-Card Map:', this.rouletteState.pocketToCardMap[this.rouletteState.winnerPocketIndex]);
+          console.log('  Ball final position:', { 
+            left: ball.style.left, 
+            top: ball.style.top 
+          });
+        }
       }, '-=0.5');
       
       // Fade out ball
@@ -979,11 +1041,11 @@ export class LuxuryCoverflow {
   }
   
   /**
-   * Phase 6: Layered morph transition
-   * Research: Microsoft Learn, YouTube morph transition tutorials
+   * Phase 6: Lift-Feature-Settle Animation
+   * Research: Apple HIG Motion Principles, Material Design Elevation
    */
-  async phase6_MorphTransition(winnerTitle) {
-    console.log('🔄 Phase 6: Layered Morph Transition');
+  async phase6_LiftFeatureSettle(winnerTitle) {
+    console.log('🎬 Phase 6: Lift-Feature-Settle');
     
     const pockets = this.rouletteState.pockets;
     const winnerPocket = pockets[this.rouletteState.winnerPocketIndex];
@@ -1017,65 +1079,144 @@ export class LuxuryCoverflow {
     const centerY = viewH / 2;
     
     return new Promise(resolve => {
-      // V7.0: Layered timeline with overlapping phases
+      // V7.3: Premium "Levitate & Morph" sequence
       const tl = gsap.timeline({ 
         defaults: { ease: 'power3.inOut' },
-        onComplete: () => this.restoreCarousel(winnerCardIndex).then(resolve)
+        onComplete: resolve // Don't call restoreCarousel - integrated below
       });
       
       // Phase A (0-0.6s): Fade out other pockets
       pockets.forEach((p, i) => {
         if (i !== this.rouletteState.winnerPocketIndex) {
-          tl.to(p, {
-            opacity: 0,
-            scale: 0.2,
-            duration: 0.6
-          }, 0);
+          tl.to(p, { opacity: 0, scale: 0.2, duration: 0.6 }, 0);
         }
       });
-      
-      // Fade rim
       tl.to(this.rouletteState.wheelRim, { opacity: 0, duration: 0.5 }, 0);
       
-      // Phase B (0.2-1.0s): Lift winner pocket
-      const pocketRect = winnerPocket.getBoundingClientRect();
-      const pocketCenterX = pocketRect.left + pocketRect.width / 2;
-      const pocketCenterY = pocketRect.top + pocketRect.height / 2;
-      const moveX = centerX - pocketCenterX;
-      const moveY = centerY - pocketCenterY - 50; // Lift up
+      // V7.3: Create absolute-positioned clone at screen center
+      const winnerClone = winnerPocket.cloneNode(true);
+      winnerClone.style.cssText = `
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        width: ${winnerPocket.offsetWidth}px;
+        height: ${winnerPocket.offsetHeight}px;
+        transform-origin: center center;
+        z-index: 10000;
+        opacity: 0;
+        pointer-events: none;
+      `;
+      overlay.appendChild(winnerClone);
       
-      tl.to(winnerPocket, {
-        x: `+=${moveX}`,
-        y: `+=${moveY}`,
-        scale: 2.5,
-        rotation: 0,
-        zIndex: 500,
-        boxShadow: '0 30px 80px rgba(0,0,0,0.6), 0 0 150px rgba(255,215,0,1)',
-        duration: 0.8
-      }, 0.2);
+      const computedStyle = window.getComputedStyle(winnerPocket);
+      const currentTransform = computedStyle.transform;
       
-      // Phase C (0.8-1.8s): Center and hold
-      tl.to(winnerPocket, {
-        y: `+=${50}`, // Lower to center
-        scale: 3.5,
-        duration: 1,
-        ease: 'power2.inOut'
-      }, 1.0);
+      // Apply initial tilted state
+      gsap.set(winnerClone, {
+        transform: `translate(-50%, -50%) ${currentTransform !== 'none' ? currentTransform : ''}`,
+        opacity: 1,
+        scale: 1
+      });
       
-      // Phase D (1.8-2.8s): Dramatic pause with glow pulse
-      tl.to(winnerPocket, {
-        boxShadow: '0 30px 80px rgba(0,0,0,0.6), 0 0 250px rgba(255,215,0,1), 0 0 400px rgba(255,215,0,0.5)',
-        duration: 0.6,
+      tl.to(winnerPocket, { opacity: 0, duration: 0.3 }, 0.2);
+      
+      // Phase B (0.6-1.2s): DRAMATIC LIFT with anticipation
+      tl.to(winnerClone, {
+        scale: 2.2,
+        boxShadow: '0 60px 120px rgba(0,0,0,0.8), 0 0 300px rgba(255,215,0,1), 0 0 600px rgba(255,170,0,0.6)',
+        filter: 'brightness(1.3) saturate(1.2)',
+        duration: 0.7,
+        ease: 'back.out(2.0)' // Stronger overshoot
+      }, 0.6);
+      
+      // Phase C (1.3-2.4s): CINEMATIC ZOOM + straighten
+      tl.to(winnerClone, {
+        transform: 'translate(-50%, -50%) rotate(0deg) scale(3.5)',
+        filter: 'brightness(1.4) saturate(1.3)',
+        duration: 1.1,
+        ease: 'expo.out' // Slow-mo deceleration
+      }, 1.3);
+      
+      // Phase D (2.4-3.0s): LUXURY SPOTLIGHT PULSE
+      tl.to(winnerClone, {
+        boxShadow: '0 80px 160px rgba(0,0,0,0.9), 0 0 400px rgba(255,215,0,1), 0 0 800px rgba(255,170,0,0.8), 0 0 1200px rgba(255,100,0,0.4)',
+        duration: 0.25,
         yoyo: true,
-        repeat: 1
-      }, 2.0);
+        repeat: 2,
+        ease: 'power1.inOut'
+      }, 2.4);
       
-      // Phase E (2.8-3.6s): Fade overlay
+      // Phase E (2.8-3.8s): DESCEND into carousel
+      // Prepare carousel position
+      this.currentIndex = winnerCardIndex;
+      this.updateAllItems(winnerCardIndex, 0);
+      
+      const winnerCard = this.items[winnerCardIndex];
+      const finalRect = winnerCard.getBoundingClientRect();
+      const finalX = finalRect.left + finalRect.width / 2;
+      const finalY = finalRect.top + finalRect.height / 2;
+      
+      // Reveal carousel cards - but hide winner card initially for cross-fade
+      gsap.set(this.items, { opacity: 0 });
+      
+      // MORPH: Descend clone to EXACT carousel card position + match size
+      tl.to(winnerClone, {
+        left: finalX,
+        top: finalY,
+        width: finalRect.width,
+        height: finalRect.height,
+        transform: 'translate(-50%, -50%) rotate(0deg) scale(1)',
+        filter: 'brightness(1.0) saturate(1.0)',
+        borderRadius: '8px',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+        duration: 1.0,
+        ease: 'expo.inOut'
+      }, 3.0);
+      
+      // CROSS-FADE: Clone OUT, winner card IN (true merge)
+      tl.to(winnerClone, {
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.in'
+      }, 3.6);
+      
+      tl.to(winnerCard, {
+        opacity: 1,
+        duration: 0.5,
+        ease: 'power2.out'
+      }, 3.6);
+      
+      // Other cards fade in after
+      const otherCards = this.items.filter((_, i) => i !== winnerCardIndex);
+      tl.to(otherCards, {
+        opacity: 1,
+        duration: 0.4,
+        stagger: 0.03
+      }, 3.8);
+      
+      // Fade overlay
       tl.to(overlay, {
         opacity: 0,
-        duration: 0.8,
+        duration: 0.6,
         ease: 'power2.in'
-      }, 3.0);
+      }, 3.8);
+      
+      // Winner pulse
+      tl.add(() => {
+        gsap.timeline()
+          .to(winnerCard, { scale: 1.15, duration: 0.3, ease: 'back.out(2)' })
+          .to(winnerCard, { scale: 1.0, duration: 0.2 });
+        
+        this.delay(400).then(() => {
+          const link = winnerCard.querySelector('.card-link') || winnerCard.querySelector('a[href]');
+          if (link) {
+            const title = winnerCard.dataset.title || 'Selected Project';
+            if (confirm(`🎉 ${title}!\n\nView this project?`)) {
+              window.location.href = link.href;
+            }
+          }
+        });
+      }, 4.2);
     });
   }
   
