@@ -12,6 +12,7 @@ node_modules/
 
 # Local one-off scripts
 audit.js
+scripts/amend-merge-message.ps1
 
 # Lighthouse reports (local profiling only)
 .lighthouse/
