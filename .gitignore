@@ -31,6 +31,12 @@ tmp-serve*.log
 playwright-report/
 test-results/
 
+# Local git worktrees (never commit)
+.worktrees/
+
+# Local verification artifacts
+verification-failure*.png
+
 
 
 # Restore tool artifacts

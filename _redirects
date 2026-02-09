@@ -16,6 +16,9 @@
 # BEGIN GENERATED (fix-seo)
 # URL normalization (301)
 /about/    /about    301
+/about/background/    /about/background    301
+/about/values/    /about/values    301
+/about/working-with-me/    /about/working-with-me    301
 /contact/    /contact    301
 /dashboard/    /dashboard    301
 /deep-dive/    /deep-dive    301
@@ -54,6 +57,9 @@
 
 # Clean URL rewrites (200) -> serve from /EN/
 /about    /EN/about    200
+/about/background    /EN/about/background    200
+/about/values    /EN/about/values    200
+/about/working-with-me    /EN/about/working-with-me    200
 /contact    /EN/contact    200
 /dashboard    /EN/dashboard    200
 /deep-dive    /EN/deep-dive    200
@@ -93,6 +99,12 @@
 # Prevent indexing /EN/* directly (301)
 /EN/about.html    /about    301
 /EN/about    /EN/about.html    200
+/EN/about/background.html    /about/background    301
+/EN/about/background    /EN/about/background.html    200
+/EN/about/values.html    /about/values    301
+/EN/about/values    /EN/about/values.html    200
+/EN/about/working-with-me.html    /about/working-with-me    301
+/EN/about/working-with-me    /EN/about/working-with-me.html    200
 /EN/contact.html    /contact    301
 /EN/contact    /EN/contact.html    200
 /EN/dashboard.html    /dashboard    301

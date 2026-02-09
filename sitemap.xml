@@ -7,6 +7,18 @@
     <loc>https://www.estivanayramia.com/about</loc>
   </url>
   <url>
+    <loc>https://www.estivanayramia.com/about/values</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/about/background</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/about/working-with-me</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.estivanayramia.com/ar/</loc>
   </url>
   <url>

@@ -4,6 +4,7 @@
   "rewrites": [
     { "source": "/", "destination": "/EN/index.html" },
     { "source": "/about", "destination": "/EN/about.html" },
+    { "source": "/about/:slug", "destination": "/EN/about/:slug.html" },
     { "source": "/contact", "destination": "/EN/contact.html" },
     { "source": "/dashboard", "destination": "/EN/dashboard.html" },
     { "source": "/hobbies-games", "destination": "/EN/hobbies-games.html" },

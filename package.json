@@ -10,6 +10,8 @@
     "build:js": "esbuild assets/js/site.js --bundle --minify --platform=browser --format=iife --target=es2018 --outfile=assets/js/site.min.js",
     "build:lazy": "esbuild assets/js/lazy-loader.js --minify --outfile=assets/js/lazy-loader.min.js",
     "build:hud": "esbuild assets/js/debugger-hud.js --bundle --minify --platform=browser --format=iife --target=es2018 --outfile=assets/js/debugger-hud.min.js",
+    "build:coverflow": "esbuild assets/js/carousel/CoverflowCarousel.js --bundle --minify --outfile=assets/js/carousel/CoverflowCarousel.min.js && esbuild assets/css/carousel/coverflow-luxury.css --minify --outfile=assets/css/carousel/coverflow-luxury.min.css",
+    "build:luxury-coverflow": "esbuild assets/js/carousel/luxury-coverflow.js --bundle --minify --platform=browser --format=esm --outfile=assets/js/carousel/luxury-coverflow.min.js && esbuild assets/css/components/luxury-coverflow.css --minify --outfile=assets/css/components/luxury-coverflow.min.css",
     "upload:facts": "node scripts/upload-site-facts.mjs",
     "verify:pages": "node tools/verify-pages-output.mjs",
     "sync:index": "node tools/sync-root-index.mjs",
@@ -78,7 +80,7 @@
   },
   "homepage": "https://github.com/estivanayramia/portfolio-site#readme",
   "dependencies": {
-    "gsap": "^3.14.2",
+    "gsap": "^3.12.5",
     "marked": "^17.0.1"
   }
 }
