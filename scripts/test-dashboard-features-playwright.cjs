@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const { spawn } = require('child_process');
+const http = require('http');
 const { chromium } = require('playwright');
 
 const DEFAULT_DASHBOARD_URL = `http://localhost:5500/dashboard?demo=1&cb=${Date.now()}`;
@@ -53,6 +54,32 @@ function isLocalhostUrl(url) {
   }
 }
 
+async function isPortServingHttp(port, timeoutMs = 750) {
+  return await new Promise((resolve) => {
+    const req = http.request(
+      {
+        host: '127.0.0.1',
+        port,
+        method: 'GET',
+        path: '/',
+        timeout: timeoutMs,
+      },
+      (res) => {
+        res.resume();
+        resolve(true);
+      }
+    );
+
+    req.on('timeout', () => {
+      try { req.destroy(); } catch {}
+      resolve(false);
+    });
+
+    req.on('error', () => resolve(false));
+    req.end();
+  });
+}
+
 async function startLocalServer(port = 5500) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, ['scripts/local-serve.js'], {
@@ -102,8 +129,14 @@ async function startLocalServer(port = 5500) {
 (async () => {
   let serverProc = null;
   if (AUTO_START_SERVER && isLocalhostUrl(DASHBOARD_URL)) {
-    console.log('Starting local server for dashboard test…');
-    serverProc = await startLocalServer(5500);
+    const port = 5500;
+    const alreadyServing = await isPortServingHttp(port);
+    if (alreadyServing) {
+      console.log(`Using existing local server on port ${port}…`);
+    } else {
+      console.log('Starting local server for dashboard test…');
+      serverProc = await startLocalServer(port);
+    }
   }
 
   const browser = await chromium.launch({ headless: true });
