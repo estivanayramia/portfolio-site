@@ -22,6 +22,167 @@ import { RouletteWheelEngine } from './roulette-wheel-engine.js';
 
 gsap.ticker.fps(60);
 
+const PERF_PROFILE_GLOBAL_KEY = 'LUXURY_PERF_PROFILE';
+let cachedPerfProfile = null;
+
+function safeMatchMedia(query) {
+  try {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return null;
+    return window.matchMedia(query);
+  } catch {
+    return null;
+  }
+}
+
+function getReducedMotionPreference() {
+  const mq = safeMatchMedia('(prefers-reduced-motion: reduce)');
+  return !!(mq && mq.matches);
+}
+
+export function computePerformanceProfile() {
+  if (cachedPerfProfile) return cachedPerfProfile;
+
+  const g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : {});
+  if (g && g[PERF_PROFILE_GLOBAL_KEY]) {
+    cachedPerfProfile = g[PERF_PROFILE_GLOBAL_KEY];
+    return cachedPerfProfile;
+  }
+
+  const reducedMotion = getReducedMotionPreference();
+
+  const cores = typeof navigator !== 'undefined' && Number.isFinite(navigator.hardwareConcurrency)
+    ? navigator.hardwareConcurrency
+    : null;
+  const memoryGb = typeof navigator !== 'undefined' && Number.isFinite(navigator.deviceMemory)
+    ? navigator.deviceMemory
+    : null;
+
+  const viewportW = typeof window !== 'undefined' && Number.isFinite(window.innerWidth)
+    ? window.innerWidth
+    : null;
+
+  const uaMobile = (() => {
+    try {
+      if (navigator.userAgentData && typeof navigator.userAgentData.mobile === 'boolean') {
+        return navigator.userAgentData.mobile;
+      }
+    } catch {
+      // ignore
+    }
+    try {
+      const ua = String(navigator.userAgent || '');
+      return /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
+    } catch {
+      return false;
+    }
+  })();
+
+  const smallViewport = typeof viewportW === 'number' ? viewportW < 600 : false;
+
+  let tier = 'standard';
+  if (reducedMotion) {
+    tier = 'reduced-motion';
+  } else {
+    let score = 0;
+    if (uaMobile || smallViewport) score -= 2;
+
+    if (typeof cores === 'number') {
+      if (cores >= 8) score += 2;
+      else if (cores >= 4) score += 1;
+      else score -= 1;
+    }
+
+    if (typeof memoryGb === 'number') {
+      if (memoryGb >= 8) score += 1;
+      else if (memoryGb <= 2) score -= 1;
+    }
+
+    if (score >= 3) tier = 'premium';
+    else if (score <= 0) tier = 'low';
+    else tier = 'standard';
+  }
+
+  cachedPerfProfile = {
+    tier,
+    metrics: {
+      reducedMotion,
+      cores,
+      memoryGb,
+      viewportW,
+      uaMobile,
+      smallViewport
+    }
+  };
+
+  if (g) g[PERF_PROFILE_GLOBAL_KEY] = cachedPerfProfile;
+
+  try {
+    if (typeof document !== 'undefined' && document.documentElement) {
+      const root = document.documentElement;
+      root.classList.remove('cf-tier-premium', 'cf-tier-standard', 'cf-tier-low', 'cf-tier-reduced-motion');
+      root.classList.add(`cf-tier-${tier}`);
+    }
+  } catch {
+    // ignore
+  }
+
+  return cachedPerfProfile;
+}
+
+function normalizeTier(tier) {
+  if (!tier) return null;
+  const t = String(tier).trim().toLowerCase();
+  if (t === 'premium' || t === 'standard' || t === 'low' || t === 'reduced-motion') return t;
+  return null;
+}
+
+function getTierRuntimeDefaults(tier) {
+  switch (tier) {
+    case 'premium':
+      return {
+        motionScale: 1,
+        animationDuration: 0.55,
+        staggerDelay: 0.02,
+        enableSmoothTracking: true,
+        enableScroll: true,
+        scrollSensitivity: 0.004,
+        rouletteMode: 'full'
+      };
+    case 'standard':
+      return {
+        motionScale: 0.85,
+        animationDuration: 0.45,
+        staggerDelay: 0.015,
+        enableSmoothTracking: true,
+        enableScroll: true,
+        scrollSensitivity: 0.0035,
+        rouletteMode: 'full'
+      };
+    case 'low':
+      return {
+        motionScale: 0.65,
+        animationDuration: 0.33,
+        staggerDelay: 0.005,
+        enableSmoothTracking: false,
+        enableScroll: true,
+        scrollSensitivity: 0.003,
+        rouletteMode: 'minimal'
+      };
+    case 'reduced-motion':
+      return {
+        motionScale: 0.35,
+        animationDuration: 0.22,
+        staggerDelay: 0,
+        enableSmoothTracking: false,
+        enableScroll: true,
+        scrollSensitivity: 0.003,
+        rouletteMode: 'minimal'
+      };
+    default:
+      return getTierRuntimeDefaults('standard');
+  }
+}
+
 export class LuxuryCoverflow {
   constructor(containerSelector, options = {}) {
     this.container = document.querySelector(containerSelector);
@@ -34,6 +195,9 @@ export class LuxuryCoverflow {
     this.items = Array.from(this.container.querySelectorAll('.coverflow-card'));
     
     this.config = {
+      initialIndex: 0,
+      performanceTier: null,
+      performanceAutoTune: true,
       autoplay: false,
       autoplayDelay: 5000,
       infiniteLoop: true,
@@ -50,8 +214,42 @@ export class LuxuryCoverflow {
       enableCasinoWheel: true,
       ...options
     };
-    
-    this.currentIndex = Math.floor(this.items.length / 2);
+
+    const reducedMotion = getReducedMotionPreference();
+    const tierFromOptions = normalizeTier(this.config.performanceTier);
+    const autoProfile = this.config.performanceAutoTune ? computePerformanceProfile() : null;
+    const autoTier = autoProfile ? normalizeTier(autoProfile.tier) : null;
+    const resolvedTier = reducedMotion ? 'reduced-motion' : (tierFromOptions || autoTier || 'premium');
+    const tierDefaults = getTierRuntimeDefaults(resolvedTier);
+
+    this.runtimeProfile = {
+      tier: resolvedTier,
+      motionScale: tierDefaults.motionScale,
+      rouletteMode: tierDefaults.rouletteMode,
+      metrics: autoProfile ? autoProfile.metrics : { reducedMotion }
+    };
+
+    this.config.animationDuration = tierDefaults.animationDuration;
+    this.config.staggerDelay = tierDefaults.staggerDelay;
+    this.config.enableSmoothTracking = tierDefaults.enableSmoothTracking;
+    this.config.enableScroll = tierDefaults.enableScroll;
+    this.config.scrollSensitivity = tierDefaults.scrollSensitivity;
+
+    if (reducedMotion) {
+      this.config.autoplay = false;
+    }
+
+    const initialIndexRaw = Number.isFinite(this.config.initialIndex)
+      ? Math.trunc(this.config.initialIndex)
+      : 0;
+    const totalItems = this.items.length;
+    if (totalItems > 0) {
+      this.currentIndex = this.config.infiniteLoop
+        ? ((initialIndexRaw % totalItems) + totalItems) % totalItems
+        : Math.max(0, Math.min(totalItems - 1, initialIndexRaw));
+    } else {
+      this.currentIndex = 0;
+    }
     this.isAnimating = false;
     this.autoplayTimer = null;
     this.navQueue = null;
@@ -254,17 +452,19 @@ export class LuxuryCoverflow {
     if (!this.config.enableScroll) return;
     let scrollDeltaX = 0, scrollTimeout;
     this.container.addEventListener('wheel', (e) => {
-      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) * 0.5 && Math.abs(e.deltaX) > 5) {
-        e.preventDefault();
-        scrollDeltaX += e.deltaX;
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-          if (Math.abs(scrollDeltaX) >= this.config.scrollThreshold) {
-            scrollDeltaX > 0 ? this.next() : this.prev();
-          }
-          scrollDeltaX = 0;
-        }, 80);
-      }
+      const absX = Math.abs(e.deltaX);
+      const absY = Math.abs(e.deltaY);
+      if (absY >= absX || absX <= 5) return;
+
+      e.preventDefault();
+      scrollDeltaX += e.deltaX;
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        if (Math.abs(scrollDeltaX) >= this.config.scrollThreshold) {
+          scrollDeltaX > 0 ? this.next() : this.prev();
+        }
+        scrollDeltaX = 0;
+      }, 80);
     }, { passive: false });
   }
   
@@ -272,7 +472,9 @@ export class LuxuryCoverflow {
     if (!this.config.enableSmoothTracking) return;
     let targetPosition = this.currentIndex, scrollEndTimeout;
     this.container.addEventListener('wheel', (e) => {
-      if (Math.abs(e.deltaX) <= Math.abs(e.deltaY) * 0.5 || Math.abs(e.deltaX) < 5) return;
+      const absX = Math.abs(e.deltaX);
+      const absY = Math.abs(e.deltaY);
+      if (absY >= absX || absX <= 5) return;
       e.preventDefault();
       targetPosition += e.deltaX * this.config.scrollSensitivity;
       if (this.config.infiniteLoop) {
@@ -380,6 +582,22 @@ export class LuxuryCoverflow {
     
     const winnerTitle = this.items[this.rouletteState.originalWinnerIndex].dataset.title || 'Selected!';
     console.log(`🎯 Winner: Card ${this.rouletteState.originalWinnerIndex} "${winnerTitle}"`);
+
+    const rouletteMode = this.runtimeProfile?.rouletteMode || 'full';
+    if (rouletteMode !== 'full') {
+      try {
+        this.goToSlide(this.rouletteState.originalWinnerIndex, Math.min(this.config.animationDuration, 0.25));
+        const winnerEl = this.items[this.rouletteState.originalWinnerIndex];
+        if (winnerEl) {
+          gsap.fromTo(winnerEl, { scale: 1 }, { scale: 1.03, duration: 0.16, yoyo: true, repeat: 1, ease: 'power1.out' });
+        }
+      } finally {
+        this.cleanupCasinoWheel();
+        this.rouletteState.isActive = false;
+        this.isAnimating = false;
+      }
+      return;
+    }
     
     try {
       await this.phase1_CreatePerspectiveOverlay();
@@ -388,7 +606,7 @@ export class LuxuryCoverflow {
       await this.phase4_SpinWithOrbit();
       
       // V7.5: Increased settle delay (ensure wheel FULLY stops before ball landing)
-      await this.delay(400);
+      await this.delay(Math.round(400 * (this.runtimeProfile?.motionScale || 1)));
       
       await this.phase5_BallLanding();
       await this.phase6_LiftFeatureSettle(winnerTitle);
@@ -445,8 +663,10 @@ export class LuxuryCoverflow {
     this.rouletteState.status = status;
     
     return new Promise(resolve => {
-      gsap.to(overlay, { opacity: 1, duration: 0.5 });
-      gsap.to(this.items, { opacity: 0, duration: 0.5, onComplete: resolve });
+      const s = this.runtimeProfile?.motionScale || 1;
+      const d = Math.max(0.18, 0.5 * s);
+      gsap.to(overlay, { opacity: 1, duration: d });
+      gsap.to(this.items, { opacity: 0, duration: d, onComplete: resolve });
     });
   }
   
@@ -1380,5 +1600,5 @@ export class LuxuryCoverflow {
 
 document.addEventListener('DOMContentLoaded', () => {
   const el = document.querySelector('[data-luxury-coverflow-auto]');
-  if (el) window.luxuryCoverflow = new LuxuryCoverflow('[data-luxury-coverflow-auto]');
+  if (el) window.luxuryCoverflow = new LuxuryCoverflow('[data-luxury-coverflow-auto]', { initialIndex: 0, performanceTier: null });
 });

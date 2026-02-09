@@ -314,7 +314,10 @@
     import LuxuryCoverflow from '/assets/js/carousel/luxury-coverflow.js';
     
     document.addEventListener('DOMContentLoaded', () => {
+        const perfTier = window.LUXURY_PERF_PROFILE?.tier ?? null;
         const carousel = new LuxuryCoverflow('#luxury-portfolio-carousel', {
+            initialIndex: 0,
+            performanceTier: perfTier,
             autoplay: false,
             enableKeyboard: true,
             enableMouse: true,
