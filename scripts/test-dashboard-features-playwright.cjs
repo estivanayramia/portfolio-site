@@ -184,6 +184,11 @@ async function startLocalServer(port = 5500) {
 
     await ensureDashboardVisible(page);
 
+    // V12 Diagnostics must be available globally on the dashboard page.
+    await page.waitForFunction(() => {
+      return typeof window.__SavonieTelemetry === 'object' && typeof window.__SavonieHUD === 'object';
+    }, null, { timeout: 15000 });
+
     // Buttons/tabs must be clickable
     await clickTab(page, 'errors');
     await clickTab(page, 'console');

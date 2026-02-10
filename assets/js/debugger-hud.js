@@ -142,15 +142,189 @@
     "Errors",
     "Performance",
     "Layout",
-    "Storage"
+    "Storage",
+    "Accessibility",
+    "Security"
   ];
 
   let activeTab = "Summary";
   let lastActiveEl = null;
   let layoutScanResults = null;
+  let a11yResults = null;
+  let a11yLoading = false;
+  let securityResults = null;
+  let securityLoading = false;
   let mountRoot = document.body;
   let useBackdrop = true;
   let embedded = false;
+
+  function loadScriptOnce(src, testGlobalName) {
+    return new Promise((resolve, reject) => {
+      try {
+        if (testGlobalName && window[testGlobalName]) return resolve(true);
+        const existing = Array.from(document.scripts || []).find((s) => String(s && s.src).includes(src));
+        if (existing) {
+          const done = () => resolve(true);
+          const fail = () => reject(new Error(`Failed to load ${src}`));
+          existing.addEventListener("load", done, { once: true });
+          existing.addEventListener("error", fail, { once: true });
+          // If it already loaded, resolve on next tick.
+          setTimeout(() => {
+            if (testGlobalName && window[testGlobalName]) resolve(true);
+          }, 0);
+          return;
+        }
+
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.crossOrigin = "anonymous";
+        s.onload = () => resolve(true);
+        s.onerror = () => reject(new Error(`Failed to load ${src}`));
+        document.head.appendChild(s);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  function analyzeCsp(cspValue) {
+    const out = { present: !!cspValue, directives: {}, issues: [] };
+    if (!cspValue) {
+      out.issues.push("CSP header missing");
+      return out;
+    }
+
+    try {
+      const parts = String(cspValue)
+        .split(";")
+        .map((p) => p.trim())
+        .filter(Boolean);
+      for (const p of parts) {
+        const segs = p.split(/\s+/).filter(Boolean);
+        const name = segs.shift();
+        if (!name) continue;
+        out.directives[name] = segs;
+      }
+
+      const raw = String(cspValue);
+      if (/\bunsafe-inline\b/i.test(raw)) out.issues.push("CSP allows 'unsafe-inline'");
+      if (/\bunsafe-eval\b/i.test(raw)) out.issues.push("CSP allows 'unsafe-eval'");
+      if (/\*\s*$/m.test(raw) || /\s\*\s/.test(raw)) out.issues.push("CSP contains wildcard (*)");
+    } catch {
+      out.issues.push("CSP parse failed");
+    }
+
+    return out;
+  }
+
+  function scoreA11y(violations) {
+    try {
+      const weights = { critical: 6, serious: 4, moderate: 2, minor: 1 };
+      let points = 100;
+      for (const v of violations || []) {
+        const impact = v && v.impact ? String(v.impact) : "minor";
+        const nodes = Array.isArray(v && v.nodes) ? v.nodes.length : 1;
+        points -= (weights[impact] || 1) * nodes;
+      }
+      return Math.max(0, Math.min(100, Math.round(points)));
+    } catch {
+      return null;
+    }
+  }
+
+  async function runA11yAudit() {
+    const started = Date.now();
+    const axeSrc = "https://unpkg.com/axe-core@4.10.0/axe.min.js";
+    await loadScriptOnce(axeSrc, "axe");
+    if (!window.axe || typeof window.axe.run !== "function") {
+      throw new Error("axe-core did not initialize (window.axe missing)");
+    }
+
+    const results = await window.axe.run(document, {
+      runOnly: { type: "tag", values: ["wcag2aa", "wcag2a", "best-practice"] },
+      resultTypes: ["violations", "incomplete"],
+      rules: {
+        // Keep a sane default set; callers can expand later.
+        "color-contrast": { enabled: true },
+        "label": { enabled: true },
+        "heading-order": { enabled: true },
+        "landmark-one-main": { enabled: true }
+      }
+    });
+
+    const violations = (results && results.violations) || [];
+    const score = scoreA11y(violations);
+    const summary = {
+      scannedAt: Date.now(),
+      durationMs: Date.now() - started,
+      score,
+      violationCount: violations.length,
+      byImpact: violations.reduce((acc, v) => {
+        const k = v && v.impact ? String(v.impact) : "unknown";
+        acc[k] = (acc[k] || 0) + 1;
+        return acc;
+      }, {})
+    };
+
+    return {
+      summary,
+      violations: violations.map((v) => ({
+        id: v.id,
+        impact: v.impact,
+        help: v.help,
+        description: v.description,
+        helpUrl: v.helpUrl,
+        tags: v.tags,
+        nodes: (v.nodes || []).slice(0, 20).map((n) => ({
+          target: n.target,
+          html: n.html,
+          failureSummary: n.failureSummary
+        }))
+      }))
+    };
+  }
+
+  async function runSecurityScan() {
+    const started = Date.now();
+    const res = await fetch("/", { method: "GET", cache: "no-store" });
+    const get = (h) => {
+      try { return res.headers.get(h); } catch { return null; }
+    };
+
+    const headers = {
+      "content-security-policy": get("content-security-policy"),
+      "strict-transport-security": get("strict-transport-security"),
+      "x-content-type-options": get("x-content-type-options"),
+      "x-frame-options": get("x-frame-options"),
+      "referrer-policy": get("referrer-policy"),
+      "permissions-policy": get("permissions-policy")
+    };
+
+    const csp = analyzeCsp(headers["content-security-policy"]);
+
+    const missing = Object.entries(headers)
+      .filter(([, v]) => !v)
+      .map(([k]) => k);
+
+    let score = 100;
+    // Missing headers are high signal.
+    score -= missing.length * 12;
+    // CSP issues are also meaningful.
+    score -= (csp.issues || []).length * 10;
+    score = Math.max(0, Math.min(100, Math.round(score)));
+
+    return {
+      scannedAt: Date.now(),
+      durationMs: Date.now() - started,
+      status: res.status,
+      url: res.url,
+      score,
+      missing,
+      headers,
+      csp
+    };
+  }
 
   // ============================================
   // FIX #1: HARDEN HUD INPUT HANDLING
@@ -244,10 +418,11 @@
       case "copy-issue":
         try {
           const issueIdx = parseInt(target.dataset.issueIndex, 10);
-          const issues = st.issues || [];
+          const exported = tel.export({ includeAll: false });
+          const issues = (exported && exported.issues) ? exported.issues : [];
           if (issueIdx >= 0 && issueIdx < issues.length) {
             const issue = issues[issueIdx];
-            const report = { schema: "savonie.issue.v1", issue, ctx: tel.export({ includeAll: false }).ctx };
+            const report = { schema: "savonie.issue.v1", issue, ctx: exported ? exported.ctx : null };
             navigator.clipboard.writeText(JSON.stringify(report, null, 2));
             showToast("Issue copied");
           }
@@ -258,6 +433,70 @@
 
       case "run-layout-scan":
         layoutScanResults = runLayoutScan();
+        render();
+        break;
+
+      case "run-a11y":
+      case "run-a11y-audit":
+        if (a11yLoading) return;
+        a11yLoading = true;
+        try {
+          target.disabled = true;
+          target.textContent = "Running…";
+        } catch {}
+        showToast("Running accessibility audit…");
+
+        runA11yAudit()
+          .then((results) => {
+            a11yResults = results;
+            try { tel.push({ kind: "a11y", level: "info", msg: "a11y.audit", data: { score: a11yResults && a11yResults.summary ? a11yResults.summary.score : null } }); } catch {}
+            showToast("Accessibility audit complete");
+          })
+          .catch((err) => {
+            console.error("A11y audit failed:", err);
+            showToast("A11y audit failed");
+          })
+          .finally(() => {
+            a11yLoading = false;
+            render();
+          });
+        break;
+
+      case "clear-a11y":
+        a11yResults = null;
+        a11yLoading = false;
+        render();
+        break;
+
+      case "run-security":
+      case "run-security-scan":
+        if (securityLoading) return;
+        securityLoading = true;
+        try {
+          target.disabled = true;
+          target.textContent = "Scanning…";
+        } catch {}
+        showToast("Scanning security headers…");
+
+        runSecurityScan()
+          .then((results) => {
+            securityResults = results;
+            try { tel.push({ kind: "security", level: "info", msg: "security.scan", data: { score: securityResults && securityResults.score } }); } catch {}
+            showToast("Security scan complete");
+          })
+          .catch((err) => {
+            console.error("Security scan failed:", err);
+            showToast("Security scan failed");
+          })
+          .finally(() => {
+            securityLoading = false;
+            render();
+          });
+        break;
+
+      case "clear-security":
+        securityResults = null;
+        securityLoading = false;
         render();
         break;
     }
@@ -494,11 +733,20 @@
     const card = el("div", { class: "savonie-card" });
 
     const kv = el("div", { class: "savonie-kv" });
+    const lcpSel = p.lcpAttribution && p.lcpAttribution.selector ? String(p.lcpAttribution.selector) : "n/a";
+    const lcpUrl = p.lcpAttribution && p.lcpAttribution.url ? String(p.lcpAttribution.url) : "n/a";
+    const clsSel = p.clsAttribution && p.clsAttribution.selector ? String(p.clsAttribution.selector) : "n/a";
+    const inpSel = p.inpAttribution && p.inpAttribution.selector ? String(p.inpAttribution.selector) : "n/a";
     const pairs = [
       ["CLS", p.cls == null ? "n/a" : String(p.cls)],
       ["LCP", p.lcp == null ? "n/a" : `${Math.round(p.lcp)}ms`],
       ["INP", p.inp == null ? "n/a" : `${Math.round(p.inp)}ms`],
-      ["Long tasks", String(p.longTasks || 0)]
+      ["Long tasks", String(p.longTasks || 0)],
+      ["Long task max", p.longTaskMax == null ? "n/a" : `${Math.round(p.longTaskMax)}ms`],
+      ["LCP element", lcpSel],
+      ["LCP resource", lcpUrl],
+      ["CLS source", clsSel],
+      ["INP target", inpSel]
     ];
     for (const [k, v] of pairs) {
       kv.appendChild(el("div", { class: "savonie-k", text: k }));
@@ -594,6 +842,89 @@
     return wrap;
   }
 
+  function renderA11y() {
+    const wrap = el("div", { class: "savonie-list" });
+
+    const actions = el("div", { class: "savonie-card" });
+    actions.appendChild(el("div", { text: "On-demand only. Loads axe-core from unpkg when you click Run." }));
+    const row = el("div", { class: "savonie-row" });
+    const btnRun = el("button", { class: "savonie-btn", type: "button", "data-action": "run-a11y", text: a11yLoading ? "Running..." : "Run audit" });
+    if (a11yLoading) btnRun.disabled = true;
+    row.appendChild(btnRun);
+    row.appendChild(el("button", { class: "savonie-btn secondary", type: "button", "data-action": "clear-a11y", text: "Clear" }));
+    actions.appendChild(row);
+    wrap.appendChild(actions);
+
+    if (!a11yResults) {
+      wrap.appendChild(el("div", { class: "savonie-card", text: "No accessibility results yet." }));
+      return wrap;
+    }
+
+    const summary = el("div", { class: "savonie-card" });
+    const s = a11yResults.summary || {};
+    const kv = el("div", { class: "savonie-kv" });
+    const pairs = [
+      ["Score", s.score == null ? "n/a" : `${s.score}/100`],
+      ["Violations", String(s.violationCount || 0)],
+      ["Duration", `${Math.round(s.durationMs || 0)}ms`]
+    ];
+    for (const [k, v] of pairs) {
+      kv.appendChild(el("div", { class: "savonie-k", text: k }));
+      kv.appendChild(el("div", { class: "savonie-v", text: v }));
+    }
+    summary.appendChild(kv);
+    wrap.appendChild(summary);
+
+    const detail = el("div", { class: "savonie-card" });
+    const pre = el("div", { class: "savonie-mono" });
+    pre.textContent = JSON.stringify(a11yResults, null, 2);
+    detail.appendChild(pre);
+    wrap.appendChild(detail);
+    return wrap;
+  }
+
+  function renderSecurity() {
+    const wrap = el("div", { class: "savonie-list" });
+
+    const actions = el("div", { class: "savonie-card" });
+    actions.appendChild(el("div", { text: "On-demand only. Fetches / and inspects response headers." }));
+    const row = el("div", { class: "savonie-row" });
+    const btnScan = el("button", { class: "savonie-btn", type: "button", "data-action": "run-security", text: securityLoading ? "Scanning..." : "Run scan" });
+    if (securityLoading) btnScan.disabled = true;
+    row.appendChild(btnScan);
+    row.appendChild(el("button", { class: "savonie-btn secondary", type: "button", "data-action": "clear-security", text: "Clear" }));
+    actions.appendChild(row);
+    wrap.appendChild(actions);
+
+    if (!securityResults) {
+      wrap.appendChild(el("div", { class: "savonie-card", text: "No security scan results yet." }));
+      return wrap;
+    }
+
+    const summary = el("div", { class: "savonie-card" });
+    const kv = el("div", { class: "savonie-kv" });
+    const pairs = [
+      ["Score", securityResults.score == null ? "n/a" : `${securityResults.score}/100`],
+      ["Status", String(securityResults.status)],
+      ["Missing headers", String((securityResults.missing || []).length)],
+      ["CSP issues", String((securityResults.csp && securityResults.csp.issues ? securityResults.csp.issues.length : 0))]
+    ];
+    for (const [k, v] of pairs) {
+      kv.appendChild(el("div", { class: "savonie-k", text: k }));
+      kv.appendChild(el("div", { class: "savonie-v", text: v }));
+    }
+    summary.appendChild(kv);
+    wrap.appendChild(summary);
+
+    const detail = el("div", { class: "savonie-card" });
+    const pre = el("div", { class: "savonie-mono" });
+    pre.textContent = JSON.stringify(securityResults, null, 2);
+    detail.appendChild(pre);
+    wrap.appendChild(detail);
+
+    return wrap;
+  }
+
   function render() {
     const st = tel.getState();
     renderTabs();
@@ -607,6 +938,8 @@
     if (activeTab === "Performance") content = renderPerf(st);
     if (activeTab === "Layout") content = renderLayout();
     if (activeTab === "Storage") content = renderStorage();
+    if (activeTab === "Accessibility") content = renderA11y();
+    if (activeTab === "Security") content = renderSecurity();
 
     body.appendChild(content || el("div", { class: "savonie-card", text: "Not implemented." }));
   }

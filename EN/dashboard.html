@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="20251125-001">
+  <meta name="build-version" content="20260210-41ac12b">
   <title>Error Dashboard - Estivan Ayramia</title>
   <link rel="stylesheet" href="/assets/css/dashboard.css?v=36c2000">
   <script src="/assets/js/hud-debug-patch.js"></script>
@@ -333,6 +333,104 @@
       </div>
     </div>
   </div>
+
+  <!-- V12 Diagnostics Telemetry (always available on dashboard) -->
+  <script src="/assets/js/telemetry-core.min.js"></script>
+  <script>
+    (function () {
+      try {
+        if (!window.__SavonieDiagnosticsConsent) {
+          const KEYS = {
+            consent: 'site_diagnostics_consent',
+            upload: 'site_diagnostics_upload',
+            asked: 'site_diagnostics_asked'
+          };
+
+          const storage = {
+            type: (function () {
+              try {
+                const k = '__ls_test__';
+                localStorage.setItem(k, '1');
+                localStorage.removeItem(k);
+                return 'localStorage';
+              } catch {
+                return 'cookie';
+              }
+            })(),
+            set: function (k, v) {
+              if (this.type === 'localStorage') {
+                try { localStorage.setItem(k, v); } catch {}
+                return;
+              }
+              try { document.cookie = encodeURIComponent(k) + '=' + encodeURIComponent(v) + '; path=/; SameSite=Lax'; } catch {}
+            },
+            get: function (k) {
+              if (this.type === 'localStorage') {
+                try { return localStorage.getItem(k); } catch { return null; }
+              }
+              try {
+                const m = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(k) + '=([^;]*)'));
+                return m ? decodeURIComponent(m[1]) : null;
+              } catch {
+                return null;
+              }
+            }
+          };
+
+          const getState = function () {
+            return {
+              consent: storage.get(KEYS.consent),
+              upload: storage.get(KEYS.upload) === 'on',
+              asked: storage.get(KEYS.asked) === '1',
+              storage: storage.type
+            };
+          };
+
+          window.__SavonieDiagnosticsConsent = {
+            get: getState,
+            set: function (o) {
+              try {
+                if (o && typeof o.consent === 'string') storage.set(KEYS.consent, o.consent);
+                if (o && typeof o.upload === 'boolean') storage.set(KEYS.upload, o.upload ? 'on' : 'off');
+                storage.set(KEYS.asked, '1');
+              } catch {}
+            },
+            revoke: function () {
+              try {
+                storage.set(KEYS.consent, 'denied');
+                storage.set(KEYS.upload, 'off');
+                storage.set(KEYS.asked, '1');
+                window.__SavonieTelemetry && window.__SavonieTelemetry.disable && window.__SavonieTelemetry.disable();
+              } catch {}
+            },
+            clearData: function () {
+              try { window.__SavonieTelemetry && window.__SavonieTelemetry.clear && window.__SavonieTelemetry.clear(); } catch {}
+            }
+          };
+
+          // Default to granted for authenticated dashboard usage
+          if (!storage.get(KEYS.consent)) {
+            storage.set(KEYS.consent, 'granted');
+            storage.set(KEYS.upload, 'off');
+            storage.set(KEYS.asked, '1');
+          }
+        }
+
+        // Enable telemetry so breadcrumbs/network/perf hooks attach immediately.
+        if (window.__SavonieTelemetry && typeof window.__SavonieTelemetry.enable === 'function') {
+          window.__SavonieTelemetry.enable({ upload: false, mode: 'dev' });
+        }
+      } catch {}
+    })();
+  </script>
+  <script src="/assets/js/debugger-hud.min.js"></script>
+  <script>
+    (function () {
+      try {
+        if (window.__SavonieHUD && !window.Savonie) window.Savonie = window.__SavonieHUD;
+      } catch {}
+    })();
+  </script>
   
   <script src="/assets/js/dashboard.js?v=36c2000"></script>
 </body>

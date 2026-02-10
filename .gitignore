@@ -10,6 +10,9 @@
 ALL_CODE_COPY.txt
 node_modules/
 
+# Git worktree directories should never be tracked
+.worktrees/
+
 # Local one-off scripts
 audit.js
 scripts/amend-merge-message.ps1

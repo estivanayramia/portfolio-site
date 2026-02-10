@@ -250,6 +250,7 @@ function loadScript(src) {
     try {
       const shouldBust =
         src === '/assets/js/telemetry-core.js' ||
+        src === '/assets/js/telemetry-core.min.js' ||
         src === '/assets/js/debugger-hud.min.js';
 
       if (shouldBust) {
@@ -372,7 +373,7 @@ async function loadDiagnosticsAssets() {
       return;
   }
   setDiagnosticsStatus('Loading diagnostics…', 'loading');
-  await loadScript('/assets/js/telemetry-core.js');
+  await loadScript('/assets/js/telemetry-core.min.js');
   ensureDashboardConsent();
   window.__SavonieTelemetry?.enable?.({ upload: false, mode: 'dev' });
   await loadScript(`/assets/js/debugger-hud.min.js?v=${__DIAGNOSTICS_ASSET_VERSION}`);

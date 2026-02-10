@@ -4,10 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redirect Debugger</title>
+    <script>
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            const isStandalone =
+                params.has('forcedebugreal') ||
+                params.get('forcedebugreal') === '1' ||
+                params.get('forcedebugreal') === 'true' ||
+                params.has('standalone') ||
+                params.get('standalone') === '1' ||
+                params.get('standalone') === 'true';
+
+            // MODE 2 (default): preserve historical behavior.
+            // MODE 1 (standalone): allow using this page directly for debugging.
+            if (!isStandalone) {
+                try { window.location.replace('/dashboard#redirects'); } catch {}
+            }
+
+            // Expose for the UI (non-sensitive).
+            window.__REDIRECT_DEBUG_STANDALONE__ = isStandalone;
+        })();
+    </script>
+    <noscript>
         <meta http-equiv="refresh" content="0; url=/dashboard#redirects">
-        <script>
-            try { window.location.replace('/dashboard#redirects'); } catch {}
-        </script>
+    </noscript>
     <style>
         body {
             font-family: 'Courier New', monospace;

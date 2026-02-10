@@ -5,7 +5,7 @@
   const MAX = {
     events: 1000,
     issues: 200,
-    breadcrumbs: 50
+    breadcrumbs: 100
   };
 
   const LIMITS = {
@@ -19,6 +19,104 @@
 
   const SENSITIVE_KEY_RE = /(token|auth|password|secret|session|cookie|credit|card|ssn|cvv|email)/i;
 
+  function getDomNodeLabel(node) {
+    try {
+      if (!node || typeof node !== "object") return null;
+      const el = node instanceof Element ? node : null;
+      if (!el) return null;
+      const tag = (el.tagName || "").toLowerCase();
+      const id = el.id ? `#${clampStr(el.id, 80)}` : "";
+      const cls = el.classList && el.classList.length
+        ? `.${Array.from(el.classList).slice(0, 4).map((c) => clampStr(c, 40)).join(".")}`
+        : "";
+      const out = `${tag}${id}${cls}`;
+      return out ? clampStr(out, 180) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // JSON-safe sanitizer intended for breadcrumbs.
+  // Goals:
+  // - never throw on JSON.stringify
+  // - avoid emitting placeholder sentinel strings that look like broken data
+  // - reduce DOM/Event objects to small, useful summaries
+  function sanitizeForJSON(value, maxDepth = 3, maxKeys = 50, seen = new WeakSet(), depth = 0) {
+    try {
+      if (value == null) return value;
+      const t = typeof value;
+      if (t === "string") {
+        const s = String(value);
+        // Strip debug sentinels from other serializers (they break v12 expectations).
+        // Avoid embedding bracketed sentinel literals in source/minified bundles.
+        if (s && s.length <= 20 && s[0] === "[" && s[s.length - 1] === "]") {
+          const inner = s.slice(1, -1);
+          if (inner === "Circular" || inner === "Object" || inner === "Array" || inner === "Unserializable") return undefined;
+        }
+        return clampStr(s, LIMITS.str);
+      }
+      if (t === "number" || t === "boolean") return value;
+      if (t === "function") return null;
+
+      if (value instanceof Error) {
+        return {
+          name: clampStr(value.name, 80),
+          message: clampStr(value.message, LIMITS.msg),
+          stack: clampStr(value.stack || "", LIMITS.stack)
+        };
+      }
+
+      if (typeof Node !== "undefined" && value instanceof Node) {
+        return getDomNodeLabel(value) || (value.nodeName ? String(value.nodeName) : "Node");
+      }
+
+      if (typeof Event !== "undefined" && value instanceof Event) {
+        return value && typeof value.type === "string" ? `[Event ${clampStr(value.type, 80)}]` : "Event";
+      }
+
+      if (t !== "object") return clampStr(value, LIMITS.str);
+
+      if (depth >= maxDepth) return undefined;
+      if (seen.has(value)) return undefined;
+      seen.add(value);
+
+      if (Array.isArray(value)) {
+        const out = [];
+        for (let i = 0; i < Math.min(value.length, 50); i++) {
+          const cleaned = sanitizeForJSON(value[i], maxDepth, maxKeys, seen, depth + 1);
+          if (cleaned !== undefined) out.push(cleaned);
+        }
+        return out;
+      }
+
+      // Try to condense common event-like objects.
+      const maybeType = value && typeof value.type === "string" ? clampStr(value.type, 80) : null;
+      const maybeTarget = value && value.target ? getDomNodeLabel(value.target) : null;
+      const isEventLike = maybeType && ("target" in value || "timeStamp" in value);
+      if (isEventLike) {
+        return {
+          type: maybeType,
+          target: maybeTarget || undefined,
+          timeStamp: typeof value.timeStamp === "number" ? value.timeStamp : undefined
+        };
+      }
+
+      const out = {};
+      const keys = Object.keys(value).slice(0, maxKeys);
+      for (const k of keys) {
+        if (SENSITIVE_KEY_RE.test(k)) {
+          out[k] = "[Redacted]";
+          continue;
+        }
+        const cleaned = sanitizeForJSON(value[k], maxDepth, maxKeys, seen, depth + 1);
+        if (cleaned !== undefined) out[k] = cleaned;
+      }
+      return out;
+    } catch {
+      return null;
+    }
+  }
+
   function now() {
     return Date.now();
   }
@@ -30,44 +128,12 @@
     return s.slice(0, maxLen) + "…";
   }
 
-  function safeStringify(value, depth = LIMITS.objDepth, seen = new Set()) {
+  function safeStringify(value, depth = LIMITS.objDepth) {
     try {
-      if (value == null) return value;
-      if (typeof value === "string") return clampStr(value, LIMITS.str);
-      if (typeof value === "number" || typeof value === "boolean") return value;
-
-      if (value instanceof Error) {
-        return {
-          name: clampStr(value.name, 80),
-          message: clampStr(value.message, LIMITS.msg),
-          stack: clampStr(value.stack || "", LIMITS.stack)
-        };
-      }
-
-      if (typeof value !== "object") return clampStr(value, LIMITS.str);
-
-      if (seen.has(value)) return "[Circular]";
-      seen.add(value);
-
-      if (Array.isArray(value)) {
-        if (depth <= 0) return "[Array]";
-        return value.slice(0, 50).map((v) => safeStringify(v, depth - 1, seen));
-      }
-
-      if (depth <= 0) return "[Object]";
-
-      const out = {};
-      const keys = Object.keys(value).slice(0, LIMITS.objKeys);
-      for (const k of keys) {
-        if (SENSITIVE_KEY_RE.test(k)) {
-          out[k] = "[Redacted]";
-          continue;
-        }
-        out[k] = safeStringify(value[k], depth - 1, seen);
-      }
-      return out;
+      const cleaned = sanitizeForJSON(value, depth, LIMITS.objKeys);
+      return cleaned === undefined ? null : cleaned;
     } catch {
-      return "[Unserializable]";
+      return null;
     }
   }
 
@@ -128,6 +194,20 @@
     if (arr.length > max) arr.splice(0, arr.length - max);
   }
 
+  function describeElement(el) {
+    try {
+      if (!(el instanceof Element)) return null;
+      const tag = (el.tagName || "").toLowerCase();
+      const id = el.id ? `#${clampStr(el.id, 80)}` : "";
+      const cls = el.classList && el.classList.length
+        ? `.${Array.from(el.classList).slice(0, 4).map((c) => clampStr(c, 40)).join(".")}`
+        : "";
+      return clampStr(`${tag}${id}${cls}`, 180);
+    } catch {
+      return null;
+    }
+  }
+
   const subs = new Set();
 
   const state = {
@@ -146,7 +226,11 @@
       cls: null,
       lcp: null,
       inp: null,
-      longTasks: 0
+      longTasks: 0,
+      lcpAttribution: null,
+      clsAttribution: null,
+      inpAttribution: null,
+      longTaskMax: null
     },
 
     installed: {
@@ -160,7 +244,11 @@
   };
 
   function getCtx() {
-    return safeStringify({
+    return sanitizeForJSON(getCtxRaw(), 4);
+  }
+
+  function getCtxRaw() {
+    return {
       url: window.location.href,
       referrer: document.referrer || "",
       buildVersion: state.buildVersion,
@@ -184,7 +272,7 @@
             usedJSHeapSize: performance.memory.usedJSHeapSize
           }
         : null
-    });
+    };
   }
 
   function notify(entry) {
@@ -197,13 +285,14 @@
 
   function push(entry) {
     // Enforce schema + caps
+    const rawCtx = entry && entry.ctx ? entry.ctx : getCtxRaw();
     const e = {
       t: typeof entry.t === "number" ? entry.t : now(),
       kind: clampStr(entry.kind || "debug", 40),
       level: entry.level == null ? null : clampStr(entry.level, 10),
       msg: clampStr(entry.msg || "", LIMITS.msg),
-      data: safeStringify(entry.data),
-      ctx: entry.ctx ? safeStringify(entry.ctx) : getCtx()
+      data: (entry && entry.kind === "breadcrumb") ? sanitizeForJSON(entry.data) : safeStringify(entry.data),
+      ctx: (entry && entry.kind === "breadcrumb") ? sanitizeForJSON(rawCtx, 4) : safeStringify(rawCtx)
     };
 
     ringPush(state.events, e, MAX.events);
@@ -249,9 +338,16 @@
       msg: clampStr(base.msg || "issue", LIMITS.msg),
       level: base.level == null ? null : clampStr(base.level, 10),
       url: normalizeUrl(base.url || window.location.href),
-      data: safeStringify(base.data),
+      data: sanitizeForJSON(base.data, 4),
       stack: base.stack ? clampStr(base.stack, LIMITS.stack) : null,
-      breadcrumbs: crumbs
+      // Store a snapshot of the last N breadcrumbs, sanitized and de-referenced.
+      breadcrumbs: crumbs.map((bc) => ({
+        t: bc && typeof bc.t === "number" ? bc.t : now(),
+        kind: clampStr(bc && bc.kind ? bc.kind : "breadcrumb", 40),
+        level: bc && bc.level != null ? clampStr(bc.level, 10) : null,
+        msg: clampStr(bc && bc.msg ? bc.msg : "", LIMITS.msg),
+        data: sanitizeForJSON(bc ? bc.data : null, 3)
+      }))
     };
 
     ringPush(state.issues, issue, MAX.issues);
@@ -293,11 +389,11 @@
   let lastUploadTry = 0;
 
   function makeUploadPayload() {
-    return safeStringify({
+    return sanitizeForJSON({
       buildVersion: state.buildVersion,
       ctx: getCtx(),
       issues: state.issues.slice(-50).map((i) =>
-        safeStringify({
+        sanitizeForJSON({
           signature: i.signature,
           count: i.count,
           firstSeen: i.firstSeen,
@@ -309,9 +405,9 @@
           stack: i.stack,
           data: i.data,
           breadcrumbs: i.breadcrumbs
-        })
+        }, 4)
       )
-    });
+    }, 4);
   }
 
   function scheduleUpload() {
@@ -326,11 +422,121 @@
     }, 3000);
   }
 
+  function mapIssueType(issue) {
+    try {
+      const k = String(issue && issue.kind ? issue.kind : "").toLowerCase();
+      const msg = String(issue && issue.msg ? issue.msg : "").toLowerCase();
+      if (msg.includes("unhandledrejection")) return "unhandled_rejection";
+      if (k === "network") return "network_error";
+      if (k === "resource") return "resource_error";
+      if (k === "perf") return "performance_issue";
+      return "javascript_error";
+    } catch {
+      return "javascript_error";
+    }
+  }
+
+  function breadcrumbToDashboardCrumb(bc) {
+    try {
+      const msg = String(bc && bc.msg ? bc.msg : "");
+      const rawData = bc && bc.data && typeof bc.data === "object" ? bc.data : {};
+      const data = sanitizeForJSON(rawData, 3) || {};
+
+      let type = "info";
+      if (msg.startsWith("nav.")) type = "navigation";
+      else if (msg.startsWith("console.")) type = "console";
+      else if (msg.startsWith("network.")) type = "network";
+      else if (msg.startsWith("ui.")) type = "user";
+      else if (msg.startsWith("doc.")) type = "navigation";
+
+      const selector = data && (data.selector || data.tag || data.id || data.cls)
+        ? clampStr(
+            data.selector ||
+              `${data.tag || ""}${data.id ? `#${data.id}` : ""}${data.cls ? `.${String(data.cls).split(/\s+/).filter(Boolean).slice(0, 4).join(".")}` : ""}`,
+            200
+          )
+        : "";
+
+      const url = data && data.url ? normalizeUrl(String(data.url)) : "";
+      const message = clampStr(
+        data && data.text ? String(data.text) :
+        data && data.key ? `${msg} ${data.key}` :
+        msg,
+        240
+      );
+
+      return {
+        type,
+        timestamp: typeof bc.t === "number" ? bc.t : now(),
+        message,
+        selector: selector || undefined,
+        url: url || undefined
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  function makeWorkerErrorReport(issue) {
+    const ctx = getCtx();
+    const crumbs = (issue && Array.isArray(issue.breadcrumbs) ? issue.breadcrumbs : [])
+      .slice(-20)
+      .map(breadcrumbToDashboardCrumb)
+      .filter(Boolean);
+
+    return {
+      type: mapIssueType(issue),
+      message: clampStr(issue && issue.msg ? issue.msg : "issue", 1000),
+      filename: null,
+      line: null,
+      col: null,
+      stack: issue && issue.stack ? clampStr(issue.stack, LIMITS.stack) : null,
+      url: clampStr(issue && issue.url ? issue.url : normalizeUrl(window.location.href), 500),
+      viewport: (() => {
+        try {
+          return JSON.stringify(ctx && ctx.viewport ? ctx.viewport : { w: window.innerWidth, h: window.innerHeight });
+        } catch {
+          return null;
+        }
+      })(),
+      version: state.buildVersion,
+      breadcrumbs: (() => {
+        try {
+          return JSON.stringify(crumbs);
+        } catch {
+          return null;
+        }
+      })()
+    };
+  }
+
+  let lastUploadedSig = null;
+  let lastUploadedSeen = 0;
+
+  function pickIssueToUpload() {
+    try {
+      if (!state.issues.length) return null;
+      const newest = state.issues.slice().sort((a, b) => (b.lastSeen || 0) - (a.lastSeen || 0));
+      for (const it of newest) {
+        if (!it) continue;
+        if (typeof it.lastSeen !== "number") continue;
+        if (it.lastSeen > lastUploadedSeen) return it;
+        if (it.signature && it.signature !== lastUploadedSig && it.lastSeen === lastUploadedSeen) return it;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
   async function uploadIssues(onUnload) {
     if (!state.enabled || !state.upload) return;
     lastUploadTry = now();
 
-    const payload = makeUploadPayload();
+    const issue = pickIssueToUpload();
+    if (!issue) return;
+
+    const payload = makeWorkerErrorReport(issue);
     let json = "";
     try {
       json = JSON.stringify(payload);
@@ -339,8 +545,8 @@
     }
 
     // Hard cap (client-side) to avoid log abuse.
-    if (json.length > 256 * 1024) {
-      json = json.slice(0, 256 * 1024);
+    if (json.length > 64 * 1024) {
+      json = json.slice(0, 64 * 1024);
     }
 
     const url = "/api/error-report";
@@ -349,7 +555,11 @@
     try {
       if (onUnload && navigator.sendBeacon) {
         const ok = navigator.sendBeacon(url, new Blob([json], { type: "application/json" }));
-        if (ok) state.lastUploadAt = now();
+        if (ok) {
+          state.lastUploadAt = now();
+          lastUploadedSig = issue.signature || null;
+          lastUploadedSeen = issue.lastSeen || lastUploadedSeen;
+        }
         return;
       }
 
@@ -360,7 +570,11 @@
         keepalive: !!onUnload
       });
 
-      if (res.ok) state.lastUploadAt = now();
+      if (res.ok) {
+        state.lastUploadAt = now();
+        lastUploadedSig = issue.signature || null;
+        lastUploadedSeen = issue.lastSeen || lastUploadedSeen;
+      }
     } catch {}
   }
 
@@ -446,6 +660,56 @@
 
     push({ kind: "breadcrumb", level: "info", msg: "nav.load", data: { url: normalizeUrl(window.location.href) } });
 
+    // Navigation breadcrumbs (Sentry-style) – minimal, safe.
+    try {
+      const origPushState = history.pushState;
+      const origReplaceState = history.replaceState;
+
+      if (origPushState && !origPushState.__savonieWrapped) {
+        history.pushState = function () {
+          try {
+            const to = (() => {
+              try {
+                const u = arguments && arguments.length >= 3 ? arguments[2] : null;
+                return u == null ? null : normalizeUrl(String(u));
+              } catch {
+                return null;
+              }
+            })();
+            push({ kind: "breadcrumb", level: "info", msg: "nav.pushState", data: { url: to || normalizeUrl(window.location.href) } });
+          } catch {}
+          return origPushState.apply(this, arguments);
+        };
+        history.pushState.__savonieWrapped = true;
+      }
+
+      if (origReplaceState && !origReplaceState.__savonieWrapped) {
+        history.replaceState = function () {
+          try {
+            const to = (() => {
+              try {
+                const u = arguments && arguments.length >= 3 ? arguments[2] : null;
+                return u == null ? null : normalizeUrl(String(u));
+              } catch {
+                return null;
+              }
+            })();
+            push({ kind: "breadcrumb", level: "info", msg: "nav.replaceState", data: { url: to || normalizeUrl(window.location.href) } });
+          } catch {}
+          return origReplaceState.apply(this, arguments);
+        };
+        history.replaceState.__savonieWrapped = true;
+      }
+    } catch {}
+
+    window.addEventListener("popstate", () => {
+      push({ kind: "breadcrumb", level: "info", msg: "nav.popstate", data: { url: normalizeUrl(window.location.href) } });
+    });
+
+    window.addEventListener("hashchange", () => {
+      push({ kind: "breadcrumb", level: "info", msg: "nav.hashchange", data: { url: normalizeUrl(window.location.href) } });
+    });
+
     document.addEventListener("click", (ev) => {
       const t = ev.target;
       if (!(t instanceof Element)) return;
@@ -496,7 +760,9 @@
       const wrapped = function (...args) {
         try {
           const level = m === "log" ? "info" : m;
-          const text = args.map((a) => (typeof a === "string" ? a : JSON.stringify(safeStringify(a)))).join(" ");
+          const text = args
+            .map((a) => (typeof a === "string" ? a : JSON.stringify(sanitizeForJSON(a, 2))))
+            .join(" ");
           const shouldCapture = state.mode === "dev" || m === "warn" || m === "error";
 
           if (state.enabled && shouldCapture) {
@@ -645,9 +911,27 @@
           for (const e of list.getEntries()) {
             if (!state.enabled) continue;
             state.perf.longTasks += 1;
+            state.perf.longTaskMax = Math.max(state.perf.longTaskMax || 0, e.duration || 0);
             if (e.duration > 200) {
-              push({ kind: "perf", level: "warn", msg: "perf.longtask", data: { dur: e.duration } });
-              recordIssue({ kind: "perf", level: "warn", msg: "perf.longtask", data: { dur: e.duration } });
+              const attrib = (() => {
+                try {
+                  const a = Array.isArray(e.attribution) ? e.attribution[0] : null;
+                  if (!a) return null;
+                  return safeStringify({
+                    containerType: a.containerType,
+                    containerName: a.containerName,
+                    containerSrc: a.containerSrc,
+                    name: a.name,
+                    entryType: a.entryType,
+                    startTime: a.startTime,
+                    duration: a.duration
+                  });
+                } catch {
+                  return null;
+                }
+              })();
+              push({ kind: "perf", level: "warn", msg: "perf.longtask", data: { dur: e.duration, attribution: attrib } });
+              recordIssue({ kind: "perf", level: "warn", msg: "perf.longtask", data: { dur: e.duration, attribution: attrib } });
             }
           }
         });
@@ -662,11 +946,22 @@
         const clsObs = new PerformanceObserver((list) => {
           for (const e of list.getEntries()) {
             if (!e.hadRecentInput) cls += e.value;
+
+            try {
+              const src = e.sources && e.sources.length ? e.sources[0] : null;
+              const node = src && src.node ? src.node : null;
+              if (node) {
+                state.perf.clsAttribution = {
+                  selector: describeElement(node) || null,
+                  value: src.value
+                };
+              }
+            } catch {}
           }
           state.perf.cls = cls;
           if (state.enabled && cls > 0.1) {
-            push({ kind: "perf", level: "warn", msg: "perf.cls", data: { cls } });
-            recordIssue({ kind: "perf", level: "warn", msg: "perf.cls", data: { cls } });
+            push({ kind: "perf", level: "warn", msg: "perf.cls", data: { cls, attribution: state.perf.clsAttribution } });
+            recordIssue({ kind: "perf", level: "warn", msg: "perf.cls", data: { cls, attribution: state.perf.clsAttribution } });
           }
         });
         clsObs.observe({ type: "layout-shift", buffered: true });
@@ -683,9 +978,17 @@
           if (!last) return;
           lcp = last.startTime;
           state.perf.lcp = lcp;
+
+          try {
+            state.perf.lcpAttribution = {
+              selector: describeElement(last.element) || null,
+              url: last.url ? normalizeUrl(String(last.url)) : null
+            };
+          } catch {}
+
           if (state.enabled && lcp > 2500) {
-            push({ kind: "perf", level: "warn", msg: "perf.lcp", data: { lcp } });
-            recordIssue({ kind: "perf", level: "warn", msg: "perf.lcp", data: { lcp } });
+            push({ kind: "perf", level: "warn", msg: "perf.lcp", data: { lcp, attribution: state.perf.lcpAttribution } });
+            recordIssue({ kind: "perf", level: "warn", msg: "perf.lcp", data: { lcp, attribution: state.perf.lcpAttribution } });
           }
         });
         lcpObs.observe({ type: "largest-contentful-paint", buffered: true });
@@ -701,13 +1004,21 @@
           for (const e of entries) {
             if (typeof e.duration === "number") {
               inp = Math.max(inp || 0, e.duration);
+
+              try {
+                const target = e.target || null;
+                state.perf.inpAttribution = {
+                  selector: describeElement(target) || null,
+                  type: e.name || null
+                };
+              } catch {}
             }
           }
           if (inp != null) {
             state.perf.inp = inp;
             if (state.enabled && inp > 200) {
-              push({ kind: "perf", level: "warn", msg: "perf.inp", data: { inp } });
-              recordIssue({ kind: "perf", level: "warn", msg: "perf.inp", data: { inp } });
+              push({ kind: "perf", level: "warn", msg: "perf.inp", data: { inp, attribution: state.perf.inpAttribution } });
+              recordIssue({ kind: "perf", level: "warn", msg: "perf.inp", data: { inp, attribution: state.perf.inpAttribution } });
             }
           }
         });
@@ -750,7 +1061,7 @@
     state.events = [];
     state.issues = [];
     state.breadcrumbs = [];
-    state.perf = { cls: null, lcp: null, inp: null, longTasks: 0 };
+    state.perf = { cls: null, lcp: null, inp: null, longTasks: 0, lcpAttribution: null, clsAttribution: null, inpAttribution: null, longTaskMax: null };
     try {
       sessionStorage.removeItem("site_diagnostics_state");
     } catch {}
@@ -759,20 +1070,57 @@
 
   function exportJSON(opts) {
     const includeAll = !!(opts && opts.includeAll);
-    return safeStringify({
+    const sanitizeEntry = (e) => {
+      try {
+        if (!e || typeof e !== "object") return null;
+        return {
+          t: typeof e.t === "number" ? e.t : null,
+          kind: e.kind ? clampStr(e.kind, 40) : null,
+          level: e.level == null ? null : clampStr(e.level, 10),
+          msg: clampStr(e.msg || "", LIMITS.msg),
+          data: sanitizeForJSON(e.data, 3),
+          ctx: sanitizeForJSON(e.ctx, 3)
+        };
+      } catch {
+        return null;
+      }
+    };
+
+    const sanitizeIssue = (i) => {
+      try {
+        if (!i || typeof i !== "object") return null;
+        return {
+          signature: i.signature ? clampStr(i.signature, 500) : null,
+          count: typeof i.count === "number" ? i.count : 1,
+          firstSeen: typeof i.firstSeen === "number" ? i.firstSeen : null,
+          lastSeen: typeof i.lastSeen === "number" ? i.lastSeen : null,
+          kind: i.kind ? clampStr(i.kind, 40) : null,
+          msg: clampStr(i.msg || "issue", LIMITS.msg),
+          level: i.level == null ? null : clampStr(i.level, 10),
+          url: i.url ? clampStr(i.url, 500) : null,
+          data: sanitizeForJSON(i.data, 4),
+          stack: i.stack ? clampStr(i.stack, LIMITS.stack) : null,
+          breadcrumbs: Array.isArray(i.breadcrumbs) ? i.breadcrumbs.map(sanitizeEntry).filter(Boolean) : []
+        };
+      } catch {
+        return null;
+      }
+    };
+
+    return {
       state: {
-        enabled: state.enabled,
-        upload: state.upload,
+        enabled: !!state.enabled,
+        upload: !!state.upload,
         mode: state.mode,
         buildVersion: state.buildVersion,
         lastUploadAt: state.lastUploadAt
       },
-      ctx: getCtx(),
-      perf: state.perf,
-      issues: state.issues,
-      breadcrumbs: state.breadcrumbs,
-      events: includeAll ? state.events : state.events.slice(-200)
-    });
+      ctx: sanitizeForJSON(getCtxRaw(), 4),
+      perf: sanitizeForJSON(state.perf, 4),
+      issues: state.issues.map(sanitizeIssue).filter(Boolean),
+      breadcrumbs: state.breadcrumbs.map(sanitizeEntry).filter(Boolean),
+      events: (includeAll ? state.events : state.events.slice(-200)).map(sanitizeEntry).filter(Boolean)
+    };
   }
 
   function subscribe(fn) {
@@ -784,7 +1132,7 @@
   }
 
   function getState() {
-    return safeStringify(state);
+    return state;
   }
 
   function setConsentFlags({ sessionOnly }) {
@@ -804,6 +1152,7 @@
     getState,
     recordIssue,
     setConsentFlags,
+    sanitizeForJSON,
     _internal: {
       redactHeaders,
       safeStringify,
