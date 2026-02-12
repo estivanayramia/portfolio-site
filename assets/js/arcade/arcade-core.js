@@ -1,6 +1,6 @@
 import { ACHIEVEMENTS } from './achievements-defs.js';
 
-// Global Sound System
+// Global Sound System (Enhanced: Site-wide mute + M key + iframe broadcast)
 window.ArcadeSound = {
     muted: false,
     muteAll() {
@@ -8,12 +8,14 @@ window.ArcadeSound = {
         localStorage.setItem('arcadeMuted', '1');
         this.updateIcon();
         this.applyToGames();
+        this.broadcastToIframes();
     },
     unmuteAll() {
         this.muted = false;
         localStorage.removeItem('arcadeMuted');
         this.updateIcon();
         this.applyToGames();
+        this.broadcastToIframes();
     },
     isMuted() {
         return this.muted || localStorage.getItem('arcadeMuted') === '1';
@@ -33,6 +35,19 @@ window.ArcadeSound = {
     applyToGames() {
         window.dispatchEvent(new CustomEvent('arcade-sound-change', { detail: { muted: this.isMuted() } }));
     },
+    broadcastToIframes() {
+        // Broadcast mute state to ALL iframes (third-party games)
+        document.querySelectorAll('iframe').forEach(iframe => {
+            try {
+                iframe.contentWindow.postMessage({ 
+                    type: 'arcade-mute', 
+                    muted: this.isMuted() 
+                }, '*');
+            } catch(e) {
+                // Cross-origin iframe: silently fail (expected for third-party games)
+            }
+        });
+    },
     init() {
         this.muted = this.isMuted();
         this.updateIcon();
@@ -47,12 +62,29 @@ window.ArcadeSound = {
             }
         });
 
+        // Add 'M' key global mute toggle
+        document.addEventListener('keydown', (e) => {
+            if (e.key.toLowerCase() === 'm' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                // Ignore if typing in input/textarea
+                const activeEl = document.activeElement;
+                if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+                    return;
+                }
+                this.toggle();
+            }
+        });
+
+        // Broadcast mute state to iframes on load (for third-party games)
+        window.addEventListener('load', () => {
+            setTimeout(() => this.broadcastToIframes(), 500);
+        });
+
         // Initial UI update
         if (window.ArcadeAchievements) window.ArcadeAchievements.updateUI();
     }
 };
 
-// Universal Pause
+// Universal Pause (P key)
 document.addEventListener('keydown', (e) => {
     if (e.key.toLowerCase() === 'p') {
         // Find active game and toggle pause
@@ -62,7 +94,7 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Achievements System
+// Achievements System (Enhanced: Strict validation + better error handling)
 window.ArcadeAchievements = {
     _filter: 'all',
     setFilter(filter) {
@@ -72,11 +104,23 @@ window.ArcadeAchievements = {
         return this._filter || 'all';
     },
     unlock(id) {
+        // STRICT VALIDATION: Fail loudly on invalid IDs
+        if (!id || typeof id !== 'string') {
+            console.error('[ArcadeAchievements] Invalid ID:', id);
+            return;
+        }
+
         const def = ACHIEVEMENTS[id];
-        if (!def) return;
+        if (!def) {
+            console.error(`[ArcadeAchievements] Achievement not found: "${id}". Check achievements-defs.js for valid IDs.`);
+            return;
+        }
 
         const unlocked = this.getUnlocked();
-        if (unlocked.includes(id)) return; // Already unlocked
+        if (unlocked.includes(id)) {
+            // Already unlocked, silently return
+            return;
+        }
 
         unlocked.push(id);
         localStorage.setItem('arcade_achievements', JSON.stringify(unlocked));
@@ -86,34 +130,71 @@ window.ArcadeAchievements = {
     },
     getUnlocked() {
         try {
-            return JSON.parse(localStorage.getItem('arcade_achievements') || '[]');
-        } catch { return []; }
+            const raw = localStorage.getItem('arcade_achievements');
+            return JSON.parse(raw || '[]');
+        } catch { 
+            return []; 
+        }
     },
     showToast(def) {
         const icon = (def && def.icon) || '🏆';
         const title = (def && (def.title || def.name)) || 'Achievement';
         const description = (def && (def.description || def.desc)) || '';
+        
         const toast = document.createElement('div');
-        toast.className = 'fixed bottom-4 right-4 bg-[#212842] text-white p-4 rounded-xl shadow-2xl z-[9999] flex items-center gap-4 transition-all duration-500 transform translate-y-10 opacity-0';
-        toast.innerHTML = `
-            <div class="text-3xl">${icon}</div>
-            <div>
-                <div class="font-bold text-xs text-yellow-400 uppercase tracking-wider">Achievement Unlocked!</div>
-                <div class="font-bold text-sm">${title}</div>
-                <div class="text-xs opacity-80">${description}</div>
-            </div>
+        toast.className = 'achievement-notification show';
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #212842;
+            color: #e1d4c2;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(225, 212, 194, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 99999;
+            min-width: 300px;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         `;
+        
+        toast.innerHTML = `
+            <div class="achievement-icon" style="font-size: 2.5rem;">${icon}</div>
+            <div class="achievement-content" style="flex: 1;">
+                <div class="achievement-title" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; margin-bottom: 2px;">Achievement Unlocked!</div>
+                <div class="achievement-name" style="font-weight: 700; font-size: 1.1rem; margin-bottom: 2px;">${title}</div>
+                <div class="achievement-desc" style="font-size: 0.85rem; opacity: 0.8;">${description}</div>
+            </div>
+            <button class="achievement-close" style="background: transparent; border: none; color: inherit; font-size: 1.5rem; cursor: pointer; opacity: 0.5; padding: 0 5px;">×</button>
+        `;
+        
         document.body.appendChild(toast);
 
         // Animate in
         requestAnimationFrame(() => {
-            toast.classList.remove('translate-y-10', 'opacity-0');
+            toast.style.transform = 'translateX(0)';
         });
 
+        // Close button
+        const closeBtn = toast.querySelector('.achievement-close');
+        if (closeBtn) {
+            closeBtn.onclick = () => {
+                toast.style.transform = 'translateX(120%)';
+                setTimeout(() => toast.remove(), 400);
+            };
+        }
+
+        // Auto remove after 4s
         setTimeout(() => {
-            toast.classList.add('translate-y-10', 'opacity-0');
-            setTimeout(() => toast.remove(), 500);
-        }, 3000);
+            if (document.body.contains(toast)) {
+                toast.style.transform = 'translateX(120%)';
+                setTimeout(() => toast.remove(), 400);
+            }
+        }, 4000);
     },
     updateUI() {
         window.dispatchEvent(new CustomEvent('arcade-achievements-update'));
