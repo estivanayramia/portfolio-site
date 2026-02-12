@@ -48,25 +48,15 @@ for (const fp of expectedFiles) {
 const redirects = fs.readFileSync(redirectsPath, "utf8");
 dbg(`Read _redirects (${redirects.length} chars)`);
 
-// Root must be explicitly rewritten to /index.html, otherwise a catch-all rule
-// can swallow the homepage and send everything into the 404 flow.
-const rootToIndexRe = /^\/\s+\/index\.html\s+200\s*$/m;
-if (!rootToIndexRe.test(redirects)) {
+// Catch-all rules are SPA-style and will swallow real files on this site.
+// Reject them to prevent redirect loops and missing-asset behavior.
+const catchAllRe = /^\/\*\s+/m;
+if (catchAllRe.test(redirects)) {
   if (DEBUG) {
-    const lines = findMatchingLines(redirects, /^\/\s+/m);
-    dbg(`Root rule candidates: ${lines.slice(0, 10).join(' | ')}`);
+    const lines = findMatchingLines(redirects, catchAllRe);
+    dbg(`Catch-all candidates: ${lines.slice(0, 10).join(' | ')}`);
   }
-  fail("_redirects must include '/  /index.html  200' to prevent catch-all from swallowing '/'.");
-}
-
-// /EN/404 must be reachable without redirecting to itself.
-const en404RewriteRe = /^\/EN\/404\s+\/EN\/404\.html\s+200\s*$/m;
-if (!en404RewriteRe.test(redirects)) {
-  if (DEBUG) {
-    const lines = findMatchingLines(redirects, /^\/EN\/404/m);
-    dbg(`/EN/404 candidates: ${lines.slice(0, 10).join(' | ')}`);
-  }
-  fail("_redirects must include '/EN/404  /EN/404.html  200' to prevent Pages redirect loops.");
+  fail("_redirects must NOT include a catch-all rule ('/* ...'). This site is not an SPA.");
 }
 
 // Guard against a broad root rewrite. In Cloudflare Pages, this has been observed

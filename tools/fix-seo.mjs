@@ -203,8 +203,6 @@ function generateRedirects() {
         // '/EN/   /    301',
         '',
         '# Root is served by /index.html; no root rewrite (avoids /about -> /EN/about redirects)',
-        '# Explicitly rewrite / to /index.html so catch-all does not swallow the homepage',
-        '/    /index.html    200',
         '',
         '# 1. Canonical Redirects (301) - Enforce clean URLs',
         '/index.html                  /                            301',
@@ -216,14 +214,7 @@ function generateRedirects() {
         '',
     ];
 
-    const footerLines = [
-        '',
-        '# 404 page must be reachable without triggering clean-url canonicalization loops',
-        '/EN/404    /EN/404.html    200',
-        '# Catch-all 404 (served with 200 for Pages/Workers compatibility)',
-        '/*    /EN/404.html    200',
-        '',
-    ];
+    const footerLines = [''];
 
     const updated = `${headerLines.join('\n')}\n${BEGIN}\n${generatedLines.join('\n')}\n${END}${footerLines.join('\n')}`;
 
