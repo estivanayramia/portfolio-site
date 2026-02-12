@@ -1,17 +1,20 @@
-name = "portfolio-worker"
+name = "portfolio-api-debugger"
 main = "debugger-worker.js"
 compatibility_date = "2024-01-01"
 workers_dev = true
 
 # Debugger/ingestion worker owns ONLY these endpoints.
 # IMPORTANT: do not add broad patterns like /api/* here.
-# NOTE: www subdomain handled by Pages (apex only here to prevent redirect loops)
 routes = [
   { pattern = "estivanayramia.com/api/error-report", zone_name = "estivanayramia.com" },
+
   { pattern = "estivanayramia.com/api/errors*", zone_name = "estivanayramia.com" },
+
   { pattern = "estivanayramia.com/api/auth", zone_name = "estivanayramia.com" },
+
   { pattern = "estivanayramia.com/api/health", zone_name = "estivanayramia.com" },
-  { pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" }
+
+  { pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" },
 ]
 
 # D1 Database for error monitoring
@@ -27,7 +30,7 @@ id = "e723b1dbdc9a40a6b6ccd04764108d6c"
 
 [vars]
 # Used for diagnostics/identification when debugging.
-SERVICE_NAME = "portfolio-worker"
+SERVICE_NAME = "portfolio-api-debugger"
 
 # Rate limiting for auth + ingestion + session
 RATE_LIMIT_MAX = "10"

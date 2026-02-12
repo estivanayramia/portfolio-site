@@ -1,0 +1,25 @@
+{
+  "urls_to_test": [
+    "http://estivanayramia.com",
+    "https://estivanayramia.com",
+    "http://www.estivanayramia.com",
+    "https://www.estivanayramia.com",
+    "https://estivanayramia.com/about",
+    "https://www.estivanayramia.com/about",
+    "https://estivanayramia.com/projects/",
+    "https://estivanayramia.com/api/health",
+    "https://estivanayramia.com/nonexistent-page"
+  ],
+  "expected_behavior": {
+    "http://estivanayramia.com": "301 to https://estivanayramia.com",
+    "https://estivanayramia.com": "200 OK, loads homepage",
+    "http://www.estivanayramia.com": "301 to https://www.estivanayramia.com, then 301 to https://estivanayramia.com",
+    "https://www.estivanayramia.com": "301 to https://estivanayramia.com",
+    "https://estivanayramia.com/about": "200 OK (internal rewrite to /EN/about)",
+    "https://www.estivanayramia.com/about": "301 to https://estivanayramia.com/about",
+    "https://estivanayramia.com/projects/": "200 OK",
+    "https://estivanayramia.com/api/health": "200 OK, JSON response",
+    "https://estivanayramia.com/nonexistent-page": "200 OK (serves /EN/404.html)"
+  },
+  "failure_threshold": "More than 3 redirects = LOOP DETECTED"
+}

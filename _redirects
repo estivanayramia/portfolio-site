@@ -14,6 +14,30 @@
 /favicon.ico                 /assets/img/favicon.ico      200
 
 # BEGIN GENERATED (fix-seo)
+# Legacy slug migrations (301)
+/projects/logistics    /projects/loreal-maps-campaign    301
+/projects/logistics/    /projects/loreal-maps-campaign    301
+/projects/logistics.html    /projects/loreal-maps-campaign    301
+/projects/discipline    /projects/franklin-templeton-concept    301
+/projects/discipline/    /projects/franklin-templeton-concept    301
+/projects/discipline.html    /projects/franklin-templeton-concept    301
+/projects/documentation    /projects/endpoint-linkedin-campaign    301
+/projects/documentation/    /projects/endpoint-linkedin-campaign    301
+/projects/documentation.html    /projects/endpoint-linkedin-campaign    301
+/projects/multilingual    /projects/endpoint-elosity-video    301
+/projects/multilingual/    /projects/endpoint-elosity-video    301
+/projects/multilingual.html    /projects/endpoint-elosity-video    301
+/projects/competitive-strategy    /projects/endpoint-competitive-playbook    301
+/projects/competitive-strategy/    /projects/endpoint-competitive-playbook    301
+/projects/competitive-strategy.html    /projects/endpoint-competitive-playbook    301
+/projects/conflict    /projects/endpoint-competitive-playbook    301
+/projects/conflict/    /projects/endpoint-competitive-playbook    301
+/projects/conflict.html    /projects/endpoint-competitive-playbook    301
+/project-logistics.html    /projects/loreal-maps-campaign    301
+/project-logistics.html/    /projects/loreal-maps-campaign    301
+/project-conflict.html    /projects/endpoint-competitive-playbook    301
+/project-conflict.html/    /projects/endpoint-competitive-playbook    301
+
 # URL normalization (301)
 /about/    /about    301
 /about/background/    /about/background    301
@@ -174,5 +198,5 @@
 /EN/projects/portfolio.html    /projects/portfolio    301
 /EN/projects/portfolio    /EN/projects/portfolio.html    200
 # END GENERATED (fix-seo)
-# Catch-all: serve custom 404 page (200 rewrite — Workers doesn't support 404 status)
+# Catch-all 404 (served with 200 for Pages/Workers compatibility)
 /*    /EN/404.html    200

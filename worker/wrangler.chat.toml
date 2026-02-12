@@ -5,9 +5,9 @@ workers_dev = true
 
 # Chat worker owns ONLY the chat endpoints.
 # IMPORTANT: do not add broad patterns like /api/* here.
-# NOTE: www subdomain handled by Pages (apex only here to prevent redirect loops)
 routes = [
   { pattern = "estivanayramia.com/api/chat", zone_name = "estivanayramia.com" },
+
   # Optional: friendly alias for chat
   { pattern = "estivanayramia.com/chat", zone_name = "estivanayramia.com" }
 ]
