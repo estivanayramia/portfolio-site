@@ -2,26 +2,6 @@
   "name": "portfolio-worker",
   "compatibility_date": "2026-02-12",
   "assets": {
-    "directory": ".",
-    "exclude": [
-      "node_modules/**",
-      ".git/**",
-      ".github/**",
-      ".wrangler/**",
-      "worker/**",
-      ".vscode/**",
-      ".lighthouse/**",
-      "lighthouse-results/**",
-      "playwright-report/**",
-      "test-results/**",
-      "*.log",
-      "*.md",
-      ".gitignore",
-      ".env*",
-      "package.json",
-      "package-lock.json",
-      "wrangler.jsonc",
-      "tsconfig.json"
-    ]
+    "directory": "./dist"
   }
 }

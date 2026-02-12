@@ -68,3 +68,6 @@ visual-diff/
 .reports.bak/
 .reports/
 history.txt
+
+# Deployment staging output
+dist/
