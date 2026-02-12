@@ -33,8 +33,41 @@ if (!fs.existsSync(redirectsPath)) {
   fail(`Missing _redirects in output directory: "${outDir}". Pages rewrites will not run.`);
 }
 
+// Sanity-check that the expected output directory looks like a real deploy.
+// This catches misconfigured Pages output directories (deploying an empty dist/).
+const expectedFiles = [
+  path.join(process.cwd(), outDir, "index.html"),
+  path.join(process.cwd(), outDir, "EN", "index.html"),
+];
+for (const fp of expectedFiles) {
+  if (!fs.existsSync(fp)) {
+    fail(`Missing expected file in output directory "${outDir}": ${path.relative(process.cwd(), fp)}`);
+  }
+}
+
 const redirects = fs.readFileSync(redirectsPath, "utf8");
 dbg(`Read _redirects (${redirects.length} chars)`);
+
+// Root must be explicitly rewritten to /index.html, otherwise a catch-all rule
+// can swallow the homepage and send everything into the 404 flow.
+const rootToIndexRe = /^\/\s+\/index\.html\s+200\s*$/m;
+if (!rootToIndexRe.test(redirects)) {
+  if (DEBUG) {
+    const lines = findMatchingLines(redirects, /^\/\s+/m);
+    dbg(`Root rule candidates: ${lines.slice(0, 10).join(' | ')}`);
+  }
+  fail("_redirects must include '/  /index.html  200' to prevent catch-all from swallowing '/'.");
+}
+
+// /EN/404 must be reachable without redirecting to itself.
+const en404RewriteRe = /^\/EN\/404\s+\/EN\/404\.html\s+200\s*$/m;
+if (!en404RewriteRe.test(redirects)) {
+  if (DEBUG) {
+    const lines = findMatchingLines(redirects, /^\/EN\/404/m);
+    dbg(`/EN/404 candidates: ${lines.slice(0, 10).join(' | ')}`);
+  }
+  fail("_redirects must include '/EN/404  /EN/404.html  200' to prevent Pages redirect loops.");
+}
 
 // Guard against a broad root rewrite. In Cloudflare Pages, this has been observed
 // to redirect clean routes like /about -> /EN/about (leaking locale paths).
