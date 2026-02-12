@@ -4,9 +4,10 @@ compatibility_date = "2024-01-01"
 workers_dev = true
 
 # NOTE: Routes must be top-level (NOT inside [vars]).
-# Temporarily keep this worker un-routed to avoid route conflicts while
-# portfolio-api-debugger owns specific /api/* ingestion endpoints.
-routes = []
+routes = [
+	{ pattern = "estivanayramia.com/api/*", zone_name = "estivanayramia.com" },
+	{ pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" },
+]
 
 # D1 Database for error monitoring
 [[d1_databases]]
