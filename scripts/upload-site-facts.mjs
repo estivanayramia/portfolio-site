@@ -17,8 +17,9 @@ const hasToken = Boolean(
     (process.env.CF_API_TOKEN && process.env.CF_API_TOKEN.trim()),
 );
 
-if (process.env.CF_PAGES && !forceUpload) {
-  log("Skipping upload on Cloudflare Pages (CF_PAGES=1).");
+// Skip on Cloudflare Pages or any CI environment without explicit token
+if ((process.env.CF_PAGES || process.env.CI) && !forceUpload) {
+  log("Skipping upload on Cloudflare Pages/CI (CF_PAGES or CI detected).");
   process.exit(0);
 }
 
