@@ -47,6 +47,20 @@ function staticRedirectAudit() {
 
   const rules = parseRedirectsFile(redirectsPath);
 
+  // Root must be explicitly rewritten to /index.html, otherwise the catch-all
+  // rule will swallow the homepage on Cloudflare Pages.
+  const rootRule = rules.find((r) => r.from === '/' && r.to === '/index.html' && r.status === '200');
+  if (!rootRule) {
+    fail('Missing required root rewrite: /  /index.html  200');
+  }
+
+  // /EN/404 must be explicitly rewritten to the underlying HTML file.
+  // This prevents Pages from self-redirecting /EN/404 forever.
+  const en404Rule = rules.find((r) => r.from === '/EN/404' && r.to === '/EN/404.html' && r.status === '200');
+  if (!en404Rule) {
+    fail('Missing required rewrite: /EN/404  /EN/404.html  200');
+  }
+
   // Catch-all must serve 200 (Pages/Workers asset compatibility)
   const catchAll = rules.find((r) => r.from === '/*' && r.to === '/EN/404.html');
   if (!catchAll) {
