@@ -1,0 +1,35 @@
+name = "portfolio-api-debugger"
+main = "debugger-worker.js"
+compatibility_date = "2024-01-01"
+workers_dev = true
+
+# NOTE: This config intentionally omits `routes = [...]`.
+# Use it when the Cloudflare routes API is erroring (e.g. code 10013),
+# then attach routes manually in the dashboard.
+
+# D1 Database for error monitoring
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-errors"
+database_id = "90a1df04-e5b9-48b9-90f4-02e3fb773ca8"
+
+# KV storage for sessions + rate limiting
+[[kv_namespaces]]
+binding = "SAVONIE_KV"
+id = "e723b1dbdc9a40a6b6ccd04764108d6c"
+
+[vars]
+SERVICE_NAME = "portfolio-api-debugger"
+RATE_LIMIT_MAX = "10"
+RATE_LIMIT_WINDOW = "60000"
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 1
+persist = true
