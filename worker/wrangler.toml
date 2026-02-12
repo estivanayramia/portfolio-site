@@ -15,11 +15,10 @@ DASHBOARD_PASSWORD_HASH = "__SET_VIA_CLOUDFLARE_SECRETS__"  # In production, use
 RATE_LIMIT_MAX = "10"
 RATE_LIMIT_WINDOW = "60000"
 
+# NOTE: www subdomain handled by Pages (apex only here to prevent redirect loops)
 routes = [
 	{ pattern = "estivanayramia.com/api/*", zone_name = "estivanayramia.com" },
-	{ pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" },
-	{ pattern = "www.estivanayramia.com/api/*", zone_name = "estivanayramia.com" },
-	{ pattern = "www.estivanayramia.com/health", zone_name = "estivanayramia.com" }
+	{ pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" }
 ]
 
 
