@@ -10,14 +10,29 @@ let running = false;
 let paused = false;
 
 let paddle = { x: 150, w: 100, h: 10 };
-let ball = { x: 200, y: 300, dx: 0, dy: 0, r: 6 };
+let balls = [];
 let bricks = [];
 let score = 0;
 let lives = 3;
 let level = 1;
 
-let paddleDir = 0; // -1, 0, 1
+let paddleDir = 0;
 let started = false;
+
+// ── Phase 3B: Multi-Ball & Laser ──
+let multiBallTimer = 0;
+let laserAmmo = 0;
+let lasers = [];
+let bricksDestroyedByLaser = 0;
+let multiBallTime = 0;
+
+// Brick type colors and properties
+const BRICK_TYPES = {
+  normal:      { hits: 1, color: 'rgba(168,85,247,0.9)',  border: 'rgba(255,255,255,0.25)', points: 10, label: '' },
+  tough:       { hits: 2, color: 'rgba(59,130,246,0.9)',   border: 'rgba(147,197,253,0.4)',  points: 25, label: '2' },
+  gold:        { hits: 3, color: 'rgba(234,179,8,0.9)',    border: 'rgba(253,224,71,0.5)',   points: 50, label: '3' },
+  diamond:     { hits: 99,color: 'rgba(209,213,219,0.95)', border: 'rgba(255,255,255,0.6)',  points: 100,label: '💎' },
+};
 
 function setText(el, value) {
   if (el) el.textContent = String(value);
@@ -36,25 +51,45 @@ function makeBricks() {
 
   for (let c = 0; c < cols; c++) {
     for (let r = 0; r < rows; r++) {
+      // Determine brick type based on level
+      let type = 'normal';
+      if (level >= 2 && r === 0) type = 'tough';
+      if (level >= 3 && r === 0 && c === Math.floor(cols / 2)) type = 'gold';
+      if (level >= 4 && r === 0 && (c === 0 || c === cols - 1)) type = 'diamond';
+
+      const def = BRICK_TYPES[type];
       bricks.push({
         x: startX + c * (brickW + gapX),
         y: startY + r * (brickH + gapY),
         w: brickW,
         h: brickH,
         alive: true,
+        type,
+        hitsLeft: def.hits,
+        maxHits: def.hits,
+        points: def.points,
       });
     }
   }
 }
 
+function addBall(x, y, dx, dy) {
+  balls.push({ x, y, dx, dy, r: 6 });
+}
+
 function reset() {
   paddle = { x: 150, w: 100, h: 10 };
-  ball = { x: 200, y: 300, dx: 0, dy: 0, r: 6 };
+  balls = [];
+  addBall(200, 300, 0, 0);
   score = 0;
   lives = 3;
   level = 1;
   paddleDir = 0;
   started = false;
+  laserAmmo = 0;
+  lasers = [];
+  bricksDestroyedByLaser = 0;
+  multiBallTime = 0;
   makeBricks();
 
   setText(scoreEl, score);
@@ -64,8 +99,74 @@ function reset() {
 function startBallIfNeeded() {
   if (started) return;
   started = true;
-  ball.dx = 4 * (Math.random() > 0.5 ? 1 : -1);
-  ball.dy = -4;
+  balls.forEach(b => {
+    b.dx = 4 * (Math.random() > 0.5 ? 1 : -1);
+    b.dy = -4;
+  });
+}
+
+// ── Power-Up Drops ──
+let powerDrops = [];
+
+function maybeDropPower(x, y) {
+  if (Math.random() > 0.15) return; // 15% chance
+  const types = ['multiball', 'laser', 'widen', 'life'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  const colors = { multiball: '#3b82f6', laser: '#ef4444', widen: '#22c55e', life: '#f59e0b' };
+  const labels = { multiball: 'M', laser: 'L', widen: 'W', life: '+' };
+  powerDrops.push({ x, y, w: 14, h: 14, dy: 2, type, color: colors[type], label: labels[type], alive: true });
+}
+
+function applyPower(type) {
+  playBeep(520, 0.08, 'triangle', 0.2);
+  if (type === 'multiball') {
+    // Spawn 2 extra balls from paddle center
+    const px = paddle.x + paddle.w / 2;
+    addBall(px, 290, -3, -4);
+    addBall(px, 290, 3, -4);
+    multiBallTime = Date.now();
+  }
+  if (type === 'laser') {
+    laserAmmo += 5;
+  }
+  if (type === 'widen') {
+    paddle.w = Math.min(160, paddle.w + 20);
+  }
+  if (type === 'life') {
+    lives = Math.min(5, lives + 1);
+    setText(livesEl, lives);
+  }
+}
+
+function fireLaser() {
+  if (laserAmmo <= 0) return;
+  laserAmmo--;
+  const px = paddle.x + paddle.w / 2;
+  lasers.push({ x: px - 2, y: 475, w: 4, h: 12, dy: -8, alive: true });
+  lasers.push({ x: px + 2, y: 475, w: 4, h: 12, dy: -8, alive: true });
+  playBeep(600, 0.04, 'sawtooth', 0.12);
+}
+
+function damageBrick(b) {
+  b.hitsLeft--;
+  if (b.hitsLeft <= 0) {
+    // Diamond bricks only break when all non-diamond bricks are gone
+    if (b.type === 'diamond') {
+      const otherAlive = bricks.some(br => br.alive && br.type !== 'diamond' && br !== b);
+      if (otherAlive) {
+        b.hitsLeft = 1; // Keep alive
+        return false;
+      }
+    }
+    b.alive = false;
+    score += b.points * level;
+    setText(scoreEl, score);
+    maybeDropPower(b.x + b.w / 2, b.y + b.h);
+
+    if (b.type === 'diamond') unlock("breaker:diamond_breaker");
+    return true; // brick destroyed
+  }
+  return false;
 }
 
 function update() {
@@ -74,21 +175,122 @@ function update() {
   paddle.x = Math.max(0, Math.min(canvas.width - paddle.w, paddle.x));
 
   if (!started) {
-    ball.x = paddle.x + paddle.w / 2;
-    ball.y = 300;
+    if (balls.length > 0) {
+      balls[0].x = paddle.x + paddle.w / 2;
+      balls[0].y = 300;
+    }
     return;
   }
 
-  // ball
-  ball.x += ball.dx;
-  ball.y += ball.dy;
+  // Multi-ball duration achievement tracking
+  if (balls.length >= 2 && multiBallTime > 0) {
+    if (Date.now() - multiBallTime >= 30000) {
+      unlock("breaker:multi_ball");
+    }
+  }
 
-  // walls
-  if (ball.x + ball.r >= canvas.width || ball.x - ball.r <= 0) ball.dx *= -1;
-  if (ball.y - ball.r <= 0) ball.dy *= -1;
+  // Lasers
+  for (const l of lasers) {
+    if (!l.alive) continue;
+    l.y += l.dy;
+    if (l.y < -20) { l.alive = false; continue; }
 
-  // bottom
-  if (ball.y - ball.r > canvas.height) {
+    for (const b of bricks) {
+      if (!b.alive) continue;
+      if (l.x + l.w > b.x && l.x < b.x + b.w && l.y > b.y && l.y < b.y + b.h) {
+        l.alive = false;
+        if (damageBrick(b)) {
+          bricksDestroyedByLaser++;
+          if (bricksDestroyedByLaser >= 20) unlock("breaker:laser_master");
+        }
+        playBeep(250, 0.05, 'sawtooth', 0.15);
+        break;
+      }
+    }
+  }
+  lasers = lasers.filter(l => l.alive);
+
+  // Power drops
+  for (const p of powerDrops) {
+    if (!p.alive) continue;
+    p.y += p.dy;
+    if (p.y > canvas.height + 20) { p.alive = false; continue; }
+
+    if (p.y + p.h >= 480 && p.y <= 490 && p.x + p.w >= paddle.x && p.x <= paddle.x + paddle.w) {
+      p.alive = false;
+      applyPower(p.type);
+    }
+  }
+  powerDrops = powerDrops.filter(p => p.alive);
+
+  // balls
+  let anyAlive = false;
+  for (const ball of balls) {
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+
+    // walls
+    if (ball.x + ball.r >= canvas.width || ball.x - ball.r <= 0) ball.dx *= -1;
+    if (ball.y - ball.r <= 0) ball.dy *= -1;
+
+    // bottom
+    if (ball.y - ball.r > canvas.height) {
+      // Remove this ball
+      ball.dead = true;
+      continue;
+    }
+    anyAlive = true;
+
+    // paddle collision
+    const paddleY = 480;
+    if (
+      ball.y + ball.r >= paddleY &&
+      ball.y + ball.r <= paddleY + paddle.h &&
+      ball.x >= paddle.x &&
+      ball.x <= paddle.x + paddle.w &&
+      ball.dy > 0
+    ) {
+      ball.dy = -Math.abs(ball.dy);
+      const hit = (ball.x - paddle.x) / paddle.w;
+      ball.dx = (hit - 0.5) * 8;
+      playBeep(220, 0.06, "square", 0.18);
+    }
+
+    // brick collision
+    for (const b of bricks) {
+      if (!b.alive) continue;
+      if (
+        ball.x + ball.r > b.x &&
+        ball.x - ball.r < b.x + b.w &&
+        ball.y + ball.r > b.y &&
+        ball.y - ball.r < b.y + b.h
+      ) {
+        ball.dy *= -1;
+        damageBrick(b);
+        playBeep(180, 0.07, "sawtooth", 0.2);
+
+        unlock("breaker:first_brick");
+        if (score >= 500) unlock("breaker:score_500");
+
+        if (bricks.every(x => !x.alive)) {
+          level += 1;
+          makeBricks();
+          balls.forEach(bl => {
+            bl.dx *= 1.05;
+            bl.dy *= 1.05;
+          });
+          playBeep(520, 0.1, "triangle", 0.18);
+          if (level >= 3) unlock("breaker:level_3");
+        }
+        break;
+      }
+    }
+  }
+
+  // Remove dead balls
+  balls = balls.filter(b => !b.dead);
+
+  if (!anyAlive || balls.length === 0) {
     lives -= 1;
     setText(livesEl, lives);
     if (lives <= 0) {
@@ -96,55 +298,9 @@ function update() {
       return;
     }
     started = false;
-    ball.dx = 0;
-    ball.dy = 0;
-    return;
-  }
-
-  // paddle collision
-  const paddleY = 480;
-  if (
-    ball.y + ball.r >= paddleY &&
-    ball.y + ball.r <= paddleY + paddle.h &&
-    ball.x >= paddle.x &&
-    ball.x <= paddle.x + paddle.w &&
-    ball.dy > 0
-  ) {
-    ball.dy = -Math.abs(ball.dy);
-    const hit = (ball.x - paddle.x) / paddle.w;
-    ball.dx = (hit - 0.5) * 8;
-    playBeep(220, 0.06, "square", 0.18);
-  }
-
-  // brick collision
-  for (const b of bricks) {
-    if (!b.alive) continue;
-    if (
-      ball.x + ball.r > b.x &&
-      ball.x - ball.r < b.x + b.w &&
-      ball.y + ball.r > b.y &&
-      ball.y - ball.r < b.y + b.h
-    ) {
-      b.alive = false;
-      ball.dy *= -1;
-      score += 10 * level;
-      setText(scoreEl, score);
-      playBeep(180, 0.07, "sawtooth", 0.2);
-
-      unlock("breaker:first_brick");
-      if (score >= 500) unlock("breaker:score_500");
-
-      if (bricks.every((x) => !x.alive)) {
-        level += 1;
-        makeBricks();
-        // speed up a little
-        ball.dx *= 1.05;
-        ball.dy *= 1.05;
-        playBeep(520, 0.1, "triangle", 0.18);
-        if (level >= 3) unlock("breaker:level_3");
-      }
-      break;
-    }
+    balls = [];
+    addBall(paddle.x + paddle.w / 2, 300, 0, 0);
+    multiBallTime = 0;
   }
 }
 
@@ -157,23 +313,74 @@ function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // bricks
-  bricks.forEach((b) => {
+  bricks.forEach(b => {
     if (!b.alive) return;
-    ctx.fillStyle = "rgba(168,85,247,0.9)";
+    const def = BRICK_TYPES[b.type];
+    ctx.fillStyle = def.color;
     ctx.fillRect(b.x, b.y, b.w, b.h);
-    ctx.strokeStyle = "rgba(255,255,255,0.25)";
+    ctx.strokeStyle = def.border;
     ctx.strokeRect(b.x, b.y, b.w, b.h);
+
+    // Hit indicators for multi-hit bricks
+    if (b.maxHits > 1 && b.type !== 'diamond') {
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(b.hitsLeft), b.x + b.w / 2, b.y + b.h / 2);
+    }
+    if (b.type === 'diamond') {
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('💎', b.x + b.w / 2, b.y + b.h / 2);
+    }
+  });
+
+  // lasers
+  lasers.forEach(l => {
+    if (!l.alive) return;
+    ctx.fillStyle = 'rgba(239,68,68,0.95)';
+    ctx.fillRect(l.x, l.y, l.w, l.h);
+  });
+
+  // power drops
+  powerDrops.forEach(p => {
+    if (!p.alive) return;
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, p.w, p.h);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 10px Inter, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(p.label, p.x + p.w / 2, p.y + p.h / 2 + 0.5);
   });
 
   // paddle
-  ctx.fillStyle = "rgba(168,85,247,1)";
+  ctx.fillStyle = laserAmmo > 0 ? 'rgba(239,68,68,1)' : "rgba(168,85,247,1)";
   ctx.fillRect(paddle.x, 480, paddle.w, paddle.h);
 
-  // ball
-  ctx.fillStyle = "rgba(255,255,255,0.95)";
-  ctx.beginPath();
-  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
-  ctx.fill();
+  // balls
+  balls.forEach(b => {
+    ctx.fillStyle = "rgba(255,255,255,0.95)";
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // HUD: Ball count & Laser ammo
+  ctx.save();
+  ctx.font = 'bold 10px Inter, system-ui, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillStyle = 'rgba(255,255,255,0.8)';
+  if (balls.length > 1) {
+    ctx.fillText(`Balls: ${balls.length}`, canvas.width - 8, 14);
+  }
+  if (laserAmmo > 0) {
+    ctx.fillStyle = 'rgba(239,68,68,0.9)';
+    ctx.fillText(`Laser: ${laserAmmo}`, canvas.width - 8, balls.length > 1 ? 28 : 14);
+  }
+  ctx.restore();
 
   if (!started) {
     ctx.fillStyle = "rgba(0,0,0,0.35)";
@@ -229,6 +436,11 @@ function bindInputs() {
         e.preventDefault();
         startBallIfNeeded();
         paddleDir = 1;
+      }
+      // Laser fire with Space
+      if (e.code === "Space" && laserAmmo > 0) {
+        e.preventDefault();
+        fireLaser();
       }
     },
     { passive: false }

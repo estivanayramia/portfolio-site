@@ -591,6 +591,11 @@ const initDarkMode = () => {
         // Update icon
         toggleButton.innerHTML = newTheme === 'dark' ? '<span style="color: #e1d4c2">🔆</span>' : '<span style="color: #212842">🌙</span>';
         
+        // 🏆 ACHIEVEMENT: Night Owl - Toggle dark mode
+        if (typeof window.ArcadeAchievements !== 'undefined' && window.ArcadeAchievements.unlock) {
+            window.ArcadeAchievements.unlock('nightOwl');
+        }
+        
         // Track analytics (both Clarity and GA4)
         if (typeof clarity === 'function') {
             clarity('event', 'theme_toggle', { theme: newTheme });
@@ -605,6 +610,7 @@ const initDarkMode = () => {
         // Update ARIA label
         toggleButton.setAttribute('aria-label', `Switch to ${theme} mode`);
     };
+
 
     // Listen for system theme changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
@@ -4604,3 +4610,145 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
+
+// ============================================================================
+// SITE-WIDE ACHIEVEMENT TRACKING
+// ============================================================================
+
+/**
+ * Site-Wide Achievement System
+ * 
+ * Tracks user interactions across the site and unlocks achievements:
+ * - explorer: Visit all main pages
+ * - networker: Click social links (LinkedIn/GitHub)
+ * - chatter: Open chat widget
+ * - formFiller: Submit contact form
+ * - gamer: Play a game (tracked on hobbies-games page)
+ * - reader: Visit Deep Dive page (auto-tracked by page visit)
+ * - nightOwl: Toggle dark mode (wired into toggleTheme above)
+ * - konami: Konami code (separate implementation if exists)
+ */
+
+// Achievement: Explorer - Visit all main pages
+(() => {
+    try {
+        const mainPages = ['/', '/about', '/projects', '/hobbies-games', '/contact'];
+        
+        // Function to normalize page paths for comparison
+        const normalizePath = (path) => {
+            // Remove .html extension
+            path = path.replace(/\.html$/, '');
+            // Remove trailing slash unless it's root
+            if (path.length > 1 && path.endsWith('/')) {
+                path = path.slice(0, -1);
+            }
+            // Remove /EN/ prefix if present
+            path = path.replace(/^\/EN/, '');
+            return path || '/';
+        };
+        
+        const currentPath = normalizePath(window.location.pathname);
+        
+        // Get visited pages from sessionStorage
+        let visited = [];
+        try {
+            const stored = sessionStorage.getItem('visited_pages');
+            visited = stored ? JSON.parse(stored) : [];
+        } catch (e) {
+            visited = [];
+        }
+        
+        // Add current page if it's a main page and not already visited
+        if (mainPages.includes(currentPath) && !visited.includes(currentPath)) {
+            visited.push(currentPath);
+            sessionStorage.setItem('visited_pages', JSON.stringify(visited));
+            
+            // Check if all pages visited
+            const allVisited = mainPages.every(page => visited.includes(page));
+            if (allVisited && typeof window.ArcadeAchievements !== 'undefined') {
+                window.ArcadeAchievements.unlock('explorer');
+            }
+        }
+        
+        // 🏆 ACHIEVEMENT: Reader - Visit Deep Dive page
+        if (currentPath === '/deep-dive' && typeof window.ArcadeAchievements !== 'undefined') {
+            window.ArcadeAchievements.unlock('reader');
+        }
+    } catch (e) {
+        console.warn('[Achievements] Explorer tracking error:', e);
+    }
+})();
+
+// Achievement: Networker - Click social links
+(() => {
+    try {
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a[href*="linkedin.com"], a[href*="github.com"]');
+            if (link && typeof window.ArcadeAchievements !== 'undefined') {
+                window.ArcadeAchievements.unlock('networker');
+            }
+        });
+    } catch (e) {
+        console.warn('[Achievements] Networker tracking error:', e);
+    }
+})();
+
+// Achievement: Chatter - Open chat widget
+(() => {
+    try {
+        // Wait for DOM to ensure chat toggle exists
+        const wireChatter = () => {
+            const chatToggle = document.getElementById('chat-toggle');
+            if (chatToggle) {
+                chatToggle.addEventListener('click', () => {
+                    if (typeof window.ArcadeAchievements !== 'undefined') {
+                        window.ArcadeAchievements.unlock('chatter');
+                    }
+                });
+            }
+        };
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', wireChatter);
+        } else {
+            wireChatter();
+        }
+    } catch (e) {
+        console.warn('[Achievements] Chatter tracking error:', e);
+    }
+})();
+
+// Achievement: Form Filler - Submit contact form
+(() => {
+    try {
+        const wireFormFiller = () => {
+            // Find contact form (look for common patterns)
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                // Check if it's likely a contact form
+                const hasNameField = form.querySelector('input[name*="name"], input[id*="name"]');
+                const hasEmailField = form.querySelector('input[type="email"], input[name*="email"]');
+                const hasMessageField = form.querySelector('textarea, input[name*="message"]');
+                
+                if (hasNameField && hasEmailField && hasMessageField) {
+                    form.addEventListener('submit', () => {
+                        if (typeof window.ArcadeAchievements !== 'undefined') {
+                            window.ArcadeAchievements.unlock('formFiller');
+                        }
+                    });
+                }
+            });
+        };
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', wireFormFiller);
+        } else {
+            wireFormFiller();
+        }
+    } catch (e) {
+        console.warn('[Achievements] FormFiller tracking error:', e);
+    }
+})();
+
+// Achievement: Gamer - Play a game (wired on hobbies-games page)
+// This will be handled by individual game start logic in hobbies-games.html

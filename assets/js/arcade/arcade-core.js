@@ -145,31 +145,32 @@ window.ArcadeAchievements = {
         toast.className = 'achievement-notification show';
         toast.style.cssText = `
             position: fixed;
-            top: 20px;
+            bottom: calc(20px + env(safe-area-inset-bottom, 0px));
             right: 20px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             background: #212842;
             color: #e1d4c2;
-            padding: 16px 20px;
-            border-radius: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
             border: 2px solid rgba(225, 212, 194, 0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
             z-index: 99999;
-            min-width: 300px;
+            min-width: 240px;
+            max-width: min(280px, calc(100vw - 40px));
             transform: translateX(120%);
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         `;
         
         toast.innerHTML = `
-            <div class="achievement-icon" style="font-size: 2.5rem;">${icon}</div>
-            <div class="achievement-content" style="flex: 1;">
-                <div class="achievement-title" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; margin-bottom: 2px;">Achievement Unlocked!</div>
-                <div class="achievement-name" style="font-weight: 700; font-size: 1.1rem; margin-bottom: 2px;">${title}</div>
-                <div class="achievement-desc" style="font-size: 0.85rem; opacity: 0.8;">${description}</div>
+            <div class="achievement-icon" style="font-size: 2rem;">${icon}</div>
+            <div class="achievement-content" style="flex: 1; min-width: 0;">
+                <div class="achievement-title" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; margin-bottom: 2px;">Achievement Unlocked!</div>
+                <div class="achievement-name" style="font-weight: 700; font-size: 1rem; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${title}</div>
+                <div class="achievement-desc" style="font-size: 0.8rem; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${description}</div>
             </div>
-            <button class="achievement-close" style="background: transparent; border: none; color: inherit; font-size: 1.5rem; cursor: pointer; opacity: 0.5; padding: 0 5px;">×</button>
+            <button class="achievement-close" style="background: transparent; border: none; color: inherit; font-size: 1.3rem; cursor: pointer; opacity: 0.5; padding: 0 4px; line-height: 1;">×</button>
         `;
         
         document.body.appendChild(toast);

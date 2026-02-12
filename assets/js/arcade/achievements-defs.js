@@ -641,6 +641,110 @@ export const ACHIEVEMENTS = {
         description: 'Stay on xx142-b2exe for 5 minutes',
         difficulty: 'Hard',
         icon: '🏅'
+    },
+
+    // ── Phase 3A: Snake New Achievements ──
+    snake_powerup_collector: {
+        id: 'snake_powerup_collector',
+        game: 'snake',
+        title: 'Power Hungry',
+        description: 'Collect 10 power-ups',
+        difficulty: 'Medium',
+        icon: '🍇'
+    },
+    snake_invincible_master: {
+        id: 'snake_invincible_master',
+        game: 'snake',
+        title: 'Untouchable',
+        description: 'Use invincibility 5 times',
+        difficulty: 'Hard',
+        icon: '🍊'
+    },
+    snake_obstacle_dodger: {
+        id: 'snake_obstacle_dodger',
+        game: 'snake',
+        title: 'Obstacle Course',
+        description: 'Survive 50 moves with obstacles on the field',
+        difficulty: 'Hard',
+        icon: '🧱'
+    },
+
+    // ── Phase 3B: Block Breaker New Achievements ──
+    breaker_multi_ball: {
+        id: 'breaker_multi_ball',
+        game: 'breaker',
+        title: 'Juggler',
+        description: 'Keep 2+ balls alive for 30 seconds',
+        difficulty: 'Hard',
+        icon: '🔵'
+    },
+    breaker_laser_master: {
+        id: 'breaker_laser_master',
+        game: 'breaker',
+        title: 'Laser Vision',
+        description: 'Destroy 20 bricks with lasers',
+        difficulty: 'Medium',
+        icon: '🔴'
+    },
+    breaker_diamond_breaker: {
+        id: 'breaker_diamond_breaker',
+        game: 'breaker',
+        title: 'Diamond Crusher',
+        description: 'Break a diamond brick',
+        difficulty: 'Hard',
+        icon: '💎'
+    },
+
+    // ── Phase 3C: 2048 New Achievements ──
+    merge_undo_saver: {
+        id: 'merge_undo_saver',
+        game: 'merge',
+        title: 'Time Traveler',
+        description: 'Use undo to save your game',
+        difficulty: 'Easy',
+        icon: '⏪'
+    },
+    merge_combo_king: {
+        id: 'merge_combo_king',
+        game: 'merge',
+        title: 'Combo King',
+        description: 'Trigger a 4-tile combo in one move',
+        difficulty: 'Hard',
+        icon: '👑'
+    },
+    merge_no_undo: {
+        id: 'merge_no_undo',
+        game: 'merge',
+        title: 'Purist',
+        description: 'Reach 2048 without using undo',
+        difficulty: 'Legendary',
+        icon: '🏆'
+    },
+
+    // ── Phase 3D: Space Invaders New Achievements ──
+    invaders_boss_killer: {
+        id: 'invaders_boss_killer',
+        game: 'invaders',
+        title: 'Boss Slayer',
+        description: 'Defeat a boss alien',
+        difficulty: 'Hard',
+        icon: '👹'
+    },
+    invaders_spread_master: {
+        id: 'invaders_spread_master',
+        game: 'invaders',
+        title: 'Spread Eagle',
+        description: 'Use spread shot 10 times',
+        difficulty: 'Medium',
+        icon: '🔥'
+    },
+    invaders_shield_keeper: {
+        id: 'invaders_shield_keeper',
+        game: 'invaders',
+        title: 'Fortress',
+        description: 'Complete a wave with 3 shield charges',
+        difficulty: 'Hard',
+        icon: '🛡️'
     }
 };
 
@@ -660,9 +764,16 @@ export const GAME_LABELS = {
 export function buildAchievementIndex() {
   // achievements.js expects an id -> definition index for fast lookups.
   // ACHIEVEMENTS is authored as an object, so build defensively from values.
+  // CRITICAL: Game files use colon format (snake:first_food) but defs use
+  // underscore format (snake_first_food). Index both formats for compatibility.
   const index = {};
   for (const def of Object.values(ACHIEVEMENTS)) {
-    if (def && typeof def.id === 'string') index[def.id] = def;
+    if (def && typeof def.id === 'string') {
+      index[def.id] = def;
+      // Also index by colon format: snake_first_food -> snake:first_food
+      const colonId = def.id.replace(/_/, ':');
+      if (colonId !== def.id) index[colonId] = def;
+    }
   }
   return index;
 }

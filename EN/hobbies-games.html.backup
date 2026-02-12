@@ -1,0 +1,3866 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <!-- Meta Tags -->
+    <meta charset="UTF-8">
+    <script>document.documentElement.classList.add('js')</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Premium arcade games: Snake, Block Breaker, 2048, and Space Invaders.">
+    <link rel="canonical" href="https://www.estivanayramia.com/hobbies-games">
+    <title>Arcade Games | Estivan Ayramia</title>
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Arcade Games | Estivan Ayramia">
+    <meta property="og:description" content="Play Snake, Block Breaker, 2048, and Space Invaders.">
+    <meta property="og:url" content="https://www.estivanayramia.com/hobbies-games">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="/assets/css/style.css?v=20260120">
+    <link rel="stylesheet" href="/theme.css?v=v20260119-5">
+    
+    <!-- Main Site Logic (Chat, Theme, etc.) -->
+    <script src="/assets/js/site.min.js?v=20260120" defer></script>
+    <script type="module" src="/assets/js/arcade/arcade-core.js"></script>
+    <script type="module" src="/assets/js/arcade/achievements-ui.js"></script>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/assets/img/icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+    
+    <style>
+        /* ============================================
+           CRITICAL FIX: Text Sharpness & Rendering
+           ============================================ */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+        
+        /* Prevent sub-pixel blur from transforms */
+        .game-container,
+        .game-card,
+        .score-display,
+        button {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+        
+        /* ============================================
+           Custom Scrollbar for Game List
+           ============================================ */
+        .game-list-container {
+            max-height: 80vh; /* Dynamic height based on screen size */
+            min-height: 500px; /* Minimum height to ensure visibility */
+            overflow-y: auto;
+            padding-right: 1rem;
+            padding-bottom: 4rem; /* Extra padding to prevent cutoff */
+            position: relative;
+            z-index: 0; /* Establish stacking context */
+            isolation: isolate; /* Prevent z-index leaks */
+            scroll-behavior: smooth;
+            border: 1px solid rgba(0,0,0,0.05);
+            border-radius: 1rem;
+            background: rgba(255,255,255,0.02);
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        [data-theme="dark"] .game-list-container {
+            border-color: rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.1);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: 5px;
+            margin: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(54, 32, 23, 0.2);
+            border-radius: 5px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+            transition: background 0.2s ease;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(54, 32, 23, 0.4);
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+
+        [data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        [data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(225, 212, 194, 0.2);
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+
+        [data-theme="dark"] .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(225, 212, 194, 0.4);
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+
+        /* Sticky Headers for Categories */
+        .category-header {
+            position: sticky;
+            top: 0;
+            z-index: 50; /* High z-index to stay above cards */
+            padding: 1rem 0.5rem;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 0 0 1rem 1rem;
+            background: rgba(255, 255, 255, 0.85);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Shadow to separate from content */
+        }
+
+        [data-theme="dark"] .category-header {
+            background: rgba(33, 40, 66, 0.85);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Enhanced Game Card */
+        .game-card-mini {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 1; /* Base z-index */
+            overflow: hidden;
+            /* Ensure transform doesn't cause overflow issues */
+            backface-visibility: hidden; 
+            transform: translateZ(0);
+        }
+
+        [data-theme="dark"] .game-card-mini {
+            border-color: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .game-card-mini:hover {
+            transform: translateY(-4px) translateZ(0); /* Maintain 3D context */
+            z-index: 10; /* Lift above siblings but below header */
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1);
+            border-color: rgba(54, 32, 23, 0.2);
+            background: rgba(255,255,255,0.8);
+        }
+
+        [data-theme="dark"] .game-card-mini:hover {
+            border-color: rgba(225, 212, 194, 0.2);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
+        }
+
+        .game-card-mini .icon-wrapper {
+            transition: transform 0.3s ease;
+        }
+
+        .game-card-mini:hover .icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* ============================================
+           Layout & Spacing
+           ============================================ */
+        /* body padding handled by global CSS */
+        
+        main {
+            /* padding-top handled by global CSS */
+            padding-bottom: 120px; /* Added padding to clear footer */
+            min-height: calc(100vh - 80px);
+            position: relative;
+        }
+
+        footer {
+            position: relative;
+        }
+        
+        /* ============================================
+           Dark Mode Support
+           ============================================ */
+        [data-theme="dark"] body {
+            background-color: #212842 !important;
+            color: #e1d4c2 !important;
+        }
+        
+        [data-theme="dark"] header {
+            background-color: rgba(33, 40, 66, 0.95) !important;
+            border-color: rgba(225, 212, 194, 0.1) !important;
+        }
+        
+        [data-theme="dark"] .bg-white\/50 {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+        }
+        
+        [data-theme="dark"] .border-chocolate\/10 {
+            border-color: rgba(225, 212, 194, 0.1) !important;
+        }
+        
+        [data-theme="dark"] .text-chocolate {
+            color: #e1d4c2 !important;
+        }
+        
+        [data-theme="dark"] .bg-chocolate {
+            background-color: #e1d4c2 !important;
+            color: #212842 !important;
+        }
+        
+        [data-theme="dark"] .btn-skip {
+            background-color: #ffffff !important;
+            color: #212842 !important;
+            border: 2px solid #ffffff;
+        }
+        
+        [data-theme="dark"] .btn-skip:hover {
+            background-color: #e1d4c2 !important;
+            color: #212842 !important;
+        }
+        
+        /* ============================================
+           Game Container
+           ============================================ */
+        .game-container {
+            min-height: 450px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        canvas {
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            max-width: 100%;
+            height: auto;
+            transition: all 0.3s ease;
+            touch-action: none;
+        }
+
+        /* ============================================
+           Game Selection Cards
+           ============================================ */
+        .game-card {
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: currentColor;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .game-card:hover::before {
+            left: 100%;
+        }
+        
+        .game-card:active {
+            transform: translateY(-4px) scale(1.01);
+        }
+        
+        /* ============================================
+           Score Display
+           ============================================ */
+        .score-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 12px 24px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        /* ============================================
+           SNAKE GAME - Enhanced with Animated Background
+           ============================================ */
+        #snake-canvas {
+            border: 3px solid currentColor;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            image-rendering: pixelated;
+            position: relative;
+        }
+        
+        #snake-canvas::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(120, 255, 198, 0.1) 0%, transparent 50%);
+            animation: bg-float 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes bg-float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(10px, -10px) scale(1.05); }
+            66% { transform: translate(-10px, 10px) scale(0.95); }
+        }
+        
+        [data-theme="light"] #snake-canvas {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            border-color: #362017;
+        }
+
+        /* ============================================
+           BLOCK BREAKER - Enhanced with Animated Background
+           ============================================ */
+        #breaker-canvas {
+            border: 3px solid currentColor;
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            position: relative;
+        }
+        
+        #breaker-canvas::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 70%, rgba(168, 85, 247, 0.1) 0%, transparent 60%),
+                        radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.1) 0%, transparent 60%);
+            animation: bg-pulse 6s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes bg-pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+        
+        [data-theme="light"] #breaker-canvas {
+            background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-color: #362017;
+        }
+
+        /* ============================================
+           SPACE INVADERS - Enhanced with Animated Background
+           ============================================ */
+        #invaders-canvas {
+            border: 3px solid currentColor;
+            background: linear-gradient(180deg, #000000 0%, #0f0f23 100%);
+            position: relative;
+        }
+        
+        #invaders-canvas::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.05) 0%, transparent 70%),
+                        radial-gradient(circle at 20% 80%, rgba(0, 255, 0, 0.05) 0%, transparent 70%),
+                        radial-gradient(circle at 80% 20%, rgba(0, 0, 255, 0.05) 0%, transparent 70%);
+            animation: bg-stars 10s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes bg-stars {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-20px); }
+        }
+        
+        [data-theme="light"] #invaders-canvas {
+            background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%);
+            border-color: #362017;
+        }
+
+        /* ============================================
+           2048 - Fixed Alignment & Enhanced
+           ============================================ */
+        .merge-grid-container {
+            position: relative;
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 12px;
+            width: 340px;
+            height: 340px;
+            touch-action: none;
+            overflow: hidden;
+        }
+        
+        .merge-grid-container::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            background: radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+            animation: merge-bg-glow 4s ease-in-out infinite alternate;
+            pointer-events: none;
+            border-radius: 8px;
+        }
+        
+        @keyframes merge-bg-glow {
+            0% { opacity: 0.3; }
+            100% { opacity: 0.6; }
+        }
+        
+        .merge-grid-bg {
+            display: grid;
+            grid-template-columns: repeat(4, 70px);
+            grid-template-rows: repeat(4, 70px);
+            gap: 12px;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 12px;
+            left: 12px;
+        }
+
+        /* Layer that holds moving tiles - positioned over the grid cells */
+        #merge-tiles-layer {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            width: calc(100% - 24px);
+            height: calc(100% - 24px);
+            pointer-events: none;
+        }
+        
+        .merge-cell-bg {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+        
+        .merge-tile {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.12s ease;
+            will-change: transform, opacity;
+            z-index: 10;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border: 2px solid rgba(255,255,255,0.1);
+            transform-origin: center center;
+        }
+        
+        .merge-tile.new {
+            animation: pop-in 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .merge-tile.merged {
+            animation: pop-merge 0.24s ease-out;
+            z-index: 20;
+        }
+        
+        .merge-tile.moving {
+            transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes pop-in {
+            0% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(0); opacity: 0; }
+            50% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1.1); opacity: 0.8; }
+            100% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1); opacity: 1; }
+        }
+        
+        @keyframes pop-merge {
+            0% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+            50% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1.3); box-shadow: 0 8px 16px rgba(0,0,0,0.4); }
+            100% { transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            .merge-tile {
+                transition: transform 0.08s ease, opacity 0.08s ease;
+            }
+            .merge-tile.new,
+            .merge-tile.merged {
+                animation: none;
+            }
+        }
+        
+        /* Enhanced Tile Colors with Gradients */
+        .tile-2 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .tile-4 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .tile-8 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .tile-16 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .tile-32 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .tile-64 { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+        .tile-128 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .tile-256 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+        .tile-512 { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+        .tile-1024 { background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%); }
+        .tile-2048 { background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); box-shadow: 0 0 20px #8ec5fc; }
+
+        /* ============================================
+           MODAL
+           ============================================ */
+        .game-modal {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            z-index: 2000;
+            max-width: 350px;
+            padding: 20px;
+            background: rgba(33, 40, 66, 0.98);
+            border: 2px solid rgba(225, 212, 194, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            animation: modal-slide-in 0.3s ease-out;
+            color: #fff;
+        }
+        
+        @keyframes modal-slide-in {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* ============================================
+           Touch Controls
+           ============================================ */
+        .touch-controls {
+            display: none;
+            gap: 8px;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .touch-controls {
+                display: grid;
+                grid-template-areas: 
+                    ". up ."
+                    "left . right"
+                    ". down .";
+                grid-template-columns: 60px 60px 60px;
+                grid-template-rows: 60px 60px 60px;
+            }
+            
+            .touch-controls.horizontal {
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+            }
+        }
+        
+        .touch-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .touch-btn:active { 
+            background: rgba(255,255,255,0.4);
+            transform: scale(0.95);
+            border-color: rgba(255,255,255,0.5);
+        }
+        .touch-btn.up { grid-area: up; }
+        .touch-btn.down { grid-area: down; }
+        .touch-btn.left { grid-area: left; }
+        .touch-btn.right { grid-area: right; }
+
+        .hidden { display: none !important; }
+        
+        /* ============================================
+           Particle Effects
+           ============================================ */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            animation: particle-explode 1s ease-out forwards;
+        }
+        
+        @keyframes particle-explode {
+            0% { 
+                transform: translate(0, 0) scale(1); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translate(var(--dx), var(--dy)) scale(0); 
+                opacity: 0; 
+            }
+        }
+        
+        @keyframes combo-float {
+            0% { 
+                transform: translateY(0) scale(1); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translateY(-50px) scale(1.5); 
+                opacity: 0; 
+            }
+        }
+        
+        /* ============================================
+           Achievement Notification (Hub Override)
+           Matches the hub's required DOM + class behavior
+           ============================================ */
+        .achievement-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #212842;
+            color: #e1d4c2;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(225, 212, 194, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 99999;
+            min-width: 300px;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .achievement-notification.show {
+            transform: translateX(0);
+        }
+
+        .achievement-icon {
+            font-size: 2.5rem;
+        }
+
+        .achievement-content {
+            flex: 1;
+        }
+
+        .achievement-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+            margin-bottom: 2px;
+        }
+
+        .achievement-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 2px;
+        }
+
+        .achievement-desc {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .achievement-close {
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.5;
+            padding: 0 5px;
+        }
+
+        .achievement-close:hover {
+            opacity: 1;
+        }
+        
+        @keyframes tile-bounce {
+            0%, 100% { transform: translate(var(--x), var(--y)) scale(1); }
+            50% { transform: translate(var(--x), var(--y)) scale(1.1); }
+        }
+        
+        @keyframes tile-slide {
+            from { transform: translate(var(--from-x), var(--from-y)); }
+            to { transform: translate(var(--x), var(--y)); }
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid currentColor;
+            border-radius: 8px;
+            color: inherit;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .btn-back:hover { background: rgba(0,0,0,0.3); }
+
+        /* ============================================
+           Enhanced Animations & Effects
+           ============================================ */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .glow {
+            box-shadow: 0 0 20px currentColor;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: currentColor;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particle-float 1s ease-out forwards;
+        }
+        
+        @keyframes particle-float {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-20px) scale(0); }
+        }
+    </style>
+</head>
+<body class="bg-beige text-chocolate min-h-screen transition-colors duration-300">
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress" aria-hidden="true"></div>
+    
+    <!-- Fixed Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
+            <a href="/" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center" aria-label="Go to Portfolio home page">
+                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain" width="300" height="264" fetchpriority="high">
+                <span>Estivan Ayramia</span>
+            </a>
+            
+            <!-- Main Navigation -->
+            <ul class="hidden md:flex items-center space-x-8">
+                <li><a href="/overview" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
+                <li><a href="/deep-dive" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
+                <li><a href="/about" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
+                <li><a href="/projects/" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
+                <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+            
+            <!-- Language Switcher -->
+            <div class="flex items-center space-x-3">
+                <a href="/hobbies-games" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">EN</a>
+                <a href="/es/" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
+                <a href="/ar/" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
+            </div>
+            
+            <!-- Dark Mode Toggle -->
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            
+            <!-- Mobile Menu Toggle -->
+            <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+        </nav>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
+            <ul class="px-6 py-4 space-y-3">
+                <li><a href="/overview" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
+                <li><a href="/deep-dive" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
+                <li><a href="/about" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
+                <li><a href="/projects/" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Projects</a></li>
+                <li><a href="/contact" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full text-center hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="pb-32 px-4">
+        <div class="max-w-6xl mx-auto">
+            <!-- ========================================
+                 GAME SELECTION SCREEN
+                 ======================================== -->
+            <section id="game-selection" class="no-parallax">
+                <div class="flex justify-between items-center mb-6 max-w-4xl mx-auto px-4">
+                    <a href="/about" id="back-to-about" class="back-link text-sm font-medium opacity-70 hover:opacity-100 transition-opacity" aria-label="Back to About">← About</a>
+                    <div class="flex gap-2">
+                        <button onclick="toggleAchievements(true)" class="px-4 py-2 bg-indigodeep text-white rounded-lg font-medium text-sm hover:bg-opacity-90 transition-all flex items-center gap-2">
+                            <span aria-hidden="true">🏆</span> <span class="hidden sm:inline">Achievements</span>
+                        </button>
+                        <button id="sound-toggle" class="px-4 py-2 bg-indigodeep text-white rounded-lg font-medium text-sm hover:bg-opacity-90 transition-all">🔊</button>
+                    </div>
+                </div>
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-4">Arcade Zone</h1>
+                    <p class="text-lg opacity-80 max-w-2xl mx-auto mb-4">
+                        Select a game to play. All games are optimized for desktop and mobile.
+                        <span class="block text-sm mt-2 opacity-60">Tip: Press P to pause any game</span>
+                    </p>
+                    <p class="text-sm opacity-60 italic max-w-xl mx-auto">
+                        "Oh wow, how incredibly thoughtful of people to want to discover my hobbies through 
+                        interactive games instead of, you know, just reading about them like normal humans. 
+                        Because nothing says 'get to know me' like frantically mashing buttons to avoid virtual death! 
+                        What a brilliant innovation! 🎮💀✨"
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-4xl mx-auto">
+                    <!-- Snake -->
+                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/snake'">
+                        <div class="text-5xl mb-3">🐍</div>
+                        <h3 class="text-2xl font-bold mb-2">Snake</h3>
+                        <p class="text-sm opacity-70 mb-4">Classic reflex test with growing difficulty. Eat and grow!</p>
+                        <div id="snake-progress" class="text-xs opacity-60 mb-3"></div>
+                        <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" onclick="showStats('snake'); event.stopPropagation();">View All Achievements ▸</button>
+                        <div id="snake-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
+                        <div class="inline-block px-4 py-2 bg-green-600 rounded-lg text-sm font-medium game-action">Play Snake</div>
+                    </div>
+                    
+                    <!-- Block Breaker -->
+                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/block-breaker'">
+                        <div class="text-5xl mb-3">🧱</div>
+                        <h3 class="text-2xl font-bold mb-2">Block Breaker</h3>
+                        <p class="text-sm opacity-70 mb-4">Smash bricks with increasing speed and power-ups!</p>
+                        <div id="breaker-progress" class="text-xs opacity-60 mb-3"></div>
+                        <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" onclick="showStats('breaker'); event.stopPropagation();">View All Achievements ▸</button>
+                        <div id="breaker-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
+                        <div class="inline-block px-4 py-2 bg-purple-600 rounded-lg text-sm font-medium game-action">Play Breaker</div>
+                    </div>
+                    
+                    <!-- 2048 -->
+                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/2048'">
+                        <div class="text-5xl mb-3">🧩</div>
+                        <h3 class="text-2xl font-bold mb-2">2048</h3>
+                        <p class="text-sm opacity-70 mb-4">Combine tiles to reach 2048 with smooth animations!</p>
+                        <div id="merge-progress" class="text-xs opacity-60 mb-3"></div>
+                        <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" onclick="showStats('merge'); event.stopPropagation();">View All Achievements ▸</button>
+                        <div id="merge-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
+                        <div class="inline-block px-4 py-2 bg-blue-600 rounded-lg text-sm font-medium game-action">Play 2048</div>
+                    </div>
+
+                    <!-- Space Invaders -->
+                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/space-invaders'">
+                        <div class="text-5xl mb-3">👾</div>
+                        <h3 class="text-2xl font-bold mb-2">Space Invaders</h3>
+                        <p class="text-sm opacity-70 mb-4">Defend Earth from alien waves with escalating difficulty!</p>
+                        <div id="invaders-progress" class="text-xs opacity-60 mb-3"></div>
+                        <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" onclick="showStats('invaders'); event.stopPropagation();">View All Achievements ▸</button>
+                        <div id="invaders-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
+                        <div class="inline-block px-4 py-2 bg-red-600 rounded-lg text-sm font-medium game-action">Play Invaders</div>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <button onclick="toggleSound()" id="sound-toggle" class="mb-4 px-6 py-2 bg-indigodeep text-white rounded-lg font-medium hover:opacity-90 transition-all" title="Toggle Sound Effects">
+                        🔊
+                    </button>
+                    <br>
+                    <a href="/hobbies/" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigodeep to-[#362017] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        <span>Continue to Hobbies</span>
+                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    </a>
+                </div>
+
+                <!-- ========================================
+                     MINI-GAMES BY CATEGORY
+                     ======================================== -->
+                <div class="mt-16 max-w-5xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-2">More Games</h2>
+                    <p class="text-center opacity-70 mb-8">Third-party mini-games organized by category</p>
+
+                    <div class="game-list-container custom-scrollbar p-4">
+                        <!-- Puzzle Games -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2 category-header">
+                                <span class="text-2xl">🧩</span> Puzzle
+                                <span class="text-xs font-normal opacity-50 ml-auto bg-black/5 dark:bg-white/10 px-2 py-1 rounded-full">4 Games</span>
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <a href="/hobbies-games/1024-moves" class="game-card-mini bg-white/50 rounded-xl p-4 text-center block group">
+                                    <div class="text-3xl mb-2 icon-wrapper">🧊</div>
+                                    <h4 class="font-bold text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">1024 Moves</h4>
+                                    <p class="text-xs opacity-60 mt-1">Push cubes to the orb</p>
+                                </a>
+                                <a href="/hobbies-games/oh-flip" class="game-card-mini bg-white/50 rounded-xl p-4 text-center block group">
+                                    <div class="text-3xl mb-2 icon-wrapper">🔄</div>
+                                    <h4 class="font-bold text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Oh Flip</h4>
+                                    <p class="text-xs opacity-60 mt-1">Flip tiles to match</p>
+                                </a>
+                                <a href="/hobbies-games/onoff" class="game-card-mini bg-white/50 rounded-xl p-4 text-center block group">
+                                    <div class="text-3xl mb-2 icon-wrapper">💡</div>
+                                    <h4 class="font-bold text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">On/Off</h4>
+                                    <p class="text-xs opacity-60 mt-1">Toggle switch puzzles</p>
+                                </a>
+                                <a href="/hobbies-games/triangle-back-to-home" class="game-card-mini bg-white/50 rounded-xl p-4 text-center block group">
+                                    <div class="text-3xl mb-2 icon-wrapper">🔺</div>
+                                    <h4 class="font-bold text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Triangle Home</h4>
+                                    <p class="text-xs opacity-60 mt-1">Guide triangle home</p>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Action Games -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2 category-header">
+                                <span class="text-2xl">⚔️</span> Action
+                                <span class="text-xs font-normal opacity-50 ml-auto bg-black/5 dark:bg-white/10 px-2 py-1 rounded-full">1 Game</span>
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <a href="/hobbies-games/nano-wirebot" class="game-card-mini bg-white/50 rounded-xl p-4 text-center block group">
+                                    <div class="text-3xl mb-2 icon-wrapper">🤖</div>
+                                    <h4 class="font-bold text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Nano Wirebot</h4>
+                                    <p class="text-xs opacity-60 mt-1">Robot wire mazes</p>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Arcade Games -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2 category-header">
+                                <span class="text-2xl">🕹️</span> Arcade
+                                <span class="text-xs font-normal opacity-50 ml-auto bg-black/5 dark:bg-white/10 px-2 py-1 rounded-full">1 Game</span>
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <a href="/hobbies-games/off-the-line" class="game-card-mini bg-white/50 rounded-xl p-4 text-center block group">
+                                    <div class="text-3xl mb-2 icon-wrapper">〰️</div>
+                                    <h4 class="font-bold text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Off The Line</h4>
+                                    <p class="text-xs opacity-60 mt-1">Stay off the line</p>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Racing Games -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2 category-header">
+                                <span class="text-2xl">🏎️</span> Racing
+                                <span class="text-xs font-normal opacity-50 ml-auto bg-black/5 dark:bg-white/10 px-2 py-1 rounded-full">1 Game</span>
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <a href="/hobbies-games/racer" class="game-card-mini bg-white/50 rounded-xl p-4 text-center block group">
+                                    <div class="text-3xl mb-2 icon-wrapper">🏎️</div>
+                                    <h4 class="font-bold text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Racer</h4>
+                                    <p class="text-xs opacity-60 mt-1">High-speed racing</p>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Casual Games -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2 category-header">
+                                <span class="text-2xl">🎲</span> Casual
+                                <span class="text-xs font-normal opacity-50 ml-auto bg-black/5 dark:bg-white/10 px-2 py-1 rounded-full">1 Game</span>
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <a href="/hobbies-games/pizza-undelivery" class="game-card-mini bg-white/50 rounded-xl p-4 text-center block group">
+                                    <div class="text-3xl mb-2 icon-wrapper">🍕</div>
+                                    <h4 class="font-bold text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Pizza Undelivery</h4>
+                                    <p class="text-xs opacity-60 mt-1">Quirky delivery game</p>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Experimental Games -->
+                        <div class="mb-8">
+                            <h3 class="text-xl font-bold mb-4 flex items-center gap-2 category-header">
+                                <span class="text-2xl">🧪</span> Experimental
+                                <span class="text-xs font-normal opacity-50 ml-auto bg-black/5 dark:bg-white/10 px-2 py-1 rounded-full">2 Games</span>
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <a href="/hobbies-games/the-matr13k" class="game-card-mini bg-white/50 rounded-xl p-4 text-center block group">
+                                    <div class="text-3xl mb-2 icon-wrapper">🔢</div>
+                                    <h4 class="font-bold text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">The Matr13k</h4>
+                                    <p class="text-xs opacity-60 mt-1">Enter the matrix</p>
+                                </a>
+                                <a href="/hobbies-games/xx142-b2exe" class="game-card-mini bg-white/50 rounded-xl p-4 text-center block group">
+                                    <div class="text-3xl mb-2 icon-wrapper">💾</div>
+                                    <h4 class="font-bold text-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">XX142-B2.EXE</h4>
+                                    <p class="text-xs opacity-60 mt-1">Glitchy adventure</p>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================
+                 SNAKE GAME SCREEN
+                 ======================================== -->
+            <section id="snake-game" class="hidden">
+                <div class="flex items-center justify-between mb-4 max-w-md mx-auto">
+                    <button onclick="backToSelection()" class="btn-back">← Menu</button>
+                    <div class="score-display py-2 px-4 text-lg">
+                        Score: <span id="snake-score">0</span> | Level: <span id="snake-level">1</span>
+                        <span id="snake-combo" style="display:none;color:#fbbf24;font-weight:bold;margin-left:8px;"></span>
+                    </div>
+                    <button onclick="showStats('snake')" class="btn-back" style="padding:8px 12px;font-size:20px;" title="View Stats">🏆</button>
+                </div>
+                <div class="game-container">
+                    <canvas id="snake-canvas" width="400" height="400"></canvas>
+                    <div class="touch-controls">
+                        <button class="touch-btn up" onpointerdown="setSnakeDirection('up')">↑</button>
+                        <button class="touch-btn left" onpointerdown="setSnakeDirection('left')">←</button>
+                        <button class="touch-btn right" onpointerdown="setSnakeDirection('right')">→</button>
+                        <button class="touch-btn down" onpointerdown="setSnakeDirection('down')">↓</button>
+                    </div>
+                    <div class="flex gap-2 mt-4 justify-center">
+                        <button onclick="togglePause('snake')" id="snake-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
+                        <button onclick="initSnake()" class="px-6 py-2 bg-green-600 rounded-lg font-medium game-action">Restart</button>
+                        <button onclick="toggleSound()" id="sound-toggle-snake" class="px-6 py-2 bg-indigodeep text-white rounded-lg font-medium" title="Toggle Sound">🔊</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================
+                 BLOCK BREAKER SCREEN
+                 ======================================== -->
+            <section id="breaker-game" class="hidden">
+                <div class="flex items-center justify-between mb-4 max-w-md mx-auto">
+                    <button onclick="backToSelection()" class="btn-back">← Menu</button>
+                    <div class="score-display py-2 px-4 text-lg">Score: <span id="breaker-score">0</span> | Lives: <span id="breaker-lives">3</span></div>
+                    <button onclick="showStats('breaker')" class="btn-back" style="padding:8px 12px;font-size:20px;" title="View Stats">🏆</button>
+                </div>
+                <div class="game-container">
+                    <canvas id="breaker-canvas" width="400" height="500"></canvas>
+                    <div class="touch-controls horizontal">
+                        <button class="touch-btn" onpointerdown="breakerPaddleDir = -1" onpointerup="breakerPaddleDir = 0" onpointercancel="breakerPaddleDir = 0" onpointerleave="breakerPaddleDir = 0">←</button>
+                        <button class="touch-btn" onpointerdown="breakerPaddleDir = 1" onpointerup="breakerPaddleDir = 0" onpointercancel="breakerPaddleDir = 0" onpointerleave="breakerPaddleDir = 0">→</button>
+                    </div>
+                    <div class="flex gap-2 mt-4 justify-center">
+                        <button onclick="togglePause('breaker')" id="breaker-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
+                        <button onclick="initBreaker()" class="px-6 py-2 bg-purple-600 rounded-lg font-medium game-action">Restart</button>
+                        <button onclick="toggleSound()" id="sound-toggle-breaker" class="px-6 py-2 bg-indigodeep text-white rounded-lg font-medium" title="Toggle Sound">🔊</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ========================================
+                 2048 SCREEN
+                 ======================================== -->
+            <section id="merge-game" class="hidden">
+                <div class="flex items-center justify-between mb-4 max-w-md mx-auto">
+                    <button onclick="backToSelection()" class="btn-back">← Menu</button>
+                    <div class="score-display py-2 px-4 text-lg">Score: <span id="merge-score">0</span> | Best: <span id="merge-best">0</span></div>
+                    <button onclick="showStats('merge')" class="btn-back" style="padding:8px 12px;font-size:20px;" title="View Stats">🏆</button>
+                </div>
+                <div class="game-container">
+                    <div class="merge-grid-container" id="merge-container">
+                        <div class="merge-grid-bg">
+                            <!-- 16 background cells -->
+                            <div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div>
+                            <div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div>
+                            <div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div>
+                            <div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div><div class="merge-cell-bg"></div>
+                        </div>
+                        <div id="merge-tiles-layer"></div>
+                    </div>
+                    <p class="mt-4 text-sm opacity-70">Arrow keys or Swipe to merge tiles.</p>
+                    <button onclick="initMerge()" class="mt-2 px-6 py-2 bg-blue-600 text-white rounded-lg font-medium">Restart</button>
+                </div>
+            </section>
+
+            <!-- ========================================
+                 SPACE INVADERS SCREEN
+                 ======================================== -->
+            <section id="invaders-game" class="hidden">
+                <div class="flex items-center justify-between mb-4 max-w-md mx-auto">
+                    <button onclick="backToSelection()" class="btn-back">← Menu</button>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div class="score-display py-2 px-4 text-lg">Score: <span id="invaders-score">0</span> | Wave: <span id="invaders-wave">1</span></div>
+                        <div id="invaders-hud" style="font-weight:700;color:#22c55e;padding:6px 10px;border-radius:8px;background:rgba(34,197,94,0.08);display:none">LIVE</div>
+                    </div>
+                    <button onclick="showStats('invaders')" class="btn-back" style="padding:8px 12px;font-size:20px;" title="View Stats">🏆</button>
+                </div>
+                <div class="game-container">
+                    <canvas id="invaders-canvas" width="400" height="500"></canvas>
+                    <div class="touch-controls horizontal">
+                        <button class="touch-btn" onpointerdown="setInvaderInput('left', true)" onpointerup="setInvaderInput('left', false)" onpointercancel="setInvaderInput('left', false)" onpointerleave="setInvaderInput('left', false)">←</button>
+                        <button class="touch-btn" onpointerdown="setInvaderInput('shoot', true)" onpointerup="setInvaderInput('shoot', false)" onpointercancel="setInvaderInput('shoot', false)" onpointerleave="setInvaderInput('shoot', false)">🔥</button>
+                        <button class="touch-btn" onpointerdown="setInvaderInput('right', true)" onpointerup="setInvaderInput('right', false)" onpointercancel="setInvaderInput('right', false)" onpointerleave="setInvaderInput('right', false)">→</button>
+                    </div>
+                    <div class="flex gap-2 mt-4 justify-center">
+                        <button onclick="togglePause('invaders')" id="invaders-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action" disabled>Pause</button>
+                        <button onclick="initInvaders()" class="px-6 py-2 bg-red-600 rounded-lg font-medium game-action">Restart</button>
+                        <button onclick="toggleSound()" id="sound-toggle-invaders" class="px-6 py-2 bg-indigodeep text-white rounded-lg font-medium" title="Toggle Sound">🔊</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+<footer class="bg-indigodeep text-beige py-12">
+        <div class="max-w-7xl mx-auto px-6 lg:px-12">
+            <div class="grid md:grid-cols-3 gap-12 mb-12">
+                <!-- Column 1: Brand -->
+                <div class="space-y-4">
+                    <a href="/" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
+                        <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
+                        <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
+                    </a>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                </div>
+                
+                <!-- Column 2: Quick Links -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/overview" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/deep-dive" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/projects/" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
+                        <li><a href="/about" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3: Connect -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
+                    <ul class="space-y-2">
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
+                        <li><a href="/contact" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
+                        <li><a href="/privacy" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-beige/20 pt-8 text-center">
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ====================================================================
+        // GLOBAL & UTILS
+        // ====================================================================
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        let currentGame = null;
+        
+        // Mobile detection
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        
+        // Sound System
+        const __storedSoundsEnabled = localStorage.getItem('gameSoundsEnabled');
+        // Default muted on mobile/iPhone unless user explicitly enabled
+        let soundsEnabled = (__storedSoundsEnabled === null)
+            ? (!isMobile)
+            : (__storedSoundsEnabled !== 'false');
+
+        let audioContext = null;
+        const sounds = {
+            eat: null,
+            hit: null,
+            powerup: null,
+            shoot: null,
+            destroy: null,
+            gameover: null
+        };
+        
+        function initSounds() {
+            // Lazily create/resume AudioContext only when needed (prevents autoplay issues on iOS)
+            const ensureAudio = () => {
+                if (audioContext) return audioContext;
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    audioContext = null;
+                }
+                return audioContext;
+            };
+
+            const ensureAudioRunning = () => {
+                const ctx = ensureAudio();
+                if (!ctx) return null;
+                try {
+                    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+                } catch (e) {}
+                return ctx;
+            };
+            
+            function createBeep(freq, duration, type = 'sine') {
+                return () => {
+                    if (!soundsEnabled) return;
+                    const ctx = ensureAudioRunning();
+                    if (!ctx) return;
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = type;
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + duration);
+                };
+            }
+            
+            sounds.eat = createBeep(440, 0.1);
+            sounds.hit = createBeep(200, 0.15, 'square');
+            sounds.powerup = createBeep(600, 0.2);
+            sounds.shoot = createBeep(300, 0.05);
+            sounds.destroy = createBeep(150, 0.2, 'sawtooth');
+            sounds.gameover = createBeep(100, 0.5, 'triangle');
+        }
+        
+        function toggleSound() {
+            soundsEnabled = !soundsEnabled;
+            localStorage.setItem('gameSoundsEnabled', soundsEnabled);
+            // User gesture: attempt to resume audio when enabling
+            if (soundsEnabled) {
+                try {
+                    if (!audioContext) {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    }
+                    if (audioContext && audioContext.state === 'suspended') {
+                        audioContext.resume().catch(() => {});
+                    }
+                } catch (e) {}
+            }
+            const icon = soundsEnabled ? '🔊' : '🔇';
+            // Update all sound toggle buttons
+            ['sound-toggle', 'sound-toggle-snake', 'sound-toggle-breaker', 'sound-toggle-invaders'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.textContent = icon;
+            });
+            
+            // Broadcast to all iframes
+            document.querySelectorAll('iframe').forEach(iframe => {
+                try {
+                    iframe.contentWindow.postMessage({ type: 'set-mute', muted: !soundsEnabled }, '*');
+                } catch(e) {}
+            });
+        }
+
+        // Pause RAF-based games when tab is backgrounded
+        let __pausedByVisibility = false;
+        let __wasPausedBeforeVisibility = false;
+        document.addEventListener('visibilitychange', () => {
+            try {
+                if (document.hidden) {
+                    if (!currentGame) return;
+                    __pausedByVisibility = true;
+                    __wasPausedBeforeVisibility = !!gamePaused;
+                    gamePaused = true;
+                    if (typeof snakeAnimId !== 'undefined' && snakeAnimId) { cancelAnimationFrame(snakeAnimId); snakeAnimId = null; }
+                    if (typeof breakerAnimId !== 'undefined' && breakerAnimId) { cancelAnimationFrame(breakerAnimId); breakerAnimId = null; }
+                    if (typeof invaderAnimId !== 'undefined' && invaderAnimId) { cancelAnimationFrame(invaderAnimId); invaderAnimId = null; }
+                    return;
+                }
+
+                if (__pausedByVisibility) {
+                    __pausedByVisibility = false;
+                    if (!__wasPausedBeforeVisibility) {
+                        gamePaused = false;
+                        if (currentGame === 'snake' && typeof snakeRunning !== 'undefined' && snakeRunning && typeof snakeLoop !== 'undefined' && !snakeAnimId) {
+                            try { snakeLastMove = performance.now(); } catch (e) {}
+                            snakeAnimId = requestAnimationFrame(snakeLoop);
+                        }
+                        if (currentGame === 'breaker' && typeof breakerRunning !== 'undefined' && breakerRunning && typeof breakerLoop !== 'undefined' && typeof breakerAnimId !== 'undefined' && !breakerAnimId) {
+                            breakerAnimId = requestAnimationFrame(breakerLoop);
+                        }
+                        if (currentGame === 'invaders' && typeof invaderRunning !== 'undefined' && invaderRunning && typeof invaderLoop !== 'undefined' && typeof invaderAnimId !== 'undefined' && !invaderAnimId) {
+                            invaderAnimId = requestAnimationFrame(invaderLoop);
+                        }
+                    }
+                    __wasPausedBeforeVisibility = false;
+                }
+            } catch (e) {}
+        });
+        
+        // Helper: Get theme-aware foreground color for canvas
+        function getGameFg() {
+            const fg = getComputedStyle(document.documentElement).getPropertyValue('--game-fg').trim();
+            return fg || '#ffffff'; // Fallback to white
+        }
+        
+        let gamePaused = false;
+        
+        // Achievement & Stats System
+        const GAME_OBJECTIVES = {
+            snake: ['Eat food to grow', 'Build combos for multipliers', 'Survive long enough to level up'],
+            breaker: ['Break all bricks to advance', 'Collect power-ups', 'Keep the ball alive'],
+            merge: ['Merge tiles to grow values', 'Reach 2048', 'Push for a higher score'],
+            invaders: ['Clear waves of aliens', 'Collect power-ups', 'Avoid enemy fire']
+        };
+
+        window.ACHIEVEMENTS = {
+            snake: [
+                {id: 'first_food', name: 'First Bite', desc: 'Eat your first food', icon: '🍎', difficulty: 'Easy'},
+                {id: 'combo_5', name: 'Combo Master', desc: 'Reach 5x combo', icon: '🔥', difficulty: 'Medium'},
+                {id: 'score_100', name: 'Century', desc: 'Score 100 points', icon: '💯', difficulty: 'Easy'},
+                {id: 'level_5', name: 'Speed Demon', desc: 'Reach level 5', icon: '⚡', difficulty: 'Medium'},
+                {id: 'length_20', name: 'Long Snake', desc: 'Grow to 20 segments', icon: '🐍', difficulty: 'Hard'},
+            ],
+            breaker: [
+                {id: 'first_brick', name: 'First Break', desc: 'Break your first brick', icon: '🧱', difficulty: 'Easy'},
+                {id: 'powerup_5', name: 'Power Collector', desc: 'Collect 5 power-ups', icon: '⭐', difficulty: 'Medium'},
+                {id: 'level_3', name: 'Triple Threat', desc: 'Complete 3 levels', icon: '🎯', difficulty: 'Medium'},
+                {id: 'perfect_level', name: 'Flawless', desc: 'Complete a level without losing a life', icon: '💎', difficulty: 'Hard'},
+                {id: 'score_500', name: 'Brick Breaker', desc: 'Score 500 points', icon: '🏆', difficulty: 'Easy'},
+            ],
+            merge: [
+                {id: 'tile_128', name: 'Getting Big', desc: 'Create a 128 tile', icon: '🎲', difficulty: 'Easy'},
+                {id: 'tile_512', name: 'Half Way', desc: 'Create a 512 tile', icon: '🎯', difficulty: 'Medium'},
+                {id: 'tile_1024', name: 'Almost There', desc: 'Create a 1024 tile', icon: '⭐', difficulty: 'Hard'},
+                {id: 'tile_2048', name: '2048 Master', desc: 'Reach 2048!', icon: '🏆', difficulty: 'Hard'},
+                {id: 'score_5000', name: 'High Roller', desc: 'Score 5000 points', icon: '💎', difficulty: 'Medium'},
+            ],
+            invaders: [
+                {id: 'first_kill', name: 'First Blood', desc: 'Destroy your first alien', icon: '👾', difficulty: 'Easy'},
+                {id: 'wave_3', name: 'Survivor', desc: 'Complete 3 waves', icon: '🌊', difficulty: 'Medium'},
+                {id: 'score_500', name: 'Space Ace', desc: 'Score 500 points', icon: '🚀', difficulty: 'Medium'},
+                {id: 'perfect_wave', name: 'No Damage', desc: 'Complete a wave without being hit', icon: '🛡️', difficulty: 'Hard'},
+                {id: 'aliens_50', name: 'Exterminator', desc: 'Destroy 50 aliens total', icon: '💥', difficulty: 'Hard'},
+            ]
+        };
+        
+        function loadGameData(game) {
+            const data = localStorage.getItem(`${game}_data`);
+            return data ? JSON.parse(data) : {
+                highScore: 0,
+                totalGames: 0,
+                totalScore: 0,
+                achievements: [],
+                stats: {}
+            };
+        }
+        
+        function saveGameData(game, data) {
+            localStorage.setItem(`${game}_data`, JSON.stringify(data));
+        }
+
+        function getUnifiedUnlockedSet() {
+            const unlocked = new Set();
+
+            // Prefer the unified arcade store when available.
+            try {
+                if (window.ArcadeAchievements && typeof window.ArcadeAchievements.getUnlocked === 'function') {
+                    (window.ArcadeAchievements.getUnlocked() || []).forEach((id) => unlocked.add(id));
+                } else {
+                    const raw = localStorage.getItem('arcade_achievements');
+                    const arr = raw ? JSON.parse(raw) : [];
+                    if (Array.isArray(arr)) arr.forEach((id) => unlocked.add(id));
+                }
+            } catch (e) {}
+
+            // Also merge per-game legacy stores (short ids) defensively.
+            try {
+                ['snake', 'breaker', 'merge', 'invaders'].forEach((game) => {
+                    const data = loadGameData(game);
+                    const list = (data && Array.isArray(data.achievements)) ? data.achievements : [];
+                    list.forEach((shortId) => {
+                        const sid = String(shortId || '');
+                        if (!sid) return;
+                        const full = sid.startsWith(game + '_') ? sid : (game + '_' + sid);
+                        unlocked.add(full);
+                    });
+                });
+            } catch (e) {}
+
+            return unlocked;
+        }
+
+        function resolveAchievementDef(game, achievementId, fullId) {
+            try {
+                const defs = window.ArcadeAchievements && typeof window.ArcadeAchievements.getDefinitions === 'function'
+                    ? window.ArcadeAchievements.getDefinitions()
+                    : null;
+                if (defs && fullId && defs[fullId]) return defs[fullId];
+            } catch (e) {}
+
+            // Fallback to local page definitions
+            try {
+                const list = (window.ACHIEVEMENTS && window.ACHIEVEMENTS[game]) ? window.ACHIEVEMENTS[game] : [];
+                const shortId = String(achievementId || '').startsWith(game + '_')
+                    ? String(achievementId).slice((game + '_').length)
+                    : String(achievementId || '');
+                const hit = Array.isArray(list) ? list.find((a) => a && a.id === shortId) : null;
+                if (hit) {
+                    return {
+                        id: fullId,
+                        game,
+                        title: hit.name,
+                        description: hit.desc,
+                        icon: hit.icon,
+                        difficulty: hit.difficulty
+                    };
+                }
+            } catch (e) {}
+
+            return {
+                id: fullId || achievementId,
+                game,
+                title: 'Achievement',
+                description: '',
+                icon: '🏆',
+                difficulty: 'Easy'
+            };
+        }
+
+        function renderGlobalAchievements() {
+            const listEl = document.getElementById('achievements-list');
+            if (!listEl) return;
+
+            const unlocked = getUnifiedUnlockedSet();
+
+            // Build a unified list of definitions.
+            let defs = [];
+            try {
+                if (window.ArcadeAchievements && typeof window.ArcadeAchievements.getDefinitions === 'function') {
+                    defs = Object.values(window.ArcadeAchievements.getDefinitions() || {});
+                }
+            } catch (e) {}
+
+            if (!defs || !defs.length) {
+                // Fallback to local page definitions (limited to the 4 first-party games).
+                defs = [];
+                try {
+                    ['snake', 'breaker', 'merge', 'invaders'].forEach((game) => {
+                        const list = (window.ACHIEVEMENTS && window.ACHIEVEMENTS[game]) ? window.ACHIEVEMENTS[game] : [];
+                        (Array.isArray(list) ? list : []).forEach((a) => {
+                            if (!a || !a.id) return;
+                            defs.push({
+                                id: `${game}_${a.id}`,
+                                game,
+                                title: a.name,
+                                description: a.desc,
+                                icon: a.icon,
+                                difficulty: a.difficulty
+                            });
+                        });
+                    });
+                } catch (e) {}
+            }
+
+            const formatGameTitle = (gameKey) => {
+                const gameTitles = {
+                    snake: 'Snake',
+                    breaker: 'Block Breaker',
+                    merge: '2048',
+                    invaders: 'Space Invaders',
+                    site: 'Website'
+                };
+                if (gameTitles[gameKey]) return gameTitles[gameKey];
+                if (typeof gameKey === 'string' && gameKey.startsWith('mini_')) {
+                    const raw = gameKey.replace(/^mini_/, '').replace(/_/g, ' ');
+                    return raw.replace(/\b\w/g, (c) => c.toUpperCase());
+                }
+                return String(gameKey || 'Unknown');
+            };
+
+            const difficultyOrder = ['Easy', 'Medium', 'Hard'];
+            const getDifficulty = (def) => {
+                const d = (def && def.difficulty) ? String(def.difficulty).trim() : '';
+                return difficultyOrder.includes(d) ? d : 'Easy';
+            };
+            const getDifficultyRank = (def) => difficultyOrder.indexOf(getDifficulty(def));
+
+            // Group by game (respect any active filter, if the arcade store is present)
+            const filter = (window.ArcadeAchievements && typeof window.ArcadeAchievements.getFilter === 'function')
+                ? window.ArcadeAchievements.getFilter()
+                : 'all';
+
+            const byGame = {};
+            (defs || []).forEach((def) => {
+                if (!def || !def.id) return;
+                if (filter !== 'all' && def.game !== filter) return;
+                if (!byGame[def.game]) byGame[def.game] = [];
+                byGame[def.game].push(def);
+            });
+
+            const html = Object.entries(byGame).map(([game, list]) => {
+                const title = formatGameTitle(game);
+                const total = list.length;
+                const earned = list.filter((d) => unlocked.has(d.id)).length;
+
+                const sorted = list.slice().sort((a, b) => {
+                    const byD = getDifficultyRank(a) - getDifficultyRank(b);
+                    if (byD !== 0) return byD;
+                    const at = String(a && (a.title || a.name) ? (a.title || a.name) : '').toLowerCase();
+                    const bt = String(b && (b.title || b.name) ? (b.title || b.name) : '').toLowerCase();
+                    return at.localeCompare(bt);
+                });
+
+                const buckets = { Easy: [], Medium: [], Hard: [] };
+                sorted.forEach((def) => {
+                    const d = getDifficulty(def);
+                    (buckets[d] || buckets.Easy).push(def);
+                });
+
+                const sections = difficultyOrder
+                    .filter((d) => buckets[d] && buckets[d].length)
+                    .map((d) => {
+                        const items = buckets[d].map((def) => {
+                            const isUnlocked = unlocked.has(def.id);
+                            const icon = isUnlocked ? (def.icon || '🏆') : '🔒';
+                            const itemTitle = escapeHtml(def.title || def.name || 'Achievement');
+                            const itemDesc = escapeHtml(def.description || def.desc || '');
+                            return `
+                                <div class="flex items-center gap-4 p-3 rounded-lg ${isUnlocked ? 'bg-indigodeep/5 dark:bg-white/5' : 'opacity-40 grayscale'}">
+                                    <div class="text-2xl">${icon}</div>
+                                    <div>
+                                        <div class="font-bold text-sm">${itemTitle}</div>
+                                        <div class="text-xs opacity-70">${itemDesc}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+
+                        return `
+                            <details open class="mb-4 last:mb-0">
+                                <summary class="cursor-pointer text-xs font-bold uppercase tracking-wider opacity-70 mb-2">${d}</summary>
+                                <div class="grid grid-cols-1 gap-2">${items}</div>
+                            </details>
+                        `;
+                    }).join('');
+
+                return `
+                    <div class="mb-8 last:mb-0">
+                        <h3 class="font-bold text-lg mb-3 sticky top-0 bg-white dark:bg-[#212842] py-2 z-10 border-b border-black/5 dark:border-white/5 flex items-center gap-2">
+                            ${escapeHtml(title)}
+                            <span class="text-xs font-normal opacity-50 bg-black/5 dark:bg-white/10 px-2 py-0.5 rounded-full">${earned}/${total}</span>
+                        </h3>
+                        ${sections}
+                    </div>
+                `;
+            }).join('');
+
+            listEl.innerHTML = html || '<div class="opacity-70 text-sm">No achievements available.</div>';
+        }
+
+        function refreshAchievementUI() {
+            try {
+                if (typeof updateProgressDisplays === 'function') updateProgressDisplays();
+            } catch (e) {}
+
+            try {
+                ['snake', 'breaker', 'merge', 'invaders'].forEach((game) => {
+                    const state = achievementPanelState && achievementPanelState[game];
+                    if (state && state.open && typeof renderAchievementPanel === 'function') {
+                        renderAchievementPanel(game);
+                    }
+                });
+            } catch (e) {}
+
+            try {
+                renderGlobalAchievements();
+            } catch (e) {}
+        }
+        
+        function unlockHubAchievement(game, achievementId) {
+            console.log('🚀 Hub Unlock Triggered for:', game, achievementId);
+            let fullId = achievementId;
+            if (!achievementId.startsWith(game + '_')) {
+                fullId = game + '_' + achievementId;
+            }
+
+            const shortId = String(achievementId || '').startsWith(game + '_')
+                ? String(achievementId).slice((game + '_').length)
+                : String(achievementId || '');
+
+            // Determine whether this is already unlocked (avoid duplicate toasts)
+            let legacyAlreadyUnlocked = false;
+            let arcadeAlreadyUnlocked = false;
+            try {
+                const data = loadGameData(game);
+                const list = Array.isArray(data.achievements) ? data.achievements : [];
+                legacyAlreadyUnlocked = !!(shortId && list.includes(shortId));
+            } catch (e) {}
+            try {
+                if (window.ArcadeAchievements && typeof window.ArcadeAchievements.getUnlocked === 'function') {
+                    arcadeAlreadyUnlocked = new Set(window.ArcadeAchievements.getUnlocked()).has(fullId);
+                } else {
+                    const raw = localStorage.getItem('arcade_achievements');
+                    const list = raw ? JSON.parse(raw) : [];
+                    arcadeAlreadyUnlocked = Array.isArray(list) && list.includes(fullId);
+                }
+            } catch (e) {}
+
+            if (legacyAlreadyUnlocked && arcadeAlreadyUnlocked) return;
+
+            // Find the achievement object from window.ACHIEVEMENTS for the specific popup
+            let achievementObject = null;
+            try {
+                const list = (window.ACHIEVEMENTS && window.ACHIEVEMENTS[game]) ? window.ACHIEVEMENTS[game] : [];
+                if (Array.isArray(list)) {
+                    achievementObject = list.find((a) => a && a.id === shortId) || null;
+                }
+            } catch (e) {}
+
+            // Always persist to the per-game store (legacy) so counts work even if the arcade modules aren't ready yet.
+            try {
+                const data = loadGameData(game);
+                data.achievements = Array.isArray(data.achievements) ? data.achievements : [];
+                if (shortId && !data.achievements.includes(shortId)) {
+                    data.achievements.push(shortId);
+                    saveGameData(game, data);
+                }
+            } catch (e) {}
+
+            // Ensure the unified arcade store is updated even if ArcadeAchievements isn't initialized yet.
+            try {
+                if (!(window.ArcadeAchievements && typeof window.ArcadeAchievements.unlock === 'function')) {
+                    const raw = localStorage.getItem('arcade_achievements');
+                    const list = raw ? JSON.parse(raw) : [];
+                    const arr = Array.isArray(list) ? list : [];
+                    if (!arr.includes(fullId)) {
+                        arr.push(fullId);
+                        localStorage.setItem('arcade_achievements', JSON.stringify(arr));
+                    }
+                }
+            } catch (e) {}
+
+            if (window.ArcadeAchievements) {
+                window.ArcadeAchievements.unlock(fullId);
+            }
+
+            // Show the specific popup (icon + name + desc) only when this is newly unlocked overall.
+            if (!legacyAlreadyUnlocked && !arcadeAlreadyUnlocked) {
+                if (achievementObject) {
+                    showAchievementUnlock(achievementObject);
+                } else {
+                    const resolved = resolveAchievementDef(game, achievementId, fullId);
+                    showAchievementUnlock({
+                        icon: resolved.icon || '🏆',
+                        name: resolved.title || resolved.name || 'Achievement',
+                        desc: resolved.description || resolved.desc || ''
+                    });
+                }
+            }
+
+            // Force immediate UI refresh so counters/locks update without reload.
+            try { if (typeof updateProgressDisplays === 'function') updateProgressDisplays(); } catch (e) {}
+            try { if (typeof renderAllAchievementPanels === 'function') renderAllAchievementPanels(); } catch (e) {}
+            refreshAchievementUI();
+
+            // Also notify any listeners if the arcade core isn't present.
+            if (!(window.ArcadeAchievements && typeof window.ArcadeAchievements.unlock === 'function')) {
+                try { window.dispatchEvent(new CustomEvent('arcade-achievements-update')); } catch (e) {}
+            }
+        }
+
+        // Debug helper (temporary): run in console to verify hub unlock path is used.
+        window.debugUnlock = function() {
+            console.log('Testing Unlock...');
+            unlockHubAchievement('snake', 'first_food');
+        };
+
+        // Self-test mode (temporary): add ?debugUnlock=1 to the URL.
+        try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('debugUnlock') === '1') {
+                window.setTimeout(() => {
+                    try {
+                        if (typeof window.debugUnlock === 'function') window.debugUnlock();
+                    } catch (e) {}
+                }, 300);
+            }
+        } catch (e) {}
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        const achievementPanelState = {
+            snake: { open: false, tab: 'pending' },
+            breaker: { open: false, tab: 'pending' },
+            merge: { open: false, tab: 'pending' },
+            invaders: { open: false, tab: 'pending' }
+        };
+
+        function renderAchievementPanel(game) {
+            const panel = document.getElementById(`${game}-achievements`);
+            if (!panel) return;
+
+            const state = achievementPanelState[game] || { open: false, tab: 'pending' };
+            let all = (ACHIEVEMENTS[game] || []);
+            let unlockedIds = new Set();
+            let earned = [];
+            let pending = [];
+
+            if (window.ArcadeAchievements) {
+                const allDefs = window.ArcadeAchievements.getDefinitions();
+                const defs = Object.values(allDefs).filter(a => a.game === game);
+                all = defs.map(a => ({
+                    id: a.id,
+                    name: a.title || a.name,
+                    desc: a.description || a.desc,
+                    icon: a.icon
+                }));
+                unlockedIds = new Set(window.ArcadeAchievements.getUnlocked());
+                earned = all.filter(a => unlockedIds.has(a.id));
+                pending = all.filter(a => !unlockedIds.has(a.id));
+            } else {
+                const data = loadGameData(game);
+                unlockedIds = new Set((data.achievements || []));
+                earned = all.filter(a => unlockedIds.has(a.id));
+                pending = all.filter(a => !unlockedIds.has(a.id));
+            }
+            
+            // Safety check for undefined achievements
+            if (!all || all.length === 0) {
+                panel.innerHTML = '<div style="opacity:0.75; padding: 10px;">No achievements available for this game.</div>';
+                return;
+            }
+
+            const objectives = (GAME_OBJECTIVES[game] || []).map(o => `<div style="opacity:0.85;">• ${escapeHtml(o)}</div>`).join('');
+
+            const list = (state.tab === 'earned' ? earned : pending).map(a => {
+                const isEarned = unlockedIds.has(a.id);
+                const icon = isEarned ? (a.icon || '✔') : '🔒';
+                return `
+                    <div style="display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:10px;background:${isEarned ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.18)'};">
+                        <div style="font-size:18px;line-height:1.2;">${icon}</div>
+                        <div style="flex:1;">
+                            <div style="font-weight:700;">${escapeHtml(a.name)}</div>
+                            <div style="opacity:0.8;">${escapeHtml(a.desc)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            panel.innerHTML = `
+                <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                    <div style="font-weight:700;opacity:0.9;">Objectives</div>
+                    <div style="opacity:0.7;">🏆 ${earned.length}/${all.length}</div>
+                </div>
+                <div style="margin-bottom:12px;">${objectives}</div>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+                    <button type="button" data-ach-tab="${game}" data-tab="pending" class="text-xs" style="padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);background:${state.tab === 'pending' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.18)'};color:inherit;cursor:pointer;">Pending (${pending.length})</button>
+                    <button type="button" data-ach-tab="${game}" data-tab="earned" class="text-xs" style="padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);background:${state.tab === 'earned' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.18)'};color:inherit;cursor:pointer;">Earned (${earned.length})</button>
+                </div>
+                <div style="display:grid;gap:8px;max-height:190px;overflow-y:auto;padding-right:4px;">${list || '<div style="opacity:0.75;">No achievements in this view yet.</div>'}</div>
+            `;
+        }
+
+        function renderAllAchievementPanels() {
+            ['snake', 'breaker', 'merge', 'invaders'].forEach(renderAchievementPanel);
+        }
+        
+        function showAchievementUnlock(achievement) {
+            // Remove existing if any
+            const existing = document.querySelector('.achievement-notification');
+            if (existing) existing.remove();
+
+            const icon = (achievement && achievement.icon) ? String(achievement.icon) : '🏆';
+            const name = (achievement && (achievement.name || achievement.title)) ? String(achievement.name || achievement.title) : 'Achievement';
+            const desc = (achievement && (achievement.desc || achievement.description)) ? String(achievement.desc || achievement.description) : '';
+
+            const toast = document.createElement('div');
+            toast.className = 'achievement-notification show';
+            toast.innerHTML = `
+                <div class="achievement-icon">${escapeHtml(icon)}</div>
+                <div class="achievement-content">
+                    <div class="achievement-title">Achievement Unlocked!</div>
+                    <div class="achievement-name">${escapeHtml(name)}</div>
+                    <div class="achievement-desc">${escapeHtml(desc)}</div>
+                </div>
+                <button class="achievement-close" aria-label="Close achievement notification">×</button>
+            `;
+
+            document.body.appendChild(toast);
+
+            // Close handlers
+            const closeBtn = toast.querySelector('.achievement-close');
+            if (closeBtn) closeBtn.onclick = () => toast.remove();
+            
+            // Auto remove after 4s
+            window.setTimeout(() => {
+                try {
+                    if (document.body.contains(toast)) toast.remove();
+                } catch (e) {}
+            }, 4000);
+        }
+
+        function showStats(game) {
+            const data = loadGameData(game);
+
+            // Use centralized achievements if available
+            let achievements = [];
+            let unlockedIds = [];
+
+            if (window.ArcadeAchievements) {
+                const allDefs = window.ArcadeAchievements.getDefinitions();
+                achievements = Object.values(allDefs).filter(a => a.game === game);
+                unlockedIds = window.ArcadeAchievements.getUnlocked();
+            } else {
+                // Fallback
+                achievements = ACHIEVEMENTS[game] || [];
+                unlockedIds = data.achievements || [];
+            }
+
+            const unlockedSet = new Set(unlockedIds);
+            const unlockedCount = achievements.filter(ach => unlockedSet.has(ach.id)).length;
+
+            const difficultyOrder = ['Easy', 'Medium', 'Hard', 'Legendary'];
+            const getDifficulty = (ach) => {
+                const d = (ach && ach.difficulty) ? String(ach.difficulty).trim() : '';
+                return difficultyOrder.includes(d) ? d : 'Easy';
+            };
+            const getDifficultyRank = (ach) => difficultyOrder.indexOf(getDifficulty(ach));
+
+            const sorted = achievements.slice().sort((a, b) => {
+                const byDifficulty = getDifficultyRank(a) - getDifficultyRank(b);
+                if (byDifficulty !== 0) return byDifficulty;
+                const at = String(a && (a.title || a.name) ? (a.title || a.name) : '').toLowerCase();
+                const bt = String(b && (b.title || b.name) ? (b.title || b.name) : '').toLowerCase();
+                return at.localeCompare(bt);
+            });
+
+            const buckets = {};
+            difficultyOrder.forEach(d => buckets[d] = []);
+            sorted.forEach(ach => {
+                const d = getDifficulty(ach);
+                if (!buckets[d]) buckets[d] = [];
+                buckets[d].push(ach);
+            });
+
+            const achievementHTML = achievements.length ? difficultyOrder
+                .filter(d => buckets[d] && buckets[d].length)
+                .map(d => {
+                    const items = buckets[d].map(ach => {
+                        const unlocked = unlockedSet.has(ach.id);
+                        return `
+                            <div style="display:flex;align-items:center;gap:12px;padding:12px;background:${unlocked?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.2)'};border-radius:8px;margin-bottom:8px;${unlocked?'':'opacity:0.5;'}">
+                                <div style="font-size:28px;">${unlocked ? (ach.icon || '🏆') : '🔒'}</div>
+                                <div style="flex:1;">
+                                    <div style="font-weight:bold;font-size:14px;">${ach.title || ach.name || 'Achievement'}</div>
+                                    <div style="font-size:12px;opacity:0.8;">${ach.description || ach.desc || ''}</div>
+                                </div>
+                                ${unlocked ? '<div style="color:#22c55e;font-size:20px;">✔</div>' : ''}
+                            </div>
+                        `;
+                    }).join('');
+                    return `
+                        <div style="margin:14px 0 10px;font-size:11px;font-weight:bold;opacity:0.7;letter-spacing:0.08em;text-transform:uppercase;">${d}</div>
+                        ${items}
+                    `;
+                }).join('')
+                : '<div style="padding:20px;text-align:center;opacity:0.7;">No achievements defined.</div>';
+
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fade-in 0.3s;';
+            modal.innerHTML = `
+                <div style="background:#212842;color:#e1d4c2;border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 12px 48px rgba(0,0,0,0.5);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+                        <h2 style="font-size:24px;font-weight:bold;margin:0;">🎮 ${game.toUpperCase()} Stats</h2>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;padding:0;width:32px;height:32px;">×</button>
+                    </div>
+                    <div style="margin-bottom:24px;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                            <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:8px;text-align:center;">
+                                <div style="font-size:28px;font-weight:bold;color:#fbbf24;">${data.highScore || 0}</div>
+                                <div style="font-size:12px;opacity:0.7;text-transform:uppercase;margin-top:4px;">High Score</div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.05);padding:16px;border-radius:8px;text-align:center;">
+                                <div style="font-size:28px;font-weight:bold;color:#22c55e;">${data.totalGames || 0}</div>
+                                <div style="font-size:12px;opacity:0.7;text-transform:uppercase;margin-top:4px;">Games Played</div>
+                            </div>
+                        </div>
+                    </div>
+                    <h3 style="font-size:18px;font-weight:bold;margin-bottom:12px;">🏆 Achievements (${unlockedCount}/${achievements.length})</h3>
+                    <div style="max-height:300px;overflow-y:auto;">
+                        ${achievementHTML}
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        }
+        
+        // Theme Logic - Handled by site.js, but we need to react to changes for canvas redraws
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                    // Re-init current game to update canvas colors
+                    if (currentGame === 'snake') initSnake();
+                    if (currentGame === 'breaker') initBreaker();
+                    if (currentGame === 'invaders') initInvaders();
+                }
+            });
+        });
+        
+        observer.observe(html, { attributes: true });
+        
+        // Initialize progress displays
+        function updateProgressDisplays() {
+            ['snake', 'breaker', 'merge', 'invaders'].forEach(game => {
+                const data = loadGameData(game);
+                let total = (ACHIEVEMENTS[game] || []).length;
+                let unlocked = (data.achievements || []).length;
+
+                if (window.ArcadeAchievements) {
+                    const allDefs = window.ArcadeAchievements.getDefinitions();
+                    const defs = Object.values(allDefs).filter(a => a.game === game);
+                    const unlockedSet = new Set(window.ArcadeAchievements.getUnlocked());
+                    total = defs.length;
+                    unlocked = defs.filter(a => unlockedSet.has(a.id)).length;
+                }
+                const progressEl = document.getElementById(`${game}-progress`);
+                if (progressEl) {
+                    progressEl.innerHTML = `🏆 ${unlocked}/${total} achievements | 🎮 High: ${data.highScore || 0}`;
+                }
+            });
+        }
+        updateProgressDisplays();
+
+        window.addEventListener('arcade-achievements-update', () => {
+            // Defer so this runs after any upstream UI updates.
+            window.setTimeout(() => {
+                try { refreshAchievementUI(); } catch (e) {}
+            }, 0);
+        });
+
+        // Tiny Achievements tabs inside the selection cards (collapsed by default)
+        document.addEventListener('click', (e) => {
+            const toggle = e.target && e.target.closest ? e.target.closest('[data-ach-toggle]') : null;
+            if (toggle) {
+                e.preventDefault();
+                e.stopPropagation();
+                const game = toggle.getAttribute('data-ach-toggle');
+                if (!game) return;
+                const panel = document.getElementById(`${game}-achievements`);
+                if (!panel) return;
+                const state = achievementPanelState[game] || (achievementPanelState[game] = { open: false, tab: 'pending' });
+                state.open = !state.open;
+                toggle.setAttribute('aria-expanded', state.open ? 'true' : 'false');
+                toggle.textContent = state.open ? 'Achievements ▾' : 'Achievements ▸';
+                panel.classList.toggle('hidden', !state.open);
+                if (state.open) renderAchievementPanel(game);
+                return;
+            }
+
+            const tab = e.target && e.target.closest ? e.target.closest('[data-ach-tab]') : null;
+            if (tab) {
+                e.preventDefault();
+                e.stopPropagation();
+                const game = tab.getAttribute('data-ach-tab');
+                const which = tab.getAttribute('data-tab');
+                if (!game || !which) return;
+                const state = achievementPanelState[game] || (achievementPanelState[game] = { open: false, tab: 'pending' });
+                state.tab = which;
+                renderAchievementPanel(game);
+            }
+        }, { passive: false });
+
+        // Prevent Space Scroll
+        window.addEventListener('keydown', (e) => {
+            if (currentGame && (e.code === 'Space' || e.key.startsWith('Arrow'))) {
+                e.preventDefault();
+            }
+        });
+        
+        // Initialize sounds when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initSounds();
+            const icon = soundsEnabled ? '🔊' : '🔇';
+            ['sound-toggle', 'sound-toggle-snake', 'sound-toggle-breaker', 'sound-toggle-invaders'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.textContent = icon;
+            });
+        });
+
+        function startGame(game) {
+            stopAllGames();
+            document.getElementById('game-selection').classList.add('hidden');
+            document.getElementById(`${game}-game`).classList.remove('hidden');
+            currentGame = game;
+            
+            // Initialize specific game
+            if (game === 'snake') initSnake();
+            if (game === 'breaker') initBreaker();
+            if (game === 'merge') initMerge();
+            if (game === 'invaders') initInvaders();
+            
+            updateProgressDisplays();
+        }
+
+        function backToSelection() {
+            stopAllGames();
+            gamePaused = false;
+            document.querySelectorAll('section[id$="-game"]').forEach(s => s.classList.add('hidden'));
+            document.getElementById('game-selection').classList.remove('hidden');
+            currentGame = null;
+            updateProgressDisplays();
+        }
+
+        function togglePause(game) {
+            gamePaused = !gamePaused;
+            const btn = document.getElementById(`${game}-pause`);
+            if (!btn) {
+                if (gamePaused) showPauseOverlay();
+                else removePauseOverlay();
+                return;
+            }
+            if (gamePaused) {
+                btn.textContent = 'Resume';
+                btn.classList.remove('bg-yellow-600');
+                btn.classList.add('bg-green-600');
+                showPauseOverlay();
+            } else {
+                btn.textContent = 'Pause';
+                btn.classList.remove('bg-green-600');
+                btn.classList.add('bg-yellow-600');
+                removePauseOverlay();
+            }
+        }
+
+        function showPauseOverlay() {
+            const overlay = document.createElement('div');
+            overlay.id = 'pause-overlay';
+            overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;';
+            overlay.innerHTML = '<div style="text-align:center;color:white;"><div style="font-size:4rem;margin-bottom:1rem;">⏸️</div><h2 style="font-size:2rem;font-weight:bold;">PAUSED</h2><p style="margin-top:0.5rem;opacity:0.8;">Click anywhere to resume</p></div>';
+            overlay.addEventListener('click', () => togglePause(currentGame));
+            document.body.appendChild(overlay);
+        }
+
+        function removePauseOverlay() {
+            const overlay = document.getElementById('pause-overlay');
+            if (overlay) overlay.remove();
+        }
+
+        function stopAllGames() {
+            if (snakeInterval) clearInterval(snakeInterval);
+            if (breakerAnimId) cancelAnimationFrame(breakerAnimId);
+            if (invaderAnimId) cancelAnimationFrame(invaderAnimId);
+            snakeRunning = false;
+            breakerRunning = false;
+            invaderRunning = false;
+        }
+
+        function showGameOver(emoji, title, message, restartFn) {
+            // Ensure we only ever show one game-over modal at a time.
+            document.querySelectorAll('.game-modal').forEach(m => m.remove());
+
+            const modal = document.createElement('div');
+            modal.className = 'game-modal';
+            modal.innerHTML = `
+                <button class="modal-close" onclick="this.parentElement.remove()">×</button>
+                <div class="text-center">
+                    <div class="text-5xl mb-3">${emoji}</div>
+                    <h3 class="text-xl font-bold mb-2">${title}</h3>
+                    <p class="mb-4 opacity-90">${message}</p>
+                    <button id="modal-restart" class="px-6 py-2 bg-white rounded-lg font-bold hover:bg-gray-200" style="color: black !important;">Play Again</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const restartBtn = modal.querySelector('#modal-restart');
+            if (restartBtn) {
+                restartBtn.addEventListener('click', () => {
+                    modal.remove();
+                    restartFn();
+                }, { once: true });
+            }
+
+            setTimeout(() => { if (modal.parentElement) modal.remove(); }, 8000);
+        }
+
+        function createParticles(x, y, count = 5, color = '#fff') {
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.backgroundColor = color;
+                particle.style.setProperty('--dx', (Math.random() - 0.5) * 100 + 'px');
+                particle.style.setProperty('--dy', (Math.random() - 0.5) * 100 + 'px');
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        function screenShake(intensity = 5, duration = 200) {
+            const gameContainer = document.querySelector('.game-container');
+            if (!gameContainer) return;
+            
+            gameContainer.style.transition = 'none';
+            let shakes = 0;
+            const shakeInterval = setInterval(() => {
+                const offsetX = (Math.random() - 0.5) * intensity;
+                const offsetY = (Math.random() - 0.5) * intensity;
+                gameContainer.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+                shakes++;
+                if (shakes > duration / 20) {
+                    clearInterval(shakeInterval);
+                    gameContainer.style.transition = 'transform 0.1s ease-out';
+                    gameContainer.style.transform = 'translate(0, 0)';
+                }
+            }, 20);
+        }
+
+
+        // ====================================================================
+        // SNAKE GAME - Enhanced with Levels & Difficulty
+        // ====================================================================
+        const snakeCanvas = document.getElementById('snake-canvas');
+        const snakeCtx = snakeCanvas.getContext('2d');
+        let snake = [], food = {}, snakeDir = {}, nextSnakeDir = {}, snakeScore = 0, snakeInterval, snakeRunning = false;
+        let snakeAnimId = null, snakeLastMove = 0;
+        let snakeLevel = 1, snakeSpeed = 100, snakeFoodEaten = 0;
+        let snakeCombo = 0, snakeComboTimer = null, snakeGameStarted = false;
+        let snakeHighScore = parseInt(localStorage.getItem('snakeHighScore') || '0');
+
+        function initSnake() {
+            snake = [{x:10,y:10}, {x:9,y:10}, {x:8,y:10}];
+            snakeDir = {x:0,y:0}; nextSnakeDir = {x:0,y:0}; // Start with no movement
+            snakeScore = 0; snakeLevel = 1; snakeSpeed = 100; snakeFoodEaten = 0;
+            snakeCombo = 0; snakeGameStarted = false; snakeLastMove = 0;
+            document.getElementById('snake-score').textContent = '0';
+            document.getElementById('snake-level').textContent = '1';
+            document.getElementById('snake-combo').style.display = 'none';
+            placeFood();
+            if (snakeInterval) clearInterval(snakeInterval);
+            snakeRunning = true;
+            
+            // Mobile touch controls for Snake
+            if (isMobile) {
+                const canvas = document.getElementById('snake-canvas');
+                let touchStartX = 0, touchStartY = 0;
+                
+                canvas.ontouchstart = (e) => {
+                    e.preventDefault();
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                };
+                
+                canvas.ontouchmove = (e) => {
+                    e.preventDefault();
+                };
+                
+                canvas.ontouchend = (e) => {
+                    e.preventDefault();
+                    if (!snakeGameStarted) {
+                        snakeGameStarted = true;
+                        snakeLastMove = performance.now();
+                    }
+                    
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const touchEndY = e.changedTouches[0].clientY;
+                    const dx = touchEndX - touchStartX;
+                    const dy = touchEndY - touchStartY;
+                    
+                    if (Math.abs(dx) > Math.abs(dy)) {
+                        // Horizontal swipe
+                        if (Math.abs(dx) > 30) {
+                            setSnakeDirection(dx > 0 ? 'right' : 'left');
+                        }
+                    } else {
+                        // Vertical swipe
+                        if (Math.abs(dy) > 30) {
+                            setSnakeDirection(dy > 0 ? 'down' : 'up');
+                        }
+                    }
+                };
+            }
+            
+            // Start continuous rendering for preview
+            snakeLoop();
+        }
+
+        function placeFood() {
+            food = { x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20) };
+        }
+
+        function snakeLoop(timestamp) {
+            if (!snakeRunning) return;
+            if (gamePaused) {
+                snakeAnimId = requestAnimationFrame(snakeLoop);
+                return;
+            }
+            
+            try {
+                const fg = getGameFg();
+            // Only move if game has started and enough time has passed
+            if (snakeGameStarted && timestamp - snakeLastMove > snakeSpeed) {
+                snakeDir = {...nextSnakeDir};
+                const head = {x: snake[0].x + snakeDir.x, y: snake[0].y + snakeDir.y};
+                
+                // Improved collision detection
+                const hitWall = head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20;
+                const hitSelf = snake.slice(1).some(s => s.x === head.x && s.y === head.y);
+            
+            if (hitWall || hitSelf) {
+                snakeRunning = false;
+                clearInterval(snakeInterval);
+                
+                // Save game data
+                const data = loadGameData('snake');
+                data.totalGames++;
+                data.totalScore += snakeScore;
+                if (snakeScore > data.highScore) data.highScore = snakeScore;
+                saveGameData('snake', data);
+                
+                if (snakeScore > snakeHighScore) {
+                    snakeHighScore = snakeScore;
+                    localStorage.setItem('snakeHighScore', snakeHighScore.toString());
+                    showGameOver('🏆', 'New High Score!', `Score: ${snakeScore} | Level: ${snakeLevel}`, initSnake);
+                } else {
+                    showGameOver('🐍', 'Game Over', `Score: ${snakeScore} | Level: ${snakeLevel} | Best: ${snakeHighScore}`, initSnake);
+                }
+                return;
+            }
+            
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                // Combo system
+                snakeCombo++;
+                if (snakeComboTimer) clearTimeout(snakeComboTimer);
+                snakeComboTimer = setTimeout(() => { snakeCombo = 0; updateComboDisplay(); }, 2000);
+                
+                const multiplier = Math.min(snakeCombo, 5);
+                const points = snakeLevel * 10 * multiplier;
+                snakeScore += points;
+                snakeFoodEaten++;
+                document.getElementById('snake-score').textContent = snakeScore;
+                updateComboDisplay();
+                
+                // Play eat sound
+                if (sounds.eat) sounds.eat();
+                
+                // Check achievements
+                if (snakeFoodEaten === 1) unlockHubAchievement('snake', 'first_food');
+                if (multiplier >= 5) unlockHubAchievement('snake', 'combo_5');
+                if (snakeScore >= 100) unlockHubAchievement('snake', 'score_100');
+                if (snake.length >= 20) unlockHubAchievement('snake', 'length_20');
+                
+                // Visual feedback for combo
+                if (multiplier > 1) {
+                    showComboText(food.x * 20, food.y * 20, `x${multiplier}!`, '#fbbf24');
+                }
+                
+                // Level up every 5 foods
+                if (snakeFoodEaten % 5 === 0) {
+                    snakeLevel++;
+                    snakeSpeed = Math.max(50, snakeSpeed - 10);
+                    document.getElementById('snake-level').textContent = snakeLevel;
+                    if (snakeLevel >= 5) unlockHubAchievement('snake', 'level_5');
+                    createParticles(food.x * 20 + 10, food.y * 20 + 10, 8, '#22c55e');
+                }
+                
+                placeFood();
+            } else {
+                snake.pop();
+            }
+            
+            snakeLastMove = timestamp;
+            } // End of snakeGameStarted check
+            drawSnake();
+            } catch (e) {
+                if (window.__logCollect) {
+                    window.__logCollect('game.error', {
+                        game: 'snake',
+                        message: e.message,
+                        stack: e.stack,
+                        timestamp: Date.now()
+                    });
+                }
+                console.error('Snake game error:', e);
+            }
+            
+            // Continue loop
+            snakeAnimId = requestAnimationFrame(snakeLoop);
+        }
+
+        function drawSnake() {
+            // Optimized rendering
+            snakeCtx.fillStyle = '#1a1a2e';
+            snakeCtx.fillRect(0,0,400,400);
+            
+            // Grid with level-based opacity
+            const gridOpacity = Math.min(0.1, 0.02 * snakeLevel);
+            snakeCtx.strokeStyle = `rgba(255,255,255,${gridOpacity})`;
+            snakeCtx.lineWidth = 1;
+            for (let i = 0; i <= 20; i++) {
+                snakeCtx.beginPath();
+                snakeCtx.moveTo(i * 20, 0);
+                snakeCtx.lineTo(i * 20, 400);
+                snakeCtx.stroke();
+                snakeCtx.beginPath();
+                snakeCtx.moveTo(0, i * 20);
+                snakeCtx.lineTo(400, i * 20);
+                snakeCtx.stroke();
+            }
+            
+            // Food with pulsing effect
+            const pulse = Math.sin(Date.now() * 0.005) * 0.3 + 0.7;
+            snakeCtx.fillStyle = `rgba(239, 68, 68, ${pulse})`;
+            snakeCtx.shadowColor = '#ef4444';
+            snakeCtx.shadowBlur = 15 * pulse;
+            snakeCtx.beginPath();
+            snakeCtx.arc(food.x*20+10, food.y*20+10, 8 * pulse, 0, Math.PI*2);
+            snakeCtx.fill();
+            snakeCtx.shadowBlur = 0;
+            
+            // Snake with gradient, glow, and trail
+            snake.forEach((s, i) => {
+                const alpha = Math.max(0.3, 1 - (i * 0.1));
+                const size = i === 0 ? 18 : Math.max(8, 18 - (i * 2));
+                
+                if (i === 0) {
+                    // Head with eyes and glow
+                    snakeCtx.fillStyle = '#22c55e';
+                    snakeCtx.shadowColor = '#22c55e';
+                    snakeCtx.shadowBlur = 15;
+                    snakeCtx.fillRect(s.x*20 + (20-size)/2, s.y*20 + (20-size)/2, size, size);
+                    snakeCtx.shadowBlur = 0;
+                    
+                    // Eyes
+                    snakeCtx.fillStyle = 'white';
+                    const eyeSize = 3;
+                    if (snakeDir.x === 1) {
+                        snakeCtx.beginPath();
+                        snakeCtx.arc(s.x*20 + 14, s.y*20 + 6, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.arc(s.x*20 + 14, s.y*20 + 14, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.fill();
+                    } else if (snakeDir.x === -1) {
+                        snakeCtx.beginPath();
+                        snakeCtx.arc(s.x*20 + 6, s.y*20 + 6, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.arc(s.x*20 + 6, s.y*20 + 14, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.fill();
+                    } else if (snakeDir.y === -1) {
+                        snakeCtx.beginPath();
+                        snakeCtx.arc(s.x*20 + 6, s.y*20 + 6, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.arc(s.x*20 + 14, s.y*20 + 6, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.fill();
+                    } else {
+                        snakeCtx.beginPath();
+                        snakeCtx.arc(s.x*20 + 6, s.y*20 + 14, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.arc(s.x*20 + 14, s.y*20 + 14, eyeSize, 0, Math.PI * 2);
+                        snakeCtx.fill();
+                    }
+                } else {
+                    // Body with gradient and trail effect
+                    snakeCtx.fillStyle = `rgba(34, 197, 94, ${alpha})`;
+                    snakeCtx.fillRect(s.x*20 + (20-size)/2, s.y*20 + (20-size)/2, size, size);
+                }
+            });
+            
+            // Start game prompt
+            if (!snakeGameStarted) {
+                snakeCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                snakeCtx.fillRect(0, 0, 400, 400);
+                const fg = getGameFg();
+                snakeCtx.fillStyle = fg;
+                snakeCtx.font = 'bold 24px Inter';
+                snakeCtx.textAlign = 'center';
+                snakeCtx.fillText('Press Arrow Key to Start', 200, 200);
+            }
+        }
+
+        function setSnakeDirection(d) {
+            if (!snakeRunning) return;
+            if (!snakeGameStarted) {
+                snakeGameStarted = true;
+                snakeLastMove = performance.now();
+            }
+            const ops = {up:'down', down:'up', left:'right', right:'left'};
+            const cur = snakeDir.y===-1?'up':snakeDir.y===1?'down':snakeDir.x===-1?'left':'right';
+            if (d !== ops[cur]) {
+                if(d==='up') nextSnakeDir={x:0,y:-1};
+                if(d==='down') nextSnakeDir={x:0,y:1};
+                if(d==='left') nextSnakeDir={x:-1,y:0};
+                if(d==='right') nextSnakeDir={x:1,y:0};
+            }
+        }
+
+        function updateComboDisplay() {
+            const comboEl = document.getElementById('snake-combo');
+            if (snakeCombo > 1) {
+                comboEl.textContent = `COMBO x${Math.min(snakeCombo, 5)}`;
+                comboEl.style.display = 'inline';
+            } else {
+                comboEl.style.display = 'none';
+            }
+        }
+
+        function showComboText(x, y, text, color) {
+            const comboText = document.createElement('div');
+            comboText.textContent = text;
+            comboText.style.cssText = `position:fixed;left:${x}px;top:${y}px;color:${color};font-size:24px;font-weight:bold;pointer-events:none;z-index:10000;text-shadow:2px 2px 4px rgba(0,0,0,0.8);animation:combo-float 1s ease-out forwards;`;
+            document.body.appendChild(comboText);
+            setTimeout(() => comboText.remove(), 1000);
+        }
+
+        // ====================================================================
+        // BLOCK BREAKER - Enhanced with Power-ups & Lives
+        // ====================================================================
+        const brCanvas = document.getElementById('breaker-canvas');
+        const brCtx = brCanvas.getContext('2d');
+        let brPaddle = {x: 150, w: 100, h: 10}, brBall = {x: 200, y: 250, dx: 4, dy: -4, r: 6};
+        let brBricks = [], brScore = 0, breakerRunning = false, breakerAnimId;
+        let breakerPaddleDir = 0, breakerLives = 3, breakerLevel = 1;
+        let powerUps = [], breakerSpeed = 4;
+        let breakerHighScore = parseInt(localStorage.getItem('breakerHighScore') || '0');
+        let breakerPowerupsCollected = 0, breakerBricksDestroyed = 0, breakerLivesAtLevelStart = 3;
+        let breakerBalls = [], breakerSlowMoEndTime = 0, breakerPaddleExpanded = 0, breakerGameStarted = false;
+
+        function initBreaker() {
+            brPaddle = {x: 150, w: 100, h: 10};
+            brBall = {x: 200, y: 300, dx: 0, dy: 0, r: 6};
+            brBricks = []; powerUps = []; breakerBalls = [];
+            // Brick layout (computed to center within canvas)
+            const cols = 5, rows = 4;
+            const brickW = 60, brickH = 20;
+            const spacingX = 10, spacingY = 10;
+            const startX = Math.round((brCanvas.width - (cols * brickW + (cols - 1) * spacingX)) / 2);
+            const startY = 40;
+            for(let c=0; c<cols; c++) {
+                for(let r=0; r<rows; r++) {
+                    const x = startX + c * (brickW + spacingX);
+                    const y = startY + r * (brickH + spacingY);
+                    brBricks.push({x: x, y: y, status: 1, hits: 1});
+                }
+            }
+            brScore = 0; breakerLives = 3; breakerLevel = 1; breakerSpeed = 4;
+            breakerPowerupsCollected = 0; breakerBricksDestroyed = 0; breakerLivesAtLevelStart = 3;
+            breakerSlowMoEndTime = 0; breakerPaddleExpanded = 0; breakerGameStarted = false;
+            document.getElementById('breaker-score').textContent = '0';
+            document.getElementById('breaker-lives').textContent = '3';
+            
+            // Mobile touch controls for Brick Breaker
+            if (isMobile) {
+                const canvas = document.getElementById('breaker-canvas');
+                let touching = false;
+                
+                canvas.ontouchstart = (e) => {
+                    e.preventDefault();
+                    touching = true;
+                    if (!breakerGameStarted) {
+                        breakerGameStarted = true;
+                        brBall.dx = 4 * (Math.random() > 0.5 ? 1 : -1);
+                        brBall.dy = -4;
+                    }
+                };
+                
+                canvas.ontouchmove = (e) => {
+                    e.preventDefault();
+                    if (touching) {
+                        const rect = canvas.getBoundingClientRect();
+                        const touchX = e.touches[0].clientX - rect.left;
+                        const canvasX = (touchX / rect.width) * 400;
+                        brPaddle.x = Math.max(0, Math.min(400 - brPaddle.w, canvasX - brPaddle.w / 2));
+                    }
+                };
+                
+                canvas.ontouchend = (e) => {
+                    e.preventDefault();
+                    touching = false;
+                };
+            }
+            
+            breakerRunning = true;
+            if(breakerAnimId) cancelAnimationFrame(breakerAnimId);
+            breakerLoop();
+        }
+
+        function breakerLoop() {
+            if(!breakerRunning) return;
+            if(gamePaused) {
+                breakerAnimId = requestAnimationFrame(breakerLoop);
+                return;
+            }
+            
+            try {
+            brCtx.clearRect(0,0,400,500);
+            
+            // Move Paddle
+            brPaddle.x += breakerPaddleDir * 7;
+            if(brPaddle.x < 0) brPaddle.x = 0;
+            if(brPaddle.x + brPaddle.w > 400) brPaddle.x = 400 - brPaddle.w;
+            
+            // Calculate speed multiplier (used by both main ball and extra balls)
+            const baseSpeed = 1.2;
+            const speedIncrease = Math.min(breakerBricksDestroyed * 0.05, 2.0); // Max +200% speed
+            const speedMultiplier = Date.now() < breakerSlowMoEndTime ? 0.6 : (baseSpeed + speedIncrease);
+            
+            // Move Ball with progressively increasing speed (only if game started)
+            if (breakerGameStarted) {
+                brBall.x += brBall.dx * speedMultiplier;
+                brBall.y += brBall.dy * speedMultiplier;
+            }
+            
+            // Move extra balls (only if game started)
+            if (breakerGameStarted) {
+                for (let idx = breakerBalls.length - 1; idx >= 0; idx--) {
+                    const ball = breakerBalls[idx];
+                    ball.x += ball.dx * speedMultiplier;
+                    ball.y += ball.dy * speedMultiplier;
+                    
+                    // Wall collision for extra balls
+                    if(ball.x + ball.r > 400 || ball.x - ball.r < 0) ball.dx = -ball.dx;
+                    if(ball.y - ball.r < 0) ball.dy = -ball.dy;
+                    if(ball.y + ball.r > 500) {
+                        breakerBalls.splice(idx, 1);
+                        continue;
+                    }
+                    
+                    // Paddle collision for extra balls
+                    if(ball.y + ball.r > 480 && ball.y - ball.r < 490 && ball.x > brPaddle.x && ball.x < brPaddle.x + brPaddle.w) {
+                        ball.dy = -Math.abs(ball.dy);
+                        let hitPoint = (ball.x - brPaddle.x) / brPaddle.w;
+                        ball.dx = (hitPoint - 0.5) * 8;
+                    }
+                }
+            }
+            
+            // Wall Collision
+            if(brBall.x + brBall.r > 400 || brBall.x - brBall.r < 0) brBall.dx = -brBall.dx;
+            if(brBall.y - brBall.r < 0) brBall.dy = -brBall.dy;
+            if(brBall.y + brBall.r > 500) {
+                // Check if we have extra balls to promote
+                if (breakerBalls.length > 0) {
+                    brBall = breakerBalls.shift();
+                } else {
+                    breakerLives--;
+                    document.getElementById('breaker-lives').textContent = breakerLives;
+                    if (breakerLives <= 0) {
+                    breakerRunning = false;
+                    
+                    // Save game data
+                    const data = loadGameData('breaker');
+                    data.totalGames++;
+                    data.totalScore += brScore;
+                    if (brScore > data.highScore) data.highScore = brScore;
+                    saveGameData('breaker', data);
+                    
+                    if (brScore > breakerHighScore) {
+                        breakerHighScore = brScore;
+                        localStorage.setItem('breakerHighScore', breakerHighScore.toString());
+                        showGameOver('🏆', 'New High Score!', `Score: ${brScore}`, initBreaker);
+                    } else {
+                        showGameOver('🧱', 'Game Over', `Score: ${brScore} | Best: ${breakerHighScore}`, initBreaker);
+                    }
+                    return;
+                } else {
+                    // Reset ball
+                    brBall = {x: 200, y: 300, dx: 3 * (Math.random() > 0.5 ? 1 : -1), dy: -3, r: 6};
+                }
+                }
+            }
+            
+            // Paddle Collision with angle
+            if(brBall.y + brBall.r > 480 && brBall.y - brBall.r < 490 && brBall.x > brPaddle.x && brBall.x < brPaddle.x + brPaddle.w) {
+                brBall.dy = -Math.abs(brBall.dy);
+                let hitPoint = (brBall.x - brPaddle.x) / brPaddle.w;
+                brBall.dx = (hitPoint - 0.5) * 8; // Angle based on hit position
+                createParticles(brBall.x, 480, 3, '#a855f7');
+                screenShake(3, 100);
+            }
+            
+            // Brick Collision - Main ball
+            brBricks.forEach(b => {
+                if(b.status === 1) {
+                    const ballInBrickX = brBall.x + brBall.r > b.x && brBall.x - brBall.r < b.x + 60;
+                    const ballInBrickY = brBall.y + brBall.r > b.y && brBall.y - brBall.r < b.y + 20;
+                    
+                    if(ballInBrickX && ballInBrickY) {
+                        brBall.dy = -brBall.dy;
+                        b.hits--;
+                        if (b.hits <= 0) {
+                            b.status = 0;
+                            brScore += 10 * breakerLevel;
+                            breakerBricksDestroyed++;
+                            document.getElementById('breaker-score').textContent = brScore;
+                            createParticles(b.x + 30, b.y + 10, 5, `hsl(${b.y}, 70%, 60%)`);
+                            
+                            if (breakerBricksDestroyed === 1) unlockHubAchievement('breaker', 'first_brick');
+                            if (brScore >= 500) unlockHubAchievement('breaker', 'score_500');
+                            
+                            const powerUpChance = Math.random();
+                            if (powerUpChance < 0.25) {
+                                const powerUpTypes = ['expand', 'multiball', 'slowmo', 'life'];
+                                const type = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
+                                powerUps.push({x: b.x + 30, y: b.y + 10, type: type});
+                            }
+                        }
+                    }
+                    
+                    // Extra balls collision (reverse loop to handle removal safely)
+                    for (let bi = breakerBalls.length - 1; bi >= 0; bi--) {
+                        const ball = breakerBalls[bi];
+                        if (!ball) continue;
+                        
+                        const ballInBrickX2 = ball.x + ball.r > b.x && ball.x - ball.r < b.x + 60;
+                        const ballInBrickY2 = ball.y + ball.r > b.y && ball.y - ball.r < b.y + 20;
+                        
+                        if(ballInBrickX2 && ballInBrickY2 && b.status === 1) {
+                            ball.dy = -ball.dy;
+                            b.hits--;
+                            if (b.hits <= 0) {
+                                b.status = 0;
+                                brScore += 10 * breakerLevel;
+                                breakerBricksDestroyed++;
+                                document.getElementById('breaker-score').textContent = brScore;
+                                createParticles(b.x + 30, b.y + 10, 5, `hsl(${b.y}, 70%, 60%)`);
+                                
+                                if (sounds.hit) sounds.hit();
+                                if (brScore >= 500) unlockHubAchievement('breaker', 'score_500');
+                            }
+                        }
+                    }
+                        
+                        if(brBricks.every(brick => brick.status === 0)) {
+                            // Check for perfect level
+                            if (breakerLives === breakerLivesAtLevelStart) {
+                                unlockHubAchievement('breaker', 'perfect_level');
+                            }
+                            
+                            breakerLevel++;
+                            breakerSpeed += 0.5;
+                            if (breakerLevel >= 3) unlockHubAchievement('breaker', 'level_3');
+                            breakerLivesAtLevelStart = breakerLives;
+                            
+                            // Reset bricks for next level (centered)
+                            const cols = 5, rows = 4;
+                            const brickW = 60, brickH = 20;
+                            const spacingX = 10, spacingY = 10;
+                            const startX = Math.round((brCanvas.width - (cols * brickW + (cols - 1) * spacingX)) / 2);
+                            const startY = 40;
+                            for(let c=0; c<cols; c++) {
+                                for(let r=0; r<rows; r++) {
+                                    const x = startX + c * (brickW + spacingX);
+                                    const y = startY + r * (brickH + spacingY);
+                                    brBricks.push({x: x, y: y, status: 1, hits: breakerLevel});
+                                }
+                            }
+                        }
+                    }
+            });
+            
+            // Power-ups
+            powerUps.forEach((p, i) => {
+                p.y += 2;
+                if (p.y > 480 && p.x > brPaddle.x && p.x < brPaddle.x + brPaddle.w) {
+                    // Collected
+                    breakerPowerupsCollected++;
+                    if (breakerPowerupsCollected >= 5) unlockHubAchievement('breaker', 'powerup_5');
+                    
+                    if (p.type === 'expand') {
+                        brPaddle.w = Math.min(180, brPaddle.w + 40);
+                        breakerPaddleExpanded = 360; // 6 seconds at 60fps
+                        showComboText(p.x, p.y, 'BIG PADDLE!', '#a855f7');
+                    } else if (p.type === 'multiball') {
+                        breakerBalls.push(
+                            {x: brBall.x - 15, y: brBall.y, dx: -4, dy: -4, r: 6},
+                            {x: brBall.x + 15, y: brBall.y, dx: 4, dy: -4, r: 6}
+                        );
+                        showComboText(p.x, p.y, 'MULTI-BALL!', '#22c55e');
+                    } else if (p.type === 'slowmo') {
+                        breakerSlowMoEndTime = Date.now() + 3000; // 3 seconds
+                        showComboText(p.x, p.y, 'SLOW-MO!', '#3b82f6');
+                    } else if (p.type === 'life') {
+                        breakerLives = Math.min(5, breakerLives + 1);
+                        document.getElementById('breaker-lives').textContent = breakerLives;
+                        showComboText(p.x, p.y, '+1 LIFE!', '#ef4444');
+                    }
+                    
+                    powerUps.splice(i, 1);
+                    createParticles(p.x, p.y, 12, '#ffd700');
+                    if (sounds.powerup) sounds.powerup();
+                } else if (p.y > 500) {
+                    powerUps.splice(i, 1);
+                }
+            });
+            
+            // Handle paddle expansion timer
+            if (breakerPaddleExpanded > 0) {
+                breakerPaddleExpanded--;
+                if (breakerPaddleExpanded === 0) {
+                    brPaddle.w = 100; // Reset to normal size
+                }
+            }
+            
+            // Draw
+            brCtx.fillStyle = '#a855f7';
+            brCtx.fillRect(brPaddle.x, 480, brPaddle.w, brPaddle.h);
+            
+            const fg = getGameFg();
+            brCtx.fillStyle = fg;
+            brCtx.beginPath();
+            brCtx.arc(brBall.x, brBall.y, brBall.r, 0, Math.PI*2);
+            brCtx.fill();
+            
+            const brickW = 60, brickH = 20;
+            brBricks.forEach(b => {
+                if(b.status === 1) {
+                    const hue = (b.y * 2) % 360;
+                    brCtx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+                    brCtx.fillRect(b.x, b.y, brickW, brickH);
+                    brCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+                    brCtx.strokeRect(b.x, b.y, brickW, brickH);
+                    
+                    // Draw hit counter
+                    if (b.hits > 1) {
+                        brCtx.fillStyle = 'rgba(255,255,255,0.9)';
+                        brCtx.font = 'bold 14px Inter';
+                        brCtx.textAlign = 'center';
+                        brCtx.textBaseline = 'middle';
+                        brCtx.strokeStyle = 'rgba(0,0,0,0.5)';
+                        brCtx.lineWidth = 3;
+                        brCtx.strokeText(b.hits, b.x + brickW/2, b.y + brickH/2);
+                        brCtx.fillText(b.hits, b.x + brickW/2, b.y + brickH/2);
+                    }
+                }
+            });
+            
+            // Power-ups with icons
+            powerUps.forEach(p => {
+                const colors = {expand: '#a855f7', multiball: '#22c55e', slowmo: '#3b82f6', life: '#ef4444'};
+                brCtx.fillStyle = colors[p.type] || '#ffd700';
+                brCtx.beginPath();
+                brCtx.arc(p.x, p.y, 8, 0, Math.PI*2);
+                brCtx.fill();
+                brCtx.strokeStyle = 'white';
+                brCtx.lineWidth = 2;
+                brCtx.stroke();
+            });
+            
+            // Draw extra balls
+            breakerBalls.forEach(ball => {
+                brCtx.fillStyle = '#22c55e';
+                brCtx.beginPath();
+                brCtx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+                brCtx.fill();
+            });
+            
+            // Start game prompt
+            if (!breakerGameStarted) {
+                brCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                brCtx.fillRect(0, 0, 400, 500);
+                const fg = getGameFg();
+                brCtx.fillStyle = fg;
+                brCtx.font = 'bold 24px Inter';
+                brCtx.textAlign = 'center';
+                brCtx.fillText('Press ← or → to Start', 200, 250);
+            }
+            
+            // Slow-mo indicator
+            if (Date.now() < breakerSlowMoEndTime) {
+                brCtx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+                brCtx.fillRect(0, 0, 400, 500);
+            }
+            } catch (e) {
+                if (window.__logCollect) {
+                    window.__logCollect('game.error', {
+                        game: 'breaker',
+                        message: e.message,
+                        stack: e.stack,
+                        timestamp: Date.now()
+                    });
+                }
+                console.error('Breaker game error:', e);
+            }
+            
+            breakerAnimId = requestAnimationFrame(breakerLoop);
+        }
+
+        // ====================================================================
+        // 2048 - Enhanced with Smooth Animations & Best Score
+        // ====================================================================
+        let mergeTiles = [];
+        let mergeIdCounter = 0;
+        let mergeScore = 0;
+        let mergeBest = parseInt(localStorage.getItem('mergeBest') || '0');
+
+        function initMerge() {
+            mergeTiles = [];
+            mergeIdCounter = 0;
+            mergeScore = 0;
+
+            const scoreEl = document.getElementById('merge-score');
+            if (scoreEl) scoreEl.textContent = '0';
+
+            const bestEl = document.getElementById('merge-best');
+            if (bestEl) bestEl.textContent = mergeBest;
+
+            spawnMergeTile();
+            spawnMergeTile();
+            renderMerge();
+            
+            const el = document.getElementById('merge-container');
+            if (el) {
+                let tsx=0, tsy=0;
+                el.ontouchstart = e => { tsx=e.touches[0].clientX; tsy=e.touches[0].clientY; };
+                el.ontouchend = e => {
+                    let dx = e.changedTouches[0].clientX - tsx;
+                    let dy = e.changedTouches[0].clientY - tsy;
+                    if(Math.abs(dx) > Math.abs(dy)) {
+                        if(Math.abs(dx)>30) moveMerge(dx>0?'right':'left');
+                    } else {
+                        if(Math.abs(dy)>30) moveMerge(dy>0?'down':'up');
+                    }
+                };
+            }
+        }
+
+        function spawnMergeTile() {
+            let empty = [];
+            for(let r=0;r<4;r++) for(let c=0;c<4;c++) {
+                if(!mergeTiles.find(t => t.r===r && t.c===c)) empty.push({r,c});
+            }
+            if(empty.length) {
+                let spot = empty[Math.floor(Math.random()*empty.length)];
+                mergeTiles.push({
+                    id: mergeIdCounter++,
+                    val: Math.random()<0.9?2:4,
+                    r: spot.r,
+                    c: spot.c,
+                    new: true
+                });
+            }
+        }
+
+        function renderMerge() {
+            const layer = document.getElementById('merge-tiles-layer');
+            if (!layer) {
+                console.error('merge-tiles-layer not found!');
+                return;
+            }
+            
+            const existingTiles = new Map();
+            
+            // Store existing tiles
+            Array.from(layer.children).forEach(el => {
+                const id = el.dataset.tileId;
+                if (id) existingTiles.set(id, el);
+            });
+            
+            // Match CSS Grid dimensions exactly
+            // Container: 340px, padding: 12px each side = 316px inner
+            // Grid: 4 columns, 3 gaps of 12px = 36px gaps
+            // Cell size: (316 - 36) / 4 = 70px
+            const cols = 4, rows = 4, gap = 12;
+            const containerInner = 316; // 340 - 24px padding
+            const totalGaps = gap * (cols - 1);
+            const cellSize = Math.floor((containerInner - totalGaps) / cols); // Should be 70px
+            const tileSize = 70; // Match CSS width/height exactly
+            const stepX = cellSize + gap; // 82px between cell origins
+            const stepY = cellSize + gap; // 82px between cell origins
+            const offsetX = 0; // Tiles fill cells exactly
+            const offsetY = 0; // Tiles fill cells exactly
+            
+            // Update or create tiles
+            mergeTiles.forEach(t => {
+                let el = existingTiles.get(t.id.toString());
+                const isNew = !el;
+                
+                if (isNew) {
+                    el = document.createElement('div');
+                    el.dataset.tileId = t.id;
+                    el.className = 'merge-tile';
+                    layer.appendChild(el);
+                }
+                
+                const x = t.c * stepX + offsetX;
+                const y = t.r * stepY + offsetY;
+
+                // Set position first
+                el.style.setProperty('--x', `${x}px`);
+                el.style.setProperty('--y', `${y}px`);
+                el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+                el.style.width = `${tileSize}px`;
+                el.style.height = `${tileSize}px`;
+                el.style.fontSize = tileSize > 60 ? '2rem' : (tileSize > 40 ? '1.5rem' : '1.25rem');
+                el.textContent = t.val;
+                el.style.opacity = '1';
+                
+                // Apply animation classes after positioning
+                const classes = ['merge-tile', `tile-${t.val}`];
+                if (t.new) classes.push('new');
+                if (t.merged) classes.push('merged');
+                if (!t.new && !isNew) classes.push('moving');
+                el.className = classes.join(' ');
+                
+                existingTiles.delete(t.id.toString());
+                
+                // Clear animation flags after completion
+                if (t.new || t.merged) {
+                    setTimeout(() => {
+                        if (el && el.parentElement) {
+                            el.classList.remove('new', 'merged');
+                        }
+                        t.new = false;
+                        t.merged = false;
+                    }, 250);
+                }
+            });
+            
+            // Remove tiles that no longer exist with fade-out
+            existingTiles.forEach(el => {
+                if (el && el.parentElement) {
+                    el.style.opacity = '0';
+                    el.style.transform = el.style.transform.replace(/\)$/, ') scale(0.8)');
+                    setTimeout(() => {
+                        if (el && el.parentElement) el.remove();
+                    }, 180);
+                }
+            });
+        }
+
+        function moveMerge(dir) {
+            if(gamePaused) return;
+            
+            let moved = false;
+            let sorted = [...mergeTiles];
+            if(dir==='right') sorted.sort((a,b) => b.c - a.c);
+            if(dir==='left') sorted.sort((a,b) => a.c - b.c);
+            if(dir==='down') sorted.sort((a,b) => b.r - a.r);
+            if(dir==='up') sorted.sort((a,b) => a.r - b.r);
+            
+            let mergedIds = new Set();
+            let mergedThisMove = false;
+            
+            sorted.forEach(t => {
+                let tr = t.r, tc = t.c;
+                
+                while(true) {
+                    let nr = tr, nc = tc;
+                    if(dir==='right') nc++;
+                    if(dir==='left') nc--;
+                    if(dir==='down') nr++;
+                    if(dir==='up') nr--;
+                    
+                    if(nr<0||nr>3||nc<0||nc>3) break;
+                    
+                    let obstacle = mergeTiles.find(x => x.r===nr && x.c===nc);
+                    if(!obstacle) {
+                        tr = nr; tc = nc; moved = true;
+                    } else if(!mergedIds.has(obstacle.id) && obstacle.val === t.val) {
+                        mergeTiles = mergeTiles.filter(x => x.id !== t.id);
+                        obstacle.val *= 2;
+                        obstacle.merged = true;
+                        mergedIds.add(obstacle.id);
+                        mergeScore += obstacle.val;
+                        document.getElementById('merge-score').textContent = mergeScore;
+                        
+                        // Check achievements
+                        if (obstacle.val === 128) unlockHubAchievement('merge', 'tile_128');
+                        if (obstacle.val === 512) unlockHubAchievement('merge', 'tile_512');
+                        if (obstacle.val === 1024) unlockHubAchievement('merge', 'tile_1024');
+                        if (obstacle.val === 2048) unlockHubAchievement('merge', 'tile_2048');
+                        if (mergeScore >= 5000) unlockHubAchievement('merge', 'score_5000');
+                        
+                        if (mergeScore > mergeBest) {
+                            mergeBest = mergeScore;
+                            localStorage.setItem('mergeBest', mergeBest.toString());
+                            document.getElementById('merge-best').textContent = mergeBest;
+                        }
+                        moved = true;
+                        mergedThisMove = true;
+                        return;
+                    } else {
+                        break;
+                    }
+                }
+                
+                if (t.r !== tr || t.c !== tc) {
+                    t.r = tr; t.c = tc;
+                }
+            });
+            
+            if(moved) {
+                spawnMergeTile();
+                renderMerge();
+                
+                // Check for game over or win
+                setTimeout(() => {
+                    if(mergeTiles.length >= 16 && !canMergeMove()) {
+                        // Save game data
+                        const data = loadGameData('merge');
+                        data.totalGames++;
+                        data.totalScore += mergeScore;
+                        if (mergeScore > data.highScore) data.highScore = mergeScore;
+                        saveGameData('merge', data);
+                        
+                        showGameOver('🧩', 'Game Over', `Score: ${mergeScore}`, initMerge);
+                    }
+                    
+                    if(mergeTiles.some(t => t.val === 2048)) {
+                        const isNewBest = mergeScore > mergeBest;
+                        showGameOver('🏆', 'You Win!', `You reached 2048! Score: ${mergeScore}${isNewBest ? ' 🆕' : ''}`, initMerge);
+                    }
+                }, 300);
+            }
+        }
+        
+        function canMergeMove() {
+            for(let t of mergeTiles) {
+                if(mergeTiles.find(n => n.val===t.val && Math.abs(n.r-t.r)+Math.abs(n.c-t.c)===1)) return true;
+            }
+            return false;
+        }
+
+        // ====================================================================
+        // SPACE INVADERS - Enhanced with Waves & Difficulty
+        // ====================================================================
+        const invCanvas = document.getElementById('invaders-canvas');
+        const invCtx = invCanvas.getContext('2d');
+        let player = {x: 180, y: 450, w: 30, h: 20};
+        let bullets = [], aliens = [], invaderDir = 0, invaderScore = 0;
+        let invaderRunning = false, invaderAnimId, alienDir = 1, alienSpeed = 1;
+        let lastShot = 0, invaderWave = 1, alienFireRate = 0.001, invaderGameStarted = false;
+        let invaderHighScore = parseInt(localStorage.getItem('invaderHighScore') || '0');
+        let invaderAliensKilled = 0, invaderWaveHits = 0;
+        let invaderPowerUps = [], invaderShield = 0, invaderMultiShot = false, invaderRapidFire = false;
+        // Global safety caps to avoid runaway object growth
+        const INVADER_OBJECT_CAP = 600; // aliens + bullets + powerups
+        let invaderListenersAdded = false;
+
+        const inputState = {
+            invaders: { left: false, right: false, shoot: false }
+        };
+
+        function setInvaderInput(action, isDown) {
+            const s = inputState.invaders;
+            if (action === 'left') s.left = !!isDown;
+            if (action === 'right') s.right = !!isDown;
+            if (action === 'shoot') {
+                s.shoot = !!isDown;
+                if (isDown) {
+                    if (!invaderGameStarted) {
+                        invaderGameStarted = true;
+                        const invPauseBtn = document.getElementById('invaders-pause');
+                        if (invPauseBtn) {
+                            invPauseBtn.disabled = false;
+                            invPauseBtn.textContent = 'Pause';
+                        }
+                    }
+                    invaderShoot();
+                }
+            }
+        }
+
+        function setInvaderHUD(visible) {
+            try {
+                const el = document.getElementById('invaders-hud');
+                if (!el) return;
+                el.style.display = visible ? 'block' : 'none';
+            } catch (e) {}
+        }
+
+        function initInvaders() {
+            player = {x: 180, y: 450, w: 30, h: 20};
+            bullets = [];
+            aliens = [];
+            invaderPowerUps = [];
+            for(let r=0; r<4; r++) {
+                for(let c=0; c<8; c++) {
+                    aliens.push({x: c*40 + 20, y: r*30 + 20, w: 20, h: 20, active: true});
+                }
+            }
+            invaderScore = 0; invaderWave = 1; alienSpeed = 0.5;
+            invaderAliensKilled = 0; invaderWaveHits = 0; invaderGameStarted = false; // Wait for input
+            inputState.invaders.left = false;
+            inputState.invaders.right = false;
+            inputState.invaders.shoot = false;
+            // Show HUD now that game started
+            setInvaderHUD(true);
+            invaderShield = 0; invaderMultiShot = false; invaderRapidFire = false;
+            document.getElementById('invaders-score').textContent = '0';
+            document.getElementById('invaders-wave').textContent = '1';
+            const invPauseElInit = document.getElementById('invaders-pause');
+            if (invPauseElInit) {
+                invPauseElInit.disabled = true;
+                invPauseElInit.textContent = 'Pause';
+            }
+            
+            // Mobile touch controls for Space Invaders
+            const canvas = document.getElementById('invaders-canvas');
+            
+            if (!invaderListenersAdded) {
+                // Add click listener for desktop start
+                canvas.addEventListener('click', (e) => {
+                    if (!invaderGameStarted) {
+                        invaderGameStarted = true;
+                        const invPauseBtn = document.getElementById('invaders-pause');
+                        if (invPauseBtn) {
+                            invPauseBtn.disabled = false;
+                            invPauseBtn.textContent = 'Pause';
+                        }
+                    }
+                    // Also shoot on click
+                    invaderShoot();
+                });
+
+                if (isMobile) {
+                    let touchX = null;
+                    let lastTapTime = 0;
+                    
+                    canvas.ontouchstart = (e) => {
+                        e.preventDefault();
+                        if (!invaderGameStarted) {
+                            invaderGameStarted = true;
+                            const invPauseBtn = document.getElementById('invaders-pause');
+                            if (invPauseBtn) {
+                                invPauseBtn.disabled = false;
+                                invPauseBtn.textContent = 'Pause';
+                            }
+                        }
+                        
+                        const rect = canvas.getBoundingClientRect();
+                        touchX = e.touches[0].clientX - rect.left;
+                        
+                        // Double tap to shoot
+                        const now = Date.now();
+                        if (now - lastTapTime < 300) {
+                            invaderShoot();
+                        }
+                        lastTapTime = now;
+                    };
+                    
+                    canvas.ontouchmove = (e) => {
+                        e.preventDefault();
+                        if (touchX !== null) {
+                            const rect = canvas.getBoundingClientRect();
+                            const newTouchX = e.touches[0].clientX - rect.left;
+                            const canvasX = (newTouchX / rect.width) * 400;
+                            player.x = Math.max(0, Math.min(370, canvasX - player.w / 2));
+                            touchX = newTouchX;
+                        }
+                    };
+                    
+                    canvas.ontouchend = (e) => {
+                        e.preventDefault();
+                        touchX = null;
+                    };
+                }
+                invaderListenersAdded = true;
+            }
+            
+            invaderRunning = true;
+            if(invaderAnimId) cancelAnimationFrame(invaderAnimId);
+            invaderLoop(); // Start continuous rendering for preview
+        }
+
+        function invaderShoot() {
+            const cooldown = invaderRapidFire ? 150 : 300;
+            if(Date.now() - lastShot > cooldown) {
+                // Cap player bullets to avoid spam
+                const activePlayerBullets = bullets.filter(b => b && b.active && !b.enemy).length;
+                if (activePlayerBullets >= 3) return;
+                bullets.push({x: player.x + 13, y: player.y, active: true});
+                if (invaderMultiShot) {
+                    bullets.push({x: player.x + 5, y: player.y, active: true});
+                    bullets.push({x: player.x + 21, y: player.y, active: true});
+                }
+                lastShot = Date.now();
+                if (sounds.shoot) sounds.shoot();
+            }
+        }
+
+        function invaderLoop() {
+            if(!invaderRunning) return;
+            if(gamePaused) {
+                invaderAnimId = requestAnimationFrame(invaderLoop);
+                return;
+            }
+            
+            try {
+            // Only update game state if started
+            if (invaderGameStarted) {
+                // Calculate fire rate based on wave
+                const baseFireRate = Math.min(0.01 + (invaderWave - 1) * 0.002, 0.025);
+                
+                // Player movement (stateful input allows move + shoot simultaneously)
+                invaderDir = (inputState.invaders.left && !inputState.invaders.right) ? -1 : (inputState.invaders.right && !inputState.invaders.left) ? 1 : 0;
+                player.x += invaderDir * 6;
+                if(player.x < 0) player.x = 0;
+                if(player.x > 370) player.x = 370;
+
+                // Auto-fire while shoot is held (respects invaderShoot() cooldown)
+                if (inputState.invaders.shoot) invaderShoot();
+                
+                // Bullet movement and collision (theme-aware fallback)
+                invCtx.fillStyle = (typeof getGameFg === 'function' ? getGameFg() : '#ffff00') || '#ffff00';
+                bullets.forEach(b => {
+                    if(b.active) {
+                        if(b.enemy) {
+                            b.y += 4;
+                            invCtx.fillRect(b.x, b.y, 4, 12);
+                            
+                            // Hit player
+                            if(b.y >= player.y && b.y <= player.y + player.h && b.x >= player.x && b.x <= player.x + player.w) {
+                                b.active = false;
+                                if (invaderShield > 0) {
+                                    invaderShield--;
+                                    invaderWaveHits++;
+                                    createParticles(player.x + 15, player.y, 8, '#00ffff');
+                                } else {
+                                    invaderRunning = false;
+                                    invaderWaveHits++;
+                                    
+                                    // Save game data
+                                    const data = loadGameData('invaders');
+                                    data.totalGames++;
+                                    data.totalScore += invaderScore;
+                                    if (invaderScore > data.highScore) data.highScore = invaderScore;
+                                    saveGameData('invaders', data);
+                                    
+                                    if (invaderScore > invaderHighScore) {
+                                        invaderHighScore = invaderScore;
+                                        localStorage.setItem('invaderHighScore', invaderHighScore.toString());
+                                        showGameOver('🏆', 'New High Score!', `Score: ${invaderScore}`, initInvaders);
+                                    } else {
+                                        showGameOver('💥', 'Destroyed!', `Score: ${invaderScore} | Best: ${invaderHighScore}`, initInvaders);
+                                    }
+                                }
+                            }
+                        } else {
+                            b.y -= 8;
+                            invCtx.fillRect(b.x, b.y, 4, 12);
+                            
+                            // Hit aliens
+                            aliens.forEach(a => {
+                                if(a.active && b.x >= a.x && b.x <= a.x+a.w && b.y >= a.y && b.y <= a.y+a.h) {
+                                    a.active = false;
+                                    b.active = false;
+                                    invaderScore += 10 * invaderWave;
+                                    invaderAliensKilled++;
+                                    document.getElementById('invaders-score').textContent = invaderScore;
+                                    
+                                    // Play destroy sound
+                                    if (sounds.destroy) sounds.destroy();
+                                    
+                                    // Drop power-ups
+                                    if (Math.random() < 0.15) {
+                                        const types = ['shield', 'multishot', 'rapidfire', 'bonus'];
+                                        const type = types[Math.floor(Math.random() * types.length)];
+                                        invaderPowerUps.push({x: a.x + 10, y: a.y + 10, type: type});
+                                    }
+                                    
+                                    // Check achievements
+                                    if (invaderAliensKilled === 1) unlockHubAchievement('invaders', 'first_kill');
+                                    if (invaderAliensKilled >= 50) unlockHubAchievement('invaders', 'aliens_50');
+                                    if (invaderScore >= 500) unlockHubAchievement('invaders', 'score_500');
+                                    
+                                    createParticles(a.x + 10, a.y + 10, 6, '#ff0000');
+                                    screenShake(4, 150);
+                                }
+                            });
+                        }
+                        
+                        if(b.y < 0 || b.y > 500) b.active = false;
+                    }
+                });
+                
+                // Alien bullets (cap concurrent enemy bullets to avoid spam)
+                if (Math.random() < baseFireRate) {
+                    const activeAlienList = aliens.filter(a => a.active);
+                    if (activeAlienList.length > 0) {
+                        const shootersWanted = invaderWave >= 3 ? Math.min(2, activeAlienList.length) : 1;
+                        const activeEnemyBullets = bullets.filter(b => b && b.active && b.enemy).length;
+                        const allowed = Math.max(0, 6 - activeEnemyBullets); // allow up to 6 enemy bullets
+                        const shooters = Math.min(shootersWanted, allowed);
+                        for(let i = 0; i < shooters; i++) {
+                            const shooter = activeAlienList[Math.floor(Math.random() * activeAlienList.length)];
+                            bullets.push({x: shooter.x + 8, y: shooter.y + 20, active: true, enemy: true});
+                            
+                            // Spread shot in higher waves (respect allowed cap)
+                            if (invaderWave >= 5 && Math.random() < 0.3 && allowed - (i+1) > 0) {
+                                bullets.push({x: shooter.x + 2, y: shooter.y + 20, active: true, enemy: true});
+                                if (allowed - (i+2) > 0) bullets.push({x: shooter.x + 14, y: shooter.y + 20, active: true, enemy: true});
+                            }
+                        }
+                    }
+                }
+                
+                // Power-ups falling
+                invaderPowerUps.forEach((p, i) => {
+                    p.y += 2;
+                    if (p.y >= player.y && p.y <= player.y + player.h && p.x >= player.x && p.x <= player.x + player.w) {
+                        if (p.type === 'shield') {
+                            invaderShield = Math.min(3, invaderShield + 1);
+                            showComboText(p.x, p.y, 'SHIELD!', '#00ffff');
+                        } else if (p.type === 'multishot') {
+                            invaderMultiShot = true;
+                            setTimeout(() => invaderMultiShot = false, 8000);
+                            showComboText(p.x, p.y, 'MULTI-SHOT!', '#22c55e');
+                        } else if (p.type === 'rapidfire') {
+                            invaderRapidFire = true;
+                            setTimeout(() => invaderRapidFire = false, 8000);
+                            showComboText(p.x, p.y, 'RAPID FIRE!', '#fbbf24');
+                        } else if (p.type === 'bonus') {
+                            invaderScore += 50;
+                            document.getElementById('invaders-score').textContent = invaderScore;
+                            showComboText(p.x, p.y, '+50 PTS!', '#a855f7');
+                        }
+                        invaderPowerUps.splice(i, 1);
+                        createParticles(p.x, p.y, 10, '#ffd700');
+                        if (sounds.powerup) sounds.powerup();
+                    } else if (p.y > 500) {
+                        invaderPowerUps.splice(i, 1);
+                    }
+                });
+                
+                // Aliens movement
+                let hitEdge = false;
+                aliens.forEach(a => {
+                    if(a.active) {
+                        a.x += alienDir * alienSpeed;
+                        // Use canvas width and alien width for robust edge detection
+                        try {
+                            const aW = a.w || 20;
+                            if (invCanvas && (a.x + aW >= invCanvas.width || a.x <= 0)) hitEdge = true;
+                        } catch (e) {
+                            if(a.x > 380 || a.x < 0) hitEdge = true;
+                        }
+                    }
+                });
+                
+                if(hitEdge) {
+                    // Instrumentation: record edge hit
+                    if (window.__logCollect) window.__logCollect('invaders.hitEdge', { wave: invaderWave, speed: alienSpeed, ts: Date.now() });
+                    alienDir *= -1;
+                    aliens.forEach(a => a.y += 15);
+                    alienSpeed += 0.2; // Increase speed
+                }
+                
+                // Check if aliens reached bottom
+                aliens.forEach(a => {
+                    if(a.active && a.y > 420) {
+                        invaderRunning = false;
+                        setInvaderHUD(false);
+                        if (invaderScore > invaderHighScore) {
+                            invaderHighScore = invaderScore;
+                            localStorage.setItem('invaderHighScore', invaderHighScore.toString());
+                            showGameOver('🏆', 'High Score!', `Score: ${invaderScore}`, initInvaders);
+                        } else {
+                            showGameOver('👾', 'Invasion Successful', `Score: ${invaderScore} | Best: ${invaderHighScore}`, initInvaders);
+                        }
+                    }
+                });
+                
+                // Check for wave completion (compute active aliens first)
+                const currentActiveAlienCount = Array.isArray(aliens) ? aliens.filter(a => a.active).length : 0;
+                if (currentActiveAlienCount === 0) {
+                    // Clear prior arrays before spawning a new wave to avoid runaway accumulation
+                    aliens = [];
+                    // Remove any stray bullets/powerups from previous wave
+                    bullets = []; // clear all bullets when spawning fresh wave
+                    invaderPowerUps = [];
+                    // Instrumentation: about to spawn a new wave
+                    if (window.__logCollect) window.__logCollect('invaders.spawnWave', { nextWave: invaderWave + 1, ts: Date.now() });
+                    // Check for perfect wave
+                    if (invaderWaveHits === 0) {
+                        unlockHubAchievement('invaders', 'perfect_wave');
+                    }
+                    
+                    invaderWave++;
+                    invaderWaveHits = 0;
+                    if (invaderWave >= 3) unlockHubAchievement('invaders', 'wave_3');
+                    
+                    alienSpeed = 0.5 + (invaderWave - 1) * 0.3;
+                    document.getElementById('invaders-wave').textContent = invaderWave;
+                    
+                    // Spawn new wave (respect global cap)
+                    const potentialNew = aliens.length + (4*8) + bullets.length + invaderPowerUps.length;
+                    if (potentialNew > INVADER_OBJECT_CAP) {
+                        if (window.__logCollect) window.__logCollect('invaders.capHit', { potentialNew, cap: INVADER_OBJECT_CAP, ts: Date.now() });
+                        const maxAliensAllowed = Math.max(0, INVADER_OBJECT_CAP - bullets.length - invaderPowerUps.length);
+                        const rowsToSpawn = Math.min(4, Math.ceil(maxAliensAllowed / 8));
+                        for(let r=0; r<rowsToSpawn; r++) {
+                            for(let c=0; c<8; c++) {
+                                if (aliens.length < INVADER_OBJECT_CAP) aliens.push({x: c*40 + 20, y: r*30 + 20, w: 20, h: 20, active: true});
+                            }
+                        }
+                    } else {
+                        for(let r=0; r<4; r++) {
+                            for(let c=0; c<8; c++) {
+                                aliens.push({x: c*40 + 20, y: r*30 + 20, w: 20, h: 20, active: true});
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Always render (for preview)
+            invCtx.clearRect(0,0,400,500);
+            
+            // Player with glow
+            invCtx.shadowColor = '#00ff00';
+            invCtx.shadowBlur = 10;
+            invCtx.fillStyle = '#00ff00';
+            invCtx.beginPath();
+            invCtx.moveTo(player.x + 15, player.y);
+            invCtx.lineTo(player.x + 30, player.y + 20);
+            invCtx.lineTo(player.x, player.y + 20);
+            invCtx.fill();
+            invCtx.shadowBlur = 0;
+            
+            // Draw shield indicator
+            if (invaderShield > 0) {
+                invCtx.strokeStyle = '#00ffff';
+                invCtx.lineWidth = 3;
+                invCtx.globalAlpha = 0.6;
+                invCtx.beginPath();
+                invCtx.arc(player.x + 15, player.y + 10, 25, 0, Math.PI * 2);
+                invCtx.stroke();
+                invCtx.globalAlpha = 1;
+                
+                invCtx.fillStyle = '#00ffff';
+                invCtx.font = 'bold 12px Inter';
+                invCtx.fillText(`x${invaderShield}`, player.x + 10, player.y - 5);
+            }
+            
+            // Draw power-ups
+            invaderPowerUps.forEach(p => {
+                const colors = {shield: '#00ffff', multishot: '#22c55e', rapidfire: '#fbbf24', bonus: '#a855f7'};
+                invCtx.fillStyle = colors[p.type] || '#ffd700';
+                invCtx.beginPath();
+                invCtx.arc(p.x, p.y, 8, 0, Math.PI*2);
+                invCtx.fill();
+                invCtx.strokeStyle = 'white';
+                invCtx.lineWidth = 2;
+                invCtx.stroke();
+            });
+            
+            // Draw bullets
+            invCtx.fillStyle = '#ffff00';
+            bullets.forEach(b => {
+                if(b.active) {
+                    invCtx.fillRect(b.x, b.y, 4, 12);
+                }
+            });
+            
+            // Draw enemy bullets
+            bullets.filter(b => b.enemy).forEach(b => {
+                if(b.active) {
+                    invCtx.fillStyle = '#ff4444';
+                    invCtx.fillRect(b.x, b.y, 4, 12);
+                }
+            });
+            
+            // Draw power-ups
+            invaderPowerUps.forEach(p => {
+                const colors = {shield: '#00ffff', multishot: '#22c55e', rapidfire: '#fbbf24', bonus: '#a855f7'};
+                invCtx.fillStyle = colors[p.type] || '#ffd700';
+                invCtx.beginPath();
+                invCtx.arc(p.x, p.y, 8, 0, Math.PI*2);
+                invCtx.fill();
+                invCtx.strokeStyle = 'white';
+                invCtx.lineWidth = 2;
+                invCtx.stroke();
+            });
+            
+            // Draw aliens with geometric shapes
+            const skillShapes = [
+                {shape: 'diamond', color: '#e34f26', name: 'HTML'},     // Red diamond
+                {shape: 'triangle', color: '#1572b6', name: 'CSS'},     // Blue triangle  
+                {shape: 'hexagon', color: '#f7df1e', name: 'JS'},       // Yellow hexagon
+                {shape: 'circle', color: '#61dafb', name: 'React'},     // Cyan circle
+                {shape: 'square', color: '#339933', name: 'Node'},     // Green square
+                {shape: 'pentagon', color: '#3776ab', name: 'Python'},  // Blue pentagon
+                {shape: 'star', color: '#ff6b6b', name: 'Design'},      // Coral star
+                {shape: 'cross', color: '#4ecdc4', name: 'SEO'}        // Teal cross
+            ];
+            let shapeIndex = 0;
+            activeAlienCount = 0; // reset for this render pass
+            aliens.forEach(a => {
+                if(a.active) {
+                    activeAlienCount++;
+                    // Animated geometric aliens
+                    const pulse = Math.sin(Date.now() * 0.01 + a.x) * 0.3 + 0.7;
+                    invCtx.globalAlpha = pulse;
+                    
+                    const skill = skillShapes[shapeIndex % skillShapes.length];
+                    shapeIndex++;
+                    
+                    invCtx.fillStyle = skill.color;
+                    invCtx.strokeStyle = 'white';
+                    invCtx.lineWidth = 2;
+                    invCtx.beginPath();
+                    
+                    const cx = a.x + a.w/2;
+                    const cy = a.y + a.h/2;
+                    const size = a.w/2 - 3;
+                    
+                    switch(skill.shape) {
+                        case 'diamond':
+                            invCtx.moveTo(cx, cy - size);
+                            invCtx.lineTo(cx + size, cy);
+                            invCtx.lineTo(cx, cy + size);
+                            invCtx.lineTo(cx - size, cy);
+                            break;
+                        case 'triangle':
+                            invCtx.moveTo(cx, cy - size);
+                            invCtx.lineTo(cx - size, cy + size);
+                            invCtx.lineTo(cx + size, cy + size);
+                            break;
+                        case 'hexagon':
+                            for(let i = 0; i < 6; i++) {
+                                const angle = (i * Math.PI) / 3;
+                                const x = cx + size * Math.cos(angle);
+                                const y = cy + size * Math.sin(angle);
+                                if(i === 0) invCtx.moveTo(x, y);
+                                else invCtx.lineTo(x, y);
+                            }
+                            break;
+                        case 'circle':
+                            invCtx.arc(cx, cy, size, 0, Math.PI * 2);
+                            break;
+                        case 'square':
+                            invCtx.rect(cx - size, cy - size, size * 2, size * 2);
+                            break;
+                        case 'pentagon':
+                            for(let i = 0; i < 5; i++) {
+                                const angle = (i * 2 * Math.PI) / 5 - Math.PI/2;
+                                const x = cx + size * Math.cos(angle);
+                                const y = cy + size * Math.sin(angle);
+                                if(i === 0) invCtx.moveTo(x, y);
+                                else invCtx.lineTo(x, y);
+                            }
+                            break;
+                        case 'star':
+                            const spikes = 5;
+                            for(let i = 0; i < spikes * 2; i++) {
+                                const angle = (i * Math.PI) / spikes;
+                                const radius = i % 2 === 0 ? size : size * 0.5;
+                                const x = cx + radius * Math.cos(angle);
+                                const y = cy + radius * Math.sin(angle);
+                                if(i === 0) invCtx.moveTo(x, y);
+                                else invCtx.lineTo(x, y);
+                            }
+                            break;
+                        case 'cross':
+                            const arm = size * 0.6;
+                            invCtx.moveTo(cx - arm, cy - arm/3);
+                            invCtx.lineTo(cx + arm, cy - arm/3);
+                            invCtx.lineTo(cx + arm, cy + arm/3);
+                            invCtx.lineTo(cx - arm, cy + arm/3);
+                            invCtx.closePath();
+                            invCtx.moveTo(cx - arm/3, cy - arm);
+                            invCtx.lineTo(cx + arm/3, cy - arm);
+                            invCtx.lineTo(cx + arm/3, cy + arm);
+                            invCtx.lineTo(cx - arm/3, cy + arm);
+                            break;
+                    }
+                    
+                    invCtx.closePath();
+                    invCtx.fill();
+                    invCtx.stroke();
+                    
+                    invCtx.globalAlpha = 1;
+                }
+            });
+            
+            // Start game prompt
+            if (!invaderGameStarted) {
+                invCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                invCtx.fillRect(0, 0, 400, 500);
+                invCtx.fillStyle = 'white';
+                invCtx.font = 'bold 24px Inter';
+                invCtx.textAlign = 'center';
+                invCtx.fillText('Press ← or → to Start', 200, 250);
+            }
+            } catch (e) {
+                if (window.__logCollect) {
+                    window.__logCollect('game.error', {
+                        game: 'invaders',
+                        message: e.message,
+                        stack: e.stack,
+                        timestamp: Date.now()
+                    });
+                }
+                console.error('Invaders game error:', e);
+            }
+            
+            invaderAnimId = requestAnimationFrame(invaderLoop);
+        }
+
+        // Keyboard Input
+        window.addEventListener('keydown', e => {
+            
+            // Pause with P key
+            if(e.key === 'p' || e.key === 'P') {
+                // Broadcast to all iframes
+                document.querySelectorAll('iframe').forEach(iframe => {
+                    try {
+                        iframe.contentWindow.postMessage({ type: 'toggle-pause' }, '*');
+                    } catch(e) {}
+                });
+
+                if(currentGame) {
+                    togglePause(currentGame);
+                    e.preventDefault();
+                    return;
+                }
+            }
+            
+            if(currentGame === 'snake') {
+                if(e.key==='ArrowUp') {
+                    if (!snakeGameStarted) {
+                        snakeGameStarted = true;
+                        snakeLastMove = performance.now(); // Initialize timing
+                    }
+                    setSnakeDirection('up');
+                }
+                if(e.key==='ArrowDown') {
+                    if (!snakeGameStarted) {
+                        snakeGameStarted = true;
+                        snakeLastMove = performance.now(); // Initialize timing
+                    }
+                    setSnakeDirection('down');
+                }
+                if(e.key==='ArrowLeft') {
+                    if (!snakeGameStarted) {
+                        snakeGameStarted = true;
+                        snakeLastMove = performance.now(); // Initialize timing
+                    }
+                    setSnakeDirection('left');
+                }
+                if(e.key==='ArrowRight') {
+                    if (!snakeGameStarted) {
+                        snakeGameStarted = true;
+                        snakeLastMove = performance.now(); // Initialize timing
+                    }
+                    setSnakeDirection('right');
+                }
+            }
+            if(currentGame === 'breaker') {
+                if(e.key==='ArrowLeft') {
+                    if (!breakerGameStarted) {
+                        breakerGameStarted = true;
+                        brBall.dx = 4 * (Math.random() > 0.5 ? 1 : -1);
+                        brBall.dy = -4;
+                    }
+                    breakerPaddleDir = -1;
+                }
+                if(e.key==='ArrowRight') {
+                    if (!breakerGameStarted) {
+                        breakerGameStarted = true;
+                        brBall.dx = 4 * (Math.random() > 0.5 ? 1 : -1);
+                        brBall.dy = -4;
+                    }
+                    breakerPaddleDir = 1;
+                }
+            }
+            if(currentGame === 'merge') {
+                if(e.key==='ArrowUp') moveMerge('up');
+                if(e.key==='ArrowDown') moveMerge('down');
+                if(e.key==='ArrowLeft') moveMerge('left');
+                if(e.key==='ArrowRight') moveMerge('right');
+            }
+            if(currentGame === 'invaders') {
+                if(e.key==='ArrowLeft' || e.code==='KeyA') {
+                    if (!invaderGameStarted) {
+                        invaderGameStarted = true;
+                        const invPauseBtn = document.getElementById('invaders-pause');
+                        if (invPauseBtn) {
+                            invPauseBtn.disabled = false;
+                            invPauseBtn.textContent = 'Pause';
+                        }
+                    }
+                    inputState.invaders.left = true;
+                    e.preventDefault();
+                }
+                if(e.key==='ArrowRight' || e.code==='KeyD') {
+                    if (!invaderGameStarted) {
+                        invaderGameStarted = true;
+                        const invPauseBtn = document.getElementById('invaders-pause');
+                        if (invPauseBtn) {
+                            invPauseBtn.disabled = false;
+                            invPauseBtn.textContent = 'Pause';
+                        }
+                    }
+                    inputState.invaders.right = true;
+                    e.preventDefault();
+                }
+                if(e.code==='Space' || e.code==='ArrowUp' || e.code==='KeyW') {
+                    if (!invaderGameStarted) {
+                        invaderGameStarted = true;
+                        const invPauseBtn = document.getElementById('invaders-pause');
+                        if (invPauseBtn) {
+                            invPauseBtn.disabled = false;
+                            invPauseBtn.textContent = 'Pause';
+                        }
+                    }
+                    inputState.invaders.shoot = true;
+                    e.preventDefault();
+                }
+            }
+        });
+        
+        window.addEventListener('keyup', e => {
+            if(currentGame === 'breaker') {
+                if(e.key==='ArrowLeft' && breakerPaddleDir===-1) breakerPaddleDir = 0;
+                if(e.key==='ArrowRight' && breakerPaddleDir===1) breakerPaddleDir = 0;
+            }
+            if(currentGame === 'invaders') {
+                if(e.key==='ArrowLeft' || e.code==='KeyA') inputState.invaders.left = false;
+                if(e.key==='ArrowRight' || e.code==='KeyD') inputState.invaders.right = false;
+                if(e.code==='Space' || e.code==='ArrowUp' || e.code==='KeyW') inputState.invaders.shoot = false;
+            }
+        });
+
+        // FPS Counter
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('debug')) {
+                const fpsDiv = document.createElement('div');
+                fpsDiv.style.cssText = 'position:fixed;top:0;left:0;background:rgba(0,0,0,0.5);color:lime;padding:2px 5px;z-index:10000;font-family:monospace;pointer-events:none;';
+                document.body.appendChild(fpsDiv);
+                
+                let lastTime = performance.now();
+                let frames = 0;
+                
+                function loop() {
+                    const now = performance.now();
+                    frames++;
+                    if (now - lastTime >= 1000) {
+                        fpsDiv.textContent = frames + ' FPS';
+                        frames = 0;
+                        lastTime = now;
+                    }
+                    requestAnimationFrame(loop);
+                }
+                loop();
+            }
+        })();
+
+    </script>
+
+    <!-- Savonie AI Chat Widget -->
+    <div id="chat-widget" class="fixed bottom-6 z-50 font-sans" style="z-index: 9999;" role="region" aria-label="AI Chat Assistant">
+        <!-- Chat Window (independently positioned when dragging) -->
+        <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);" role="dialog" aria-modal="true" aria-labelledby="chat-title">
+            <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
+                <h3 id="chat-title" class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
+                    <img src="/assets/img/savonie-thumb.webp" alt="Savonie chatbot avatar" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64" loading="lazy" decoding="async">
+                    Savonie AI
+                </h3>
+                <button type="button" id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer" aria-label="Close chat">&times;</button>
+            </div>
+            
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-white/50" role="log" aria-live="polite" aria-label="Chat messages"></div>
+
+            <!-- Dynamic Suggestion Chips Container -->
+            <div id="chat-chips" data-chat-suggestions="container" class="p-2 bg-white/80 border-t border-[#362017]/5 flex gap-2 overflow-x-auto whitespace-nowrap" role="group" aria-label="Suggested questions"></div>
+
+            <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white dark:bg-[#362017] border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
+                <button type="button" id="suggestions-btn" data-chat-suggestions-toggle="button" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors">
+                    💡
+                </button>
+                <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] dark:text-[#e1d4c2] dark:placeholder-[#e1d4c2]/60 focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
+                <button type="button" id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Welcome Bubble (anchored above toggle button) -->
+        <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+        </div>
+
+        <!-- Toggle Button (always stays in bottom-right corner) -->
+        <button type="button" id="chat-toggle" class="absolute bottom-0 right-0 bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 overflow-hidden" aria-label="Open Chat">
+            <img src="/assets/img/savonie-thumb.webp" alt="Savonie chat UI" class="w-full h-full object-cover" width="64" height="64" loading="lazy" decoding="async">
+        </button>
+    </div>
+        <!-- Scroll to Top Button -->
+        <button id="scroll-to-top" class="scroll-to-top-btn" type="button" title="Back to top" aria-label="Back to top" aria-describedby="scroll-to-top-tooltip">
+            <svg class="scroll-progress-ring" viewBox="0 0 47 47" width="47" height="47" aria-hidden="true" focusable="false">
+                <circle class="scroll-progress-track" cx="23.5" cy="23.5" r="22" fill="none" stroke="currentColor" stroke-width="3"></circle>
+                <circle class="scroll-progress-circle" cx="23.5" cy="23.5" r="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"></circle>
+            </svg>
+            <svg class="scroll-to-top-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                <path d="M18 15l-6-6-6 6"></path>
+            </svg>
+            <div id="scroll-to-top-tooltip" class="scroll-to-top-btn-tooltip" role="tooltip">Back to top</div>
+        </button>
+</body>
+</html>
+
+
+
