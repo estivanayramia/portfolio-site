@@ -174,5 +174,5 @@
 /EN/projects/portfolio.html    /projects/portfolio    301
 /EN/projects/portfolio    /EN/projects/portfolio.html    200
 # END GENERATED (fix-seo)
-# Catch-all 404
-/*    /EN/404.html    404
+# Catch-all: serve custom 404 page (200 rewrite — Workers doesn't support 404 status)
+/*    /EN/404.html    200
