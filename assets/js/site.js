@@ -4161,7 +4161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 friendly = 'The AI service is experiencing high demand. Retrying automatically in 30 seconds...';
                 shouldRetry = true;
                 retryDelay = 30000; // 30 seconds from Retry-After header
-            } else if (data.errorType === 'AuthError') {
+            } else if (data.errorType === 'AuthError' || data.errorType === 'ConfigError') {
                 friendly = 'The AI service is having configuration issues. Please try again later or explore projects directly.';
             } else if (data.errorType === 'Timeout') {
                 friendly = 'The request timed out. Please try again with a shorter question.';

@@ -1031,10 +1031,16 @@ export default {
 
       // --- VALIDATE API KEY ---
       if (!env.GEMINI_API_KEY) {
-        console.error("GEMINI_API_KEY missing");
+        console.warn("GEMINI_API_KEY missing – using local fallback mode");
+        const fallback = generateLocalFallback(lowerMsg, siteFacts);
         return jsonReply(
-          { errorType: "ConfigError", reply: "Service temporarily unavailable. Please try again later." },
-          503,
+          {
+            errorType: null,
+            reply: fallback.reply,
+            chips: fallback.chips,
+            fallback_mode: true
+          },
+          200,
           corsHeaders
         );
       }

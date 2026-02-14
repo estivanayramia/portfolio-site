@@ -7,9 +7,11 @@ workers_dev = true
 # IMPORTANT: do not add broad patterns like /api/* here.
 routes = [
   { pattern = "estivanayramia.com/api/chat", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/chat", zone_name = "estivanayramia.com" },
 
   # Optional: friendly alias for chat
-  { pattern = "estivanayramia.com/chat", zone_name = "estivanayramia.com" }
+  { pattern = "estivanayramia.com/chat", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/chat", zone_name = "estivanayramia.com" }
 ]
 
 [vars]
