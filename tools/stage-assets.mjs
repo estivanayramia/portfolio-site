@@ -20,7 +20,7 @@ const EXCLUDE_FILES = new Set([
   'history.txt', 'verify_mapping.js',
 ]);
 
-const EXCLUDE_EXT = new Set(['.log']);
+const EXCLUDE_EXT = new Set(['.log', '.zip']);
 
 function shouldExclude(name, isDir) {
   if (isDir && EXCLUDE_DIRS.has(name)) return true;

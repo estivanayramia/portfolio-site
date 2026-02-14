@@ -6,15 +6,18 @@ workers_dev = true
 # Debugger/ingestion worker owns ONLY these endpoints.
 # IMPORTANT: do not add broad patterns like /api/* here.
 routes = [
+  # bare domain
   { pattern = "estivanayramia.com/api/error-report", zone_name = "estivanayramia.com" },
-
   { pattern = "estivanayramia.com/api/errors*", zone_name = "estivanayramia.com" },
-
   { pattern = "estivanayramia.com/api/auth", zone_name = "estivanayramia.com" },
-
   { pattern = "estivanayramia.com/api/health", zone_name = "estivanayramia.com" },
-
   { pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" },
+  # www (dashboard lives here)
+  { pattern = "www.estivanayramia.com/api/error-report*", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/errors*", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/auth*", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/health", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/health", zone_name = "estivanayramia.com" },
 ]
 
 # D1 Database for error monitoring

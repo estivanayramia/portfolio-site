@@ -157,7 +157,7 @@ let cachedModel = "gemini-2.5-flash";
 const GEMINI_TIMEOUT = 35000; // Increased to account for larger tokens/retries
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_REPLY_CHARS = 8000; // Increased from 3000
-const VERSION_TAG = "v2026.01.26-error-collection-FIX2";
+const VERSION_TAG = "v2026.02.13-dashboard-auth-routes";
 
 // Optional local rate limiter (fallback if env.RATE_LIMITER not configured)
 const localRateLimiter = new Map();
@@ -728,9 +728,6 @@ export default {
     // POST /api/error-report
     if (url.pathname.startsWith("/api/error-report")) {
       if (request.method !== "POST") return methodNotAllowed(corsHeaders, request.method);
-      const { apiHandleErrorReport } = await import('./error-api.js').catch(() => ({})); 
-      // Fallback if import fails (should rely on appended version, but keeping appended calls)
-      // Actually we are using appended functions, so just call them directly
       return apiHandleErrorReport(request, env, corsHeaders);
     }
     
@@ -1679,7 +1676,23 @@ async function apiHandleErrorReport(request, env, corsHeaders) {
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
     
-    await stmt.bind(type, message?.slice(0, 1000), filename?.slice(0, 500), line||null, col||null, stack?.slice(0, 2000), url?.slice(0, 500), userAgent?.slice(0, 500), viewport, version, breadcrumbs ? breadcrumbs.slice(0, 20000) : null, Date.now(), category, 'new', isBot?1:0).run();
+    await stmt.bind(
+      type,
+      message ? String(message).slice(0, 1000) : '',
+      filename ? String(filename).slice(0, 500) : null,
+      typeof line === 'number' ? line : null,
+      typeof col === 'number' ? col : null,
+      stack ? String(stack).slice(0, 2000) : null,
+      url ? String(url).slice(0, 500) : null,
+      userAgent ? String(userAgent).slice(0, 500) : null,
+      viewport != null ? String(viewport) : null,
+      version != null ? String(version) : null,
+      breadcrumbs ? (typeof breadcrumbs === 'string' ? breadcrumbs : JSON.stringify(breadcrumbs)).slice(0, 20000) : null,
+      Date.now(),
+      category,
+      'new',
+      isBot ? 1 : 0
+    ).run();
     
     return new Response(JSON.stringify({ success: true }), { status: 202, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error) {
