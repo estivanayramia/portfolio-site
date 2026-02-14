@@ -125,19 +125,19 @@ async function main() {
   const tasks = [
     {
       name: 'Photography (extracted)',
-      source: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio Media/photography-/extracted'),
-      target: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio Media/photography-')
+      source: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio-Media/photography-/extracted'),
+      target: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio-Media/photography-')
     },
     {
       name: 'Whispers (HEIC only)',
-      source: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio Media/whispers-'),
-      target: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio Media/whispers-'),
+      source: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio-Media/whispers-'),
+      target: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio-Media/whispers-'),
       pattern: 'Note (38|39|40|41|42|43|44|45|46)\\.HEIC'
     },
     {
       name: 'Reading (optimize existing)',
-      source: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio Media/reading-'),
-      target: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio Media/reading-')
+      source: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio-Media/reading-'),
+      target: path.join(ROOT, 'assets/img/Portolio-Media/Portfolio-Media/reading-')
     }
   ];
   
