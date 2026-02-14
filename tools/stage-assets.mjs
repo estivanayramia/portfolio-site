@@ -11,7 +11,7 @@ const EXCLUDE_DIRS = new Set([
   '.vscode', '.lighthouse', 'lighthouse-results', 'playwright-report',
   'test-results', '.worktrees', '.vscode_restore_backup', '.vscode_restore_reports',
   'visual-baseline', 'visual-current', 'visual-diff', '.reports', '.reports.bak',
-  'scripts', 'tools', '.gemini', '.agent',
+  'scripts', 'tools', '.gemini', '.agent', 'extracted',
 ]);
 
 const EXCLUDE_FILES = new Set([
