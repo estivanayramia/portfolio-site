@@ -16,4 +16,13 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run verify:pages
+
+      # Validate _redirects and expected files in the source tree.
+      # The full build (npm run build) requires Cloudflare secrets for
+      # upload:facts, so CI validates the repo root directly.  The same
+      # _redirects and HTML files are copied verbatim to dist/ by
+      # build:stage, so this is equivalent to validating the deploy output.
+      - name: Verify Pages output
+        run: node tools/verify-pages-output.mjs
+        env:
+          PAGES_OUTPUT_DIR: "."
