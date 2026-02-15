@@ -53,7 +53,7 @@ It is designed to help recruiters, hiring managers, and collaborators learn abou
    - Type: Competitive Strategy
    - Description: Marketing strategy deck for competitive positioning.
 
-## Hobbies (6 total)
+## Hobbies (7 total)
 
 1. Gym & Strength Training - https://www.estivanayramia.com/hobbies/gym
 2. Photography - https://www.estivanayramia.com/hobbies/photography
@@ -61,6 +61,7 @@ It is designed to help recruiters, hiring managers, and collaborators learn abou
 4. Cooking - https://www.estivanayramia.com/hobbies/cooking
 5. Whispers (Sticky Notes) - https://www.estivanayramia.com/hobbies/whispers
 6. Reading - https://www.estivanayramia.com/hobbies/reading
+7. Me - https://www.estivanayramia.com/hobbies/me
 
 ## Important Clarifications
 

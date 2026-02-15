@@ -84,6 +84,14 @@
       "filePath": "/hobbies/gym.html"
     },
     {
+      "id": "me",
+      "title": "Me",
+      "summary": "Personal snapshots that capture identity, growth, and the moments behind the work.",
+      "url": "/hobbies/me",
+      "fullUrl": "https://www.estivanayramia.com/hobbies/me",
+      "filePath": "/hobbies/me.html"
+    },
+    {
       "id": "photography",
       "title": "Photography",
       "summary": "Capturing moments worth remembering. iPhone shots that tell stories; no DSLR needed, just good lighting and better timing.",
@@ -110,7 +118,7 @@
   ],
   "meta": {
     "projectCount": 5,
-    "hobbyCount": 6,
+    "hobbyCount": 7,
     "source": "Generated from HTML content by scripts/generate-site-facts.js"
   }
 }
