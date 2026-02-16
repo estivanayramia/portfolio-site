@@ -1,12 +1,31 @@
 name = "portfolio-worker"
-main = "worker.js"
+main = "debugger-worker.js"
 compatibility_date = "2024-01-01"
 workers_dev = true
 
-# NOTE: Routes must be top-level (NOT inside [vars]).
-# Temporarily keep this worker un-routed to avoid route conflicts while
-# portfolio-api-debugger owns specific /api/* ingestion endpoints.
-routes = []
+# This is the DEFAULT wrangler config in the worker/ directory.
+# Workers Builds uses this when root_dir = "worker/" and deploy command = default.
+# The dashboard worker "portfolio-worker" serves the debugger/error-reporting API.
+#
+# For the chat worker, use:  npx wrangler deploy --config wrangler.chat.toml
+# For manual debugger deploys to "portfolio-api-debugger", use:
+#   npx wrangler deploy --config wrangler.debugger.toml
+
+# Debugger/ingestion worker owns these endpoints.
+routes = [
+  # bare domain
+  { pattern = "estivanayramia.com/api/error-report", zone_name = "estivanayramia.com" },
+  { pattern = "estivanayramia.com/api/errors*", zone_name = "estivanayramia.com" },
+  { pattern = "estivanayramia.com/api/auth", zone_name = "estivanayramia.com" },
+  { pattern = "estivanayramia.com/api/health", zone_name = "estivanayramia.com" },
+  { pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" },
+  # www (dashboard lives here)
+  { pattern = "www.estivanayramia.com/api/error-report*", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/errors*", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/auth*", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/api/health", zone_name = "estivanayramia.com" },
+  { pattern = "www.estivanayramia.com/health", zone_name = "estivanayramia.com" },
+]
 
 # D1 Database for error monitoring
 [[d1_databases]]
@@ -14,14 +33,19 @@ binding = "DB"
 database_name = "portfolio-errors"
 database_id = "90a1df04-e5b9-48b9-90f4-02e3fb773ca8"
 
-# Environment variables
+# KV storage for sessions + rate limiting
+[[kv_namespaces]]
+binding = "SAVONIE_KV"
+id = "e723b1dbdc9a40a6b6ccd04764108d6c"
+
 [vars]
-DASHBOARD_PASSWORD_HASH = "__SET_VIA_CLOUDFLARE_SECRETS__"  # In production, use hashed passwords
+SERVICE_NAME = "portfolio-worker"
 RATE_LIMIT_MAX = "10"
 RATE_LIMIT_WINDOW = "60000"
 
+# Secrets (set via Cloudflare dashboard or `wrangler secret put`):
+# - DASHBOARD_PASSWORD (plain) OR DASHBOARD_PASSWORD_HASH (sha256 hex or plain)
 
-# Observability settings
 [observability.logs]
 enabled = true
 head_sampling_rate = 1
@@ -32,11 +56,4 @@ persist = true
 enabled = true
 head_sampling_rate = 1
 persist = true
-
-# Environment variables
-# Add GEMINI_API_KEY as a secret via: wrangler secret put GEMINI_API_KEY
-
-[[kv_namespaces]]
-binding = "SAVONIE_KV"
-id = "e723b1dbdc9a40a6b6ccd04764108d6c"
 
