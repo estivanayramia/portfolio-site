@@ -114,13 +114,13 @@
 /overview    /EN/overview    200
 /privacy    /EN/privacy    200
 /projects/    /EN/projects/    200
-/projects/endpoint-competitive-playbook    /EN/projects/endpoint-competitive-playbook.html    200
+/projects/endpoint-competitive-playbook    /EN/projects/endpoint-competitive-playbook    200
 /projects/conflict    /projects/endpoint-competitive-playbook    301
-/projects/franklin-templeton-concept    /EN/projects/franklin-templeton-concept.html    200
-/projects/endpoint-linkedin-campaign    /EN/projects/endpoint-linkedin-campaign.html    200
-/projects/loreal-maps-campaign    /EN/projects/loreal-maps-campaign.html    200
-/projects/endpoint-elosity-video    /EN/projects/endpoint-elosity-video.html    200
-/projects/portfolio    /EN/projects/portfolio.html    200
+/projects/franklin-templeton-concept    /EN/projects/franklin-templeton-concept    200
+/projects/endpoint-linkedin-campaign    /EN/projects/endpoint-linkedin-campaign    200
+/projects/loreal-maps-campaign    /EN/projects/loreal-maps-campaign    200
+/projects/endpoint-elosity-video    /EN/projects/endpoint-elosity-video    200
+/projects/portfolio    /EN/projects/portfolio    200
 
 # Prevent indexing /EN/* directly (301)
 /EN/about.html    /about    301
