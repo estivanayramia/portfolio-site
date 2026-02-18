@@ -3,29 +3,14 @@ main = "debugger-worker.js"
 compatibility_date = "2024-01-01"
 workers_dev = true
 
-# This is the DEFAULT wrangler config in the worker/ directory.
-# Workers Builds uses this when root_dir = "worker/" and deploy command = default.
-# The dashboard worker "portfolio-worker" serves the debugger/error-reporting API.
+# Routes intentionally omitted from this config.
+# portfolio-api-debugger (wrangler.debugger.toml) owns all production
+# routes. This config is used by Workers Builds CI only — it deploys
+# to workers_dev for validation. Do NOT add routes here or they will
+# conflict with portfolio-api-debugger and break the build.
 #
-# For the chat worker, use:  npx wrangler deploy --config wrangler.chat.toml
-# For manual debugger deploys to "portfolio-api-debugger", use:
-#   npx wrangler deploy --config wrangler.debugger.toml
-
-# Debugger/ingestion worker owns these endpoints.
-routes = [
-  # bare domain
-  { pattern = "estivanayramia.com/api/error-report", zone_name = "estivanayramia.com" },
-  { pattern = "estivanayramia.com/api/errors*", zone_name = "estivanayramia.com" },
-  { pattern = "estivanayramia.com/api/auth", zone_name = "estivanayramia.com" },
-  { pattern = "estivanayramia.com/api/health", zone_name = "estivanayramia.com" },
-  { pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" },
-  # www (dashboard lives here)
-  { pattern = "www.estivanayramia.com/api/error-report*", zone_name = "estivanayramia.com" },
-  { pattern = "www.estivanayramia.com/api/errors*", zone_name = "estivanayramia.com" },
-  { pattern = "www.estivanayramia.com/api/auth*", zone_name = "estivanayramia.com" },
-  { pattern = "www.estivanayramia.com/api/health", zone_name = "estivanayramia.com" },
-  { pattern = "www.estivanayramia.com/health", zone_name = "estivanayramia.com" },
-]
+# Production route owner: portfolio-api-debugger (wrangler.debugger.toml)
+# For chat worker: npx wrangler deploy --config wrangler.chat.toml
 
 # D1 Database for error monitoring
 [[d1_databases]]
