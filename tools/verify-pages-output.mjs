@@ -90,10 +90,11 @@ if (badLocaleRewriteRe.test(redirects)) {
   );
 }
 
-// Check directory routes rewrite to directory paths (not index.html)
-// This prevents Cloudflare Pages rewrite failures
-const hobbiesRewriteRe = /^\/hobbies\/\s+\/EN\/hobbies\/\s+200\s*$/m;
-const projectsRewriteRe = /^\/projects\/\s+\/EN\/projects\/\s+200\s*$/m;
+// Check directory routes rewrite directly to physical index.html files.
+// We use explicit .html targets throughout to bypass Cloudflare Pages' automatic
+// 308 clean-URL behavior which fires before _redirects and causes redirect loops.
+const hobbiesRewriteRe = /^\/hobbies\/\s+\/EN\/hobbies\/index\.html\s+200\s*$/m;
+const projectsRewriteRe = /^\/projects\/\s+\/EN\/projects\/index\.html\s+200\s*$/m;
 
 if (!hobbiesRewriteRe.test(redirects)) {
   if (DEBUG) {
@@ -101,7 +102,7 @@ if (!hobbiesRewriteRe.test(redirects)) {
     dbg(`/hobbies/ candidates: ${candidates.slice(0, 10).join(' | ')}`);
   }
   fail(
-    "_redirects does not include '/hobbies/  /EN/hobbies/  200' (must rewrite to directory, not index.html).",
+    "_redirects does not include '/hobbies/  /EN/hobbies/index.html  200' (must rewrite to explicit .html file).",
   );
 }
 
@@ -111,22 +112,10 @@ if (!projectsRewriteRe.test(redirects)) {
     dbg(`/projects/ candidates: ${candidates.slice(0, 10).join(' | ')}`);
   }
   fail(
-    "_redirects does not include '/projects/  /EN/projects/  200' (must rewrite to directory, not index.html).",
-  );
-}
-
-// Fail if any directory canonical rewrites to index.html (regression guard)
-const badDirectoryRewriteRe = /^\/[^/]+\/\s+\/EN\/[^/]+\/index\.html\s+200\s*$/m;
-if (badDirectoryRewriteRe.test(redirects)) {
-  if (DEBUG) {
-    const lines = findMatchingLines(redirects, badDirectoryRewriteRe);
-    dbg(`Bad directory->index.html rewrite lines: ${lines.slice(0, 10).join(' | ')}`);
-  }
-  fail(
-    "_redirects contains directory route rewriting to index.html (should rewrite to directory path).",
+    "_redirects does not include '/projects/  /EN/projects/index.html  200' (must rewrite to explicit .html file).",
   );
 }
 
 console.log(
-  `[verify-pages-output] OK. Found _redirects in "${outDir}" with expected rewrites (no root rewrite + directory routes).`,
+  `[verify-pages-output] OK. Found _redirects in "${outDir}" with expected rewrites (no root rewrite + explicit .html rewrite targets).`,
 );
