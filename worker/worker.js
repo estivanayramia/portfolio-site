@@ -467,7 +467,7 @@ Please reach Estivan directly at [hello@estivanayramia.com](mailto:hello@estivan
 
 ${resultList}
 
-[Explore all ${matches[0].item.type}s →](/${matches[0].item.type}s/)`,
+[Explore all ${matches[0].item.type === 'hobby' ? 'hobbies' : 'projects'} →](/${matches[0].item.type === 'hobby' ? 'hobbies' : 'projects'}/)`,
       chips: matches.map(m => m.item.title)
     };
   }
