@@ -1,0 +1,40 @@
+# This file is used by Workers Builds CI (runs npx wrangler deploy from repo root).
+# Wrangler picks .toml over .jsonc, so this takes priority over wrangler.jsonc
+# (the Pages asset config — left untouched intentionally).
+#
+# Routes intentionally omitted. portfolio-api-debugger
+# (worker/wrangler.debugger.toml) owns all production routes.
+# portfolio-worker deploys to workers_dev only for CI validation.
+#
+# For chat worker:     npx wrangler deploy --config worker/wrangler.chat.toml
+# For prod debugger:   npx wrangler deploy --config worker/wrangler.debugger.toml
+
+name = "portfolio-worker"
+main = "worker/debugger-worker.js"
+compatibility_date = "2024-01-01"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-errors"
+database_id = "90a1df04-e5b9-48b9-90f4-02e3fb773ca8"
+
+[[kv_namespaces]]
+binding = "SAVONIE_KV"
+id = "e723b1dbdc9a40a6b6ccd04764108d6c"
+
+[vars]
+SERVICE_NAME = "portfolio-worker"
+RATE_LIMIT_MAX = "10"
+RATE_LIMIT_WINDOW = "60000"
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 1
+persist = true
