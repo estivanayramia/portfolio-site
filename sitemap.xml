@@ -1,135 +1,262 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- HOMEPAGE -->
   <url>
     <loc>https://www.estivanayramia.com/</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
   </url>
+
+  <!-- ABOUT -->
   <url>
     <loc>https://www.estivanayramia.com/about</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/about/values</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/about/background</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/about/working-with-me</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://www.estivanayramia.com/ar/</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/contact</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/dashboard</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/deep-dive</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/es/</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/1024-moves</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/2048</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/block-breaker</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/nano-wirebot</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/off-the-line</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/oh-flip</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/onoff</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/pizza-undelivery</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/racer</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/snake</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/space-invaders</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/the-matr13k</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/triangle-back-to-home</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies-games/xx142-b2exe</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/car</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/cooking</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/gym</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/me</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/photography</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/reading</loc>
-  </url>
-  <url>
-    <loc>https://www.estivanayramia.com/hobbies/whispers</loc>
-  </url>
+
+  <!-- OVERVIEW -->
   <url>
     <loc>https://www.estivanayramia.com/overview</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
   </url>
+
+  <!-- DEEP DIVE -->
   <url>
-    <loc>https://www.estivanayramia.com/privacy</loc>
+    <loc>https://www.estivanayramia.com/deep-dive</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
+
+  <!-- PROJECTS -->
   <url>
     <loc>https://www.estivanayramia.com/projects/</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/endpoint-competitive-playbook</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/conflict</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/franklin-templeton-concept</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/endpoint-linkedin-campaign</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/loreal-maps-campaign</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/endpoint-elosity-video</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/portfolio</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
   </url>
+
+  <!-- HOBBIES -->
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/car</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/cooking</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/gym</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/me</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/photography</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/reading</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies/whispers</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- GAMES -->
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/1024-moves</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/2048</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/block-breaker</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/nano-wirebot</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/off-the-line</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/oh-flip</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/onoff</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/pizza-undelivery</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/racer</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/snake</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/space-invaders</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/the-matr13k</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/triangle-back-to-home</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.estivanayramia.com/hobbies-games/xx142-b2exe</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- CONTACT -->
+  <url>
+    <loc>https://www.estivanayramia.com/contact</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- PRIVACY -->
+  <url>
+    <loc>https://www.estivanayramia.com/privacy</loc>
+    <lastmod>2026-02-17</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
 </urlset>
