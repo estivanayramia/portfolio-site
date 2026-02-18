@@ -200,3 +200,17 @@
 /EN/projects/portfolio.html    /projects/portfolio    301
 /EN/projects/portfolio    /EN/projects/portfolio.html    200
 # END GENERATED (fix-seo)
+
+# Clean URL rewrites for renamed project files (200) - serve existing EN files
+/projects/loreal-maps-campaign    /EN/projects/logistics.html    200
+/projects/franklin-templeton-concept    /EN/projects/discipline.html    200
+/projects/endpoint-linkedin-campaign    /EN/projects/documentation.html    200
+/projects/endpoint-elosity-video    /EN/projects/multilingual.html    200
+/projects/endpoint-competitive-playbook    /EN/projects/competitive-strategy.html    200
+
+# Serve .html when requested for clean URLs
+/EN/projects/loreal-maps-campaign    /EN/projects/logistics.html    200
+/EN/projects/franklin-templeton-concept    /EN/projects/discipline.html    200
+/EN/projects/endpoint-linkedin-campaign    /EN/projects/documentation.html    200
+/EN/projects/endpoint-elosity-video    /EN/projects/multilingual.html    200
+/EN/projects/endpoint-competitive-playbook    /EN/projects/competitive-strategy.html    200
