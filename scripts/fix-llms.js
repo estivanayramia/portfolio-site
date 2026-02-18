@@ -12,11 +12,11 @@ const enDirName = fs.existsSync(path.join(__dirname, '..', 'EN')) ? '/EN' : '/en
 // Update project URLs
 const projectReplacements = [
   ['/projects/portfolio', `${enDirName}/projects/portfolio.html`],
-  ['/projects/logistics', `${enDirName}/projects/logistics.html`],
-  ['/projects/discipline', `${enDirName}/projects/discipline.html`],
-  ['/projects/documentation', `${enDirName}/projects/documentation.html`],
-  ['/projects/multilingual', `${enDirName}/projects/multilingual.html`],
-  ['/projects/competitive-strategy', `${enDirName}/projects/competitive-strategy.html`]
+  ['/projects/loreal-maps-campaign', `${enDirName}/projects/loreal-maps-campaign.html`],
+  ['/projects/franklin-templeton-concept', `${enDirName}/projects/franklin-templeton-concept.html`],
+  ['/projects/endpoint-linkedin-campaign', `${enDirName}/projects/endpoint-linkedin-campaign.html`],
+  ['/projects/endpoint-elosity-video', `${enDirName}/projects/endpoint-elosity-video.html`],
+  ['/projects/endpoint-competitive-playbook', `${enDirName}/projects/endpoint-competitive-playbook.html`]
 ];
 
 projectReplacements.forEach(([oldUrl, newUrl]) => {

@@ -29,27 +29,27 @@ It is designed to help recruiters, hiring managers, and collaborators learn abou
    - Description: Hand-coded portfolio with no templates or CMS. Features include service worker, AI chatbot, and Lighthouse 90+ scores.
 
 2. L'Oréal Cell BioPrint MAPS Campaign
-   - URL: https://www.estivanayramia.com/projects/logistics
+   - URL: https://www.estivanayramia.com/projects/loreal-maps-campaign
    - Type: Campaign Strategy
    - Description: Class concept campaign deck mapping three personas and their touchpoints across the funnel.
 
 3. Franklin Templeton Class Concept
-   - URL: https://www.estivanayramia.com/projects/discipline
+   - URL: https://www.estivanayramia.com/projects/franklin-templeton-concept
    - Type: Content Strategy
    - Description: 17-page class concept deck for a 'Voice of Progress' campaign.
 
 4. EndPoint LinkedIn Campaign
-   - URL: https://www.estivanayramia.com/projects/documentation
+   - URL: https://www.estivanayramia.com/projects/endpoint-linkedin-campaign
    - Type: Retargeting Strategy
    - Description: 15-page deck outlining Phase 2A and Phase 2B of a LinkedIn retargeting campaign.
 
 5. Endpoint Elosity Launch Video
-   - URL: https://www.estivanayramia.com/projects/multilingual
+   - URL: https://www.estivanayramia.com/projects/endpoint-elosity-video
    - Type: Video Concept
    - Description: Motion storyboard and voiceover script for product launch.
 
 6. Taking Down Endpoint (Almac Group + 4G Clinical)
-   - URL: https://www.estivanayramia.com/projects/competitive-strategy
+   - URL: https://www.estivanayramia.com/projects/endpoint-competitive-playbook
    - Type: Competitive Strategy
    - Description: Marketing strategy deck for competitive positioning.
 

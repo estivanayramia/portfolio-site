@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Test Chat Grounding - Validate chatbot responses are factually accurate
  * 
  * This script tests:
@@ -53,22 +53,22 @@ const failures = [];
 
 function test(name, condition, details = '') {
   if (condition) {
-    console.log(`✅ ${name}`);
+    console.log(`âœ… ${name}`);
     passed++;
   } else {
-    console.log(`❌ ${name}${details ? ': ' + details : ''}`);
+    console.log(`âŒ ${name}${details ? ': ' + details : ''}`);
     failed++;
     failures.push({ name, details });
   }
 }
 
-console.log('🧪 Testing Chat Grounding...\n');
+console.log('ðŸ§ª Testing Chat Grounding...\n');
 
 // ============================================================================
 // Test 1: Site-facts.json exists and is valid JSON
 // ============================================================================
 
-console.log('📦 Test Group: Site Facts');
+console.log('ðŸ“¦ Test Group: Site Facts');
 
 let siteFacts = null;
 try {
@@ -125,7 +125,7 @@ if (siteFacts) {
 // Test 2: Worker.js validation
 // ============================================================================
 
-console.log('\n🔧 Test Group: Worker');
+console.log('\nðŸ”§ Test Group: Worker');
 
 let workerContent = null;
 try {
@@ -139,8 +139,8 @@ if (workerContent) {
   // Check for INCORRECT legacy URLs (without /en/ prefix)
   const incorrectLegacyPatterns = [
     { pattern: '/projects.html', correct: '/projects/' },
-    { pattern: '/project-logistics.html', correct: '/projects/logistics' },
-    { pattern: '/project-conflict.html', correct: '/projects/competitive-strategy' }
+    { pattern: '/project-logistics.html', correct: '/projects/loreal-maps-campaign' },
+    { pattern: '/project-conflict.html', correct: '/projects/endpoint-competitive-playbook' }
   ];
   
   // Remove comments for checking
@@ -170,7 +170,7 @@ if (workerContent) {
 // Test 3: llms.txt validation
 // ============================================================================
 
-console.log('\n📄 Test Group: LLMs.txt');
+console.log('\nðŸ“„ Test Group: LLMs.txt');
 
 let llmsTxt = null;
 try {
@@ -190,22 +190,22 @@ if (llmsTxt) {
 }
 
 // ============================================================================
-// Test 4: L'Oréal Handler Logic
+// Test 4: L'OrÃ©al Handler Logic
 // ============================================================================
 
-console.log('\n🔧 Test Group: L\'Oréal Handler');
+console.log('\nðŸ”§ Test Group: L\'OrÃ©al Handler');
 
-// Check that the L'Oréal project exists with correct canonical URL
+// Check that the L'OrÃ©al project exists with correct canonical URL
 if (siteFacts?.projects) {
-  const lorealProject = siteFacts.projects.find(p => p.url === '/projects/logistics');
-  test('L\'Oréal project exists with canonical URL', !!lorealProject, lorealProject?.url || '/projects/logistics');
+  const lorealProject = siteFacts.projects.find(p => p.url === '/projects/loreal-maps-campaign');
+  test('L\'OrÃ©al project exists with canonical URL', !!lorealProject, lorealProject?.url || '/projects/loreal-maps-campaign');
   
   if (lorealProject) {
-    test('L\'Oréal project has title', !!lorealProject.title);
-    test('L\'Oréal project has summary', !!lorealProject.summary);
-    test('L\'Oréal project title matches expected pattern', 
+    test('L\'OrÃ©al project has title', !!lorealProject.title);
+    test('L\'OrÃ©al project has summary', !!lorealProject.summary);
+    test('L\'OrÃ©al project title matches expected pattern', 
       lorealProject.title.toLowerCase().includes('loreal') || 
-      lorealProject.title.toLowerCase().includes('l\'oréal') ||
+      lorealProject.title.toLowerCase().includes('l\'orÃ©al') ||
       lorealProject.title.toLowerCase().includes('bioprint'),
       lorealProject.title
     );
@@ -213,8 +213,8 @@ if (siteFacts?.projects) {
   
   // Verify worker embeds siteFacts correctly with canonical URLs (no .html)
   const workerContents = fs.readFileSync(WORKER_PATH, 'utf-8');
-  test('Worker has L\'Oréal in embedded siteFacts with canonical URL', 
-    workerContents.includes('/projects/logistics"') || workerContents.includes('/projects/logistics\'')
+  test('Worker has L\'OrÃ©al in embedded siteFacts with canonical URL', 
+    workerContents.includes('/projects/loreal-maps-campaign"') || workerContents.includes('/projects/loreal-maps-campaign\'')
   );
 }
 
@@ -222,7 +222,7 @@ if (siteFacts?.projects) {
 // Test 5: File Existence
 // ============================================================================
 
-console.log('\n📁 Test Group: File Existence');
+console.log('\nðŸ“ Test Group: File Existence');
 
 const criticalFiles = [
   'EN/index.html',
@@ -268,16 +268,16 @@ if (siteFacts?.hobbies) {
 // ============================================================================
 
 console.log('\n' + '='.repeat(60));
-console.log(`📊 Results: ${passed} passed, ${failed} failed`);
+console.log(`ðŸ“Š Results: ${passed} passed, ${failed} failed`);
 
 if (failed > 0) {
-  console.log('\n❌ Failures:');
+  console.log('\nâŒ Failures:');
   failures.forEach(f => {
     console.log(`   - ${f.name}${f.details ? ': ' + f.details : ''}`);
   });
-  console.log('\n🛑 Tests FAILED');
+  console.log('\nðŸ›‘ Tests FAILED');
   process.exit(1);
 } else {
-  console.log('\n✨ All tests passed!');
+  console.log('\nâœ¨ All tests passed!');
   process.exit(0);
 }

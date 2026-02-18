@@ -114,12 +114,12 @@
 /overview    /EN/overview    200
 /privacy    /EN/privacy    200
 /projects/    /EN/projects/    200
-/projects/competitive-strategy    /EN/projects/competitive-strategy    200
+/projects/endpoint-competitive-playbook    /EN/projects/endpoint-competitive-playbook.html    200
 /projects/conflict    /EN/projects/conflict    200
-/projects/discipline    /EN/projects/discipline    200
-/projects/documentation    /EN/projects/documentation    200
-/projects/logistics    /EN/projects/logistics    200
-/projects/multilingual    /EN/projects/multilingual    200
+/projects/franklin-templeton-concept    /EN/projects/franklin-templeton-concept.html    200
+/projects/endpoint-linkedin-campaign    /EN/projects/endpoint-linkedin-campaign.html    200
+/projects/loreal-maps-campaign    /EN/projects/loreal-maps-campaign.html    200
+/projects/endpoint-elosity-video    /EN/projects/endpoint-elosity-video.html    200
 /projects/portfolio    /EN/projects/portfolio    200
 
 # Prevent indexing /EN/* directly (301)
@@ -184,33 +184,26 @@
 /EN/overview    /EN/overview.html    200
 /EN/privacy.html    /privacy    301
 /EN/privacy    /EN/privacy.html    200
-/EN/projects/competitive-strategy.html    /projects/competitive-strategy    301
-/EN/projects/competitive-strategy    /EN/projects/competitive-strategy.html    200
+/EN/projects/endpoint-competitive-playbook.html    /projects/endpoint-competitive-playbook    301
+/EN/projects/endpoint-competitive-playbook    /EN/projects/endpoint-competitive-playbook.html    200
 /EN/projects/conflict.html    /projects/conflict    301
 /EN/projects/conflict    /EN/projects/conflict.html    200
-/EN/projects/discipline.html    /projects/discipline    301
-/EN/projects/discipline    /EN/projects/discipline.html    200
-/EN/projects/documentation.html    /projects/documentation    301
-/EN/projects/documentation    /EN/projects/documentation.html    200
+/EN/projects/franklin-templeton-concept.html    /projects/franklin-templeton-concept    301
+/EN/projects/franklin-templeton-concept    /EN/projects/franklin-templeton-concept.html    200
+/EN/projects/endpoint-linkedin-campaign.html    /projects/endpoint-linkedin-campaign    301
+/EN/projects/endpoint-linkedin-campaign    /EN/projects/endpoint-linkedin-campaign.html    200
 /EN/projects/index.html    /projects/    301
-/EN/projects/logistics.html    /projects/logistics    301
-/EN/projects/logistics    /EN/projects/logistics.html    200
-/EN/projects/multilingual.html    /projects/multilingual    301
-/EN/projects/multilingual    /EN/projects/multilingual.html    200
+/EN/projects/loreal-maps-campaign.html    /projects/loreal-maps-campaign    301
+/EN/projects/loreal-maps-campaign    /EN/projects/loreal-maps-campaign.html    200
+/EN/projects/endpoint-elosity-video.html    /projects/endpoint-elosity-video    301
+/EN/projects/endpoint-elosity-video    /EN/projects/endpoint-elosity-video.html    200
 /EN/projects/portfolio.html    /projects/portfolio    301
 /EN/projects/portfolio    /EN/projects/portfolio.html    200
 # END GENERATED (fix-seo)
 
-# Clean URL rewrites for renamed project files (200) - serve existing EN files
-/projects/loreal-maps-campaign    /EN/projects/logistics.html    200
-/projects/franklin-templeton-concept    /EN/projects/discipline.html    200
-/projects/endpoint-linkedin-campaign    /EN/projects/documentation.html    200
-/projects/endpoint-elosity-video    /EN/projects/multilingual.html    200
-/projects/endpoint-competitive-playbook    /EN/projects/competitive-strategy.html    200
-
 # Serve .html when requested for clean URLs
-/EN/projects/loreal-maps-campaign    /EN/projects/logistics.html    200
-/EN/projects/franklin-templeton-concept    /EN/projects/discipline.html    200
-/EN/projects/endpoint-linkedin-campaign    /EN/projects/documentation.html    200
-/EN/projects/endpoint-elosity-video    /EN/projects/multilingual.html    200
-/EN/projects/endpoint-competitive-playbook    /EN/projects/competitive-strategy.html    200
+/EN/projects/loreal-maps-campaign    /EN/projects/loreal-maps-campaign.html    200
+/EN/projects/franklin-templeton-concept    /EN/projects/franklin-templeton-concept.html    200
+/EN/projects/endpoint-linkedin-campaign    /EN/projects/endpoint-linkedin-campaign.html    200
+/EN/projects/endpoint-elosity-video    /EN/projects/endpoint-elosity-video.html    200
+/EN/projects/endpoint-competitive-playbook    /EN/projects/endpoint-competitive-playbook.html    200

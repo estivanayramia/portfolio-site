@@ -862,7 +862,7 @@ export default {
         const targetProject = (siteFacts?.projects || []).find(
           (p) =>
             p?.id === "taking-down-endpoint-almac-group-4g-clinical" ||
-            p?.url === "/projects/competitive-strategy"
+            p?.url === "/projects/endpoint-competitive-playbook"
         );
 
         if (targetProject?.title && targetProject?.url) {
@@ -977,7 +977,7 @@ export default {
       // Project inquiries - use actual project from siteFacts
       // Match by URL to avoid id mismatches
       if (lowerMsg.includes("logistics") || lowerMsg.includes("loreal") || lowerMsg.includes("l'oréal") || lowerMsg.includes("bioprint") || lowerMsg.includes("maps campaign")) {
-        const project = siteFacts.projects.find(p => p.url === "/projects/logistics");
+        const project = siteFacts.projects.find(p => p.url === "/projects/loreal-maps-campaign");
         
         // Null check to prevent crashes if project not found
         if (project) {
