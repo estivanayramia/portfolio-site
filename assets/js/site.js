@@ -1668,88 +1668,84 @@ const initLazyLoading = () => {
  */
 const initPdfPreviews = () => {
     try {
-        document.querySelectorAll('.preview-panel').forEach(panel => {
+        document.querySelectorAll('.preview-panel').forEach((panel) => {
             try {
+                const iframe = panel.querySelector('.pdf-frame');
+                const loading = panel.querySelector('.pdf-loading');
+                const error = panel.querySelector('.pdf-error');
                 const section = panel.closest('section') || panel.parentElement;
-                if (!section) return;
-                // find first PDF link within the same section
-                const pdfLink = section.querySelector('a[href$=".pdf"]');
-                if (!pdfLink) return;
-                const pdfUrl = pdfLink.href;
+                const toggleBtn = section ? section.querySelector('.preview-toggle') : null;
 
-                // Mark as loaded so other scripts don't try to load it again
-                panel.dataset.pdfLoaded = 'true';
+                if (!iframe || !loading || !error) return;
 
-                // helper to show fallback message
-                const showFallback = (reason) => {
+                let loadSettled = false;
+                let loadTimeout = null;
+
+                const showError = (reason) => {
+                    if (loadSettled) return;
+                    loadSettled = true;
                     try {
-                        panel.innerHTML = '<div class="rounded-xl border border-chocolate/20 bg-white/40 overflow-hidden p-8 text-center"><p class="text-sm text-chocolate/70">Inline PDF preview may be blocked by hosting or browser settings. Use the buttons below to open or download the deck.</p></div>';
-                        __logCollect && __logCollect('pdf.preview.fallback', { url: pdfUrl, reason: reason });
+                        loading.style.display = 'none';
+                        iframe.style.display = 'none';
+                        error.classList.remove('hidden');
+                        panel.dataset.pdfLoaded = 'false';
+                        __logCollect && __logCollect('pdf.preview.fallback', { reason });
                     } catch (e) {}
                 };
 
-                // prepare placeholder / spinner with stable background
-                panel.innerHTML = '<div class="py-12 bg-white/30 rounded-xl border border-chocolate/10 flex items-center justify-center min-h-[480px]">\n  <div class="text-sm text-chocolate/60 flex items-center gap-2"><svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Loading previewâ€¦</div>\n</div>';
-
-                // create iframe but keep it hidden until load confirmed
-                const iframe = document.createElement('iframe');
-                iframe.setAttribute('aria-label', 'PDF preview');
-                iframe.style.cssText = 'width:100%;height:480px;border:0;border-radius:12px;background:#fff;opacity:0;position:absolute;top:0;left:0;';
-                iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-                
-                // Set panel to relative positioning for absolute iframe
-                panel.style.position = 'relative';
-                panel.style.minHeight = '480px';
-
-                let loaded = false;
-                let settled = false;
-                
-                const finalize = (success) => {
-                    if (settled) return;
-                    settled = true;
-                    
-                    if (success) {
-                        // Smoothly fade in the iframe
-                        iframe.style.position = 'relative';
-                        iframe.style.opacity = '1';
-                        iframe.style.transition = 'opacity 0.3s ease';
-                        // Remove placeholder
-                        const placeholder = panel.querySelector('div');
-                        if (placeholder) placeholder.remove();
-                        __logCollect && __logCollect('pdf.preview.loaded', { url: pdfUrl });
-                    } else {
-                        try { iframe.remove(); } catch(_){}
-                        showFallback('load_failed');
-                    }
+                const showSuccess = () => {
+                    if (loadSettled) return;
+                    loadSettled = true;
+                    if (loadTimeout) clearTimeout(loadTimeout);
+                    try {
+                        loading.style.display = 'none';
+                        iframe.style.display = 'block';
+                        error.classList.add('hidden');
+                        panel.dataset.pdfLoaded = 'true';
+                        __logCollect && __logCollect('pdf.preview.loaded', { src: iframe.getAttribute('src') || '' });
+                    } catch (e) {}
                 };
 
-                iframe.addEventListener('load', () => {
-                    loaded = true;
-                    // Give it a moment to actually render content
-                    setTimeout(() => finalize(true), 100);
-                });
-                
-                iframe.addEventListener('error', () => finalize(false));
+                if (!iframe.getAttribute('src')) {
+                    const pdfLink = section && (section.querySelector('a[href$=".pdf"]') || section.querySelector('a[href*=".pdf?"]'));
+                    const href = pdfLink ? pdfLink.getAttribute('href') : '';
+                    if (href) {
+                        iframe.setAttribute('src', `${href}#toolbar=1&navpanes=1&scrollbar=1&page=1&view=FitH`);
+                    }
+                }
 
-                // attempt to set src
-                try {
-                    iframe.src = pdfUrl;
-                    panel.appendChild(iframe);
-                    __logCollect && __logCollect('pdf.preview.attempt', { url: pdfUrl });
-                } catch (e) {
-                    finalize(false);
+                if (!iframe.getAttribute('src')) {
+                    showError('missing_src');
                     return;
                 }
 
-                // fallback timeout: if not loaded within 5s, assume success (browser swallowed load event)
-                setTimeout(() => {
-                    if (!loaded) finalize(true);
-                }, 5000);
+                iframe.addEventListener('load', () => {
+                    setTimeout(showSuccess, 100);
+                }, { once: true });
+
+                iframe.addEventListener('error', () => {
+                    showError('load_error');
+                }, { once: true });
+
+                loadTimeout = setTimeout(() => {
+                    showError('timeout');
+                }, 8000);
+
+                __logCollect && __logCollect('pdf.preview.attempt', { src: iframe.getAttribute('src') || '' });
+
+                if (toggleBtn && !toggleBtn.dataset.pdfToggleBound) {
+                    toggleBtn.dataset.pdfToggleBound = 'true';
+                    let isVisible = true;
+                    toggleBtn.addEventListener('click', () => {
+                        isVisible = !isVisible;
+                        panel.style.display = isVisible ? 'block' : 'none';
+                        toggleBtn.textContent = isVisible ? 'Hide preview' : 'Show preview';
+                    });
+                }
             } catch (e) {}
         });
     } catch (e) {}
 };
-
 // ==========================================================================
 // Scroll to Top Button
 // ==========================================================================
@@ -4499,117 +4495,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// ==========================================================================
-// PDF Preview Toggle (for project pages)
-// ==========================================================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Helper: produce the default fallback markup (keeps existing copy consistent)
-    const defaultFallback = () => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'rounded-xl border border-chocolate/20 bg-white/40 overflow-hidden p-8 text-center';
-        const p = document.createElement('p');
-        p.className = 'text-sm text-chocolate/70';
-        p.textContent = 'Inline PDF preview may be blocked by hosting or browser settings. Use the buttons below to open or download the deck.';
-        wrapper.appendChild(p);
-        return wrapper;
-    };
-
-    // Try to load a PDF into an iframe; if it fails, show fallback
-    const tryLoadPdf = (panel, pdfUrl) => {
-        if (!panel || !pdfUrl) return;
-        if (panel.dataset.pdfLoaded) return; // already attempted
-
-        // Insert a lightweight loading state
-        panel.innerHTML = '';
-        const loading = document.createElement('div');
-        loading.className = 'py-12 text-sm text-chocolate/60';
-        loading.textContent = 'Attempting to load inline previewâ€¦';
-        panel.appendChild(loading);
-
-        const iframe = document.createElement('iframe');
-        iframe.src = pdfUrl;
-        iframe.title = 'PDF preview';
-        iframe.style.width = '100%';
-        iframe.style.height = '480px';
-        iframe.style.border = '0';
-        iframe.loading = 'lazy';
-
-        let timedOut = false;
-        const timeout = setTimeout(() => {
-            timedOut = true;
-            // Loading took too long - assume success (browser swallowed load event for PDF)
-            console.log('PDF load timeout - assuming success');
-            
-            // Clean up loading state
-            try { loading.remove(); } catch(e) {}
-            if (!panel.contains(iframe)) panel.appendChild(iframe);
-            panel.dataset.pdfLoaded = 'true';
-        }, 5000);
-
-        const onFail = () => {
-            clearTimeout(timeout);
-            try { iframe.remove(); } catch (e) {}
-            panel.innerHTML = '';
-            panel.appendChild(defaultFallback());
-            panel.dataset.pdfLoaded = 'false';
-        };
-
-        iframe.addEventListener('load', () => {
-            clearTimeout(timeout);
-            // If iframe content is accessible, treat as success.
-            try {
-                try { loading.remove(); } catch(e) {}
-                if (!panel.contains(iframe)) panel.appendChild(iframe);
-                panel.dataset.pdfLoaded = 'true';
-            } catch (e) {
-                // If something goes wrong, fallback
-                onFail();
-            }
-        });
-
-        iframe.addEventListener('error', onFail);
-
-        // Append iframe so browser begins loading
-        panel.appendChild(iframe);
-    };
-
-    // Initialize toggles and progressive load for every preview-toggle on the page
-    document.querySelectorAll('.preview-toggle').forEach((btn) => {
-        // Find the preview panel within the same section
-        const section = btn.closest('section');
-        const panel = section && section.querySelector('.preview-panel');
-
-        // Attempt to find a PDF link within the same section (first match)
-        let pdfLink = null;
-        if (section) {
-            pdfLink = section.querySelector('a[href$=".pdf"]') || section.querySelector('a[href*=".pdf?"]');
-        }
-        const pdfUrl = pdfLink ? pdfLink.getAttribute('href') : null;
-
-        // If a PDF URL exists, try to progressively load the iframe now (so the preview is ready).
-        // This preserves the user's expectation that an inline preview appears when possible.
-        if (panel && pdfUrl) {
-            tryLoadPdf(panel, pdfUrl);
-        }
-
-        btn.addEventListener('click', () => {
-            if (!panel) return;
-            panel.classList.toggle('hidden');
-            const isVisible = !panel.classList.contains('hidden');
-            btn.textContent = isVisible ? 'Hide preview' : 'Show preview';
-
-            // Track PDF toggle
-            if (typeof clarity === 'function') clarity('event', isVisible ? 'pdf_preview_show' : 'pdf_preview_hide');
-            if (typeof gtag === 'function') gtag('event', isVisible ? 'pdf_preview_show' : 'pdf_preview_hide', {'event_category': 'PDF'});
-
-            // If the panel becomes visible and we haven't attempted loading yet, try again
-            if (isVisible && !panel.dataset.pdfLoaded && pdfUrl) {
-                tryLoadPdf(panel, pdfUrl);
-            }
-        });
-    });
-});
+// PDF preview behavior is handled by initPdfPreviews() in the main boot flow.
 
 // ============================================================================
 // SITE-WIDE ACHIEVEMENT TRACKING
@@ -4752,3 +4638,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Achievement: Gamer - Play a game (wired on hobbies-games page)
 // This will be handled by individual game start logic in hobbies-games.html
+
+
+
+
