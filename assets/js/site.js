@@ -1710,6 +1710,7 @@ const initPdfPreviews = () => {
                     try {
                         loading.style.display = 'none';
                         iframe.style.display = 'none';
+                        iframe.style.opacity = '0';
                         error.classList.remove('hidden');
                         panel.dataset.pdfLoaded = 'false';
                         __logCollect && __logCollect('pdf.preview.fallback', { reason });
@@ -1723,7 +1724,8 @@ const initPdfPreviews = () => {
                     pdfLog('showSuccess called');
                     try {
                         loading.style.display = 'none';
-                        iframe.style.display = 'block';
+                        iframe.style.opacity = '1';
+                        iframe.style.transition = 'opacity 0.3s ease';
                         error.classList.add('hidden');
                         panel.dataset.pdfLoaded = 'true';
                         __logCollect && __logCollect('pdf.preview.loaded', { src: iframe.getAttribute('src') || '' });
@@ -1756,7 +1758,7 @@ const initPdfPreviews = () => {
 
                 loadTimeout = setTimeout(() => {
                     showError('timeout');
-                }, 8000);
+                }, 20000);
 
                 __logCollect && __logCollect('pdf.preview.attempt', { src: iframe.getAttribute('src') || '' });
 
