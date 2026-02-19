@@ -2820,3 +2820,22 @@ footer {
   margin-top: 5rem !important;
 }
 
+/* PDF Preview Enhancements */
+.pdf-loading {
+    min-height: 600px;
+    transition: opacity 0.3s ease-out;
+}
+
+.pdf-frame {
+    transition: opacity 0.3s ease-in;
+}
+
+.preview-panel {
+    transition: all 0.3s ease-in-out;
+}
+
+.preview-toggle {
+    user-select: none;
+    cursor: pointer;
+}
+
