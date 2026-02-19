@@ -1667,8 +1667,20 @@ const initLazyLoading = () => {
  * - Logs attempts, successes, failures when ?collect-logs=1
  */
 const initPdfPreviews = () => {
+    // ── PDF Debug Mode (?pdf-debug=1) ──────────────────────────────────
+    const pdfDebug = typeof window !== 'undefined' &&
+        window.location && window.location.search &&
+        window.location.search.includes('pdf-debug=1');
+    const pdfLog = pdfDebug
+        ? (...args) => console.log('[PDF Preview]', ...args)
+        : () => {};
+    // ─────────────────────────────────────────────────────────────────
+
     try {
-        document.querySelectorAll('.preview-panel').forEach((panel) => {
+        const panels = document.querySelectorAll('.preview-panel');
+        pdfLog('panels found:', panels.length);
+
+        panels.forEach((panel, i) => {
             try {
                 const iframe = panel.querySelector('.pdf-frame');
                 const loading = panel.querySelector('.pdf-loading');
@@ -1676,7 +1688,17 @@ const initPdfPreviews = () => {
                 const section = panel.closest('section') || panel.parentElement;
                 const toggleBtn = section ? section.querySelector('.preview-toggle') : null;
 
-                if (!iframe || !loading || !error) return;
+                pdfLog(`panel[${i}]`, {
+                    hasIframe:  !!iframe,
+                    hasLoading: !!loading,
+                    hasError:   !!error,
+                    hasToggle:  !!toggleBtn
+                });
+
+                if (!iframe || !loading || !error) {
+                    pdfLog(`panel[${i}] SKIP — missing required elements`);
+                    return;
+                }
 
                 let loadSettled = false;
                 let loadTimeout = null;
@@ -1684,6 +1706,7 @@ const initPdfPreviews = () => {
                 const showError = (reason) => {
                     if (loadSettled) return;
                     loadSettled = true;
+                    pdfLog('showError called, reason:', reason);
                     try {
                         loading.style.display = 'none';
                         iframe.style.display = 'none';
@@ -1697,6 +1720,7 @@ const initPdfPreviews = () => {
                     if (loadSettled) return;
                     loadSettled = true;
                     if (loadTimeout) clearTimeout(loadTimeout);
+                    pdfLog('showSuccess called');
                     try {
                         loading.style.display = 'none';
                         iframe.style.display = 'block';
@@ -1718,6 +1742,9 @@ const initPdfPreviews = () => {
                     showError('missing_src');
                     return;
                 }
+
+                const resolvedSrc = iframe.getAttribute('src');
+                pdfLog('iframe src resolved to:', resolvedSrc);
 
                 iframe.addEventListener('load', () => {
                     setTimeout(showSuccess, 100);
