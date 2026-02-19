@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 
   <!-- HOMEPAGE -->
   <url>
@@ -7,6 +8,11 @@
     <lastmod>2026-02-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+
+    <image:image>
+      <image:loc>https://www.estivanayramia.com/assets/img/logo-ea.webp</image:loc>
+      <image:title>Estivan Ayramia logo</image:title>
+    </image:image>
   </url>
 
   <!-- ABOUT -->
@@ -15,6 +21,11 @@
     <lastmod>2026-02-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+
+    <image:image>
+      <image:loc>https://www.estivanayramia.com/assets/img/headshot.webp</image:loc>
+      <image:title>Headshot of Estivan Ayramia</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/about/values</loc>
@@ -57,48 +68,88 @@
     <lastmod>2026-02-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+
+    <image:image>
+      <image:loc>https://www.estivanayramia.com/assets/img/logo-ea.webp</image:loc>
+      <image:title>Estivan Ayramia projects overview</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/endpoint-competitive-playbook</loc>
     <lastmod>2026-02-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
+
+    <image:image>
+      <image:loc>https://www.estivanayramia.com/assets/img/logo-ea.webp</image:loc>
+      <image:title>Endpoint Competitive Playbook project</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/conflict</loc>
     <lastmod>2026-02-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
+
+    <image:image>
+      <image:loc>https://www.estivanayramia.com/assets/img/logo-ea.webp</image:loc>
+      <image:title>Conflict strategy case project</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/franklin-templeton-concept</loc>
     <lastmod>2026-02-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
+
+    <image:image>
+      <image:loc>https://www.estivanayramia.com/assets/img/logo-ea.webp</image:loc>
+      <image:title>Franklin Templeton concept project</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/endpoint-linkedin-campaign</loc>
     <lastmod>2026-02-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
+
+    <image:image>
+      <image:loc>https://www.estivanayramia.com/assets/img/logo-ea.webp</image:loc>
+      <image:title>Endpoint LinkedIn campaign project</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/loreal-maps-campaign</loc>
     <lastmod>2026-02-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
+
+    <image:image>
+      <image:loc>https://www.estivanayramia.com/assets/img/logo-ea.webp</image:loc>
+      <image:title>Loreal MAPS campaign project</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/endpoint-elosity-video</loc>
     <lastmod>2026-02-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
+
+    <image:image>
+      <image:loc>https://www.estivanayramia.com/assets/img/logo-ea.webp</image:loc>
+      <image:title>Endpoint Elosity video project</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://www.estivanayramia.com/projects/portfolio</loc>
     <lastmod>2026-02-17</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
+
+    <image:image>
+      <image:loc>https://www.estivanayramia.com/assets/img/logo-ea.webp</image:loc>
+      <image:title>Portfolio build project</image:title>
+    </image:image>
   </url>
 
   <!-- HOBBIES -->
