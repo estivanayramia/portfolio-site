@@ -98,7 +98,8 @@
     function setStatus(type, message) {
         if (!statusArea) return;
         statusArea.setAttribute('data-status', type);
-        statusArea.textContent = message;
+        const hasMessage = typeof message === 'string' && message.trim().length > 0;
+        statusArea.textContent = hasMessage ? message : '\u00A0';
     }
 
     function showToast(kind, message) {

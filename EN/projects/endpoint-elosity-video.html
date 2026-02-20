@@ -18,18 +18,24 @@
                     <meta name="twitter:description" content="Discover the Endpoint Elosity Video project by Estivan Ayramia, including creative direction, narrative structure, and production choices tied to campaign intent.">
     
     <!-- Google Fonts: Inter (non-render-blocking) -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://www.youtube.com">
+    <link rel="dns-prefetch" href="https://i.ytimg.com">
+    <link rel="preconnect" href="https://www.youtube.com">
+    <link rel="preconnect" href="https://i.ytimg.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="(max-width: 768px)">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" data-media="(min-width: 769px)">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
     
-    <!-- Preload Critical LCP Image -->
-    <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
+    <!-- Preload video thumbnail used by embedded hero video -->
+    <link rel="preload" as="image" href="https://i.ytimg.com/vi/q8RmdNRzx1g/maxresdefault.jpg" fetchpriority="high">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=49f1cef">
-    <link rel="preload" href="/assets/css/style.css?v=49f1cef" as="style">
-    <script src="/assets/js/site.min.js?v=49f1cef" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=218eec7">
+    <link rel="preload" href="/assets/css/style.css?v=218eec7" as="style">
+    <script src="/assets/js/site.min.js?v=218eec7" defer></script>
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -102,7 +108,7 @@
     <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
         <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between">
             <a href="/" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center" aria-label="Go to Portfolio home page">
-                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain" width="300" height="264" fetchpriority="high">
+                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain" width="300" height="264" fetchpriority="high" loading="eager" decoding="sync">
                 <span>Estivan Ayramia</span>
             </a>
             
@@ -171,7 +177,7 @@
         <!-- Project Visual (Embedded Video) -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8 space-y-4">
             <div class="aspect-video rounded-2xl overflow-hidden shadow-lg border border-chocolate/10 bg-gradient-to-br from-indigodeep/60 to-chocolate/90" data-gsap="fade-up" data-gsap-delay="0.4">
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/q8RmdNRzx1g?si=1AFLJgFbSzz6yKp2" title="Endpoint Elosity Video Concept" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full h-full"></iframe>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/q8RmdNRzx1g?si=1AFLJgFbSzz6yKp2" title="Endpoint Elosity Video Concept" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full h-full" loading="eager" fetchpriority="high"></iframe>
             </div>
             <div class="text-center" data-gsap="fade-up" data-gsap-delay="0.5">
                 <p class="text-sm text-chocolate/60">Concept video for Endpoint's Elosity platform.</p>

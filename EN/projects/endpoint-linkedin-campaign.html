@@ -18,18 +18,17 @@
                     <meta name="twitter:description" content="Analyze the Endpoint LinkedIn Campaign project: audience targeting, campaign structure, and messaging decisions used to support measurable engagement outcomes.">
     
     <!-- Google Fonts: Inter (non-render-blocking) -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="(max-width: 768px)">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" data-media="(min-width: 769px)">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
     
-    <!-- Preload Critical LCP Image -->
-    <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
-    
-    <link rel="stylesheet" href="/assets/css/style.css?v=49f1cef">
-    <link rel="preload" href="/assets/css/style.css?v=49f1cef" as="style">
-    <script src="/assets/js/site.min.js?v=49f1cef" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=218eec7">
+    <link rel="preload" href="/assets/css/style.css?v=218eec7" as="style">
+    <script src="/assets/js/site.min.js?v=218eec7" defer></script>
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -102,7 +101,7 @@
     <header class="fixed top-0 left-0 right-0 z-40 border-b bg-beige/95 backdrop-blur-sm border-chocolate/10">
         <nav class="flex items-center justify-between px-6 py-6 mx-auto max-w-7xl lg:px-12">
             <a href="/" class="inline-flex items-center text-xl font-semibold transition-colors rounded text-indigodeep hover:text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Go to Portfolio home page">
-                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="object-contain w-8 h-8 mr-2" width="300" height="264" fetchpriority="high">
+                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="object-contain w-8 h-8 mr-2" width="300" height="264" fetchpriority="high" loading="eager" decoding="sync">
                 <span>Estivan Ayramia</span>
             </a>
             
@@ -194,9 +193,12 @@
                 </div>
                 <iframe 
                     class="pdf-frame w-full h-[600px] md:h-[700px] lg:h-[800px] border-0" 
+                    width="1280"
+                    height="800"
                     src="/assets/img/Portolio-Media/Portfolio-Media/projects-/endpoint-linkedin-campaign.pdf#toolbar=1&navpanes=1&scrollbar=1&page=1&view=FitH"
                     title="PDF Preview"
-                    loading="lazy"
+                    loading="eager"
+                    fetchpriority="high"
                     allowfullscreen
                     style="opacity:0;">
                 </iframe>

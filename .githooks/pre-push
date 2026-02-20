@@ -1,0 +1,9 @@
+#!/bin/sh
+# Pre-push hook: block pushes that fail core perf gates
+set -eu
+
+echo "🚀 Pre-push: running build gate..."
+npm run -s build
+
+echo "🎞️ Pre-push: running animation jank gate..."
+npm run -s anim:jank
