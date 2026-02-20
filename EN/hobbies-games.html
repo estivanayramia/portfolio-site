@@ -21,11 +21,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/assets/css/style.css?v=6a389f4">
+    <link rel="stylesheet" href="/assets/css/style.css?v=8904c24">
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
     
     <!-- Main Site Logic (Chat, Theme, etc.) -->
-    <script src="/assets/js/site.min.js?v=6a389f4" defer></script>
+    <script src="/assets/js/site.min.js?v=8904c24" defer></script>
     <script type="module" src="/assets/js/arcade/arcade-core.js"></script>
     <script type="module" src="/assets/js/arcade/achievements-ui.js"></script>
     
@@ -868,7 +868,7 @@
                 <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
 <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">🔆</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -1964,7 +1964,7 @@
             const modal = document.createElement('div');
             modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fade-in 0.3s;';
             modal.innerHTML = `
-                <div style="background:#212842;color:#e1d4c2;border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 12px 48px rgba(0,0,0,0.5);">
+                <div class="bg-indigodeep text-beige" style="border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 12px 48px rgba(0,0,0,0.5);">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
                         <h2 style="font-size:24px;font-weight:bold;margin:0;">🎮 ${game.toUpperCase()} Stats</h2>
                         <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;padding:0;width:32px;height:32px;">×</button>

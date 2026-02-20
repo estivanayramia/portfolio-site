@@ -44,7 +44,8 @@
     "audit:cf-files": "node tools/audit-cf-files.mjs",
     "audit:secrets": "node tools/audit-secrets.mjs",
     "audit:sw-version": "node tools/audit-sw-version.mjs",
-    "audit": "npm run audit:secrets && npm run audit:cf-files && npm run audit:inline-css && npm run audit:css-sync && npm run audit:sw-version"
+    "audit:encoding": "node scripts/audit-encoding.mjs",
+    "audit": "npm run audit:secrets && npm run audit:cf-files && npm run audit:inline-css && npm run audit:css-sync && npm run audit:sw-version && npm run audit:encoding"
   },
   "keywords": [
     "portfolio",

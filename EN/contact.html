@@ -34,9 +34,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp" fetchpriority="high">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=6a389f4">
+    <link rel="stylesheet" href="/assets/css/style.css?v=8904c24">
     
-    <script src="/assets/js/site.min.js?v=6a389f4" defer></script>
+    <script src="/assets/js/site.min.js?v=8904c24" defer></script>
     <!-- Theme CSS -->
     <noscript></noscript>
     
@@ -121,7 +121,7 @@
                 <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
 <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">🔆</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -255,7 +255,7 @@
                                     accept=".csv,.doc,.docx,.pdf,.txt,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.svg,.webp"
                                     class="w-full px-4 py-3 bg-white border border-chocolate/20 rounded-lg text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:border-transparent transition-all"
                                 >
-                                <p class="mt-2 text-xs" id="contact-file-help" style="color: var(--color-text); opacity: 0.7;">Accepted: CSV, DOC, DOCX, PDF, TXT, XLS, XLSX, JPG, PNG, GIF, SVG, WEBP (max <span id="contact-max-file-mb">5</span>MB).</p>
+                                <p class="mt-2 text-xs text-chocolate/70 dark:text-beige/70" id="contact-file-help" >Accepted: CSV, DOC, DOCX, PDF, TXT, XLS, XLSX, JPG, PNG, GIF, SVG, WEBP (max <span id="contact-max-file-mb">5</span>MB).</p>
                             </div>
 
                             <!-- Honeypot Field -->
@@ -299,7 +299,7 @@
                             </div>
                             
                             <!-- Privacy Note -->
-                            <p class="text-xs leading-relaxed" style="color: var(--color-text); opacity: 0.7;">
+                            <p class="text-xs text-chocolate/70 dark:text-beige/70 leading-relaxed" >
                                 By submitting this form, you agree to the <a href="/privacy" class="text-indigodeep underline hover:text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep rounded">Privacy Policy</a>. Your information will never be shared with third parties.
                             </p>
                         </form>

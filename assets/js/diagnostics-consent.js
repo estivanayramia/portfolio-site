@@ -172,7 +172,7 @@ export function initDiagnosticsConsent() {
 
     const title = document.createElement("div");
     title.style.fontWeight = "700";
-    title.style.color = "#212842";
+    title.classList.add('text-indigodeep');
     title.style.marginBottom = "4px";
     title.textContent = "Help Improve This Site?";
 
@@ -208,7 +208,7 @@ export function initDiagnosticsConsent() {
     btnEnable.style.padding = "10px 12px";
     btnEnable.style.borderRadius = "10px";
     btnEnable.style.border = "1px solid rgba(33,40,66,0.25)";
-    btnEnable.style.background = "#212842";
+    btnEnable.classList.add('bg-indigodeep');
     btnEnable.style.color = "white";
     btnEnable.style.fontWeight = "700";
     btnEnable.style.cursor = "pointer";
@@ -221,7 +221,7 @@ export function initDiagnosticsConsent() {
     btnNo.style.borderRadius = "10px";
     btnNo.style.border = "1px solid rgba(54,32,23,0.20)";
     btnNo.style.background = "transparent";
-    btnNo.style.color = "#362017";
+    btnNo.classList.add('text-chocolate');
     btnNo.style.fontWeight = "600";
     btnNo.style.cursor = "pointer";
     btnNo.style.minHeight = "44px";

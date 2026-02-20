@@ -1,4 +1,5 @@
-* text=auto
+# Enforce LF and UTF-8 for all text files
+* text=auto eol=lf
 *.html text eol=lf
 *.css text eol=lf
 *.js text eol=lf
@@ -11,3 +12,13 @@
 
 _headers text eol=lf
 _redirects text eol=lf
+
+# Binary — no transformation
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.ico  binary
+*.woff2 binary
+*.pdf  binary
