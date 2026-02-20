@@ -218,8 +218,10 @@ const MOCK_ERRORS = [
 let authToken = null;
 let currentPage = 0;
 const pageSize = 50;
-let currentFilters = { status: '', category: '' };
+let currentFilters = { status: '', category: '', bot: '', search: '' };
 let currentErrorId = null;
+let latestFilteredErrors = [];
+let searchDebounceTimer = null;
 
 // Unified dashboard tab state
 const dashboardTabs = {
@@ -1573,27 +1575,23 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 // Load errors from API
 async function loadErrors() {
   if (DEMO_MODE) {
-    // Demo mode - use mock data
-    const filtered = MOCK_ERRORS.filter(error => {
-      if (currentFilters.status && error.status !== currentFilters.status) return false;
-      if (currentFilters.category && error.category !== currentFilters.category) return false;
-      return true;
-    });
+    const filtered = applyFilters(MOCK_ERRORS);
+    latestFilteredErrors = filtered;
     
     const start = currentPage * pageSize;
     const pageErrors = filtered.slice(start, start + pageSize);
     
     renderErrors(pageErrors);
-    updateStats(pageErrors, filtered.length);
+    updateStats(pageErrors, filtered.length, MOCK_ERRORS.length);
     updatePagination(filtered.length);
+    announceFilterResults(filtered.length, MOCK_ERRORS.length);
     return;
   }
   
   try {
     const params = new URLSearchParams({
-      limit: pageSize,
-      offset: currentPage * pageSize,
-      ...currentFilters
+      limit: '5000',
+      offset: '0'
     });
     
     const response = await fetch(apiUrl(`/api/errors?${params}`), {
@@ -1614,14 +1612,66 @@ async function loadErrors() {
     const { json } = await readJsonOrText(response);
     const data = json;
     if (!data) throw new Error('Non-JSON API response');
-    renderErrors(data.errors);
-    updateStats(data.errors, data.total);
-    updatePagination(data.total);
+    const allErrors = Array.isArray(data.errors) ? data.errors : [];
+    const filtered = applyFilters(allErrors);
+    latestFilteredErrors = filtered;
+
+    const start = currentPage * pageSize;
+    const pageErrors = filtered.slice(start, start + pageSize);
+
+    renderErrors(pageErrors);
+    updateStats(pageErrors, filtered.length, allErrors.length);
+    updatePagination(filtered.length);
+    announceFilterResults(filtered.length, allErrors.length);
     
   } catch (error) {
     console.error('Error loading errors:', error);
     alert('Failed to load errors');
   }
+}
+
+function isBotError(error) {
+  return error?.is_bot === true || error?.is_bot === 1 || error?.is_bot === '1';
+}
+
+function applyFilters(errors) {
+  const searchValue = String(currentFilters.search || '').trim().toLowerCase();
+  const hasSearch = searchValue.length > 0;
+
+  return errors.filter((error) => {
+    if (currentFilters.status && error.status !== currentFilters.status) return false;
+    if (currentFilters.category && error.category !== currentFilters.category) return false;
+
+    if (currentFilters.bot === '1' && !isBotError(error)) return false;
+    if (currentFilters.bot === '0' && isBotError(error)) return false;
+
+    if (hasSearch) {
+      const message = String(error.message || '').toLowerCase();
+      const url = String(error.url || '').toLowerCase();
+      if (!message.includes(searchValue) && !url.includes(searchValue)) return false;
+    }
+
+    return true;
+  });
+}
+
+function hasActiveFilters() {
+  return !!(
+    currentFilters.status ||
+    currentFilters.category ||
+    currentFilters.bot ||
+    String(currentFilters.search || '').trim()
+  );
+}
+
+function announceFilterResults(filteredTotal, fullTotal) {
+  const liveRegion = document.getElementById('filters-live-region');
+  if (!liveRegion) return;
+  if (!hasActiveFilters()) {
+    liveRegion.textContent = `Showing all ${fullTotal} errors`;
+    return;
+  }
+  liveRegion.textContent = `Showing ${filteredTotal} of ${fullTotal} errors`;
 }
 
 // Render errors in table
@@ -1691,8 +1741,13 @@ function renderErrors(errors) {
 }
 
 // Update stats
-function updateStats(currentPageErrors, total) {
-  document.getElementById('total-errors').textContent = total;
+function updateStats(currentPageErrors, filteredTotal, fullTotal) {
+  const totalEl = document.getElementById('total-errors');
+  if (hasActiveFilters()) {
+    totalEl.textContent = `Showing ${filteredTotal} of ${fullTotal} errors`;
+  } else {
+    totalEl.textContent = fullTotal;
+  }
   
   // Count by status (current page only - approximation)
   const newCount = currentPageErrors.filter(e => e.status === 'new').length;
@@ -1840,10 +1895,37 @@ document.getElementById('category-filter').addEventListener('change', (e) => {
   loadErrors();
 });
 
+const botFilterEl = document.getElementById('bot-filter');
+if (botFilterEl) {
+  botFilterEl.addEventListener('change', (e) => {
+    currentFilters.bot = e.target.value;
+    currentPage = 0;
+    loadErrors();
+  });
+}
+
+const messageSearchEl = document.getElementById('message-search');
+if (messageSearchEl) {
+  messageSearchEl.addEventListener('input', (e) => {
+    if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+    const nextValue = e.target.value;
+    searchDebounceTimer = setTimeout(() => {
+      currentFilters.search = nextValue;
+      currentPage = 0;
+      loadErrors();
+    }, 200);
+  });
+}
+
 document.getElementById('clear-filters').addEventListener('click', () => {
-  currentFilters = { status: '', category: '' };
+  currentFilters = { status: '', category: '', bot: '', search: '' };
   document.getElementById('status-filter').value = '';
   document.getElementById('category-filter').value = '';
+  const botFilter = document.getElementById('bot-filter');
+  const messageSearch = document.getElementById('message-search');
+  if (botFilter) botFilter.value = '';
+  if (messageSearch) messageSearch.value = '';
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
   currentPage = 0;
   loadErrors();
 });
@@ -1877,46 +1959,92 @@ document.getElementById('refresh-btn').addEventListener('click', async () => {
 });
 
 // Export CSV
-document.getElementById('export-btn').addEventListener('click', async () => {
-  try {
-    const btn = document.getElementById('export-btn');
-    const originalText = btn.textContent;
-    btn.textContent = 'Exporting...';
-    btn.disabled = true;
+function getExportFilename() {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, '0');
+  const datePart = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const timePart = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  return `errors-${datePart}-${timePart}.csv`;
+}
 
-    if (DEMO_MODE) {
-      const filtered = MOCK_ERRORS.filter(error => {
-        if (currentFilters.status && error.status !== currentFilters.status) return false;
-        if (currentFilters.category && error.category !== currentFilters.category) return false;
-        return true;
-      });
-      const csv = errorsToCSV(filtered);
-      downloadCSV(csv, `errors-${Date.now()}.csv`);
-      btn.textContent = originalText;
-      btn.disabled = false;
-      return;
-    }
+async function fetchAllErrorsForExport() {
+  if (DEMO_MODE) return MOCK_ERRORS.slice();
 
-    // Fetch all errors for export
-    const response = await fetch(apiUrl('/api/errors?limit=1000'), {
+  const pageLimit = 500;
+  let offset = 0;
+  let total = Infinity;
+  const all = [];
+
+  while (offset < total) {
+    const params = new URLSearchParams({
+      limit: String(pageLimit),
+      offset: String(offset)
+    });
+
+    if (currentFilters.status) params.set('status', currentFilters.status);
+    if (currentFilters.category) params.set('category', currentFilters.category);
+
+    const response = await fetch(apiUrl(`/api/errors?${params}`), {
       headers: getAuthHeaders()
     });
-    
-    if (!response.ok) throw new Error('Export fetch failed');
-    
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        authToken = null;
+        localStorage.removeItem('dashboard_token');
+        showLogin();
+        throw new Error('Unauthorized export request');
+      }
+      throw new Error(`Export fetch failed with HTTP ${response.status}`);
+    }
+
     const { json } = await readJsonOrText(response);
-    const csv = errorsToCSV(json?.errors || []);
-    downloadCSV(csv, `errors-${Date.now()}.csv`);
-    
-    btn.textContent = originalText;
-    btn.disabled = false;
+    if (!json) throw new Error('Non-JSON export response');
+
+    const batch = Array.isArray(json.errors) ? json.errors : [];
+    if (Number.isFinite(Number(json.total))) {
+      total = Number(json.total);
+    }
+
+    all.push(...batch);
+
+    if (batch.length < pageLimit) break;
+    offset += pageLimit;
+  }
+
+  return all;
+}
+
+async function exportFilteredCSV() {
+  try {
+    const exportBtn = document.getElementById('export-btn');
+    const filterExportBtn = document.getElementById('export-csv-btn');
+    if (exportBtn) exportBtn.disabled = true;
+    if (filterExportBtn) filterExportBtn.disabled = true;
+    if (exportBtn) exportBtn.textContent = 'Exporting...';
+    if (filterExportBtn) filterExportBtn.textContent = 'Exporting...';
+
+    const allErrors = await fetchAllErrorsForExport();
+    const filtered = applyFilters(allErrors);
+    latestFilteredErrors = filtered;
+    const csv = errorsToCSV(filtered);
+    downloadCSV(csv, getExportFilename());
   } catch (error) {
     console.error('Export failed:', error);
     alert('Failed to export errors');
-    document.getElementById('export-btn').textContent = 'Export CSV';
-    document.getElementById('export-btn').disabled = false;
+  } finally {
+    const exportBtn = document.getElementById('export-btn');
+    const filterExportBtn = document.getElementById('export-csv-btn');
+    if (exportBtn && exportBtn.textContent === 'Exporting...') exportBtn.textContent = '📥';
+    if (filterExportBtn && filterExportBtn.textContent === 'Exporting...') filterExportBtn.textContent = '📥 CSV';
+    if (exportBtn) exportBtn.disabled = false;
+    if (filterExportBtn) filterExportBtn.disabled = false;
   }
-});
+}
+
+document.getElementById('export-btn').addEventListener('click', exportFilteredCSV);
+const exportCsvBtn = document.getElementById('export-csv-btn');
+if (exportCsvBtn) exportCsvBtn.addEventListener('click', exportFilteredCSV);
 
 // Helper functions (kept as is)
 function escapeHtml(text) {
@@ -1944,16 +2072,16 @@ function formatTime(timestamp) {
 
 function errorsToCSV(errors) {
   if (!errors || !Array.isArray(errors)) return '';
-  const headers = ['ID', 'Type', 'Message', 'URL', 'Category', 'Status', 'Bot', 'Timestamp'];
+  const headers = ['id', 'type', 'category', 'message', 'url', 'timestamp', 'is_bot', 'stack'];
   const rows = errors.map(e => [
     e.id,
     e.type,
-    (e.message || '').replace(/"/g, '""'),
-    e.url,
     e.category,
-    e.status,
-    e.is_bot ? 'Yes' : 'No',
-    new Date(e.timestamp).toISOString()
+    (e.message || '').replace(/"/g, '""'),
+    e.url || '',
+    Number.isFinite(Number(e.timestamp)) ? new Date(Number(e.timestamp)).toISOString() : '',
+    isBotError(e) ? '1' : '0',
+    String(e.stack || '').slice(0, 500).replace(/"/g, '""')
   ]);
   
   return [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');

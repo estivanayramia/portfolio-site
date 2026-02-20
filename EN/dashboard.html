@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="20260219-59b604a">
+  <meta name="build-version" content="20260220-2ec7deb">
   <title>Error Dashboard - Estivan Ayramia</title>
   <link rel="stylesheet" href="/assets/css/dashboard.css?v=36c2000">
   <script src="/assets/js/hud-debug-patch.js"></script>
@@ -93,7 +93,7 @@
       <div class="tab-panel active" id="tab-errors">
         <!-- Filters -->
         <div class="filters">
-          <select id="status-filter">
+          <select id="status-filter" aria-label="Filter by status">
             <option value="">All Statuses</option>
             <option value="new">New</option>
             <option value="investigating">Investigating</option>
@@ -101,7 +101,7 @@
             <option value="ignored">Ignored</option>
           </select>
           
-          <select id="category-filter">
+          <select id="category-filter" aria-label="Filter by category">
             <option value="">All Categories</option>
             <option value="code_bug">Code Bug</option>
             <option value="async_bug">Async Bug</option>
@@ -109,9 +109,20 @@
             <option value="connectivity">Connectivity</option>
             <option value="uncategorized">Uncategorized</option>
           </select>
+
+          <select id="bot-filter" aria-label="Filter by bot traffic">
+            <option value="">Both (Bots + Real Users)</option>
+            <option value="0">Real Users Only</option>
+            <option value="1">Bots Only</option>
+          </select>
+
+          <input type="text" id="message-search" aria-label="Search by message or URL" placeholder="🔍 Search message/url...">
+
+          <button id="export-csv-btn" class="icon-btn" title="Export filtered CSV">📥 CSV</button>
           
           <button id="clear-filters">Clear Filters</button>
         </div>
+        <div id="filters-live-region" class="sr-only" aria-live="polite" aria-atomic="true"></div>
         
         <!-- Stats -->
         <div class="stats">
