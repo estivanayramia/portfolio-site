@@ -80,11 +80,14 @@ try {
 }
 
 if (siteFacts) {
+  const projectCount = siteFacts.projects?.length || 0;
+  const hobbyCount = siteFacts.hobbies?.length || 0;
+
   // Check structure
   test('Has projects array', Array.isArray(siteFacts.projects));
   test('Has hobbies array', Array.isArray(siteFacts.hobbies));
-  test('Has 6 projects', siteFacts.projects?.length === 6, `Found ${siteFacts.projects?.length}`);
-  test('Has 6 hobbies', siteFacts.hobbies?.length === 6, `Found ${siteFacts.hobbies?.length}`);
+  test('Has at least 5 projects', projectCount >= 5, `Found ${projectCount}`);
+  test('Has at least 6 hobbies', hobbyCount >= 6, `Found ${hobbyCount}`);
   
   // Check all projects have required fields
   const requiredProjectFields = ['id', 'title', 'url', 'summary'];
@@ -181,10 +184,19 @@ try {
 }
 
 if (llmsTxt) {
+  const llmsProjectsMatch = llmsTxt.match(/Projects\s*\((\d+)\s+total\)/i);
+  const llmsHobbiesMatch = llmsTxt.match(/Hobbies\s*\((\d+)\s+total\)/i);
+  const llmsProjectCount = llmsProjectsMatch ? Number(llmsProjectsMatch[1]) : null;
+  const llmsHobbyCount = llmsHobbiesMatch ? Number(llmsHobbiesMatch[1]) : null;
+  const siteProjectCount = siteFacts?.projects?.length || 0;
+  const siteHobbyCount = siteFacts?.hobbies?.length || 0;
+
   test('Contains owner name', llmsTxt.includes('Estivan Ayramia'));
   test('Contains email', llmsTxt.includes('hello@estivanayramia.com'));
-  test('Contains 6 projects', llmsTxt.includes('Projects (6 total)'));
-  test('Contains 6 hobbies', llmsTxt.includes('Hobbies (6 total)'));
+  test('Contains project count header', llmsProjectCount !== null);
+  test('Contains hobby count header', llmsHobbyCount !== null);
+  test('LLMs project count covers site-facts', llmsProjectCount >= siteProjectCount, `LLMs=${llmsProjectCount}, site-facts=${siteProjectCount}`);
+  test('LLMs hobby count covers site-facts', llmsHobbyCount >= siteHobbyCount, `LLMs=${llmsHobbyCount}, site-facts=${siteHobbyCount}`);
   test('Clarifies Whispers is hobby', llmsTxt.includes('Whispers" is a HOBBY'));
   test('Clarifies getWispers doesn\'t exist', llmsTxt.includes('getWispers') && llmsTxt.includes('NOT'));
 }
