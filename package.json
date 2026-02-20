@@ -21,7 +21,7 @@
     "route:smoke": "node scripts/route-smoke.mjs",
     "perf:budget": "node scripts/perf-budget.mjs",
     "anim:jank": "node scripts/animation-sanity.mjs --jank",
-    "build": "npm run build:version && npm run build:facts && npm run build:css && npm run build:js && npm run build:lazy && npm run build:telemetry && npm run build:hud && npm run upload:facts && npm run build:stage && npm run verify:pages",
+    "build": "npm run build:version && npm run apply:versioning && npm run build:facts && npm run build:css && npm run build:js && npm run build:lazy && npm run build:telemetry && npm run build:hud && npm run upload:facts && npm run build:stage && npm run verify:pages && npm run verify:versioning",
     "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
     "start": "node scripts/local-serve.js",
     "setup:hooks": "node tools/install-git-hooks.mjs",

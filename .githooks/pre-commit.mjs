@@ -22,6 +22,55 @@ const stagedFiles = execSync('git diff --cached --name-only', { encoding: 'utf-8
   .split('\n')
   .filter(Boolean);
 
+function getCurrentSha() {
+  return execSync('git rev-parse --short HEAD', { encoding: 'utf-8' }).trim();
+}
+
+function findStaleVersionStringsInFile(file, sha) {
+  if (!fs.existsSync(file)) return [];
+  const content = fs.readFileSync(file, 'utf8');
+  const matches = [...content.matchAll(/\?v=([a-f0-9]+)/g)];
+  return matches.filter((m) => m[1] !== sha);
+}
+
+const stagedHtmlFiles = stagedFiles.filter((f) => f.endsWith('.html'));
+
+if (stagedHtmlFiles.length > 0) {
+  console.log('🧩 Staged HTML detected, verifying cache-busting version strings...');
+
+  try {
+    const sha = getCurrentSha();
+    const staleBefore = stagedHtmlFiles.flatMap((file) =>
+      findStaleVersionStringsInFile(file, sha).map((m) => ({ file, value: m[1] })),
+    );
+
+    if (staleBefore.length > 0) {
+      console.log('⚠️  Stale ?v= strings found in staged HTML; running apply-versioning...');
+      execSync('node tools/apply-versioning.mjs', { stdio: 'inherit' });
+
+      for (const file of stagedHtmlFiles) {
+        execSync(`git add -- "${file}"`, { stdio: 'ignore' });
+      }
+    }
+
+    const staleAfter = stagedHtmlFiles.flatMap((file) =>
+      findStaleVersionStringsInFile(file, sha).map((m) => ({ file, value: m[1] })),
+    );
+
+    if (staleAfter.length > 0) {
+      console.error('❌ Stale ?v= strings remain in staged HTML after apply-versioning:');
+      staleAfter.forEach((item) => console.error(`   - ${item.file} has ?v=${item.value}`));
+      console.error('\n💡 Run: npm run apply:versioning');
+      process.exit(1);
+    }
+
+    console.log('✅ HTML cache-busting version strings are current');
+  } catch (error) {
+    console.error('❌ Failed HTML version-string check:', error.message);
+    process.exit(1);
+  }
+}
+
 const jsSourceChanged = stagedFiles.some(f => 
   f.startsWith('assets/js/') && f.endsWith('.js') && !f.endsWith('.min.js')
 );
