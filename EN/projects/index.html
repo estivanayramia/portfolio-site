@@ -28,9 +28,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=0546612">
-    <link rel="preload" href="/assets/css/style.css?v=0546612" as="style">
-    <script src="/assets/js/site.min.js?v=0546612" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=47888dc">
+    <link rel="preload" href="/assets/css/style.css?v=47888dc" as="style">
+    <script src="/assets/js/site.min.js?v=47888dc" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
@@ -38,7 +38,7 @@
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
     
     <!-- Luxury Coverflow Carousel V4 -->
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=0546612-v4">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=47888dc-v4">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -587,15 +587,47 @@
         
         document.addEventListener('DOMContentLoaded', () => {
             const carouselEl = document.getElementById('luxury-portfolio-carousel');
-            if (carouselEl) {
+            if (!carouselEl) return;
+
+            let initialized = false;
+            const initCarousel = () => {
+                if (initialized) return;
+                initialized = true;
                 window.luxuryCoverflow = new LuxuryCoverflow('#luxury-portfolio-carousel', {
                     infiniteLoop: true,
                     enableScroll: true,
                     autoplay: false,
-                    animationDuration: 0.55  // V4: Even faster
+                    animationDuration: 0.55
                 });
                 console.log('✨ Luxury Coverflow V5.0 loaded — CASINO WHEEL ENABLED! 🎰');
+            };
+
+            const scheduleInit = () => {
+                const start = () => requestAnimationFrame(initCarousel);
+                if ('requestIdleCallback' in window) {
+                    window.requestIdleCallback(start, { timeout: 1200 });
+                } else {
+                    setTimeout(start, 120);
+                }
+            };
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        observer.disconnect();
+                        scheduleInit();
+                    });
+                }, { rootMargin: '200px 0px' });
+                observer.observe(carouselEl);
+            } else {
+                scheduleInit();
             }
+
+            const fastStart = () => scheduleInit();
+            window.addEventListener('pointerdown', fastStart, { once: true, passive: true });
+            window.addEventListener('keydown', fastStart, { once: true });
+            window.addEventListener('wheel', fastStart, { once: true, passive: true });
         });
     </script>
     <!-- Scroll to Top Button -->

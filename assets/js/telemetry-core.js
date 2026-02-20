@@ -512,6 +512,81 @@
 
   let lastUploadedSig = null;
   let lastUploadedSeen = 0;
+  const UPLOAD_QUEUE_KEY = "site_diagnostics_upload_queue";
+  const MAX_UPLOAD_QUEUE = 25;
+
+  function readUploadQueue() {
+    try {
+      const raw = localStorage.getItem(UPLOAD_QUEUE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.slice(0, MAX_UPLOAD_QUEUE);
+    } catch {
+      return [];
+    }
+  }
+
+  function writeUploadQueue(queue) {
+    try {
+      const safe = Array.isArray(queue) ? queue.slice(0, MAX_UPLOAD_QUEUE) : [];
+      localStorage.setItem(UPLOAD_QUEUE_KEY, JSON.stringify(safe));
+    } catch {}
+  }
+
+  function enqueueUploadPayload(item) {
+    try {
+      if (!item || typeof item !== "object") return;
+      const q = readUploadQueue();
+      const sig = item.sig || "";
+      const seen = typeof item.seen === "number" ? item.seen : 0;
+      const exists = q.some((it) => it && it.sig === sig && it.seen === seen);
+      if (exists) return;
+      q.push({
+        json: item.json,
+        sig,
+        seen,
+        tries: 0,
+        t: now()
+      });
+      if (q.length > MAX_UPLOAD_QUEUE) q.splice(0, q.length - MAX_UPLOAD_QUEUE);
+      writeUploadQueue(q);
+    } catch {}
+  }
+
+  async function drainUploadQueue() {
+    if (!state.enabled || !state.upload) return;
+    let q = readUploadQueue();
+    if (!q.length) return;
+
+    const url = "/api/error-report";
+    const headers = { "Content-Type": "application/json" };
+    const keep = [];
+
+    for (const item of q) {
+      if (!item || typeof item.json !== "string" || !item.json) continue;
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers,
+          body: item.json,
+          keepalive: false
+        });
+
+        if (res && res.ok) {
+          state.lastUploadAt = now();
+          if (item.sig) lastUploadedSig = item.sig;
+          if (typeof item.seen === "number") lastUploadedSeen = Math.max(lastUploadedSeen, item.seen);
+          continue;
+        }
+      } catch {}
+
+      const tries = (Number(item.tries) || 0) + 1;
+      if (tries < 5) keep.push({ ...item, tries });
+    }
+
+    writeUploadQueue(keep);
+  }
 
   function pickIssueToUpload() {
     try {
@@ -559,6 +634,12 @@
           state.lastUploadAt = now();
           lastUploadedSig = issue.signature || null;
           lastUploadedSeen = issue.lastSeen || lastUploadedSeen;
+        } else {
+          enqueueUploadPayload({
+            json,
+            sig: issue.signature || "",
+            seen: issue.lastSeen || 0
+          });
         }
         return;
       }
@@ -574,8 +655,21 @@
         state.lastUploadAt = now();
         lastUploadedSig = issue.signature || null;
         lastUploadedSeen = issue.lastSeen || lastUploadedSeen;
+        void drainUploadQueue();
+      } else {
+        enqueueUploadPayload({
+          json,
+          sig: issue.signature || "",
+          seen: issue.lastSeen || 0
+        });
       }
-    } catch {}
+    } catch {
+      enqueueUploadPayload({
+        json,
+        sig: issue.signature || "",
+        seen: issue.lastSeen || 0
+      });
+    }
   }
 
   function installErrorHooks() {
@@ -585,10 +679,21 @@
     const isIgnoredResourceUrl = (u) => {
       const s = String(u || "");
       if (!s) return false;
+      if (/^(chrome-extension|moz-extension|safari-extension|ms-browser-extension):/i.test(s)) return true;
       // Favicon noise (default browser request or icon links)
       if (/(^|\/)(favicon\.ico|favicon-\d+x\d+\.(png|webp))($|\?)/i.test(s)) return true;
       // Known external probe path that can return auth errors unrelated to this site
       if (/\/api\/browser_extension\//i.test(s) || /browser_extension\//i.test(s)) return true;
+      try {
+        const parsed = new URL(s, window.location.href);
+        const host = String(parsed.hostname || "").toLowerCase();
+        if (/(^|\.)googletagmanager\.com$/.test(host)) return true;
+        if (/(^|\.)google-analytics\.com$/.test(host)) return true;
+        if (/(^|\.)doubleclick\.net$/.test(host)) return true;
+        if (/(^|\.)clarity\.ms$/.test(host)) return true;
+        if (/(^|\.)bat\.bing\.com$/.test(host)) return true;
+        if (/(^|\.)facebook\.net$/.test(host) || /(^|\.)connect\.facebook\.net$/.test(host)) return true;
+      } catch {}
       return false;
     };
 
@@ -1040,6 +1145,7 @@
     installFetchWrap();
     installXHRWrap();
     installPerf();
+    void drainUploadQueue();
 
     persist();
 
