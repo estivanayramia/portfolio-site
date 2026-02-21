@@ -30,6 +30,7 @@ const hookPaths = [
   path.join(rootDir, '.githooks', 'pre-commit'),
   path.join(rootDir, '.githooks', 'pre-commit.mjs'),
   path.join(rootDir, '.githooks', 'pre-push'),
+  path.join(rootDir, '.githooks', 'pre-push.mjs'),
   path.join(rootDir, '.githooks', 'post-commit'),
   path.join(rootDir, '.githooks', 'post-commit.mjs'),
 ];

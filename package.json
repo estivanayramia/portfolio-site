@@ -25,6 +25,7 @@
     "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
     "start": "node scripts/local-serve.js",
     "setup:hooks": "node tools/install-git-hooks.mjs",
+    "prepush:dry": "node .githooks/pre-push.mjs",
     "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push",
     "ship:force": "npm run build && git add -A && git commit --allow-empty -m \"deploy: force update\" && git push",
     "dev:chat-worker": "cd worker && npx wrangler dev --config wrangler.chat.toml",
