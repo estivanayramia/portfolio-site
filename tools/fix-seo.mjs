@@ -137,11 +137,25 @@ function generateRedirects() {
         if (!from.endsWith('.html')) generatedLines.push(`${from}.html    ${to}    301`);
     }
 
+    // Exclude legacy migration source paths from normalization
+    // and clean URL rewrite generation. These paths already have
+    // explicit 301 rules above and must not generate conflicting
+    // 200 rewrites. /EN/* deindex section is unaffected.
+    // Ref: EA-AC v5.3.1-M1-R3
+    const legacyMigrationSources = new Set(
+        legacyRedirects.map(r => r.from)
+    );
+    const filteredCanonicalToEnFile = new Map(
+        [...canonicalToEnFile.entries()].filter(
+            ([canonical]) => !legacyMigrationSources.has(canonical)
+        )
+    );
+
     generatedLines.push('');
     // URL normalization (301) so /x and /x/ both resolve to the canonical route
     generatedLines.push('# URL normalization (301)');
 
-    const canonicals = [...canonicalToEnFile.keys()].sort((a, b) => a.localeCompare(b));
+    const canonicals = [...filteredCanonicalToEnFile.keys()].sort((a, b) => a.localeCompare(b));
     for (const canonical of canonicals) {
         if (canonical === '/') continue;
 
@@ -157,7 +171,7 @@ function generateRedirects() {
 
     generatedLines.push('');
     generatedLines.push('# Clean URL rewrites (200) -> serve from /EN/');
-    for (const [canonical, enFile] of [...canonicalToEnFile.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    for (const [canonical, enFile] of [...filteredCanonicalToEnFile.entries()].sort(([a], [b]) => a.localeCompare(b))) {
         // Do not proxy the site root. Root should serve /index.html directly.
         if (canonical === '/') continue;
         // For directory canonicals (ending with /), rewrite to directory path, not index.html
