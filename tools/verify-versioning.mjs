@@ -7,13 +7,23 @@ function run(command) {
   return execSync(command, { stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8' }).trim();
 }
 
-function getCurrentSha() {
+function getAcceptableShas() {
+  // Accept HEAD or HEAD~1 because apply-versioning stamps the current HEAD,
+  // but committing creates a new SHA.  The committed version strings therefore
+  // always reference the *parent* commit — HEAD~1 at verify time.
+  const shas = new Set();
   try {
-    return run('git rev-parse --short HEAD');
+    shas.add(run('git rev-parse --short HEAD'));
   } catch {
     console.error('[verify-versioning] ERROR: failed to resolve git SHA. Are you in a git repository?');
     process.exit(1);
   }
+  try {
+    shas.add(run('git rev-parse --short HEAD~1'));
+  } catch {
+    /* first commit or shallow clone — ignore */
+  }
+  return shas;
 }
 
 function getTrackedHtmlFiles() {
@@ -30,7 +40,8 @@ function getLineNumber(content, index) {
 }
 
 function main() {
-  const sha = getCurrentSha();
+  const acceptableShas = getAcceptableShas();
+  const shaLabel = [...acceptableShas].join(' or ');
   const files = getTrackedHtmlFiles();
   const violations = [];
 
@@ -41,7 +52,7 @@ function main() {
 
     while (match) {
       const foundSha = match[1];
-      if (foundSha !== sha) {
+      if (!acceptableShas.has(foundSha)) {
         const line = getLineNumber(content, match.index);
         violations.push({ file, line, foundSha });
       }
@@ -52,7 +63,7 @@ function main() {
   if (violations.length > 0) {
     for (const violation of violations) {
       console.error(
-        `[verify-versioning] FAIL: ${violation.file} line ${violation.line} has ?v=${violation.foundSha} (expected ?v=${sha})`,
+        `[verify-versioning] FAIL: ${violation.file} line ${violation.line} has ?v=${violation.foundSha} (expected ?v=${shaLabel})`,
       );
     }
     console.error(
@@ -61,7 +72,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log(`[verify-versioning] ✅ All ?v= strings match SHA ${sha} across ${files.length} files`);
+  console.log(`[verify-versioning] ✅ All ?v= strings match SHA ${shaLabel} across ${files.length} files`);
 }
 
 main();

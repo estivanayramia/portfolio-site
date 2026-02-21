@@ -25,6 +25,7 @@
     "watch": "npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
     "start": "node scripts/local-serve.js",
     "setup:hooks": "node tools/install-git-hooks.mjs",
+    "prepush:dry": "node .githooks/pre-push.mjs",
     "ship": "npm run build && git add -A && git commit -m \"auto-deploy: build\" || echo 'No changes to commit' && git push",
     "ship:force": "npm run build && git add -A && git commit --allow-empty -m \"deploy: force update\" && git push",
     "dev:chat-worker": "cd worker && npx wrangler dev --config wrangler.chat.toml",
@@ -44,7 +45,8 @@
     "audit:cf-files": "node tools/audit-cf-files.mjs",
     "audit:secrets": "node tools/audit-secrets.mjs",
     "audit:sw-version": "node tools/audit-sw-version.mjs",
-    "audit": "npm run audit:secrets && npm run audit:cf-files && npm run audit:inline-css && npm run audit:css-sync && npm run audit:sw-version"
+    "audit:encoding": "node scripts/audit-encoding.mjs",
+    "audit": "npm run audit:secrets && npm run audit:cf-files && npm run audit:inline-css && npm run audit:css-sync && npm run audit:sw-version && npm run audit:encoding"
   },
   "keywords": [
     "portfolio",

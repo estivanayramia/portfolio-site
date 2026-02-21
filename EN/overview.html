@@ -19,17 +19,16 @@
                     <meta name="twitter:description" content="Get a concise overview of Estivan Ayramia's profile, capabilities, and focus areas, with quick pathways into projects, strategy work, and deeper context.">
     
     <!-- Google Fonts: Inter (load immediately to avoid CLS) -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Preload Critical LCP Image -->
-    <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
+    <link rel="stylesheet" href="/assets/css/style.css?v=9c21f85">
+    <link rel="preload" href="/assets/css/style.css?v=9c21f85" as="style">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=0546612">
-    <link rel="preload" href="/assets/css/style.css?v=0546612" as="style">
-    
-    <script src="/assets/js/site.min.js?v=0546612" defer></script>
+    <script src="/assets/js/site.min.js?v=9c21f85" defer></script>
     <!-- Theme CSS - loads reliably for all viewports -->
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
     
@@ -98,7 +97,7 @@
     <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
         <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between">
             <a href="/" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center" aria-label="Go to Portfolio home page">
-                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain" width="300" height="264" fetchpriority="high">
+                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain" width="300" height="264" fetchpriority="high" loading="eager" decoding="sync">
                 <span>Estivan Ayramia</span>
             </a>
             
@@ -111,7 +110,7 @@
                 <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
 <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">🔆</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">

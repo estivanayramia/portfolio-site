@@ -25,14 +25,23 @@ try {
   process.exit(1);
 }
 
-// Make hook executable (Unix)
-const hookPath = path.join(rootDir, '.githooks', 'pre-commit.mjs');
+// Make hooks executable (Unix)
+const hookPaths = [
+  path.join(rootDir, '.githooks', 'pre-commit'),
+  path.join(rootDir, '.githooks', 'pre-commit.mjs'),
+  path.join(rootDir, '.githooks', 'pre-push'),
+  path.join(rootDir, '.githooks', 'pre-push.mjs'),
+  path.join(rootDir, '.githooks', 'post-commit'),
+  path.join(rootDir, '.githooks', 'post-commit.mjs'),
+];
 if (process.platform !== 'win32') {
-  try {
-    fs.chmodSync(hookPath, '755');
-    console.log('✅ Hook made executable');
-  } catch (err) {
-    console.warn('⚠️  Could not make hook executable:', err.message);
+  for (const hookPath of hookPaths) {
+    try {
+      fs.chmodSync(hookPath, '755');
+      console.log(`✅ Hook made executable: ${path.relative(rootDir, hookPath)}`);
+    } catch (err) {
+      console.warn(`⚠️  Could not make hook executable (${path.relative(rootDir, hookPath)}):`, err.message);
+    }
   }
 }
 

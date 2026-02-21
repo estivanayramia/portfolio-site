@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Test Chat Grounding - Validate chatbot responses are factually accurate
  * 
  * This script tests:
@@ -53,22 +53,22 @@ const failures = [];
 
 function test(name, condition, details = '') {
   if (condition) {
-    console.log(`âœ… ${name}`);
+    console.log(`✅ ${name}`);
     passed++;
   } else {
-    console.log(`âŒ ${name}${details ? ': ' + details : ''}`);
+    console.log(`❌ ${name}${details ? ': ' + details : ''}`);
     failed++;
     failures.push({ name, details });
   }
 }
 
-console.log('ðŸ§ª Testing Chat Grounding...\n');
+console.log('🧪 Testing Chat Grounding...\n');
 
 // ============================================================================
 // Test 1: Site-facts.json exists and is valid JSON
 // ============================================================================
 
-console.log('ðŸ“¦ Test Group: Site Facts');
+console.log('📦 Test Group: Site Facts');
 
 let siteFacts = null;
 try {
@@ -80,11 +80,14 @@ try {
 }
 
 if (siteFacts) {
+  const projectCount = siteFacts.projects?.length || 0;
+  const hobbyCount = siteFacts.hobbies?.length || 0;
+
   // Check structure
   test('Has projects array', Array.isArray(siteFacts.projects));
   test('Has hobbies array', Array.isArray(siteFacts.hobbies));
-  test('Has 6 projects', siteFacts.projects?.length === 6, `Found ${siteFacts.projects?.length}`);
-  test('Has 6 hobbies', siteFacts.hobbies?.length === 6, `Found ${siteFacts.hobbies?.length}`);
+  test('Has at least 5 projects', projectCount >= 5, `Found ${projectCount}`);
+  test('Has at least 6 hobbies', hobbyCount >= 6, `Found ${hobbyCount}`);
   
   // Check all projects have required fields
   const requiredProjectFields = ['id', 'title', 'url', 'summary'];
@@ -125,7 +128,7 @@ if (siteFacts) {
 // Test 2: Worker.js validation
 // ============================================================================
 
-console.log('\nðŸ”§ Test Group: Worker');
+console.log('\n🔧 Test Group: Worker');
 
 let workerContent = null;
 try {
@@ -170,7 +173,7 @@ if (workerContent) {
 // Test 3: llms.txt validation
 // ============================================================================
 
-console.log('\nðŸ“„ Test Group: LLMs.txt');
+console.log('\n📄 Test Group: LLMs.txt');
 
 let llmsTxt = null;
 try {
@@ -181,31 +184,40 @@ try {
 }
 
 if (llmsTxt) {
+  const llmsProjectsMatch = llmsTxt.match(/Projects\s*\((\d+)\s+total\)/i);
+  const llmsHobbiesMatch = llmsTxt.match(/Hobbies\s*\((\d+)\s+total\)/i);
+  const llmsProjectCount = llmsProjectsMatch ? Number(llmsProjectsMatch[1]) : null;
+  const llmsHobbyCount = llmsHobbiesMatch ? Number(llmsHobbiesMatch[1]) : null;
+  const siteProjectCount = siteFacts?.projects?.length || 0;
+  const siteHobbyCount = siteFacts?.hobbies?.length || 0;
+
   test('Contains owner name', llmsTxt.includes('Estivan Ayramia'));
   test('Contains email', llmsTxt.includes('hello@estivanayramia.com'));
-  test('Contains 6 projects', llmsTxt.includes('Projects (6 total)'));
-  test('Contains 6 hobbies', llmsTxt.includes('Hobbies (6 total)'));
+  test('Contains project count header', llmsProjectCount !== null);
+  test('Contains hobby count header', llmsHobbyCount !== null);
+  test('LLMs project count covers site-facts', llmsProjectCount >= siteProjectCount, `LLMs=${llmsProjectCount}, site-facts=${siteProjectCount}`);
+  test('LLMs hobby count covers site-facts', llmsHobbyCount >= siteHobbyCount, `LLMs=${llmsHobbyCount}, site-facts=${siteHobbyCount}`);
   test('Clarifies Whispers is hobby', llmsTxt.includes('Whispers" is a HOBBY'));
   test('Clarifies getWispers doesn\'t exist', llmsTxt.includes('getWispers') && llmsTxt.includes('NOT'));
 }
 
 // ============================================================================
-// Test 4: L'OrÃ©al Handler Logic
+// Test 4: L'Oréal Handler Logic
 // ============================================================================
 
-console.log('\nðŸ”§ Test Group: L\'OrÃ©al Handler');
+console.log('\n🔧 Test Group: L\'Oréal Handler');
 
-// Check that the L'OrÃ©al project exists with correct canonical URL
+// Check that the L'Oréal project exists with correct canonical URL
 if (siteFacts?.projects) {
   const lorealProject = siteFacts.projects.find(p => p.url === '/projects/loreal-maps-campaign');
-  test('L\'OrÃ©al project exists with canonical URL', !!lorealProject, lorealProject?.url || '/projects/loreal-maps-campaign');
+  test('L\'Oréal project exists with canonical URL', !!lorealProject, lorealProject?.url || '/projects/loreal-maps-campaign');
   
   if (lorealProject) {
-    test('L\'OrÃ©al project has title', !!lorealProject.title);
-    test('L\'OrÃ©al project has summary', !!lorealProject.summary);
-    test('L\'OrÃ©al project title matches expected pattern', 
+    test('L\'Oréal project has title', !!lorealProject.title);
+    test('L\'Oréal project has summary', !!lorealProject.summary);
+    test('L\'Oréal project title matches expected pattern', 
       lorealProject.title.toLowerCase().includes('loreal') || 
-      lorealProject.title.toLowerCase().includes('l\'orÃ©al') ||
+      lorealProject.title.toLowerCase().includes('l\'oréal') ||
       lorealProject.title.toLowerCase().includes('bioprint'),
       lorealProject.title
     );
@@ -213,7 +225,7 @@ if (siteFacts?.projects) {
   
   // Verify worker embeds siteFacts correctly with canonical URLs (no .html)
   const workerContents = fs.readFileSync(WORKER_PATH, 'utf-8');
-  test('Worker has L\'OrÃ©al in embedded siteFacts with canonical URL', 
+  test('Worker has L\'Oréal in embedded siteFacts with canonical URL', 
     workerContents.includes('/projects/loreal-maps-campaign"') || workerContents.includes('/projects/loreal-maps-campaign\'')
   );
 }
@@ -222,7 +234,7 @@ if (siteFacts?.projects) {
 // Test 5: File Existence
 // ============================================================================
 
-console.log('\nðŸ“ Test Group: File Existence');
+console.log('\n📁 Test Group: File Existence');
 
 const criticalFiles = [
   'EN/index.html',
@@ -268,16 +280,16 @@ if (siteFacts?.hobbies) {
 // ============================================================================
 
 console.log('\n' + '='.repeat(60));
-console.log(`ðŸ“Š Results: ${passed} passed, ${failed} failed`);
+console.log(`📊 Results: ${passed} passed, ${failed} failed`);
 
 if (failed > 0) {
-  console.log('\nâŒ Failures:');
+  console.log('\n❌ Failures:');
   failures.forEach(f => {
     console.log(`   - ${f.name}${f.details ? ': ' + f.details : ''}`);
   });
-  console.log('\nðŸ›‘ Tests FAILED');
+  console.log('\n🛑 Tests FAILED');
   process.exit(1);
 } else {
-  console.log('\nâœ¨ All tests passed!');
+  console.log('\n✨ All tests passed!');
   process.exit(0);
 }

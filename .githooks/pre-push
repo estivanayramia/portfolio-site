@@ -1,0 +1,5 @@
+#!/bin/sh
+# Pre-push hook: block pushes that fail core perf gates
+set -eu
+
+node .githooks/pre-push.mjs

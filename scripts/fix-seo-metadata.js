@@ -1,4 +1,4 @@
-﻿// Deprecated script.
+// Deprecated script.
 // This repository no longer uses an /en prefix and canonical/og:url values must be extensionless.
 // The old behavior would regress SEO, so this script is intentionally disabled.
 

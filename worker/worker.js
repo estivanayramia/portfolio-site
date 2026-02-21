@@ -11,9 +11,11 @@
 // This ensures chatbot responses stay grounded in actual site content
 
 // In-memory cache for site facts (expires after 1 hour)
-let cachedSiteFacts = null;
-let cachedSiteFactsSource = "unknown"; // "kv" | "fallback" | "unknown"
-let cacheTimestamp = 0;
+const factsCache = globalThis.__savonieFactsCache || (globalThis.__savonieFactsCache = {
+  data: null,
+  source: "unknown", // "kv" | "fallback" | "unknown"
+  timestamp: 0,
+});
 const CACHE_TTL_MS = 3600000; // 1 hour
 
 /**
@@ -24,19 +26,19 @@ async function getSiteFacts(env) {
   const now = Date.now();
   
   // Return cached facts if still valid
-  if (cachedSiteFacts && (now - cacheTimestamp) < CACHE_TTL_MS) {
-    return cachedSiteFacts;
+  if (factsCache.data && (now - factsCache.timestamp) < CACHE_TTL_MS) {
+    return factsCache.data;
   }
   
   // Try loading from KV
   try {
     const kvData = await env.SAVONIE_KV.get("site-facts:v1", { type: "json" });
     if (kvData && kvData.projects && kvData.hobbies) {
-      cachedSiteFacts = kvData;
-      cachedSiteFactsSource = "kv";
-      cacheTimestamp = now;
+      factsCache.data = kvData;
+      factsCache.source = "kv";
+      factsCache.timestamp = now;
       console.log(`✅ Loaded site facts from KV (${kvData.projects.length} projects, ${kvData.hobbies.length} hobbies)`);
-      return cachedSiteFacts;
+      return factsCache.data;
     }
   } catch (error) {
     console.error("⚠️ KV fetch failed, using fallback:", error.message);
@@ -146,9 +148,9 @@ async function getSiteFacts(env) {
     ],
   };
   
-  cachedSiteFacts = fallbackFacts;
-  cachedSiteFactsSource = "fallback";
-  cacheTimestamp = now;
+  factsCache.data = fallbackFacts;
+  factsCache.source = "fallback";
+  factsCache.timestamp = now;
   console.warn("⚠️ Using fallback site facts - KV unavailable");
   return fallbackFacts;
 }
@@ -776,7 +778,7 @@ export default {
       const authHashOrPlain = normalizeSecret(env.DASHBOARD_PASSWORD_HASH);
       const authConfigured = !!(authPlain || authHashOrPlain);
       const authSource = authPlain ? "DASHBOARD_PASSWORD" : (authHashOrPlain ? "DASHBOARD_PASSWORD_HASH" : null);
-      const factsCacheAgeMs = cachedSiteFacts ? Math.max(0, Date.now() - cacheTimestamp) : null;
+      const factsCacheAgeMs = factsCache.data ? Math.max(0, Date.now() - factsCache.timestamp) : null;
 
       let d1Ok = false;
       try {
@@ -798,7 +800,7 @@ export default {
           authConfigured,
           authSource,
           factsKey: "site-facts:v1",
-          factsSource: cachedSiteFactsSource,
+          factsSource: factsCache.source,
           factsCacheAgeMs,
           errorApi: true
         },

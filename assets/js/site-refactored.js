@@ -323,7 +323,7 @@
             right: 20px;
             z-index: 10001;
             background: rgba(33, 40, 66, 0.95);
-            color: #e1d4c2;
+            color: #e1d4c2; /* dynamic: diagnostic overlay, cannot use Tailwind (cssText) */
             border: 1px solid rgba(225, 212, 194, 0.2);
             border-radius: 12px;
             padding: 16px;
@@ -339,7 +339,7 @@
         overlay.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(225, 212, 194, 0.1); padding-bottom: 8px;">
                 <span style="font-weight: 600; font-size: 14px;">📊 Diagnostics</span>
-                <button id="diag-toggle" style="background: transparent; border: none; color: #e1d4c2; cursor: pointer; font-size: 18px; padding: 0; width: 24px; height: 24px;">×</button>
+                <button id="diag-toggle" class="text-beige" style="background: transparent; border: none;  cursor: pointer; font-size: 18px; padding: 0; width: 24px; height: 24px;">×</button>
             </div>
             <div style="display: grid; gap: 8px;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -513,7 +513,7 @@
             height: 48px;
             border-radius: 50%;
             background: rgba(33, 40, 66, 0.9);
-            color: #e1d4c2;
+            color: #e1d4c2; /* dynamic: diagnostic FAB button, cannot use Tailwind (cssText) */
             border: 1px solid rgba(225, 212, 194, 0.2);
             cursor: pointer;
             font-size: 20px;

@@ -40,27 +40,14 @@ if (stagedHtmlFiles.length > 0) {
 
   try {
     const sha = getCurrentSha();
-    const staleBefore = stagedHtmlFiles.flatMap((file) =>
-      findStaleVersionStringsInFile(file, sha).map((m) => ({ file, value: m[1] })),
-    );
-
-    if (staleBefore.length > 0) {
-      console.log('⚠️  Stale ?v= strings found in staged HTML; running apply-versioning...');
-      execSync('node tools/apply-versioning.mjs', { stdio: 'inherit' });
-
-      for (const file of stagedHtmlFiles) {
-        execSync(`git add -- "${file}"`, { stdio: 'ignore' });
-      }
-    }
-
     const staleAfter = stagedHtmlFiles.flatMap((file) =>
       findStaleVersionStringsInFile(file, sha).map((m) => ({ file, value: m[1] })),
     );
 
     if (staleAfter.length > 0) {
-      console.error('❌ Stale ?v= strings remain in staged HTML after apply-versioning:');
+      console.error('❌ Stale ?v= strings found in staged HTML:');
       staleAfter.forEach((item) => console.error(`   - ${item.file} has ?v=${item.value}`));
-      console.error('\n💡 Run: npm run apply:versioning');
+      console.error('\n💡 Run: npm run apply:versioning && git add -A');
       process.exit(1);
     }
 

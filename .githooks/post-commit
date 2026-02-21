@@ -1,0 +1,4 @@
+#!/bin/sh
+# Post-commit hook wrapper
+set -eu
+node .githooks/post-commit.mjs
