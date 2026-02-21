@@ -72,12 +72,12 @@
 /overview/    /overview    301
 /privacy/    /privacy    301
 /projects    /projects/    301
-/projects/competitive-strategy/    /projects/competitive-strategy    301
-/projects/conflict/    /projects/conflict    301
-/projects/discipline/    /projects/discipline    301
-/projects/documentation/    /projects/documentation    301
-/projects/logistics/    /projects/logistics    301
-/projects/multilingual/    /projects/multilingual    301
+# REMOVED (dead normalization  legacy slug already in SET A migration): /projects/competitive-strategy/    /projects/competitive-strategy    301
+# REMOVED (dead normalization  legacy slug already in SET A migration): /projects/conflict/    /projects/conflict    301
+# REMOVED (dead normalization  legacy slug already in SET A migration): /projects/discipline/    /projects/discipline    301
+# REMOVED (dead normalization  legacy slug already in SET A migration): /projects/documentation/    /projects/documentation    301
+# REMOVED (dead normalization  legacy slug already in SET A migration): /projects/logistics/    /projects/logistics    301
+# REMOVED (dead normalization  legacy slug already in SET A migration): /projects/multilingual/    /projects/multilingual    301
 /projects/portfolio/    /projects/portfolio    301
 
 # Clean URL rewrites (200) -> serve from /EN/
@@ -115,7 +115,7 @@
 /privacy    /EN/privacy    200
 /projects/    /EN/projects/    200
 /projects/endpoint-competitive-playbook    /EN/projects/endpoint-competitive-playbook    200
-/projects/conflict    /projects/endpoint-competitive-playbook    301
+# REMOVED (exact duplicate  first occurrence kept above): /projects/conflict    /projects/endpoint-competitive-playbook    301
 /projects/franklin-templeton-concept    /EN/projects/franklin-templeton-concept    200
 /projects/endpoint-linkedin-campaign    /EN/projects/endpoint-linkedin-campaign    200
 /projects/loreal-maps-campaign    /EN/projects/loreal-maps-campaign    200
