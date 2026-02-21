@@ -1,4 +1,4 @@
-﻿import "./telemetry-core.js";
+import "./telemetry-core.js";
 import { initDiagnosticsConsent } from "./diagnostics-consent.js";
 
 // Expose consent init for the boot block

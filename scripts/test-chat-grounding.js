@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Test Chat Grounding - Validate chatbot responses are factually accurate
  * 
  * This script tests:
