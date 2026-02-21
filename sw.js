@@ -2,7 +2,7 @@
 // Service worker caching for public pages only.
 // Strictly bypasses the dashboard + diagnostics + all /api/* routes to avoid preview/prod auth surprises.
 
-const CACHE_VERSION = 'v20260221-b1faf33-dashboard-bypass';
+const CACHE_VERSION = 'v20260221-9c21f85-dashboard-bypass';
 const CACHE_PREFIX = 'portfolio-cache-';
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
