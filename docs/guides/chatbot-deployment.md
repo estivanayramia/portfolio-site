@@ -14,7 +14,7 @@ This document outlines the deployment steps and verification procedures for the 
    - `gemini-1.5-pro` → `gemini-2.5-pro`
 2. Changed authentication method:
    - Old: `?key=${apiKey}` (query parameter)
-   - New: `x-goog-api-key: ${apiKey}` (HTTP header)
+  - New: `x-goog-api-key: $GEMINI_API_KEY` (HTTP header)
 3. Updated API endpoint format:
    - URL: `https://generativelanguage.googleapis.com/v1beta/${model}:generateContent`
 

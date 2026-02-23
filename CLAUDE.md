@@ -107,8 +107,12 @@
 | 2026-02-23 | §HOUSE | NEVER leave TODO comments without a trac | found 12 untracked TODOs in co |
 | 2026-02-23 | §HOUSE | NEVER commit debug HTML to root  use too | coverflow-diagnostic.html, lux |
 | 2026-02-23 | §HOUSE | NEVER commit CI artifacts to root  use . | audit_failure_log.txt, redirec |
+| 2026-02-23 | §SEC | NEVER write GEMINI_API_KEY or x-goog-api | audit:secrets blocked build  7 |
+| 2026-02-23 | §WORKER | NEVER put secrets in wrangler.toml [vars | GEMINI_API_KEY was in wrangler |
 
 - **NEVER commit node_modules to the repo** (WHEN running npm install for the first time)
 - **NEVER leave TODO comments without a tracking issue**
 - **NEVER commit debug HTML to root  use tools/debug/ (gitignored)**
 - **NEVER commit CI artifacts to root  use .reports/ (gitignored)**
+- **NEVER write GEMINI_API_KEY or x-goog-api-key as a literal in source, tests, or docs**
+- **NEVER put secrets in wrangler.toml [vars]  use wrangler secret put only**

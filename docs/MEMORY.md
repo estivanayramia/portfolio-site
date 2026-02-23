@@ -92,6 +92,17 @@ node tools/update-agent-memory.mjs \
 
 ---
 
+  ### SEC-MLYRVMTX — Incident (Fixed)
+
+**Date:** 2026-02-23
+**What broke:** audit:secrets blocked build  7 files had literal key patterns
+**Root cause:** Literal GEMINI_API_KEY found in worker.js, wrangler.toml, test-gemini.js, test_chat_logic.mjs, and 3 docs. Replaced with env.GEMINI_API_KEY in runtime, process.env in tests, <REDACTED> in docs. wrangler.toml [vars] section purged.
+**Files:** `worker/worker.js,worker/wrangler.toml,worker/test-gemini.js,scripts/test_chat_logic.mjs,docs/guides/chatbot-deployment.md,docs/notes/deployment-root.md,docs/worker/index.md`
+**Val:** `npm run audit:secrets`
+**CLAUDE.md rule:** §SEC — "NEVER write GEMINI_API_KEY or x-goog-api-key as a literal in source, tests, or docs"
+
+---
+
 ## §CSS — Forensics
 
 > Quick rules: `CLAUDE.md §CSS`
@@ -154,6 +165,17 @@ node tools/update-agent-memory.mjs \
 **What broke:** Hardcoded secrets.
 
 **CLAUDE.md rule:** §WORKER — "NEVER hardcode secrets in worker.js or wrangler.toml"
+
+---
+
+  ### WORKER-MLYRVQ0Q — Incident (Fixed)
+
+**Date:** 2026-02-23
+**What broke:** GEMINI_API_KEY was in wrangler.toml [vars] as plaintext, committed to git
+**Root cause:** wrangler.toml [vars] contained GEMINI_API_KEY in plaintext. Removed. Secret now lives only in CF secret binding set via wrangler secret put.
+**Files:** `worker/wrangler.toml`
+**Val:** `wrangler secret list --config worker/wrangler.toml`
+**CLAUDE.md rule:** §WORKER — "NEVER put secrets in wrangler.toml [vars]  use wrangler secret put only"
 
 ---
 
@@ -264,3 +286,5 @@ node tools/update-agent-memory.mjs \
 | 2026-02-23 | §HOUSE | HOUSE-MLYRLE9F | HOUSE-001  Debug HTML in Root  | Fixed |
 | 2026-02-23 | §HOUSE | HOUSE-MLYRLHTJ | HOUSE-002  CI Artifacts in Roo | Fixed |
 | 2026-02-23 | §HOUSE | HOUSE-MLYRLNAM | HOUSE-003  Script in Root Reso | Fixed |
+| 2026-02-23 | §SEC | SEC-MLYRVMTX | SEC-001  API Key Literals Reso | Fixed |
+| 2026-02-23 | §WORKER | WORKER-MLYRVQ0Q | WORKER-001  Secret in Wrangler | Fixed |

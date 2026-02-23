@@ -20,7 +20,8 @@ global.fetch = async (url, options) => {
 async function testTruncationAndContinuation() {
   console.log("Running Chat Logic Tests...");
   
-  const env = { GEMINI_API_KEY: "test-key" };
+  const apiKey = process.env.GEMINI_API_KEY ?? 'TEST_KEY_NOT_SET';
+  const env = { GEMINI_API_KEY: apiKey };
   
   // TEST 1: Auto-Continuation
   // Scenario: First calls returns MAX_TOKENS, second call returns rest.
@@ -91,7 +92,8 @@ async function testTruncationAndContinuation() {
 async function testErrorHandling() {
   console.log("Running Error Handling Tests...");
   
-  const env = { GEMINI_API_KEY: "test-key" };
+  const apiKey = process.env.GEMINI_API_KEY ?? 'TEST_KEY_NOT_SET';
+  const env = { GEMINI_API_KEY: apiKey };
   
   // TEST 3: Upstream 429 -> 503 UpstreamBusy
   console.log("Test 3: Upstream 429 returns 503 UpstreamBusy");

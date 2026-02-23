@@ -1,5 +1,5 @@
 // Quick test script to check Gemini API
-const API_KEY = process.env.GEMINI_API_KEY || 'YOUR_KEY_HERE';
+const API_KEY = process.env.GEMINI_API_KEY ?? 'TEST_KEY_NOT_SET';
 
 async function testGemini() {
   // First, list available models
