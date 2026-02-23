@@ -256,7 +256,7 @@ async function captureScreenshots({ baseUrl, outDir }) {
         });
 
         // Small settle time for layout/paint completion
-        await page.waitForTimeout(250);
+        await new Promise(r => setTimeout(r, 250));
 
         const shotPath = path.join(outDir, makeShotName(viewport.name, route.name));
         await page.screenshot({ path: shotPath, fullPage: true });

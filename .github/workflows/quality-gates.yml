@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI: true
+      JANK_THRESHOLD: '100'
     steps:
       - uses: actions/checkout@v4
 
@@ -41,6 +42,20 @@ jobs:
 
       - name: Performance Budget
         run: npm run perf:budget
+
+      - name: Visual Regression Baseline (from main)
+        run: |
+          PR_SHA=$(git rev-parse HEAD)
+          git fetch origin main --depth=1
+          # Save our patched scripts (fix Puppeteer v22+ waitForTimeout removal)
+          cp -r scripts/ /tmp/pr-scripts/
+          # Checkout main's HTML/CSS/assets for baseline capture
+          git checkout origin/main -- .
+          # Restore patched scripts so baseline runs without Puppeteer crash
+          cp -r /tmp/pr-scripts/. scripts/
+          node scripts/visual-regression.mjs baseline
+          # Restore full PR state
+          git checkout "$PR_SHA" -- .
 
       - name: Visual Regression Check
         run: npm run visual:check
@@ -93,6 +108,19 @@ jobs:
         run: npm run route:smoke
       - name: Performance Budget
         run: npm run perf:budget
+      - name: Visual Regression Baseline (from main)
+        run: |
+          PR_SHA=$(git rev-parse HEAD)
+          git fetch origin main --depth=1
+          # Save our patched scripts (fix Puppeteer v22+ waitForTimeout removal)
+          cp -r scripts/ /tmp/pr-scripts/
+          # Checkout main's HTML/CSS/assets for baseline capture
+          git checkout origin/main -- .
+          # Restore patched scripts so baseline runs without Puppeteer crash
+          cp -r /tmp/pr-scripts/. scripts/
+          node scripts/visual-regression.mjs baseline
+          # Restore full PR state
+          git checkout "$PR_SHA" -- .
       - name: Visual Regression Check
         run: npm run visual:check
       - name: Animation Sanity Check
