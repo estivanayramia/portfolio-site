@@ -135,7 +135,8 @@ async function checkJank(page, url) {
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
     await sleep(2000);
 
-    const result = await page.evaluate(async () => {
+    const thresholdPx = Number(process.env.JANK_THRESHOLD) || 50; // px jump; override via JANK_THRESHOLD env var
+    const result = await page.evaluate(async (thresholdPx) => {
         // Selection Logic
         const candidates = [
             ...Array.from(document.querySelectorAll('[data-gsap]')).slice(0, 25),
@@ -178,7 +179,7 @@ async function checkJank(page, url) {
         }
         
         // Analysis
-        const THRESHOLD = Number(process.env.JANK_THRESHOLD) || 50; // px jump; override via JANK_THRESHOLD env var
+        const THRESHOLD = thresholdPx;
         const fails = [];
         let worstSelector = '-';
         let worstSpikeValue = 0;
@@ -209,7 +210,7 @@ async function checkJank(page, url) {
         });
         
         return { fails, worstSelector, worstSpikeValue, framesOver };
-    });
+    }, thresholdPx);
     
     return {
         url,
