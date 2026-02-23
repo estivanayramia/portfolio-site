@@ -105,6 +105,10 @@
 | 2026-02-22 | ALL | CLAUDE.md compressed | < 4KB target met |
 | 2026-02-23 | §HOUSE | NEVER commit node_modules to the repo | accidental node_modules commit |
 | 2026-02-23 | §HOUSE | NEVER leave TODO comments without a trac | found 12 untracked TODOs in co |
+| 2026-02-23 | §HOUSE | NEVER commit debug HTML to root  use too | coverflow-diagnostic.html, lux |
+| 2026-02-23 | §HOUSE | NEVER commit CI artifacts to root  use . | audit_failure_log.txt, redirec |
 
 - **NEVER commit node_modules to the repo** (WHEN running npm install for the first time)
 - **NEVER leave TODO comments without a tracking issue**
+- **NEVER commit debug HTML to root  use tools/debug/ (gitignored)**
+- **NEVER commit CI artifacts to root  use .reports/ (gitignored)**

@@ -267,15 +267,6 @@ function generateRedirects() {
             dbg('generateRedirects: SELF-REDIRECT rules detected (likely loop):', selfRedirects.map((r) => r.raw));
         }
 
-        const expectedDebug200 = rules.filter((r) => (r.from === '/redirect-debug' || r.from === '/redirect-debug.html'));
-        if (!expectedDebug200.length) {
-            dbg('generateRedirects: WARNING missing debug route rules for /redirect-debug(.html)');
-        } else {
-            for (const r of expectedDebug200) {
-                if (r.status !== '200') dbg('generateRedirects: WARNING debug route not 200:', r.raw);
-            }
-        }
-
         const expected404 = rules.filter((r) => r.from === '/EN/404' || r.from === '/EN/404/' || r.from === '/EN/404.html' || r.from === '/404' || r.from === '/404.html');
         for (const r of expected404) {
             if (r.status !== '200') dbg('generateRedirects: WARNING 404 guard not 200:', r.raw);

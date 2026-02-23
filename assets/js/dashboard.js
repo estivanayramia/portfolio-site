@@ -1142,7 +1142,6 @@ async function runRedirectDiagnostics() {
     { path: '/', expected: 200 },
     { path: '/EN/', expected: 200 },
     { path: '/EN/index.html', expected: 200 },
-    { path: '/redirect-debug.html', expected: 200 },
     { path: '/nonexistent-page', expected: 404 }
   ];
 

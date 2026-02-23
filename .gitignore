@@ -45,6 +45,11 @@ test-results/
 # Local verification artifacts
 verification-failure*.png
 
+# Root CI artifacts (must live under .reports/)
+audit_failure_log.txt
+redirect-trace.txt
+test_matrix.json
+
 
 
 # Restore tool artifacts

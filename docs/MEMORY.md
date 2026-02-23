@@ -218,6 +218,39 @@ node tools/update-agent-memory.mjs \
 
 ---
 
+  ### HOUSE-MLYRLE9F — Incident (Fixed)
+
+**Date:** 2026-02-23
+**What broke:** coverflow-diagnostic.html, luxury-coverflow.html, redirect-debug.html removed
+**Root cause:** 3 debug HTML files were publicly deployed to Cloudflare Pages via root. Deleted. No references to them found in source.
+**Files:** `coverflow-diagnostic.html,luxury-coverflow.html,redirect-debug.html,.gitignore`
+**Val:** `git ls-files | grep -E 'diagnostic|luxury-coverflow|redirect-debug'`
+**CLAUDE.md rule:** §HOUSE — "NEVER commit debug HTML to root  use tools/debug/ (gitignored)"
+
+---
+
+  ### HOUSE-MLYRLHTJ — Incident (Fixed)
+
+**Date:** 2026-02-23
+**What broke:** audit_failure_log.txt, redirect-trace.txt, test_matrix.json removed and gitignored
+**Root cause:** 3 CI output artifacts committed to root, publicly visible. Deleted and added to .gitignore.
+**Files:** `audit_failure_log.txt,redirect-trace.txt,test_matrix.json,.gitignore`
+**Val:** `git ls-files | grep -E 'audit_failure_log|redirect-trace|test_matrix'`
+**CLAUDE.md rule:** §HOUSE — "NEVER commit CI artifacts to root  use .reports/ (gitignored)"
+
+---
+
+  ### HOUSE-MLYRLNAM — Incident (Fixed)
+
+**Date:** 2026-02-23
+**What broke:** test-chat-errors.ps1 moved from root to scripts/
+**Root cause:** PowerShell test script was in root. Moved to scripts/.
+**Files:** `test-chat-errors.ps1,scripts/test-chat-errors.ps1`
+**Val:** `git ls-files | grep -E '^[^/]+\.ps1$'`
+**CLAUDE.md rule:** §HOUSE — "NEVER place scripts in root  use scripts/ or tools/"
+
+---
+
 ## §AUTO-UPDATE LOG
 
 <!-- ✍️ Auto-appended by tools/update-agent-memory.mjs — DO NOT edit manually -->
@@ -228,3 +261,6 @@ node tools/update-agent-memory.mjs \
 | 2026-02-11 | §ROUTING | ROUTING-001 | ERR_TOO_MANY_REDIRECTS | ✅ Fixed |
 | 2026-02-22 | ALL | INIT | Two-tier memory initialized | ✅ Active |
 | 2026-02-23 | §HOUSE | HOUSE-MLYQE0V1 | Untracked TODO Comments | Active |
+| 2026-02-23 | §HOUSE | HOUSE-MLYRLE9F | HOUSE-001  Debug HTML in Root  | Fixed |
+| 2026-02-23 | §HOUSE | HOUSE-MLYRLHTJ | HOUSE-002  CI Artifacts in Roo | Fixed |
+| 2026-02-23 | §HOUSE | HOUSE-MLYRLNAM | HOUSE-003  Script in Root Reso | Fixed |

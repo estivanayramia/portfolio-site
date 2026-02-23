@@ -108,8 +108,8 @@ async function traceRedirects(url, maxRedirects = 5) {
 
 async function liveRedirectAudit() {
   const repoRoot = process.cwd();
-  const matrixPath = path.join(repoRoot, 'test_matrix.json');
-  const matrix = readJsonIfExists(matrixPath);
+  const matrixPath = path.join(repoRoot, '.reports', 'test_matrix.json');
+  const matrix = readJsonIfExists(matrixPath) || readJsonIfExists(path.join(repoRoot, 'test_matrix.json'));
 
   const urls =
     (Array.isArray(matrix?.urls_to_test) && matrix.urls_to_test.length

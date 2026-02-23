@@ -45,11 +45,17 @@ async function traceRedirects(url, maxDepth = 10) {
 
 function loadTestUrlsFromMatrix() {
   try {
-    const raw = fs.readFileSync(new URL('../test_matrix.json', import.meta.url), 'utf8');
+    const raw = fs.readFileSync(new URL('../.reports/test_matrix.json', import.meta.url), 'utf8');
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed?.urls_to_test) && parsed.urls_to_test.length) return parsed.urls_to_test;
   } catch {
-    // ignore
+    try {
+      const raw = fs.readFileSync(new URL('../test_matrix.json', import.meta.url), 'utf8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed?.urls_to_test) && parsed.urls_to_test.length) return parsed.urls_to_test;
+    } catch {
+      // ignore
+    }
   }
   return null;
 }
