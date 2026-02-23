@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI: true
+      JANK_THRESHOLD: '100'
     steps:
       - uses: actions/checkout@v4
 

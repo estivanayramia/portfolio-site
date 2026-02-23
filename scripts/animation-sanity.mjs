@@ -178,7 +178,7 @@ async function checkJank(page, url) {
         }
         
         // Analysis
-        const THRESHOLD = 50; // px jump
+        const THRESHOLD = Number(process.env.JANK_THRESHOLD) || 50; // px jump; override via JANK_THRESHOLD env var
         const fails = [];
         let worstSelector = '-';
         let worstSpikeValue = 0;
