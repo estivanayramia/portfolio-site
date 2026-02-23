@@ -20,6 +20,7 @@
     "sync:index": "node tools/sync-root-index.mjs",
     "route:smoke": "node scripts/route-smoke.mjs",
     "perf:budget": "node scripts/perf-budget.mjs",
+    "anim:sanity": "node scripts/animation-sanity.mjs",
     "anim:jank": "node scripts/animation-sanity.mjs --jank",
     "visual:baseline": "node scripts/visual-regression.mjs baseline",
     "visual:check": "node scripts/visual-regression.mjs check",
