@@ -11,7 +11,7 @@
                   <meta property="og:description" content="Play Nano Wirebot, a browser game in Estivan Ayramia's arcade collection, built for quick sessions, responsive controls, and engaging gameplay loops.">
                   <meta property="og:type" content="website">
                   <meta property="og:url" content="https://www.estivanayramia.com/hobbies-games/nano-wirebot">
-  <link rel="stylesheet" href="/assets/css/style.css?v=2a0632a">
+  <link rel="stylesheet" href="/assets/css/style.css?v=206c306">
   <link rel="stylesheet" href="/theme.css?v=v20260119-5">
   <link rel="icon" href="/assets/img/icon-192.png" type="image/png">
   <style>
@@ -158,7 +158,7 @@
       </div>
     </section>
   </div>
-  <script src="/assets/js/site.min.js?v=2a0632a" defer></script>
+  <script src="/assets/js/site.min.js?v=206c306" defer></script>
   <script type="module" src="/assets/js/arcade/arcade-core.js"></script>
   <script type="module" src="/assets/js/arcade/achievements-ui.js"></script>
   <script>
@@ -181,7 +181,10 @@
         <div id="chat-window" class="hidden fixed w-80 h-[500px] bg-[#e1d4c2]/95 backdrop-blur-md rounded-2xl shadow-2xl border border-[#362017]/10 overflow-hidden flex-col" style="max-width: calc(100vw - 48px); max-height: calc(100vh - 120px);" role="dialog" aria-modal="true" aria-labelledby="chat-title">
             <div id="chat-header" class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none">
                 <h3 id="chat-title" class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none">
-                    <img src="/assets/img/savonie-thumb.webp" alt="Savonie chatbot avatar" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64" loading="lazy" decoding="async">
+                    <picture>
+  <source srcset="/assets/img/savonie-thumb.webp" type="image/webp">
+  <img src="/assets/img/savonie-thumb.webp" alt="Savonie chatbot avatar" class="w-6 h-6 rounded-full border border-white/20 object-cover" width="64" height="64" loading="lazy" decoding="async">
+</picture>
                     Savonie AI
                 </h3>
                 <button type="button" id="close-chat" class="text-white/80 hover:text-white text-xl leading-none cursor-pointer" aria-label="Close chat">&times;</button>
@@ -210,7 +213,10 @@
 
         <!-- Toggle Button (always stays in bottom-right corner) -->
         <button type="button" id="chat-toggle" class="absolute bottom-0 right-0 bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 overflow-hidden" aria-label="Open Chat">
-            <img src="/assets/img/savonie-thumb.webp" alt="Savonie chat UI" class="w-full h-full object-cover" width="64" height="64" loading="lazy" decoding="async">
+            <picture>
+  <source srcset="/assets/img/savonie-thumb.webp" type="image/webp">
+  <img src="/assets/img/savonie-thumb.webp" alt="Savonie chat UI" class="w-full h-full object-cover" width="64" height="64" loading="lazy" decoding="async">
+</picture>
         </button>
     </div>
     
