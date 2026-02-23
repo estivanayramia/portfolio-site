@@ -46,8 +46,14 @@ jobs:
         run: |
           PR_SHA=$(git rev-parse HEAD)
           git fetch origin main --depth=1
+          # Save our patched scripts (fix Puppeteer v22+ waitForTimeout removal)
+          cp -r scripts/ /tmp/pr-scripts/
+          # Checkout main's HTML/CSS/assets for baseline capture
           git checkout origin/main -- .
-          npm run visual:baseline
+          # Restore patched scripts so baseline runs without Puppeteer crash
+          cp -r /tmp/pr-scripts/. scripts/
+          node scripts/visual-regression.mjs baseline
+          # Restore full PR state
           git checkout "$PR_SHA" -- .
 
       - name: Visual Regression Check
@@ -105,8 +111,14 @@ jobs:
         run: |
           PR_SHA=$(git rev-parse HEAD)
           git fetch origin main --depth=1
+          # Save our patched scripts (fix Puppeteer v22+ waitForTimeout removal)
+          cp -r scripts/ /tmp/pr-scripts/
+          # Checkout main's HTML/CSS/assets for baseline capture
           git checkout origin/main -- .
-          npm run visual:baseline
+          # Restore patched scripts so baseline runs without Puppeteer crash
+          cp -r /tmp/pr-scripts/. scripts/
+          node scripts/visual-regression.mjs baseline
+          # Restore full PR state
           git checkout "$PR_SHA" -- .
       - name: Visual Regression Check
         run: npm run visual:check
