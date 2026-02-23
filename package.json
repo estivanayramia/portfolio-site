@@ -50,7 +50,11 @@
     "audit:secrets": "node tools/audit-secrets.mjs",
     "audit:sw-version": "node tools/audit-sw-version.mjs",
     "audit:encoding": "node scripts/audit-encoding.mjs",
-    "audit": "npm run audit:secrets && npm run audit:cf-files && npm run audit:inline-css && npm run audit:css-sync && npm run audit:sw-version && npm run audit:encoding"
+    "audit": "npm run audit:secrets && npm run audit:cf-files && npm run audit:inline-css && npm run audit:css-sync && npm run audit:sw-version && npm run audit:encoding",
+    "memory:update": "node tools/update-agent-memory.mjs",
+    "memory:health": "node tools/memory-health.mjs",
+    "memory:revive": "node tools/revive-claude.mjs",
+    "memory:view": "node -e \"const fs=require('fs');const c=fs.readFileSync('CLAUDE.md','utf-8');const m=c.match(/##\\s§AUTO-UPDATE LOG[\\s\\S]+/);console.log(m?m[0]:'§AUTO-UPDATE LOG not found');\""
   },
   "keywords": [
     "portfolio",
