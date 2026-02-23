@@ -337,8 +337,9 @@ export class LuxuryCoverflow {
       const isCenter = index === Math.round(centerIndex);
       const absPosition = this.getAbsoluteDistance(index, Math.round(centerIndex));
       
-      if (duration > 0) item.style.willChange = 'transform, opacity';
-      
+      // z-index: snap to final value immediately — no crossover. [R3]
+      gsap.set(item, { zIndex: transform.zIndex });
+
       gsap.to(item, {
         x: transform.translateX,
         y: transform.translateY || 0,
@@ -347,11 +348,10 @@ export class LuxuryCoverflow {
         scale: transform.scale,
         opacity: transform.opacity,
         filter: this.engine3D.getFilterString(transform.filter),
-        zIndex: transform.zIndex,
         duration, ease: this.config.animationEase,
         delay: duration > 0 ? absPosition * this.config.staggerDelay : 0,
-        force3D: true,
-        onComplete: () => { item.style.willChange = 'auto'; }
+        force3D: true
+        // onComplete removed: force3D:true manages will-change internally [R4]
       });
       
       item.classList.toggle('is-center', isCenter);
