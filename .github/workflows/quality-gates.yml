@@ -42,6 +42,14 @@ jobs:
       - name: Performance Budget
         run: npm run perf:budget
 
+      - name: Visual Regression Baseline (from main)
+        run: |
+          PR_SHA=$(git rev-parse HEAD)
+          git fetch origin main --depth=1
+          git checkout origin/main -- .
+          npm run visual:baseline
+          git checkout "$PR_SHA" -- .
+
       - name: Visual Regression Check
         run: npm run visual:check
 
@@ -93,6 +101,13 @@ jobs:
         run: npm run route:smoke
       - name: Performance Budget
         run: npm run perf:budget
+      - name: Visual Regression Baseline (from main)
+        run: |
+          PR_SHA=$(git rev-parse HEAD)
+          git fetch origin main --depth=1
+          git checkout origin/main -- .
+          npm run visual:baseline
+          git checkout "$PR_SHA" -- .
       - name: Visual Regression Check
         run: npm run visual:check
       - name: Animation Sanity Check
