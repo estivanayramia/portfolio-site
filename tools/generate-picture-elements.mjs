@@ -73,8 +73,15 @@ for (const f of files) {
     /(<img\s(?:[^>](?!<\/picture>))*?>)/gis,
     (match) => {
       const pos = html.indexOf(match);
-      const before = html.slice(Math.max(0, pos - 60), pos);
-      if (before.includes('<picture')) { totalSkipped++; return match; }
+      const picOpen = html.lastIndexOf('<picture', pos);
+      const prevPicClose = html.lastIndexOf('</picture>', pos);
+      const nextPicClose = html.indexOf('</picture>', pos);
+      const alreadyWrapped = (
+        picOpen !== -1 &&
+        picOpen > prevPicClose &&
+        nextPicClose !== -1
+      );
+      if (alreadyWrapped) { totalSkipped++; return match; }
       for (const p of SKIP_PATTERNS) {
         if (p.test(match)) { totalSkipped++; return match; }
       }
