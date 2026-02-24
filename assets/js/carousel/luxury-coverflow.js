@@ -166,7 +166,7 @@ function getTierRuntimeDefaults(tier) {
         enableSmoothTracking: false,
         enableScroll: true,
         scrollSensitivity: 0.003,
-        rouletteMode: 'minimal'
+        rouletteMode: 'full'
       };
     case 'reduced-motion':
       return {
@@ -257,9 +257,44 @@ export class LuxuryCoverflow {
     
     this.clickState = { startTime: 0, startX: 0, startY: 0 };
     
+    const _isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+
     this.engine3D = new Coverflow3DEngine({
       ...this.config,
-      infiniteLoop: this.config.infiniteLoop
+      infiniteLoop: this.config.infiniteLoop,
+      ...(_isMobile ? {
+        positions: {
+          center: {
+            rotateY: 0, translateZ: 0, translateX: 0,
+            scale: 1.0,
+            opacity: 1, zIndex: 100,
+            blur: 0, brightness: 1.05, saturate: 1.05
+          },
+          adjacent1: {
+            rotateY: 14,
+            translateZ: -40,
+            translateX: 220,
+            scale: 0.9,
+            opacity: 0.82, zIndex: 90,
+            blur: 0, brightness: 0.9, saturate: 1
+          },
+          adjacent2: {
+            rotateY: 35, translateZ: -200, translateX: 450,
+            scale: 0.68, opacity: 0.35, zIndex: 80,
+            blur: 1, brightness: 0.8, saturate: 0.95
+          },
+          adjacent3: {
+            rotateY: 45, translateZ: -320, translateX: 580,
+            scale: 0.52, opacity: 0.1, zIndex: 70,
+            blur: 2, brightness: 0.65, saturate: 0.9
+          },
+          far: {
+            rotateY: 52, translateZ: -420, translateX: 680,
+            scale: 0.4, opacity: 0, zIndex: 60,
+            blur: 3, brightness: 0.5, saturate: 0.8
+          }
+        }
+      } : {})
     });
     
     this.physics = new CoverflowPhysics({
@@ -429,10 +464,10 @@ export class LuxuryCoverflow {
     this.track.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return;
       e.preventDefault();
-      this.startDrag(e.clientX);
+      this.startDrag(e.clientX, e.clientY, e.target);
     });
     document.addEventListener('mousemove', (e) => {
-      if (this.dragState.isDragging) this.updateDrag(e.clientX);
+      if (this.dragState.isDragging) this.updateDrag(e.clientX, e.clientY);
     });
     document.addEventListener('mouseup', () => {
       if (this.dragState.isDragging) this.endDrag();
@@ -441,9 +476,19 @@ export class LuxuryCoverflow {
   
   setupTouchDrag() {
     if (!this.config.enableTouch) return;
-    this.track.addEventListener('touchstart', (e) => this.startDrag(e.touches[0].clientX), { passive: true });
+    this.track.addEventListener('touchstart', (e) => {
+      const touch = e.touches && e.touches[0];
+      if (!touch) return;
+      this.startDrag(touch.clientX, touch.clientY, e.target);
+    }, { passive: true });
     this.track.addEventListener('touchmove', (e) => {
-      if (this.dragState.isDragging) { e.preventDefault(); this.updateDrag(e.touches[0].clientX); }
+      if (!this.dragState.isDragging) return;
+      const touch = e.touches && e.touches[0];
+      if (!touch) return;
+      this.updateDrag(touch.clientX, touch.clientY, e.target);
+      if (this.dragState.isDragging && this.dragState.axisLocked === 'horizontal') {
+        e.preventDefault();
+      }
     }, { passive: false });
     this.track.addEventListener('touchend', () => { if (this.dragState.isDragging) this.endDrag(); });
   }
@@ -492,16 +537,49 @@ export class LuxuryCoverflow {
     }, { passive: false });
   }
   
-  startDrag(clientX) {
-    this.dragState = { isDragging: true, startX: clientX, currentX: clientX, startIndex: this.currentIndex, rafPending: false };
+  startDrag(clientX, clientY = 0, target = null) {
+    if (target && (
+      target.closest('button') ||
+      target.closest('[data-no-drag]') ||
+      target.tagName === 'BUTTON'
+    )) return;
+
+    this.dragState = {
+      isDragging: true,
+      startX: clientX,
+      currentX: clientX,
+      startY: clientY,
+      currentY: clientY,
+      axisLocked: null,
+      startIndex: this.currentIndex,
+      rafPending: false
+    };
     this.physics.startDrag(clientX);
     this.stopAutoplay();
     this.container.classList.add('is-dragging');
   }
   
-  updateDrag(clientX) {
+  updateDrag(clientX, clientY = 0) {
     if (!this.dragState.isDragging) return;
+
+    const dx = Math.abs(clientX - this.dragState.startX);
+    const dy = Math.abs(clientY - this.dragState.startY);
+
+    if (this.dragState.axisLocked === null) {
+      if (dx < 8 && dy < 8) return;
+      if (dy > dx) {
+        this.dragState.axisLocked = 'vertical';
+        this.dragState.isDragging = false;
+        this.container.classList.remove('is-dragging');
+        return;
+      }
+      this.dragState.axisLocked = 'horizontal';
+    }
+
+    if (this.dragState.axisLocked !== 'horizontal') return;
+
     this.dragState.currentX = clientX;
+    this.dragState.currentY = clientY;
     if (!this.dragState.rafPending) {
       this.dragState.rafPending = true;
       requestAnimationFrame(() => { this.physics.updateDrag(this.dragState.currentX); this.dragState.rafPending = false; });
@@ -509,10 +587,26 @@ export class LuxuryCoverflow {
   }
   
   endDrag() {
+    if (this.dragState.axisLocked !== 'horizontal') {
+      this.dragState = {
+        isDragging: false,
+        startX: 0,
+        currentX: 0,
+        startY: 0,
+        currentY: 0,
+        axisLocked: null,
+        startIndex: this.currentIndex,
+        rafPending: false
+      };
+      this.container.classList.remove('is-dragging');
+      return;
+    }
+
     const delta = (this.dragState.currentX - this.dragState.startX) / 350;
     const target = this.physics.calculateSnapTarget(this.currentIndex, this.items.length, delta, this.config.infiniteLoop);
     this.goToSlide(target);
     this.dragState.isDragging = false;
+    this.dragState.axisLocked = null;
     this.container.classList.remove('is-dragging');
     this.physics.endDrag();
   }
@@ -552,10 +646,30 @@ export class LuxuryCoverflow {
     if (!btn) return;
     
     console.log('🎰 V7.0 Casino wheel ready — EA-AC Research-Backed');
+
+    const triggerRoulette = async () => {
+      await this.startCasinoWheelV70();
+    };
+
+    let rouletteTouchHandled = false;
+
+    btn.addEventListener('touchend', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      rouletteTouchHandled = true;
+      setTimeout(() => { rouletteTouchHandled = false; }, 500);
+      await triggerRoulette();
+    }, { passive: false });
+
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      await this.startCasinoWheelV70();
+      if (rouletteTouchHandled) return;
+      await triggerRoulette();
+    });
+
+    btn.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
     });
   }
   
@@ -1560,8 +1674,32 @@ export class LuxuryCoverflow {
   }
   
   setupResizeHandler() {
+    let _lastMobile = typeof window !== 'undefined' && window.innerWidth < 640;
     let timer;
-    const handle = () => { clearTimeout(timer); timer = setTimeout(() => this.updateAllItems(this.currentIndex, 0), 150); };
+    const handle = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const nowMobile = window.innerWidth < 640;
+        if (nowMobile !== _lastMobile) {
+          _lastMobile = nowMobile;
+          const isMobile = nowMobile;
+          this.engine3D = new Coverflow3DEngine({
+            ...this.config,
+            infiniteLoop: this.config.infiniteLoop,
+            ...(isMobile ? {
+              positions: {
+                center: { rotateY: 0, translateZ: 0, translateX: 0, scale: 1.0, opacity: 1, zIndex: 100, blur: 0, brightness: 1.05, saturate: 1.05 },
+                adjacent1: { rotateY: 14, translateZ: -40, translateX: 220, scale: 0.9, opacity: 0.82, zIndex: 90, blur: 0, brightness: 0.9, saturate: 1 },
+                adjacent2: { rotateY: 35, translateZ: -200, translateX: 450, scale: 0.68, opacity: 0.35, zIndex: 80, blur: 1, brightness: 0.8, saturate: 0.95 },
+                adjacent3: { rotateY: 45, translateZ: -320, translateX: 580, scale: 0.52, opacity: 0.1, zIndex: 70, blur: 2, brightness: 0.65, saturate: 0.9 },
+                far: { rotateY: 52, translateZ: -420, translateX: 680, scale: 0.4, opacity: 0, zIndex: 60, blur: 3, brightness: 0.5, saturate: 0.8 }
+              }
+            } : {})
+          });
+        }
+        this.updateAllItems(this.currentIndex, 0);
+      }, 150);
+    };
     window.addEventListener('resize', handle);
     if ('ResizeObserver' in window) new ResizeObserver(handle).observe(this.container);
   }

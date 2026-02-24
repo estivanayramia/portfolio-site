@@ -528,6 +528,10 @@
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  isolation: isolate;
 }
 
 .roulette-trigger-btn:hover {
@@ -667,11 +671,12 @@
 @media (max-width: 640px) {
   :root {
     --card-width: 80vw;
-    --card-height: calc(var(--card-width) * 1.5);
+    --card-height: min(calc(var(--card-width) * 1.5), calc(55vh - 20px));
   }
   
   .coverflow-section {
     padding: 3rem 1rem;
+    clip-path: inset(0);
   }
   
   .coverflow-container {
@@ -681,6 +686,7 @@
   
   .coverflow-perspective {
     perspective: 1200px;
+    touch-action: pan-y;
   }
   
   /* Hide reflections on mobile for performance */
