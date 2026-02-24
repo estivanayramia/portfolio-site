@@ -676,13 +676,12 @@
   
   .coverflow-section {
     padding: 3rem 1rem;
+    clip-path: inset(0);
   }
   
   .coverflow-container {
     height: 60vh;
     min-height: 400px;
-    clip-path: inset(0 0 0 0);
-    overflow: hidden;
   }
   
   .coverflow-perspective {

@@ -166,7 +166,7 @@ function getTierRuntimeDefaults(tier) {
         enableSmoothTracking: false,
         enableScroll: true,
         scrollSensitivity: 0.003,
-        rouletteMode: 'minimal'
+        rouletteMode: 'full'
       };
     case 'reduced-motion':
       return {
