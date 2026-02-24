@@ -429,10 +429,10 @@ export class LuxuryCoverflow {
     this.track.addEventListener('mousedown', (e) => {
       if (e.button !== 0) return;
       e.preventDefault();
-      this.startDrag(e.clientX);
+      this.startDrag(e.clientX, e.clientY, e.target);
     });
     document.addEventListener('mousemove', (e) => {
-      if (this.dragState.isDragging) this.updateDrag(e.clientX);
+      if (this.dragState.isDragging) this.updateDrag(e.clientX, e.clientY);
     });
     document.addEventListener('mouseup', () => {
       if (this.dragState.isDragging) this.endDrag();
@@ -441,9 +441,19 @@ export class LuxuryCoverflow {
   
   setupTouchDrag() {
     if (!this.config.enableTouch) return;
-    this.track.addEventListener('touchstart', (e) => this.startDrag(e.touches[0].clientX), { passive: true });
+    this.track.addEventListener('touchstart', (e) => {
+      const touch = e.touches && e.touches[0];
+      if (!touch) return;
+      this.startDrag(touch.clientX, touch.clientY, e.target);
+    }, { passive: true });
     this.track.addEventListener('touchmove', (e) => {
-      if (this.dragState.isDragging) { e.preventDefault(); this.updateDrag(e.touches[0].clientX); }
+      if (!this.dragState.isDragging) return;
+      const touch = e.touches && e.touches[0];
+      if (!touch) return;
+      this.updateDrag(touch.clientX, touch.clientY, e.target);
+      if (this.dragState.isDragging && this.dragState.axisLocked === 'horizontal') {
+        e.preventDefault();
+      }
     }, { passive: false });
     this.track.addEventListener('touchend', () => { if (this.dragState.isDragging) this.endDrag(); });
   }
@@ -492,16 +502,49 @@ export class LuxuryCoverflow {
     }, { passive: false });
   }
   
-  startDrag(clientX) {
-    this.dragState = { isDragging: true, startX: clientX, currentX: clientX, startIndex: this.currentIndex, rafPending: false };
+  startDrag(clientX, clientY = 0, target = null) {
+    if (target && (
+      target.closest('button') ||
+      target.closest('[data-no-drag]') ||
+      target.tagName === 'BUTTON'
+    )) return;
+
+    this.dragState = {
+      isDragging: true,
+      startX: clientX,
+      currentX: clientX,
+      startY: clientY,
+      currentY: clientY,
+      axisLocked: null,
+      startIndex: this.currentIndex,
+      rafPending: false
+    };
     this.physics.startDrag(clientX);
     this.stopAutoplay();
     this.container.classList.add('is-dragging');
   }
   
-  updateDrag(clientX) {
+  updateDrag(clientX, clientY = 0) {
     if (!this.dragState.isDragging) return;
+
+    const dx = Math.abs(clientX - this.dragState.startX);
+    const dy = Math.abs(clientY - this.dragState.startY);
+
+    if (this.dragState.axisLocked === null) {
+      if (dx < 8 && dy < 8) return;
+      if (dy > dx) {
+        this.dragState.axisLocked = 'vertical';
+        this.dragState.isDragging = false;
+        this.container.classList.remove('is-dragging');
+        return;
+      }
+      this.dragState.axisLocked = 'horizontal';
+    }
+
+    if (this.dragState.axisLocked !== 'horizontal') return;
+
     this.dragState.currentX = clientX;
+    this.dragState.currentY = clientY;
     if (!this.dragState.rafPending) {
       this.dragState.rafPending = true;
       requestAnimationFrame(() => { this.physics.updateDrag(this.dragState.currentX); this.dragState.rafPending = false; });
@@ -509,10 +552,26 @@ export class LuxuryCoverflow {
   }
   
   endDrag() {
+    if (this.dragState.axisLocked !== 'horizontal') {
+      this.dragState = {
+        isDragging: false,
+        startX: 0,
+        currentX: 0,
+        startY: 0,
+        currentY: 0,
+        axisLocked: null,
+        startIndex: this.currentIndex,
+        rafPending: false
+      };
+      this.container.classList.remove('is-dragging');
+      return;
+    }
+
     const delta = (this.dragState.currentX - this.dragState.startX) / 350;
     const target = this.physics.calculateSnapTarget(this.currentIndex, this.items.length, delta, this.config.infiniteLoop);
     this.goToSlide(target);
     this.dragState.isDragging = false;
+    this.dragState.axisLocked = null;
     this.container.classList.remove('is-dragging');
     this.physics.endDrag();
   }
@@ -552,10 +611,30 @@ export class LuxuryCoverflow {
     if (!btn) return;
     
     console.log('🎰 V7.0 Casino wheel ready — EA-AC Research-Backed');
+
+    const triggerRoulette = async () => {
+      await this.startCasinoWheelV70();
+    };
+
+    let rouletteTouchHandled = false;
+
+    btn.addEventListener('touchend', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      rouletteTouchHandled = true;
+      setTimeout(() => { rouletteTouchHandled = false; }, 500);
+      await triggerRoulette();
+    }, { passive: false });
+
     btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
-      await this.startCasinoWheelV70();
+      if (rouletteTouchHandled) return;
+      await triggerRoulette();
+    });
+
+    btn.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
     });
   }
   
