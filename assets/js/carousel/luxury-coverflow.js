@@ -257,9 +257,44 @@ export class LuxuryCoverflow {
     
     this.clickState = { startTime: 0, startX: 0, startY: 0 };
     
+    const _isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+
     this.engine3D = new Coverflow3DEngine({
       ...this.config,
-      infiniteLoop: this.config.infiniteLoop
+      infiniteLoop: this.config.infiniteLoop,
+      ...(_isMobile ? {
+        positions: {
+          center: {
+            rotateY: 0, translateZ: 0, translateX: 0,
+            scale: 1.0,
+            opacity: 1, zIndex: 100,
+            blur: 0, brightness: 1.05, saturate: 1.05
+          },
+          adjacent1: {
+            rotateY: 14,
+            translateZ: -40,
+            translateX: 220,
+            scale: 0.9,
+            opacity: 0.82, zIndex: 90,
+            blur: 0, brightness: 0.9, saturate: 1
+          },
+          adjacent2: {
+            rotateY: 35, translateZ: -200, translateX: 450,
+            scale: 0.68, opacity: 0.35, zIndex: 80,
+            blur: 1, brightness: 0.8, saturate: 0.95
+          },
+          adjacent3: {
+            rotateY: 45, translateZ: -320, translateX: 580,
+            scale: 0.52, opacity: 0.1, zIndex: 70,
+            blur: 2, brightness: 0.65, saturate: 0.9
+          },
+          far: {
+            rotateY: 52, translateZ: -420, translateX: 680,
+            scale: 0.4, opacity: 0, zIndex: 60,
+            blur: 3, brightness: 0.5, saturate: 0.8
+          }
+        }
+      } : {})
     });
     
     this.physics = new CoverflowPhysics({
@@ -1639,8 +1674,32 @@ export class LuxuryCoverflow {
   }
   
   setupResizeHandler() {
+    let _lastMobile = typeof window !== 'undefined' && window.innerWidth < 640;
     let timer;
-    const handle = () => { clearTimeout(timer); timer = setTimeout(() => this.updateAllItems(this.currentIndex, 0), 150); };
+    const handle = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const nowMobile = window.innerWidth < 640;
+        if (nowMobile !== _lastMobile) {
+          _lastMobile = nowMobile;
+          const isMobile = nowMobile;
+          this.engine3D = new Coverflow3DEngine({
+            ...this.config,
+            infiniteLoop: this.config.infiniteLoop,
+            ...(isMobile ? {
+              positions: {
+                center: { rotateY: 0, translateZ: 0, translateX: 0, scale: 1.0, opacity: 1, zIndex: 100, blur: 0, brightness: 1.05, saturate: 1.05 },
+                adjacent1: { rotateY: 14, translateZ: -40, translateX: 220, scale: 0.9, opacity: 0.82, zIndex: 90, blur: 0, brightness: 0.9, saturate: 1 },
+                adjacent2: { rotateY: 35, translateZ: -200, translateX: 450, scale: 0.68, opacity: 0.35, zIndex: 80, blur: 1, brightness: 0.8, saturate: 0.95 },
+                adjacent3: { rotateY: 45, translateZ: -320, translateX: 580, scale: 0.52, opacity: 0.1, zIndex: 70, blur: 2, brightness: 0.65, saturate: 0.9 },
+                far: { rotateY: 52, translateZ: -420, translateX: 680, scale: 0.4, opacity: 0, zIndex: 60, blur: 3, brightness: 0.5, saturate: 0.8 }
+              }
+            } : {})
+          });
+        }
+        this.updateAllItems(this.currentIndex, 0);
+      }, 150);
+    };
     window.addEventListener('resize', handle);
     if ('ResizeObserver' in window) new ResizeObserver(handle).observe(this.container);
   }

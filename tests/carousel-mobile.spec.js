@@ -68,10 +68,21 @@ for (const { name, device } of mobileDevices) {
       const startY = box.y + box.height / 2;
 
       await page.touchscreen.tap(startX, startY);
-      await page.mouse.move(startX, startY);
-      await page.mouse.down();
-      await page.mouse.move(startX, startY - 150);
-      await page.mouse.up();
+      await page.evaluate(([sx, sy]) => {
+        const track = document.querySelector('.coverflow-track');
+        track.dispatchEvent(new TouchEvent('touchstart', {
+          bubbles: true, cancelable: true,
+          touches: [new Touch({ identifier: 1, target: track, clientX: sx, clientY: sy })]
+        }));
+        track.dispatchEvent(new TouchEvent('touchmove', {
+          bubbles: true, cancelable: true,
+          touches: [new Touch({ identifier: 1, target: track, clientX: sx, clientY: sy - 150 })]
+        }));
+        track.dispatchEvent(new TouchEvent('touchend', {
+          bubbles: true, cancelable: true, touches: []
+        }));
+      }, [startX, startY]);
+      await page.waitForTimeout(700);
 
       const afterActiveCard = await activeCard.getAttribute('data-index');
       expect(afterActiveCard).toBe(initialActiveCard);
@@ -90,11 +101,22 @@ for (const { name, device } of mobileDevices) {
       const startX = box.x + box.width / 2;
       const startY = box.y + box.height / 2;
 
-      await page.mouse.move(startX, startY);
-      await page.mouse.down();
-      await page.mouse.move(startX - 280, startY + 8);
-      await page.mouse.up();
-      await page.waitForTimeout(900);
+      await page.touchscreen.tap(startX, startY);
+      await page.evaluate(([sx, sy, ex]) => {
+        const track = document.querySelector('.coverflow-track');
+        track.dispatchEvent(new TouchEvent('touchstart', {
+          bubbles: true, cancelable: true,
+          touches: [new Touch({ identifier: 1, target: track, clientX: sx, clientY: sy })]
+        }));
+        track.dispatchEvent(new TouchEvent('touchmove', {
+          bubbles: true, cancelable: true,
+          touches: [new Touch({ identifier: 1, target: track, clientX: ex, clientY: sy })]
+        }));
+        track.dispatchEvent(new TouchEvent('touchend', {
+          bubbles: true, cancelable: true, touches: []
+        }));
+      }, [startX, startY, startX - 250]);
+      await page.waitForTimeout(700);
 
       let afterActiveCard = await activeCard.getAttribute('data-index');
       if (afterActiveCard === initialActiveCard) {
