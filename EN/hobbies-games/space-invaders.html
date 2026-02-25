@@ -17,7 +17,7 @@
                   <meta name="twitter:title" content="Space Invaders Game | Estivan Ayramia">
                   <meta name="twitter:description" content="Play Space Invaders, a browser game in Estivan Ayramia's arcade collection, built for quick sessions, responsive controls, and engaging gameplay loops.">
 
-  <link rel="stylesheet" href="/assets/css/style.css?v=67f10a9" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=140a943" />
   <link rel="stylesheet" href="/theme.css?v=v20260119-5" />
   <link rel="stylesheet" href="/assets/css/arcade.css" />
                 <meta property="og:image" content="https://www.estivanayramia.com/assets/img/logo-ea.webp">
@@ -83,15 +83,15 @@
       <div class="flex items-center justify-between mb-4">
         <a class="btn-back" href="/hobbies-games" aria-label="Back to Arcade Zone">← Arcade Zone</a>
         <div class="score-display py-2 px-4 text-lg">Score: <span id="invaders-score">0</span> | Wave: <span id="invaders-wave">1</span></div>
-        <button type="button" id="invaders-sound" class="btn-back" title="Toggle Sound" aria-pressed="false">🔊</button>
+        <button type="button" id="invaders-sound" class="btn-back" title="Toggle Sound" aria-pressed="false" aria-label="Toggle Space Invaders sound">🔊</button>
       </div>
 
       <section class="game-container" aria-label="Space Invaders game">
-        <canvas id="invaders-canvas" width="400" height="500"></canvas>
+        <canvas id="invaders-canvas" width="400" height="500" role="img" tabindex="0" aria-label="Space Invaders game canvas. Use left and right controls to move and shoot to defeat invaders."></canvas>
         <div class="touch-controls horizontal" aria-label="Touch controls">
-          <button class="touch-btn" data-invaders="left" type="button">←</button>
-          <button class="touch-btn" data-invaders="shoot" type="button">🔥</button>
-          <button class="touch-btn" data-invaders="right" type="button">→</button>
+          <button class="touch-btn" data-invaders="left" type="button" aria-label="Move ship left">←</button>
+          <button class="touch-btn" data-invaders="shoot" type="button" aria-label="Shoot">🔥</button>
+          <button class="touch-btn" data-invaders="right" type="button" aria-label="Move ship right">→</button>
         </div>
         <div class="flex gap-2 mt-4 justify-center">
           <button type="button" id="invaders-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
@@ -101,7 +101,7 @@
     </div>
   </main>
 
-  <script src="/assets/js/site.min.js?v=67f10a9" defer></script>
+  <script src="/assets/js/site.min.js?v=140a943" defer></script>
   <script type="module" src="/assets/js/arcade/games/space-invaders.js"></script>
         <!-- Scroll to Top Button -->
         <button id="scroll-to-top" class="scroll-to-top-btn" type="button" title="Back to top" aria-label="Back to top" aria-describedby="scroll-to-top-tooltip">

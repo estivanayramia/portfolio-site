@@ -21,11 +21,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/assets/css/style.css?v=67f10a9">
+    <link rel="stylesheet" href="/assets/css/style.css?v=140a943">
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
     
     <!-- Main Site Logic (Chat, Theme, etc.) -->
-    <script src="/assets/js/site.min.js?v=67f10a9" defer></script>
+    <script src="/assets/js/site.min.js?v=140a943" defer></script>
     <script type="module" src="/assets/js/arcade/arcade-core.js"></script>
     <script type="module" src="/assets/js/arcade/achievements-ui.js"></script>
     
@@ -219,6 +219,14 @@
         [data-theme="dark"] .bg-chocolate {
             background-color: #e1d4c2 !important;
             color: #212842 !important;
+        }
+
+        #game-selection .opacity-60 {
+            opacity: 0.82 !important;
+        }
+
+        #game-selection .opacity-50 {
+            opacity: 0.72 !important;
         }
         
         [data-theme="dark"] .btn-skip {
@@ -848,6 +856,7 @@
     </script>
 </head>
 <body class="bg-beige text-chocolate min-h-screen transition-colors duration-300">
+    <a href="#game-grid" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-white focus:text-black focus:px-4 focus:py-2 focus:rounded focus:ring-2 focus:ring-offset-2">Skip to games</a>
     <!-- Scroll Progress Bar -->
     <div class="scroll-progress" aria-hidden="true"></div>
     
@@ -902,10 +911,10 @@
                 <div class="flex justify-between items-center mb-6 max-w-4xl mx-auto px-4">
                     <a href="/about" id="back-to-about" class="back-link text-sm font-medium opacity-70 hover:opacity-100 transition-opacity" aria-label="Back to About">← About</a>
                     <div class="flex gap-2">
-                        <button onclick="toggleAchievements(true)" class="px-4 py-2 bg-indigodeep text-white rounded-lg font-medium text-sm hover:bg-opacity-90 transition-all flex items-center gap-2">
+                        <button onclick="toggleAchievements(true)" class="px-4 py-2 bg-indigodeep text-white rounded-lg font-medium text-sm hover:bg-opacity-90 transition-all flex items-center gap-2" aria-label="Open arcade achievements panel">
                             <span aria-hidden="true">🏆</span> <span class="hidden sm:inline">Achievements</span>
                         </button>
-                        <button id="sound-toggle" class="px-4 py-2 bg-indigodeep text-white rounded-lg font-medium text-sm hover:bg-opacity-90 transition-all">🔊</button>
+                        <button id="sound-toggle" class="px-4 py-2 bg-indigodeep text-white rounded-lg font-medium text-sm hover:bg-opacity-90 transition-all" aria-label="Toggle game sound effects">🔊</button>
                     </div>
                 </div>
                 <div class="text-center mb-8">
@@ -921,12 +930,13 @@
                         What a brilliant innovation! 🎮💀✨"
                     </p>
                 </div>
+                <h2 class="sr-only">Featured games</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-4xl mx-auto">
                     <!-- Snake -->
                     <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/snake'">
                         <div class="text-5xl mb-3">🐍</div>
-                        <h3 class="text-2xl font-bold mb-2">Snake</h3>
+                        <h2 class="text-2xl font-bold mb-2">Snake</h2>
                         <p class="text-sm opacity-70 mb-4">Classic reflex test with growing difficulty. Eat and grow!</p>
                         <div id="snake-progress" class="text-xs opacity-60 mb-3"></div>
                         <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" onclick="showStats('snake'); event.stopPropagation();">View All Achievements ▸</button>
@@ -937,7 +947,7 @@
                     <!-- Block Breaker -->
                     <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/block-breaker'">
                         <div class="text-5xl mb-3">🧱</div>
-                        <h3 class="text-2xl font-bold mb-2">Block Breaker</h3>
+                        <h2 class="text-2xl font-bold mb-2">Block Breaker</h2>
                         <p class="text-sm opacity-70 mb-4">Smash bricks with increasing speed and power-ups!</p>
                         <div id="breaker-progress" class="text-xs opacity-60 mb-3"></div>
                         <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" onclick="showStats('breaker'); event.stopPropagation();">View All Achievements ▸</button>
@@ -948,7 +958,7 @@
                     <!-- 2048 -->
                     <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/2048'">
                         <div class="text-5xl mb-3">🧩</div>
-                        <h3 class="text-2xl font-bold mb-2">2048</h3>
+                        <h2 class="text-2xl font-bold mb-2">2048</h2>
                         <p class="text-sm opacity-70 mb-4">Combine tiles to reach 2048 with smooth animations!</p>
                         <div id="merge-progress" class="text-xs opacity-60 mb-3"></div>
                         <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" onclick="showStats('merge'); event.stopPropagation();">View All Achievements ▸</button>
@@ -959,7 +969,7 @@
                     <!-- Space Invaders -->
                     <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/space-invaders'">
                         <div class="text-5xl mb-3">👾</div>
-                        <h3 class="text-2xl font-bold mb-2">Space Invaders</h3>
+                        <h2 class="text-2xl font-bold mb-2">Space Invaders</h2>
                         <p class="text-sm opacity-70 mb-4">Defend Earth from alien waves with escalating difficulty!</p>
                         <div id="invaders-progress" class="text-xs opacity-60 mb-3"></div>
                         <button type="button" class="text-xs opacity-70 underline hover:opacity-100 transition-opacity" onclick="showStats('invaders'); event.stopPropagation();">View All Achievements ▸</button>
@@ -969,7 +979,7 @@
                 </div>
                 
                 <div class="text-center">
-                    <button onclick="toggleSound()" id="sound-toggle" class="mb-4 px-6 py-2 bg-indigodeep text-white rounded-lg font-medium hover:opacity-90 transition-all" title="Toggle Sound Effects">
+                    <button onclick="toggleSound()" id="sound-toggle-secondary" class="mb-4 px-6 py-2 bg-indigodeep text-white rounded-lg font-medium hover:opacity-90 transition-all" title="Toggle Sound Effects" aria-label="Toggle game sound effects">
                         🔊
                     </button>
                     <br>
@@ -986,7 +996,7 @@
                     <h2 class="text-3xl font-bold text-center mb-2">More Games</h2>
                     <p class="text-center opacity-70 mb-8">Third-party mini-games organized by category</p>
 
-                    <div class="game-list-container custom-scrollbar p-4">
+                    <div id="game-grid" class="game-list-container custom-scrollbar p-4">
                         <!-- Puzzle Games -->
                         <div class="mb-8">
                             <h3 class="text-xl font-bold mb-4 flex items-center gap-2 category-header">
@@ -1110,20 +1120,20 @@
                         Score: <span id="snake-score">0</span> | Level: <span id="snake-level">1</span>
                         <span id="snake-combo" style="display:none;color:#fbbf24;font-weight:bold;margin-left:8px;"></span>
                     </div>
-                    <button onclick="showStats('snake')" class="btn-back" style="padding:8px 12px;font-size:20px;" title="View Stats">🏆</button>
+                    <button onclick="showStats('snake')" class="btn-back" style="padding:8px 12px;font-size:20px;" title="View Stats" aria-label="View Snake stats and achievements">🏆</button>
                 </div>
                 <div class="game-container">
-                    <canvas id="snake-canvas" width="400" height="400"></canvas>
+                    <canvas id="snake-canvas" width="400" height="400" role="img" tabindex="0" aria-label="Snake game canvas. Use arrow keys to control the snake, eat food to score, and avoid collisions."></canvas>
                     <div class="touch-controls">
-                        <button class="touch-btn up" onpointerdown="setSnakeDirection('up')">↑</button>
-                        <button class="touch-btn left" onpointerdown="setSnakeDirection('left')">←</button>
-                        <button class="touch-btn right" onpointerdown="setSnakeDirection('right')">→</button>
-                        <button class="touch-btn down" onpointerdown="setSnakeDirection('down')">↓</button>
+                        <button class="touch-btn up" onpointerdown="setSnakeDirection('up')" aria-label="Move snake up">↑</button>
+                        <button class="touch-btn left" onpointerdown="setSnakeDirection('left')" aria-label="Move snake left">←</button>
+                        <button class="touch-btn right" onpointerdown="setSnakeDirection('right')" aria-label="Move snake right">→</button>
+                        <button class="touch-btn down" onpointerdown="setSnakeDirection('down')" aria-label="Move snake down">↓</button>
                     </div>
                     <div class="flex gap-2 mt-4 justify-center">
                         <button onclick="togglePause('snake')" id="snake-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
                         <button onclick="initSnake()" class="px-6 py-2 bg-green-600 rounded-lg font-medium game-action">Restart</button>
-                        <button onclick="toggleSound()" id="sound-toggle-snake" class="px-6 py-2 bg-indigodeep text-white rounded-lg font-medium" title="Toggle Sound">🔊</button>
+                        <button onclick="toggleSound()" id="sound-toggle-snake" class="px-6 py-2 bg-indigodeep text-white rounded-lg font-medium" title="Toggle Sound" aria-label="Toggle Snake game sound">🔊</button>
                     </div>
                 </div>
             </section>
@@ -1135,18 +1145,18 @@
                 <div class="flex items-center justify-between mb-4 max-w-md mx-auto">
                     <button onclick="backToSelection()" class="btn-back">← Menu</button>
                     <div class="score-display py-2 px-4 text-lg">Score: <span id="breaker-score">0</span> | Lives: <span id="breaker-lives">3</span></div>
-                    <button onclick="showStats('breaker')" class="btn-back" style="padding:8px 12px;font-size:20px;" title="View Stats">🏆</button>
+                    <button onclick="showStats('breaker')" class="btn-back" style="padding:8px 12px;font-size:20px;" title="View Stats" aria-label="View Block Breaker stats and achievements">🏆</button>
                 </div>
                 <div class="game-container">
-                    <canvas id="breaker-canvas" width="400" height="500"></canvas>
+                    <canvas id="breaker-canvas" width="400" height="500" role="img" tabindex="0" aria-label="Block Breaker game canvas. Use left and right controls to move the paddle and keep the ball in play."></canvas>
                     <div class="touch-controls horizontal">
-                        <button class="touch-btn" onpointerdown="breakerPaddleDir = -1" onpointerup="breakerPaddleDir = 0" onpointercancel="breakerPaddleDir = 0" onpointerleave="breakerPaddleDir = 0">←</button>
-                        <button class="touch-btn" onpointerdown="breakerPaddleDir = 1" onpointerup="breakerPaddleDir = 0" onpointercancel="breakerPaddleDir = 0" onpointerleave="breakerPaddleDir = 0">→</button>
+                        <button class="touch-btn" onpointerdown="breakerPaddleDir = -1" onpointerup="breakerPaddleDir = 0" onpointercancel="breakerPaddleDir = 0" onpointerleave="breakerPaddleDir = 0" aria-label="Move paddle left">←</button>
+                        <button class="touch-btn" onpointerdown="breakerPaddleDir = 1" onpointerup="breakerPaddleDir = 0" onpointercancel="breakerPaddleDir = 0" onpointerleave="breakerPaddleDir = 0" aria-label="Move paddle right">→</button>
                     </div>
                     <div class="flex gap-2 mt-4 justify-center">
                         <button onclick="togglePause('breaker')" id="breaker-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
                         <button onclick="initBreaker()" class="px-6 py-2 bg-purple-600 rounded-lg font-medium game-action">Restart</button>
-                        <button onclick="toggleSound()" id="sound-toggle-breaker" class="px-6 py-2 bg-indigodeep text-white rounded-lg font-medium" title="Toggle Sound">🔊</button>
+                        <button onclick="toggleSound()" id="sound-toggle-breaker" class="px-6 py-2 bg-indigodeep text-white rounded-lg font-medium" title="Toggle Sound" aria-label="Toggle Block Breaker sound">🔊</button>
                     </div>
                 </div>
             </section>
@@ -1186,19 +1196,19 @@
                         <div class="score-display py-2 px-4 text-lg">Score: <span id="invaders-score">0</span> | Wave: <span id="invaders-wave">1</span></div>
                         <div id="invaders-hud" style="font-weight:700;color:#22c55e;padding:6px 10px;border-radius:8px;background:rgba(34,197,94,0.08);display:none">LIVE</div>
                     </div>
-                    <button onclick="showStats('invaders')" class="btn-back" style="padding:8px 12px;font-size:20px;" title="View Stats">🏆</button>
+                    <button onclick="showStats('invaders')" class="btn-back" style="padding:8px 12px;font-size:20px;" title="View Stats" aria-label="View Space Invaders stats and achievements">🏆</button>
                 </div>
                 <div class="game-container">
-                    <canvas id="invaders-canvas" width="400" height="500"></canvas>
+                    <canvas id="invaders-canvas" width="400" height="500" role="img" tabindex="0" aria-label="Space Invaders game canvas. Use left and right controls to move and shoot to defeat invaders."></canvas>
                     <div class="touch-controls horizontal">
-                        <button class="touch-btn" onpointerdown="setInvaderInput('left', true)" onpointerup="setInvaderInput('left', false)" onpointercancel="setInvaderInput('left', false)" onpointerleave="setInvaderInput('left', false)">←</button>
-                        <button class="touch-btn" onpointerdown="setInvaderInput('shoot', true)" onpointerup="setInvaderInput('shoot', false)" onpointercancel="setInvaderInput('shoot', false)" onpointerleave="setInvaderInput('shoot', false)">🔥</button>
-                        <button class="touch-btn" onpointerdown="setInvaderInput('right', true)" onpointerup="setInvaderInput('right', false)" onpointercancel="setInvaderInput('right', false)" onpointerleave="setInvaderInput('right', false)">→</button>
+                        <button class="touch-btn" onpointerdown="setInvaderInput('left', true)" onpointerup="setInvaderInput('left', false)" onpointercancel="setInvaderInput('left', false)" onpointerleave="setInvaderInput('left', false)" aria-label="Move ship left">←</button>
+                        <button class="touch-btn" onpointerdown="setInvaderInput('shoot', true)" onpointerup="setInvaderInput('shoot', false)" onpointercancel="setInvaderInput('shoot', false)" onpointerleave="setInvaderInput('shoot', false)" aria-label="Shoot">🔥</button>
+                        <button class="touch-btn" onpointerdown="setInvaderInput('right', true)" onpointerup="setInvaderInput('right', false)" onpointercancel="setInvaderInput('right', false)" onpointerleave="setInvaderInput('right', false)" aria-label="Move ship right">→</button>
                     </div>
                     <div class="flex gap-2 mt-4 justify-center">
                         <button onclick="togglePause('invaders')" id="invaders-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action" disabled>Pause</button>
                         <button onclick="initInvaders()" class="px-6 py-2 bg-red-600 rounded-lg font-medium game-action">Restart</button>
-                        <button onclick="toggleSound()" id="sound-toggle-invaders" class="px-6 py-2 bg-indigodeep text-white rounded-lg font-medium" title="Toggle Sound">🔊</button>
+                        <button onclick="toggleSound()" id="sound-toggle-invaders" class="px-6 py-2 bg-indigodeep text-white rounded-lg font-medium" title="Toggle Sound" aria-label="Toggle Space Invaders sound">🔊</button>
                     </div>
                 </div>
             </section>
@@ -1342,7 +1352,7 @@
             }
             const icon = soundsEnabled ? '🔊' : '🔇';
             // Update all sound toggle buttons
-            ['sound-toggle', 'sound-toggle-snake', 'sound-toggle-breaker', 'sound-toggle-invaders'].forEach(id => {
+            ['sound-toggle', 'sound-toggle-secondary', 'sound-toggle-snake', 'sound-toggle-breaker', 'sound-toggle-invaders'].forEach(id => {
                 const btn = document.getElementById(id);
                 if (btn) btn.textContent = icon;
             });
@@ -1973,7 +1983,7 @@
                 <div class="bg-indigodeep text-beige" style="border-radius:16px;padding:24px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 12px 48px rgba(0,0,0,0.5);">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
                         <h2 style="font-size:24px;font-weight:bold;margin:0;">🎮 ${game.toUpperCase()} Stats</h2>
-                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;padding:0;width:32px;height:32px;">×</button>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;padding:0;width:32px;height:32px;" aria-label="Close stats dialog">×</button>
                     </div>
                     <div style="margin-bottom:24px;">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
@@ -2089,6 +2099,20 @@
             });
         });
 
+        function focusCurrentGameSurface(game) {
+            const focusTargetByGame = {
+                snake: 'snake-canvas',
+                breaker: 'breaker-canvas',
+                merge: 'merge-container',
+                invaders: 'invaders-canvas'
+            };
+            const id = focusTargetByGame[game];
+            const target = id ? document.getElementById(id) : null;
+            if (!target) return;
+            if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '0');
+            requestAnimationFrame(() => target.focus());
+        }
+
         function startGame(game) {
             stopAllGames();
             document.getElementById('game-selection').classList.add('hidden');
@@ -2100,6 +2124,7 @@
             if (game === 'breaker') initBreaker();
             if (game === 'merge') initMerge();
             if (game === 'invaders') initInvaders();
+            focusCurrentGameSurface(game);
             
             updateProgressDisplays();
         }
@@ -2164,7 +2189,7 @@
             const modal = document.createElement('div');
             modal.className = 'game-modal';
             modal.innerHTML = `
-                <button class="modal-close" onclick="this.parentElement.remove()">×</button>
+                <button class="modal-close" onclick="this.parentElement.remove()" aria-label="Close game over dialog">×</button>
                 <div class="text-center">
                     <div class="text-5xl mb-3">${emoji}</div>
                     <h3 class="text-xl font-bold mb-2">${title}</h3>

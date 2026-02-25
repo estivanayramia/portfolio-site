@@ -17,7 +17,7 @@
                   <meta name="twitter:title" content="Block Breaker Game | Estivan Ayramia">
                   <meta name="twitter:description" content="Play Block Breaker, a browser game in Estivan Ayramia's arcade collection, built for quick sessions, responsive controls, and engaging gameplay loops.">
 
-  <link rel="stylesheet" href="/assets/css/style.css?v=67f10a9" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=140a943" />
   <link rel="stylesheet" href="/theme.css?v=v20260119-5" />
   <link rel="stylesheet" href="/assets/css/arcade.css" />
                 <meta property="og:image" content="https://www.estivanayramia.com/assets/img/logo-ea.webp">
@@ -83,14 +83,14 @@
       <div class="flex items-center justify-between mb-4">
         <a class="btn-back" href="/hobbies-games" aria-label="Back to Arcade Zone">← Arcade Zone</a>
         <div class="score-display py-2 px-4 text-lg">Score: <span id="breaker-score">0</span> | Lives: <span id="breaker-lives">3</span></div>
-        <button type="button" id="breaker-sound" class="btn-back" title="Toggle Sound" aria-pressed="false">🔊</button>
+        <button type="button" id="breaker-sound" class="btn-back" title="Toggle Sound" aria-pressed="false" aria-label="Toggle Block Breaker sound">🔊</button>
       </div>
 
       <section class="game-container" aria-label="Block Breaker game">
-        <canvas id="breaker-canvas" width="400" height="500"></canvas>
+        <canvas id="breaker-canvas" width="400" height="500" role="img" tabindex="0" aria-label="Block Breaker game canvas. Use left and right controls to move the paddle and keep the ball in play."></canvas>
         <div class="touch-controls horizontal" aria-label="Touch controls">
-          <button class="touch-btn" data-breaker-move="left" type="button">←</button>
-          <button class="touch-btn" data-breaker-move="right" type="button">→</button>
+          <button class="touch-btn" data-breaker-move="left" type="button" aria-label="Move paddle left">←</button>
+          <button class="touch-btn" data-breaker-move="right" type="button" aria-label="Move paddle right">→</button>
         </div>
         <div class="flex gap-2 mt-4 justify-center">
           <button type="button" id="breaker-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
@@ -100,7 +100,7 @@
     </div>
   </main>
 
-  <script src="/assets/js/site.min.js?v=67f10a9" defer></script>
+  <script src="/assets/js/site.min.js?v=140a943" defer></script>
   <script type="module" src="/assets/js/arcade/games/block-breaker.js"></script>
         <!-- Scroll to Top Button -->
         <button id="scroll-to-top" class="scroll-to-top-btn" type="button" title="Back to top" aria-label="Back to top" aria-describedby="scroll-to-top-tooltip">
