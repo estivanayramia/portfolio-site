@@ -50,8 +50,10 @@
 ## §BUILD
 - **NEVER** push without full `npm run build`
 - **NEVER** skip `build:version` (breaks SW cache key)
+- **NEVER** use `git commit --amend` after `npm run apply:versioning` (HEAD changes can re-stale `?v=` refs)
 - **NEVER** manually push artifacts — use `npm run ship`
 - **ALWAYS** use `npm run ship` for atomic deploys
+- **WHEN** push is blocked by versioning hooks: run `npm run apply:versioning` → `git add -A` → fresh `git commit` (no amend) → `git push`
 
 ---
 
