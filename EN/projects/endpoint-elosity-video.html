@@ -33,9 +33,9 @@
     <!-- Preload video thumbnail used by embedded hero video -->
     <link rel="preload" as="image" href="https://i.ytimg.com/vi/q8RmdNRzx1g/maxresdefault.jpg" fetchpriority="high">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=67f10a9">
-    <link rel="preload" href="/assets/css/style.css?v=67f10a9" as="style">
-    <script src="/assets/js/site.min.js?v=67f10a9" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=140a943">
+    <link rel="preload" href="/assets/css/style.css?v=140a943" as="style">
+    <script src="/assets/js/site.min.js?v=140a943" defer></script>
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -177,7 +177,17 @@
         <!-- Project Visual (Embedded Video) -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8 space-y-4">
             <div class="aspect-video rounded-2xl overflow-hidden shadow-lg border border-chocolate/10 bg-gradient-to-br from-indigodeep/60 to-chocolate/90" data-gsap="fade-up" data-gsap-delay="0.4">
-                <iframe width="560" height="315" src="https://www.youtube.com/embed/q8RmdNRzx1g?si=1AFLJgFbSzz6yKp2" title="Endpoint Elosity Video Concept" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen class="w-full h-full" loading="eager" fetchpriority="high"></iframe>
+                <div class="video-facade relative w-full h-full cursor-pointer" role="button" tabindex="0" aria-label="Play Endpoint Elosity Video Concept" data-video-id="q8RmdNRzx1g" data-video-title="Endpoint Elosity Video Concept">
+                    <img src="https://i.ytimg.com/vi/q8RmdNRzx1g/maxresdefault.jpg" alt="Video thumbnail for Endpoint Elosity Video Concept" width="1280" height="720" class="w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async">
+                    <span class="absolute inset-0 bg-black/20" aria-hidden="true"></span>
+                    <span class="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+                        <span class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-600/90">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="white" aria-hidden="true" focusable="false">
+                                <path d="M8 5v14l11-7z"></path>
+                            </svg>
+                        </span>
+                    </span>
+                </div>
             </div>
             <div class="text-center" data-gsap="fade-up" data-gsap-delay="0.5">
                 <p class="text-sm text-chocolate/60">Concept video for Endpoint's Elosity platform.</p>
@@ -447,6 +457,40 @@
         </button>
     </div>
     
+    <script>
+        (function () {
+            function loadVideoFacade(facade) {
+                if (!facade || facade.dataset.loaded === 'true') return;
+                const id = facade.dataset.videoId;
+                const title = facade.dataset.videoTitle || 'Embedded video';
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0`;
+                iframe.width = '1280';
+                iframe.height = '720';
+                iframe.className = 'w-full h-full';
+                iframe.title = title;
+                iframe.loading = 'eager';
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+                iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+                iframe.setAttribute('allowfullscreen', '');
+                facade.dataset.loaded = 'true';
+                facade.innerHTML = '';
+                facade.appendChild(iframe);
+            }
+
+            function bindFacade(facade) {
+                facade.addEventListener('click', () => loadVideoFacade(facade));
+                facade.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        loadVideoFacade(facade);
+                    }
+                });
+            }
+
+            document.querySelectorAll('.video-facade').forEach(bindFacade);
+        })();
+    </script>
     <script src="/assets/js/lazy-loader.min.js" defer></script>
     <!-- Scroll to Top Button -->
     <button id="scroll-to-top" class="scroll-to-top-btn" type="button" title="Back to top" aria-label="Back to top" aria-describedby="scroll-to-top-tooltip">

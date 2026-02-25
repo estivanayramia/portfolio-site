@@ -17,7 +17,7 @@
                   <meta name="twitter:title" content="Snake Game | Estivan Ayramia">
                   <meta name="twitter:description" content="Play Snake, a browser game in Estivan Ayramia's arcade collection, built for quick sessions, responsive controls, and engaging gameplay loops.">
 
-  <link rel="stylesheet" href="/assets/css/style.css?v=67f10a9" />
+  <link rel="stylesheet" href="/assets/css/style.css?v=140a943" />
   <link rel="stylesheet" href="/theme.css?v=v20260119-5" />
   <link rel="stylesheet" href="/assets/css/arcade.css" />
                 <meta property="og:image" content="https://www.estivanayramia.com/assets/img/logo-ea.webp">
@@ -83,16 +83,16 @@
       <div class="flex items-center justify-between mb-4">
         <a class="btn-back" href="/hobbies-games" aria-label="Back to Arcade Zone">← Arcade Zone</a>
         <div class="score-display py-2 px-4 text-lg">Score: <span id="snake-score">0</span> | Level: <span id="snake-level">1</span></div>
-        <button type="button" id="snake-sound" class="btn-back" title="Toggle Sound" aria-pressed="false">🔊</button>
+        <button type="button" id="snake-sound" class="btn-back" title="Toggle Sound" aria-pressed="false" aria-label="Toggle Snake sound">🔊</button>
       </div>
 
       <section class="game-container" aria-label="Snake game">
-        <canvas id="snake-canvas" width="400" height="400"></canvas>
+        <canvas id="snake-canvas" width="400" height="400" role="img" tabindex="0" aria-label="Snake game canvas. Use arrow keys to control the snake, eat dots to score, and avoid walls and your tail."></canvas>
         <div class="touch-controls" aria-label="Touch controls">
-          <button class="touch-btn up" data-snake-dir="up" type="button">↑</button>
-          <button class="touch-btn left" data-snake-dir="left" type="button">←</button>
-          <button class="touch-btn right" data-snake-dir="right" type="button">→</button>
-          <button class="touch-btn down" data-snake-dir="down" type="button">↓</button>
+          <button class="touch-btn up" data-snake-dir="up" type="button" aria-label="Move snake up">↑</button>
+          <button class="touch-btn left" data-snake-dir="left" type="button" aria-label="Move snake left">←</button>
+          <button class="touch-btn right" data-snake-dir="right" type="button" aria-label="Move snake right">→</button>
+          <button class="touch-btn down" data-snake-dir="down" type="button" aria-label="Move snake down">↓</button>
         </div>
         <div class="flex gap-2 mt-4 justify-center">
           <button type="button" id="snake-pause" class="px-6 py-2 bg-yellow-600 rounded-lg font-medium game-action">Pause</button>
@@ -102,7 +102,7 @@
     </div>
   </main>
 
-  <script src="/assets/js/site.min.js?v=67f10a9" defer></script>
+  <script src="/assets/js/site.min.js?v=140a943" defer></script>
   <script type="module" src="/assets/js/arcade/games/snake.js"></script>
         <!-- Scroll to Top Button -->
         <button id="scroll-to-top" class="scroll-to-top-btn" type="button" title="Back to top" aria-label="Back to top" aria-describedby="scroll-to-top-tooltip">
