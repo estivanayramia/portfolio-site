@@ -25,6 +25,20 @@ let laserAmmo = 0;
 let lasers = [];
 let bricksDestroyedByLaser = 0;
 let multiBallTime = 0;
+let particles = [];
+let shakeFrames = 0;
+let shakeMagnitude = 0;
+let flashFrames = 0;
+
+const prefersReducedMotion = () => {
+  try {
+    return typeof window !== "undefined"
+      && typeof window.matchMedia === "function"
+      && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch (e) {
+    return false;
+  }
+};
 
 // Brick type colors and properties
 const BRICK_TYPES = {
@@ -74,7 +88,40 @@ function makeBricks() {
 }
 
 function addBall(x, y, dx, dy) {
-  balls.push({ x, y, dx, dy, r: 6 });
+  balls.push({ x, y, dx, dy, r: 6, _dxHistory: [], _trail: [] });
+}
+
+function triggerShake(mag = 6, frames = 12) {
+  if (prefersReducedMotion()) return;
+  shakeFrames = frames;
+  shakeMagnitude = mag;
+}
+
+function triggerFlash() {
+  if (prefersReducedMotion()) return;
+  flashFrames = 3;
+}
+
+function emitParticles(x, y, color, count = 10) {
+  if (prefersReducedMotion()) return;
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+    const speed = 1.5 + Math.random() * 3;
+    particles.push({
+      x,
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1,
+      decay: 0.04 + Math.random() * 0.04,
+      r: 2 + Math.random() * 3,
+      color,
+      alive: true,
+    });
+  }
+  if (particles.length > 200) {
+    particles.splice(0, particles.length - 200);
+  }
 }
 
 function reset() {
@@ -90,6 +137,10 @@ function reset() {
   lasers = [];
   bricksDestroyedByLaser = 0;
   multiBallTime = 0;
+  particles = [];
+  shakeFrames = 0;
+  shakeMagnitude = 0;
+  flashFrames = 0;
   makeBricks();
 
   setText(scoreEl, score);
@@ -159,8 +210,10 @@ function damageBrick(b) {
       }
     }
     b.alive = false;
+    const def = BRICK_TYPES[b.type] || BRICK_TYPES.normal;
     score += b.points * level;
     setText(scoreEl, score);
+    emitParticles(b.x + b.w / 2, b.y + b.h / 2, def.color, 12);
     maybeDropPower(b.x + b.w / 2, b.y + b.h);
 
     if (b.type === 'diamond') unlock("breaker:diamond_breaker");
@@ -223,6 +276,16 @@ function update() {
   }
   powerDrops = powerDrops.filter(p => p.alive);
 
+  for (const p of particles) {
+    if (!p.alive) continue;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.12;
+    p.life -= p.decay;
+    if (p.life <= 0) p.alive = false;
+  }
+  particles = particles.filter((p) => p.alive);
+
   // balls
   let anyAlive = false;
   for (const ball of balls) {
@@ -279,10 +342,45 @@ function update() {
             bl.dx *= 1.05;
             bl.dy *= 1.05;
           });
+          triggerShake(5, 10);
+          triggerFlash();
           playBeep(520, 0.1, "triangle", 0.18);
           if (level >= 3) unlock("breaker:level_3");
         }
         break;
+      }
+    }
+
+    ball._trail.push({ x: ball.x, y: ball.y });
+    if (ball._trail.length > 5) ball._trail.shift();
+
+    if (!ball._dxHistory) ball._dxHistory = [];
+    ball._dxHistory.push(ball.dx > 0 ? 1 : ball.dx < 0 ? -1 : 0);
+    if (ball._dxHistory.length > 6) ball._dxHistory.shift();
+
+    const allSame = ball._dxHistory.length >= 4
+      && ball._dxHistory.every((v) => v === ball._dxHistory[0]);
+    const speedMag = Math.hypot(ball.dx, ball.dy);
+    const nearVertical = Math.abs(ball.dx) < 0.8;
+
+    if (speedMag > 0 && (allSame || nearVertical)) {
+      const nudge = (Math.random() > 0.5 ? 1 : -1) * 1.5;
+      ball.dx += nudge;
+      const newMag = Math.hypot(ball.dx, ball.dy);
+      if (newMag > 0) {
+        ball.dx = (ball.dx / newMag) * speedMag;
+        ball.dy = (ball.dy / newMag) * speedMag;
+      }
+      ball._dxHistory = [];
+    }
+
+    const minDx = Math.max(1.2, speedMag * 0.18);
+    if (Math.abs(ball.dx) < minDx) {
+      ball.dx = minDx * (ball.dx >= 0 ? 1 : -1);
+      const balancedMag = Math.hypot(ball.dx, ball.dy);
+      if (balancedMag > 0 && speedMag > 0) {
+        ball.dx = (ball.dx / balancedMag) * speedMag;
+        ball.dy = (ball.dy / balancedMag) * speedMag;
       }
     }
   }
@@ -292,6 +390,7 @@ function update() {
 
   if (!anyAlive || balls.length === 0) {
     lives -= 1;
+    triggerShake(7, 14);
     setText(livesEl, lives);
     if (lives <= 0) {
       running = false;
@@ -306,18 +405,32 @@ function update() {
 
 function draw() {
   if (!ctx) return;
+  ctx.save();
+  if (shakeFrames > 0) {
+    const sx = (Math.random() - 0.5) * shakeMagnitude;
+    const sy = (Math.random() - 0.5) * shakeMagnitude;
+    ctx.translate(sx, sy);
+    shakeFrames -= 1;
+    shakeMagnitude *= 0.85;
+  }
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // background
-  ctx.fillStyle = "rgba(0,0,0,0.25)";
+  const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  bg.addColorStop(0, "rgba(15,23,42,0.95)");
+  bg.addColorStop(1, "rgba(30,10,60,0.95)");
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // bricks
   bricks.forEach(b => {
     if (!b.alive) return;
     const def = BRICK_TYPES[b.type];
+    ctx.shadowColor = def.color;
+    ctx.shadowBlur = 6;
     ctx.fillStyle = def.color;
     ctx.fillRect(b.x, b.y, b.w, b.h);
+    ctx.shadowBlur = 0;
     ctx.strokeStyle = def.border;
     ctx.strokeRect(b.x, b.y, b.w, b.h);
 
@@ -356,16 +469,44 @@ function draw() {
     ctx.fillText(p.label, p.x + p.w / 2, p.y + p.h / 2 + 0.5);
   });
 
+  particles.forEach((p) => {
+    if (!p.alive) return;
+    ctx.save();
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 4;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+
   // paddle
+  ctx.shadowColor = laserAmmo > 0 ? "rgba(239,68,68,0.8)" : "rgba(168,85,247,0.8)";
+  ctx.shadowBlur = 14;
   ctx.fillStyle = laserAmmo > 0 ? 'rgba(239,68,68,1)' : "rgba(168,85,247,1)";
   ctx.fillRect(paddle.x, 480, paddle.w, paddle.h);
+  ctx.shadowBlur = 0;
 
   // balls
   balls.forEach(b => {
+    b._trail.forEach((pt, i) => {
+      const alpha = ((i + 1) / b._trail.length) * 0.35;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(pt.x, pt.y, b.r * (0.4 + i * 0.12), 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+    ctx.shadowColor = "rgba(255,255,255,0.9)";
+    ctx.shadowBlur = 12;
     ctx.fillStyle = "rgba(255,255,255,0.95)";
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
     ctx.fill();
+    ctx.shadowBlur = 0;
   });
 
   // HUD: Ball count & Laser ammo
@@ -401,6 +542,14 @@ function draw() {
     ctx.font = "14px Inter, system-ui, sans-serif";
     ctx.fillText("Press Restart", canvas.width / 2, canvas.height / 2 + 18);
   }
+
+  if (flashFrames > 0) {
+    ctx.fillStyle = `rgba(255,255,255,${flashFrames * 0.15})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    flashFrames -= 1;
+  }
+
+  ctx.restore();
 }
 
 function loop() {
