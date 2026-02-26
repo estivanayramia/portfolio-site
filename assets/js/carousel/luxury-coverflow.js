@@ -490,7 +490,14 @@ export class LuxuryCoverflow {
         e.preventDefault();
       }
     }, { passive: false });
-    this.track.addEventListener('touchend', () => { if (this.dragState.isDragging) this.endDrag(); });
+    this.track.addEventListener('touchend', () => {
+      if (this.dragState.isDragging) this.endDrag();
+      this.dragState.axisLocked = null;
+    });
+    this.track.addEventListener('touchcancel', () => {
+      if (this.dragState.isDragging) this.endDrag();
+      this.dragState.axisLocked = null;
+    });
   }
   
   setupScrollNavigation() {
@@ -566,7 +573,7 @@ export class LuxuryCoverflow {
     const dy = Math.abs(clientY - this.dragState.startY);
 
     if (this.dragState.axisLocked === null) {
-      if (dx < 8 && dy < 8) return;
+      if (dx < 10 && dy < 10) return;
       if (dy > dx) {
         this.dragState.axisLocked = 'vertical';
         this.dragState.isDragging = false;

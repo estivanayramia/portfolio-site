@@ -453,8 +453,11 @@ function draw() {
   // lasers
   lasers.forEach(l => {
     if (!l.alive) return;
+    ctx.shadowColor = 'rgba(239,68,68,0.95)';
+    ctx.shadowBlur = 12;
     ctx.fillStyle = 'rgba(239,68,68,0.95)';
     ctx.fillRect(l.x, l.y, l.w, l.h);
+    ctx.shadowBlur = 0;
   });
 
   // power drops

@@ -85,6 +85,7 @@
   position: relative;
   width: 100%;
   height: clamp(450px, 70vh, 800px);
+  padding-bottom: 6.5rem;
   overflow: visible;
 }
 
@@ -435,7 +436,7 @@
 
 .coverflow-controls {
   position: absolute;
-  bottom: clamp(1.5rem, 4vw, 3rem);
+  bottom: clamp(2rem, 5vw, 3.5rem);
   left: 50%;
   transform: translateX(-50%);
   
@@ -682,6 +683,14 @@
   .coverflow-container {
     height: 60vh;
     min-height: 400px;
+    padding-bottom: 7rem;
+  }
+
+  .coverflow-controls {
+    position: static;
+    transform: none;
+    justify-content: center;
+    margin-top: 1rem;
   }
   
   .coverflow-perspective {
