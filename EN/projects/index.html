@@ -28,9 +28,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=38419ac">
-    <link rel="preload" href="/assets/css/style.css?v=38419ac" as="style">
-    <script src="/assets/js/site.min.js?v=38419ac" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=84f4e18">
+    <link rel="preload" href="/assets/css/style.css?v=84f4e18" as="style">
+    <script src="/assets/js/site.min.js?v=84f4e18" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
@@ -38,7 +38,7 @@
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
     
     <!-- Luxury Coverflow Carousel V4 -->
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=38419ac-v4">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=84f4e18-v4">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -190,7 +190,9 @@
                 <button 
                     type="button" 
                     class="roulette-trigger-btn"
+                    data-roulette-trigger="true"
                     data-no-drag
+                    aria-haspopup="dialog"
                     aria-label="Pick random project"
                     title="Feeling lucky? Let the roulette decide!"
                 >
@@ -585,38 +587,68 @@
     <!-- Luxury Coverflow Carousel V4 (GSAP-powered, Roulette-enabled) -->
     <script type="module">
         import { LuxuryCoverflow } from '/assets/js/carousel/luxury-coverflow.min.js';
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const carouselEl = document.getElementById('luxury-portfolio-carousel');
-            if (!carouselEl) return;
 
-            let initialized = false;
+        const carouselEl = document.getElementById('luxury-portfolio-carousel');
+
+        if (carouselEl) {
+            let initScheduled = false;
+            let initDone = false;
+            let observer = null;
+            let idleHandle = null;
+
+            const destroyExisting = () => {
+                if (window.luxuryCoverflow?.destroy) {
+                    window.luxuryCoverflow.destroy();
+                }
+                window.luxuryCoverflow = null;
+                carouselEl.dataset.coverflowReady = 'false';
+                initDone = false;
+            };
+
             const initCarousel = () => {
-                if (initialized) return;
-                initialized = true;
+                if (initDone) return;
+                initDone = true;
+                initScheduled = false;
+
                 window.luxuryCoverflow = new LuxuryCoverflow('#luxury-portfolio-carousel', {
                     infiniteLoop: true,
                     enableScroll: true,
-                    autoplay: false,
-                    animationDuration: 0.55
+                    autoplay: false
                 });
-                console.log('✨ Luxury Coverflow V5.0 loaded — CASINO WHEEL ENABLED! 🎰');
+
+                carouselEl.dataset.coverflowReady = 'true';
             };
 
             const scheduleInit = () => {
-                const start = () => requestAnimationFrame(initCarousel);
+                if (initDone || initScheduled) return;
+                initScheduled = true;
+
+                const start = () => {
+                    idleHandle = null;
+                    requestAnimationFrame(initCarousel);
+                };
+
                 if ('requestIdleCallback' in window) {
-                    window.requestIdleCallback(start, { timeout: 1200 });
+                    idleHandle = window.requestIdleCallback(start, { timeout: 900 });
                 } else {
-                    setTimeout(start, 120);
+                    idleHandle = window.setTimeout(start, 96);
                 }
             };
 
+            const fastStart = () => {
+                if (observer) {
+                    observer.disconnect();
+                    observer = null;
+                }
+                scheduleInit();
+            };
+
             if ('IntersectionObserver' in window) {
-                const observer = new IntersectionObserver((entries) => {
+                observer = new IntersectionObserver((entries) => {
                     entries.forEach((entry) => {
                         if (!entry.isIntersecting) return;
                         observer.disconnect();
+                        observer = null;
                         scheduleInit();
                     });
                 }, { rootMargin: '200px 0px' });
@@ -625,11 +657,33 @@
                 scheduleInit();
             }
 
-            const fastStart = () => scheduleInit();
             window.addEventListener('pointerdown', fastStart, { once: true, passive: true });
             window.addEventListener('keydown', fastStart, { once: true });
             window.addEventListener('wheel', fastStart, { once: true, passive: true });
-        });
+            window.addEventListener('pageshow', () => {
+                if (!window.luxuryCoverflow?.refreshLayout) return;
+                requestAnimationFrame(() => window.luxuryCoverflow.refreshLayout());
+            });
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState !== 'visible') return;
+                if (!window.luxuryCoverflow && !initDone) {
+                    scheduleInit();
+                    return;
+                }
+                window.luxuryCoverflow?.refreshLayout?.();
+            });
+            window.addEventListener('pagehide', () => {
+                if (idleHandle != null) {
+                    if ('cancelIdleCallback' in window) {
+                        window.cancelIdleCallback(idleHandle);
+                    } else {
+                        clearTimeout(idleHandle);
+                    }
+                    idleHandle = null;
+                }
+                destroyExisting();
+            });
+        }
     </script>
     <!-- Scroll to Top Button -->
     <button id="scroll-to-top" class="scroll-to-top-btn" type="button" title="Back to top" aria-label="Back to top" aria-describedby="scroll-to-top-tooltip">

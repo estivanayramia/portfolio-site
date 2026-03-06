@@ -1,18 +1,10 @@
 /**
- * Luxury Coverflow V7.0 — EA-AC RESEARCH-BACKED ANIMATION FIX
- * 
- * RESEARCH CITATIONS:
- * - 3D Spheres: cssanimation.rocks/spheres (multi-layer gradients)
- * - GSAP Modifiers: gsap.com/docs/v3/GSAP/gsap.utils (continuous rotation)
- * - Morph Transitions: Microsoft Learn (layered timelines)
- * - Fisher-Yates: Knuth Vol.2 §3.4.2 (unbiased randomization)
- * - Apple Dev Docs: Safari Visual Effects (perspective, preserve-3d)
- * 
- * FIXES:
- * ✅ Ball 3D depth — Perspective + multi-layer gradients + shadow element
- * ✅ No teleportation — Continuous rotation with proper easing
- * ✅ Perfect centering — translate(-50%, -50%) on all positioned elements
- * ✅ Smooth morph — Layered timeline with overlapping phases
+ * Luxury Coverflow Carousel
+ *
+ * Design notes:
+ * - Transform and opacity are the primary animation paths to stay compositor-friendly.
+ * - Capability tiers follow progressive enhancement so weaker devices get a lighter but still intentional experience.
+ * - Roulette uses an in-UI dialog instead of blocking browser dialogs for accessibility and deterministic focus flow.
  */
 
 import { gsap } from 'gsap';
@@ -20,14 +12,148 @@ import { Coverflow3DEngine } from './coverflow-3d-engine.js';
 import { CoverflowPhysics } from './coverflow-physics.js';
 import { RouletteWheelEngine } from './roulette-wheel-engine.js';
 
-gsap.ticker.fps(60);
+const PERF_PROFILE_GLOBAL_KEY = '__EA_LUXURY_COVERFLOW_PROFILE__';
+const ROOT_TIER_CLASSES = [
+  'cf-tier-premium',
+  'cf-tier-enhanced',
+  'cf-tier-baseline',
+  'cf-tier-reduced'
+];
 
-const PERF_PROFILE_GLOBAL_KEY = 'LUXURY_PERF_PROFILE';
-let cachedPerfProfile = null;
+const MOTION_PROFILES = {
+  premium: {
+    tierClass: 'premium',
+    slideMs: 520,
+    settleMs: 220,
+    introMs: 260,
+    spinMs: 3600,
+    dialogMs: 240,
+    scrollSensitivity: 0.0038,
+    scrollThreshold: 34,
+    dragPixelsPerSlide: 255,
+    staggerDelay: 0.016,
+    reflectionOpacity: 0.22,
+    glowStrength: 1,
+    rouletteMode: 'premium',
+    enableSmoothTracking: true,
+    blurStrength: 1
+  },
+  enhanced: {
+    tierClass: 'enhanced',
+    slideMs: 450,
+    settleMs: 180,
+    introMs: 220,
+    spinMs: 3200,
+    dialogMs: 220,
+    scrollSensitivity: 0.0034,
+    scrollThreshold: 32,
+    dragPixelsPerSlide: 245,
+    staggerDelay: 0.012,
+    reflectionOpacity: 0.16,
+    glowStrength: 0.82,
+    rouletteMode: 'full',
+    enableSmoothTracking: true,
+    blurStrength: 0.65
+  },
+  baseline: {
+    tierClass: 'baseline',
+    slideMs: 320,
+    settleMs: 150,
+    introMs: 180,
+    spinMs: 2400,
+    dialogMs: 180,
+    scrollSensitivity: 0.0028,
+    scrollThreshold: 28,
+    dragPixelsPerSlide: 228,
+    staggerDelay: 0.004,
+    reflectionOpacity: 0,
+    glowStrength: 0.3,
+    rouletteMode: 'lite',
+    enableSmoothTracking: false,
+    blurStrength: 0.2
+  },
+  reduced: {
+    tierClass: 'reduced',
+    slideMs: 180,
+    settleMs: 120,
+    introMs: 140,
+    spinMs: 1200,
+    dialogMs: 140,
+    scrollSensitivity: 0.0024,
+    scrollThreshold: 24,
+    dragPixelsPerSlide: 210,
+    staggerDelay: 0,
+    reflectionOpacity: 0,
+    glowStrength: 0,
+    rouletteMode: 'minimal',
+    enableSmoothTracking: false,
+    blurStrength: 0
+  }
+};
+
+const MOBILE_POSITIONS = {
+  center: {
+    rotateY: 0,
+    translateZ: 0,
+    translateX: 0,
+    scale: 1,
+    opacity: 1,
+    zIndex: 100,
+    blur: 0,
+    brightness: 1.04,
+    saturate: 1.04
+  },
+  adjacent1: {
+    rotateY: 14,
+    translateZ: -42,
+    translateX: 220,
+    scale: 0.9,
+    opacity: 0.82,
+    zIndex: 90,
+    blur: 0,
+    brightness: 0.92,
+    saturate: 1
+  },
+  adjacent2: {
+    rotateY: 34,
+    translateZ: -190,
+    translateX: 430,
+    scale: 0.7,
+    opacity: 0.34,
+    zIndex: 80,
+    blur: 1,
+    brightness: 0.84,
+    saturate: 0.95
+  },
+  adjacent3: {
+    rotateY: 44,
+    translateZ: -300,
+    translateX: 560,
+    scale: 0.52,
+    opacity: 0.1,
+    zIndex: 70,
+    blur: 2,
+    brightness: 0.68,
+    saturate: 0.9
+  },
+  far: {
+    rotateY: 50,
+    translateZ: -380,
+    translateX: 660,
+    scale: 0.4,
+    opacity: 0,
+    zIndex: 60,
+    blur: 3,
+    brightness: 0.55,
+    saturate: 0.82
+  }
+};
 
 function safeMatchMedia(query) {
   try {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return null;
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return null;
+    }
     return window.matchMedia(query);
   } catch {
     return null;
@@ -35,347 +161,939 @@ function safeMatchMedia(query) {
 }
 
 function getReducedMotionPreference() {
-  const mq = safeMatchMedia('(prefers-reduced-motion: reduce)');
-  return !!(mq && mq.matches);
+  const mediaQuery = safeMatchMedia('(prefers-reduced-motion: reduce)');
+  return !!(mediaQuery && mediaQuery.matches);
 }
 
-export function computePerformanceProfile() {
-  if (cachedPerfProfile) return cachedPerfProfile;
+function normalizeTier(value) {
+  if (!value) return null;
 
-  const g = typeof globalThis !== 'undefined' ? globalThis : (typeof window !== 'undefined' ? window : {});
-  if (g && g[PERF_PROFILE_GLOBAL_KEY]) {
-    cachedPerfProfile = g[PERF_PROFILE_GLOBAL_KEY];
-    return cachedPerfProfile;
+  const tier = String(value).trim().toLowerCase();
+  if (tier === 'premium' || tier === 'enhanced' || tier === 'baseline' || tier === 'reduced') {
+    return tier;
   }
-
-  const reducedMotion = getReducedMotionPreference();
-
-  const cores = typeof navigator !== 'undefined' && Number.isFinite(navigator.hardwareConcurrency)
-    ? navigator.hardwareConcurrency
-    : null;
-  const memoryGb = typeof navigator !== 'undefined' && Number.isFinite(navigator.deviceMemory)
-    ? navigator.deviceMemory
-    : null;
-
-  const viewportW = typeof window !== 'undefined' && Number.isFinite(window.innerWidth)
-    ? window.innerWidth
-    : null;
-
-  const uaMobile = (() => {
-    try {
-      if (navigator.userAgentData && typeof navigator.userAgentData.mobile === 'boolean') {
-        return navigator.userAgentData.mobile;
-      }
-    } catch {
-      // ignore
-    }
-    try {
-      const ua = String(navigator.userAgent || '');
-      return /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
-    } catch {
-      return false;
-    }
-  })();
-
-  const smallViewport = typeof viewportW === 'number' ? viewportW < 600 : false;
-
-  let tier = 'standard';
-  if (reducedMotion) {
-    tier = 'reduced-motion';
-  } else {
-    let score = 0;
-    if (uaMobile || smallViewport) score -= 2;
-
-    if (typeof cores === 'number') {
-      if (cores >= 8) score += 2;
-      else if (cores >= 4) score += 1;
-      else score -= 1;
-    }
-
-    if (typeof memoryGb === 'number') {
-      if (memoryGb >= 8) score += 1;
-      else if (memoryGb <= 2) score -= 1;
-    }
-
-    if (score >= 3) tier = 'premium';
-    else if (score <= 0) tier = 'low';
-    else tier = 'standard';
-  }
-
-  cachedPerfProfile = {
-    tier,
-    metrics: {
-      reducedMotion,
-      cores,
-      memoryGb,
-      viewportW,
-      uaMobile,
-      smallViewport
-    }
-  };
-
-  if (g) g[PERF_PROFILE_GLOBAL_KEY] = cachedPerfProfile;
-
-  try {
-    if (typeof document !== 'undefined' && document.documentElement) {
-      const root = document.documentElement;
-      root.classList.remove('cf-tier-premium', 'cf-tier-standard', 'cf-tier-low', 'cf-tier-reduced-motion');
-      root.classList.add(`cf-tier-${tier}`);
-    }
-  } catch {
-    // ignore
-  }
-
-  return cachedPerfProfile;
-}
-
-function normalizeTier(tier) {
-  if (!tier) return null;
-  const t = String(tier).trim().toLowerCase();
-  if (t === 'premium' || t === 'standard' || t === 'low' || t === 'reduced-motion') return t;
+  if (tier === 'standard') return 'enhanced';
+  if (tier === 'low') return 'baseline';
+  if (tier === 'reduced-motion') return 'reduced';
   return null;
 }
 
-function getTierRuntimeDefaults(tier) {
-  switch (tier) {
-    case 'premium':
-      return {
-        motionScale: 1,
-        animationDuration: 0.55,
-        staggerDelay: 0.02,
-        enableSmoothTracking: true,
-        enableScroll: true,
-        scrollSensitivity: 0.004,
-        rouletteMode: 'full'
-      };
-    case 'standard':
-      return {
-        motionScale: 0.85,
-        animationDuration: 0.45,
-        staggerDelay: 0.015,
-        enableSmoothTracking: true,
-        enableScroll: true,
-        scrollSensitivity: 0.0035,
-        rouletteMode: 'full'
-      };
-    case 'low':
-      return {
-        motionScale: 0.65,
-        animationDuration: 0.33,
-        staggerDelay: 0.005,
-        enableSmoothTracking: false,
-        enableScroll: true,
-        scrollSensitivity: 0.003,
-        rouletteMode: 'full'
-      };
-    case 'reduced-motion':
-      return {
-        motionScale: 0.35,
-        animationDuration: 0.22,
-        staggerDelay: 0,
-        enableSmoothTracking: false,
-        enableScroll: true,
-        scrollSensitivity: 0.003,
-        rouletteMode: 'minimal'
-      };
-    default:
-      return getTierRuntimeDefaults('standard');
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function normalizeIndex(index, totalItems, infiniteLoop) {
+  if (totalItems <= 0) return 0;
+  if (!infiniteLoop) return clamp(index, 0, totalItems - 1);
+  return ((index % totalItems) + totalItems) % totalItems;
+}
+
+function getDistance(index, centerIndex, totalItems, infiniteLoop) {
+  let distance = Math.abs(index - centerIndex);
+  if (infiniteLoop && totalItems > 1) {
+    distance = Math.min(distance, totalItems - distance);
+  }
+  return distance;
+}
+
+function createElement(tagName, className, textContent) {
+  const node = document.createElement(tagName);
+  if (className) node.className = className;
+  if (typeof textContent === 'string') node.textContent = textContent;
+  return node;
+}
+
+function isCoarsePointerDevice() {
+  const coarse = safeMatchMedia('(pointer: coarse)');
+  return !!(coarse && coarse.matches);
+}
+
+export function computePerformanceProfile() {
+  if (typeof globalThis !== 'undefined' && globalThis[PERF_PROFILE_GLOBAL_KEY]) {
+    return globalThis[PERF_PROFILE_GLOBAL_KEY];
+  }
+
+  const reducedMotion = getReducedMotionPreference();
+  const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 0;
+  const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 0;
+  const hardwareConcurrency = typeof navigator !== 'undefined' && Number.isFinite(navigator.hardwareConcurrency)
+    ? navigator.hardwareConcurrency
+    : 4;
+  const deviceMemory = typeof navigator !== 'undefined' && Number.isFinite(navigator.deviceMemory)
+    ? navigator.deviceMemory
+    : 4;
+  const coarsePointer = isCoarsePointerDevice();
+
+  let tier = 'enhanced';
+  if (reducedMotion) {
+    tier = 'reduced';
+  } else {
+    let score = 0;
+    if (hardwareConcurrency >= 8) score += 2;
+    else if (hardwareConcurrency >= 4) score += 1;
+    else score -= 1;
+
+    if (deviceMemory >= 8) score += 1;
+    else if (deviceMemory <= 2) score -= 1;
+
+    if (coarsePointer) score -= 1;
+    if (viewportWidth >= 1440 && viewportHeight >= 900) score += 1;
+    if (viewportWidth < 768) score -= 1;
+
+    if (score >= 3) tier = 'premium';
+    else if (score <= 0) tier = 'baseline';
+  }
+
+  const profile = {
+    tier,
+    metrics: {
+      reducedMotion,
+      viewportWidth,
+      viewportHeight,
+      hardwareConcurrency,
+      deviceMemory,
+      coarsePointer
+    }
+  };
+
+  if (typeof globalThis !== 'undefined') {
+    globalThis[PERF_PROFILE_GLOBAL_KEY] = profile;
+  }
+
+  try {
+    if (document?.documentElement) {
+      document.documentElement.classList.remove(...ROOT_TIER_CLASSES);
+      document.documentElement.classList.add(`cf-tier-${profile.tier}`);
+    }
+  } catch {
+    // Ignore document access failures in non-browser environments.
+  }
+
+  return profile;
+}
+
+class ResourceTracker {
+  constructor() {
+    this.abortController = new AbortController();
+    this.timeouts = new Set();
+    this.intervals = new Set();
+    this.rafs = new Set();
+    this.observers = new Set();
+  }
+
+  listen(target, type, handler, options = {}) {
+    if (!target?.addEventListener) return;
+    target.addEventListener(type, handler, { ...options, signal: this.abortController.signal });
+  }
+
+  timeout(callback, delay) {
+    const id = window.setTimeout(() => {
+      this.timeouts.delete(id);
+      callback();
+    }, delay);
+    this.timeouts.add(id);
+    return id;
+  }
+
+  clearTimeout(id) {
+    if (id == null) return;
+    window.clearTimeout(id);
+    this.timeouts.delete(id);
+  }
+
+  interval(callback, delay) {
+    const id = window.setInterval(callback, delay);
+    this.intervals.add(id);
+    return id;
+  }
+
+  clearInterval(id) {
+    if (id == null) return;
+    window.clearInterval(id);
+    this.intervals.delete(id);
+  }
+
+  raf(callback) {
+    const id = window.requestAnimationFrame((timestamp) => {
+      this.rafs.delete(id);
+      callback(timestamp);
+    });
+    this.rafs.add(id);
+    return id;
+  }
+
+  observe(observer) {
+    if (observer) this.observers.add(observer);
+    return observer;
+  }
+
+  destroy() {
+    this.abortController.abort();
+    this.timeouts.forEach((id) => window.clearTimeout(id));
+    this.intervals.forEach((id) => window.clearInterval(id));
+    this.rafs.forEach((id) => window.cancelAnimationFrame(id));
+    this.observers.forEach((observer) => observer.disconnect?.());
+    this.timeouts.clear();
+    this.intervals.clear();
+    this.rafs.clear();
+    this.observers.clear();
+  }
+}
+
+class RouletteOverlayController {
+  constructor(carousel) {
+    this.carousel = carousel;
+    this.resources = new ResourceTracker();
+    this.wheelEngine = new RouletteWheelEngine();
+    this.overlay = null;
+    this.elements = null;
+    this.pockets = [];
+    this.previewCache = [];
+    this.lastFocusedElement = null;
+    this.isActive = false;
+    this.isSpinning = false;
+    this.spinTween = null;
+    this.result = null;
+    this.interactionsLocked = false;
+    this.interactionsUnlockTimer = null;
+  }
+
+  ensureOverlay() {
+    if (this.overlay) return;
+
+    const overlay = createElement('div', 'luxury-roulette-overlay');
+    overlay.hidden = true;
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-labelledby', 'luxury-roulette-title');
+    overlay.setAttribute('aria-hidden', 'true');
+
+    const shell = createElement('div', 'luxury-roulette-shell');
+    const closeButton = createElement('button', 'luxury-roulette-close');
+    closeButton.type = 'button';
+    closeButton.dataset.rouletteClose = 'true';
+    closeButton.setAttribute('aria-label', 'Close roulette');
+    closeButton.textContent = 'Close';
+
+    const stage = createElement('div', 'luxury-roulette-stage');
+    const wheel = createElement('div', 'luxury-roulette-wheel');
+    const rim = createElement('div', 'luxury-roulette-rim');
+    const pocketRing = createElement('div', 'luxury-roulette-pocket-ring');
+
+    wheel.appendChild(rim);
+    wheel.appendChild(pocketRing);
+    stage.appendChild(wheel);
+
+    const ball = createElement('div', 'luxury-roulette-ball');
+    const ballHighlight = createElement('div', 'luxury-roulette-ball-highlight');
+    const ballShadow = createElement('div', 'luxury-roulette-ball-shadow');
+    stage.appendChild(ballShadow);
+    stage.appendChild(ball);
+    stage.appendChild(ballHighlight);
+
+    const status = createElement('p', 'luxury-roulette-status', 'Preparing roulette');
+    status.setAttribute('aria-live', 'polite');
+
+    const dialog = createElement('div', 'luxury-roulette-dialog');
+    dialog.hidden = true;
+    dialog.setAttribute('data-roulette-dialog', 'true');
+
+    const title = createElement('h3', 'luxury-roulette-dialog__title');
+    title.id = 'luxury-roulette-title';
+    const body = createElement('p', 'luxury-roulette-dialog__body');
+    const actions = createElement('div', 'luxury-roulette-dialog__actions');
+    const primaryButton = createElement('button', 'luxury-roulette-action luxury-roulette-action--primary');
+    primaryButton.type = 'button';
+    primaryButton.dataset.roulettePrimary = 'true';
+    const secondaryButton = createElement('button', 'luxury-roulette-action luxury-roulette-action--secondary');
+    secondaryButton.type = 'button';
+    secondaryButton.dataset.rouletteSecondary = 'true';
+
+    actions.appendChild(primaryButton);
+    actions.appendChild(secondaryButton);
+    dialog.appendChild(title);
+    dialog.appendChild(body);
+    dialog.appendChild(actions);
+
+    shell.appendChild(closeButton);
+    shell.appendChild(stage);
+    shell.appendChild(status);
+    shell.appendChild(dialog);
+    overlay.appendChild(shell);
+    document.body.appendChild(overlay);
+
+    this.overlay = overlay;
+    this.elements = {
+      shell,
+      stage,
+      wheel,
+      rim,
+      pocketRing,
+      ball,
+      ballHighlight,
+      ballShadow,
+      status,
+      dialog,
+      dialogTitle: title,
+      dialogBody: body,
+      dialogPrimary: primaryButton,
+      dialogSecondary: secondaryButton,
+      closeButton
+    };
+
+    this.createPocketNodes();
+    this.bindOverlayEvents();
+    this.refreshLayout();
+  }
+
+  createPocketNodes() {
+    const fragment = document.createDocumentFragment();
+    this.pockets = [];
+
+    for (let index = 0; index < this.wheelEngine.pocketCount; index += 1) {
+      const pocket = createElement('div', 'luxury-roulette-pocket');
+      pocket.dataset.pocketIndex = String(index);
+
+      const preview = createElement('div', 'luxury-roulette-pocket__preview');
+      const category = createElement('span', 'luxury-roulette-pocket__category');
+      const title = createElement('strong', 'luxury-roulette-pocket__title');
+      const badge = createElement('span', 'luxury-roulette-pocket__badge');
+
+      preview.appendChild(category);
+      preview.appendChild(title);
+      pocket.appendChild(preview);
+      pocket.appendChild(badge);
+      fragment.appendChild(pocket);
+
+      this.pockets.push({
+        root: pocket,
+        preview,
+        category,
+        title,
+        badge
+      });
+    }
+
+    this.elements.pocketRing.appendChild(fragment);
+  }
+
+  bindOverlayEvents() {
+    this.resources.listen(this.overlay, 'click', (event) => {
+      if (this.interactionsLocked) return;
+      if (event.target === this.overlay && !this.isSpinning) {
+        this.closeOverlay();
+      }
+    });
+
+    this.resources.listen(this.elements.closeButton, 'click', () => {
+      if (this.interactionsLocked) return;
+      if (this.isSpinning) {
+        this.cancelSpin('Roulette dismissed.');
+        return;
+      }
+      this.closeOverlay();
+    });
+
+    this.resources.listen(this.elements.dialogPrimary, 'click', () => {
+      if (!this.result) return;
+      if (this.result.kind === 'retry') {
+        this.start().catch(() => {
+          this.cancelSpin('Roulette retry failed.');
+        });
+        return;
+      }
+
+      if (this.result.link) {
+        window.location.href = this.result.link;
+      }
+    });
+
+    this.resources.listen(this.elements.dialogSecondary, 'click', () => {
+      this.closeOverlay();
+    });
+
+    this.resources.listen(document, 'keydown', (event) => {
+      if (!this.isActive) return;
+
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        if (this.isSpinning) {
+          this.cancelSpin('Roulette dismissed.');
+        } else {
+          this.closeOverlay();
+        }
+        return;
+      }
+
+      if (event.key === 'Tab') {
+        this.trapFocus(event);
+      }
+    });
+  }
+
+  trapFocus(event) {
+    const focusable = this.getFocusableElements();
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+      return;
+    }
+
+    if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  getFocusableElements() {
+    if (!this.overlay) return [];
+    return Array.from(
+      this.overlay.querySelectorAll('button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])')
+    ).filter((node) => !node.hidden && !node.closest('[hidden]'));
+  }
+
+  refreshLayout() {
+    this.ensureOverlay();
+
+    const diameter = Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.62);
+    const pocketSize = Math.max(76, Math.min(108, Math.round(diameter * 0.14)));
+    const wheelRadius = Math.max(150, Math.round(diameter * 0.42));
+
+    this.overlay.style.setProperty('--roulette-diameter', `${diameter}px`);
+    this.overlay.style.setProperty('--roulette-pocket-size', `${pocketSize}px`);
+    this.overlay.style.setProperty('--roulette-wheel-radius', `${wheelRadius}px`);
+
+    const positions = this.wheelEngine.calculatePocketPositions(0, 0);
+    positions.forEach((position, index) => {
+      const pocket = this.pockets[index]?.root;
+      if (!pocket) return;
+      pocket.style.setProperty('--pocket-x', `${Math.round(position.x)}px`);
+      pocket.style.setProperty('--pocket-y', `${Math.round(position.y)}px`);
+      pocket.style.setProperty('--pocket-rotation', `${position.rotation}deg`);
+    });
+  }
+
+  readCardPreviewData() {
+    if (this.previewCache.length === this.carousel.items.length) {
+      return this.previewCache;
+    }
+
+    this.previewCache = this.carousel.items.map((item) => {
+      const backgroundNode = item.querySelector('.card-bg');
+      const backgroundStyle = backgroundNode ? window.getComputedStyle(backgroundNode) : null;
+      const background = backgroundStyle
+        ? (backgroundStyle.backgroundImage !== 'none' ? backgroundStyle.backgroundImage : backgroundStyle.background)
+        : 'linear-gradient(135deg, #212842, #3d4666)';
+      const title = item.dataset.title || item.querySelector('.card-title')?.textContent?.trim() || 'Project';
+      const category = item.querySelector('.card-category')?.textContent?.trim() || 'Selected Work';
+      const link = item.querySelector('.card-link, a[href]')?.getAttribute('href') || '';
+      return { background, title, category, link };
+    });
+
+    return this.previewCache;
+  }
+
+  prepareSpinResult() {
+    const previewData = this.readCardPreviewData();
+    const winnerCardIndex = Math.floor(Math.random() * this.carousel.items.length);
+    const greenPocketIndex = this.wheelEngine.getRandomGreenPocket();
+    const winnerPocketIndex = this.wheelEngine.getWinnerPocketIndex(winnerCardIndex, this.carousel.items.length);
+
+    const mapping = [];
+    for (let index = 0; index < this.wheelEngine.pocketCount; index += 1) {
+      if (index === greenPocketIndex) {
+        mapping.push(-1);
+        continue;
+      }
+
+      let mappedCardIndex = Math.floor((index / this.wheelEngine.pocketCount) * this.carousel.items.length) % this.carousel.items.length;
+      if (index === winnerPocketIndex) mappedCardIndex = winnerCardIndex;
+      mapping.push(mappedCardIndex);
+    }
+
+    this.result = {
+      winnerCardIndex,
+      greenPocketIndex,
+      winnerPocketIndex,
+      mapping,
+      previewData,
+      kind: mapping[winnerPocketIndex] === -1 ? 'retry' : 'winner',
+      link: previewData[winnerCardIndex]?.link || ''
+    };
+
+    this.overlay.dataset.winnerIndex = String(winnerCardIndex);
+    this.overlay.dataset.resultKind = 'pending';
+  }
+
+  renderPockets() {
+    if (!this.result) return;
+
+    this.pockets.forEach((pocket, index) => {
+      const mapping = this.result.mapping[index];
+      const pocketNumber = this.wheelEngine.wheelSequence[index]?.number ?? index;
+      const pocketColor = index === this.result.greenPocketIndex
+        ? 'green'
+        : this.wheelEngine.wheelSequence[index]?.color || 'black';
+
+      pocket.root.classList.remove('is-red', 'is-black', 'is-green', 'is-winning-pocket');
+      pocket.root.classList.add(`is-${pocketColor}`);
+      if (index === this.result.winnerPocketIndex) {
+        pocket.root.classList.add('is-winning-pocket');
+      }
+
+      if (mapping === -1) {
+        pocket.preview.style.setProperty('--preview-bg', 'linear-gradient(135deg, #104b29, #0f7a37)');
+        pocket.category.textContent = 'House';
+        pocket.title.textContent = 'Try Again';
+        pocket.badge.textContent = '0';
+        return;
+      }
+
+      const preview = this.result.previewData[mapping];
+      pocket.preview.style.setProperty('--preview-bg', preview.background);
+      pocket.category.textContent = preview.category;
+      pocket.title.textContent = preview.title;
+      pocket.badge.textContent = String(pocketNumber);
+    });
+  }
+
+  resetWheelVisuals() {
+    gsap.killTweensOf([this.elements.stage, this.elements.wheel, this.elements.ball, this.elements.ballShadow, this.elements.ballHighlight, this.elements.dialog]);
+    gsap.killTweensOf(this.pockets.map((pocket) => pocket.root));
+
+    gsap.set(this.elements.wheel, { rotation: 0 });
+    gsap.set(this.elements.ball, { x: 0, y: 0, opacity: 1, scale: 1 });
+    gsap.set(this.elements.ballHighlight, { x: 0, y: 0, opacity: 0.9 });
+    gsap.set(this.elements.ballShadow, { x: 0, y: 0, opacity: 0.5, scale: 1 });
+    gsap.set(this.elements.dialog, { autoAlpha: 0, y: 14 });
+    this.elements.dialog.hidden = true;
+    this.elements.dialog.classList.remove('is-visible');
+
+    const reducedMotion = this.carousel.motion.rouletteMode === 'minimal';
+    gsap.set(this.pockets.map((pocket) => pocket.root), {
+      opacity: 1,
+      scale: reducedMotion ? 1 : 0.92
+    });
+  }
+
+  setStatus(message, mode = 'polite') {
+    this.elements.status.textContent = message;
+    this.carousel.announce(message, mode);
+  }
+
+  openOverlay() {
+    this.ensureOverlay();
+    this.lastFocusedElement = document.activeElement;
+    this.isActive = true;
+    this.interactionsLocked = true;
+    this.resources.clearTimeout(this.interactionsUnlockTimer);
+    this.interactionsUnlockTimer = this.resources.timeout(() => {
+      this.interactionsLocked = false;
+      this.interactionsUnlockTimer = null;
+    }, 320);
+    this.overlay.hidden = false;
+    this.overlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('roulette-overlay-open');
+    this.resources.raf(() => {
+      this.overlay.classList.add('is-active');
+      this.elements.closeButton.focus();
+    });
+  }
+
+  closeOverlay(options = {}) {
+    const { restoreFocus = true } = options;
+
+    this.isActive = false;
+    this.isSpinning = false;
+    this.overlay.classList.remove('is-active');
+    this.overlay.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('roulette-overlay-open');
+    this.overlay.dataset.resultKind = 'closed';
+
+    this.resources.timeout(() => {
+      if (!this.overlay.classList.contains('is-active')) {
+        this.overlay.hidden = true;
+      }
+    }, 220);
+
+    if (restoreFocus && this.lastFocusedElement?.focus) {
+      this.lastFocusedElement.focus();
+    }
+  }
+
+  showResultDialog(config) {
+    this.overlay.dataset.resultKind = config.kind;
+    this.elements.dialogTitle.textContent = config.title;
+    this.elements.dialogBody.textContent = config.body;
+    this.elements.dialogPrimary.textContent = config.primaryLabel;
+    this.elements.dialogSecondary.textContent = config.secondaryLabel;
+    this.elements.dialog.hidden = false;
+    this.elements.dialog.classList.add('is-visible');
+
+    gsap.fromTo(
+      this.elements.dialog,
+      { autoAlpha: 0, y: 18 },
+      { autoAlpha: 1, y: 0, duration: this.carousel.motion.dialogMs / 1000, ease: 'power2.out' }
+    );
+
+    this.resources.raf(() => {
+      this.elements.dialogPrimary.focus();
+    });
+  }
+
+  renderSpinFrame(frame) {
+    const radius = frame.radius;
+    const angleInRadians = (frame.ballAngle * Math.PI) / 180;
+    const x = Math.cos(angleInRadians) * radius;
+    const y = Math.sin(angleInRadians) * radius;
+
+    gsap.set(this.elements.wheel, { rotation: frame.wheelRotation });
+    gsap.set(this.elements.ball, { x, y });
+    gsap.set(this.elements.ballHighlight, { x: x - 5, y: y - 5, opacity: 0.75 });
+    gsap.set(this.elements.ballShadow, {
+      x,
+      y: y + 18,
+      opacity: 0.45,
+      scale: 0.82 + frame.progress * 0.18
+    });
+
+    if (frame.progress < 0.25) {
+      this.setStatus('Wheel at full speed');
+    } else if (frame.progress < 0.65) {
+      this.setStatus('Settling into position');
+    } else {
+      this.setStatus('Picking the final pocket');
+    }
+  }
+
+  async runIntroAnimation() {
+    if (this.carousel.motion.rouletteMode === 'minimal') {
+      gsap.set(this.pockets.map((pocket) => pocket.root), { opacity: 1, scale: 1 });
+      return;
+    }
+
+    await new Promise((resolve) => {
+      const stagger = this.carousel.motion.staggerDelay;
+      gsap.fromTo(
+        this.pockets.map((pocket) => pocket.root),
+        { opacity: 0, scale: 0.9 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: this.carousel.motion.introMs / 1000,
+          stagger,
+          ease: 'power2.out',
+          onComplete: resolve
+        }
+      );
+    });
+  }
+
+  async runSpinAnimation() {
+    const wheelSpin = this.wheelEngine.calculateWheelSpin(this.result.winnerPocketIndex);
+    const durationSeconds = this.carousel.motion.spinMs / 1000;
+    const wheelRadius = parseFloat(getComputedStyle(this.overlay).getPropertyValue('--roulette-wheel-radius')) || 220;
+    const frame = {
+      wheelRotation: 0,
+      ballAngle: 180,
+      radius: wheelRadius * 1.13,
+      progress: 0
+    };
+
+    await new Promise((resolve) => {
+      this.isSpinning = true;
+      this.spinTween = gsap.to(frame, {
+        wheelRotation: -wheelSpin.finalRotation,
+        ballAngle: frame.ballAngle - (wheelSpin.spins * 360 + 300),
+        radius: wheelRadius * 0.82,
+        duration: durationSeconds,
+        ease: this.carousel.motion.rouletteMode === 'premium' ? 'power4.out' : 'power3.out',
+        onUpdate: () => {
+          frame.progress = this.spinTween ? this.spinTween.progress() : frame.progress;
+          this.renderSpinFrame(frame);
+        },
+        onComplete: () => {
+          this.spinTween = null;
+          this.isSpinning = false;
+          resolve();
+        }
+      });
+    });
+  }
+
+  async presentResult() {
+    const winningPocket = this.pockets[this.result.winnerPocketIndex]?.root;
+    if (winningPocket) {
+      gsap.fromTo(
+        winningPocket,
+        { scale: 1 },
+        {
+          scale: 1.08,
+          duration: this.carousel.motion.settleMs / 1000,
+          repeat: 1,
+          yoyo: true,
+          ease: 'power1.out'
+        }
+      );
+    }
+
+    if (this.result.mapping[this.result.winnerPocketIndex] !== -1) {
+      this.carousel.goToSlide(this.result.winnerCardIndex, { durationMs: this.carousel.motion.slideMs });
+      this.carousel.pulseCurrentCard();
+
+      const preview = this.result.previewData[this.result.winnerCardIndex];
+      this.setStatus(`${preview.title} selected`);
+      this.showResultDialog({
+        kind: 'winner',
+        title: preview.title,
+        body: 'Roulette picked this project. The carousel is centered and ready if you want to read the details.',
+        primaryLabel: 'View project',
+        secondaryLabel: 'Stay here'
+      });
+      return;
+    }
+
+    this.setStatus('Green pocket. Spin again or close.');
+    this.showResultDialog({
+      kind: 'retry',
+      title: 'Green pocket',
+      body: 'The house kept this round. Spin again if you want another pick, or close to keep browsing manually.',
+      primaryLabel: 'Spin again',
+      secondaryLabel: 'Close'
+    });
+  }
+
+  async start() {
+    if (this.isSpinning) return;
+
+    this.ensureOverlay();
+    this.prepareSpinResult();
+    this.renderPockets();
+    this.resetWheelVisuals();
+    this.openOverlay();
+    this.setStatus('Preparing roulette');
+
+    await this.runIntroAnimation();
+    await this.runSpinAnimation();
+    await this.presentResult();
+  }
+
+  cancelSpin(message) {
+    gsap.killTweensOf([this.elements.wheel, this.elements.ball, this.elements.ballShadow, this.elements.ballHighlight, this.elements.dialog]);
+    gsap.killTweensOf(this.pockets.map((pocket) => pocket.root));
+    this.isSpinning = false;
+    this.spinTween = null;
+    this.setStatus(message, 'assertive');
+    this.closeOverlay();
+  }
+
+  destroy() {
+    if (this.overlay) {
+      this.cancelSpin('Roulette destroyed.');
+    }
+    this.resources.destroy();
+    this.overlay?.remove();
+    this.overlay = null;
+    this.elements = null;
+    this.pockets = [];
   }
 }
 
 export class LuxuryCoverflow {
   constructor(containerSelector, options = {}) {
     this.container = document.querySelector(containerSelector);
-    if (!this.container) {
-      console.error(`❌ Container "${containerSelector}" not found`);
-      return;
-    }
-    
+    if (!this.container) return;
+
     this.track = this.container.querySelector('.coverflow-track');
     this.items = Array.from(this.container.querySelectorAll('.coverflow-card'));
-    
+    if (!this.track || this.items.length === 0) return;
+
+    const profile = computePerformanceProfile();
+    const resolvedTier = getReducedMotionPreference()
+      ? 'reduced'
+      : normalizeTier(options.performanceTier) || profile.tier;
+
+    this.motion = MOTION_PROFILES[resolvedTier] || MOTION_PROFILES.enhanced;
+    this.profile = {
+      tier: resolvedTier,
+      metrics: profile.metrics
+    };
+
     this.config = {
       initialIndex: 0,
-      performanceTier: null,
-      performanceAutoTune: true,
+      infiniteLoop: true,
       autoplay: false,
       autoplayDelay: 5000,
-      infiniteLoop: true,
       enableKeyboard: true,
       enableMouse: true,
       enableTouch: true,
       enableScroll: true,
-      enableSmoothTracking: true,
-      scrollThreshold: 30,
-      scrollSensitivity: 0.004,
-      animationDuration: 0.55,
+      enableSmoothTracking: this.motion.enableSmoothTracking,
+      performanceTier: resolvedTier,
       animationEase: 'power2.out',
-      staggerDelay: 0.02,
-      enableCasinoWheel: true,
       ...options
     };
 
-    const reducedMotion = getReducedMotionPreference();
-    const tierFromOptions = normalizeTier(this.config.performanceTier);
-    const autoProfile = this.config.performanceAutoTune ? computePerformanceProfile() : null;
-    const autoTier = autoProfile ? normalizeTier(autoProfile.tier) : null;
-    const resolvedTier = reducedMotion ? 'reduced-motion' : (tierFromOptions || autoTier || 'premium');
-    const tierDefaults = getTierRuntimeDefaults(resolvedTier);
-
-    this.runtimeProfile = {
-      tier: resolvedTier,
-      motionScale: tierDefaults.motionScale,
-      rouletteMode: tierDefaults.rouletteMode,
-      metrics: autoProfile ? autoProfile.metrics : { reducedMotion }
-    };
-
-    this.config.animationDuration = tierDefaults.animationDuration;
-    this.config.staggerDelay = tierDefaults.staggerDelay;
-    this.config.enableSmoothTracking = tierDefaults.enableSmoothTracking;
-    this.config.enableScroll = tierDefaults.enableScroll;
-    this.config.scrollSensitivity = tierDefaults.scrollSensitivity;
-
-    if (reducedMotion) {
-      this.config.autoplay = false;
-    }
-
-    const initialIndexRaw = Number.isFinite(this.config.initialIndex)
-      ? Math.trunc(this.config.initialIndex)
-      : 0;
-    const totalItems = this.items.length;
-    if (totalItems > 0) {
-      this.currentIndex = this.config.infiniteLoop
-        ? ((initialIndexRaw % totalItems) + totalItems) % totalItems
-        : Math.max(0, Math.min(totalItems - 1, initialIndexRaw));
-    } else {
-      this.currentIndex = 0;
-    }
+    this.currentIndex = normalizeIndex(this.config.initialIndex, this.items.length, this.config.infiniteLoop);
+    this.previewIndex = this.currentIndex;
+    this.pendingTarget = null;
     this.isAnimating = false;
-    this.autoplayTimer = null;
-    this.navQueue = null;
-    this.scrollPosition = this.currentIndex;
-    
-    this.clickState = { startTime: 0, startX: 0, startY: 0 };
-    
-    const _isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-
-    this.engine3D = new Coverflow3DEngine({
-      ...this.config,
-      infiniteLoop: this.config.infiniteLoop,
-      ...(_isMobile ? {
-        positions: {
-          center: {
-            rotateY: 0, translateZ: 0, translateX: 0,
-            scale: 1.0,
-            opacity: 1, zIndex: 100,
-            blur: 0, brightness: 1.05, saturate: 1.05
-          },
-          adjacent1: {
-            rotateY: 14,
-            translateZ: -40,
-            translateX: 220,
-            scale: 0.9,
-            opacity: 0.82, zIndex: 90,
-            blur: 0, brightness: 0.9, saturate: 1
-          },
-          adjacent2: {
-            rotateY: 35, translateZ: -200, translateX: 450,
-            scale: 0.68, opacity: 0.35, zIndex: 80,
-            blur: 1, brightness: 0.8, saturate: 0.95
-          },
-          adjacent3: {
-            rotateY: 45, translateZ: -320, translateX: 580,
-            scale: 0.52, opacity: 0.1, zIndex: 70,
-            blur: 2, brightness: 0.65, saturate: 0.9
-          },
-          far: {
-            rotateY: 52, translateZ: -420, translateX: 680,
-            scale: 0.4, opacity: 0, zIndex: 60,
-            blur: 3, brightness: 0.5, saturate: 0.8
-          }
-        }
-      } : {})
-    });
-    
-    this.physics = new CoverflowPhysics({
-      friction: 0.92,
-      snapThreshold: 0.2,
-      velocityMultiplier: 2.5
-    });
-    
-    this.wheelEngine = new RouletteWheelEngine();
-    
+    this.animationTimeout = null;
+    this.autoplayInterval = null;
+    this.wheelState = {
+      accumulator: 0,
+      previewPosition: this.currentIndex,
+      settleTimeout: null
+    };
     this.dragState = {
       isDragging: false,
       startX: 0,
+      startY: 0,
       currentX: 0,
-      startIndex: 0,
-      rafPending: false
+      currentY: 0,
+      axisLocked: null,
+      previewPosition: this.currentIndex,
+      rafPending: false,
+      sourceTarget: null
     };
-    
-    this.rouletteState = {
-      isActive: false,
-      overlay: null,
-      wheelWrapper: null,
-      pockets: [],
-      ball: null,
-      ballShadow: null,
-      ballHighlight: null,
-      wheelRim: null,
-      status: null,
-      originalWinnerIndex: null,
-      winnerPocketIndex: null,
-      greenPocketIndex: null,
-      pocketToCardMap: []
-    };
-    
+    this.dragSequence = 0;
+    this.activePointerId = null;
+    this.lastPointerTouchAt = 0;
+    this.suppressClickUntil = 0;
+
+    this.resources = new ResourceTracker();
+    this.physics = new CoverflowPhysics({
+      friction: 0.92,
+      snapThreshold: 0.25,
+      velocityMultiplier: 2.2
+    });
+    this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
+    this.roulette = new RouletteOverlayController(this);
+
+    this.liveRegion = this.ensureLiveRegion();
     this.init();
   }
-  
+
   init() {
-    if (this.items.length === 0) {
-      console.warn('⚠️ No coverflow items found');
-      return;
+    this.container.dataset.coverflowReady = 'true';
+    this.container.dataset.coverflowTier = this.profile.tier;
+    this.container.style.setProperty('--luxury-glow-strength', String(this.motion.glowStrength));
+    this.container.style.setProperty('--luxury-reflection-opacity', String(this.motion.reflectionOpacity));
+
+    this.items.forEach((item, index) => {
+      item.dataset.index = item.dataset.index || String(index);
+      item.tabIndex = index === this.currentIndex ? 0 : -1;
+      item.setAttribute('aria-roledescription', 'slide');
+    });
+
+    const rouletteButton = this.container.querySelector('.roulette-trigger-btn');
+    if (rouletteButton) {
+      rouletteButton.dataset.rouletteTrigger = 'true';
+      rouletteButton.setAttribute('aria-haspopup', 'dialog');
+      rouletteButton.setAttribute('aria-controls', 'luxury-roulette-title');
     }
-    
+
     this.updateAllItems(this.currentIndex, 0);
-    
     this.setupKeyboardNavigation();
-    this.setupMouseDrag();
-    this.setupTouchDrag();
-    this.setupScrollNavigation();
-    this.setupSmoothScrollTracking();
-    this.setupItemClicks();
-    this.setupResizeHandler();
+    this.setupPointerInteractions();
+    this.setupTouchInteractions();
+    this.setupWheelNavigation();
+    this.setupItemInteractions();
     this.setupNavigationButtons();
     this.setupRouletteButton();
-    
-    if (this.config.autoplay) this.startAutoplay();
-    
+    this.setupResizeHandling();
+
+    if (this.config.autoplay && this.profile.tier !== 'reduced') {
+      this.startAutoplay();
+    }
+
     this.announceCurrentSlide();
-    console.log('✨ Luxury Coverflow V7.0 — EA-AC RESEARCH-BACKED FIX 🎰');
   }
-  
-  // ========================================
-  // CORE CAROUSEL METHODS
-  // ========================================
-  
-  updateAllItems(centerIndex, duration = this.config.animationDuration) {
-    const transforms = this.engine3D.calculateAllTransforms(
-      centerIndex, this.items.length, this.config.infiniteLoop
-    );
-    
+
+  getEngineConfig() {
+    const isMobile = window.innerWidth < 640;
+    const config = {
+      infiniteLoop: this.config.infiniteLoop
+    };
+
+    if (isMobile) {
+      config.positions = MOBILE_POSITIONS;
+    }
+
+    return config;
+  }
+
+  ensureLiveRegion() {
+    const existing = this.container.querySelector('.sr-live-region') || document.getElementById('coverflow-live-region');
+    if (existing) return existing;
+
+    const region = createElement('div', 'sr-only sr-live-region');
+    region.id = 'coverflow-live-region';
+    region.setAttribute('aria-live', 'polite');
+    region.setAttribute('aria-atomic', 'true');
+    this.container.appendChild(region);
+    return region;
+  }
+
+  announce(message, mode = 'polite') {
+    if (!this.liveRegion) return;
+    this.liveRegion.setAttribute('aria-live', mode);
+    this.liveRegion.textContent = '';
+    this.resources.raf(() => {
+      this.liveRegion.textContent = message;
+    });
+  }
+
+  announceCurrentSlide() {
+    const card = this.items[this.currentIndex];
+    if (!card) return;
+    const title = card.dataset.title || card.querySelector('.card-title')?.textContent?.trim() || `Slide ${this.currentIndex + 1}`;
+    this.announce(`Now showing ${title}`);
+  }
+
+  updatePagination() {
+    const current = this.container.querySelector('.pagination-current');
+    const total = this.container.querySelector('.pagination-total');
+    if (current) current.textContent = String(this.currentIndex + 1);
+    if (total) total.textContent = String(this.items.length);
+  }
+
+  applyItemState(item, index, centerIndex, transform) {
+    const roundedCenter = Math.round(centerIndex);
+    const distance = getDistance(index, roundedCenter, this.items.length, this.config.infiniteLoop);
+    const isCenter = index === roundedCenter;
+    const isAdjacent = distance === 1;
+    const hidden = distance > 4;
+
+    item.classList.toggle('is-center', isCenter);
+    item.classList.toggle('is-adjacent', isAdjacent);
+    item.classList.toggle('coverflow-card--active', isCenter);
+    item.setAttribute('aria-current', isCenter ? 'true' : 'false');
+    item.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+    item.tabIndex = isCenter ? 0 : -1;
+
+    gsap.set(item, { zIndex: transform.zIndex });
+  }
+
+  updateAllItems(centerIndex, durationMs = this.motion.slideMs) {
+    const transforms = this.engine3D.calculateAllTransforms(centerIndex, this.items.length, this.config.infiniteLoop);
+    const durationSeconds = durationMs / 1000;
+
     gsap.killTweensOf(this.items);
-    
+    this.items.forEach((item) => {
+      item.style.willChange = durationMs > 0 ? 'transform, opacity, filter' : 'auto';
+    });
+
     this.items.forEach((item, index) => {
       const transform = transforms[index];
-      const isCenter = index === Math.round(centerIndex);
-      const absPosition = this.getAbsoluteDistance(index, Math.round(centerIndex));
-      
-      // z-index: snap to final value immediately — no crossover. [R3]
-      gsap.set(item, { zIndex: transform.zIndex });
+      this.applyItemState(item, index, centerIndex, transform);
 
-      gsap.to(item, {
+      const targetState = {
         x: transform.translateX,
         y: transform.translateY || 0,
         z: transform.translateZ,
@@ -383,1367 +1101,457 @@ export class LuxuryCoverflow {
         scale: transform.scale,
         opacity: transform.opacity,
         filter: this.engine3D.getFilterString(transform.filter),
-        duration, ease: this.config.animationEase,
-        delay: duration > 0 ? absPosition * this.config.staggerDelay : 0,
+        duration: durationSeconds,
+        ease: this.config.animationEase,
         force3D: true
-        // onComplete removed: force3D:true manages will-change internally [R4]
-      });
-      
-      item.classList.toggle('is-center', isCenter);
-      item.setAttribute('aria-current', isCenter ? 'true' : 'false');
+      };
+
+      if (durationMs === 0) {
+        gsap.set(item, targetState);
+        return;
+      }
+
+      gsap.to(item, targetState);
     });
-    
+
     this.updatePagination();
+
+    if (durationMs > 0) {
+      this.setAnimating(durationMs);
+    } else {
+      this.items.forEach((item) => {
+        item.style.willChange = 'auto';
+      });
+    }
   }
-  
+
   updateContinuousPosition(position) {
-    const transforms = this.engine3D.calculateAllTransforms(
-      position, this.items.length, this.config.infiniteLoop
-    );
+    const transforms = this.engine3D.calculateAllTransforms(position, this.items.length, this.config.infiniteLoop);
     this.items.forEach((item, index) => {
-      const t = transforms[index];
+      const transform = transforms[index];
+      this.applyItemState(item, index, position, transform);
       gsap.set(item, {
-        x: t.translateX, y: t.translateY || 0, z: t.translateZ,
-        rotationY: t.rotateY, scale: t.scale, opacity: t.opacity,
-        filter: this.engine3D.getFilterString(t.filter), zIndex: t.zIndex, force3D: true
+        x: transform.translateX,
+        y: transform.translateY || 0,
+        z: transform.translateZ,
+        rotationY: transform.rotateY,
+        scale: transform.scale,
+        opacity: transform.opacity,
+        filter: this.engine3D.getFilterString(transform.filter),
+        force3D: true
       });
     });
   }
-  
-  getAbsoluteDistance(index, centerIndex) {
-    let distance = Math.abs(index - centerIndex);
-    if (this.config.infiniteLoop && this.items.length > 1) {
-      distance = Math.min(distance, this.items.length - distance);
-    }
-    return distance;
+
+  setAnimating(durationMs) {
+    this.isAnimating = true;
+    this.resources.clearTimeout(this.animationTimeout);
+    this.animationTimeout = this.resources.timeout(() => {
+      this.isAnimating = false;
+      this.items.forEach((item) => {
+        item.style.willChange = 'auto';
+      });
+      if (typeof this.pendingTarget === 'number') {
+        const queuedTarget = this.pendingTarget;
+        this.pendingTarget = null;
+        this.goToSlide(queuedTarget);
+      }
+    }, durationMs + 48);
   }
-  
-  goToSlide(targetIndex, duration = this.config.animationDuration) {
-    if (this.config.infiniteLoop && this.items.length > 0) {
-      targetIndex = ((targetIndex % this.items.length) + this.items.length) % this.items.length;
-    } else {
-      targetIndex = Math.max(0, Math.min(this.items.length - 1, targetIndex));
-    }
-    
-    if (targetIndex === this.currentIndex) return;
-    if (this.isAnimating) {
-      clearTimeout(this.navQueue);
-      this.navQueue = setTimeout(() => this.goToSlide(targetIndex, duration), 100);
+
+  goToSlide(targetIndex, options = {}) {
+    const durationMs = typeof options.durationMs === 'number' ? options.durationMs : this.motion.slideMs;
+    const announce = options.announce !== false;
+    const normalizedTarget = normalizeIndex(targetIndex, this.items.length, this.config.infiniteLoop);
+
+    if (normalizedTarget === this.currentIndex && durationMs !== 0) return;
+    if (this.isAnimating && durationMs !== 0) {
+      this.pendingTarget = normalizedTarget;
       return;
     }
-    
-    this.isAnimating = true;
-    this.currentIndex = targetIndex;
-    this.scrollPosition = targetIndex;
-    
-    this.updateAllItems(targetIndex, duration);
+
+    this.currentIndex = normalizedTarget;
+    this.previewIndex = normalizedTarget;
+    this.wheelState.previewPosition = normalizedTarget;
+    this.updateAllItems(normalizedTarget, durationMs);
     this.resetAutoplay();
-    this.announceCurrentSlide();
-    
-    setTimeout(() => { this.isAnimating = false; }, duration * 1000 + 50);
+    if (announce) this.announceCurrentSlide();
   }
-  
-  next() { this.goToSlide(this.currentIndex + 1); }
-  prev() { this.goToSlide(this.currentIndex - 1); }
-  
-  // ========================================
-  // INPUT HANDLERS
-  // ========================================
-  
+
+  next() {
+    this.goToSlide(this.currentIndex + 1);
+  }
+
+  prev() {
+    this.goToSlide(this.currentIndex - 1);
+  }
+
+  pulseCurrentCard() {
+    const current = this.items[this.currentIndex];
+    if (!current) return;
+
+    gsap.fromTo(
+      current,
+      { scale: 1 },
+      { scale: 1.025, duration: this.motion.settleMs / 1000, repeat: 1, yoyo: true, ease: 'power1.out' }
+    );
+  }
+
   setupKeyboardNavigation() {
     if (!this.config.enableKeyboard) return;
-    document.addEventListener('keydown', (e) => {
-      if (!this.container.contains(document.activeElement) && !this.container.matches(':hover')) return;
-      if (e.key === 'ArrowLeft') { e.preventDefault(); this.prev(); }
-      if (e.key === 'ArrowRight') { e.preventDefault(); this.next(); }
-    });
-  }
-  
-  setupMouseDrag() {
-    if (!this.config.enableMouse) return;
-    this.track.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
-      e.preventDefault();
-      this.startDrag(e.clientX, e.clientY, e.target);
-    });
-    document.addEventListener('mousemove', (e) => {
-      if (this.dragState.isDragging) this.updateDrag(e.clientX, e.clientY);
-    });
-    document.addEventListener('mouseup', () => {
-      if (this.dragState.isDragging) this.endDrag();
-    });
-  }
-  
-  setupTouchDrag() {
-    if (!this.config.enableTouch) return;
-    this.track.addEventListener('touchstart', (e) => {
-      const touch = e.touches && e.touches[0];
-      if (!touch) return;
-      this.startDrag(touch.clientX, touch.clientY, e.target);
-    }, { passive: true });
-    this.track.addEventListener('touchmove', (e) => {
-      if (!this.dragState.isDragging) return;
-      const touch = e.touches && e.touches[0];
-      if (!touch) return;
-      this.updateDrag(touch.clientX, touch.clientY, e.target);
-      if (this.dragState.isDragging && this.dragState.axisLocked === 'horizontal') {
-        e.preventDefault();
-      }
-    }, { passive: false });
-    this.track.addEventListener('touchend', () => {
-      if (this.dragState.isDragging) this.endDrag();
-      this.dragState.axisLocked = null;
-    });
-    this.track.addEventListener('touchcancel', () => {
-      if (this.dragState.isDragging) this.endDrag();
-      this.dragState.axisLocked = null;
-    });
-  }
-  
-  setupScrollNavigation() {
-    if (!this.config.enableScroll) return;
-    let scrollDeltaX = 0, scrollTimeout;
-    this.container.addEventListener('wheel', (e) => {
-      const absX = Math.abs(e.deltaX);
-      const absY = Math.abs(e.deltaY);
-      if (absY >= absX || absX <= 5) return;
 
-      e.preventDefault();
-      scrollDeltaX += e.deltaX;
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        if (Math.abs(scrollDeltaX) >= this.config.scrollThreshold) {
-          scrollDeltaX > 0 ? this.next() : this.prev();
-        }
-        scrollDeltaX = 0;
-      }, 80);
-    }, { passive: false });
-  }
-  
-  setupSmoothScrollTracking() {
-    if (!this.config.enableSmoothTracking) return;
-    let targetPosition = this.currentIndex, scrollEndTimeout;
-    this.container.addEventListener('wheel', (e) => {
-      const absX = Math.abs(e.deltaX);
-      const absY = Math.abs(e.deltaY);
-      if (absY >= absX || absX <= 5) return;
-      e.preventDefault();
-      targetPosition += e.deltaX * this.config.scrollSensitivity;
-      if (this.config.infiniteLoop) {
-        while (targetPosition < 0) targetPosition += this.items.length;
-        while (targetPosition >= this.items.length) targetPosition -= this.items.length;
-      } else {
-        targetPosition = Math.max(0, Math.min(this.items.length - 1, targetPosition));
+    this.resources.listen(document, 'keydown', (event) => {
+      if (this.roulette.isActive) return;
+
+      const containerHasFocus = this.container.contains(document.activeElement);
+      const containerHasHover = !isCoarsePointerDevice() && this.container.matches(':hover');
+      if (!containerHasFocus && !containerHasHover) return;
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        this.prev();
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        this.next();
+      } else if (event.key === 'Home') {
+        event.preventDefault();
+        this.goToSlide(0);
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        this.goToSlide(this.items.length - 1);
       }
-      this.updateContinuousPosition(targetPosition);
-      clearTimeout(scrollEndTimeout);
-      scrollEndTimeout = setTimeout(() => {
-        this.goToSlide(Math.round(targetPosition), 0.25);
-        targetPosition = Math.round(targetPosition);
-      }, 120);
+    });
+  }
+
+  setupPointerInteractions() {
+    if (!this.config.enableMouse) return;
+
+    if (typeof window !== 'undefined' && 'PointerEvent' in window) {
+      this.resources.listen(this.track, 'pointerdown', (event) => {
+        const isMousePointer = event.pointerType === 'mouse';
+        const isTouchPointer = event.pointerType === 'touch' || event.pointerType === 'pen';
+
+        if (isMousePointer && event.button !== 0) return;
+        if (isMousePointer && !this.config.enableMouse) return;
+        if (isTouchPointer && !this.config.enableTouch) return;
+        if (event.target.closest('button, a, [data-no-drag]')) return;
+
+        this.activePointerId = event.pointerId;
+        if (isTouchPointer) {
+          this.lastPointerTouchAt = performance.now();
+          event.preventDefault();
+        }
+
+        this.startDrag(event.clientX, event.clientY, event.target);
+      }, { passive: false });
+
+      this.resources.listen(document, 'pointermove', (event) => {
+        if (!this.dragState.isDragging) return;
+        if (this.activePointerId != null && event.pointerId !== this.activePointerId) return;
+
+        this.updateDrag(event.clientX, event.clientY);
+        if (this.dragState.axisLocked === 'horizontal' && event.cancelable) {
+          event.preventDefault();
+        }
+      }, { passive: false });
+
+      const finishPointerDrag = (event) => {
+        if (this.activePointerId != null && event.pointerId !== this.activePointerId) return;
+        this.activePointerId = null;
+        if (this.dragState.isDragging) this.endDrag();
+      };
+
+      this.resources.listen(document, 'pointerup', finishPointerDrag, { passive: true });
+      this.resources.listen(document, 'pointercancel', finishPointerDrag, { passive: true });
+      return;
+    }
+
+    this.resources.listen(this.track, 'mousedown', (event) => {
+      if (event.button !== 0) return;
+      if (event.target.closest('button, a, [data-no-drag]')) return;
+      event.preventDefault();
+      this.startDrag(event.clientX, event.clientY, event.target);
+    });
+
+    this.resources.listen(document, 'mousemove', (event) => {
+      if (!this.dragState.isDragging) return;
+      this.updateDrag(event.clientX, event.clientY);
+    });
+
+    this.resources.listen(document, 'mouseup', () => {
+      if (this.dragState.isDragging) this.endDrag();
+    });
+  }
+
+  setupTouchInteractions() {
+    if (!this.config.enableTouch) return;
+
+    this.resources.listen(this.track, 'touchstart', (event) => {
+      if (performance.now() - this.lastPointerTouchAt < 500) return;
+      const touch = event.touches?.[0];
+      if (!touch) return;
+      this.startDrag(touch.clientX, touch.clientY, event.target);
+    }, { passive: true });
+
+    this.resources.listen(this.track, 'touchmove', (event) => {
+      const touch = event.touches?.[0];
+      if (!touch || !this.dragState.isDragging) return;
+      this.updateDrag(touch.clientX, touch.clientY);
+      if (this.dragState.axisLocked === 'horizontal') {
+        event.preventDefault();
+      }
+    }, { passive: false });
+
+    const endTouch = () => {
+      if (this.dragState.isDragging) this.endDrag();
+    };
+
+    this.resources.listen(this.track, 'touchend', endTouch, { passive: true });
+    this.resources.listen(this.track, 'touchcancel', endTouch, { passive: true });
+  }
+
+  setupWheelNavigation() {
+    if (!this.config.enableScroll) return;
+
+    this.resources.listen(this.container, 'wheel', (event) => {
+      if (this.roulette.isActive) return;
+
+      const absX = Math.abs(event.deltaX);
+      const absY = Math.abs(event.deltaY);
+      if (absX < 6 || absX <= absY) return;
+
+      event.preventDefault();
+      this.stopAutoplay();
+      this.wheelState.accumulator += event.deltaX;
+
+      if (this.motion.enableSmoothTracking) {
+        let previewPosition = this.previewIndex + event.deltaX * this.motion.scrollSensitivity;
+        previewPosition = normalizeIndex(previewPosition, this.items.length, this.config.infiniteLoop);
+        this.previewIndex = previewPosition;
+        this.wheelState.previewPosition = previewPosition;
+        this.updateContinuousPosition(previewPosition);
+      }
+
+      this.resources.clearTimeout(this.wheelState.settleTimeout);
+      this.wheelState.settleTimeout = this.resources.timeout(() => {
+        let targetIndex = this.currentIndex;
+        if (Math.abs(this.wheelState.accumulator) >= this.motion.scrollThreshold) {
+          targetIndex = this.currentIndex + (this.wheelState.accumulator > 0 ? 1 : -1);
+        }
+
+        this.wheelState.accumulator = 0;
+        this.previewIndex = normalizeIndex(targetIndex, this.items.length, this.config.infiniteLoop);
+        this.goToSlide(targetIndex, { durationMs: this.motion.settleMs });
+      }, 110);
     }, { passive: false });
   }
-  
-  startDrag(clientX, clientY = 0, target = null) {
-    if (target && (
-      target.closest('button') ||
-      target.closest('[data-no-drag]') ||
-      target.tagName === 'BUTTON'
-    )) return;
+
+  startDrag(clientX, clientY, target) {
+    if (target?.closest('button, a, [data-no-drag]')) return;
+
+    this.dragSequence += 1;
 
     this.dragState = {
       isDragging: true,
       startX: clientX,
-      currentX: clientX,
       startY: clientY,
+      currentX: clientX,
       currentY: clientY,
       axisLocked: null,
-      startIndex: this.currentIndex,
-      rafPending: false
+      previewPosition: this.currentIndex,
+      sequence: this.dragSequence,
+      rafPending: false,
+      sourceTarget: target
     };
+
     this.physics.startDrag(clientX);
     this.stopAutoplay();
     this.container.classList.add('is-dragging');
   }
-  
-  updateDrag(clientX, clientY = 0) {
+
+  updateDrag(clientX, clientY) {
     if (!this.dragState.isDragging) return;
 
-    const dx = Math.abs(clientX - this.dragState.startX);
-    const dy = Math.abs(clientY - this.dragState.startY);
-
-    if (this.dragState.axisLocked === null) {
-      if (dx < 10 && dy < 10) return;
-      if (dy > dx) {
-        this.dragState.axisLocked = 'vertical';
+    const absX = Math.abs(clientX - this.dragState.startX);
+    const absY = Math.abs(clientY - this.dragState.startY);
+    if (this.dragState.axisLocked == null) {
+      if (absX < 8 && absY < 8) return;
+      this.dragState.axisLocked = absX >= absY ? 'horizontal' : 'vertical';
+      if (this.dragState.axisLocked === 'vertical') {
         this.dragState.isDragging = false;
         this.container.classList.remove('is-dragging');
         return;
       }
-      this.dragState.axisLocked = 'horizontal';
     }
 
     if (this.dragState.axisLocked !== 'horizontal') return;
 
     this.dragState.currentX = clientX;
     this.dragState.currentY = clientY;
-    if (!this.dragState.rafPending) {
-      this.dragState.rafPending = true;
-      requestAnimationFrame(() => { this.physics.updateDrag(this.dragState.currentX); this.dragState.rafPending = false; });
-    }
-  }
-  
-  endDrag() {
-    if (this.dragState.axisLocked !== 'horizontal') {
-      this.dragState = {
-        isDragging: false,
-        startX: 0,
-        currentX: 0,
-        startY: 0,
-        currentY: 0,
-        axisLocked: null,
-        startIndex: this.currentIndex,
-        rafPending: false
-      };
-      this.container.classList.remove('is-dragging');
-      return;
-    }
+    this.physics.updateDrag(clientX);
 
-    const delta = (this.dragState.currentX - this.dragState.startX) / 350;
-    const target = this.physics.calculateSnapTarget(this.currentIndex, this.items.length, delta, this.config.infiniteLoop);
-    this.goToSlide(target);
+    if (this.dragState.rafPending) return;
+    this.dragState.rafPending = true;
+    const dragSequence = this.dragState.sequence;
+    this.resources.raf(() => {
+      if (!this.dragState.isDragging || this.dragState.sequence !== dragSequence) {
+        this.dragState.rafPending = false;
+        return;
+      }
+
+      const delta = (this.dragState.startX - this.dragState.currentX) / this.motion.dragPixelsPerSlide;
+      const previewPosition = normalizeIndex(this.currentIndex + delta, this.items.length, this.config.infiniteLoop);
+      this.dragState.previewPosition = previewPosition;
+      this.previewIndex = previewPosition;
+      this.updateContinuousPosition(previewPosition);
+      this.dragState.rafPending = false;
+    });
+  }
+
+  endDrag() {
+    const deltaX = this.dragState.currentX - this.dragState.startX;
+    const velocity = this.physics.velocity;
+    const hasMeaningfulMovement = Math.abs(deltaX) >= 24 || Math.abs(velocity) > 0.2;
+    const direction = deltaX < 0 ? 1 : -1;
+    const targetIndex = hasMeaningfulMovement
+      ? this.currentIndex + direction
+      : this.currentIndex;
+
     this.dragState.isDragging = false;
     this.dragState.axisLocked = null;
+  this.dragState.sequence = null;
+  this.dragState.rafPending = false;
     this.container.classList.remove('is-dragging');
-    this.physics.endDrag();
+    if (hasMeaningfulMovement) {
+      // Touch browsers may emit a trailing click after a drag; suppress it briefly.
+      this.suppressClickUntil = performance.now() + 420;
+    }
+    this.goToSlide(targetIndex, { durationMs: this.motion.settleMs });
   }
-  
-  setupItemClicks() {
+
+  setupItemInteractions() {
     this.items.forEach((item, index) => {
-      item.addEventListener('pointerdown', (e) => {
-        this.clickState = { startTime: Date.now(), startX: e.clientX, startY: e.clientY };
-      });
-      item.addEventListener('pointerup', (e) => {
-        const dt = Date.now() - this.clickState.startTime;
-        const dx = Math.abs(e.clientX - this.clickState.startX);
-        const dy = Math.abs(e.clientY - this.clickState.startY);
-        if (dt < 300 && dx < 10 && dy < 10 && index !== this.currentIndex) {
-          e.preventDefault();
-          this.goToSlide(index);
+      this.resources.listen(item, 'click', (event) => {
+        if (performance.now() < this.suppressClickUntil) {
+          event.preventDefault();
+          return;
         }
+        if (index === this.currentIndex) return;
+        event.preventDefault();
+        this.goToSlide(index);
+      });
+
+      this.resources.listen(item, 'keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        if (index === this.currentIndex) return;
+        event.preventDefault();
+        this.goToSlide(index);
       });
     });
   }
-  
+
   setupNavigationButtons() {
-    const prev = this.container.querySelector('.coverflow-btn-prev');
-    const next = this.container.querySelector('.coverflow-btn-next');
-    if (prev) prev.addEventListener('click', (e) => { e.stopPropagation(); this.prev(); });
-    if (next) next.addEventListener('click', (e) => { e.stopPropagation(); this.next(); });
+    const previousButton = this.container.querySelector('.coverflow-btn-prev');
+    const nextButton = this.container.querySelector('.coverflow-btn-next');
+
+    if (previousButton) {
+      this.resources.listen(previousButton, 'click', (event) => {
+        event.stopPropagation();
+        this.prev();
+      });
+    }
+
+    if (nextButton) {
+      this.resources.listen(nextButton, 'click', (event) => {
+        event.stopPropagation();
+        this.next();
+      });
+    }
   }
-  
-  // ========================================
-  // V7.0: EA-AC RESEARCH-BACKED CASINO WHEEL
-  // ========================================
-  
+
   setupRouletteButton() {
-    const btn = this.container.querySelector('.roulette-trigger-btn') ||
-                document.querySelector('.roulette-trigger-btn');
-    
-    if (!btn) return;
-    
-    console.log('🎰 V7.0 Casino wheel ready — EA-AC Research-Backed');
+    const button = this.container.querySelector('[data-roulette-trigger], .roulette-trigger-btn');
+    if (!button) return;
 
-    const triggerRoulette = async () => {
-      await this.startCasinoWheelV70();
+    this.resources.listen(button, 'click', async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      await this.startRoulette();
+    });
+  }
+
+  setupResizeHandling() {
+    const refresh = () => {
+      this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
+      this.updateAllItems(this.currentIndex, 0);
+      this.roulette.refreshLayout();
     };
 
-    let rouletteTouchHandled = false;
-
-    btn.addEventListener('touchend', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      rouletteTouchHandled = true;
-      setTimeout(() => { rouletteTouchHandled = false; }, 500);
-      await triggerRoulette();
-    }, { passive: false });
-
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (rouletteTouchHandled) return;
-      await triggerRoulette();
-    });
-
-    btn.addEventListener('pointerdown', (e) => {
-      e.stopPropagation();
-    });
-  }
-  
-  /**
-   * V7.0: Casino wheel with EA-AC research-backed fixes
-   */
-  async startCasinoWheelV70() {
-    if (this.rouletteState.isActive) return;
-    
-    console.log('🎰 V7.0 CASINO — EA-AC RESEARCH-BACKED!');
-    this.rouletteState.isActive = true;
-    this.isAnimating = true;
-    
-    // Select winner
-    this.rouletteState.originalWinnerIndex = Math.floor(Math.random() * this.items.length);
-    this.rouletteState.greenPocketIndex = Math.floor(Math.random() * 37);
-    
-    // Winner pocket is NOT green
-    let winnerPocket = Math.floor(Math.random() * 37);
-    while (winnerPocket === this.rouletteState.greenPocketIndex) {
-      winnerPocket = Math.floor(Math.random() * 37);
-    }
-    this.rouletteState.winnerPocketIndex = winnerPocket;
-    
-    const winnerTitle = this.items[this.rouletteState.originalWinnerIndex].dataset.title || 'Selected!';
-    console.log(`🎯 Winner: Card ${this.rouletteState.originalWinnerIndex} "${winnerTitle}"`);
-
-    const rouletteMode = this.runtimeProfile?.rouletteMode || 'full';
-    if (rouletteMode !== 'full') {
-      try {
-        this.goToSlide(this.rouletteState.originalWinnerIndex, Math.min(this.config.animationDuration, 0.25));
-        const winnerEl = this.items[this.rouletteState.originalWinnerIndex];
-        if (winnerEl) {
-          gsap.fromTo(winnerEl, { scale: 1 }, { scale: 1.03, duration: 0.16, yoyo: true, repeat: 1, ease: 'power1.out' });
-        }
-      } finally {
-        this.cleanupCasinoWheel();
-        this.rouletteState.isActive = false;
-        this.isAnimating = false;
-      }
-      return;
-    }
-    
-    try {
-      await this.phase1_CreatePerspectiveOverlay();
-      await this.phase2_CreateWheelWithMapping();
-      await this.phase3_Create3DBall();
-      await this.phase4_SpinWithOrbit();
-      
-      // V7.5: Increased settle delay (ensure wheel FULLY stops before ball landing)
-      await this.delay(Math.round(400 * (this.runtimeProfile?.motionScale || 1)));
-      
-      await this.phase5_BallLanding();
-      await this.phase6_LiftFeatureSettle(winnerTitle);
-      
-      console.log('🎉 V7.0 Complete!');
-    } catch (error) {
-      console.error('❌ Error:', error);
-    } finally {
-      this.cleanupCasinoWheel();
-      this.rouletteState.isActive = false;
-      this.isAnimating = false;
-    }
-  }
-  
-  /**
-   * Phase 1: Create overlay WITH PERSPECTIVE
-   * Research: Apple Safari Visual Effects Guide
-   */
-  async phase1_CreatePerspectiveOverlay() {
-    console.log('📦 Phase 1: Create Perspective Overlay');
-    
-    const overlay = document.createElement('div');
-    overlay.className = 'casino-overlay-v70';
-    overlay.style.cssText = `
-      position: fixed;
-      inset: 0;
-      z-index: 10000;
-      opacity: 0;
-      background: radial-gradient(circle at 50% 50%, rgba(0, 50, 0, 0.97) 0%, rgba(0, 15, 0, 0.99) 100%);
-      overflow: hidden;
-      /* V7.0: PERSPECTIVE for 3D depth */
-      perspective: 1200px;
-      perspective-origin: 50% 50%;
-    `;
-    document.body.appendChild(overlay);
-    this.rouletteState.overlay = overlay;
-    
-    const status = document.createElement('div');
-    status.textContent = 'Preparing...';
-    status.style.cssText = `
-      position: absolute;
-      bottom: 5%;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: clamp(1rem, 2.5vw, 1.8rem);
-      font-weight: 700;
-      color: #FFD700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      text-shadow: 0 0 30px #FFD700;
-      z-index: 10;
-    `;
-    overlay.appendChild(status);
-    this.rouletteState.status = status;
-    
-    return new Promise(resolve => {
-      const s = this.runtimeProfile?.motionScale || 1;
-      const d = Math.max(0.18, 0.5 * s);
-      gsap.to(overlay, { opacity: 1, duration: d });
-      gsap.to(this.items, { opacity: 0, duration: d, onComplete: resolve });
-    });
-  }
-  
-  /**
-   * Phase 2: Create wheel with 1:1 pocket-to-card mapping
-   */
-  async phase2_CreateWheelWithMapping() {
-    console.log('🔄 Phase 2: Create Wheel (1:1 Mapping)');
-    this.rouletteState.status.textContent = 'Forming wheel...';
-    
-    const overlay = this.rouletteState.overlay;
-    const viewW = window.innerWidth;
-    const viewH = window.innerHeight;
-    const centerX = viewW / 2;
-    const centerY = viewH / 2;
-    const wheelRadius = Math.min(viewW, viewH) * 0.38;
-    
-    // V7.0: Wheel wrapper with preserve-3d
-    const wheelWrapper = document.createElement('div');
-    wheelWrapper.className = 'wheel-wrapper-v70';
-    wheelWrapper.style.cssText = `
-      position: absolute;
-      left: ${centerX}px;
-      top: ${centerY}px;
-      width: 0;
-      height: 0;
-      transform-style: preserve-3d;
-      transform-origin: center center;
-      will-change: transform;
-    `;
-    overlay.appendChild(wheelWrapper);
-    this.rouletteState.wheelWrapper = wheelWrapper;
-    
-    // Golden rim
-    const rimSize = wheelRadius * 2 + 140;
-    const rim = document.createElement('div');
-    rim.style.cssText = `
-      position: absolute;
-      left: ${-rimSize / 2}px;
-      top: ${-rimSize / 2}px;
-      width: ${rimSize}px;
-      height: ${rimSize}px;
-      border: 14px solid transparent;
-      border-radius: 50%;
-      background:
-        linear-gradient(#002800, #002800) padding-box,
-        linear-gradient(135deg, #FFD700, #FFA500, #FFD700, #B8860B, #FFD700) border-box;
-      box-shadow:
-        0 0 100px rgba(255,215,0,0.9),
-        0 0 200px rgba(255,215,0,0.5),
-        inset 0 0 120px rgba(255,215,0,0.2);
-      opacity: 0;
-      pointer-events: none;
-    `;
-    wheelWrapper.appendChild(rim);
-    this.rouletteState.wheelRim = rim;
-    gsap.to(rim, { opacity: 1, duration: 0.5 });
-    
-    const sequence = [
-      { num: 0, color: 'green' },
-      { num: 32, color: 'red' }, { num: 15, color: 'black' }, { num: 19, color: 'red' },
-      { num: 4, color: 'black' }, { num: 21, color: 'red' }, { num: 2, color: 'black' },
-      { num: 25, color: 'red' }, { num: 17, color: 'black' }, { num: 34, color: 'red' },
-      { num: 6, color: 'black' }, { num: 27, color: 'red' }, { num: 13, color: 'black' },
-      { num: 36, color: 'red' }, { num: 11, color: 'black' }, { num: 30, color: 'red' },
-      { num: 8, color: 'black' }, { num: 23, color: 'red' }, { num: 10, color: 'black' },
-      { num: 5, color: 'red' }, { num: 24, color: 'black' }, { num: 16, color: 'red' },
-      { num: 33, color: 'black' }, { num: 1, color: 'red' }, { num: 20, color: 'black' },
-      { num: 14, color: 'red' }, { num: 31, color: 'black' }, { num: 9, color: 'red' },
-      { num: 22, color: 'black' }, { num: 18, color: 'red' }, { num: 29, color: 'black' },
-      { num: 7, color: 'red' }, { num: 28, color: 'black' }, { num: 12, color: 'red' },
-      { num: 35, color: 'black' }, { num: 3, color: 'red' }, { num: 26, color: 'black' }
-    ];
-    
-    const pockets = [];
-    const pocketW = 85;
-    const pocketH = 110;
-    const greenIdx = this.rouletteState.greenPocketIndex;
-    const winnerPocket = this.rouletteState.winnerPocketIndex;
-    const winnerCard = this.rouletteState.originalWinnerIndex;
-    
-    this.rouletteState.pocketToCardMap = [];
-    
-    for (let i = 0; i < 37; i++) {
-      const data = sequence[i];
-      const angle = (360 / 37) * i - 90;
-      const angleRad = angle * Math.PI / 180;
-      const x = wheelRadius * Math.cos(angleRad);
-      const y = wheelRadius * Math.sin(angleRad);
-      
-      const isGreen = i === greenIdx;
-      const isWinner = i === winnerPocket;
-      let borderColor, glowColor;
-      
-      if (isGreen) {
-        borderColor = '#00FF00';
-        glowColor = 'rgba(0, 255, 0, 0.9)';
-      } else if (data.color === 'red') {
-        borderColor = '#FF0000';
-        glowColor = 'rgba(255, 0, 0, 0.8)';
-      } else {
-        borderColor = '#FFFFFF';
-        glowColor = 'rgba(255, 255, 255, 0.6)';
-      }
-      
-      // V7.0: Perfect centering with translate(-50%, -50%)
-      const pocket = document.createElement('div');
-      pocket.className = 'pocket-v70';
-      pocket.dataset.pocketIndex = i;
-      pocket.style.cssText = `
-        position: absolute;
-        left: ${x}px;
-        top: ${y}px;
-        width: ${pocketW}px;
-        height: ${pocketH}px;
-        transform: translate(-50%, -50%) rotate(${angle + 90}deg) scale(0);
-        transform-origin: center center;
-        border: 4px solid ${borderColor};
-        border-radius: 12px;
-        overflow: hidden;
-        opacity: 0;
-        box-shadow:
-          0 0 35px ${glowColor},
-          0 0 70px ${glowColor};
-        will-change: transform;
-        cursor: pointer;
-      `;
-      
-      if (isGreen) {
-        pocket.innerHTML = `
-          <div style="
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #003000, #006000);
-            color: #00FF00;
-            font-family: 'Arial Black', sans-serif;
-            font-size: 16px;
-            font-weight: 900;
-            text-align: center;
-            text-shadow: 0 0 20px #00FF00;
-            line-height: 1.3;
-          ">
-            <div style="font-size: 160%;">TRY</div>
-            <div style="font-size: 160%;">AGAIN</div>
-          </div>
-        `;
-        this.rouletteState.pocketToCardMap[i] = -1;
-      } else {
-        // V7.0: Winner pocket ALWAYS shows winner card
-        let cardIndex;
-        if (isWinner) {
-          cardIndex = winnerCard;
-        } else {
-          cardIndex = Math.floor((i / 37) * this.items.length) % this.items.length;
-        }
-        
-        this.rouletteState.pocketToCardMap[i] = cardIndex;
-        
-        const srcCard = this.items[cardIndex];
-        const preview = this.extractCardPreview(srcCard);
-        pocket.appendChild(preview);
-        
-        const badge = document.createElement('div');
-        badge.textContent = data.num;
-        badge.style.cssText = `
-          position: absolute;
-          top: 6px;
-          right: 6px;
-          font-family: 'Arial Black', sans-serif;
-          font-size: 14px;
-          font-weight: 900;
-          color: #FFD700;
-          text-shadow: 0 0 15px #FFD700;
-          background: rgba(0, 0, 0, 0.9);
-          padding: 4px 7px;
-          border-radius: 5px;
-          z-index: 10;
-        `;
-        pocket.appendChild(badge);
-      }
-      
-      wheelWrapper.appendChild(pocket);
-      pockets.push(pocket);
-    }
-    
-    this.rouletteState.pockets = pockets;
-    console.log(`✅ Created ${pockets.length} pockets (winner pocket ${winnerPocket} → card ${winnerCard})`);
-    
-    return new Promise(resolve => {
-      pockets.forEach((pocket, i) => {
-        gsap.to(pocket, {
-          opacity: 1,
-          scale: 1,
-          duration: 0.7,
-          delay: i * 0.03,
-          ease: 'back.out(1.3)'
-        });
-      });
-      setTimeout(resolve, 2800);
-    });
-  }
-  
-  /**
-   * Extract card preview
-   */
-  extractCardPreview(sourceCard) {
-    const preview = document.createElement('div');
-    preview.style.cssText = `
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: #1a1a2e;
-    `;
-    
-    const cardBg = sourceCard.querySelector('.card-bg');
-    if (cardBg) {
-      const bgStyle = window.getComputedStyle(cardBg);
-      const bgDiv = document.createElement('div');
-      bgDiv.style.cssText = `
-        position: absolute;
-        inset: 0;
-        background: ${bgStyle.background || bgStyle.backgroundImage || 'linear-gradient(135deg, #212842, #3d4666)'};
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      `;
-      
-      const svg = cardBg.querySelector('svg');
-      if (svg) {
-        const svgClone = svg.cloneNode(true);
-        svgClone.style.cssText = 'width: 50px; height: 50px; opacity: 0.9;';
-        bgDiv.appendChild(svgClone);
-      }
-      
-      preview.appendChild(bgDiv);
-    }
-    
-    const title = sourceCard.dataset.title || 
-                  sourceCard.querySelector('.card-title')?.textContent || 
-                  'Project';
-    
-    const titleEl = document.createElement('div');
-    titleEl.textContent = title.length > 15 ? title.substring(0, 15) + '...' : title;
-    titleEl.style.cssText = `
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 10px 6px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #fff;
-      background: linear-gradient(transparent, rgba(0,0,0,0.95));
-      text-align: center;
-      white-space: nowrap;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.9);
-    `;
-    preview.appendChild(titleEl);
-    
-    return preview;
-  }
-  
-  /**
-   * Phase 3: Create realistic 3D ball
-   * Research: cssanimation.rocks/spheres (multi-layer gradients)
-   */
-  async phase3_Create3DBall() {
-    console.log('⚽ Phase 3: Create 3D Ball (Multi-Layer)');
-    
-    const overlay = this.rouletteState.overlay;
-    const viewW = window.innerWidth;
-    const viewH = window.innerHeight;
-    const centerX = viewW / 2;
-    const centerY = viewH / 2;
-    const wheelRadius = Math.min(viewW, viewH) * 0.38;
-    const orbitRadius = wheelRadius + 80;
-    
-    // V7.0: Multi-layer 3D ball
-    // Layer 1: Base sphere gradient
-    const ball = document.createElement('div');
-    ball.className = 'roulette-ball-v70';
-    ball.style.cssText = `
-      position: absolute;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      /* Multi-layer gradients for 3D depth */
-      background:
-        /* Specular highlight (top-left) */
-        radial-gradient(circle at 30% 25%, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 35%),
-        /* Main sphere gradient */
-        radial-gradient(circle at 50% 50%, #f5f5f5 0%, #d0d0d0 40%, #a0a0a0 70%, #707070 100%);
-      /* Inset shadows for depth */
-      box-shadow:
-        inset -6px -6px 15px rgba(0,0,0,0.35),
-        inset 4px 4px 10px rgba(255,255,255,0.6),
-        0 0 50px rgba(255,215,0,0.8),
-        0 0 100px rgba(255,215,0,0.5);
-      z-index: 200;
-      pointer-events: none;
-      /* V7.0: Preserve-3d for proper depth */
-      transform-style: preserve-3d;
-    `;
-    overlay.appendChild(ball);
-    this.rouletteState.ball = ball;
-    
-    // Layer 2: Ball highlight (separate element for better control)
-    const highlight = document.createElement('div');
-    highlight.style.cssText = `
-      position: absolute;
-      width: 20px;
-      height: 12px;
-      border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(255,255,255,0.9) 0%, transparent 70%);
-      z-index: 201;
-      pointer-events: none;
-      filter: blur(1px);
-    `;
-    overlay.appendChild(highlight);
-    this.rouletteState.ballHighlight = highlight;
-    
-    // Layer 3: Ball shadow (rotated ellipse below)
-    const shadow = document.createElement('div');
-    shadow.style.cssText = `
-      position: absolute;
-      width: 55px;
-      height: 18px;
-      border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, transparent 65%);
-      filter: blur(5px);
-      z-index: 98;
-      pointer-events: none;
-      /* V7.0: Shadow positioned below ball */
-      transform: rotateX(90deg);
-    `;
-    overlay.appendChild(shadow);
-    this.rouletteState.ballShadow = shadow;
-    
-    // Initial position (outside wheel)
-    const startAngle = Math.random() * 360;
-    const startRad = startAngle * Math.PI / 180;
-    const startX = centerX + orbitRadius * Math.cos(startRad);
-    const startY = centerY + orbitRadius * Math.sin(startRad);
-    
-    gsap.set(ball, { 
-      left: startX - 25, 
-      top: startY - 25,
-      opacity: 1
-    });
-    gsap.set(highlight, {
-      left: startX - 22,
-      top: startY - 22
-    });
-    gsap.set(shadow, {
-      left: startX - 27,
-      top: startY + 35
-    });
-    
-    // Store initial angle
-    ball.dataset.angle = startAngle;
-    
-    console.log('⚽ 3D ball created with multi-layer rendering');
-  }
-  
-  /**
-   * Phase 4: Spin wheel and orbit ball (full circumference)
-   */
-  async phase4_SpinWithOrbit() {
-    console.log('🎡 Phase 4: Spin Wheel + Full Ball Orbit');
-    this.rouletteState.status.textContent = 'Spinning...';
-    
-    const overlay = this.rouletteState.overlay;
-    const wrapper = this.rouletteState.wheelWrapper;
-    const ball = this.rouletteState.ball;
-    const highlight = this.rouletteState.ballHighlight;
-    const shadow = this.rouletteState.ballShadow;
-    
-    const viewW = window.innerWidth;
-    const viewH = window.innerHeight;
-    const centerX = viewW / 2;
-    const centerY = viewH / 2;
-    const wheelRadius = Math.min(viewW, viewH) * 0.38;
-    
-    // Calculate spin parameters
-    const winnerPocket = this.rouletteState.winnerPocketIndex;
-    const pocketAngle = (360 / 37) * winnerPocket;
-    const spins = 5 + Math.floor(Math.random() * 2); // 5-6 full spins
-    const finalWheelRotation = -(spins * 360 + pocketAngle + 90);
-    const duration = 6 + Math.random() * 0.5; // 6-6.5 seconds
-    
-    console.log(`🎡 Spinning ${spins} rotations, landing on pocket ${winnerPocket}`);
-    
-    // Ball orbit parameters
-    const outerOrbitRadius = wheelRadius + 80;
-    const innerOrbitRadius = wheelRadius + 5;
-    let ballAngle = parseFloat(ball.dataset.angle) || 0;
-    
-    // V7.1: Define safe boundaries (ball containment fix)
-    const wheelVisualRadius = wheelRadius + 70; // Max visible extent
-    const minSafeRadius = wheelRadius - 20; // Inner boundary
-    const maxSafeRadius = wheelVisualRadius; // Outer boundary
-    
-    const statusEl = this.rouletteState.status;
-    
-    return new Promise(resolve => {
-      // Spin wheel (counter-clockwise)
-      gsap.to(wrapper, {
-        rotation: finalWheelRotation,
-        duration,
-        ease: 'power3.out'
-      });
-      
-      // V7.0: Ball orbits FULL circumference in OPPOSITE direction
-      gsap.to({}, {
-        duration,
-        ease: 'none',
-        onUpdate: function() {
-          const progress = this.progress();
-          
-          // V7.0: Smooth deceleration curve (no teleportation)
-          // Using exponential decay for realistic physics
-          const velocityFactor = Math.pow(1 - progress, 2);
-          const angularSpeed = 900 * velocityFactor;
-          ballAngle += angularSpeed * 0.016; // ~60fps
-          
-          // Keep angle normalized (prevent overflow)
-          while (ballAngle >= 360) ballAngle -= 360;
-          
-          // Spiral inward progressively
-          let currentRadius = outerOrbitRadius;
-          if (progress > 0.25) {
-            const spiralProgress = (progress - 0.25) / 0.75;
-            const easedSpiral = Math.pow(spiralProgress, 2.5);
-            currentRadius = outerOrbitRadius - (outerOrbitRadius - innerOrbitRadius) * easedSpiral;
-          }
-          
-          // V7.1: CRITICAL - Clamp to safe boundaries (prevents ball boundary violation)
-          currentRadius = gsap.utils.clamp(minSafeRadius, maxSafeRadius, currentRadius);
-          
-          // Calculate position
-          const rad = ballAngle * Math.PI / 180;
-          const x = centerX + currentRadius * Math.cos(rad);
-          const y = centerY + currentRadius * Math.sin(rad);
-          
-          // Update all ball layers
-          gsap.set(ball, { left: x - 25, top: y - 25 });
-          gsap.set(highlight, { left: x - 22, top: y - 22 });
-          gsap.set(shadow, { left: x - 27, top: y + 35, opacity: 0.6 - progress * 0.3 });
-          
-          // Dynamic glow based on velocity
-          const glowSize = 50 + velocityFactor * 80;
-          ball.style.boxShadow = `
-            inset -6px -6px 15px rgba(0,0,0,0.35),
-            inset 4px 4px 10px rgba(255,255,255,0.6),
-            0 0 ${glowSize}px rgba(255,215,0,${0.5 + velocityFactor * 0.5}),
-            0 0 ${glowSize * 2}px rgba(255,215,0,${0.3 + velocityFactor * 0.3})
-          `;
-          
-          // Status updates
-          if (progress < 0.25) statusEl.textContent = '🎰 Fast spin!';
-          else if (progress < 0.5) statusEl.textContent = '🎰 Round and round...';
-          else if (progress < 0.8) statusEl.textContent = '🎰 Slowing down...';
-          else statusEl.textContent = '🎰 Almost there...';
-        },
-        onComplete: () => {
-          // V7.2: Ball naturally ends at orbital position (no snap)
-          console.log('⚽ Ball orbit complete');
-          resolve();
-        }
-      });
-      
-      // Haptic feedback
-      if ('vibrate' in navigator) {
-        const interval = setInterval(() => navigator.vibrate(3), 150);
-        setTimeout(() => clearInterval(interval), duration * 1000);
-      }
-    });
-  }
-  
-  /**
-   * Phase 5: Ball landing - DETECT actual landing pocket
-   * V7.5: Fixed ball jump bug - ball stays where it lands
-   */
-  async phase5_BallLanding() {
-    console.log('⚾ Phase 5: Ball Landing');
-    this.rouletteState.status.textContent = 'Landing...';
-    
-    const ball = this.rouletteState.ball;
-    const highlight = this.rouletteState.ballHighlight;
-    const shadow = this.rouletteState.ballShadow;
-    const pockets = this.rouletteState.pockets;
-    
-    // V7.5: DETECT which pocket ball is actually nearest to
-    const ballRect = ball.getBoundingClientRect();
-    const ballCenterX = ballRect.left + ballRect.width / 2;
-    const ballCenterY = ballRect.top + ballRect.height / 2;
-    
-    let nearestPocketIndex = 0;
-    let nearestDistance = Infinity;
-    
-    pockets.forEach((pocket, i) => {
-      const pocketRect = pocket.getBoundingClientRect();
-      const pocketCenterX = pocketRect.left + pocketRect.width / 2;
-      const pocketCenterY = pocketRect.top + pocketRect.height / 2;
-      
-      const distance = Math.sqrt(
-        Math.pow(ballCenterX - pocketCenterX, 2) + 
-        Math.pow(ballCenterY - pocketCenterY, 2)
-      );
-      
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearestPocketIndex = i;
-      }
-    });
-    
-    // V7.5: UPDATE winner to actual landing pocket (no more jump!)
-    console.log(`🎯 Ball landed near pocket ${nearestPocketIndex} (was targeting ${this.rouletteState.winnerPocketIndex})`);
-    this.rouletteState.winnerPocketIndex = nearestPocketIndex;
-    
-    const winnerPocket = pockets[nearestPocketIndex];
-    
-    return new Promise(resolve => {
-      const tl = gsap.timeline({ onComplete: resolve });
-      
-      // Fine-tune position to center of detected pocket
-      const rect = winnerPocket.getBoundingClientRect();
-      const targetX = rect.left + rect.width / 2 - 25;
-      const targetY = rect.top + rect.height / 2 - 25;
-      
-      // V7.5: Short, subtle adjustment (not a big jump)
-      tl.to(ball, {
-        left: targetX,
-        top: targetY,
-        duration: 0.15,
-        ease: 'power2.out'
-      });
-      tl.to(highlight, {
-        left: targetX + 3,
-        top: targetY - 22,
-        duration: 0.35,
-        ease: 'expo.out'
-      }, 0);
-      tl.to(shadow, {
-        left: targetX - 2,
-        top: targetY + 35,
-        duration: 0.35,
-        ease: 'expo.out'
-      }, 0);
-      
-      // Natural bounce sequence - vertical only
-      tl.to(ball, { top: targetY - 35, duration: 0.18, ease: 'power2.out' });
-      tl.to(ball, { top: targetY, duration: 0.22, ease: 'bounce.out' });
-      tl.to(ball, { top: targetY - 15, duration: 0.12, ease: 'power1.out' });
-      tl.to(ball, { top: targetY, duration: 0.15, ease: 'bounce.out' });
-      tl.to(ball, { top: targetY - 5, duration: 0.08, ease: 'power1.out' });
-      tl.to(ball, { top: targetY, duration: 0.08 });
-      
-      // Winner glow flash
-      tl.to(winnerPocket, {
-        boxShadow: '0 0 120px rgba(255,215,0,1), 0 0 200px rgba(255,215,0,0.8)',
-        duration: 0.12,
-        repeat: 4,
-        yoyo: true,
-        onComplete: () => {
-          // V7.4: Diagnostic logging
-          console.log('🔍 Ball Landing Diagnostics:');
-          console.log('  Winner Pocket Index:', this.rouletteState.winnerPocketIndex);
-          console.log('  Pocket-to-Card Map:', this.rouletteState.pocketToCardMap[this.rouletteState.winnerPocketIndex]);
-          console.log('  Ball final position:', { 
-            left: ball.style.left, 
-            top: ball.style.top 
-          });
-        }
-      }, '-=0.5');
-      
-      // Fade out ball
-      tl.to([ball, highlight, shadow], {
-        opacity: 0,
-        scale: 0.3,
-        duration: 0.4
-      });
-      
-      if ('vibrate' in navigator) navigator.vibrate([50, 30, 80, 40, 30]);
-    });
-  }
-  
-  /**
-   * Phase 6: Lift-Feature-Settle Animation
-   * Research: Apple HIG Motion Principles, Material Design Elevation
-   */
-  async phase6_LiftFeatureSettle(winnerTitle) {
-    console.log('🎬 Phase 6: Lift-Feature-Settle');
-    
-    const pockets = this.rouletteState.pockets;
-    const winnerPocket = pockets[this.rouletteState.winnerPocketIndex];
-    const winnerCardIndex = this.rouletteState.pocketToCardMap[this.rouletteState.winnerPocketIndex];
-    const overlay = this.rouletteState.overlay;
-    
-    this.rouletteState.status.textContent = `🎉 ${winnerTitle}`;
-    
-    // Check for green pocket
-    if (winnerCardIndex === -1) {
-      console.log('💚 Green pocket hit!');
-      await this.delay(1500);
-      
-      if (confirm('🎰 Spin again?\n\nOK = Spin\nCancel = Browse')) {
-        this.cleanupCasinoWheel();
-        this.rouletteState.isActive = false;
-        this.isAnimating = false;
-        await this.delay(300);
-        return this.startCasinoWheelV70();
-      }
-      
-      // Continue to restore carousel at current position
-      return this.restoreCarousel(this.currentIndex);
-    }
-    
-    console.log(`✅ Winner: Card ${winnerCardIndex} "${this.items[winnerCardIndex]?.dataset.title}"`);
-    
-    const viewW = window.innerWidth;
-    const viewH = window.innerHeight;
-    const centerX = viewW / 2;
-    const centerY = viewH / 2;
-    
-    return new Promise(resolve => {
-      // V7.3: Premium "Levitate & Morph" sequence
-      const tl = gsap.timeline({ 
-        defaults: { ease: 'power3.inOut' },
-        onComplete: resolve // Don't call restoreCarousel - integrated below
-      });
-      
-      // Phase A (0-0.6s): Fade out other pockets
-      pockets.forEach((p, i) => {
-        if (i !== this.rouletteState.winnerPocketIndex) {
-          tl.to(p, { opacity: 0, scale: 0.2, duration: 0.6 }, 0);
-        }
-      });
-      tl.to(this.rouletteState.wheelRim, { opacity: 0, duration: 0.5 }, 0);
-      
-      // V7.3: Create absolute-positioned clone at screen center
-      const winnerClone = winnerPocket.cloneNode(true);
-      winnerClone.style.cssText = `
-        position: fixed;
-        left: 50%;
-        top: 50%;
-        width: ${winnerPocket.offsetWidth}px;
-        height: ${winnerPocket.offsetHeight}px;
-        transform-origin: center center;
-        z-index: 10000;
-        opacity: 0;
-        pointer-events: none;
-      `;
-      overlay.appendChild(winnerClone);
-      
-      const computedStyle = window.getComputedStyle(winnerPocket);
-      const currentTransform = computedStyle.transform;
-      
-      // Apply initial tilted state
-      gsap.set(winnerClone, {
-        transform: `translate(-50%, -50%) ${currentTransform !== 'none' ? currentTransform : ''}`,
-        opacity: 1,
-        scale: 1
-      });
-      
-      tl.to(winnerPocket, { opacity: 0, duration: 0.3 }, 0.2);
-      
-      // Phase B (0.6-1.2s): DRAMATIC LIFT with anticipation
-      tl.to(winnerClone, {
-        scale: 2.2,
-        boxShadow: '0 60px 120px rgba(0,0,0,0.8), 0 0 300px rgba(255,215,0,1), 0 0 600px rgba(255,170,0,0.6)',
-        filter: 'brightness(1.3) saturate(1.2)',
-        duration: 0.7,
-        ease: 'back.out(2.0)' // Stronger overshoot
-      }, 0.6);
-      
-      // Phase C (1.3-2.4s): CINEMATIC ZOOM + straighten
-      tl.to(winnerClone, {
-        transform: 'translate(-50%, -50%) rotate(0deg) scale(3.5)',
-        filter: 'brightness(1.4) saturate(1.3)',
-        duration: 1.1,
-        ease: 'expo.out' // Slow-mo deceleration
-      }, 1.3);
-      
-      // Phase D (2.4-3.0s): LUXURY SPOTLIGHT PULSE
-      tl.to(winnerClone, {
-        boxShadow: '0 80px 160px rgba(0,0,0,0.9), 0 0 400px rgba(255,215,0,1), 0 0 800px rgba(255,170,0,0.8), 0 0 1200px rgba(255,100,0,0.4)',
-        duration: 0.25,
-        yoyo: true,
-        repeat: 2,
-        ease: 'power1.inOut'
-      }, 2.4);
-      
-      // Phase E (2.8-3.8s): DESCEND into carousel
-      // Prepare carousel position
-      this.currentIndex = winnerCardIndex;
-      this.updateAllItems(winnerCardIndex, 0);
-      
-      const winnerCard = this.items[winnerCardIndex];
-      const finalRect = winnerCard.getBoundingClientRect();
-      const finalX = finalRect.left + finalRect.width / 2;
-      const finalY = finalRect.top + finalRect.height / 2;
-      
-      // Reveal carousel cards - but hide winner card initially for cross-fade
-      gsap.set(this.items, { opacity: 0 });
-      
-      // MORPH: Descend clone to EXACT carousel card position + match size
-      tl.to(winnerClone, {
-        left: finalX,
-        top: finalY,
-        width: finalRect.width,
-        height: finalRect.height,
-        transform: 'translate(-50%, -50%) rotate(0deg) scale(1)',
-        filter: 'brightness(1.0) saturate(1.0)',
-        borderRadius: '8px',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
-        duration: 1.0,
-        ease: 'expo.inOut'
-      }, 3.0);
-      
-      // CROSS-FADE: Clone OUT, winner card IN (true merge)
-      tl.to(winnerClone, {
-        opacity: 0,
-        duration: 0.5,
-        ease: 'power2.in'
-      }, 3.6);
-      
-      tl.to(winnerCard, {
-        opacity: 1,
-        duration: 0.5,
-        ease: 'power2.out'
-      }, 3.6);
-      
-      // Other cards fade in after
-      const otherCards = this.items.filter((_, i) => i !== winnerCardIndex);
-      tl.to(otherCards, {
-        opacity: 1,
-        duration: 0.4,
-        stagger: 0.03
-      }, 3.8);
-      
-      // Fade overlay
-      tl.to(overlay, {
-        opacity: 0,
-        duration: 0.6,
-        ease: 'power2.in'
-      }, 3.8);
-      
-      // Winner pulse
-      tl.add(() => {
-        gsap.timeline()
-          .to(winnerCard, { scale: 1.15, duration: 0.3, ease: 'back.out(2)' })
-          .to(winnerCard, { scale: 1.0, duration: 0.2 });
-        
-        this.delay(400).then(() => {
-          const link = winnerCard.querySelector('.card-link') || winnerCard.querySelector('a[href]');
-          if (link) {
-            const title = winnerCard.dataset.title || 'Selected Project';
-            if (confirm(`🎉 ${title}!\n\nView this project?`)) {
-              window.location.href = link.href;
-            }
-          }
-        });
-      }, 4.2);
-    });
-  }
-  
-  /**
-   * Restore carousel with winner centered
-   */
-  async restoreCarousel(winnerCardIndex) {
-    console.log('🎬 Restore Carousel');
-    
-    // Clear GSAP styles
-    this.items.forEach(item => {
-      gsap.set(item, { clearProps: 'all' });
-    });
-    
-    await this.delay(50);
-    
-    // Set current index to winner
-    this.currentIndex = winnerCardIndex;
-    this.updateAllItems(this.currentIndex, 0);
-    
-    // Fade cards in
-    gsap.set(this.items, { opacity: 0 });
-    
-    return new Promise(resolve => {
-      gsap.to(this.items, {
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.05,
-        ease: 'power2.out',
-        onComplete: () => {
-          console.log('✅ Carousel restored');
-          
-          // Highlight winner
-          const winner = this.items[winnerCardIndex];
-          if (winner) {
-            gsap.timeline()
-              .to(winner, { scale: 1.3, duration: 0.4, ease: 'back.out(2)' })
-              .to(winner, { scale: 1.15, duration: 0.3 });
-            
-            // Prompt to view
-            this.delay(700).then(() => {
-              const link = winner.querySelector('.card-link') || winner.querySelector('a[href]');
-              if (link) {
-                const title = winner.dataset.title || 'Selected Project';
-                if (confirm(`🎉 ${title}!\n\nView this project?`)) {
-                  window.location.href = link.href;
-                }
-              }
-              resolve();
-            });
-          } else {
-            resolve();
-          }
-        }
-      });
-    });
-  }
-  
-  /**
-   * Cleanup
-   */
-  cleanupCasinoWheel() {
-    console.log('🧹 V7.0: Cleanup');
-    
-    gsap.killTweensOf([
-      this.rouletteState.overlay,
-      this.rouletteState.wheelWrapper,
-      this.rouletteState.ball,
-      this.rouletteState.ballShadow,
-      this.rouletteState.ballHighlight,
-      this.rouletteState.wheelRim,
-      ...this.rouletteState.pockets
-    ].filter(Boolean));
-    
-    this.rouletteState.overlay?.remove();
-    
-    this.rouletteState = {
-      isActive: false,
-      overlay: null,
-      wheelWrapper: null,
-      pockets: [],
-      ball: null,
-      ballShadow: null,
-      ballHighlight: null,
-      wheelRim: null,
-      status: null,
-      originalWinnerIndex: null,
-      winnerPocketIndex: null,
-      greenPocketIndex: null,
-      pocketToCardMap: []
+    let resizeTimeout = null;
+    const handleResize = () => {
+      this.resources.clearTimeout(resizeTimeout);
+      resizeTimeout = this.resources.timeout(refresh, 120);
     };
+
+    this.resources.listen(window, 'resize', handleResize, { passive: true });
+    this.resources.listen(window, 'orientationchange', handleResize, { passive: true });
+
+    if ('ResizeObserver' in window) {
+      const observer = this.resources.observe(new ResizeObserver(handleResize));
+      observer.observe(this.container);
+    }
   }
-  
-  // ========================================
-  // UTILITY METHODS
-  // ========================================
-  
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-  
-  updatePagination() {
-    const curr = this.container.querySelector('.pagination-current');
-    const total = this.container.querySelector('.pagination-total');
-    if (curr) curr.textContent = String(this.currentIndex + 1);
-    if (total) total.textContent = String(this.items.length);
-  }
-  
+
   startAutoplay() {
-    if (!this.config.autoplay) return;
-    this.autoplayTimer = setInterval(() => this.next(), this.config.autoplayDelay);
+    if (!this.config.autoplay || this.autoplayInterval) return;
+    this.autoplayInterval = this.resources.interval(() => this.next(), this.config.autoplayDelay);
   }
-  
+
   stopAutoplay() {
-    if (this.autoplayTimer) { clearInterval(this.autoplayTimer); this.autoplayTimer = null; }
+    if (!this.autoplayInterval) return;
+    this.resources.clearInterval(this.autoplayInterval);
+    this.autoplayInterval = null;
   }
-  
+
   resetAutoplay() {
     this.stopAutoplay();
-    if (this.config.autoplay) this.startAutoplay();
+    this.startAutoplay();
   }
-  
-  setupResizeHandler() {
-    let _lastMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-    let timer;
-    const handle = () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        const nowMobile = window.innerWidth < 640;
-        if (nowMobile !== _lastMobile) {
-          _lastMobile = nowMobile;
-          const isMobile = nowMobile;
-          this.engine3D = new Coverflow3DEngine({
-            ...this.config,
-            infiniteLoop: this.config.infiniteLoop,
-            ...(isMobile ? {
-              positions: {
-                center: { rotateY: 0, translateZ: 0, translateX: 0, scale: 1.0, opacity: 1, zIndex: 100, blur: 0, brightness: 1.05, saturate: 1.05 },
-                adjacent1: { rotateY: 14, translateZ: -40, translateX: 220, scale: 0.9, opacity: 0.82, zIndex: 90, blur: 0, brightness: 0.9, saturate: 1 },
-                adjacent2: { rotateY: 35, translateZ: -200, translateX: 450, scale: 0.68, opacity: 0.35, zIndex: 80, blur: 1, brightness: 0.8, saturate: 0.95 },
-                adjacent3: { rotateY: 45, translateZ: -320, translateX: 580, scale: 0.52, opacity: 0.1, zIndex: 70, blur: 2, brightness: 0.65, saturate: 0.9 },
-                far: { rotateY: 52, translateZ: -420, translateX: 680, scale: 0.4, opacity: 0, zIndex: 60, blur: 3, brightness: 0.5, saturate: 0.8 }
-              }
-            } : {})
-          });
-        }
-        this.updateAllItems(this.currentIndex, 0);
-      }, 150);
-    };
-    window.addEventListener('resize', handle);
-    if ('ResizeObserver' in window) new ResizeObserver(handle).observe(this.container);
+
+  async startRoulette() {
+    if (this.roulette.isSpinning) return;
+    await this.roulette.start();
   }
-  
-  announceCurrentSlide() {
-    const card = this.items[this.currentIndex];
-    if (!card) return;
-    const title = card.dataset.title || card.querySelector('.card-title')?.textContent || `Slide ${this.currentIndex + 1}`;
-    let region = document.getElementById('coverflow-live-region');
-    if (!region) {
-      region = document.createElement('div');
-      region.id = 'coverflow-live-region';
-      region.className = 'sr-only';
-      region.setAttribute('aria-live', 'polite');
-      document.body.appendChild(region);
-    }
-    region.textContent = `Now showing: ${title}`;
+
+  refreshLayout() {
+    this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
+    this.updateAllItems(this.currentIndex, 0);
+    this.roulette.refreshLayout();
   }
-  
+
   destroy() {
     this.stopAutoplay();
+    this.resources.destroy();
+    this.physics.destroy();
+    this.roulette.destroy();
     gsap.killTweensOf(this.items);
-    this.cleanupCasinoWheel();
-    console.log('⏹️ Coverflow destroyed');
+    this.container.dataset.coverflowReady = 'false';
   }
-  
+
   getState() {
     return {
       currentIndex: this.currentIndex,
       totalItems: this.items.length,
       isAnimating: this.isAnimating,
-      casinoActive: this.rouletteState.isActive
+      rouletteActive: this.roulette.isActive,
+      rouletteSpinning: this.roulette.isSpinning,
+      tier: this.profile.tier
     };
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const el = document.querySelector('[data-luxury-coverflow-auto]');
-  if (el) window.luxuryCoverflow = new LuxuryCoverflow('[data-luxury-coverflow-auto]', { initialIndex: 0, performanceTier: null });
+  const autoMount = document.querySelector('[data-luxury-coverflow-auto]');
+  if (!autoMount) return;
+  window.luxuryCoverflow = new LuxuryCoverflow('[data-luxury-coverflow-auto]');
 });
