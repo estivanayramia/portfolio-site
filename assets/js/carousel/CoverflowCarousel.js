@@ -89,10 +89,13 @@ export default class CoverflowCarousel {
   init() {
     if (!this.viewport || !this.track || this.setSize === 0) return;
 
+    this._storageKey = this._resolveStorageKey();
+
     if (!this.element.hasAttribute('tabindex')) this.element.tabIndex = 0;
 
     this.buildTrack();
     this.measure();
+    this._restorePosition();
     this.bindEvents();
 
     this.element.classList.add('coverflow-ready');
@@ -118,6 +121,46 @@ export default class CoverflowCarousel {
     }
 
     this.cards = Array.from(this.track.querySelectorAll('.coverflow-card'));
+  }
+
+  /** @returns {string} */
+  _resolveStorageKey() {
+    const byId = this.element.id?.trim();
+    if (byId) return `carousel:pos:${byId}`;
+    const byData = this.element.dataset?.carouselId?.trim();
+    if (byData) return `carousel:pos:${byData}`;
+    const siblings = Array.from(document.querySelectorAll('[data-coverflow-luxury]'));
+    const idx = siblings.indexOf(this.element);
+    return `carousel:pos:${window.location.pathname}:${idx}`;
+  }
+
+  _savePosition() {
+    try {
+      const logical = ((this.currentIndex - this.setSize) % this.setSize + this.setSize) % this.setSize;
+      sessionStorage.setItem(this._storageKey, String(logical));
+    } catch {
+      // sessionStorage unavailable — fail silently
+    }
+  }
+
+  /**
+   * Reads saved logical index from sessionStorage, jumps to it.
+   * Must be called AFTER buildTrack() and measure() so this.setSize is valid.
+   * @returns {boolean} true if saved position was applied
+   */
+  _restorePosition() {
+    try {
+      const raw = sessionStorage.getItem(this._storageKey);
+      if (raw === null) return false;
+      const logical = parseInt(raw, 10);
+      if (!Number.isFinite(logical) || logical < 0 || logical >= this.setSize) return false;
+      const absolute = logical + this.setSize;
+      this.currentIndex = absolute;
+      this.virtualIndex = absolute;
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   bindEvents() {
@@ -495,6 +538,7 @@ export default class CoverflowCarousel {
     this.virtualIndex = target;
 
     this.render(reduced ? 0 : smooth ? this.options.rotationSpeed : 0);
+    this._savePosition();
 
     if (reduced || !smooth) return;
     window.clearTimeout(this._normalizeTimer);
@@ -509,6 +553,7 @@ export default class CoverflowCarousel {
       this.currentIndex = normalized;
       this.virtualIndex = normalized;
       this.render(0);
+      this._savePosition();
     }
   }
 
@@ -577,6 +622,7 @@ export default class CoverflowCarousel {
 
 function boot() {
   const carousels = document.querySelectorAll('[data-coverflow-luxury]');
+  const instances = [];
   carousels.forEach((el) => {
     try {
       const element = /** @type {HTMLElement} */ (el);
@@ -584,10 +630,23 @@ function boot() {
       if (prefersReducedMotion() && safeMatchMedia('(max-width: 480px)').matches) {
         return;
       }
-      new CoverflowCarousel(element);
+      instances.push(new CoverflowCarousel(element));
     } catch (err) {
       console.error('Coverflow init failed:', err);
     }
+  });
+
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted) return;
+    instances.forEach((carousel) => {
+      try {
+        carousel._restorePosition();
+        carousel.virtualIndex = carousel.currentIndex;
+        carousel.render(0);
+      } catch {
+        // Instance destroyed — ignore
+      }
+    });
   });
 }
 

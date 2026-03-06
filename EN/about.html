@@ -283,10 +283,8 @@
                         <article class="coverflow-card" role="listitem" data-index="1" data-title="Background">
                             <div class="card-inner">
                                 <div class="card-image-container">
-                                    <div class="card-bg" style="background: linear-gradient(135deg, #312e81, #6366f1);">
-                                        <svg width="80" height="80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                                        </svg>
+                                    <div class="card-bg" style="background: linear-gradient(135deg, #312e81, #6366f1); position: relative; overflow: hidden;">
+                                        <img src="/assets/img/Portolio-Media/Portfolio-Media/Estivan_and_Alen_in_Iraq.jpg" alt="Estivan with his brother" width="1290" height="952" loading="lazy" decoding="async" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; opacity: 0.65;" />
                                     </div>
                                     <div class="card-image-overlay"></div>
                                 </div>
@@ -520,7 +518,7 @@
                                     <h3 class="card-title">Games</h3>
                                     <p class="card-description">Chess, strategy games, competitive thinking. Because even hobbies teach systems.</p>
                                     <div class="card-actions">
-                                        <a href="/hobbies-games" class="card-link">
+                                        <a href="/EN/hobbies-games.html" class="card-link">
                                             <span>View Details</span>
                                             <svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
                                         </a>
@@ -669,6 +667,55 @@
                     autoplay: false,
                     animationDuration: 0.55
                 });
+
+                const c = window.aboutCarousel;
+                let wheelAccum = 0;
+                let wheelLocked = false;
+                let lastWheelAt = 0;
+
+                carouselEl.addEventListener('wheel', (event) => {
+                    if (!c || typeof c.next !== 'function' || typeof c.prev !== 'function') {
+                        return;
+                    }
+
+                    const absX = Math.abs(event.deltaX);
+                    const absY = Math.abs(event.deltaY);
+
+                    if (event.ctrlKey || absY <= absX || absY < 8) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+
+                    const now = Date.now();
+                    if (now - lastWheelAt > 240) {
+                        wheelAccum = 0;
+                    }
+                    lastWheelAt = now;
+                    wheelAccum += event.deltaY;
+
+                    if (Math.abs(wheelAccum) < 36) {
+                        return;
+                    }
+
+                    if (wheelLocked) {
+                        return;
+                    }
+
+                    wheelLocked = true;
+                    if (wheelAccum > 0) {
+                        c.next();
+                    } else {
+                        c.prev();
+                    }
+                    wheelAccum = 0;
+
+                    window.setTimeout(() => {
+                        wheelLocked = false;
+                    }, 720);
+                }, { passive: false, capture: true });
+
                 console.log('✨ About Carousel loaded successfully! 🎠');
             }
         });
