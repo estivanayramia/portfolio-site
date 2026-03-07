@@ -13,6 +13,7 @@ import { CoverflowPhysics } from './coverflow-physics.js';
 import { RouletteWheelEngine } from './roulette-wheel-engine.js';
 
 const PERF_PROFILE_GLOBAL_KEY = '__EA_LUXURY_COVERFLOW_PROFILE__';
+let liveRegionCounter = 0;
 const ROOT_TIER_CLASSES = [
   'cf-tier-premium',
   'cf-tier-enhanced',
@@ -201,6 +202,19 @@ function createElement(tagName, className, textContent) {
   if (className) node.className = className;
   if (typeof textContent === 'string') node.textContent = textContent;
   return node;
+}
+
+function createNoopRouletteController() {
+  return {
+    isActive: false,
+    isSpinning: false,
+    async start() {},
+    refreshLayout() {},
+    destroy() {},
+    getStablePocketOrder() {
+      return [];
+    }
+  };
 }
 
 function hashString(value) {
@@ -985,8 +999,25 @@ export class LuxuryCoverflow {
       : containerSelector;
     if (!this.container) return;
 
-    this.track = this.container.querySelector('.coverflow-track');
-    this.items = Array.from(this.container.querySelectorAll('.coverflow-card'));
+    this.selectors = {
+      track: '.coverflow-track',
+      items: '.coverflow-card',
+      prevButton: '.coverflow-btn-prev',
+      nextButton: '.coverflow-btn-next',
+      paginationCurrent: '.pagination-current',
+      paginationTotal: '.pagination-total',
+      dots: null,
+      ...options.selectors
+    };
+
+    this.callbacks = {
+      onActiveItemSelect: null,
+      resolveItemTitle: null,
+      ...options.callbacks
+    };
+
+    this.track = this.container.querySelector(this.selectors.track);
+    this.items = Array.from(this.container.querySelectorAll(this.selectors.items));
     if (!this.track || this.items.length === 0) return;
 
     const profile = computePerformanceProfile();
@@ -1012,6 +1043,10 @@ export class LuxuryCoverflow {
       enableSmoothTracking: this.motion.enableSmoothTracking,
       performanceTier: resolvedTier,
       animationEase: 'power2.out',
+      surface: 'default',
+      activeStateClass: 'coverflow-card--active',
+      maxVisibleDots: 7,
+      itemRoleDescription: 'slide',
       rouletteAutoNavigate: true,
       rouletteAutoNavigateDelay: 1200,
       ...options
@@ -1051,7 +1086,11 @@ export class LuxuryCoverflow {
       velocityMultiplier: 2.2
     });
     this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
-    this.roulette = new RouletteOverlayController(this);
+    this.dots = [];
+    this.dotTargets = [];
+    this.dotContainer = this.selectors.dots ? this.container.querySelector(this.selectors.dots) : null;
+    const rouletteButton = this.container.querySelector('[data-roulette-trigger], .roulette-trigger-btn');
+    this.roulette = rouletteButton ? new RouletteOverlayController(this) : createNoopRouletteController();
 
     this.liveRegion = this.ensureLiveRegion();
     this.init();
@@ -1060,22 +1099,24 @@ export class LuxuryCoverflow {
   init() {
     this.container.dataset.coverflowReady = 'true';
     this.container.dataset.coverflowTier = this.profile.tier;
+    this.container.dataset.coverflowSurface = this.config.surface;
     this.container.style.setProperty('--luxury-glow-strength', String(this.motion.glowStrength));
     this.container.style.setProperty('--luxury-reflection-opacity', String(this.motion.reflectionOpacity));
 
     this.items.forEach((item, index) => {
       item.dataset.index = item.dataset.index || String(index);
       item.tabIndex = index === this.currentIndex ? 0 : -1;
-      item.setAttribute('aria-roledescription', 'slide');
+      item.setAttribute('aria-roledescription', this.config.itemRoleDescription);
     });
 
-    const rouletteButton = this.container.querySelector('.roulette-trigger-btn');
+    const rouletteButton = this.container.querySelector('[data-roulette-trigger], .roulette-trigger-btn');
     if (rouletteButton) {
       rouletteButton.dataset.rouletteTrigger = 'true';
       rouletteButton.setAttribute('aria-haspopup', 'dialog');
       rouletteButton.setAttribute('aria-controls', 'luxury-roulette-title');
     }
 
+    this.buildDots();
     this.updateAllItems(this.currentIndex, 0);
     this.setupKeyboardNavigation();
     this.setupPointerInteractions();
@@ -1107,15 +1148,30 @@ export class LuxuryCoverflow {
   }
 
   ensureLiveRegion() {
-    const existing = this.container.querySelector('.sr-live-region') || document.getElementById('coverflow-live-region');
+    const existing = this.container.querySelector('.sr-live-region');
     if (existing) return existing;
 
     const region = createElement('div', 'sr-only sr-live-region');
-    region.id = 'coverflow-live-region';
+    liveRegionCounter += 1;
+    region.id = `coverflow-live-region-${liveRegionCounter}`;
     region.setAttribute('aria-live', 'polite');
     region.setAttribute('aria-atomic', 'true');
     this.container.appendChild(region);
     return region;
+  }
+
+  resolveItemTitle(item, fallbackIndex = this.currentIndex) {
+    if (!item) return `Slide ${fallbackIndex + 1}`;
+    if (typeof this.callbacks.resolveItemTitle === 'function') {
+      const resolvedTitle = this.callbacks.resolveItemTitle(item, fallbackIndex, this);
+      if (resolvedTitle) return String(resolvedTitle);
+    }
+
+    return item.dataset.title
+      || item.getAttribute('aria-label')
+      || item.querySelector('.card-title')?.textContent?.trim()
+      || item.querySelector('img')?.alt?.trim()
+      || `Slide ${fallbackIndex + 1}`;
   }
 
   announce(message, mode = 'polite') {
@@ -1130,15 +1186,62 @@ export class LuxuryCoverflow {
   announceCurrentSlide() {
     const card = this.items[this.currentIndex];
     if (!card) return;
-    const title = card.dataset.title || card.querySelector('.card-title')?.textContent?.trim() || `Slide ${this.currentIndex + 1}`;
+    const title = this.resolveItemTitle(card, this.currentIndex);
     this.announce(`Now showing ${title}`);
   }
 
   updatePagination() {
-    const current = this.container.querySelector('.pagination-current');
-    const total = this.container.querySelector('.pagination-total');
+    const current = this.selectors.paginationCurrent ? this.container.querySelector(this.selectors.paginationCurrent) : null;
+    const total = this.selectors.paginationTotal ? this.container.querySelector(this.selectors.paginationTotal) : null;
     if (current) current.textContent = String(this.currentIndex + 1);
     if (total) total.textContent = String(this.items.length);
+  }
+
+  buildDots() {
+    if (!this.dotContainer) return;
+
+    const dotCount = Math.min(this.items.length, Math.max(0, this.config.maxVisibleDots || this.items.length));
+    if (dotCount <= 0) return;
+
+    this.dotContainer.innerHTML = '';
+    this.dots = Array.from({ length: dotCount }, (_, slotIndex) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'carousel-dot';
+      dot.dataset.dotSlot = String(slotIndex);
+      this.resources.listen(dot, 'click', () => {
+        const targetIndex = this.dotTargets[slotIndex];
+        if (Number.isInteger(targetIndex)) {
+          this.goToSlide(targetIndex);
+        }
+      });
+      this.dotContainer.appendChild(dot);
+      return dot;
+    });
+  }
+
+  updateDots() {
+    if (!this.dots.length) return;
+
+    const dotCount = this.dots.length;
+    const maxStart = Math.max(0, this.items.length - dotCount);
+    const windowStart = this.items.length <= dotCount
+      ? 0
+      : clamp(this.currentIndex - Math.floor(dotCount / 2), 0, maxStart);
+
+    this.dotTargets = this.dots.map((_, slotIndex) => windowStart + slotIndex);
+    this.dots.forEach((dot, slotIndex) => {
+      const targetIndex = this.dotTargets[slotIndex];
+      const targetItem = this.items[targetIndex];
+      const isActive = targetIndex === this.currentIndex;
+      const label = this.resolveItemTitle(targetItem, targetIndex);
+
+      dot.classList.toggle('active', isActive);
+      dot.setAttribute('aria-label', `Go to ${label}`);
+      dot.setAttribute('aria-current', isActive ? 'true' : 'false');
+      dot.dataset.index = String(targetIndex);
+      dot.hidden = !targetItem;
+    });
   }
 
   applyItemState(item, index, centerIndex, transform) {
@@ -1150,9 +1253,10 @@ export class LuxuryCoverflow {
 
     item.classList.toggle('is-center', isCenter);
     item.classList.toggle('is-adjacent', isAdjacent);
-    item.classList.toggle('coverflow-card--active', isCenter);
+    item.classList.toggle(this.config.activeStateClass, isCenter);
     item.setAttribute('aria-current', isCenter ? 'true' : 'false');
     item.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+    item.setAttribute('aria-label', `${this.resolveItemTitle(item, index)} (${index + 1} of ${this.items.length})`);
     item.tabIndex = isCenter ? 0 : -1;
 
     gsap.set(item, { zIndex: transform.zIndex });
@@ -1193,6 +1297,7 @@ export class LuxuryCoverflow {
     });
 
     this.updatePagination();
+  this.updateDots();
 
     if (durationMs > 0) {
       this.setAnimating(durationMs);
@@ -1219,6 +1324,7 @@ export class LuxuryCoverflow {
         force3D: true
       });
     });
+    this.updateDots();
   }
 
   setAnimating(durationMs) {
@@ -1279,7 +1385,7 @@ export class LuxuryCoverflow {
     if (!this.config.enableKeyboard) return;
 
     this.resources.listen(document, 'keydown', (event) => {
-      if (this.roulette.isActive) return;
+      if (this.roulette?.isActive) return;
 
       const containerHasFocus = this.container.contains(document.activeElement);
       const containerHasHover = !isCoarsePointerDevice() && this.container.matches(':hover');
@@ -1392,7 +1498,7 @@ export class LuxuryCoverflow {
     if (!this.config.enableScroll) return;
 
     this.resources.listen(this.container, 'wheel', (event) => {
-      if (this.roulette.isActive) return;
+      if (this.roulette?.isActive) return;
 
       const absX = Math.abs(event.deltaX);
       const absY = Math.abs(event.deltaY);
@@ -1514,14 +1620,26 @@ export class LuxuryCoverflow {
           event.preventDefault();
           return;
         }
-        if (index === this.currentIndex) return;
+        if (index === this.currentIndex) {
+          if (typeof this.callbacks.onActiveItemSelect === 'function') {
+            event.preventDefault();
+            this.callbacks.onActiveItemSelect(item, index, this, event);
+          }
+          return;
+        }
         event.preventDefault();
         this.goToSlide(index);
       });
 
       this.resources.listen(item, 'keydown', (event) => {
         if (event.key !== 'Enter' && event.key !== ' ') return;
-        if (index === this.currentIndex) return;
+        if (index === this.currentIndex) {
+          if (typeof this.callbacks.onActiveItemSelect === 'function') {
+            event.preventDefault();
+            this.callbacks.onActiveItemSelect(item, index, this, event);
+          }
+          return;
+        }
         event.preventDefault();
         this.goToSlide(index);
       });
@@ -1529,8 +1647,8 @@ export class LuxuryCoverflow {
   }
 
   setupNavigationButtons() {
-    const previousButton = this.container.querySelector('.coverflow-btn-prev');
-    const nextButton = this.container.querySelector('.coverflow-btn-next');
+    const previousButton = this.container.querySelector(this.selectors.prevButton);
+    const nextButton = this.container.querySelector(this.selectors.nextButton);
 
     if (previousButton) {
       this.resources.listen(previousButton, 'click', (event) => {
@@ -1621,8 +1739,8 @@ export class LuxuryCoverflow {
       currentIndex: this.currentIndex,
       totalItems: this.items.length,
       isAnimating: this.isAnimating,
-      rouletteActive: this.roulette.isActive,
-      rouletteSpinning: this.roulette.isSpinning,
+      rouletteActive: this.roulette?.isActive || false,
+      rouletteSpinning: this.roulette?.isSpinning || false,
       tier: this.profile.tier
     };
   }

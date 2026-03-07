@@ -174,7 +174,8 @@ async function prepareMiniCarouselAt(page, url, selector = '[data-mini-carousel]
 
   const carousel = page.locator(selector);
   await expect(carousel).toBeVisible({ timeout: 10000 });
-  await expect(carousel).toHaveAttribute('data-mini-carousel-ready', 'true', { timeout: 10000 });
+  await expect(carousel).toHaveAttribute('data-gallery-coverflow-init', 'true', { timeout: 10000 });
+  await expect(carousel).toHaveAttribute('data-coverflow-ready', 'true', { timeout: 10000 });
   await carousel.scrollIntoViewIfNeeded();
   await page.waitForTimeout(250);
 }
@@ -206,22 +207,30 @@ async function ensureMiniCarouselInView(page, selector = '[data-mini-carousel]')
 async function getMiniState(page, selector = '[data-mini-carousel]') {
   return page.locator(selector).first().evaluate((section) => {
     const slides = Array.from(section.querySelectorAll('.carousel-slide'));
-    const active = section.querySelector('.carousel-slide.is-active');
+    const active = section.querySelector('.carousel-slide.coverflow-card--active, .carousel-slide.is-center');
     const track = section.querySelector('.carousel-track');
     const buttons = Array.from(section.querySelectorAll('.carousel-btn')).map((button) => {
       const rect = button.getBoundingClientRect();
       return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
     });
+    const dots = Array.from(section.querySelectorAll('.carousel-dot')).map((dot) => ({
+      active: dot.classList.contains('active') || dot.getAttribute('aria-current') === 'true',
+      index: dot.getAttribute('data-index') || ''
+    }));
 
     return {
       activeIndex: slides.indexOf(active),
-      activeCount: section.querySelectorAll('.carousel-slide.is-active').length,
-      nearCount: section.querySelectorAll('.carousel-slide.is-near').length,
+      activeCount: section.querySelectorAll('.carousel-slide.coverflow-card--active, .carousel-slide.is-center').length,
       mode: section.dataset.miniCarouselMode || '',
-      ready: section.dataset.miniCarouselReady || '',
+      ready: section.dataset.coverflowReady || '',
+      surface: section.dataset.gallerySurface || section.dataset.coverflowSurface || '',
+      variant: section.dataset.galleryVariant || '',
       trackTransform: track ? getComputedStyle(track).transform : '',
       sectionRect: section.getBoundingClientRect().toJSON(),
       activeRect: active ? active.getBoundingClientRect().toJSON() : null,
+      activeLabel: active ? active.getAttribute('aria-label') || '' : '',
+      activeDotCount: dots.filter((dot) => dot.active).length,
+      dots,
       buttons
     };
   });
@@ -339,10 +348,13 @@ async function expectMiniLayoutStable(page, selector = '[data-mini-carousel]') {
   const state = await getMiniState(page, selector);
   expect(state.ready).toBe('true');
   expect(state.activeCount).toBe(1);
-  expect(state.nearCount).toBeGreaterThan(0);
+  expect(state.activeDotCount).toBe(1);
+  expect(state.surface).toBe('luxury-coverflow');
   expect(state.activeRect).not.toBeNull();
   expect(state.sectionRect.left).toBeGreaterThanOrEqual(-4);
   expect(state.sectionRect.right).toBeLessThanOrEqual(state.sectionRect.width + state.sectionRect.left + 4);
+  expect(state.activeRect.left).toBeGreaterThanOrEqual(state.sectionRect.left - 12);
+  expect(state.activeRect.right).toBeLessThanOrEqual(state.sectionRect.right + 12);
   state.buttons.forEach((buttonBox) => {
     expect(buttonBox.x).toBeGreaterThanOrEqual(state.sectionRect.left - 8);
     expect(buttonBox.x + buttonBox.width).toBeLessThanOrEqual(state.sectionRect.right + 8);
@@ -677,7 +689,7 @@ test.describe('Shared Premium Pages', () => {
   });
 });
 
-test.describe('Mini Gallery Rollout', () => {
+test.describe('Gallery Coverflow Rollout', () => {
   for (const miniPage of miniPages) {
     test(`${miniPage.name} is explicitly migrated and excludes roulette`, async ({ page }) => {
       await prepareMiniCarouselAt(page, miniPage.url);
@@ -685,13 +697,14 @@ test.describe('Mini Gallery Rollout', () => {
       const state = await getMiniState(page);
       expect(state.ready).toBe('true');
       expect(state.mode).toMatch(/gallery|notes/);
-      await expect(page.locator('[data-mini-carousel]')).toHaveAttribute('data-mini-carousel', 'true');
+      expect(state.surface).toBe('luxury-coverflow');
+      await expect(page.locator('[data-mini-carousel]')).toHaveAttribute('data-gallery-surface', 'luxury-coverflow');
       await expect(page.locator('[data-mini-carousel] [data-roulette-trigger], [data-mini-carousel] .roulette-trigger-btn')).toHaveCount(0);
     });
   }
 });
 
-test.describe('Mini Gallery Input', () => {
+test.describe('Gallery Coverflow Input', () => {
   test('photography ignores pure vertical wheel and accepts horizontal wheel', async ({ page }) => {
     await prepareMiniCarouselAt(page, photographyUrl);
 
@@ -723,6 +736,37 @@ test.describe('Mini Gallery Input', () => {
     await swipeMiniCarousel(page, 'left', { selector: '[data-mini-carousel]', distanceRatio: 0.58 });
     const finalState = await getMiniState(page);
     expect(finalState.activeIndex).not.toBe(initialState.activeIndex);
+  });
+
+  test('active gallery item opens lightbox and Escape closes it', async ({ page }) => {
+    await prepareMiniCarouselAt(page, photographyUrl);
+
+    const activeSlide = page.locator('[data-mini-carousel] .carousel-slide.coverflow-card--active, [data-mini-carousel] .carousel-slide.is-center').first();
+    await activeSlide.click();
+    await expect(page.locator('#lightbox')).toHaveClass(/active/);
+    await expect(page.locator('#lightbox')).toHaveAttribute('aria-hidden', 'false');
+
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#lightbox')).not.toHaveClass(/active/);
+    await expect(page.locator('#lightbox')).toHaveAttribute('aria-hidden', 'true');
+  });
+});
+
+test.describe('Gallery Reduced Motion', () => {
+  test('reduced motion gallery still initializes and advances', async ({ browser }) => {
+    const context = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+      reducedMotion: 'reduce'
+    });
+    const page = await context.newPage();
+
+    await prepareMiniCarouselAt(page, photographyUrl);
+    const initialState = await getMiniState(page);
+    await clickMiniButton(page, 'next');
+    const finalState = await getMiniState(page);
+
+    expect(finalState.activeIndex).not.toBe(initialState.activeIndex);
+    await context.close();
   });
 });
 
@@ -769,11 +813,11 @@ for (const profile of responsiveProfiles) {
 }
 
 for (const profile of responsiveProfiles) {
-  test.describe(`${profile.name} — Mini Responsive Proof`, () => {
+  test.describe(`${profile.name} — Gallery Responsive Proof`, () => {
     test.use(profile.use);
 
     for (const miniPage of responsiveMiniPages) {
-      test(`${miniPage.name} mini carousel stays contained without bleed`, async ({ page }) => {
+      test(`${miniPage.name} gallery coverflow stays contained without bleed`, async ({ page }) => {
         await prepareMiniCarouselAt(page, miniPage.url);
         await expectSectionWithinViewport(page, '[data-mini-carousel]');
         await expectMiniLayoutStable(page);
