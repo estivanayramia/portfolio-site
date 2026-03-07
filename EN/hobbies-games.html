@@ -21,11 +21,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/assets/css/style.css?v=185613f">
+    <link rel="stylesheet" href="/assets/css/style.css?v=e7949ba">
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=e7949ba-v4">
     
     <!-- Main Site Logic (Chat, Theme, etc.) -->
-    <script src="/assets/js/site.min.js?v=185613f" defer></script>
+    <script src="/assets/js/site.min.js?v=e7949ba" defer></script>
     <script type="module" src="/assets/js/arcade/arcade-core.js"></script>
     <script type="module" src="/assets/js/arcade/achievements-ui.js"></script>
     
@@ -924,51 +925,98 @@
                 </div>
                 <h2 class="sr-only">Featured games</h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-4xl mx-auto">
-                    <!-- Snake -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/snake'">
-                        <div class="text-5xl mb-3">🐍</div>
-                        <h2 class="text-2xl font-bold mb-2">Snake</h2>
-                        <p class="text-sm text-chocolate/80 dark:text-[#e1d4c2] mb-4">Classic reflex test with growing difficulty. Eat and grow!</p>
-                        <div id="snake-progress" class="text-xs text-chocolate/70 dark:text-[#e1d4c2] mb-3"></div>
-                        <button type="button" class="text-xs text-chocolate/80 dark:text-[#e1d4c2] underline hover:opacity-100 transition-opacity" onclick="showStats('snake'); event.stopPropagation();">View All Achievements ▸</button>
-                        <div id="snake-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
-                        <div class="inline-block px-4 py-2 bg-green-600 rounded-lg text-sm font-medium game-action">Play Snake</div>
-                    </div>
-                    
-                    <!-- Block Breaker -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/block-breaker'">
-                        <div class="text-5xl mb-3">🧱</div>
-                        <h2 class="text-2xl font-bold mb-2">Block Breaker</h2>
-                        <p class="text-sm text-chocolate/80 dark:text-[#e1d4c2] mb-4">Smash bricks with increasing speed and power-ups!</p>
-                        <div id="breaker-progress" class="text-xs text-chocolate/70 dark:text-[#e1d4c2] mb-3"></div>
-                        <button type="button" class="text-xs text-chocolate/80 dark:text-[#e1d4c2] underline hover:opacity-100 transition-opacity" onclick="showStats('breaker'); event.stopPropagation();">View All Achievements ▸</button>
-                        <div id="breaker-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
-                        <div class="inline-block px-4 py-2 bg-purple-600 rounded-lg text-sm font-medium game-action">Play Breaker</div>
-                    </div>
-                    
-                    <!-- 2048 -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/2048'">
-                        <div class="text-5xl mb-3">🧩</div>
-                        <h2 class="text-2xl font-bold mb-2">2048</h2>
-                        <p class="text-sm text-chocolate/80 dark:text-[#e1d4c2] mb-4">Combine tiles to reach 2048 with smooth animations!</p>
-                        <div id="merge-progress" class="text-xs text-chocolate/70 dark:text-[#e1d4c2] mb-3"></div>
-                        <button type="button" class="text-xs text-chocolate/80 dark:text-[#e1d4c2] underline hover:opacity-100 transition-opacity" onclick="showStats('merge'); event.stopPropagation();">View All Achievements ▸</button>
-                        <div id="merge-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
-                        <div class="inline-block px-4 py-2 bg-blue-600 rounded-lg text-sm font-medium game-action">Play 2048</div>
+                <section id="arcade-featured-carousel" class="coverflow-section" data-luxury-coverflow aria-label="Featured arcade games" role="region" style="min-height:auto; background:transparent; padding:0.5rem 0 1rem;">
+                    <div class="coverflow-header mb-6">
+                        <h2 class="coverflow-title">
+                            <span class="title-main">Featured Games</span>
+                            <span class="title-sub">Arcade Favorites</span>
+                        </h2>
                     </div>
 
-                    <!-- Space Invaders -->
-                    <div class="game-card bg-white/50 rounded-2xl p-6 text-center" onclick="window.location.href='/hobbies-games/space-invaders'">
-                        <div class="text-5xl mb-3">👾</div>
-                        <h2 class="text-2xl font-bold mb-2">Space Invaders</h2>
-                        <p class="text-sm text-chocolate/80 dark:text-[#e1d4c2] mb-4">Defend Earth from alien waves with escalating difficulty!</p>
-                        <div id="invaders-progress" class="text-xs text-chocolate/70 dark:text-[#e1d4c2] mb-3"></div>
-                        <button type="button" class="text-xs text-chocolate/80 dark:text-[#e1d4c2] underline hover:opacity-100 transition-opacity" onclick="showStats('invaders'); event.stopPropagation();">View All Achievements ▸</button>
-                        <div id="invaders-achievements" class="hidden mt-3 text-left" style="font-size:12px;"></div>
-                        <div class="inline-block px-4 py-2 bg-red-600 rounded-lg text-sm font-medium game-action">Play Invaders</div>
+                    <div class="coverflow-container" style="height:clamp(32rem, 72vh, 38rem);">
+                        <div class="coverflow-perspective">
+                            <div class="coverflow-track" role="list">
+                                <article class="coverflow-card" role="listitem" data-index="0" data-title="Snake">
+                                    <div class="card-inner">
+                                        <div class="card-image-container">
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #0f5132, #14532d); font-size: 4rem;">🐍</div>
+                                            <div class="card-image-overlay"></div>
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="card-category">Arcade Classic</div>
+                                            <h3 class="card-title">Snake</h3>
+                                            <p class="card-description">Classic reflex play with escalating speed, clean controls, and fast restart loops.</p>
+                                            <div id="snake-progress" class="text-xs text-white/70 mb-3"></div>
+                                            <div class="card-actions">
+                                                <a href="/hobbies-games/snake" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <article class="coverflow-card" role="listitem" data-index="1" data-title="Block Breaker">
+                                    <div class="card-inner">
+                                        <div class="card-image-container">
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #4c1d95, #7c3aed); font-size: 4rem;">🧱</div>
+                                            <div class="card-image-overlay"></div>
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="card-category">Precision</div>
+                                            <h3 class="card-title">Block Breaker</h3>
+                                            <p class="card-description">Momentum-heavy brick breaking with speed ramps, rebounds, and quick session pacing.</p>
+                                            <div id="breaker-progress" class="text-xs text-white/70 mb-3"></div>
+                                            <div class="card-actions">
+                                                <a href="/hobbies-games/block-breaker" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <article class="coverflow-card" role="listitem" data-index="2" data-title="2048">
+                                    <div class="card-inner">
+                                        <div class="card-image-container">
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #1d4ed8, #0ea5e9); font-size: 4rem;">🧩</div>
+                                            <div class="card-image-overlay"></div>
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="card-category">Strategy</div>
+                                            <h3 class="card-title">2048</h3>
+                                            <p class="card-description">Clean merge logic, smooth board movement, and just enough tension to keep pushing one more run.</p>
+                                            <div id="merge-progress" class="text-xs text-white/70 mb-3"></div>
+                                            <div class="card-actions">
+                                                <a href="/hobbies-games/2048" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <article class="coverflow-card" role="listitem" data-index="3" data-title="Space Invaders">
+                                    <div class="card-inner">
+                                        <div class="card-image-container">
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #7f1d1d, #ef4444); font-size: 4rem;">👾</div>
+                                            <div class="card-image-overlay"></div>
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="card-category">Survival</div>
+                                            <h3 class="card-title">Space Invaders</h3>
+                                            <p class="card-description">Wave defense under pressure with tight movement windows and a sharper arcade feel.</p>
+                                            <div id="invaders-progress" class="text-xs text-white/70 mb-3"></div>
+                                            <div class="card-actions">
+                                                <a href="/hobbies-games/space-invaders" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+
+                        <div class="coverflow-controls" role="group" aria-label="Featured games navigation">
+                            <button class="coverflow-btn coverflow-btn-prev" type="button" aria-label="Previous featured game">←</button>
+                            <div class="coverflow-pagination"><span class="pagination-current">1</span><span class="pagination-separator">/</span><span class="pagination-total">4</span></div>
+                            <button class="coverflow-btn coverflow-btn-next" type="button" aria-label="Next featured game">→</button>
+                        </div>
                     </div>
-                </div>
+                </section>
                 
                 <div class="text-center">
                     <button onclick="toggleSound()" id="sound-toggle-secondary" class="mb-4 px-6 py-2 bg-indigodeep text-white rounded-lg font-medium hover:opacity-90 transition-all" title="Toggle Sound Effects" aria-label="Toggle game sound effects">
@@ -3921,6 +3969,21 @@
             </svg>
             <div id="scroll-to-top-tooltip" class="scroll-to-top-btn-tooltip" role="tooltip">Back to top</div>
         </button>
+        <script type="module">
+            import { LuxuryCoverflow } from '/assets/js/carousel/luxury-coverflow.min.js';
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const carouselEl = document.getElementById('arcade-featured-carousel');
+                if (!carouselEl) return;
+
+                window.arcadeFeaturedCarousel = new LuxuryCoverflow('#arcade-featured-carousel', {
+                    infiniteLoop: true,
+                    enableScroll: true,
+                    autoplay: false,
+                    rouletteAutoNavigate: false
+                });
+            });
+        </script>
 </body>
 </html>
 

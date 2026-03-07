@@ -27,9 +27,9 @@
     <!-- Preload Critical LCP (Largest Contentful Paint) Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=185613f">
-    <link rel="preload" href="/assets/css/style.css?v=185613f" as="style">
-    <script src="/assets/js/site.min.js?v=185613f" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=e7949ba">
+    <link rel="preload" href="/assets/css/style.css?v=e7949ba" as="style">
+    <script src="/assets/js/site.min.js?v=e7949ba" defer></script>
     
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
@@ -93,21 +93,33 @@
 
         /* Your existing carousel CSS continues below */
         .lightbox-next { right: 1rem; }
-        .gallery-carousel {
+                .gallery-carousel {
             position: relative;
             overflow: hidden;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
-        .carousel-track {
+                .carousel-track {
             display: flex;
+            width: 100%;
+            align-items: stretch;
             transition: transform 0.5s ease-out;
             gap: 1rem;
+            touch-action: pan-y pinch-zoom;
+            will-change: transform;
         }
-        .carousel-slide {
+                .carousel-slide {
             flex: 0 0 calc(50% - 0.5rem);
-            aspect-ratio: 16/9;
+            min-width: 0;
+            aspect-ratio: 1;
         }
         @media (min-width: 768px) {
-            .carousel-slide { flex: 0 0 calc(33.333% - 0.667rem); }
+                    .carousel-slide {
+            flex: 0 0 calc(50% - 0.5rem);
+            min-width: 0;
+            aspect-ratio: 1;
+        }
         }
         .carousel-btn {
             position: absolute;
@@ -318,7 +330,7 @@
             <div class="grid lg:grid-cols-3 gap-12">
                 
                 <!-- Main Content -->
-                <div class="lg:col-span-2 space-y-12">
+                <div class="lg:col-span-2 min-w-0 space-y-12">
                     
                     <!-- Current Setup -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
@@ -331,7 +343,7 @@
                     </div>
                     
                     <!-- What I Learned -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                    <div>
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">What I Learned from Modifying This Car</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
                             <p>Cars are systems. Every component affects something else. Change the exhaust flow, and you change how the turbo behaves. Change the tune, and you change how the engine responds to every input. Understanding those relationships teaches you to think about consequences and trade-offs.</p>
@@ -353,11 +365,11 @@
                     </div>
                     
                     <!-- Photo Gallery -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                    <div>
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">Gallery</h2>
                         <p class="text-chocolate mb-6 text-sm">Click any image to view larger. Use arrows or swipe to browse.</p>
                         
-                        <div class="gallery-carousel" id="galleryCarousel">
+                        <div class="gallery-carousel" id="galleryCarousel" data-mini-carousel="true">
                             <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">←</button>
                             <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">→</button>
                             

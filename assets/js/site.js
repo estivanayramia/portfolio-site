@@ -148,206 +148,382 @@ __initPreloadStylesheets();
 
 // Carousel + lightbox (CSP-friendly replacement for inline hobby page scripts)
 // Enables the hobby pages to avoid inline <script> blocks.
-const __initCarouselAndLightbox = () => {
+const ensureMiniGalleryStyles = () => {
     try {
-        const track = document.getElementById('carouselTrack');
-        if (!track) return;
-        if (track.dataset && track.dataset.carouselInit === '1') return;
+        if (document.getElementById('mini-gallery-coverflow-styles')) return;
 
-        const wrapMode = !!(track.dataset && track.dataset.carouselWrap === '1');
-
-        const noteCardImages = Array.from(document.querySelectorAll('.note-card img'));
-        const isWhispersStyle = noteCardImages.length > 0;
-
-        const slides = Array.from(document.querySelectorAll('.carousel-slide'));
-        if (!slides.length) return;
-
-        const prevBtn = document.getElementById('carouselPrev');
-        const nextBtn = document.getElementById('carouselNext');
-        const dotsContainer = document.getElementById('carouselDots');
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-image');
-        const closeBtn = document.querySelector('.lightbox-close');
-        const prevLightboxBtn = document.querySelector('.lightbox-prev');
-        const nextLightboxBtn = document.querySelector('.lightbox-next');
-
-        if (!prevBtn || !nextBtn || !dotsContainer || !lightbox || !lightboxImg || !closeBtn || !prevLightboxBtn || !nextLightboxBtn) return;
-
-        const slideImages = slides.map(s => s.querySelector('img')).filter(Boolean);
-        const lightboxImages = isWhispersStyle ? noteCardImages : slideImages;
-        if (!lightboxImages.length) return;
-
-        let currentIndex = 0;
-        let currentLightboxIndex = 0;
-
-        const getSlidesPerView = () => {
-            if (!isWhispersStyle) return (window.innerWidth >= 768 ? 3 : 2);
-            if (window.innerWidth >= 1024) return 5;
-            if (window.innerWidth >= 768) return 4;
-            if (window.innerWidth >= 640) return 3;
-            return 2;
-        };
-        let slidesPerView = getSlidesPerView();
-
-        const clearDots = () => {
-            try { dotsContainer.innerHTML = ''; } catch (e) {
-                while (dotsContainer.firstChild) dotsContainer.removeChild(dotsContainer.firstChild);
+        const style = document.createElement('style');
+        style.id = 'mini-gallery-coverflow-styles';
+        style.textContent = `
+            .gallery-carousel.is-mini-coverflow {
+                position: relative;
+                overflow: hidden;
+                padding-inline: clamp(2.75rem, 5vw, 4.5rem);
+                padding-block: 0.5rem;
+                isolation: isolate;
             }
-        };
 
-        const closeLightbox = () => {
-            try {
-                lightbox.classList.remove('active');
-                lightbox.setAttribute('aria-hidden', 'true');
-            } catch (e) {}
-        };
+            .gallery-carousel.is-mini-coverflow .carousel-track {
+                display: flex;
+                align-items: stretch;
+                gap: clamp(0.85rem, 1.8vw, 1.35rem);
+                transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+                will-change: transform;
+            }
 
-        const getTotalPages = () => Math.ceil(slides.length / slidesPerView);
+            .gallery-carousel.is-mini-coverflow .carousel-slide {
+                transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
+                transform-origin: center center;
+                opacity: 0.42;
+                filter: saturate(0.82) brightness(0.88);
+            }
 
-        const updateCarousel = () => {
-            try {
-                const slideWidth = (slides[0] && slides[0].offsetWidth ? slides[0].offsetWidth : 0) + 16;
-                const totalPages = getTotalPages();
+            .gallery-carousel.is-mini-coverflow .carousel-slide.is-active {
+                transform: scale(1.02);
+                opacity: 1;
+                filter: none;
+                box-shadow: 0 18px 40px rgba(0, 0, 0, 0.14);
+            }
 
-                if (isWhispersStyle) {
-                    const maxStart = Math.max(0, slides.length - slidesPerView);
-                    currentIndex = Math.max(0, Math.min(currentIndex, maxStart));
-                    track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
-                } else {
-                    currentIndex = Math.max(0, Math.min(currentIndex, totalPages - 1));
-                    track.style.transform = `translateX(-${currentIndex * slideWidth * slidesPerView}px)`;
+            .gallery-carousel.is-mini-coverflow .carousel-slide.is-near {
+                transform: scale(0.94);
+                opacity: 0.8;
+                filter: saturate(0.94) brightness(0.95);
+            }
+
+            .gallery-carousel.is-mini-coverflow .carousel-slide.is-far {
+                transform: scale(0.88);
+            }
+
+            .gallery-carousel.is-mini-coverflow .carousel-btn {
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+
+            @media (max-width: 640px) {
+                .gallery-carousel.is-mini-coverflow {
+                    padding-inline: 2.75rem;
                 }
 
-                Array.from(document.querySelectorAll('.carousel-dot')).forEach((d, i) => {
-                    const activeIndex = isWhispersStyle ? Math.floor(currentIndex / slidesPerView) : currentIndex;
-                    d.classList.toggle('active', i === activeIndex);
-                });
-            } catch (e) {}
-        };
+                .gallery-carousel.is-mini-coverflow .carousel-slide.is-active {
+                    transform: scale(1);
+                }
+            }
+        `;
 
-        const buildDots = () => {
-            clearDots();
-            const totalPages = getTotalPages();
-            for (let i = 0; i < totalPages; i++) {
-                const dot = document.createElement('button');
-                dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-                try { dot.setAttribute('aria-label', `Go to page ${i + 1}`); } catch (e) {}
-                dot.addEventListener('click', () => {
+        document.head.appendChild(style);
+    } catch (e) {}
+};
+
+const __initCarouselAndLightbox = () => {
+    try {
+        ensureMiniGalleryStyles();
+
+        const sections = document.querySelectorAll('[data-mini-carousel], [data-carousel="mini-gallery"]');
+        sections.forEach((section) => {
+            try {
+                if (!section || section.closest('[data-luxury-coverflow]')) return;
+
+                const track = section.querySelector('.carousel-track');
+                const prevBtn = section.querySelector('.carousel-prev, .prev-btn, .carousel-btn-prev, [data-carousel-prev]');
+                const nextBtn = section.querySelector('.carousel-next, .next-btn, .carousel-btn-next, [data-carousel-next]');
+                const dotsContainer = section.querySelector('.carousel-dots, [data-carousel-dots]');
+
+                const lightbox = document.getElementById('lightbox') || document.getElementById('carousel-lightbox');
+                const lightboxImg = lightbox && lightbox.querySelector('.lightbox-image, img');
+                const closeBtn = lightbox && lightbox.querySelector('.lightbox-close, [data-lightbox-close]');
+                const prevLightboxBtn = lightbox && lightbox.querySelector('.lightbox-prev, [data-lightbox-prev]');
+                const nextLightboxBtn = lightbox && lightbox.querySelector('.lightbox-next, [data-lightbox-next]');
+
+                if (!track || !prevBtn || !nextBtn || !dotsContainer || !lightbox || !lightboxImg || !closeBtn || !prevLightboxBtn || !nextLightboxBtn) return;
+                try {
+                    if (track.dataset.carouselInit === '1') return;
+                } catch (e) {}
+
+                const slides = Array.from(track.children).filter((node) => node && node.nodeType === 1);
+                if (!slides.length) return;
+                section.classList.add('is-mini-coverflow');
+                section.dataset.miniCarouselMode = 'gallery';
+
+                const noteCardImages = Array.from(section.querySelectorAll('.note-card img'));
+                const isWhispersStyle = section.classList.contains('whispers-carousel') || noteCardImages.length > 0;
+                const wrapMode = section.dataset.wrap !== 'false';
+                if (isWhispersStyle) {
+                    section.dataset.miniCarouselMode = 'notes';
+                }
+
+                const slideImages = slides.map(s => s.querySelector('img')).filter(Boolean);
+                const lightboxImages = isWhispersStyle ? noteCardImages : slideImages;
+                if (!lightboxImages.length) return;
+
+                let currentIndex = 0;
+                let currentLightboxIndex = 0;
+
+                const getSlidesPerView = () => {
+                    if (!isWhispersStyle) return (window.innerWidth >= 768 ? 3 : 2);
+                    if (window.innerWidth >= 1024) return 5;
+                    if (window.innerWidth >= 768) return 4;
+                    if (window.innerWidth >= 640) return 3;
+                    return 2;
+                };
+                let slidesPerView = getSlidesPerView();
+
+                const applyMiniCoverflowState = () => {
+                    let visibleStart = 0;
+                    let visibleEnd = slidesPerView - 1;
+
+                    if (isWhispersStyle) {
+                        visibleStart = currentIndex;
+                        visibleEnd = Math.min(slides.length - 1, currentIndex + slidesPerView - 1);
+                    } else {
+                        visibleStart = currentIndex * slidesPerView;
+                        visibleEnd = Math.min(slides.length - 1, visibleStart + slidesPerView - 1);
+                    }
+
+                    const activeIndex = Math.min(
+                        slides.length - 1,
+                        visibleStart + Math.floor((visibleEnd - visibleStart) / 2)
+                    );
+
+                    slides.forEach((slide, slideIndex) => {
+                        slide.classList.remove('is-active', 'is-near', 'is-far');
+
+                        if (slideIndex < visibleStart || slideIndex > visibleEnd) {
+                            slide.classList.add('is-far');
+                            return;
+                        }
+
+                        if (slideIndex === activeIndex) {
+                            slide.classList.add('is-active');
+                            return;
+                        }
+
+                        slide.classList.add('is-near');
+                    });
+                };
+
+                const clearDots = () => {
+                    try { dotsContainer.innerHTML = ''; } catch (e) {
+                        while (dotsContainer.firstChild) dotsContainer.removeChild(dotsContainer.firstChild);
+                    }
+                };
+
+                const closeLightbox = () => {
+                    try {
+                        lightbox.classList.remove('active');
+                        lightbox.setAttribute('aria-hidden', 'true');
+                    } catch (e) {}
+                };
+
+                const getTotalPages = () => Math.ceil(slides.length / slidesPerView);
+
+                const updateCarousel = () => {
+                    try {
+                        const slideWidth = (slides[0] && slides[0].offsetWidth ? slides[0].offsetWidth : 0) + 16;
+                        const totalPages = getTotalPages();
+
+                        if (isWhispersStyle) {
+                            const maxStart = Math.max(0, slides.length - slidesPerView);
+                            currentIndex = Math.max(0, Math.min(currentIndex, maxStart));
+                            track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+                        } else {
+                            currentIndex = Math.max(0, Math.min(currentIndex, totalPages - 1));
+                            track.style.transform = `translateX(-${currentIndex * slideWidth * slidesPerView}px)`;
+                        }
+
+                        Array.from(section.querySelectorAll('.carousel-dot')).forEach((d, i) => {
+                            const activeIndex = isWhispersStyle ? Math.floor(currentIndex / slidesPerView) : currentIndex;
+                            d.classList.toggle('active', i === activeIndex);
+                        });
+
+                        applyMiniCoverflowState();
+                    } catch (e) {}
+                };
+
+                const buildDots = () => {
+                    clearDots();
+                    const totalPages = getTotalPages();
+                    for (let i = 0; i < totalPages; i++) {
+                        const dot = document.createElement('button');
+                        dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                        try { dot.setAttribute('aria-label', `Go to page ${i + 1}`); } catch (e) {}
+                        dot.addEventListener('click', () => {
+                            if (isWhispersStyle) {
+                                const maxStart = Math.max(0, slides.length - slidesPerView);
+                                currentIndex = Math.max(0, Math.min(i * slidesPerView, maxStart));
+                            } else {
+                                currentIndex = wrapMode ? ((i + totalPages) % totalPages) : Math.max(0, Math.min(i, totalPages - 1));
+                            }
+                            updateCarousel();
+                        });
+                        dotsContainer.appendChild(dot);
+                    }
+                    updateCarousel();
+                };
+
+                prevBtn.addEventListener('click', () => {
+                    const totalPages = getTotalPages();
+
                     if (isWhispersStyle) {
                         const maxStart = Math.max(0, slides.length - slidesPerView);
-                        currentIndex = Math.max(0, Math.min(i * slidesPerView, maxStart));
+                        if (wrapMode) {
+                            currentIndex = currentIndex - slidesPerView;
+                            if (currentIndex < 0) currentIndex = maxStart;
+                        } else {
+                            currentIndex = Math.max(0, currentIndex - slidesPerView);
+                        }
                     } else {
-                        currentIndex = wrapMode ? ((i + totalPages) % totalPages) : Math.max(0, Math.min(i, totalPages - 1));
+                        currentIndex = wrapMode ? ((currentIndex - 1 + totalPages) % totalPages) : Math.max(0, Math.min(currentIndex - 1, totalPages - 1));
                     }
                     updateCarousel();
                 });
-                dotsContainer.appendChild(dot);
-            }
-            updateCarousel();
-        };
 
-        prevBtn.addEventListener('click', () => {
-            const totalPages = getTotalPages();
+                nextBtn.addEventListener('click', () => {
+                    const totalPages = getTotalPages();
 
-            if (isWhispersStyle) {
-                const maxStart = Math.max(0, slides.length - slidesPerView);
-                if (wrapMode) {
-                    currentIndex = currentIndex - slidesPerView;
-                    if (currentIndex < 0) currentIndex = maxStart;
+                    if (isWhispersStyle) {
+                        const maxStart = Math.max(0, slides.length - slidesPerView);
+                        if (wrapMode) {
+                            currentIndex = currentIndex + slidesPerView;
+                            if (currentIndex > maxStart) currentIndex = 0;
+                        } else {
+                            currentIndex = Math.min(maxStart, currentIndex + slidesPerView);
+                        }
+                    } else {
+                        currentIndex = wrapMode ? ((currentIndex + 1) % totalPages) : Math.max(0, Math.min(currentIndex + 1, totalPages - 1));
+                    }
+                    updateCarousel();
+                });
+
+                const showLightboxImage = (index) => {
+                    const img = lightboxImages[index];
+                    if (!img) return;
+                    currentLightboxIndex = index;
+                    lightboxImg.src = img.src;
+                    lightboxImg.alt = img.alt || '';
+                    try { lightboxImg.style.transform = img.style && img.style.transform ? img.style.transform : ''; } catch (e) {}
+
+                    if (isWhispersStyle) {
+                        try { prevLightboxBtn.style.display = index > 0 ? 'block' : 'none'; } catch (e) {}
+                        try { nextLightboxBtn.style.display = index < lightboxImages.length - 1 ? 'block' : 'none'; } catch (e) {}
+                    }
+                };
+
+                const openLightboxAt = (index) => {
+                    showLightboxImage(index);
+                    lightbox.classList.add('active');
+                    lightbox.setAttribute('aria-hidden', 'false');
+                };
+
+                if (isWhispersStyle) {
+                    lightboxImages.forEach((img, i) => {
+                        img.addEventListener('click', () => openLightboxAt(i));
+                    });
                 } else {
-                    currentIndex = Math.max(0, currentIndex - slidesPerView);
+                    slides.forEach((slide, i) => {
+                        slide.addEventListener('click', () => openLightboxAt(i));
+                    });
                 }
-            } else {
-                currentIndex = wrapMode ? ((currentIndex - 1 + totalPages) % totalPages) : Math.max(0, Math.min(currentIndex - 1, totalPages - 1));
-            }
-            updateCarousel();
-        });
-        nextBtn.addEventListener('click', () => {
-            const totalPages = getTotalPages();
 
-            if (isWhispersStyle) {
-                const maxStart = Math.max(0, slides.length - slidesPerView);
-                if (wrapMode) {
-                    currentIndex = currentIndex + slidesPerView;
-                    if (currentIndex > maxStart) currentIndex = 0;
-                } else {
-                    currentIndex = Math.min(maxStart, currentIndex + slidesPerView);
-                }
-            } else {
-                currentIndex = wrapMode ? ((currentIndex + 1) % totalPages) : Math.max(0, Math.min(currentIndex + 1, totalPages - 1));
-            }
-            updateCarousel();
-        });
+                closeBtn.addEventListener('click', closeLightbox);
+                lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
 
-        const showLightboxImage = (index) => {
-            const img = lightboxImages[index];
-            if (!img) return;
-            currentLightboxIndex = index;
-            lightboxImg.src = img.src;
-            lightboxImg.alt = img.alt || '';
-            try { lightboxImg.style.transform = img.style && img.style.transform ? img.style.transform : ''; } catch (e) {}
+                prevLightboxBtn.addEventListener('click', (e) => {
+                    if (e && e.stopPropagation) e.stopPropagation();
+                    if (isWhispersStyle) {
+                        if (currentLightboxIndex > 0) showLightboxImage(currentLightboxIndex - 1);
+                    } else {
+                        showLightboxImage((currentLightboxIndex - 1 + lightboxImages.length) % lightboxImages.length);
+                    }
+                });
 
-            if (isWhispersStyle) {
-                try { prevLightboxBtn.style.display = index > 0 ? 'block' : 'none'; } catch (e) {}
-                try { nextLightboxBtn.style.display = index < lightboxImages.length - 1 ? 'block' : 'none'; } catch (e) {}
-            }
-        };
+                nextLightboxBtn.addEventListener('click', (e) => {
+                    if (e && e.stopPropagation) e.stopPropagation();
+                    if (isWhispersStyle) {
+                        if (currentLightboxIndex < lightboxImages.length - 1) showLightboxImage(currentLightboxIndex + 1);
+                    } else {
+                        showLightboxImage((currentLightboxIndex + 1) % lightboxImages.length);
+                    }
+                });
 
-        const openLightboxAt = (index) => {
-            showLightboxImage(index);
-            lightbox.classList.add('active');
-            lightbox.setAttribute('aria-hidden', 'false');
-        };
+                document.addEventListener('keydown', (e) => {
+                    if (!lightbox.classList.contains('active')) return;
+                    if (e.key === 'Escape') closeLightbox();
+                    if (e.key === 'ArrowLeft') prevLightboxBtn.click();
+                    if (e.key === 'ArrowRight') nextLightboxBtn.click();
+                });
 
-        if (isWhispersStyle) {
-            lightboxImages.forEach((img, i) => {
-                img.addEventListener('click', () => openLightboxAt(i));
-            });
-        } else {
-            slides.forEach((slide, i) => {
-                slide.addEventListener('click', () => openLightboxAt(i));
-            });
-        }
+                window.addEventListener('resize', () => {
+                    const next = getSlidesPerView();
+                    if (next !== slidesPerView) {
+                        slidesPerView = next;
+                        buildDots();
+                    } else {
+                        updateCarousel();
+                    }
+                });
 
-        closeBtn.addEventListener('click', closeLightbox);
-        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let touchAxis = null;
 
-        prevLightboxBtn.addEventListener('click', (e) => {
-            if (e && e.stopPropagation) e.stopPropagation();
-            if (isWhispersStyle) {
-                if (currentLightboxIndex > 0) showLightboxImage(currentLightboxIndex - 1);
-            } else {
-                showLightboxImage((currentLightboxIndex - 1 + lightboxImages.length) % lightboxImages.length);
-            }
-        });
-        nextLightboxBtn.addEventListener('click', (e) => {
-            if (e && e.stopPropagation) e.stopPropagation();
-            if (isWhispersStyle) {
-                if (currentLightboxIndex < lightboxImages.length - 1) showLightboxImage(currentLightboxIndex + 1);
-            } else {
-                showLightboxImage((currentLightboxIndex + 1) % lightboxImages.length);
-            }
-        });
+                track.addEventListener('touchstart', (event) => {
+                    const touch = event.touches && event.touches[0];
+                    if (!touch) return;
+                    touchStartX = touch.clientX;
+                    touchStartY = touch.clientY;
+                    touchAxis = null;
+                }, { passive: true });
 
-        document.addEventListener('keydown', (e) => {
-            if (!lightbox.classList.contains('active')) return;
-            if (e.key === 'Escape') closeLightbox();
-            if (e.key === 'ArrowLeft') prevLightboxBtn.click();
-            if (e.key === 'ArrowRight') nextLightboxBtn.click();
-        });
+                track.addEventListener('touchmove', (event) => {
+                    const touch = event.touches && event.touches[0];
+                    if (!touch) return;
 
-        window.addEventListener('resize', () => {
-            const next = getSlidesPerView();
-            if (next !== slidesPerView) {
-                slidesPerView = next;
+                    const dx = touch.clientX - touchStartX;
+                    const dy = touch.clientY - touchStartY;
+
+                    if (!touchAxis && (Math.abs(dx) > 10 || Math.abs(dy) > 10)) {
+                        touchAxis = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
+                    }
+
+                    if (touchAxis === 'horizontal') {
+                        event.preventDefault();
+                    }
+                }, { passive: false });
+
+                track.addEventListener('touchend', (event) => {
+                    const touch = event.changedTouches && event.changedTouches[0];
+                    if (!touch || touchAxis !== 'horizontal') return;
+
+                    const deltaX = touch.clientX - touchStartX;
+                    if (Math.abs(deltaX) < 40) return;
+
+                    if (deltaX < 0) nextBtn.click();
+                    else prevBtn.click();
+                }, { passive: true });
+
+                track.addEventListener('wheel', (event) => {
+                    const absX = Math.abs(event.deltaX);
+                    const absY = Math.abs(event.deltaY);
+
+                    if (event.ctrlKey || absX < 12 || absX <= absY) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    if (event.deltaX > 0) nextBtn.click();
+                    else prevBtn.click();
+                }, { passive: false });
+
+                try {
+                    track.dataset.carouselInit = '1';
+                    section.dataset.miniCarouselReady = 'true';
+                } catch (e) {}
                 buildDots();
-            } else {
-                updateCarousel();
-            }
+            } catch (e) {}
         });
 
-        try { track.dataset.carouselInit = '1'; } catch (e) {}
-        buildDots();
+        initPdfPreviews();
     } catch (e) {}
 };
 

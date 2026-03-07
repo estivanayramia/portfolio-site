@@ -27,9 +27,9 @@
     <!-- Preload Critical LCP (Largest Contentful Paint) Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=185613f">
-    <link rel="preload" href="/assets/css/style.css?v=185613f" as="style">
-    <script src="/assets/js/site.min.js?v=185613f" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=e7949ba">
+    <link rel="preload" href="/assets/css/style.css?v=e7949ba" as="style">
+    <script src="/assets/js/site.min.js?v=e7949ba" defer></script>
     
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
@@ -91,21 +91,33 @@
         .lightbox-next { right: 1rem; }
 
         /* Keep your existing Whispers carousel + card CSS below this line (copy from your file) */
-        .gallery-carousel {
+                .gallery-carousel {
             position: relative;
             overflow: hidden;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
-        .carousel-track {
+                .carousel-track {
             display: flex;
+            width: 100%;
+            align-items: stretch;
             transition: transform 0.5s ease-out;
             gap: 1rem;
+            touch-action: pan-y pinch-zoom;
+            will-change: transform;
         }
-        .carousel-slide {
+                .carousel-slide {
             flex: 0 0 calc(50% - 0.5rem);
+            min-width: 0;
             aspect-ratio: 1;
         }
         @media (min-width: 768px) {
-            .carousel-slide { flex: 0 0 calc(33.333% - 0.667rem); }
+                    .carousel-slide {
+            flex: 0 0 calc(50% - 0.5rem);
+            min-width: 0;
+            aspect-ratio: 1;
+        }
         }
         .carousel-btn {
             position: absolute;
@@ -322,7 +334,7 @@
                 </div>
                 
                 <!-- What I Write -->
-                <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                <div>
                     <h2 class="text-2xl font-bold text-indigodeep mb-4">What I Write</h2>
                     <div class="prose prose-lg text-chocolate leading-relaxed space-y-4 max-w-3xl">
                         <p>Simple things. Not cheesy motivational quotes. Just honest reminders. "You're doing better than you think." "Take a breath. You'll figure it out." "Someone is proud of you." Things I would want to hear on a hard day.</p>
@@ -331,11 +343,11 @@
                 </div>
                 
                 <!-- Note Gallery - Carousel -->
-                <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                <div>
                     <h2 class="text-2xl font-bold text-indigodeep mb-6">The Notes</h2>
                     <p class="text-chocolate mb-6">Swipe or use arrows to browse. Click any note to view it larger.</p>
                     
-                    <div class="gallery-carousel" id="notesCarousel">
+                    <div class="gallery-carousel whispers-carousel" id="notesCarousel" data-mini-carousel="true">
                         <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous notes">&#x2190;</button>
                         <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next notes">&#x2192;</button>
                         

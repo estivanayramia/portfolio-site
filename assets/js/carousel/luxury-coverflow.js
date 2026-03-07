@@ -203,6 +203,28 @@ function createElement(tagName, className, textContent) {
   return node;
 }
 
+function hashString(value) {
+  let hash = 2166136261;
+  const input = String(value || '');
+
+  for (let index = 0; index < input.length; index += 1) {
+    hash ^= input.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+
+  return hash >>> 0;
+}
+
+function buildStableMixedOrder(items) {
+  return items
+    .map((item, index) => ({
+      index,
+      weight: hashString(`${item.title}|${item.category}|${item.link}|${index}`)
+    }))
+    .sort((left, right) => left.weight - right.weight || left.index - right.index)
+    .map((entry) => entry.index);
+}
+
 function isCoarsePointerDevice() {
   const coarse = safeMatchMedia('(pointer: coarse)');
   return !!(coarse && coarse.matches);
@@ -349,6 +371,9 @@ class RouletteOverlayController {
     this.elements = null;
     this.pockets = [];
     this.previewCache = [];
+    this.stablePocketOrder = [];
+    this.stableGreenPocketIndex = null;
+    this.autoNavigateTimer = null;
     this.lastFocusedElement = null;
     this.isActive = false;
     this.isSpinning = false;
@@ -504,7 +529,7 @@ class RouletteOverlayController {
       }
 
       if (this.result.link) {
-        window.location.href = this.result.link;
+        this.navigateToResultLink(this.result.link);
       }
     });
 
@@ -598,23 +623,57 @@ class RouletteOverlayController {
     return this.previewCache;
   }
 
+  getStablePocketOrder() {
+    const previewData = this.readCardPreviewData();
+
+    if (this.stablePocketOrder.length === previewData.length) {
+      return this.stablePocketOrder;
+    }
+
+    this.stablePocketOrder = buildStableMixedOrder(previewData);
+    return this.stablePocketOrder;
+  }
+
+  clearAutoNavigateTimer() {
+    if (!this.autoNavigateTimer) return;
+    this.resources.clearTimeout(this.autoNavigateTimer);
+    this.autoNavigateTimer = null;
+  }
+
+  navigateToResultLink(link) {
+    if (!link) return;
+    this.clearAutoNavigateTimer();
+    window.location.href = link;
+  }
+
   prepareSpinResult() {
     const previewData = this.readCardPreviewData();
-    const winnerCardIndex = Math.floor(Math.random() * this.carousel.items.length);
-    const greenPocketIndex = this.wheelEngine.getRandomGreenPocket();
-    const winnerPocketIndex = this.wheelEngine.getWinnerPocketIndex(winnerCardIndex, this.carousel.items.length);
+    const stableOrder = this.getStablePocketOrder();
+    const greenPocketIndex = this.stableGreenPocketIndex ?? this.wheelEngine.getRandomGreenPocket();
+    this.stableGreenPocketIndex = greenPocketIndex;
+    this.wheelEngine.greenPocketIndex = greenPocketIndex;
 
     const mapping = [];
+    let orderCursor = 0;
     for (let index = 0; index < this.wheelEngine.pocketCount; index += 1) {
       if (index === greenPocketIndex) {
         mapping.push(-1);
         continue;
       }
 
-      let mappedCardIndex = Math.floor((index / this.wheelEngine.pocketCount) * this.carousel.items.length) % this.carousel.items.length;
-      if (index === winnerPocketIndex) mappedCardIndex = winnerCardIndex;
+      const mappedCardIndex = stableOrder[orderCursor % stableOrder.length];
+      orderCursor += 1;
       mapping.push(mappedCardIndex);
     }
+
+    const selectablePocketIndices = mapping
+      .map((mappedCardIndex, index) => (mappedCardIndex === -1 ? null : index))
+      .filter((value) => value != null);
+
+    const winnerPocketIndex = selectablePocketIndices[
+      Math.floor(Math.random() * selectablePocketIndices.length)
+    ];
+    const winnerCardIndex = mapping[winnerPocketIndex];
 
     this.result = {
       winnerCardIndex,
@@ -688,6 +747,7 @@ class RouletteOverlayController {
 
   openOverlay() {
     this.ensureOverlay();
+    this.clearAutoNavigateTimer();
     this.lastFocusedElement = document.activeElement;
     this.isActive = true;
     this.interactionsLocked = true;
@@ -708,6 +768,7 @@ class RouletteOverlayController {
   closeOverlay(options = {}) {
     const { restoreFocus = true } = options;
 
+    this.clearAutoNavigateTimer();
     this.isActive = false;
     this.isSpinning = false;
     this.overlay.classList.remove('is-active');
@@ -727,6 +788,7 @@ class RouletteOverlayController {
   }
 
   showResultDialog(config) {
+    this.clearAutoNavigateTimer();
     this.overlay.dataset.resultKind = config.kind;
     this.elements.dialogTitle.textContent = config.title;
     this.elements.dialogBody.textContent = config.body;
@@ -851,10 +913,21 @@ class RouletteOverlayController {
       this.showResultDialog({
         kind: 'winner',
         title: preview.title,
-        body: 'Roulette picked this project. The carousel is centered and ready if you want to read the details.',
+        body: 'Roulette picked this card. The carousel centers, holds for a beat, then opens the destination automatically.',
         primaryLabel: 'View project',
         secondaryLabel: 'Stay here'
       });
+
+      if (preview.link && this.carousel.config.rouletteAutoNavigate !== false) {
+        const delayMs = Number.isFinite(this.carousel.config.rouletteAutoNavigateDelay)
+          ? this.carousel.config.rouletteAutoNavigateDelay
+          : 1200;
+
+        this.autoNavigateTimer = this.resources.timeout(() => {
+          if (!this.isActive || this.isSpinning) return;
+          this.navigateToResultLink(preview.link);
+        }, Math.max(400, delayMs));
+      }
       return;
     }
 
@@ -884,6 +957,7 @@ class RouletteOverlayController {
   }
 
   cancelSpin(message) {
+    this.clearAutoNavigateTimer();
     gsap.killTweensOf([this.elements.wheel, this.elements.ball, this.elements.ballShadow, this.elements.ballHighlight, this.elements.dialog]);
     gsap.killTweensOf(this.pockets.map((pocket) => pocket.root));
     this.isSpinning = false;
@@ -906,7 +980,9 @@ class RouletteOverlayController {
 
 export class LuxuryCoverflow {
   constructor(containerSelector, options = {}) {
-    this.container = document.querySelector(containerSelector);
+    this.container = typeof containerSelector === 'string'
+      ? document.querySelector(containerSelector)
+      : containerSelector;
     if (!this.container) return;
 
     this.track = this.container.querySelector('.coverflow-track');
@@ -936,6 +1012,8 @@ export class LuxuryCoverflow {
       enableSmoothTracking: this.motion.enableSmoothTracking,
       performanceTier: resolvedTier,
       animationEase: 'power2.out',
+      rouletteAutoNavigate: true,
+      rouletteAutoNavigateDelay: 1200,
       ...options
     };
 
