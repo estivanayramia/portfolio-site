@@ -31,6 +31,14 @@
 (function() {
     'use strict';
 
+    function logLazyLoaderDebug() {
+        try {
+            const search = window.location && window.location.search ? window.location.search : '';
+            if (!search.includes('debug-loader=1') && !search.includes('debug-analytics=1')) return;
+            console.log.apply(console, arguments);
+        } catch (e) {}
+    }
+
     // Avoid delaying the window load event by injecting new subresources
     // (analytics/CDN scripts) before the page has finished loading.
     let pageLoaded = document.readyState === 'complete';
@@ -114,7 +122,7 @@
     function loadGoogleAnalytics() {
         // Prevent duplicate initialization
         if (analyticsInitialized.ga4) {
-            console.log('[LazyLoader] Google Analytics already initialized, skipping');
+            logLazyLoaderDebug('[LazyLoader] Google Analytics already initialized, skipping');
             return;
         }
         
@@ -149,7 +157,7 @@
         // Load gtag.js script asynchronously
         injectScript(`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`);
         
-        console.log('[LazyLoader] ✓ Google Analytics 4 initialized:', GA_MEASUREMENT_ID);
+        logLazyLoaderDebug('[LazyLoader] Google Analytics 4 initialized:', GA_MEASUREMENT_ID);
     }
 
     // ========================================================================
@@ -172,7 +180,7 @@
     function loadClarity() {
         // Prevent duplicate initialization
         if (analyticsInitialized.clarity) {
-            console.log('[LazyLoader] Microsoft Clarity already initialized, skipping');
+            logLazyLoaderDebug('[LazyLoader] Microsoft Clarity already initialized, skipping');
             return;
         }
         
@@ -190,7 +198,7 @@
         // 2) loading the Clarity tag script directly.
         injectScript(`https://www.clarity.ms/tag/${CLARITY_PROJECT_ID}`);
         
-        console.log('[LazyLoader] ✓ Microsoft Clarity initialized:', CLARITY_PROJECT_ID);
+        logLazyLoaderDebug('[LazyLoader] Microsoft Clarity initialized:', CLARITY_PROJECT_ID);
     }
 
     // ========================================================================
@@ -208,7 +216,7 @@
     function loadMarkedJS() {
         // Prevent duplicate initialization
         if (analyticsInitialized.marked) {
-            console.log('[LazyLoader] Marked.js already loaded, skipping');
+            logLazyLoaderDebug('[LazyLoader] Marked.js already loaded, skipping');
             return;
         }
         
@@ -219,7 +227,7 @@
             '/assets/vendor/marked.min.js',
             true,
             function() {
-                console.log('[LazyLoader] ✓ Marked.js loaded for chat markdown parsing');
+                logLazyLoaderDebug('[LazyLoader] Marked.js loaded for chat markdown parsing');
             }
         );
     }
@@ -249,7 +257,7 @@
     function loadAllScripts() {
         // Prevent duplicate execution
         if (scriptsLoaded) {
-            console.log('[LazyLoader] Scripts already loaded, aborting');
+            logLazyLoaderDebug('[LazyLoader] Scripts already loaded, aborting');
             return;
         }
         
@@ -261,7 +269,7 @@
             document.removeEventListener(event, onFirstInteraction, { passive: true, capture: true });
         });
         
-        console.log('[LazyLoader] 🚀 User interaction detected - initializing analytics...');
+        logLazyLoaderDebug('[LazyLoader] User interaction detected - initializing analytics...');
 
         // To avoid delaying `window.load` (and to keep Lighthouse stable),
         // only inject new external scripts after the page has finished loading.
@@ -270,7 +278,7 @@
             loadMarkedJS();
 
             if (isAutomated) {
-                console.log('[LazyLoader] Automated context detected - skipping analytics');
+                logLazyLoaderDebug('[LazyLoader] Automated context detected - skipping analytics');
                 return;
             }
 
@@ -278,14 +286,14 @@
             // This tells the browser to run these when it has spare cycles
             if ('requestIdleCallback' in window) {
                 requestIdleCallback(function() {
-                    console.log('[LazyLoader] Browser idle - loading analytics...');
+                    logLazyLoaderDebug('[LazyLoader] Browser idle - loading analytics...');
                     loadGoogleAnalytics();
                     loadClarity();
                 }, { timeout: 3000 });  // Force load after 3s even if not idle
             } else {
                 // Fallback for browsers without requestIdleCallback (older Safari)
                 setTimeout(function() {
-                    console.log('[LazyLoader] Using setTimeout fallback for analytics...');
+                    logLazyLoaderDebug('[LazyLoader] Using setTimeout fallback for analytics...');
                     loadGoogleAnalytics();
                     loadClarity();
                 }, 100);
@@ -327,7 +335,7 @@
     function init() {
         // Check if already initialized (prevent duplicate initialization)
         if (window.__lazyLoaderInitialized) {
-            console.log('[LazyLoader] Already initialized, skipping');
+            logLazyLoaderDebug('[LazyLoader] Already initialized, skipping');
             return;
         }
         
@@ -347,8 +355,8 @@
             });
         });
         
-        console.log('[LazyLoader] ⏳ Initialized - waiting for user interaction...');
-        console.log('[LazyLoader] Analytics will load on:', INTERACTION_EVENTS.join(', '));
+        logLazyLoaderDebug('[LazyLoader] Initialized - waiting for user interaction...');
+        logLazyLoaderDebug('[LazyLoader] Analytics will load on:', INTERACTION_EVENTS.join(', '));
     }
 
     // ========================================================================
