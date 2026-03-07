@@ -10,6 +10,13 @@
 // - Always enabled when `?demo=1`
 const __dashboardParams = new URLSearchParams(location.search);
 
+function logDashboardDebug() {
+  try {
+    if (__dashboardParams.get('debug-dashboard') !== '1') return;
+    console.log.apply(console, arguments);
+  } catch {}
+}
+
 // Cache-busting for critical diagnostics assets.
 // Some environments (desktop profiles + SW) can hold stale JS/CSS even after deploy.
 // This version should be bumped when diagnosing “frozen buttons” regressions.
@@ -1476,10 +1483,10 @@ function initDiagnosticsPanel() {
   closeBtn.style.position = 'relative';
   closeBtn.style.zIndex = '9999';
 
-  console.log('[Dashboard] Diagnostics panel initialized. Open button:', openBtn, 'Close button:', closeBtn);
+  logDashboardDebug('[Dashboard] Diagnostics panel initialized. Open button:', openBtn, 'Close button:', closeBtn);
 
   openBtn.addEventListener('click', async (e) => {
-    console.log('[Dashboard] Open diagnostics clicked!', e);
+    logDashboardDebug('[Dashboard] Open diagnostics clicked!', e);
     try {
       e.preventDefault();
       e.stopPropagation();
@@ -1488,7 +1495,7 @@ function initDiagnosticsPanel() {
   }, { capture: true });
 
   closeBtn.addEventListener('click', (e) => {
-    console.log('[Dashboard] Close diagnostics clicked!', e);
+    logDashboardDebug('[Dashboard] Close diagnostics clicked!', e);
     try {
       e.preventDefault();
       e.stopPropagation();
