@@ -34,9 +34,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp" fetchpriority="high">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=185613f">
+    <link rel="stylesheet" href="/assets/css/style.css?v=f326979">
     
-    <script src="/assets/js/site.min.js?v=185613f" defer></script>
+    <script src="/assets/js/site.min.js?v=f326979" defer></script>
     <!-- Theme CSS -->
     <noscript></noscript>
 
@@ -56,7 +56,7 @@
     
     <!-- Schema.org Person Markup -->
 <!-- Luxury Coverflow Carousel V4 -->
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=185613f-v4">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=f326979-v4">
                 <meta property="og:image" content="https://www.estivanayramia.com/assets/img/headshot.webp">
                 <meta name="twitter:image" content="https://www.estivanayramia.com/assets/img/headshot.webp">
 
@@ -665,56 +665,9 @@
                     infiniteLoop: true,
                     enableScroll: true,
                     autoplay: false,
-                    animationDuration: 0.55
+                    animationDuration: 0.55,
+                    rouletteAutoNavigateDelay: 1300
                 });
-
-                const c = window.aboutCarousel;
-                let wheelAccum = 0;
-                let wheelLocked = false;
-                let lastWheelAt = 0;
-
-                carouselEl.addEventListener('wheel', (event) => {
-                    if (!c || typeof c.next !== 'function' || typeof c.prev !== 'function') {
-                        return;
-                    }
-
-                    const absX = Math.abs(event.deltaX);
-                    const absY = Math.abs(event.deltaY);
-
-                    if (event.ctrlKey || absY <= absX || absY < 8) {
-                        return;
-                    }
-
-                    event.preventDefault();
-                    event.stopImmediatePropagation();
-
-                    const now = Date.now();
-                    if (now - lastWheelAt > 240) {
-                        wheelAccum = 0;
-                    }
-                    lastWheelAt = now;
-                    wheelAccum += event.deltaY;
-
-                    if (Math.abs(wheelAccum) < 36) {
-                        return;
-                    }
-
-                    if (wheelLocked) {
-                        return;
-                    }
-
-                    wheelLocked = true;
-                    if (wheelAccum > 0) {
-                        c.next();
-                    } else {
-                        c.prev();
-                    }
-                    wheelAccum = 0;
-
-                    window.setTimeout(() => {
-                        wheelLocked = false;
-                    }, 720);
-                }, { passive: false, capture: true });
 
                 console.log('✨ About Carousel loaded successfully! 🎠');
             }
