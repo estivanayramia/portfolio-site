@@ -103,13 +103,13 @@ Run-Cmd -Label "git config --get core.eol (or unset)" -Cmd {
 
 Section "I) Docs policy checks"
 Run-Cmd -Label "Tracked .md outside docs excluding .github/copilot-instructions.md" -Cmd {
-  git ls-files -- '*.md' | Where-Object { $_ -notmatch '^docs/' -and $_ -ne '.github/copilot-instructions.md' }
+  git ls-files -- '*.md' | Where-Object { $_ -notmatch '^docs/' -and $_ -ne '.github/copilot-instructions.md' -and $_ -ne 'CLAUDE.md' }
 } -PassEmpty
 Run-Cmd -Label "Non-ignored .md outside docs excluding .github/copilot-instructions.md" -Cmd {
-  git ls-files -co --exclude-standard -- '*.md' | Where-Object { $_ -notmatch '^docs/' -and $_ -ne '.github/copilot-instructions.md' }
+  git ls-files -co --exclude-standard -- '*.md' | Where-Object { $_ -notmatch '^docs/' -and $_ -ne '.github/copilot-instructions.md' -and $_ -ne 'CLAUDE.md' }
 } -PassEmpty
 Run-Cmd -Label "Root-level .md files" -Cmd {
-  Get-ChildItem -Path . -File -Filter '*.md' | Select-Object -ExpandProperty Name
+  Get-ChildItem -Path . -File -Filter '*.md' | Where-Object { $_.Name -ne 'CLAUDE.md' } | Select-Object -ExpandProperty Name
 } -PassEmpty
 Run-Cmd -Label "Root-level dirs ending with .md" -Cmd {
   Get-ChildItem -Path . -Directory | Where-Object { $_.Name -like '*.md' } | Select-Object -ExpandProperty Name
