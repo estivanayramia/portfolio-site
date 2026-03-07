@@ -46,8 +46,8 @@ console.log('[Savonie DEBUG] site.js loaded');
  * 4. All analytics code is defensive (checks typeof before calling)
  * 
  * To verify analytics:
- * - GA4: https://analytics.google.com â†’ Realtime â†’ Events
- * - Clarity: https://clarity.microsoft.com â†’ Dashboard â†’ Recordings
+ * - GA4: https://analytics.google.com �  Realtime �  Events
+ * - Clarity: https://clarity.microsoft.com �  Dashboard �  Recordings
  * 
  * @version 2.1.0
  * @author Estivan Ayramia
@@ -777,7 +777,7 @@ const initDarkMode = () => {
     }
 
     // Set initial icon
-    toggleButton.innerHTML = currentTheme === 'dark' ? '<span aria-hidden="true">ðŸ”†</span>' : '<span aria-hidden="true">ðŸŒ™</span>';
+    toggleButton.innerHTML = currentTheme === 'dark' ? '<span aria-hidden="true">�x </span>' : '<span aria-hidden="true">�xR"</span>';
 
     // Toggle theme function
     const toggleTheme = () => {
@@ -788,9 +788,9 @@ const initDarkMode = () => {
         localStorage.setItem('theme', newTheme);
         
         // Update icon
-        toggleButton.innerHTML = newTheme === 'dark' ? '<span aria-hidden="true">ðŸ”†</span>' : '<span aria-hidden="true">ðŸŒ™</span>';
+        toggleButton.innerHTML = newTheme === 'dark' ? '<span aria-hidden="true">�x </span>' : '<span aria-hidden="true">�xR"</span>';
         
-        // ðŸ† ACHIEVEMENT: Night Owl - Toggle dark mode
+        // �x�  ACHIEVEMENT: Night Owl - Toggle dark mode
         if (typeof window.ArcadeAchievements !== 'undefined' && window.ArcadeAchievements.unlock) {
             window.ArcadeAchievements.unlock('nightOwl');
         }
@@ -818,7 +818,7 @@ const initDarkMode = () => {
             const newTheme = e.matches ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            toggleButton.innerHTML = newTheme === 'dark' ? '<span aria-hidden="true">ðŸ”†</span>' : '<span aria-hidden="true">ðŸŒ™</span>';
+            toggleButton.innerHTML = newTheme === 'dark' ? '<span aria-hidden="true">�x </span>' : '<span aria-hidden="true">�xR"</span>';
         }
     });
 
@@ -1477,11 +1477,11 @@ const initMiniGame = (rootId) => {
             <div class="text-xs text-ink/60">Best: <span id="mg-best">${highScore}</span></div>
         </div>
         <div class="flex items-center justify-between mb-2">
-            <div class="text-xs text-ink/60">Lives: <span id="mg-lives">â¤â¤â¤</span></div>
+            <div class="text-xs text-ink/60">Lives: <span id="mg-lives">❤❤❤</span></div>
             <button id="mg-start" class="text-xs bg-indigodeep text-white px-3 py-1 rounded-full">Start</button>
         </div>
         <canvas id="mg-canvas" class="w-full rounded border border-chocolate/10" style="touch-action: none; height: 320px;"></canvas>
-        <p class="text-xs text-ink/60 mt-2">Catch the orbs. Golden orbs are bonus. Tap/drag on mobile, or use â—€ â–¶.</p>
+        <p class="text-xs text-ink/60 mt-2">Catch the orbs. Golden orbs are bonus. Tap/drag on mobile, or use �� ��.</p>
     `;
 
     const canvas = root.querySelector('#mg-canvas');
@@ -1526,7 +1526,7 @@ const initMiniGame = (rootId) => {
         draw();
     };
 
-    const heartStr = (n) => 'â¤â¤â¤'.slice(0, n);
+    const heartStr = (n) => '❤❤❤'.slice(0, n);
     const vibrate = (ms) => { if (navigator.vibrate) navigator.vibrate(ms); };
 
     const addParticles = (x, y, color = '#212842', count = 10) => {
@@ -1954,97 +1954,82 @@ const translations = {
             formFiller: { name: 'Messenger', description: 'Submitted the contact form' }
         },
         es: {
-            unlocked: 'Â¡Logro Desbloqueado!',
-            explorer: { name: 'Explorador', description: 'VisitÃ³ todas las pÃ¡ginas principales' },
-            reader: { name: 'Buzo Profundo', description: 'LeyÃ³ la inmersiÃ³n completa' },
-            gamer: { name: 'Maestro del Juego', description: 'JugÃ³ el juego del formulario de contacto' },
-            chatter: { name: 'Conversador', description: 'AbriÃ³ el chat' },
-            nightOwl: { name: 'NoctÃ¡mbulo', description: 'AlternÃ³ el modo oscuro' },
-            konami: { name: 'Descubridor Secreto', description: 'EncontrÃ³ el cÃ³digo Konami' },
-            networker: { name: 'Redactor', description: 'VisitÃ³ perfiles sociales' },
-            formFiller: { name: 'Mensajero', description: 'EnviÃ³ el formulario de contacto' }
+            unlocked: '¡Logro Desbloqueado!',
+            explorer: { name: 'Explorador', description: 'Visitó todas las páginas principales' },
+            reader: { name: 'Buzo Profundo', description: 'Leyó la inmersión completa' },
+            gamer: { name: 'Maestro del Juego', description: 'Jugó el juego del formulario de contacto' },
+            chatter: { name: 'Conversador', description: 'Abrió el chat' },
+            nightOwl: { name: 'Noctámbulo', description: 'Alternó el modo oscuro' },
+            konami: { name: 'Descubridor Secreto', description: 'Encontró el código Konami' },
+            networker: { name: 'Redactor', description: 'Visitó perfiles sociales' },
+            formFiller: { name: 'Mensajero', description: 'Envió el formulario de contacto' }
         },
         ar: {
-            unlocked: 'ØªÙ… Ø¥Ù„ØºØ§Ø¡ Ù‚ÙÙ„ Ø§Ù„Ø¥Ù†Ø¬Ø§Ø²!',
-            explorer: { name: 'Ø§Ù„Ù…Ø³ØªÙƒØ´Ù', description: 'Ø²Ø§Ø± Ø¬Ù…ÙŠØ¹ Ø§Ù„ØµÙØ­Ø§Øª Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©' },
-            reader: { name: 'Ø§Ù„ØºÙˆØ§Øµ Ø§Ù„Ø¹Ù…ÙŠÙ‚', description: 'Ù‚Ø±Ø£ Ø§Ù„ØºÙˆØµ Ø§Ù„ÙƒØ§Ù…Ù„' },
-            gamer: { name: 'Ø³ÙŠØ¯ Ø§Ù„Ù„Ø¹Ø¨Ø©', description: 'Ù„Ø¹Ø¨ Ù„Ø¹Ø¨Ø© Ù†Ù…ÙˆØ°Ø¬ Ø§Ù„Ø§ØªØµØ§Ù„' },
-            chatter: { name: 'Ø§Ù„Ù…Ø­Ø§Ø¯Ø«', description: 'ÙØªØ­ Ø§Ù„Ø¯Ø±Ø¯Ø´Ø©' },
-            nightOwl: { name: 'Ø¨ÙˆÙ…Ø© Ø§Ù„Ù„ÙŠÙ„', description: 'Ø¨Ø¯Ù‘Ù„ Ø§Ù„ÙˆØ¶Ø¹ Ø§Ù„Ù…Ø¸Ù„Ù…' },
-            konami: { name: 'Ø§Ù„Ù…ÙƒØªØ´Ù Ø§Ù„Ø³Ø±ÙŠ', description: 'ÙˆØ¬Ø¯ Ø±Ù…Ø² ÙƒÙˆÙ†Ø§Ù…ÙŠ' },
-            networker: { name: 'Ø§Ù„Ø´Ø¨ÙƒÙŠ', description: 'Ø²Ø§Ø± Ø§Ù„Ù…Ù„ÙØ§Øª Ø§Ù„Ø´Ø®ØµÙŠØ© Ø§Ù„Ø§Ø¬ØªÙ…Ø§Ø¹ÙŠØ©' },
-            formFiller: { name: 'Ø§Ù„Ø±Ø³ÙˆÙ„', description: 'Ø£Ø±Ø³Ù„ Ù†Ù…ÙˆØ°Ø¬ Ø§Ù„Ø§ØªØµØ§Ù„' }
+            unlocked: 'ت�& إ�غاء �ف� ا�إ� جاز!',
+            explorer: { name: 'ا��&ستْشف', description: 'زار ج�&�`ع ا�صفحات ا�رئ�`س�`ة' },
+            reader: { name: 'ا�غ��اص ا�ع�&�`�', description: '�رأ ا�غ��ص ا�ْا�&�' },
+            gamer: { name: 'س�`د ا��عبة', description: '�عب �عبة � �&��ذج ا�اتصا�' },
+            chatter: { name: 'ا��&حادث', description: 'فتح ا�دردشة' },
+            nightOwl: { name: 'ب���&ة ا���`�', description: 'بد�� ا���ضع ا��&ظ��&' },
+            konami: { name: 'ا��&ْتشف ا�سر�`', description: '��جد ر�&ز ْ��� ا�&�`' },
+            networker: { name: 'ا�شبْ�`', description: 'زار ا��&�فات ا�شخص�`ة ا�اجت�&اع�`ة' },
+            formFiller: { name: 'ا�رس���', description: 'أرس� � �&��ذج ا�اتصا�' }
         }
     },
     // Konami code messages
     konami: {
         en: {
-            title: 'ðŸŽ® You found the secret!',
-            message: 'Congratulations! You\'ve unlocked the Konami code.',
-            giftText: 'Click the gift for a surprise!',
-            stats: 'You\'re one of the {percent}% who found this!',
+            title: 'Secret Route Unlocked',
+            message: 'You found the hidden sequence. That means you actually explore interfaces properly.',
+            giftText: 'Pick a compliment. You earned it.',
+            stats: 'Top {percent}% of visitors ever find this.',
             compliments: [
-                "You're absolutely amazing! ðŸŒŸ",
-                "You're a coding wizard! ðŸ§™â€â™‚ï¸",
-                "You're incredibly talented! ðŸŽ¨",
-                "You're a problem-solving genius! ðŸ§ ",
-                "You're making the world better! ðŸŒ",
-                "You're a creative powerhouse! âš¡",
-                "You're inspiring others! ðŸ’«",
-                "You're a true innovator! ðŸš€",
-                "You're exceptionally skilled! ðŸ†",
-                "You're a digital artist! ðŸŽ­",
-                "You're building something incredible! ðŸ—ï¸",
-                "You're a technology trailblazer! ðŸ—ºï¸",
-                "You're exceptionally creative! ðŸŽ¨",
-                "You're a user experience master! ðŸŽ¯",
-                "You're a design virtuoso! ðŸŽ¨"
+                'You have sharp pattern recognition.',
+                'You notice details most people miss.',
+                'You have real builder energy.',
+                'You bring calm focus to complexity.',
+                'You have excellent taste in hidden features.',
+                'You move through systems with intent.',
+                'You make curiosity look disciplined.',
+                'You have strong creative instincts.',
+                'You think like a product person.',
+                'You are good at finding signal fast.'
             ]
         },
         es: {
-            title: 'ðŸŽ® Â¡Encontraste el secreto!',
-            message: 'Â¡Felicitaciones! Has desbloqueado el cÃ³digo Konami.',
-            giftText: 'Â¡Haz clic en el regalo para una sorpresa!',
-            stats: 'Â¡Eres uno del {percent}% que encontrÃ³ esto!',
+            title: 'Ruta secreta desbloqueada',
+            message: 'Encontraste la secuencia oculta. Eso significa que si exploras las interfaces con intencion.',
+            giftText: 'Elige un cumplido. Te lo ganaste.',
+            stats: 'Solo el {percent}% superior de visitantes encuentra esto.',
             compliments: [
-                "Â¡Eres absolutamente increÃ­ble! ðŸŒŸ",
-                "Â¡Eres un mago de la programaciÃ³n! ðŸ§™â€â™‚ï¸",
-                "Â¡Eres increÃ­blemente talentoso! ðŸŽ¨",
-                "Â¡Eres un genio para resolver problemas! ðŸ§ ",
-                "Â¡EstÃ¡s haciendo el mundo mejor! ðŸŒ",
-                "Â¡Eres una potencia creativa! âš¡",
-                "Â¡EstÃ¡s inspirando a otros! ðŸ’«",
-                "Â¡Eres un verdadero innovador! ðŸš€",
-                "Â¡Eres excepcionalmente hÃ¡bil! ðŸ†",
-                "Â¡Eres un artista digital! ðŸŽ­",
-                "Â¡EstÃ¡s construyendo algo increÃ­ble! ðŸ—ï¸",
-                "Â¡Eres un pionero de la tecnologÃ­a! ðŸ—ºï¸",
-                "Â¡Eres excepcionalmente creativo! ðŸŽ¨",
-                "Â¡Eres un maestro de la experiencia del usuario! ðŸŽ¯",
-                "Â¡Eres un virtuoso del diseÃ±o! ðŸŽ¨"
+                'Tienes un gran ojo para los patrones.',
+                'Notas detalles que otros pasan por alto.',
+                'Tienes energia real de constructor.',
+                'Aportas calma y enfoque a la complejidad.',
+                'Tienes muy buen gusto para funciones ocultas.',
+                'Recorres sistemas con intencion.',
+                'Tu curiosidad tiene disciplina.',
+                'Tienes instinto creativo fuerte.',
+                'Piensas como alguien de producto.',
+                'Encuentras senal rapido.'
             ]
         },
         ar: {
-            title: 'ðŸŽ® Ù„Ù‚Ø¯ ÙˆØ¬Ø¯Øª Ø§Ù„Ø³Ø±!',
-            message: 'ØªÙ‡Ø§Ù†ÙŠÙ†Ø§! Ù„Ù‚Ø¯ Ù‚Ù…Øª Ø¨ÙØªØ­ Ø±Ù…Ø² ÙƒÙˆÙ†Ø§Ù…ÙŠ.',
-            giftText: 'Ø§Ù†Ù‚Ø± Ø¹Ù„Ù‰ Ø§Ù„Ù‡Ø¯ÙŠØ© Ù„Ù„Ø­ØµÙˆÙ„ Ø¹Ù„Ù‰ Ù…ÙØ§Ø¬Ø£Ø©!',
-            stats: 'Ø£Ù†Øª ÙˆØ§Ø­Ø¯ Ù…Ù† {percent}% Ø§Ù„Ø°ÙŠÙ† ÙˆØ¬Ø¯ÙˆØ§ Ù‡Ø°Ø§!',
+            title: 'Secret route unlocked',
+            message: 'You found the hidden sequence. That means you explore interfaces with focus.',
+            giftText: 'Pick a compliment. You earned it.',
+            stats: 'Top {percent}% of visitors ever find this.',
             compliments: [
-                "Ø£Ù†Øª Ø±Ø§Ø¦Ø¹ ØªÙ…Ø§Ù…Ø§Ù‹! ðŸŒŸ",
-                "Ø£Ù†Øª Ø³Ø§Ø­Ø± Ø¨Ø±Ù…Ø¬Ø©! ðŸ§™â€â™‚ï¸",
-                "Ø£Ù†Øª Ù…ÙˆÙ‡ÙˆØ¨ Ø¨Ø´ÙƒÙ„ Ù„Ø§ ÙŠØµØ¯Ù‚! ðŸŽ¨",
-                "Ø£Ù†Øª Ø¹Ø¨Ù‚Ø±ÙŠ ÙÙŠ Ø­Ù„ Ø§Ù„Ù…Ø´ÙƒÙ„Ø§Øª! ðŸ§ ",
-                "Ø£Ù†Øª ØªØ¬Ø¹Ù„ Ø§Ù„Ø¹Ø§Ù„Ù… Ø£ÙØ¶Ù„! ðŸŒ",
-                "Ø£Ù†Øª Ù‚ÙˆØ© Ø¥Ø¨Ø¯Ø§Ø¹ÙŠØ©! âš¡",
-                "Ø£Ù†Øª ØªÙ„Ù‡Ù… Ø§Ù„Ø¢Ø®Ø±ÙŠÙ†! ðŸ’«",
-                "Ø£Ù†Øª Ù…Ø¨ØªÙƒØ± Ø­Ù‚ÙŠÙ‚ÙŠ! ðŸš€",
-                "Ø£Ù†Øª Ù…Ø§Ù‡Ø± Ø¨Ø´ÙƒÙ„ Ø§Ø³ØªØ«Ù†Ø§Ø¦ÙŠ! ðŸ†",
-                "Ø£Ù†Øª ÙÙ†Ø§Ù† Ø±Ù‚Ù…ÙŠ! ðŸŽ­",
-                "Ø£Ù†Øª ØªØ¨Ù†ÙŠ Ø´ÙŠØ¦Ø§Ù‹ Ù…Ø°Ù‡Ù„Ø§Ù‹! ðŸ—ï¸",
-                "Ø£Ù†Øª Ø±Ø§Ø¦Ø¯ ØªÙƒÙ†ÙˆÙ„ÙˆØ¬ÙŠØ§! ðŸ—ºï¸",
-                "Ø£Ù†Øª Ù…Ø¨Ø¯Ø¹ Ø¨Ø´ÙƒÙ„ Ø§Ø³ØªØ«Ù†Ø§Ø¦ÙŠ! ðŸŽ¨",
-                "Ø£Ù†Øª Ø®Ø¨ÙŠØ± ÙÙŠ ØªØ¬Ø±Ø¨Ø© Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…! ðŸŽ¯",
-                "Ø£Ù†Øª ÙÙ†Ø§Ù† ØªØµÙ…ÙŠÙ…! ðŸŽ¨"
+                'You bring creative energy.',
+                'You inspire people around you.',
+                'You think like an innovator.',
+                'You are exceptionally skilled.',
+                'You have a strong design eye.',
+                'You build memorable things.',
+                'You move through systems with intent.',
+                'You notice details that matter.',
+                'You understand the user.',
+                'You turn curiosity into action.'
             ]
         }
     },
@@ -2052,8 +2037,8 @@ const translations = {
     chat: {
         welcome: {
             en: "Hello! I am Savonie. Ask me anything about Estivan.",
-            es: "Â¡Hola! Soy Savonie. PregÃºntame cualquier cosa sobre Estivan.",
-            ar: "Ù…Ø±Ø­Ø¨Ø§Ù‹! Ø£Ù†Ø§ Ø³Ø§ÙÙˆÙ†ÙŠ. Ø§Ø³Ø£Ù„Ù†ÙŠ Ø£ÙŠ Ø´ÙŠØ¡ Ø¹Ù† Ø§Ø³ØªÙŠÙØ§Ù†."
+            es: "¡Hola! Soy Savonie. Pregúntame cualquier cosa sobre Estivan.",
+            ar: "�&رحبا�9! أ� ا ساف��� �`. اسأ�� �` أ�` ش�`ء ع�  است�`فا� ."
         },
         defaultChips: {
             en: [
@@ -2063,16 +2048,16 @@ const translations = {
                 "How can I contact him?"
             ],
             es: [
-                "Â¿QuÃ© hace Estivan?",
-                "HÃ¡blame de su experiencia",
-                "Â¿CuÃ¡les son sus habilidades?",
-                "Â¿CÃ³mo puedo contactarlo?"
+                "¿Qu� hace Estivan?",
+                "Háblame de su experiencia",
+                "¿Cuáles son sus habilidades?",
+                "¿Cómo puedo contactarlo?"
             ],
             ar: [
-                "Ù…Ø§Ø°Ø§ ÙŠÙØ¹Ù„ Ø§Ø³ØªÙŠÙØ§Ù†ØŸ",
-                "Ø£Ø®Ø¨Ø±Ù†ÙŠ Ø¹Ù† Ø®Ù„ÙÙŠØªÙ‡",
-                "Ù…Ø§ Ù‡ÙŠ Ù…Ù‡Ø§Ø±Ø§ØªÙ‡ØŸ",
-                "ÙƒÙŠÙ ÙŠÙ…ÙƒÙ†Ù†ÙŠ Ø§Ù„Ø§ØªØµØ§Ù„ Ø¨Ù‡ØŸ"
+                "�&اذا �`فع� است�`فا� �x",
+                "أخبر� �` ع�  خ�ف�`ت�!",
+                "�&ا �!�` �&�!ارات�!�x",
+                "ْ�`ف �`�&ْ� � �` ا�اتصا� ب�!�x"
             ]
         },
         contextualSuggestions: {
@@ -2087,30 +2072,30 @@ const translations = {
                 early: ["What are your main skills?", "Tell me about your background", "What projects are you proud of?", "What's something unique about you?", "Why did you choose this field?", "What's your biggest achievement?"]
             },
             es: {
-                skills: ["Â¿En quÃ© proyectos has trabajado?", "HÃ¡blame de tu experiencia", "Â¿QuÃ© estÃ¡s aprendiendo actualmente?", "Â¿CÃ³mo abordas la resoluciÃ³n de problemas?", "Â¿CuÃ¡l es tu habilidad favorita para usar?", "Â¿CÃ³mo te mantienes motivado en tu trabajo?"],
-                background: ["Â¿CuÃ¡les son tus principales habilidades?", "HÃ¡blame de tu educaciÃ³n", "Â¿En quÃ© industrias has trabajado?", "Â¿QuÃ© te inspirÃ³ a entrar en la tecnologÃ­a?", "Â¿CÃ³mo ha sido tu trayectoria profesional?", "Â¿AlgÃºn mentor que te haya influido?"],
-                projects: ["Â¿Puedes mostrarme tu cÃ³digo?", "Â¿QuÃ© tecnologÃ­as usaste?", "Â¿CuÃ¡nto tiempo tomÃ³ construirlo?", "Â¿QuÃ© desafÃ­os superaste?", "Â¿Trabajaste con un equipo?", "Â¿CuÃ¡les son tus planes futuros para este proyecto?"],
-                contact: ["Â¿EstÃ¡s disponible para trabajo freelance?", "Â¿CuÃ¡l es tu tiempo tÃ­pico de respuesta?", "Â¿Trabajas de forma remota?", "Â¿CÃ³mo puedo contactarte mejor?", "Â¿CuÃ¡l es tu forma preferida de comunicaciÃ³n?", "Â¿EstÃ¡s abierto a colaboraciones?"],
-                education: ["Â¿QuÃ© certificaciones tienes?", "Â¿CuÃ¡l es tu lenguaje de programaciÃ³n favorito?", "Â¿CÃ³mo te mantienes actualizado con la tecnologÃ­a?", "Â¿CuÃ¡l fue tu curso mÃ¡s desafiante?", "Â¿CÃ³mo ha moldeado tu educaciÃ³n tu carrera?", "Â¿AlgÃºn curso en lÃ­nea o autoaprendizaje?"],
-                projectResponse: ["Â¿Puedes contarme mÃ¡s sobre ese proyecto?", "Â¿QuÃ© desafÃ­os enfrentaste?", "Â¿QuÃ© aprendiste de ello?", "Â¿CuÃ¡l fue la parte mÃ¡s interesante?", "Â¿CÃ³mo lo probaste?", "Â¿HarÃ­as algo diferente ahora?"],
-                skillResponse: ["Â¿CÃ³mo aprendiste eso?", "Â¿Lo has usado en proyectos?", "Â¿CuÃ¡l es tu nivel de competencia?", "Â¿CuÃ¡l es tu forma favorita de aplicar esta habilidad?", "Â¿AlgÃºn consejo para principiantes?", "Â¿CÃ³mo ha evolucionado esta habilidad para ti?"],
-                early: ["Â¿CuÃ¡les son tus principales habilidades?", "HÃ¡blame de tu experiencia", "Â¿De quÃ© proyectos estÃ¡s orgulloso?", "Â¿QuÃ© hay de Ãºnico en ti?", "Â¿Por quÃ© elegiste este campo?", "Â¿CuÃ¡l es tu mayor logro?"]
+                skills: ["¿En qu� proyectos has trabajado?", "Háblame de tu experiencia", "¿Qu� estás aprendiendo actualmente?", "¿Cómo abordas la resolución de problemas?", "¿Cuál es tu habilidad favorita para usar?", "¿Cómo te mantienes motivado en tu trabajo?"],
+                background: ["¿Cuáles son tus principales habilidades?", "Háblame de tu educación", "¿En qu� industrias has trabajado?", "¿Qu� te inspiró a entrar en la tecnología?", "¿Cómo ha sido tu trayectoria profesional?", "¿Algún mentor que te haya influido?"],
+                projects: ["¿Puedes mostrarme tu código?", "¿Qu� tecnologías usaste?", "¿Cuánto tiempo tomó construirlo?", "¿Qu� desafíos superaste?", "¿Trabajaste con un equipo?", "¿Cuáles son tus planes futuros para este proyecto?"],
+                contact: ["¿Estás disponible para trabajo freelance?", "¿Cuál es tu tiempo típico de respuesta?", "¿Trabajas de forma remota?", "¿Cómo puedo contactarte mejor?", "¿Cuál es tu forma preferida de comunicación?", "¿Estás abierto a colaboraciones?"],
+                education: ["¿Qu� certificaciones tienes?", "¿Cuál es tu lenguaje de programación favorito?", "¿Cómo te mantienes actualizado con la tecnología?", "¿Cuál fue tu curso más desafiante?", "¿Cómo ha moldeado tu educación tu carrera?", "¿Algún curso en línea o autoaprendizaje?"],
+                projectResponse: ["¿Puedes contarme más sobre ese proyecto?", "¿Qu� desafíos enfrentaste?", "¿Qu� aprendiste de ello?", "¿Cuál fue la parte más interesante?", "¿Cómo lo probaste?", "¿Harías algo diferente ahora?"],
+                skillResponse: ["¿Cómo aprendiste eso?", "¿Lo has usado en proyectos?", "¿Cuál es tu nivel de competencia?", "¿Cuál es tu forma favorita de aplicar esta habilidad?", "¿Algún consejo para principiantes?", "¿Cómo ha evolucionado esta habilidad para ti?"],
+                early: ["¿Cuáles son tus principales habilidades?", "Háblame de tu experiencia", "¿De qu� proyectos estás orgulloso?", "¿Qu� hay de único en ti?", "¿Por qu� elegiste este campo?", "¿Cuál es tu mayor logro?"]
             },
             ar: {
-                skills: ["Ù…Ø§ Ù‡ÙŠ Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹ Ø§Ù„ØªÙŠ Ø¹Ù…Ù„Øª Ø¹Ù„ÙŠÙ‡Ø§ØŸ", "Ø£Ø®Ø¨Ø±Ù†ÙŠ Ø¹Ù† ØªØ¬Ø±Ø¨ØªÙƒ", "Ù…Ø§Ø°Ø§ ØªØªØ¹Ù„Ù… Ø­Ø§Ù„ÙŠØ§Ù‹ØŸ", "ÙƒÙŠÙ ØªØªØ¹Ø§Ù…Ù„ Ù…Ø¹ Ø­Ù„ Ø§Ù„Ù…Ø´ÙƒÙ„Ø§ØªØŸ", "Ù…Ø§ Ù‡ÙŠ Ù…Ù‡Ø§Ø±ØªÙƒ Ø§Ù„Ù…ÙØ¶Ù„Ø© Ù„Ø§Ø³ØªØ®Ø¯Ø§Ù…Ù‡Ø§ØŸ", "ÙƒÙŠÙ ØªØ­Ø§ÙØ¸ Ø¹Ù„Ù‰ Ø¯Ø§ÙØ¹Ùƒ ÙÙŠ Ø¹Ù…Ù„ÙƒØŸ"],
-                background: ["Ù…Ø§ Ù‡ÙŠ Ù…Ù‡Ø§Ø±Ø§ØªÙƒ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©ØŸ", "Ø£Ø®Ø¨Ø±Ù†ÙŠ Ø¹Ù† ØªØ¹Ù„ÙŠÙ…Ùƒ", "ÙÙŠ Ø£ÙŠ ØµÙ†Ø§Ø¹Ø§Øª Ø¹Ù…Ù„ØªØŸ", "Ù…Ø§ Ø§Ù„Ø°ÙŠ Ø£Ù„Ù‡Ù…Ùƒ Ù„Ù„Ø¯Ø®ÙˆÙ„ ÙÙŠ Ù…Ø¬Ø§Ù„ Ø§Ù„ØªÙƒÙ†ÙˆÙ„ÙˆØ¬ÙŠØ§ØŸ", "ÙƒÙŠÙ ÙƒØ§Ù†Øª Ø±Ø­Ù„ØªÙƒ Ø§Ù„Ù…Ù‡Ù†ÙŠØ©ØŸ", "Ø£ÙŠ Ù…Ø±Ø´Ø¯ÙŠÙ† Ø£Ø«Ø±ÙˆØ§ Ø¹Ù„ÙŠÙƒØŸ"],
-                projects: ["Ù‡Ù„ ÙŠÙ…ÙƒÙ†Ùƒ Ø¥Ø¸Ù‡Ø§Ø± ÙƒÙˆØ¯ÙƒØŸ", "Ù…Ø§ Ù‡ÙŠ Ø§Ù„ØªÙ‚Ù†ÙŠØ§Øª Ø§Ù„ØªÙŠ Ø§Ø³ØªØ®Ø¯Ù…ØªÙ‡Ø§ØŸ", "ÙƒÙ… Ù…Ù† Ø§Ù„ÙˆÙ‚Øª Ø§Ø³ØªØºØ±Ù‚ Ø¨Ù†Ø§Ø¤Ù‡ØŸ", "Ù…Ø§ Ù‡ÙŠ Ø§Ù„ØªØ­Ø¯ÙŠØ§Øª Ø§Ù„ØªÙŠ ØªØºÙ„Ø¨Øª Ø¹Ù„ÙŠÙ‡Ø§ØŸ", "Ù‡Ù„ Ø¹Ù…Ù„Øª Ù…Ø¹ ÙØ±ÙŠÙ‚ØŸ", "Ù…Ø§ Ù‡ÙŠ Ø®Ø·Ø·Ùƒ Ø§Ù„Ù…Ø³ØªÙ‚Ø¨Ù„ÙŠØ© Ù„Ù‡Ø°Ø§ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ØŸ"],
-                contact: ["Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ§Ø­ Ù„Ù„Ø¹Ù…Ù„ Ø§Ù„Ø­Ø±ØŸ", "Ù…Ø§ Ù‡Ùˆ ÙˆÙ‚Øª Ø±Ø¯Ùƒ Ø§Ù„Ù…Ø¹ØªØ§Ø¯ØŸ", "Ù‡Ù„ ØªØ¹Ù…Ù„ Ø¹Ù† Ø¨Ø¹Ø¯ØŸ", "ÙƒÙŠÙ ÙŠÙ…ÙƒÙ†Ù†ÙŠ Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹Ùƒ Ø¨Ø´ÙƒÙ„ Ø£ÙØ¶Ù„ØŸ", "Ù…Ø§ Ù‡ÙŠ Ø·Ø±ÙŠÙ‚Ø© Ø§Ù„ØªÙˆØ§ØµÙ„ Ø§Ù„Ù…ÙØ¶Ù„Ø© Ù„Ø¯ÙŠÙƒØŸ", "Ù‡Ù„ Ø£Ù†Øª Ù…ÙØªÙˆØ­ Ù„Ù„ØªØ¹Ø§ÙˆÙ†ØŸ"],
-                education: ["Ù…Ø§ Ù‡ÙŠ Ø§Ù„Ø´Ù‡Ø§Ø¯Ø§Øª Ø§Ù„ØªÙŠ Ù„Ø¯ÙŠÙƒØŸ", "Ù…Ø§ Ù‡Ùˆ Ù„ØºØ© Ø§Ù„Ø¨Ø±Ù…Ø¬Ø© Ø§Ù„Ù…ÙØ¶Ù„Ø© Ù„Ø¯ÙŠÙƒØŸ", "ÙƒÙŠÙ ØªØ­Ø§ÙØ¸ Ø¹Ù„Ù‰ ØªØ­Ø¯ÙŠØ« Ù†ÙØ³Ùƒ Ø¨Ø§Ù„ØªÙƒÙ†ÙˆÙ„ÙˆØ¬ÙŠØ§ØŸ", "Ù…Ø§ ÙƒØ§Ù† Ø£ÙƒØ«Ø± Ø¯ÙˆØ±Ø© ØªØ­Ø¯ÙŠØ§Ù‹ Ù„ÙƒØŸ", "ÙƒÙŠÙ Ø´ÙƒÙ„Øª ØªØ¹Ù„ÙŠÙ…Ùƒ Ù…Ø³ÙŠØ±ØªÙƒ Ø§Ù„Ù…Ù‡Ù†ÙŠØ©ØŸ", "Ø£ÙŠ Ø¯ÙˆØ±Ø§Øª Ø¹Ø¨Ø± Ø§Ù„Ø¥Ù†ØªØ±Ù†Øª Ø£Ùˆ ØªØ¹Ù„Ù… Ø°Ø§ØªÙŠØŸ"],
-                projectResponse: ["Ù‡Ù„ ÙŠÙ…ÙƒÙ†Ùƒ Ø¥Ø®Ø¨Ø§Ø±ÙŠ Ø§Ù„Ù…Ø²ÙŠØ¯ Ø¹Ù† Ù‡Ø°Ø§ Ø§Ù„Ù…Ø´Ø±ÙˆØ¹ØŸ", "Ù…Ø§ Ù‡ÙŠ Ø§Ù„ØªØ­Ø¯ÙŠØ§Øª Ø§Ù„ØªÙŠ ÙˆØ§Ø¬Ù‡ØªÙ‡Ø§ØŸ", "Ù…Ø§Ø°Ø§ ØªØ¹Ù„Ù…Øª Ù…Ù†Ù‡ØŸ", "Ù…Ø§ ÙƒØ§Ù†Øª Ø§Ù„Ø¬Ø²Ø¡ Ø§Ù„Ø£ÙƒØ«Ø± Ø¥Ø«Ø§Ø±Ø© Ù„Ù„Ø§Ù‡ØªÙ…Ø§Ù…ØŸ", "ÙƒÙŠÙ Ø§Ø®ØªØ¨Ø±ØªÙ‡ØŸ", "Ù‡Ù„ Ø³ØªÙØ¹Ù„ Ø´ÙŠØ¦Ø§Ù‹ Ù…Ø®ØªÙ„ÙØ§Ù‹ Ø§Ù„Ø¢Ù†ØŸ"],
-                skillResponse: ["ÙƒÙŠÙ ØªØ¹Ù„Ù…Øª Ø°Ù„ÙƒØŸ", "Ù‡Ù„ Ø§Ø³ØªØ®Ø¯Ù…ØªÙ‡ ÙÙŠ Ù…Ø´Ø§Ø±ÙŠØ¹ØŸ", "Ù…Ø§ Ù‡Ùˆ Ù…Ø³ØªÙˆÙ‰ Ù…Ù‡Ø§Ø±ØªÙƒØŸ", "Ù…Ø§ Ù‡ÙŠ Ø·Ø±ÙŠÙ‚ØªÙƒ Ø§Ù„Ù…ÙØ¶Ù„Ø© Ù„ØªØ·Ø¨ÙŠÙ‚ Ù‡Ø°Ù‡ Ø§Ù„Ù…Ù‡Ø§Ø±Ø©ØŸ", "Ø£ÙŠ Ù†ØµØ§Ø¦Ø­ Ù„Ù„Ù…Ø¨ØªØ¯Ø¦ÙŠÙ†ØŸ", "ÙƒÙŠÙ ØªØ·ÙˆØ±Øª Ù‡Ø°Ù‡ Ø§Ù„Ù…Ù‡Ø§Ø±Ø© Ø¨Ø§Ù„Ù†Ø³Ø¨Ø© Ù„ÙƒØŸ"],
-                early: ["Ù…Ø§ Ù‡ÙŠ Ù…Ù‡Ø§Ø±Ø§ØªÙƒ Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©ØŸ", "Ø£Ø®Ø¨Ø±Ù†ÙŠ Ø¹Ù† Ø®Ù„ÙÙŠØªÙƒ", "Ù…Ø§ Ù‡ÙŠ Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹ Ø§Ù„ØªÙŠ ØªÙØ®Ø± Ø¨Ù‡Ø§ØŸ", "Ù…Ø§ Ø§Ù„Ø´ÙŠØ¡ Ø§Ù„ÙØ±ÙŠØ¯ ÙÙŠÙƒØŸ", "Ù„Ù…Ø§Ø°Ø§ Ø§Ø®ØªØ±Øª Ù‡Ø°Ø§ Ø§Ù„Ù…Ø¬Ø§Ù„ØŸ", "Ù…Ø§ Ù‡Ùˆ Ø£ÙƒØ¨Ø± Ø¥Ù†Ø¬Ø§Ø² Ù„ÙƒØŸ"]
+                skills: ["�&ا �!�` ا��&شار�`ع ا�ت�` ع�&�ت ع��`�!ا�x", "أخبر� �` ع�  تجربتْ", "�&اذا تتع��& حا��`ا�9�x", "ْ�`ف تتعا�&� �&ع ح� ا��&شْ�ات�x", "�&ا �!�` �&�!ارتْ ا��&فض�ة �استخدا�&�!ا�x", "ْ�`ف تحافظ ع��0 دافعْ ف�` ع�&�ْ�x"],
+                background: ["�&ا �!�` �&�!اراتْ ا�رئ�`س�`ة�x", "أخبر� �` ع�  تع��`�&ْ", "ف�` أ�` ص� اعات ع�&�ت�x", "�&ا ا�ذ�` أ��!�&ْ ��دخ��� ف�` �&جا� ا�تْ� �����ج�`ا�x", "ْ�`ف ْا� ت رح�تْ ا��&�!� �`ة�x", "أ�` �&رشد�`�  أثر��ا ع��`ْ�x"],
+                projects: ["�!� �`�&ْ� ْ إظ�!ار ْ��دْ�x", "�&ا �!�` ا�ت�� �`ات ا�ت�` استخد�&ت�!ا�x", "ْ�& �&�  ا����ت استغر� ب� اؤ�!�x", "�&ا �!�` ا�تحد�`ات ا�ت�` تغ�بت ع��`�!ا�x", "�!� ع�&�ت �&ع فر�`��x", "�&ا �!�` خططْ ا��&ست�ب��`ة ��!ذا ا��&شر��ع�x"],
+                contact: ["�!� أ� ت �&تاح ��ع�&� ا�حر�x", "�&ا �!�� ���ت ردْ ا��&عتاد�x", "�!� تع�&� ع�  بعد�x", "ْ�`ف �`�&ْ� � �` ا�ت��اص� �&عْ بشْ� أفض��x", "�&ا �!�` طر�`�ة ا�ت��اص� ا��&فض�ة �د�`ْ�x", "�!� أ� ت �&فت��ح ��تعا��� �x"],
+                education: ["�&ا �!�` ا�ش�!ادات ا�ت�` �د�`ْ�x", "�&ا �!�� �غة ا�بر�&جة ا��&فض�ة �د�`ْ�x", "ْ�`ف تحافظ ع��0 تحد�`ث � فسْ با�تْ� �����ج�`ا�x", "�&ا ْا�  أْثر د��رة تحد�`ا�9 �ْ�x", "ْ�`ف شْ�ت تع��`�&ْ �&س�`رتْ ا��&�!� �`ة�x", "أ�` د��رات عبر ا�إ� تر� ت أ�� تع��& ذات�`�x"],
+                projectResponse: ["�!� �`�&ْ� ْ إخبار�` ا��&ز�`د ع�  �!ذا ا��&شر��ع�x", "�&ا �!�` ا�تحد�`ات ا�ت�` ��اج�!ت�!ا�x", "�&اذا تع��&ت �&� �!�x", "�&ا ْا� ت ا�جزء ا�أْثر إثارة ��ا�!ت�&ا�&�x", "ْ�`ف اختبرت�!�x", "�!� ستفع� ش�`ئا�9 �&خت�فا�9 ا�آ� �x"],
+                skillResponse: ["ْ�`ف تع��&ت ذ�ْ�x", "�!� استخد�&ت�! ف�` �&شار�`ع�x", "�&ا �!�� �&ست���0 �&�!ارتْ�x", "�&ا �!�` طر�`�تْ ا��&فض�ة �تطب�`� �!ذ�! ا��&�!ارة�x", "أ�` � صائح ���&بتدئ�`� �x", "ْ�`ف تط��رت �!ذ�! ا��&�!ارة با�� سبة �ْ�x"],
+                early: ["�&ا �!�` �&�!اراتْ ا�رئ�`س�`ة�x", "أخبر� �` ع�  خ�ف�`تْ", "�&ا �!�` ا��&شار�`ع ا�ت�` تفخر ب�!ا�x", "�&ا ا�ش�`ء ا�فر�`د ف�`ْ�x", "��&اذا اخترت �!ذا ا��&جا��x", "�&ا �!�� أْبر إ� جاز �ْ�x"]
             }
         },
         pinnedChips: {
             en: ["Projects", "Resume", "Contact"],
-            es: ["Proyectos", "CurrÃ­culum", "Contacto"],
-            ar: ["Ù…Ø´Ø§Ø±ÙŠØ¹", "Ø§Ù„Ø³ÙŠØ±Ø© Ø§Ù„Ø°Ø§ØªÙŠØ©", "Ø§ØªØµØ§Ù„"]
+            es: ["Proyectos", "Currículum", "Contacto"],
+            ar: ["�&شار�`ع", "ا�س�`رة ا�ذات�`ة", "اتصا�"]
         },
         pinnedFollowUps: {
             en: {
@@ -2119,14 +2104,14 @@ const translations = {
                 contact: ["Email", "LinkedIn", "Best way to reach you?"]
             },
             es: {
-                projects: ["MuÃ©strame tu mejor proyecto", "Â¿QuÃ© stack tecnolÃ³gico usas mÃ¡s?", "Â¿AlgÃºn ejemplo detallado?"],
-                resume: ["Resume tu experiencia", "Â¿QuÃ© roles buscas?", "Â¿CuÃ¡les son tus habilidades mÃ¡s fuertes?"],
-                contact: ["Email", "LinkedIn", "Â¿Mejor forma de contactarte?"]
+                projects: ["Mu�strame tu mejor proyecto", "¿Qu� stack tecnológico usas más?", "¿Algún ejemplo detallado?"],
+                resume: ["Resume tu experiencia", "¿Qu� roles buscas?", "¿Cuáles son tus habilidades más fuertes?"],
+                contact: ["Email", "LinkedIn", "¿Mejor forma de contactarte?"]
             },
             ar: {
-                projects: ["Ø£Ø±Ù†ÙŠ Ø£ÙØ¶Ù„ Ù…Ø´Ø±ÙˆØ¹ Ù„Ùƒ", "Ù…Ø§ Ù‡ÙŠ Ø§Ù„ØªÙ‚Ù†ÙŠØ§Øª Ø§Ù„Ø£ÙƒØ«Ø± Ø§Ø³ØªØ®Ø¯Ø§Ù…Ø§Ù‹ØŸ", "Ø£ÙŠ Ø£Ù…Ø«Ù„Ø© Ù…ÙØµÙ„Ø©ØŸ"],
-                resume: ["Ù„Ø®Øµ Ø®Ø¨Ø±ØªÙƒ", "Ù…Ø§ Ù‡ÙŠ Ø§Ù„Ø£Ø¯ÙˆØ§Ø± Ø§Ù„Ù…Ø³ØªÙ‡Ø¯ÙØ©ØŸ", "Ù…Ø§ Ù‡ÙŠ Ø£Ù‚ÙˆÙ‰ Ù…Ù‡Ø§Ø±Ø§ØªÙƒØŸ"],
-                contact: ["Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ", "LinkedIn", "Ø£ÙØ¶Ù„ Ø·Ø±ÙŠÙ‚Ø© Ù„Ù„ØªÙˆØ§ØµÙ„ØŸ"]
+                projects: ["أر� �` أفض� �&شر��ع �ْ", "�&ا �!�` ا�ت�� �`ات ا�أْثر استخدا�&ا�9�x", "أ�` أ�&ث�ة �&فص�ة�x"],
+                resume: ["�خص خبرتْ", "�&ا �!�` ا�أد��ار ا��&ست�!دفة�x", "�&ا �!�` أ����0 �&�!اراتْ�x"],
+                contact: ["ا�بر�`د ا�إ�ْتر��� �`", "LinkedIn", "أفض� طر�`�ة ��ت��اص��x"]
             }
         }
     }
@@ -2139,14 +2124,14 @@ const initAchievements = () => {
     
     // Achievement definitions (now using translations)
     const achievements = {
-        explorer: { id: 'explorer', icon: 'ðŸ—ºï¸' },
-        reader: { id: 'reader', icon: 'ðŸ“–' },
-        gamer: { id: 'gamer', icon: 'ðŸŽ®' },
-        chatter: { id: 'chatter', icon: 'ðŸ’¬' },
-        nightOwl: { id: 'nightOwl', icon: 'ðŸŒ™' },
-        konami: { id: 'konami', icon: 'ðŸŽ¯' },
-        networker: { id: 'networker', icon: 'ðŸ”—' },
-        formFiller: { id: 'formFiller', icon: 'âœ‰ï¸' }
+        explorer: { id: 'explorer', icon: '�x�️' },
+        reader: { id: 'reader', icon: '�x' },
+        gamer: { id: 'gamer', icon: '�x}�' },
+        chatter: { id: 'chatter', icon: '�x�' },
+        nightOwl: { id: 'nightOwl', icon: '�xR"' },
+        konami: { id: 'konami', icon: '�x}�' },
+        networker: { id: 'networker', icon: '�x' },
+        formFiller: { id: 'formFiller', icon: '�S0️' }
     };
 
     // Get achievements from storage
@@ -2245,7 +2230,7 @@ const initAchievements = () => {
             };
         }
 
-        const safeIcon = resolved.icon || 'ðŸ†';
+        const safeIcon = resolved.icon || '�x� ';
         const safeName = resolved.name || 'Achievement';
         const safeDesc = resolved.description || '';
         const notification = document.createElement('div');
@@ -2257,7 +2242,7 @@ const initAchievements = () => {
                 <div class="achievement-name">${safeName}</div>
                 <div class="achievement-desc">${safeDesc}</div>
             </div>
-            <button class="achievement-close" aria-label="Close achievement notification">Ã—</button>
+            <button class="achievement-close" aria-label="Close achievement notification">�</button>
         `;
         document.body.appendChild(notification);
 
@@ -2363,7 +2348,7 @@ const initKonamiCode = () => {
                 <div class="konami-body">
                     <p class="konami-message">${konamiText.message}</p>
                     <div class="konami-gift">
-                        <div class="gift-emoji">ðŸŽ</div>
+                        <div class="gift-emoji">�x}�</div>
                         <p class="gift-text">${konamiText.giftText}</p>
                         <div class="compliment-container" style="display: none;">
                             <p class="compliment-text"></p>
@@ -2837,7 +2822,7 @@ const initPhase2 = () => {
                 // Visual feedback: change text if link has inner text
                 if (link.innerText || link.textContent) {
                     const originalText = link.innerText || link.textContent;
-                    link.innerText = 'Copied! âœ…';
+                    link.innerText = 'Copied! ';
                     
                     // Revert after 2 seconds
                     setTimeout(() => {
@@ -2932,7 +2917,7 @@ const __ensureStandardEnglishChrome = () => {
             </div>
             
             <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">ðŸ”†</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">�x </span></button>
             
             <!-- Mobile Menu Toggle -->
             <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -3004,8 +2989,8 @@ const __ensureStandardEnglishChrome = () => {
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
                     <ul class="space-y-2">
-                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn â†—</a></li>
-                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub â†—</a></li>
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn � </a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub � </a></li>
                         <li><a href="/contact" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
                         <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
                         <li><a href="/privacy" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
@@ -3013,7 +2998,7 @@ const __ensureStandardEnglishChrome = () => {
                 </div>
             </div>
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">Â© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">� <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
             `;
@@ -3114,20 +3099,20 @@ const __shuffleInPlace = (arr, rnd) => {
 };
 
 const __GAME_CATALOG = [
-    { id: 'snake', href: '/hobbies-games/snake', emoji: 'ðŸ', title: 'Snake', subtitle: 'Classic growth game' },
-    { id: 'breaker', href: '/hobbies-games/block-breaker', emoji: 'ðŸ§±', title: 'Block Breaker', subtitle: 'Smash the bricks' },
-    { id: '2048', href: '/hobbies-games/2048', emoji: 'ðŸ§©', title: '2048', subtitle: 'Merge the numbers' },
-    { id: 'invaders', href: '/hobbies-games/space-invaders', emoji: 'ðŸ‘¾', title: 'Space Invaders', subtitle: 'Defend the earth' },
-    { id: 'racer', href: '/hobbies-games/racer', emoji: 'ðŸŽï¸', title: 'Racer', subtitle: 'Fast reflex racing' },
-    { id: 'oh-flip', href: '/hobbies-games/oh-flip', emoji: 'ðŸ¤¸', title: 'Oh Flip', subtitle: 'Timing + tricks' },
-    { id: 'onoff', href: '/hobbies-games/onoff', emoji: 'âš¡', title: 'ON/OFF', subtitle: 'Switch-based puzzle' },
-    { id: '1024-moves', href: '/hobbies-games/1024-moves', emoji: 'ðŸ§ ', title: '1024 Moves', subtitle: 'Move-limited strategy' },
-    { id: 'nano-wirebot', href: '/hobbies-games/nano-wirebot', emoji: 'ðŸ¤–', title: 'Nano Wirebot', subtitle: 'Precision platforming' },
-    { id: 'off-the-line', href: '/hobbies-games/off-the-line', emoji: 'ðŸ§·', title: 'Off The Line', subtitle: 'Donâ€™t cross the line' },
-    { id: 'pizza-undelivery', href: '/hobbies-games/pizza-undelivery', emoji: 'ðŸ•', title: 'Pizza Undelivery', subtitle: 'Fast food chaos' },
-    { id: 'the-matr13k', href: '/hobbies-games/the-matr13k', emoji: 'ðŸ§¬', title: 'The Matr13k', subtitle: 'Pattern puzzle' },
-    { id: 'triangle-back-to-home', href: '/hobbies-games/triangle-back-to-home', emoji: 'ðŸ”º', title: 'Triangle: Back to Home', subtitle: 'Geometry adventure' },
-    { id: 'xx142-b2exe', href: '/hobbies-games/xx142-b2exe', emoji: 'ðŸ§ª', title: 'XX142-B2EXE', subtitle: 'Experimental arcade' }
+    { id: 'snake', href: '/hobbies-games/snake', emoji: '�x��', title: 'Snake', subtitle: 'Classic growth game' },
+    { id: 'breaker', href: '/hobbies-games/block-breaker', emoji: '�x��', title: 'Block Breaker', subtitle: 'Smash the bricks' },
+    { id: '2048', href: '/hobbies-games/2048', emoji: '�x��', title: '2048', subtitle: 'Merge the numbers' },
+    { id: 'invaders', href: '/hobbies-games/space-invaders', emoji: '�x�', title: 'Space Invaders', subtitle: 'Defend the earth' },
+    { id: 'racer', href: '/hobbies-games/racer', emoji: '�x�}️', title: 'Racer', subtitle: 'Fast reflex racing' },
+    { id: 'oh-flip', href: '/hobbies-games/oh-flip', emoji: '�x��', title: 'Oh Flip', subtitle: 'Timing + tricks' },
+    { id: 'onoff', href: '/hobbies-games/onoff', emoji: '�a�', title: 'ON/OFF', subtitle: 'Switch-based puzzle' },
+    { id: '1024-moves', href: '/hobbies-games/1024-moves', emoji: '�x��', title: '1024 Moves', subtitle: 'Move-limited strategy' },
+    { id: 'nano-wirebot', href: '/hobbies-games/nano-wirebot', emoji: '�x�', title: 'Nano Wirebot', subtitle: 'Precision platforming' },
+    { id: 'off-the-line', href: '/hobbies-games/off-the-line', emoji: '�x��', title: 'Off The Line', subtitle: 'Dont cross the line' },
+    { id: 'pizza-undelivery', href: '/hobbies-games/pizza-undelivery', emoji: '�x�"', title: 'Pizza Undelivery', subtitle: 'Fast food chaos' },
+    { id: 'the-matr13k', href: '/hobbies-games/the-matr13k', emoji: '�x��', title: 'The Matr13k', subtitle: 'Pattern puzzle' },
+    { id: 'triangle-back-to-home', href: '/hobbies-games/triangle-back-to-home', emoji: '�x�', title: 'Triangle: Back to Home', subtitle: 'Geometry adventure' },
+    { id: 'xx142-b2exe', href: '/hobbies-games/xx142-b2exe', emoji: '�x��', title: 'XX142-B2EXE', subtitle: 'Experimental arcade' }
 ];
 
 const __renderSuggestionGrid = (gridEl, opts) => {
@@ -3175,7 +3160,7 @@ const __renderSuggestionGrid = (gridEl, opts) => {
 
     gridEl.innerHTML = chosen.map(g => `
         <a href="${g.href}" class="${tileClass}" data-game-id="${g.id}">
-            <div class="${emojiClass}">${g.emoji || 'ðŸŽ®'}</div>
+            <div class="${emojiClass}">${g.emoji || '�x}�'}</div>
             <div class="font-bold text-sm">${g.title || g.id}</div>
             <div class="text-xs opacity-60 mt-1">${g.subtitle || ''}</div>
         </a>
@@ -3657,20 +3642,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const combinedContext = lastUserMessage + ' ' + lastBotMessage;
         
         // More intelligent context detection based on both question and answer
-        if (combinedContext.match(/skill|technology|expertise|proficiency|technical|programming|coding|developer|engineer|habilidad|tecnologÃ­a|experiencia|programaciÃ³n|Ù…Ù‡Ø§Ø±Ø©|ØªÙƒÙ†ÙˆÙ„ÙˆØ¬ÙŠØ§|Ø®Ø¨Ø±Ø©|Ø¨Ø±Ù…Ø¬Ø©/i)) {
+        if (combinedContext.match(/skill|technology|expertise|proficiency|technical|programming|coding|developer|engineer|habilidad|tecnología|experiencia|programación|�&�!ارة|تْ� �����ج�`ا|خبرة|بر�&جة/i)) {
             suggestions.push(...(contextualSuggestions[detectedLang]?.skills || contextualSuggestions.en.skills));
-        } else if (combinedContext.match(/background|experience|career|journey|history|education|degree|university|studied|fondo|experiencia|carrera|educaciÃ³n|universidad|Ø®Ù„ÙÙŠØ©|Ø®Ø¨Ø±Ø©|Ù…Ø³ÙŠØ±Ø©|ØªØ¹Ù„ÙŠÙ…|Ø¬Ø§Ù…Ø¹Ø©/i)) {
+        } else if (combinedContext.match(/background|experience|career|journey|history|education|degree|university|studied|fondo|experiencia|carrera|educación|universidad|خ�ف�`ة|خبرة|�&س�`رة|تع��`�&|جا�&عة/i)) {
             suggestions.push(...(contextualSuggestions[detectedLang]?.background || contextualSuggestions.en.background));
-        } else if (combinedContext.match(/project|portfolio|work|built|created|developed|application|website|system|proyecto|trabajo|portafolio|construido|desarrollado|aplicaciÃ³n|Ù…Ø´Ø±ÙˆØ¹|Ø¹Ù…Ù„|Ù…Ø­ÙØ¸Ø©|Ø¨Ù†Ù‰|Ø·ÙˆØ±/i)) {
+        } else if (combinedContext.match(/project|portfolio|work|built|created|developed|application|website|system|proyecto|trabajo|portafolio|construido|desarrollado|aplicación|�&شر��ع|ع�&�|�&حفظة|ب� �0|ط��ر/i)) {
             suggestions.push(...(contextualSuggestions[detectedLang]?.projects || contextualSuggestions.en.projects));
-        } else if (combinedContext.match(/contact|reach|email|connect|hire|available|freelance|contacto|alcanzar|correo|conectar|contratar|disponible|Ø§ØªØµØ§Ù„|Ø§Ù„ÙˆØµÙˆÙ„|Ø¨Ø±ÙŠØ¯|ØªÙˆØ¸ÙŠÙ|Ù…ØªØ§Ø­/i)) {
+        } else if (combinedContext.match(/contact|reach|email|connect|hire|available|freelance|contacto|alcanzar|correo|conectar|contratar|disponible|اتصا�|ا���ص���|بر�`د|ت��ظ�`ف|�&تاح/i)) {
             suggestions.push(...(contextualSuggestions[detectedLang]?.contact || contextualSuggestions.en.contact));
-        } else if (combinedContext.match(/education|study|learn|course|certification|degree|training|class|educaciÃ³n|estudio|aprender|curso|certificaciÃ³n|grado|ØªØ¹Ù„ÙŠÙ…|Ø¯Ø±Ø§Ø³Ø©|ØªØ¹Ù„Ù…|Ø¯ÙˆØ±Ø©|Ø´Ù‡Ø§Ø¯Ø©/i)) {
+        } else if (combinedContext.match(/education|study|learn|course|certification|degree|training|class|educación|estudio|aprender|curso|certificación|grado|تع��`�&|دراسة|تع��&|د��رة|ش�!ادة/i)) {
             suggestions.push(...(contextualSuggestions[detectedLang]?.education || contextualSuggestions.en.education));
-        } else if (lastBotMessage.match(/project|portfolio|application|system|website|built|created|developed|proyecto|aplicaciÃ³n|sistema|construido|desarrollado|Ù…Ø´Ø±ÙˆØ¹|Ù…Ø­ÙØ¸Ø©|Ø¨Ù†Ù‰|Ø·ÙˆØ±/i)) {
+        } else if (lastBotMessage.match(/project|portfolio|application|system|website|built|created|developed|proyecto|aplicación|sistema|construido|desarrollado|�&شر��ع|�&حفظة|ب� �0|ط��ر/i)) {
             // Bot is talking about projects, offer project-related follow-ups
             suggestions.push(...(contextualSuggestions[detectedLang]?.projectResponse || contextualSuggestions.en.projectResponse));
-        } else if (lastBotMessage.match(/skill|technology|proficiency|expertise|language|framework|tool|habilidad|tecnologÃ­a|lenguaje|herramienta|Ù…Ù‡Ø§Ø±Ø©|ØªÙƒÙ†ÙˆÙ„ÙˆØ¬ÙŠØ§|Ù„ØºØ©|Ø£Ø¯Ø§Ø©/i)) {
+        } else if (lastBotMessage.match(/skill|technology|proficiency|expertise|language|framework|tool|habilidad|tecnología|lenguaje|herramienta|�&�!ارة|تْ� �����ج�`ا|�غة|أداة/i)) {
             // Bot is talking about skills, offer skill-related follow-ups
             suggestions.push(...(contextualSuggestions[detectedLang]?.skillResponse || contextualSuggestions.en.skillResponse));
         } else if (history.length < 4) {
@@ -3696,7 +3681,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (arabicChars.test(text)) return 'ar';
         
         // Spanish detection (common Spanish words and patterns)
-        const spanishWords = /\b(quÃ©|como|dÃ³nde|cuÃ¡ndo|por quÃ©|estÃ¡|son|tiene|trabajo|habilidades?|experiencia|proyecto|contacto)\b/i;
+        const spanishWords = /\b(qu�|como|dónde|cuándo|por qu�|está|son|tiene|trabajo|habilidades?|experiencia|proyecto|contacto)\b/i;
         if (spanishWords.test(text)) return 'es';
         
         // Default to English
@@ -3920,9 +3905,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Define action labels for special handling
-        const projectLabels = ["Projects", "View Projects", "Projects", "View projects", "Proyectos", "Ver proyectos", "Ù…Ø´Ø§Ø±ÙŠØ¹", "Ø¹Ø±Ø¶ Ø§Ù„Ù…Ø´Ø§Ø±ÙŠØ¹"];
-        const resumeLabels = ["Resume", "Download Resume", "View Resume", "Get resume", "CurrÃ­culum", "Descargar currÃ­culum", "Ø§Ù„Ø³ÙŠØ±Ø© Ø§Ù„Ø°Ø§ØªÙŠØ©", "ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø³ÙŠØ±Ø©"];
-        const contactLabels = ["Contact", "Email", "Email Estivan", "Contact Estivan", "Contacto", "Correo electrÃ³nico", "Ø§ØªØµØ§Ù„", "Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ"];
+        const projectLabels = ["Projects", "View Projects", "Projects", "View projects", "Proyectos", "Ver proyectos", "�&شار�`ع", "عرض ا��&شار�`ع"];
+        const resumeLabels = ["Resume", "Download Resume", "View Resume", "Get resume", "Currículum", "Descargar currículum", "ا�س�`رة ا�ذات�`ة", "تح�&�`� ا�س�`رة"];
+        const contactLabels = ["Contact", "Email", "Email Estivan", "Contact Estivan", "Contacto", "Correo electrónico", "اتصا�", "ا�بر�`د ا�إ�ْتر��� �`"];
         const linkedinLabels = ["LinkedIn", "Open LinkedIn"];
 
         // Render all chips
@@ -3992,7 +3977,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const closeBtn = document.createElement('button');
         closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
         closeBtn.setAttribute('data-chat-suggestions-close', 'button');
-        closeBtn.innerHTML = 'Ã—';
+        closeBtn.innerHTML = '�';
         closeBtn.title = 'Hide suggestions';
         closeBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -4671,7 +4656,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // ðŸ† ACHIEVEMENT: Reader - Visit Deep Dive page
+        // �x�  ACHIEVEMENT: Reader - Visit Deep Dive page
         if (currentPath === '/deep-dive' && typeof window.ArcadeAchievements !== 'undefined') {
             window.ArcadeAchievements.unlock('reader');
         }
