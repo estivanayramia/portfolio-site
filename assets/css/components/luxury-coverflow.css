@@ -652,6 +652,7 @@
   width: var(--roulette-diameter);
   height: var(--roulette-diameter);
   border-radius: 50%;
+  will-change: transform;
 }
 
 .luxury-roulette-rim {
@@ -688,6 +689,7 @@
   background: rgba(17, 19, 29, 0.94);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
+  will-change: transform, opacity;
 }
 
 .luxury-roulette-pocket.is-red {
@@ -723,6 +725,7 @@
 .luxury-roulette-pocket__preview--flying {
   border-radius: 1rem;
   overflow: hidden;
+  will-change: transform, opacity;
 }
 
 .luxury-roulette-pocket__category,
@@ -770,6 +773,7 @@
   height: 18px;
   background: radial-gradient(circle at 30% 30%, #fff, #efe2c7 58%, #c9a76d);
   box-shadow: 0 0 16px rgba(201, 167, 109, 0.6), 0 8px 20px rgba(0, 0, 0, 0.26);
+  will-change: transform;
 }
 
 .luxury-roulette-ball-highlight {
@@ -777,6 +781,7 @@
   height: 8px;
   background: rgba(255, 255, 255, 0.85);
   filter: blur(1px);
+  will-change: transform, opacity;
 }
 
 .luxury-roulette-ball-shadow {
@@ -784,6 +789,7 @@
   height: 8px;
   background: rgba(0, 0, 0, 0.32);
   filter: blur(6px);
+  will-change: transform, opacity;
 }
 
 .luxury-roulette-status {

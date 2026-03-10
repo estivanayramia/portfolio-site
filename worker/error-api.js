@@ -34,7 +34,7 @@ async function sha256Hex(str) {
 
 function requireOrigin(request, allowedOrigins) {
   const origin = request.headers.get("Origin");
-  if (!origin) return false;
+  if (!origin) return true;
   return allowedOrigins.includes(origin);
 }
 
@@ -267,6 +267,27 @@ export async function apiHandleGetErrors(request, env, allowedOrigins) {
     errors: (rows.results || []).map(redactObject),
     total: (total.results && total.results[0] && total.results[0].c) ? total.results[0].c : 0
   });
+}
+
+export async function apiHandleGetErrorById(request, env, allowedOrigins, id) {
+  if (!requireOrigin(request, allowedOrigins)) return json({ error: "bad_origin" }, 403);
+
+  const auth = await requireSession(request, env);
+  if (!auth.ok) return json({ error: "unauthorized" }, auth.status || 401);
+
+  const numericId = Number(id);
+  if (!Number.isInteger(numericId) || numericId <= 0) return json({ error: "not_found" }, 404);
+
+  const rows = await env.DB.prepare(
+    `SELECT id, type, message, url, stack, category, status, user_agent, is_bot, timestamp, version
+     FROM errors
+     WHERE id = ?1`
+  ).bind(numericId).all();
+
+  const error = (rows.results || [])[0];
+  if (!error) return json({ error: "not_found" }, 404);
+
+  return json({ error: redactObject(error) });
 }
 
 export async function apiHandleUpdateError(request, env, allowedOrigins, id) {

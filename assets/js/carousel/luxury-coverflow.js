@@ -24,11 +24,11 @@ const ROOT_TIER_CLASSES = [
 const MOTION_PROFILES = {
   premium: {
     tierClass: 'premium',
-    slideMs: 520,
-    settleMs: 220,
+    slideMs: 620,
+    settleMs: 280,
     introMs: 260,
-    spinMs: 3600,
-    dialogMs: 240,
+    spinMs: 4400,
+    dialogMs: 260,
     scrollSensitivity: 0.0038,
     scrollThreshold: 34,
     dragPixelsPerSlide: 255,
@@ -41,11 +41,11 @@ const MOTION_PROFILES = {
   },
   enhanced: {
     tierClass: 'enhanced',
-    slideMs: 450,
-    settleMs: 180,
+    slideMs: 540,
+    settleMs: 240,
     introMs: 220,
-    spinMs: 3200,
-    dialogMs: 220,
+    spinMs: 3900,
+    dialogMs: 240,
     scrollSensitivity: 0.0034,
     scrollThreshold: 32,
     dragPixelsPerSlide: 245,
@@ -58,11 +58,11 @@ const MOTION_PROFILES = {
   },
   baseline: {
     tierClass: 'baseline',
-    slideMs: 320,
-    settleMs: 150,
+    slideMs: 380,
+    settleMs: 180,
     introMs: 180,
-    spinMs: 2400,
-    dialogMs: 180,
+    spinMs: 2900,
+    dialogMs: 200,
     scrollSensitivity: 0.0028,
     scrollThreshold: 28,
     dragPixelsPerSlide: 228,
@@ -881,7 +881,8 @@ class RouletteOverlayController {
     clone.style.zIndex = '10002';
     clone.style.pointerEvents = 'none';
     clone.style.transformOrigin = 'center center';
-    clone.style.boxShadow = '0 26px 70px rgba(0, 0, 0, 0.35)';
+    clone.style.boxShadow = '0 34px 90px rgba(0, 0, 0, 0.42)';
+    clone.style.willChange = 'transform, opacity';
     document.body.appendChild(clone);
 
     const overlayBackground = this.overlay;
@@ -895,45 +896,51 @@ class RouletteOverlayController {
       this.elements.ballShadow
     ];
 
-    gsap.set(activeItem, { opacity: 0.2, scale: 0.96, filter: 'blur(1px) brightness(0.92)' });
+    gsap.set(activeItem, { opacity: 0.12, scale: 0.94, filter: 'blur(2px) brightness(0.88)' });
 
     await new Promise((resolve) => {
       const timeline = gsap.timeline({ onComplete: resolve });
       timeline.to(clone, {
         x: window.innerWidth * 0.5 - (pocketRect.left + pocketRect.width * 0.5),
-        y: window.innerHeight * 0.48 - (pocketRect.top + pocketRect.height * 0.5),
-        scale: 2.8,
+        y: window.innerHeight * 0.44 - (pocketRect.top + pocketRect.height * 0.5),
+        scale: 3.15,
         rotate: 0,
-        duration: 0.52,
-        ease: 'power3.out'
+        duration: 0.58,
+        ease: 'power4.out'
+      });
+      timeline.to(clone, {
+        y: `-=${Math.max(18, window.innerHeight * 0.02)}`,
+        scale: 3.28,
+        duration: 0.18,
+        ease: 'sine.out'
       });
       timeline.to(overlayWheelTargets, {
         opacity: 0,
-        duration: 0.28,
+        duration: 0.34,
         ease: 'power2.out'
-      }, '-=0.24');
+      }, '-=0.3');
       timeline.to(overlayBackground, {
         backgroundColor: 'rgba(2, 4, 10, 0)',
         backdropFilter: 'blur(0px)',
-        duration: 0.32,
+        duration: 0.38,
         ease: 'power2.out'
-      }, '-=0.16');
+      }, '-=0.24');
       timeline.to(clone, {
         x: activeRect.left + activeRect.width * 0.5 - (pocketRect.left + pocketRect.width * 0.5),
         y: activeRect.top + activeRect.height * 0.5 - (pocketRect.top + pocketRect.height * 0.5),
         scaleX: activeRect.width / pocketRect.width,
         scaleY: activeRect.height / pocketRect.height,
-        opacity: 0.18,
-        duration: 0.48,
-        ease: 'power2.inOut'
+        opacity: 0.08,
+        duration: 0.56,
+        ease: 'expo.inOut'
       });
       timeline.to(activeItem, {
         opacity: 1,
         scale: 1,
         filter: 'blur(0px) brightness(1.04)',
-        duration: 0.32,
-        ease: 'power2.out'
-      }, '-=0.22');
+        duration: 0.4,
+        ease: 'power3.out'
+      }, '-=0.24');
     });
 
     clone.remove();
@@ -1010,23 +1017,51 @@ class RouletteOverlayController {
       progress: 0
     };
 
+    const renderFrame = () => {
+      frame.progress = this.spinTween ? this.spinTween.progress() : frame.progress;
+      this.renderSpinFrame(frame);
+    };
+
     await new Promise((resolve) => {
       this.isSpinning = true;
-      this.spinTween = gsap.to(frame, {
-        wheelRotation: -wheelSpin.finalRotation,
-        ballAngle: frame.ballAngle - (wheelSpin.spins * 360 + 300),
-        radius: wheelRadius * 0.82,
-        duration: durationSeconds,
-        ease: this.carousel.motion.rouletteMode === 'premium' ? 'power4.out' : 'power3.out',
-        onUpdate: () => {
-          frame.progress = this.spinTween ? this.spinTween.progress() : frame.progress;
-          this.renderSpinFrame(frame);
-        },
+      const totalBallRotation = wheelSpin.spins * 360 + 300;
+      const firstLeg = durationSeconds * 0.58;
+      const secondLeg = durationSeconds * 0.24;
+      const finalLeg = Math.max(0.36, durationSeconds - firstLeg - secondLeg);
+
+      this.spinTween = gsap.timeline({
         onComplete: () => {
           this.spinTween = null;
           this.isSpinning = false;
           resolve();
         }
+      });
+
+      this.spinTween.to(frame, {
+        wheelRotation: -(wheelSpin.finalRotation * 0.72),
+        ballAngle: frame.ballAngle - (totalBallRotation * 0.78),
+        radius: wheelRadius * 1.04,
+        duration: firstLeg,
+        ease: 'none',
+        onUpdate: renderFrame
+      });
+
+      this.spinTween.to(frame, {
+        wheelRotation: -wheelSpin.finalRotation + 42,
+        ballAngle: frame.ballAngle - (totalBallRotation * 0.19),
+        radius: wheelRadius * 0.9,
+        duration: secondLeg,
+        ease: 'power2.out',
+        onUpdate: renderFrame
+      });
+
+      this.spinTween.to(frame, {
+        wheelRotation: -wheelSpin.finalRotation,
+        ballAngle: frame.ballAngle - (totalBallRotation * 0.03),
+        radius: wheelRadius * 0.82,
+        duration: finalLeg,
+        ease: 'back.out(1.08)',
+        onUpdate: renderFrame
       });
     });
   }
@@ -1173,7 +1208,7 @@ export class LuxuryCoverflow {
       enableScroll: true,
       enableSmoothTracking: this.motion.enableSmoothTracking,
       performanceTier: resolvedTier,
-      animationEase: 'power2.out',
+      animationEase: 'power3.out',
       surface: 'default',
       activeStateClass: 'coverflow-card--active',
       maxVisibleDots: 7,
