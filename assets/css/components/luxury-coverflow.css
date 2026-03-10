@@ -720,6 +720,11 @@
     var(--preview-bg, linear-gradient(135deg, #212842, #3d4666));
 }
 
+.luxury-roulette-pocket__preview--flying {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
 .luxury-roulette-pocket__category,
 .luxury-roulette-pocket__title,
 .luxury-roulette-pocket__badge {

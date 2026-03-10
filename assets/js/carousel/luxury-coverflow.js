@@ -395,6 +395,7 @@ class RouletteOverlayController {
     this.result = null;
     this.interactionsLocked = false;
     this.interactionsUnlockTimer = null;
+    this.lastStatusPhase = '';
   }
 
   ensureOverlay() {
@@ -838,13 +839,141 @@ class RouletteOverlayController {
       scale: 0.82 + frame.progress * 0.18
     });
 
+    let phase = 'final';
+    let message = 'Picking the final pocket';
     if (frame.progress < 0.25) {
-      this.setStatus('Wheel at full speed');
+      phase = 'fast';
+      message = 'Wheel at full speed';
     } else if (frame.progress < 0.65) {
-      this.setStatus('Settling into position');
-    } else {
-      this.setStatus('Picking the final pocket');
+      phase = 'settling';
+      message = 'Settling into position';
     }
+
+    if (phase !== this.lastStatusPhase) {
+      this.lastStatusPhase = phase;
+      this.setStatus(message);
+    }
+  }
+
+  async runWinningCardTransition(preview) {
+    await this.waitForCarouselSettle();
+
+    const winningPocket = this.pockets[this.result.winnerPocketIndex]?.root;
+    const activeItem = this.carousel.items[this.result.winnerCardIndex];
+    if (!winningPocket || !activeItem) return;
+
+    const pocketPreview = winningPocket.querySelector('.luxury-roulette-pocket__preview');
+    if (!pocketPreview) return;
+
+    const pocketRect = pocketPreview.getBoundingClientRect();
+    const activeRect = activeItem.getBoundingClientRect();
+    if (!pocketRect.width || !pocketRect.height || !activeRect.width || !activeRect.height) return;
+
+    const clone = pocketPreview.cloneNode(true);
+    clone.classList.add('luxury-roulette-pocket__preview--flying');
+    clone.style.setProperty('--preview-bg', preview.background);
+    clone.style.position = 'fixed';
+    clone.style.left = `${pocketRect.left}px`;
+    clone.style.top = `${pocketRect.top}px`;
+    clone.style.width = `${pocketRect.width}px`;
+    clone.style.height = `${pocketRect.height}px`;
+    clone.style.margin = '0';
+    clone.style.zIndex = '10002';
+    clone.style.pointerEvents = 'none';
+    clone.style.transformOrigin = 'center center';
+    clone.style.boxShadow = '0 26px 70px rgba(0, 0, 0, 0.35)';
+    document.body.appendChild(clone);
+
+    const overlayBackground = this.overlay;
+    const overlayWheelTargets = [
+      this.elements.shell,
+      this.elements.stage,
+      this.elements.status,
+      ...this.pockets.map((pocket) => pocket.root),
+      this.elements.ball,
+      this.elements.ballHighlight,
+      this.elements.ballShadow
+    ];
+
+    gsap.set(activeItem, { opacity: 0.2, scale: 0.96, filter: 'blur(1px) brightness(0.92)' });
+
+    await new Promise((resolve) => {
+      const timeline = gsap.timeline({ onComplete: resolve });
+      timeline.to(clone, {
+        x: window.innerWidth * 0.5 - (pocketRect.left + pocketRect.width * 0.5),
+        y: window.innerHeight * 0.48 - (pocketRect.top + pocketRect.height * 0.5),
+        scale: 2.8,
+        rotate: 0,
+        duration: 0.52,
+        ease: 'power3.out'
+      });
+      timeline.to(overlayWheelTargets, {
+        opacity: 0,
+        duration: 0.28,
+        ease: 'power2.out'
+      }, '-=0.24');
+      timeline.to(overlayBackground, {
+        backgroundColor: 'rgba(2, 4, 10, 0)',
+        backdropFilter: 'blur(0px)',
+        duration: 0.32,
+        ease: 'power2.out'
+      }, '-=0.16');
+      timeline.to(clone, {
+        x: activeRect.left + activeRect.width * 0.5 - (pocketRect.left + pocketRect.width * 0.5),
+        y: activeRect.top + activeRect.height * 0.5 - (pocketRect.top + pocketRect.height * 0.5),
+        scaleX: activeRect.width / pocketRect.width,
+        scaleY: activeRect.height / pocketRect.height,
+        opacity: 0.18,
+        duration: 0.48,
+        ease: 'power2.inOut'
+      });
+      timeline.to(activeItem, {
+        opacity: 1,
+        scale: 1,
+        filter: 'blur(0px) brightness(1.04)',
+        duration: 0.32,
+        ease: 'power2.out'
+      }, '-=0.22');
+    });
+
+    clone.remove();
+    gsap.set(activeItem, { clearProps: 'opacity,scale,filter' });
+    gsap.set(overlayBackground, { clearProps: 'backgroundColor,backdropFilter' });
+    gsap.set(overlayWheelTargets, { clearProps: 'opacity' });
+  }
+
+  async waitForCarouselSettle() {
+    const carousel = this.carousel;
+    if (!carousel) return;
+
+    const settleFrame = () => new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    });
+
+    if (!carousel.isAnimating) {
+      await settleFrame();
+      return;
+    }
+
+    const timeoutMs = Math.max(180, carousel.motion.slideMs + carousel.motion.settleMs + 96);
+    const start = performance.now();
+
+    await new Promise((resolve) => {
+      const check = () => {
+        if (!carousel.isAnimating || performance.now() - start >= timeoutMs) {
+          resolve();
+          return;
+        }
+
+        requestAnimationFrame(check);
+      };
+
+      requestAnimationFrame(check);
+    });
+
+    await settleFrame();
   }
 
   async runIntroAnimation() {
@@ -920,10 +1049,11 @@ class RouletteOverlayController {
 
     if (this.result.mapping[this.result.winnerPocketIndex] !== -1) {
       this.carousel.goToSlide(this.result.winnerCardIndex, { durationMs: this.carousel.motion.slideMs });
-      this.carousel.pulseCurrentCard();
 
       const preview = this.result.previewData[this.result.winnerCardIndex];
       this.setStatus(`${preview.title} selected`);
+      await this.runWinningCardTransition(preview);
+      this.carousel.pulseCurrentCard();
       this.showResultDialog({
         kind: 'winner',
         title: preview.title,
@@ -962,6 +1092,7 @@ class RouletteOverlayController {
     this.prepareSpinResult();
     this.renderPockets();
     this.resetWheelVisuals();
+    this.lastStatusPhase = '';
     this.openOverlay();
     this.setStatus('Preparing roulette');
 
@@ -1237,6 +1368,7 @@ export class LuxuryCoverflow {
       const label = this.resolveItemTitle(targetItem, targetIndex);
 
       dot.classList.toggle('active', isActive);
+      dot.textContent = targetItem ? String(targetIndex + 1) : '';
       dot.setAttribute('aria-label', `Go to ${label}`);
       dot.setAttribute('aria-current', isActive ? 'true' : 'false');
       dot.dataset.index = String(targetIndex);
