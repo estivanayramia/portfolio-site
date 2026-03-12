@@ -902,6 +902,15 @@ class RouletteOverlayController {
 
     await new Promise((resolve) => {
       const timeline = gsap.timeline({ onComplete: resolve });
+      // Step 2: Card lifts out of roulette track with glow
+      timeline.to(clone, {
+        y: `-=40`,
+        scale: 1.45,
+        boxShadow: `0 34px 90px rgba(201, 167, 109, 0.35)`,
+        duration: 0.3,
+        ease: 'power2.out'
+      });
+      // Step 3: Card flies to center and expands
       timeline.to(clone, {
         x: window.innerWidth * 0.5 - (pocketRect.left + pocketRect.width * 0.5),
         y: window.innerHeight * 0.44 - (pocketRect.top + pocketRect.height * 0.5),
@@ -916,6 +925,7 @@ class RouletteOverlayController {
         duration: 0.22,
         ease: 'sine.inOut'
       });
+      // Step 4: Roulette UI fades out
       timeline.to(overlayWheelTargets, {
         opacity: 0,
         duration: 0.38,
@@ -927,6 +937,7 @@ class RouletteOverlayController {
         duration: 0.44,
         ease: 'power2.out'
       }, '-=0.34');
+      // Step 5: Card morphs down into carousel position
       timeline.to(clone, {
         x: activeRect.left + activeRect.width * 0.5 - (pocketRect.left + pocketRect.width * 0.5),
         y: activeRect.top + activeRect.height * 0.5 - (pocketRect.top + pocketRect.height * 0.5),
@@ -1028,8 +1039,8 @@ class RouletteOverlayController {
     await new Promise((resolve) => {
       this.isSpinning = true;
       const totalBallRotation = wheelSpin.spins * 360 + 300;
-      const firstLeg = durationSeconds * 0.58;
-      const secondLeg = durationSeconds * 0.24;
+      const firstLeg = durationSeconds * 0.55;
+      const secondLeg = durationSeconds * 0.30;
       const finalLeg = Math.max(0.36, durationSeconds - firstLeg - secondLeg);
 
       this.spinTween = gsap.timeline({
@@ -1040,30 +1051,33 @@ class RouletteOverlayController {
         }
       });
 
+      // Leg 1: Smooth acceleration (mimics real roulette wheel build-up)
       this.spinTween.to(frame, {
         wheelRotation: -(wheelSpin.finalRotation * 0.72),
         ballAngle: frame.ballAngle - (totalBallRotation * 0.78),
         radius: wheelRadius * 1.04,
         duration: firstLeg,
-        ease: 'none',
+        ease: 'power1.in',
         onUpdate: renderFrame
       });
 
+      // Leg 2: Deceleration (exponential slowdown)
       this.spinTween.to(frame, {
         wheelRotation: -wheelSpin.finalRotation + 42,
         ballAngle: frame.ballAngle - (totalBallRotation * 0.19),
         radius: wheelRadius * 0.9,
         duration: secondLeg,
-        ease: 'power2.out',
+        ease: 'power4.out',
         onUpdate: renderFrame
       });
 
+      // Leg 3: Settle with subtle elastic bounce (ball dropping into pocket)
       this.spinTween.to(frame, {
         wheelRotation: -wheelSpin.finalRotation,
         ballAngle: frame.ballAngle - (totalBallRotation * 0.03),
         radius: wheelRadius * 0.82,
         duration: finalLeg,
-        ease: 'back.out(1.08)',
+        ease: 'elastic.out(1, 0.3)',
         onUpdate: renderFrame
       });
     });
@@ -1072,15 +1086,17 @@ class RouletteOverlayController {
   async presentResult() {
     const winningPocket = this.pockets[this.result.winnerPocketIndex]?.root;
     if (winningPocket) {
+      // Step 1: Winner pocket scales up with a glow
       gsap.fromTo(
         winningPocket,
-        { scale: 1 },
+        { scale: 1, boxShadow: '0 0 0px rgba(201,167,109,0)' },
         {
-          scale: 1.08,
-          duration: this.carousel.motion.settleMs / 1000,
+          scale: 1.15,
+          boxShadow: '0 0 28px rgba(201,167,109,0.6)',
+          duration: 0.3,
           repeat: 1,
           yoyo: true,
-          ease: 'power1.out'
+          ease: 'power2.out'
         }
       );
     }
@@ -1585,6 +1601,8 @@ export class LuxuryCoverflow {
   }
 
   getDiscreteNavigationDuration() {
+    // Gallery carousels use the full slideMs for smooth cinematic transitions
+    if (this.config.surface === 'luxury-coverflow') return this.motion.slideMs;
     return 180;
   }
 
