@@ -24,8 +24,8 @@ const ROOT_TIER_CLASSES = [
 const MOTION_PROFILES = {
   premium: {
     tierClass: 'premium',
-    slideMs: 620,
-    settleMs: 280,
+    slideMs: 420,
+    settleMs: 240,
     introMs: 260,
     spinMs: 4400,
     dialogMs: 260,
@@ -41,8 +41,8 @@ const MOTION_PROFILES = {
   },
   enhanced: {
     tierClass: 'enhanced',
-    slideMs: 540,
-    settleMs: 240,
+    slideMs: 400,
+    settleMs: 220,
     introMs: 220,
     spinMs: 3900,
     dialogMs: 240,
@@ -58,7 +58,7 @@ const MOTION_PROFILES = {
   },
   baseline: {
     tierClass: 'baseline',
-    slideMs: 380,
+    slideMs: 340,
     settleMs: 180,
     introMs: 180,
     spinMs: 2900,
@@ -192,6 +192,7 @@ function normalizeIndex(index, totalItems, infiniteLoop) {
 function getDistance(index, centerIndex, totalItems, infiniteLoop) {
   let distance = Math.abs(index - centerIndex);
   if (infiniteLoop && totalItems > 1) {
+    distance = distance % totalItems;
     distance = Math.min(distance, totalItems - distance);
   }
   return distance;
@@ -883,6 +884,7 @@ class RouletteOverlayController {
     clone.style.transformOrigin = 'center center';
     clone.style.boxShadow = '0 34px 90px rgba(0, 0, 0, 0.42)';
     clone.style.willChange = 'transform, opacity';
+    clone.style.borderRadius = getComputedStyle(pocketPreview).borderRadius || '1.25rem';
     document.body.appendChild(clone);
 
     const overlayBackground = this.overlay;
@@ -896,51 +898,52 @@ class RouletteOverlayController {
       this.elements.ballShadow
     ];
 
-    gsap.set(activeItem, { opacity: 0.12, scale: 0.94, filter: 'blur(2px) brightness(0.88)' });
+    gsap.set(activeItem, { opacity: 0.04, scale: 0.88, filter: 'blur(8px) brightness(0.8)' });
 
     await new Promise((resolve) => {
       const timeline = gsap.timeline({ onComplete: resolve });
       timeline.to(clone, {
         x: window.innerWidth * 0.5 - (pocketRect.left + pocketRect.width * 0.5),
         y: window.innerHeight * 0.44 - (pocketRect.top + pocketRect.height * 0.5),
-        scale: 3.15,
+        scale: 3.35,
         rotate: 0,
-        duration: 0.58,
+        duration: 0.64,
         ease: 'power4.out'
       });
       timeline.to(clone, {
-        y: `-=${Math.max(18, window.innerHeight * 0.02)}`,
-        scale: 3.28,
-        duration: 0.18,
-        ease: 'sine.out'
+        y: `-=${Math.max(22, window.innerHeight * 0.024)}`,
+        scale: 3.56,
+        duration: 0.22,
+        ease: 'sine.inOut'
       });
       timeline.to(overlayWheelTargets, {
         opacity: 0,
-        duration: 0.34,
+        duration: 0.38,
         ease: 'power2.out'
-      }, '-=0.3');
+      }, '-=0.28');
       timeline.to(overlayBackground, {
         backgroundColor: 'rgba(2, 4, 10, 0)',
         backdropFilter: 'blur(0px)',
-        duration: 0.38,
+        duration: 0.44,
         ease: 'power2.out'
-      }, '-=0.24');
+      }, '-=0.34');
       timeline.to(clone, {
         x: activeRect.left + activeRect.width * 0.5 - (pocketRect.left + pocketRect.width * 0.5),
         y: activeRect.top + activeRect.height * 0.5 - (pocketRect.top + pocketRect.height * 0.5),
         scaleX: activeRect.width / pocketRect.width,
         scaleY: activeRect.height / pocketRect.height,
-        opacity: 0.08,
-        duration: 0.56,
+        borderRadius: getComputedStyle(activeItem).borderRadius || '1.35rem',
+        opacity: 0.06,
+        duration: 0.7,
         ease: 'expo.inOut'
       });
       timeline.to(activeItem, {
         opacity: 1,
         scale: 1,
         filter: 'blur(0px) brightness(1.04)',
-        duration: 0.4,
+        duration: 0.48,
         ease: 'power3.out'
-      }, '-=0.24');
+      }, '-=0.36');
     });
 
     clone.remove();
@@ -1083,19 +1086,16 @@ class RouletteOverlayController {
     }
 
     if (this.result.mapping[this.result.winnerPocketIndex] !== -1) {
-      this.carousel.goToSlide(this.result.winnerCardIndex, { durationMs: this.carousel.motion.slideMs });
+      this.overlay.dataset.resultKind = 'winner';
+      this.carousel.goToSlide(this.result.winnerCardIndex, {
+        durationMs: Math.max(this.carousel.motion.slideMs, this.carousel.motion.settleMs + 420)
+      });
 
       const preview = this.result.previewData[this.result.winnerCardIndex];
       this.setStatus(`${preview.title} selected`);
       await this.runWinningCardTransition(preview);
       this.carousel.pulseCurrentCard();
-      this.showResultDialog({
-        kind: 'winner',
-        title: preview.title,
-        body: 'Roulette picked this card. The carousel centers, holds for a beat, then opens the destination automatically.',
-        primaryLabel: 'View project',
-        secondaryLabel: 'Stay here'
-      });
+      this.carousel.items[this.result.winnerCardIndex]?.focus?.({ preventScroll: true });
 
       if (preview.link && this.carousel.config.rouletteAutoNavigate !== false) {
         const delayMs = Number.isFinite(this.carousel.config.rouletteAutoNavigateDelay)
@@ -1208,7 +1208,7 @@ export class LuxuryCoverflow {
       enableScroll: true,
       enableSmoothTracking: this.motion.enableSmoothTracking,
       performanceTier: resolvedTier,
-      animationEase: 'power3.out',
+      animationEase: 'power3.inOut',
       surface: 'default',
       activeStateClass: 'coverflow-card--active',
       maxVisibleDots: 7,
@@ -1223,6 +1223,7 @@ export class LuxuryCoverflow {
     this.pendingTarget = null;
     this.isAnimating = false;
     this.animationTimeout = null;
+    this.positionTween = null;
     this.autoplayInterval = null;
     this.wheelState = {
       accumulator: 0,
@@ -1363,6 +1364,44 @@ export class LuxuryCoverflow {
     if (total) total.textContent = String(this.items.length);
   }
 
+  getNearestIndex(position = this.previewIndex) {
+    const fallbackPosition = Number.isFinite(position) ? position : this.currentIndex;
+    return normalizeIndex(Math.round(fallbackPosition), this.items.length, this.config.infiniteLoop);
+  }
+
+  getContinuousTargetPosition(targetIndex) {
+    if (!this.config.infiniteLoop || this.items.length <= 1) {
+      return normalizeIndex(targetIndex, this.items.length, false);
+    }
+
+    const currentPosition = Number.isFinite(this.previewIndex) ? this.previewIndex : this.currentIndex;
+    const loopSize = this.items.length;
+    const normalizedTarget = normalizeIndex(targetIndex, loopSize, true);
+    const loopBase = Math.round(currentPosition / loopSize);
+    const candidates = [
+      normalizedTarget + (loopBase - 1) * loopSize,
+      normalizedTarget + loopBase * loopSize,
+      normalizedTarget + (loopBase + 1) * loopSize
+    ];
+
+    return candidates.reduce((best, candidate) => (
+      Math.abs(candidate - currentPosition) < Math.abs(best - currentPosition) ? candidate : best
+    ));
+  }
+
+  clearPositionTween() {
+    if (!this.positionTween) return;
+    this.positionTween.kill();
+    this.positionTween = null;
+  }
+
+  finishAnimation() {
+    this.isAnimating = false;
+    this.items.forEach((item) => {
+      item.style.willChange = 'auto';
+    });
+  }
+
   buildDots() {
     if (!this.dotContainer) return;
 
@@ -1390,16 +1429,17 @@ export class LuxuryCoverflow {
     if (!this.dots.length) return;
 
     const dotCount = this.dots.length;
+    const activeIndex = this.getNearestIndex();
     const maxStart = Math.max(0, this.items.length - dotCount);
     const windowStart = this.items.length <= dotCount
       ? 0
-      : clamp(this.currentIndex - Math.floor(dotCount / 2), 0, maxStart);
+      : clamp(activeIndex - Math.floor(dotCount / 2), 0, maxStart);
 
     this.dotTargets = this.dots.map((_, slotIndex) => windowStart + slotIndex);
     this.dots.forEach((dot, slotIndex) => {
       const targetIndex = this.dotTargets[slotIndex];
       const targetItem = this.items[targetIndex];
-      const isActive = targetIndex === this.currentIndex;
+      const isActive = targetIndex === activeIndex;
       const label = this.resolveItemTitle(targetItem, targetIndex);
 
       dot.classList.toggle('active', isActive);
@@ -1412,11 +1452,11 @@ export class LuxuryCoverflow {
   }
 
   applyItemState(item, index, centerIndex, transform) {
-    const roundedCenter = Math.round(centerIndex);
-    const distance = getDistance(index, roundedCenter, this.items.length, this.config.infiniteLoop);
+    const roundedCenter = normalizeIndex(Math.round(centerIndex), this.items.length, this.config.infiniteLoop);
+    const distance = getDistance(index, centerIndex, this.items.length, this.config.infiniteLoop);
     const isCenter = index === roundedCenter;
-    const isAdjacent = distance === 1;
-    const hidden = distance > 4;
+    const isAdjacent = !isCenter && distance < 1.6;
+    const hidden = distance > 4.1;
 
     item.classList.toggle('is-center', isCenter);
     item.classList.toggle('is-adjacent', isAdjacent);
@@ -1430,52 +1470,69 @@ export class LuxuryCoverflow {
   }
 
   updateAllItems(centerIndex, durationMs = this.motion.slideMs) {
-    const transforms = this.engine3D.calculateAllTransforms(centerIndex, this.items.length, this.config.infiniteLoop);
     const durationSeconds = durationMs / 1000;
 
+    this.clearPositionTween();
     gsap.killTweensOf(this.items);
     this.items.forEach((item) => {
       item.style.willChange = durationMs > 0 ? 'transform, opacity, filter' : 'auto';
     });
 
-    this.items.forEach((item, index) => {
-      const transform = transforms[index];
-      this.applyItemState(item, index, centerIndex, transform);
-
-      const targetState = {
-        x: transform.translateX,
-        y: transform.translateY || 0,
-        z: transform.translateZ,
-        rotationY: transform.rotateY,
-        scale: transform.scale,
-        opacity: transform.opacity,
-        filter: this.engine3D.getFilterString(transform.filter),
-        duration: durationSeconds,
-        ease: this.config.animationEase,
-        force3D: true
-      };
-
-      if (durationMs === 0) {
-        gsap.set(item, targetState);
-        return;
-      }
-
-      gsap.to(item, targetState);
-    });
-
-    this.updatePagination();
-  this.updateDots();
-
-    if (durationMs > 0) {
-      this.setAnimating(durationMs);
-    } else {
-      this.items.forEach((item) => {
-        item.style.willChange = 'auto';
+    const applyTransforms = (position) => {
+      const transforms = this.engine3D.calculateAllTransforms(position, this.items.length, this.config.infiniteLoop);
+      this.items.forEach((item, index) => {
+        const transform = transforms[index];
+        this.applyItemState(item, index, position, transform);
+        gsap.set(item, {
+          x: transform.translateX,
+          y: transform.translateY || 0,
+          z: transform.translateZ,
+          rotationY: transform.rotateY,
+          scale: transform.scale,
+          opacity: transform.opacity,
+          filter: this.engine3D.getFilterString(transform.filter),
+          force3D: true
+        });
       });
+      this.updateDots();
+    };
+
+    if (durationMs === 0) {
+      this.previewIndex = centerIndex;
+      this.wheelState.previewPosition = centerIndex;
+      applyTransforms(centerIndex);
+      this.updatePagination();
+      this.finishAnimation();
+      return;
     }
+
+    const startPosition = Number.isFinite(this.previewIndex) ? this.previewIndex : this.currentIndex;
+    const tweenState = { position: startPosition };
+    this.isAnimating = true;
+    this.updatePagination();
+
+    this.positionTween = gsap.to(tweenState, {
+      position: centerIndex,
+      duration: durationSeconds,
+      ease: this.config.animationEase,
+      onUpdate: () => {
+        this.previewIndex = tweenState.position;
+        this.wheelState.previewPosition = tweenState.position;
+        applyTransforms(tweenState.position);
+      },
+      onComplete: () => {
+        this.positionTween = null;
+        this.previewIndex = centerIndex;
+        this.wheelState.previewPosition = centerIndex;
+        applyTransforms(centerIndex);
+        this.finishAnimation();
+      }
+    });
   }
 
   updateContinuousPosition(position) {
+    this.previewIndex = position;
+    this.wheelState.previewPosition = position;
     const transforms = this.engine3D.calculateAllTransforms(position, this.items.length, this.config.infiniteLoop);
     this.items.forEach((item, index) => {
       const transform = transforms[index];
@@ -1514,27 +1571,29 @@ export class LuxuryCoverflow {
     const durationMs = typeof options.durationMs === 'number' ? options.durationMs : this.motion.slideMs;
     const announce = options.announce !== false;
     const normalizedTarget = normalizeIndex(targetIndex, this.items.length, this.config.infiniteLoop);
+    const continuousTarget = this.getContinuousTargetPosition(normalizedTarget);
+    const currentNearest = this.getNearestIndex();
 
-    if (normalizedTarget === this.currentIndex && durationMs !== 0) return;
-    if (this.isAnimating && durationMs !== 0) {
-      this.pendingTarget = normalizedTarget;
+    if (normalizedTarget === currentNearest && durationMs !== 0 && Math.abs(continuousTarget - (this.previewIndex ?? this.currentIndex)) < 0.001) {
       return;
     }
 
     this.currentIndex = normalizedTarget;
-    this.previewIndex = normalizedTarget;
-    this.wheelState.previewPosition = normalizedTarget;
-    this.updateAllItems(normalizedTarget, durationMs);
+    this.updateAllItems(continuousTarget, durationMs);
     this.resetAutoplay();
     if (announce) this.announceCurrentSlide();
   }
 
+  getDiscreteNavigationDuration() {
+    return 180;
+  }
+
   next() {
-    this.goToSlide(this.currentIndex + 1);
+    this.goToSlide(this.currentIndex + 1, { durationMs: this.getDiscreteNavigationDuration() });
   }
 
   prev() {
-    this.goToSlide(this.currentIndex - 1);
+    this.goToSlide(this.currentIndex - 1, { durationMs: this.getDiscreteNavigationDuration() });
   }
 
   pulseCurrentCard() {
@@ -1553,10 +1612,20 @@ export class LuxuryCoverflow {
 
     this.resources.listen(document, 'keydown', (event) => {
       if (this.roulette?.isActive) return;
+      if (event.defaultPrevented) return;
 
-      const containerHasFocus = this.container.contains(document.activeElement);
+      const activeElement = document.activeElement;
+      const isTypingContext = activeElement && (
+        activeElement.matches?.('input, textarea, select, [contenteditable="true"]')
+        || activeElement.closest?.('[contenteditable="true"]')
+      );
+      if (isTypingContext) return;
+
+      const containerHasFocus = this.container.contains(activeElement);
       const containerHasHover = !isCoarsePointerDevice() && this.container.matches(':hover');
-      if (!containerHasFocus && !containerHasHover) return;
+      const premiumCarousels = document.querySelectorAll('[data-luxury-coverflow]');
+      const allowSoleCarouselKeyboard = premiumCarousels.length === 1;
+      if (!containerHasFocus && !containerHasHover && !allowSoleCarouselKeyboard) return;
 
       if (event.key === 'ArrowLeft') {
         event.preventDefault();
@@ -1566,10 +1635,10 @@ export class LuxuryCoverflow {
         this.next();
       } else if (event.key === 'Home') {
         event.preventDefault();
-        this.goToSlide(0);
+        this.goToSlide(0, { durationMs: this.getDiscreteNavigationDuration() });
       } else if (event.key === 'End') {
         event.preventDefault();
-        this.goToSlide(this.items.length - 1);
+        this.goToSlide(this.items.length - 1, { durationMs: this.getDiscreteNavigationDuration() });
       }
     });
   }
@@ -1799,6 +1868,30 @@ export class LuxuryCoverflow {
       });
 
       this.resources.listen(item, 'keydown', (event) => {
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          this.prev();
+          return;
+        }
+
+        if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          this.next();
+          return;
+        }
+
+        if (event.key === 'Home') {
+          event.preventDefault();
+          this.goToSlide(0, { durationMs: this.getDiscreteNavigationDuration() });
+          return;
+        }
+
+        if (event.key === 'End') {
+          event.preventDefault();
+          this.goToSlide(this.items.length - 1, { durationMs: this.getDiscreteNavigationDuration() });
+          return;
+        }
+
         if (event.key !== 'Enter' && event.key !== ' ') return;
         if (index === this.currentIndex) {
           if (typeof this.callbacks.onActiveItemSelect === 'function') {
