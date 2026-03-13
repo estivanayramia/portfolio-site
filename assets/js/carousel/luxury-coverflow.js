@@ -245,6 +245,10 @@ function isCoarsePointerDevice() {
   return !!(coarse && coarse.matches);
 }
 
+function isGalleryMediaSurface(root) {
+  return root?.dataset?.galleryVariant === 'media' || root?.dataset?.miniCarouselMode === 'gallery';
+}
+
 export function computePerformanceProfile() {
   if (typeof globalThis !== 'undefined' && globalThis[PERF_PROFILE_GLOBAL_KEY]) {
     return globalThis[PERF_PROFILE_GLOBAL_KEY];
@@ -1233,6 +1237,15 @@ export class LuxuryCoverflow {
       rouletteAutoNavigateDelay: 1200,
       ...options
     };
+
+    if (isGalleryMediaSurface(this.container)) {
+      // Gallery surfaces get a slightly longer, smoother travel curve than project carousels.
+      this.motion = {
+        ...this.motion,
+        slideMs: 550
+      };
+      this.config.animationEase = 'power2.inOut';
+    }
 
     this.currentIndex = normalizeIndex(this.config.initialIndex, this.items.length, this.config.infiniteLoop);
     this.previewIndex = this.currentIndex;

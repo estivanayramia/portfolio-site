@@ -35,11 +35,16 @@ function computeBuildVersion() {
     }
   }
 
-  const d = new Date();
-  const y = String(d.getUTCFullYear());
-  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(d.getUTCDate()).padStart(2, '0');
-  const date = `${y}${m}${day}`;
+  let date = '';
+  try {
+    date = run('git show -s --format=%cd --date=format:%Y%m%d HEAD');
+  } catch {
+    const d = new Date();
+    const y = String(d.getUTCFullYear());
+    const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    date = `${y}${m}${day}`;
+  }
 
   return `${date}-${shortSha}`;
 }

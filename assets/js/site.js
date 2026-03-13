@@ -46,8 +46,8 @@ console.log('[Savonie DEBUG] site.js loaded');
  * 4. All analytics code is defensive (checks typeof before calling)
  * 
  * To verify analytics:
- * - GA4: https://analytics.google.com �  Realtime �  Events
- * - Clarity: https://clarity.microsoft.com �  Dashboard �  Recordings
+ * - GA4: https://analytics.google.com -> Realtime -> Events
+ * - Clarity: https://clarity.microsoft.com -> Dashboard -> Recordings
  * 
  * @version 2.1.0
  * @author Estivan Ayramia
@@ -149,124 +149,18 @@ __initPreloadStylesheets();
 
 const ensureGalleryCoverflowStyles = () => {
     try {
-        if (document.getElementById('luxury-gallery-coverflow-styles')) return;
+        if (document.getElementById('luxury-gallery-coverflow-stylesheet')) return;
 
-        const style = document.createElement('style');
-        style.id = 'luxury-gallery-coverflow-styles';
-        style.textContent = `
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow {
-                position: relative;
-                overflow: hidden;
-                isolation: isolate;
-                padding: 0.5rem clamp(3rem, 6vw, 4.75rem) 0;
-                --gallery-card-width: clamp(11.5rem, 28vw, 19rem);
-                --gallery-card-height: clamp(14rem, 36vw, 25rem);
-                --gallery-track-height: calc(var(--gallery-card-height) + clamp(3rem, 8vw, 5rem));
-            }
-
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-track {
-                position: relative;
-                display: block;
-                width: 100%;
-                height: var(--gallery-track-height);
-                min-height: var(--gallery-track-height);
-                transform-style: preserve-3d;
-                perspective: 2200px;
-                perspective-origin: 50% 50%;
-            }
-
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-slide {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: var(--gallery-card-width);
-                height: var(--gallery-card-height);
-                margin-left: calc(var(--gallery-card-width) / -2);
-                margin-top: calc(var(--gallery-card-height) / -2);
-                border-radius: 1.35rem;
-                border: 1px solid rgba(255, 255, 255, 0.22);
-                overflow: visible;
-                background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.05));
-                box-shadow: 0 28px 58px rgba(24, 31, 53, 0.28), 0 14px 28px rgba(24, 31, 53, 0.18);
-                transform-style: preserve-3d;
-                transform-origin: center center;
-                backface-visibility: hidden;
-                will-change: transform, opacity, filter;
-                cursor: pointer;
-            }
-
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-slide img {
-                display: block;
-                width: 100%;
-                height: 100%;
-                border-radius: 1.35rem;
-                object-fit: cover;
-                user-select: none;
-                -webkit-user-drag: none;
-            }
-
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-slide.is-center,
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-slide.coverflow-card--active {
-                border-color: rgba(201, 167, 109, 0.52);
-                box-shadow: 0 0 0 1px rgba(201, 167, 109, 0.22), 0 34px 86px rgba(24, 31, 53, 0.34), 0 14px 32px rgba(201, 167, 109, 0.2);
-            }
-
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-btn {
-                position: absolute;
-                top: calc(50% - 1.1rem);
-                z-index: 12;
-                width: 3.2rem;
-                height: 3.2rem;
-                border: 1px solid rgba(255, 255, 255, 0.34);
-                border-radius: 999px;
-                background: rgba(33, 40, 66, 0.84);
-                color: #fff;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 14px 28px rgba(24, 31, 53, 0.22);
-            }
-
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-btn-prev {
-                left: 0.4rem;
-            }
-
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-btn-next {
-                right: 0.4rem;
-            }
-
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-dots {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.55rem;
-                margin-top: 1.2rem;
-            }
-
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-dot.active,
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-dot[aria-current="true"] {
-                background: linear-gradient(135deg, #c9a76d, #8a7245);
-                transform: scale(1.26);
-            }
-
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-btn:focus-visible,
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-dot:focus-visible,
-            .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-slide:focus-visible {
-                outline: 2px solid rgba(201, 167, 109, 0.92);
-                outline-offset: 3px;
-            }
-
-            @media (prefers-reduced-motion: reduce) {
-                .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-track,
-                .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-slide,
-                .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-dot {
-                    transition-duration: 0.01ms !important;
-                    animation-duration: 0.01ms !important;
-                }
-            }
-        `;
-
-        document.head.appendChild(style);
+        const buildVersion = document
+            .querySelector('meta[name="build-version"]')
+            ?.getAttribute('content');
+        const stylesheet = document.createElement('link');
+        stylesheet.id = 'luxury-gallery-coverflow-stylesheet';
+        stylesheet.rel = 'stylesheet';
+        stylesheet.href = buildVersion
+            ? `/assets/css/components/luxury-coverflow.min.css?v=${encodeURIComponent(buildVersion)}`
+            : '/assets/css/components/luxury-coverflow.min.css';
+        document.head.appendChild(stylesheet);
     } catch (error) {}
 };
 
@@ -758,7 +652,7 @@ window.guardedReload = guardedReload;
  * - Uses [data-theme="dark"] selectors for dark mode styles
  * - Tailwind dark: variants work through theme.css overrides
  */
-const initDarkMode = () => {
+const legacyInitDarkMode = () => {
     const toggleButton = document.getElementById('theme-toggle');
     if (!toggleButton) return;
 
@@ -777,7 +671,7 @@ const initDarkMode = () => {
     }
 
     // Set initial icon
-    toggleButton.innerHTML = currentTheme === 'dark' ? '<span aria-hidden="true">�x </span>' : '<span aria-hidden="true">�xR"</span>';
+    toggleButton.innerHTML = currentTheme === 'dark' ? '<span aria-hidden="true">&#x1F319;</span>' : '<span aria-hidden="true">&#x2600;&#xFE0F;</span>';
 
     // Toggle theme function
     const toggleTheme = () => {
@@ -788,9 +682,9 @@ const initDarkMode = () => {
         localStorage.setItem('theme', newTheme);
         
         // Update icon
-        toggleButton.innerHTML = newTheme === 'dark' ? '<span aria-hidden="true">�x </span>' : '<span aria-hidden="true">�xR"</span>';
+        toggleButton.innerHTML = newTheme === 'dark' ? '<span aria-hidden="true">&#x1F319;</span>' : '<span aria-hidden="true">&#x2600;&#xFE0F;</span>';
         
-        // �x�  ACHIEVEMENT: Night Owl - Toggle dark mode
+        // Achievement: Night Owl - Toggle dark mode
         if (typeof window.ArcadeAchievements !== 'undefined' && window.ArcadeAchievements.unlock) {
             window.ArcadeAchievements.unlock('nightOwl');
         }
@@ -818,7 +712,7 @@ const initDarkMode = () => {
             const newTheme = e.matches ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            toggleButton.innerHTML = newTheme === 'dark' ? '<span aria-hidden="true">�x </span>' : '<span aria-hidden="true">�xR"</span>';
+            toggleButton.innerHTML = newTheme === 'dark' ? '<span aria-hidden="true">&#x1F319;</span>' : '<span aria-hidden="true">&#x2600;&#xFE0F;</span>';
         }
     });
 
@@ -826,6 +720,71 @@ const initDarkMode = () => {
     toggleButton.addEventListener('click', () => {
         toggleTheme();
         // Mark that user has manually set theme preference
+        localStorage.setItem('theme_manual', 'true');
+    });
+};
+
+const THEME_ICON_MARKUP = {
+    dark: '<span aria-hidden="true">&#x1F319;</span>',
+    light: '<span aria-hidden="true">&#x2600;&#xFE0F;</span>'
+};
+
+const getThemeToggleIconMarkup = (theme) => (theme === 'dark' ? THEME_ICON_MARKUP.dark : THEME_ICON_MARKUP.light);
+
+const getThemeToggleLabel = (theme) => `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`;
+
+const initDarkMode = () => {
+    const toggleButton = document.getElementById('theme-toggle');
+    if (!toggleButton) return;
+
+    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme');
+    const currentTheme = savedTheme || (prefersDarkMode ? 'dark' : 'light');
+
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    if (!savedTheme) {
+        localStorage.setItem('theme', currentTheme);
+    }
+
+    toggleButton.innerHTML = getThemeToggleIconMarkup(currentTheme);
+    toggleButton.setAttribute('aria-label', getThemeToggleLabel(currentTheme));
+
+    const toggleTheme = () => {
+        const theme = document.documentElement.getAttribute('data-theme');
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        toggleButton.innerHTML = getThemeToggleIconMarkup(newTheme);
+        toggleButton.setAttribute('aria-label', getThemeToggleLabel(newTheme));
+
+        if (typeof window.ArcadeAchievements !== 'undefined' && window.ArcadeAchievements.unlock) {
+            window.ArcadeAchievements.unlock('nightOwl');
+        }
+
+        if (typeof clarity === 'function') {
+            clarity('event', 'theme_toggle', { theme: newTheme });
+        }
+        if (typeof gtag === 'function') {
+            gtag('event', 'theme_toggle', {
+                event_category: 'user_preference',
+                event_label: newTheme
+            });
+        }
+    };
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+        if (!localStorage.getItem('theme_manual')) {
+            const newTheme = event.matches ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            toggleButton.innerHTML = getThemeToggleIconMarkup(newTheme);
+            toggleButton.setAttribute('aria-label', getThemeToggleLabel(newTheme));
+        }
+    });
+
+    toggleButton.addEventListener('click', () => {
+        toggleTheme();
         localStorage.setItem('theme_manual', 'true');
     });
 };
@@ -1477,11 +1436,11 @@ const initMiniGame = (rootId) => {
             <div class="text-xs text-ink/60">Best: <span id="mg-best">${highScore}</span></div>
         </div>
         <div class="flex items-center justify-between mb-2">
-            <div class="text-xs text-ink/60">Lives: <span id="mg-lives">❤❤❤</span></div>
+            <div class="text-xs text-ink/60">Lives: <span id="mg-lives">***</span></div>
             <button id="mg-start" class="text-xs bg-indigodeep text-white px-3 py-1 rounded-full">Start</button>
         </div>
         <canvas id="mg-canvas" class="w-full rounded border border-chocolate/10" style="touch-action: none; height: 320px;"></canvas>
-        <p class="text-xs text-ink/60 mt-2">Catch the orbs. Golden orbs are bonus. Tap/drag on mobile, or use �� ��.</p>
+        <p class="text-xs text-ink/60 mt-2">Catch the orbs. Golden orbs are bonus. Tap/drag on mobile, or use arrow keys.</p>
     `;
 
     const canvas = root.querySelector('#mg-canvas');
@@ -1526,7 +1485,7 @@ const initMiniGame = (rootId) => {
         draw();
     };
 
-    const heartStr = (n) => '❤❤❤'.slice(0, n);
+    const heartStr = (n) => '*'.repeat(Math.max(0, n));
     const vibrate = (ms) => { if (navigator.vibrate) navigator.vibrate(ms); };
 
     const addParticles = (x, y, color = '#212842', count = 10) => {
@@ -1954,26 +1913,26 @@ const translations = {
             formFiller: { name: 'Messenger', description: 'Submitted the contact form' }
         },
         es: {
-            unlocked: '¡Logro Desbloqueado!',
-            explorer: { name: 'Explorador', description: 'Visitó todas las páginas principales' },
-            reader: { name: 'Buzo Profundo', description: 'Leyó la inmersión completa' },
-            gamer: { name: 'Maestro del Juego', description: 'Jugó el juego del formulario de contacto' },
-            chatter: { name: 'Conversador', description: 'Abrió el chat' },
-            nightOwl: { name: 'Noctámbulo', description: 'Alternó el modo oscuro' },
-            konami: { name: 'Descubridor Secreto', description: 'Encontró el código Konami' },
-            networker: { name: 'Redactor', description: 'Visitó perfiles sociales' },
-            formFiller: { name: 'Mensajero', description: 'Envió el formulario de contacto' }
+            unlocked: 'Logro desbloqueado!',
+            explorer: { name: 'Explorador', description: 'Visito todas las paginas principales' },
+            reader: { name: 'Buzo profundo', description: 'LeyÃƒÆ’Ã‚Â³ la inmersion completa' },
+            gamer: { name: 'Maestro del juego', description: 'Jugo el juego del formulario de contacto' },
+            chatter: { name: 'Conversador', description: 'Abrio el chat' },
+            nightOwl: { name: 'Noctambulo', description: 'Activo el modo oscuro' },
+            konami: { name: 'Descubridor secreto', description: 'Encontro el codigo Konami' },
+            networker: { name: 'Conector', description: 'Visito perfiles sociales' },
+            formFiller: { name: 'Mensajero', description: 'Envio el formulario de contacto' }
         },
         ar: {
-            unlocked: 'ت�& إ�غاء �ف� ا�إ� جاز!',
-            explorer: { name: 'ا��&ستْشف', description: 'زار ج�&�`ع ا�صفحات ا�رئ�`س�`ة' },
-            reader: { name: 'ا�غ��اص ا�ع�&�`�', description: '�رأ ا�غ��ص ا�ْا�&�' },
-            gamer: { name: 'س�`د ا��عبة', description: '�عب �عبة � �&��ذج ا�اتصا�' },
-            chatter: { name: 'ا��&حادث', description: 'فتح ا�دردشة' },
-            nightOwl: { name: 'ب���&ة ا���`�', description: 'بد�� ا���ضع ا��&ظ��&' },
-            konami: { name: 'ا��&ْتشف ا�سر�`', description: '��جد ر�&ز ْ��� ا�&�`' },
-            networker: { name: 'ا�شبْ�`', description: 'زار ا��&�فات ا�شخص�`ة ا�اجت�&اع�`ة' },
-            formFiller: { name: 'ا�رس���', description: 'أرس� � �&��ذج ا�اتصا�' }
+            unlocked: 'Achievement unlocked!',
+            explorer: { name: 'Explorer', description: 'Visited all main pages' },
+            reader: { name: 'Deep Diver', description: 'Read the full deep dive' },
+            gamer: { name: 'Game Master', description: 'Played the contact form game' },
+            chatter: { name: 'Conversationalist', description: 'Opened the chat' },
+            nightOwl: { name: 'Night Owl', description: 'Toggled dark mode' },
+            konami: { name: 'Secret Discoverer', description: 'Found the Konami code' },
+            networker: { name: 'Networker', description: 'Visited social profiles' },
+            formFiller: { name: 'Messenger', description: 'Submitted the contact form' }
         }
     },
     // Konami code messages
@@ -2037,8 +1996,8 @@ const translations = {
     chat: {
         welcome: {
             en: "Hello! I am Savonie. Ask me anything about Estivan.",
-            es: "¡Hola! Soy Savonie. Pregúntame cualquier cosa sobre Estivan.",
-            ar: "�&رحبا�9! أ� ا ساف��� �`. اسأ�� �` أ�` ش�`ء ع�  است�`فا� ."
+            es: "Hola. Soy Savonie. Preguntame cualquier cosa sobre Estivan.",
+            ar: "Hello. I am Savonie. Ask me anything about Estivan.",
         },
         defaultChips: {
             en: [
@@ -2048,16 +2007,16 @@ const translations = {
                 "How can I contact him?"
             ],
             es: [
-                "¿Qu� hace Estivan?",
-                "Háblame de su experiencia",
-                "¿Cuáles son sus habilidades?",
-                "¿Cómo puedo contactarlo?"
+                "Que hace Estivan?",
+                "Hablame de su experiencia",
+                "Cuales son sus habilidades?",
+                "Como puedo contactarlo?"
             ],
             ar: [
-                "�&اذا �`فع� است�`فا� �x",
-                "أخبر� �` ع�  خ�ف�`ت�!",
-                "�&ا �!�` �&�!ارات�!�x",
-                "ْ�`ف �`�&ْ� � �` ا�اتصا� ب�!�x"
+                "What does Estivan do?",
+                "Tell me about his background",
+                "What are his skills?",
+                "How can I contact him?"
             ]
         },
         contextualSuggestions: {
@@ -2072,30 +2031,30 @@ const translations = {
                 early: ["What are your main skills?", "Tell me about your background", "What projects are you proud of?", "What's something unique about you?", "Why did you choose this field?", "What's your biggest achievement?"]
             },
             es: {
-                skills: ["¿En qu� proyectos has trabajado?", "Háblame de tu experiencia", "¿Qu� estás aprendiendo actualmente?", "¿Cómo abordas la resolución de problemas?", "¿Cuál es tu habilidad favorita para usar?", "¿Cómo te mantienes motivado en tu trabajo?"],
-                background: ["¿Cuáles son tus principales habilidades?", "Háblame de tu educación", "¿En qu� industrias has trabajado?", "¿Qu� te inspiró a entrar en la tecnología?", "¿Cómo ha sido tu trayectoria profesional?", "¿Algún mentor que te haya influido?"],
-                projects: ["¿Puedes mostrarme tu código?", "¿Qu� tecnologías usaste?", "¿Cuánto tiempo tomó construirlo?", "¿Qu� desafíos superaste?", "¿Trabajaste con un equipo?", "¿Cuáles son tus planes futuros para este proyecto?"],
-                contact: ["¿Estás disponible para trabajo freelance?", "¿Cuál es tu tiempo típico de respuesta?", "¿Trabajas de forma remota?", "¿Cómo puedo contactarte mejor?", "¿Cuál es tu forma preferida de comunicación?", "¿Estás abierto a colaboraciones?"],
-                education: ["¿Qu� certificaciones tienes?", "¿Cuál es tu lenguaje de programación favorito?", "¿Cómo te mantienes actualizado con la tecnología?", "¿Cuál fue tu curso más desafiante?", "¿Cómo ha moldeado tu educación tu carrera?", "¿Algún curso en línea o autoaprendizaje?"],
-                projectResponse: ["¿Puedes contarme más sobre ese proyecto?", "¿Qu� desafíos enfrentaste?", "¿Qu� aprendiste de ello?", "¿Cuál fue la parte más interesante?", "¿Cómo lo probaste?", "¿Harías algo diferente ahora?"],
-                skillResponse: ["¿Cómo aprendiste eso?", "¿Lo has usado en proyectos?", "¿Cuál es tu nivel de competencia?", "¿Cuál es tu forma favorita de aplicar esta habilidad?", "¿Algún consejo para principiantes?", "¿Cómo ha evolucionado esta habilidad para ti?"],
-                early: ["¿Cuáles son tus principales habilidades?", "Háblame de tu experiencia", "¿De qu� proyectos estás orgulloso?", "¿Qu� hay de único en ti?", "¿Por qu� elegiste este campo?", "¿Cuál es tu mayor logro?"]
+                skills: ["En que proyectos has trabajado?", "Hablame de tu experiencia", "Que estas aprendiendo ahora?", "Como abordas la resolucion de problemas?", "Cual es tu habilidad favorita?", "Como te mantienes motivado en tu trabajo?"],
+                background: ["Cuales son tus habilidades principales?", "Hablame de tu educacion", "En que industrias has trabajado?", "Que te inspiro a entrar en tecnologia?", "Como ha sido tu trayectoria profesional?", "Algun mentor que te haya influido?"],
+                projects: ["Puedes mostrarme tu codigo?", "Que tecnologias usaste?", "Cuanto tiempo tomo construirlo?", "Que desafios superaste?", "Trabajaste con un equipo?", "Cuales son tus planes futuros para este proyecto?"],
+                contact: ["Estas disponible para trabajo freelance?", "Cual es tu tiempo tipico de respuesta?", "Trabajas de forma remota?", "Como puedo contactarte mejor?", "Cual es tu forma preferida de comunicacion?", "Estas abierto a colaboraciones?"],
+                education: ["Que certificaciones tienes?", "Cual es tu lenguaje de programacion favorito?", "Como te mantienes actualizado con tecnologia?", "Cual fue tu curso mas desafiante?", "Como ha moldeado tu educacion tu carrera?", "Algun curso en linea o autoaprendizaje?"],
+                projectResponse: ["Puedes contarme mas sobre ese proyecto?", "Que desafios enfrentaste?", "Que aprendiste de ello?", "Cual fue la parte mas interesante?", "Como lo probaste?", "Harias algo diferente ahora?"],
+                skillResponse: ["Como aprendiste eso?", "Lo has usado en proyectos?", "Cual es tu nivel de competencia?", "Cual es tu forma favorita de aplicar esta habilidad?", "Algun consejo para principiantes?", "Como ha evolucionado esta habilidad para ti?"],
+                early: ["Cuales son tus habilidades principales?", "Hablame de tu experiencia", "De que proyectos estas orgulloso?", "Que hay de unico en ti?", "Por que elegiste este campo?", "Cual es tu mayor logro?"]
             },
             ar: {
-                skills: ["�&ا �!�` ا��&شار�`ع ا�ت�` ع�&�ت ع��`�!ا�x", "أخبر� �` ع�  تجربتْ", "�&اذا تتع��& حا��`ا�9�x", "ْ�`ف تتعا�&� �&ع ح� ا��&شْ�ات�x", "�&ا �!�` �&�!ارتْ ا��&فض�ة �استخدا�&�!ا�x", "ْ�`ف تحافظ ع��0 دافعْ ف�` ع�&�ْ�x"],
-                background: ["�&ا �!�` �&�!اراتْ ا�رئ�`س�`ة�x", "أخبر� �` ع�  تع��`�&ْ", "ف�` أ�` ص� اعات ع�&�ت�x", "�&ا ا�ذ�` أ��!�&ْ ��دخ��� ف�` �&جا� ا�تْ� �����ج�`ا�x", "ْ�`ف ْا� ت رح�تْ ا��&�!� �`ة�x", "أ�` �&رشد�`�  أثر��ا ع��`ْ�x"],
-                projects: ["�!� �`�&ْ� ْ إظ�!ار ْ��دْ�x", "�&ا �!�` ا�ت�� �`ات ا�ت�` استخد�&ت�!ا�x", "ْ�& �&�  ا����ت استغر� ب� اؤ�!�x", "�&ا �!�` ا�تحد�`ات ا�ت�` تغ�بت ع��`�!ا�x", "�!� ع�&�ت �&ع فر�`��x", "�&ا �!�` خططْ ا��&ست�ب��`ة ��!ذا ا��&شر��ع�x"],
-                contact: ["�!� أ� ت �&تاح ��ع�&� ا�حر�x", "�&ا �!�� ���ت ردْ ا��&عتاد�x", "�!� تع�&� ع�  بعد�x", "ْ�`ف �`�&ْ� � �` ا�ت��اص� �&عْ بشْ� أفض��x", "�&ا �!�` طر�`�ة ا�ت��اص� ا��&فض�ة �د�`ْ�x", "�!� أ� ت �&فت��ح ��تعا��� �x"],
-                education: ["�&ا �!�` ا�ش�!ادات ا�ت�` �د�`ْ�x", "�&ا �!�� �غة ا�بر�&جة ا��&فض�ة �د�`ْ�x", "ْ�`ف تحافظ ع��0 تحد�`ث � فسْ با�تْ� �����ج�`ا�x", "�&ا ْا�  أْثر د��رة تحد�`ا�9 �ْ�x", "ْ�`ف شْ�ت تع��`�&ْ �&س�`رتْ ا��&�!� �`ة�x", "أ�` د��رات عبر ا�إ� تر� ت أ�� تع��& ذات�`�x"],
-                projectResponse: ["�!� �`�&ْ� ْ إخبار�` ا��&ز�`د ع�  �!ذا ا��&شر��ع�x", "�&ا �!�` ا�تحد�`ات ا�ت�` ��اج�!ت�!ا�x", "�&اذا تع��&ت �&� �!�x", "�&ا ْا� ت ا�جزء ا�أْثر إثارة ��ا�!ت�&ا�&�x", "ْ�`ف اختبرت�!�x", "�!� ستفع� ش�`ئا�9 �&خت�فا�9 ا�آ� �x"],
-                skillResponse: ["ْ�`ف تع��&ت ذ�ْ�x", "�!� استخد�&ت�! ف�` �&شار�`ع�x", "�&ا �!�� �&ست���0 �&�!ارتْ�x", "�&ا �!�` طر�`�تْ ا��&فض�ة �تطب�`� �!ذ�! ا��&�!ارة�x", "أ�` � صائح ���&بتدئ�`� �x", "ْ�`ف تط��رت �!ذ�! ا��&�!ارة با�� سبة �ْ�x"],
-                early: ["�&ا �!�` �&�!اراتْ ا�رئ�`س�`ة�x", "أخبر� �` ع�  خ�ف�`تْ", "�&ا �!�` ا��&شار�`ع ا�ت�` تفخر ب�!ا�x", "�&ا ا�ش�`ء ا�فر�`د ف�`ْ�x", "��&اذا اخترت �!ذا ا��&جا��x", "�&ا �!�� أْبر إ� جاز �ْ�x"]
+                skills: ["What projects have you worked on?", "Tell me about your experience", "What are you learning currently?", "How do you approach problem-solving?", "What is your favorite skill to use?", "How do you stay motivated in your work?"],
+                background: ["What are your main skills?", "Tell me about your education", "What industries have you worked in?", "What inspired you to get into tech?", "What has your professional journey been like?", "Any mentors who influenced you?"],
+                projects: ["Can you show me your code?", "What technologies did you use?", "How long did it take to build?", "What challenges did you overcome?", "Did you work with a team?", "What are your future plans for this project?"],
+                contact: ["Are you available for freelance work?", "What is your typical response time?", "Do you work remotely?", "How can I best reach you?", "What is your preferred way of communication?", "Are you open to collaborations?"],
+                education: ["What certifications do you have?", "What is your favorite programming language?", "How do you stay updated with technology?", "What was your most challenging course?", "How has your education shaped your career?", "Any online courses or self-learning?"],
+                projectResponse: ["Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?", "What was the most interesting part?", "How did you test it?", "Would you do anything differently now?"],
+                skillResponse: ["How did you learn that?", "Have you used it in projects?", "What is your proficiency level?", "What is your favorite way to apply this skill?", "Any tips for beginners?", "How has this skill evolved for you?"],
+                early: ["What are your main skills?", "Tell me about your background", "What projects are you proud of?", "What is something unique about you?", "Why did you choose this field?", "What is your biggest achievement?"]
             }
         },
         pinnedChips: {
             en: ["Projects", "Resume", "Contact"],
-            es: ["Proyectos", "Currículum", "Contacto"],
-            ar: ["�&شار�`ع", "ا�س�`رة ا�ذات�`ة", "اتصا�"]
+            es: ["Proyectos", "Curriculum", "Contacto"],
+            ar: ["Projects", "Resume", "Contact"]
         },
         pinnedFollowUps: {
             en: {
@@ -2104,14 +2063,14 @@ const translations = {
                 contact: ["Email", "LinkedIn", "Best way to reach you?"]
             },
             es: {
-                projects: ["Mu�strame tu mejor proyecto", "¿Qu� stack tecnológico usas más?", "¿Algún ejemplo detallado?"],
-                resume: ["Resume tu experiencia", "¿Qu� roles buscas?", "¿Cuáles son tus habilidades más fuertes?"],
-                contact: ["Email", "LinkedIn", "¿Mejor forma de contactarte?"]
+                projects: ["Muestrame tu mejor proyecto", "Que stack tecnologico usas mas?", "Algun ejemplo detallado?"],
+                resume: ["Resume tu experiencia", "Que roles buscas?", "Cuales son tus habilidades mas fuertes?"],
+                contact: ["Email", "LinkedIn", "Mejor forma de contactarte?"]
             },
             ar: {
-                projects: ["أر� �` أفض� �&شر��ع �ْ", "�&ا �!�` ا�ت�� �`ات ا�أْثر استخدا�&ا�9�x", "أ�` أ�&ث�ة �&فص�ة�x"],
-                resume: ["�خص خبرتْ", "�&ا �!�` ا�أد��ار ا��&ست�!دفة�x", "�&ا �!�` أ����0 �&�!اراتْ�x"],
-                contact: ["ا�بر�`د ا�إ�ْتر��� �`", "LinkedIn", "أفض� طر�`�ة ��ت��اص��x"]
+                projects: ["Show me your top project", "What tech stack do you use most?", "Any detailed examples?"],
+                resume: ["Summarize your experience", "What roles are you targeting?", "What are your strongest skills?"],
+                contact: ["Email", "LinkedIn", "Best way to reach you"]
             }
         }
     }
@@ -2124,14 +2083,14 @@ const initAchievements = () => {
     
     // Achievement definitions (now using translations)
     const achievements = {
-        explorer: { id: 'explorer', icon: '�x�️' },
-        reader: { id: 'reader', icon: '�x' },
-        gamer: { id: 'gamer', icon: '�x}�' },
-        chatter: { id: 'chatter', icon: '�x�' },
-        nightOwl: { id: 'nightOwl', icon: '�xR"' },
-        konami: { id: 'konami', icon: '�x}�' },
-        networker: { id: 'networker', icon: '�x' },
-        formFiller: { id: 'formFiller', icon: '�S0️' }
+        explorer: { id: 'explorer', icon: 'EXP' },
+        reader: { id: 'reader', icon: 'RD' },
+        gamer: { id: 'gamer', icon: 'GM' },
+        chatter: { id: 'chatter', icon: 'CH' },
+        nightOwl: { id: 'nightOwl', icon: 'NO' },
+        konami: { id: 'konami', icon: 'KN' },
+        networker: { id: 'networker', icon: 'NW' },
+        formFiller: { id: 'formFiller', icon: 'FF' }
     };
 
     // Get achievements from storage
@@ -2230,7 +2189,7 @@ const initAchievements = () => {
             };
         }
 
-        const safeIcon = resolved.icon || '�x� ';
+        const safeIcon = resolved.icon || 'OK';
         const safeName = resolved.name || 'Achievement';
         const safeDesc = resolved.description || '';
         const notification = document.createElement('div');
@@ -2242,7 +2201,7 @@ const initAchievements = () => {
                 <div class="achievement-name">${safeName}</div>
                 <div class="achievement-desc">${safeDesc}</div>
             </div>
-            <button class="achievement-close" aria-label="Close achievement notification">�</button>
+            <button class="achievement-close" aria-label="Close achievement notification">x</button>
         `;
         document.body.appendChild(notification);
 
@@ -2348,7 +2307,7 @@ const initKonamiCode = () => {
                 <div class="konami-body">
                     <p class="konami-message">${konamiText.message}</p>
                     <div class="konami-gift">
-                        <div class="gift-emoji">�x}�</div>
+                        <div class="gift-emoji">*</div>
                         <p class="gift-text">${konamiText.giftText}</p>
                         <div class="compliment-container" style="display: none;">
                             <p class="compliment-text"></p>
@@ -2917,7 +2876,7 @@ const __ensureStandardEnglishChrome = () => {
             </div>
             
             <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">�x </span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">&#x2600;&#xFE0F;</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -2942,6 +2901,12 @@ const __ensureStandardEnglishChrome = () => {
 
             if (document.body) {
                 document.body.insertBefore(header, document.body.firstChild);
+            }
+
+            const injectedThemeToggle = header.querySelector('#theme-toggle');
+            if (injectedThemeToggle) {
+                injectedThemeToggle.innerHTML = THEME_ICON_MARKUP.light;
+                injectedThemeToggle.setAttribute('aria-label', getThemeToggleLabel('light'));
             }
 
             // Ensure content isn't hidden under fixed header
@@ -2989,8 +2954,8 @@ const __ensureStandardEnglishChrome = () => {
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
                     <ul class="space-y-2">
-                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn � </a></li>
-                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub � </a></li>
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn &rarr;</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub &rarr;</a></li>
                         <li><a href="/contact" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
                         <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
                         <li><a href="/privacy" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
@@ -2998,7 +2963,7 @@ const __ensureStandardEnglishChrome = () => {
                 </div>
             </div>
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">� <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">&copy; <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
             `;
@@ -3099,20 +3064,20 @@ const __shuffleInPlace = (arr, rnd) => {
 };
 
 const __GAME_CATALOG = [
-    { id: 'snake', href: '/hobbies-games/snake', emoji: '�x��', title: 'Snake', subtitle: 'Classic growth game' },
-    { id: 'breaker', href: '/hobbies-games/block-breaker', emoji: '�x��', title: 'Block Breaker', subtitle: 'Smash the bricks' },
-    { id: '2048', href: '/hobbies-games/2048', emoji: '�x��', title: '2048', subtitle: 'Merge the numbers' },
-    { id: 'invaders', href: '/hobbies-games/space-invaders', emoji: '�x�', title: 'Space Invaders', subtitle: 'Defend the earth' },
-    { id: 'racer', href: '/hobbies-games/racer', emoji: '�x�}️', title: 'Racer', subtitle: 'Fast reflex racing' },
-    { id: 'oh-flip', href: '/hobbies-games/oh-flip', emoji: '�x��', title: 'Oh Flip', subtitle: 'Timing + tricks' },
-    { id: 'onoff', href: '/hobbies-games/onoff', emoji: '�a�', title: 'ON/OFF', subtitle: 'Switch-based puzzle' },
-    { id: '1024-moves', href: '/hobbies-games/1024-moves', emoji: '�x��', title: '1024 Moves', subtitle: 'Move-limited strategy' },
-    { id: 'nano-wirebot', href: '/hobbies-games/nano-wirebot', emoji: '�x�', title: 'Nano Wirebot', subtitle: 'Precision platforming' },
-    { id: 'off-the-line', href: '/hobbies-games/off-the-line', emoji: '�x��', title: 'Off The Line', subtitle: 'Dont cross the line' },
-    { id: 'pizza-undelivery', href: '/hobbies-games/pizza-undelivery', emoji: '�x�"', title: 'Pizza Undelivery', subtitle: 'Fast food chaos' },
-    { id: 'the-matr13k', href: '/hobbies-games/the-matr13k', emoji: '�x��', title: 'The Matr13k', subtitle: 'Pattern puzzle' },
-    { id: 'triangle-back-to-home', href: '/hobbies-games/triangle-back-to-home', emoji: '�x�', title: 'Triangle: Back to Home', subtitle: 'Geometry adventure' },
-    { id: 'xx142-b2exe', href: '/hobbies-games/xx142-b2exe', emoji: '�x��', title: 'XX142-B2EXE', subtitle: 'Experimental arcade' }
+    { id: 'snake', href: '/hobbies-games/snake', emoji: 'SN', title: 'Snake', subtitle: 'Classic growth game' },
+    { id: 'breaker', href: '/hobbies-games/block-breaker', emoji: 'BB', title: 'Block Breaker', subtitle: 'Smash the bricks' },
+    { id: '2048', href: '/hobbies-games/2048', emoji: '24', title: '2048', subtitle: 'Merge the numbers' },
+    { id: 'invaders', href: '/hobbies-games/space-invaders', emoji: 'SI', title: 'Space Invaders', subtitle: 'Defend the earth' },
+    { id: 'racer', href: '/hobbies-games/racer', emoji: 'RC', title: 'Racer', subtitle: 'Fast reflex racing' },
+    { id: 'oh-flip', href: '/hobbies-games/oh-flip', emoji: 'OF', title: 'Oh Flip', subtitle: 'Timing + tricks' },
+    { id: 'onoff', href: '/hobbies-games/onoff', emoji: 'ON', title: 'ON/OFF', subtitle: 'Switch-based puzzle' },
+    { id: '1024-moves', href: '/hobbies-games/1024-moves', emoji: '10', title: '1024 Moves', subtitle: 'Move-limited strategy' },
+    { id: 'nano-wirebot', href: '/hobbies-games/nano-wirebot', emoji: 'NW', title: 'Nano Wirebot', subtitle: 'Precision platforming' },
+    { id: 'off-the-line', href: '/hobbies-games/off-the-line', emoji: 'OL', title: 'Off The Line', subtitle: 'Do not cross the line' },
+    { id: 'pizza-undelivery', href: '/hobbies-games/pizza-undelivery', emoji: 'PU', title: 'Pizza Undelivery', subtitle: 'Fast food chaos' },
+    { id: 'the-matr13k', href: '/hobbies-games/the-matr13k', emoji: 'TM', title: 'The Matr13k', subtitle: 'Pattern puzzle' },
+    { id: 'triangle-back-to-home', href: '/hobbies-games/triangle-back-to-home', emoji: 'TB', title: 'Triangle: Back to Home', subtitle: 'Geometry adventure' },
+    { id: 'xx142-b2exe', href: '/hobbies-games/xx142-b2exe', emoji: 'XX', title: 'XX142-B2EXE', subtitle: 'Experimental arcade' }
 ];
 
 const __renderSuggestionGrid = (gridEl, opts) => {
@@ -3160,7 +3125,7 @@ const __renderSuggestionGrid = (gridEl, opts) => {
 
     gridEl.innerHTML = chosen.map(g => `
         <a href="${g.href}" class="${tileClass}" data-game-id="${g.id}">
-            <div class="${emojiClass}">${g.emoji || '�x}�'}</div>
+            <div class="${emojiClass}">${g.emoji || "OK"}</div>
             <div class="font-bold text-sm">${g.title || g.id}</div>
             <div class="text-xs opacity-60 mt-1">${g.subtitle || ''}</div>
         </a>
@@ -3642,20 +3607,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const combinedContext = lastUserMessage + ' ' + lastBotMessage;
         
         // More intelligent context detection based on both question and answer
-        if (combinedContext.match(/skill|technology|expertise|proficiency|technical|programming|coding|developer|engineer|habilidad|tecnología|experiencia|programación|�&�!ارة|تْ� �����ج�`ا|خبرة|بر�&جة/i)) {
+        if (combinedContext.match(/skill|technology|expertise|proficiency|technical|programming|coding|developer|engineer|habilidad|tecnologia|experiencia|programacion/i)) {
             suggestions.push(...(contextualSuggestions[detectedLang]?.skills || contextualSuggestions.en.skills));
-        } else if (combinedContext.match(/background|experience|career|journey|history|education|degree|university|studied|fondo|experiencia|carrera|educación|universidad|خ�ف�`ة|خبرة|�&س�`رة|تع��`�&|جا�&عة/i)) {
+        } else if (combinedContext.match(/background|experience|career|journey|history|education|degree|university|studied|fondo|experiencia|carrera|educacion|universidad/i)) {
             suggestions.push(...(contextualSuggestions[detectedLang]?.background || contextualSuggestions.en.background));
-        } else if (combinedContext.match(/project|portfolio|work|built|created|developed|application|website|system|proyecto|trabajo|portafolio|construido|desarrollado|aplicación|�&شر��ع|ع�&�|�&حفظة|ب� �0|ط��ر/i)) {
+        } else if (combinedContext.match(/project|portfolio|work|built|created|developed|application|website|system|proyecto|trabajo|portafolio|construido|desarrollado|aplicacion/i)) {
             suggestions.push(...(contextualSuggestions[detectedLang]?.projects || contextualSuggestions.en.projects));
-        } else if (combinedContext.match(/contact|reach|email|connect|hire|available|freelance|contacto|alcanzar|correo|conectar|contratar|disponible|اتصا�|ا���ص���|بر�`د|ت��ظ�`ف|�&تاح/i)) {
+        } else if (combinedContext.match(/contact|reach|email|connect|hire|available|freelance|contacto|alcanzar|correo|conectar|contratar|disponible/i)) {
             suggestions.push(...(contextualSuggestions[detectedLang]?.contact || contextualSuggestions.en.contact));
-        } else if (combinedContext.match(/education|study|learn|course|certification|degree|training|class|educación|estudio|aprender|curso|certificación|grado|تع��`�&|دراسة|تع��&|د��رة|ش�!ادة/i)) {
+        } else if (combinedContext.match(/education|study|learn|course|certification|degree|training|class|educacion|estudio|aprender|curso|certificacion|grado/i)) {
             suggestions.push(...(contextualSuggestions[detectedLang]?.education || contextualSuggestions.en.education));
-        } else if (lastBotMessage.match(/project|portfolio|application|system|website|built|created|developed|proyecto|aplicación|sistema|construido|desarrollado|�&شر��ع|�&حفظة|ب� �0|ط��ر/i)) {
+        } else if (lastBotMessage.match(/project|portfolio|application|system|website|built|created|developed|proyecto|aplicacion|sistema|construido|desarrollado/i)) {
             // Bot is talking about projects, offer project-related follow-ups
             suggestions.push(...(contextualSuggestions[detectedLang]?.projectResponse || contextualSuggestions.en.projectResponse));
-        } else if (lastBotMessage.match(/skill|technology|proficiency|expertise|language|framework|tool|habilidad|tecnología|lenguaje|herramienta|�&�!ارة|تْ� �����ج�`ا|�غة|أداة/i)) {
+        } else if (lastBotMessage.match(/skill|technology|proficiency|expertise|language|framework|tool|habilidad|tecnologia|lenguaje|herramienta/i)) {
             // Bot is talking about skills, offer skill-related follow-ups
             suggestions.push(...(contextualSuggestions[detectedLang]?.skillResponse || contextualSuggestions.en.skillResponse));
         } else if (history.length < 4) {
@@ -3681,7 +3646,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (arabicChars.test(text)) return 'ar';
         
         // Spanish detection (common Spanish words and patterns)
-        const spanishWords = /\b(qu�|como|dónde|cuándo|por qu�|está|son|tiene|trabajo|habilidades?|experiencia|proyecto|contacto)\b/i;
+        const spanishWords = /\b(que|como|donde|cuando|por que|esta|son|tiene|trabajo|habilidades?|experiencia|proyecto|contacto)\b/i;
         if (spanishWords.test(text)) return 'es';
         
         // Default to English
@@ -3905,9 +3870,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Define action labels for special handling
-        const projectLabels = ["Projects", "View Projects", "Projects", "View projects", "Proyectos", "Ver proyectos", "�&شار�`ع", "عرض ا��&شار�`ع"];
-        const resumeLabels = ["Resume", "Download Resume", "View Resume", "Get resume", "Currículum", "Descargar currículum", "ا�س�`رة ا�ذات�`ة", "تح�&�`� ا�س�`رة"];
-        const contactLabels = ["Contact", "Email", "Email Estivan", "Contact Estivan", "Contacto", "Correo electrónico", "اتصا�", "ا�بر�`د ا�إ�ْتر��� �`"];
+        const projectLabels = ["Projects", "View Projects", "View projects", "Proyectos", "Ver proyectos"];
+        const resumeLabels = ["Resume", "Download Resume", "View Resume", "Get resume", "Curriculum", "Descargar curriculum"];
+        const contactLabels = ["Contact", "Email", "Email Estivan", "Contact Estivan", "Contacto", "Correo electronico"];
         const linkedinLabels = ["LinkedIn", "Open LinkedIn"];
 
         // Render all chips
@@ -3977,7 +3942,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const closeBtn = document.createElement('button');
         closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
         closeBtn.setAttribute('data-chat-suggestions-close', 'button');
-        closeBtn.innerHTML = '�';
+        closeBtn.innerHTML = 'x';
         closeBtn.title = 'Hide suggestions';
         closeBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -4656,7 +4621,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // �x�  ACHIEVEMENT: Reader - Visit Deep Dive page
+        // Achievement: Reader - Visit Deep Dive page
         if (currentPath === '/deep-dive' && typeof window.ArcadeAchievements !== 'undefined') {
             window.ArcadeAchievements.unlock('reader');
         }
@@ -4738,7 +4703,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Achievement: Gamer - Play a game (wired on hobbies-games page)
 // This will be handled by individual game start logic in hobbies-games.html
-
-
-
-
