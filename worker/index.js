@@ -1,7 +1,7 @@
 // Combined Worker: Chatbot + Error Collection API
 // Imports the main chatbot worker and adds error collection endpoints
 
-import * as ChatWorker from './worker.js';
+import * as ChatWorker from './worker.mjs';
 import {
   handleErrorReport,
   handleAuth,

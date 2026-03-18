@@ -18,6 +18,33 @@ const ROOT_DIR = path.join(__dirname, '..');
 const OUTPUT_PATH = path.join(ROOT_DIR, 'assets', 'data', 'site-facts.json');
 const BASE_URL = 'https://www.estivanayramia.com';
 
+const MOJIBAKE_MAP = {
+  '\u00c3\u00a9': '\u00e9',
+  '\u00c3\u00a1': '\u00e1',
+  '\u00c3\u00a8': '\u00e8',
+  '\u00c3\u00b3': '\u00f3',
+  '\u00c3\u00ba': '\u00fa',
+  '\u00c3\u00b1': '\u00f1',
+  '\u00c3\u00bc': '\u00fc',
+  '\u00e2\u20ac\u201c': '-',
+  '\u00e2\u20ac\u201d': '-',
+  '\u00e2\u20ac\u02dc': "'",
+  '\u00e2\u20ac\u2122': "'",
+  '\u00e2\u20ac\u0153': '"',
+  '\u00e2\u20ac\u009d': '"',
+  '\u00c2\u00a9': '\u00a9',
+  '\u00c2 ': ' ',
+  '\u00c2': ''
+};
+
+function cleanText(value) {
+  let output = String(value || '').trim();
+  for (const [bad, good] of Object.entries(MOJIBAKE_MAP)) {
+    output = output.split(bad).join(good);
+  }
+  return output.replace(/\s+/g, ' ').trim();
+}
+
 function normalizeRepoRelativePath(maybeAbsolutePath) {
   return String(maybeAbsolutePath || '').replace(/^\/+/, '');
 }
@@ -54,31 +81,31 @@ const BANNED_TERMS = [
 // Extract canonical URL from HTML
 function extractCanonicalUrl(html) {
   const match = html.match(/<link rel="canonical" href="([^"]+)"/);
-  return match ? match[1] : '';
+  return match ? cleanText(match[1]) : '';
 }
 
 // Extract meta description
 function extractDescription(html) {
   const match = html.match(/<meta name="description" content="([^"]+)"/);
-  return match ? match[1] : '';
+  return match ? cleanText(match[1]) : '';
 }
 
 // Extract title from card in index page
 function extractCardTitle(cardHtml) {
   const match = cardHtml.match(/<h2[^>]*>([^<]+)<\/h2>/);
-  return match ? match[1].trim() : '';
+  return match ? cleanText(match[1]) : '';
 }
 
 // Extract summary from card in index page
 function extractCardSummary(cardHtml) {
   const match = cardHtml.match(/<p class="text-sm[^>]*>([^<]+)<\/p>/);
-  return match ? match[1].trim() : '';
+  return match ? cleanText(match[1]) : '';
 }
 
 // Extract link from card
 function extractCardLink(cardHtml) {
   const match = cardHtml.match(/<a href="([^"]+)"/);
-  return match ? match[1] : '';
+  return match ? cleanText(match[1]) : '';
 }
 
 // Extract tags from card spans
@@ -86,7 +113,7 @@ function extractCardTags(cardHtml) {
   const tags = [];
   const tagMatches = cardHtml.matchAll(/<span class="text-xs bg-[^"]*"[^>]*>([^<]+)<\/span>/g);
   for (const tm of tagMatches) {
-    tags.push(tm[1].trim());
+    tags.push(cleanText(tm[1]));
   }
   return tags;
 }

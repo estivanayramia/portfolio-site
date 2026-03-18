@@ -5,7 +5,16 @@ import { LuxuryCoverflow } from "./carousel/luxury-coverflow.js";
 // Expose consent init for the boot block
 window.__SavonieInitConsent = initDiagnosticsConsent;
 
-console.log('[Savonie DEBUG] site.js loaded');
+const CHAT_DEBUG = typeof window !== 'undefined'
+  && window.location
+  && window.location.search
+  && window.location.search.includes('chat-debug=1');
+
+const chatLog = (...args) => {
+    if (CHAT_DEBUG) console.log(...args);
+};
+
+chatLog('[Savonie DEBUG] site.js loaded');
 
 /**
  * ============================================================================
@@ -1995,28 +2004,28 @@ const translations = {
     // Chat messages and suggestions
     chat: {
         welcome: {
-            en: "Hello! I am Savonie. Ask me anything about Estivan.",
-            es: "Hola. Soy Savonie. Preguntame cualquier cosa sobre Estivan.",
-            ar: "Hello. I am Savonie. Ask me anything about Estivan.",
+            en: "Hey, I'm Savonie. Ask about the work, the site, or the person behind it.",
+            es: "Hola. Soy Savonie. Puedes preguntarme sobre mi trabajo, el sitio o como pienso.",
+            ar: "Hello. I'm Savonie. Ask about the work, the site, or what I'm like to work with.",
         },
         defaultChips: {
             en: [
-                "What does Estivan do?",
-                "Tell me about his background",
-                "What are his skills?",
-                "How can I contact him?"
+                "What kind of work do you do?",
+                "Why did you build this site?",
+                "What are you like on a team?",
+                "How can I reach you?"
             ],
             es: [
-                "Que hace Estivan?",
-                "Hablame de su experiencia",
-                "Cuales son sus habilidades?",
-                "Como puedo contactarlo?"
+                "Que tipo de trabajo haces?",
+                "Por que construiste este sitio?",
+                "Como eres en un equipo?",
+                "Como puedo contactarte?"
             ],
             ar: [
-                "What does Estivan do?",
-                "Tell me about his background",
-                "What are his skills?",
-                "How can I contact him?"
+                "What kind of work do you do?",
+                "Why did you build this site?",
+                "What are you like on a team?",
+                "How can I reach you?"
             ]
         },
         contextualSuggestions: {
@@ -3372,26 +3381,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function buildSafePageContext() {
         try {
-            const parts = [];
             const path = window.location.pathname || '/';
-            parts.push(`path: ${path}`);
-            parts.push(`title: ${document.title || ''}`);
-
             const headings = Array.from(document.querySelectorAll('h1, h2'))
                 .map((h) => (h.textContent || '').trim())
                 .filter(Boolean)
                 .slice(0, 10);
 
-            if (headings.length) {
-                parts.push('headings:');
-                headings.forEach((t) => parts.push(`- ${t}`));
-            }
+            const description = document
+                .querySelector('meta[name="description"]')
+                ?.getAttribute('content') || '';
 
-            const combined = parts.join('\n');
-            // Cap to ~3.5k chars to avoid leaking too much content.
-            return combined.length > 3500 ? combined.slice(0, 3500) : combined;
+            const buildVersion = document
+                .querySelector('meta[name="build-version"]')
+                ?.getAttribute('content') || '';
+
+            const text = Array.from(document.querySelectorAll('main p'))
+                .map((node) => (node.textContent || '').trim())
+                .filter(Boolean)
+                .slice(0, 6)
+                .join(' ')
+                .slice(0, 1200);
+
+            return {
+                route: path,
+                title: document.title || '',
+                description,
+                buildVersion,
+                headings,
+                text
+            };
         } catch (e) {
-            return `${window.location.pathname || '/'} | ${document.title || ''}`;
+            return {
+                route: window.location.pathname || '/',
+                title: document.title || '',
+                description: '',
+                buildVersion: '',
+                headings: [],
+                text: ''
+            };
         }
     }
     
@@ -3437,7 +3464,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add welcome message only if no history
     if (chatHistory.length === 0) {
         const currentLang = document.documentElement.lang || 'en';
-        const welcomeMessage = translations.chat.welcome[currentLang] || "Hello! I am Savonie. Ask me anything about Estivan.";
+        const welcomeMessage = translations.chat.welcome[currentLang] || "Hey, I'm Savonie. Ask about the work, the site, or the person behind it.";
         addMessageToUI(welcomeMessage, 'bot', false);
     }
 
@@ -3485,7 +3512,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function setSuggestionsVisible(isVisible) {
         if (!els.suggestionsContainer) {
-            console.log('[Savonie DEBUG] setSuggestionsVisible called but no suggestions container');
+            chatLog('[Savonie DEBUG] setSuggestionsVisible called but no suggestions container');
             return;
         }
 
@@ -3499,12 +3526,12 @@ document.addEventListener('DOMContentLoaded', () => {
             els.suggestionsContainer.style.display = 'none';
         }
 
-        console.log('[Savonie DEBUG] setSuggestionsVisible ->', isVisible, 'classes:', els.suggestionsContainer.className);
+        chatLog('[Savonie DEBUG] setSuggestionsVisible ->', isVisible, 'classes:', els.suggestionsContainer.className);
     }
 
     function attachSuggestionHandlers() {
         if (!els.suggestionsContainer) {
-            console.log('[Savonie DEBUG] No suggestions container found on this page');
+            chatLog('[Savonie DEBUG] No suggestions container found on this page');
             return;
         }
 
@@ -3514,14 +3541,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                  els.suggestionsContainer.hasAttribute('hidden') ||
                                  els.suggestionsContainer.style.display === 'none';
                 const nextVisible = isHidden;
-                console.log('[Savonie DEBUG] Lightbulb clicked, nextVisible =', nextVisible);
+                chatLog('[Savonie DEBUG] Lightbulb clicked, nextVisible =', nextVisible);
                 setSuggestionsVisible(nextVisible);
             });
         } else {
-            console.log('[Savonie DEBUG] No suggestions toggle (lightbulb) found');
+            chatLog('[Savonie DEBUG] No suggestions toggle (lightbulb) found');
         }
 
-        console.log('[Savonie DEBUG] attachSuggestionHandlers complete');
+        chatLog('[Savonie DEBUG] attachSuggestionHandlers complete');
     }
 
     // Attach handlers immediately (DOM is already ready due to DOMContentLoaded)
@@ -3943,7 +3970,7 @@ document.addEventListener('DOMContentLoaded', () => {
         closeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('[Savonie DEBUG] Suggestions close X clicked, hiding suggestions');
+            chatLog('[Savonie DEBUG] Suggestions close X clicked, hiding suggestions');
             setSuggestionsVisible(false);
         });
         els.chipsContainer.appendChild(closeBtn);
@@ -4100,6 +4127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+            const pageContext = buildSafePageContext();
 
             try {
                 const response = await fetch(CHAT_ENDPOINT, {
@@ -4107,7 +4135,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         message: text,
-                        pageContent: buildSafePageContext(),
+                        pageContext,
+                        pageContent: pageContext.text || '',
                         language: pageLang,
                         previousContext: overrideContext || null // Support continuation
                     }),
@@ -4115,7 +4144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 clearTimeout(timeoutId);
-                console.log('[Chat Debug] Fetch completed. Status:', response.status, 'OK:', response.ok);
+                chatLog('[Chat Debug] Fetch completed. Status:', response.status, 'OK:', response.ok);
 
                 // Handle HTTP error responses
                 if (!response.ok) {
@@ -4151,7 +4180,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 data = await response.json();
-                console.log('[Chat Debug] Response parsed successfully:', data);
+                chatLog('[Chat Debug] Response parsed successfully:', data);
                 lastError = null; // Success!
                 break;
 
@@ -4200,7 +4229,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Success - process the response
         removeMessage(loadingId);
-        console.log('[Chat Debug] Processing response. Data structure:', { hasData: !!data, hasErrorType: !!(data && data.errorType), hasReply: !!(data && data.reply) });
+        chatLog('[Chat Debug] Processing response. Data structure:', { hasData: !!data, hasErrorType: !!(data && data.errorType), hasReply: !!(data && data.reply) });
 
         // Contract-level error types (may be absent)
         if (data && data.errorType) {
@@ -4268,7 +4297,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Handle Smart Signals response
-        console.log('[Chat Debug] About to check reply. data.reply exists:', !!data.reply, 'Value:', data.reply ? data.reply.substring(0, 100) + '...' : 'undefined');
+        chatLog('[Chat Debug] About to check reply. data.reply exists:', !!data.reply, 'Value:', data.reply ? data.reply.substring(0, 100) + '...' : 'undefined');
         if (data.reply) {
             // SAFETY: Strip any trailing JSON blobs if the Worker ever leaks them
             data.reply = data.reply.replace(/\n?\s*\{\s*"(reply|chips|action|card|errorType)"[\s\S]*$/, "").trim();
@@ -4292,7 +4321,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Race condition protection: Only process if this is still the latest request
         if (thisRequestId !== lastRequestId) {
-            console.log('[Chat Debug] Ignoring stale response from request', thisRequestId);
+            chatLog('[Chat Debug] Ignoring stale response from request', thisRequestId);
             isSending = false;
             return;
         }
@@ -4308,7 +4337,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (allPinned && data.chips.length > 0) {
                 // Response contains ONLY pinned chips - don't wipe dynamic chips
-                console.log('[Chat Debug] Response contains only pinned chips, keeping existing dynamic chips');
+                chatLog('[Chat Debug] Response contains only pinned chips, keeping existing dynamic chips');
                 renderChips(); // Re-render with existing dynamic chips + pinned
             } else {
                 // Response contains at least one non-pinned chip - update dynamic chips
