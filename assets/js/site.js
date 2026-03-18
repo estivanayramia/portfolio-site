@@ -2713,11 +2713,7 @@ const initPerformanceMonitoring = () => {
                     clarity('set', 'lcp', Math.round(lastEntry.renderTime || lastEntry.loadTime));
                 }
                 
-                // Warn if LCP is poor (> 2.5s)
-                const lcp = lastEntry.renderTime || lastEntry.loadTime;
-                if (lcp > 2500) {
-                    console.warn('Poor LCP detected:', lcp, 'ms');
-                }
+                // Telemetry already captures poor LCP, so keep the browser console quiet here.
             });
             
             observer.observe({ type: 'largest-contentful-paint', buffered: true });

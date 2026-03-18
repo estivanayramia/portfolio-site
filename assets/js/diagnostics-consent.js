@@ -123,6 +123,19 @@ export function initDiagnosticsConsent() {
     return storage.get(KEYS.upload) === "on";
   }
 
+  function isLocalPreviewHost() {
+    try {
+      const host = String(location.hostname || "").toLowerCase();
+      return host === "localhost" || host === "127.0.0.1";
+    } catch {
+      return false;
+    }
+  }
+
+  function getEffectiveUpload() {
+    return !isLocalPreviewHost() && readUpload();
+  }
+
   function asked() {
     return storage.get(KEYS.asked) === "1";
   }
@@ -135,7 +148,7 @@ export function initDiagnosticsConsent() {
     const consent = readConsent();
     if (consent !== "granted") return;
 
-    const upload = readUpload();
+    const upload = getEffectiveUpload();
     const mode = (new URLSearchParams(location.search).get("debug") === "1") ? "dev" : "user";
     tel.enable({ upload, mode });
   }
@@ -233,19 +246,20 @@ export function initDiagnosticsConsent() {
 
       const rb = readConsent();
       const verified = ok1 && ok2 && rb === "granted";
+      const upload = getEffectiveUpload();
 
       if (!verified) {
         tel.setConsentFlags({ sessionOnly: true });
         toast("Enabled for this session only");
       } else {
-        toast("Thank you — diagnostics enabled with automatic reporting");
+        toast(upload ? "Thank you - diagnostics enabled with automatic reporting" : "Diagnostics enabled for this preview without uploads");
       }
 
       hideBanner(banner);
 
       const mode = (new URLSearchParams(location.search).get("debug") === "1") ? "dev" : "user";
-      tel.enable({ upload: true, mode });
-      tel.push({ kind: "consent", level: "info", msg: "consent.granted", data: { upload: true } });
+      tel.enable({ upload, mode });
+      tel.push({ kind: "consent", level: "info", msg: "consent.granted", data: { upload } });
     });
 
     btnNo.addEventListener("click", () => {

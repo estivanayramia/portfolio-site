@@ -248,6 +248,16 @@ async function captureScreenshots({ baseUrl, outDir }) {
                 transition-delay: 0s !important;
                 caret-color: transparent !important;
               }
+              .diagnostics-consent-banner,
+              [aria-label="Diagnostics consent"],
+              #chat-widget,
+              #chat-window,
+              .install-banner,
+              [data-install-banner] {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+              }
             `;
             document.head.appendChild(style);
           } catch {
