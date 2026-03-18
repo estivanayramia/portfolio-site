@@ -2004,60 +2004,60 @@ const translations = {
     // Chat messages and suggestions
     chat: {
         welcome: {
-            en: "Hey, I'm Savonie. Ask about the work, the site, or the person behind it.",
-            es: "Hola. Soy Savonie. Puedes preguntarme sobre mi trabajo, el sitio o como pienso.",
-            ar: "Hello. I'm Savonie. Ask about the work, the site, or what I'm like to work with.",
+            en: "Hey, I'm Savonie. Ask about Estivan, the work, or the site.",
+            es: "Hola. Soy Savonie. Puedes preguntarme sobre Estivan, su trabajo o el sitio.",
+            ar: "Hello. I'm Savonie. Ask about Estivan, the work, or the site.",
         },
         defaultChips: {
             en: [
-                "What kind of work do you do?",
-                "Why did you build this site?",
-                "What are you like on a team?",
-                "How can I reach you?"
+                "What kind of work does he do?",
+                "Why did he build this site?",
+                "What is he like on a team?",
+                "How can I reach him?"
             ],
             es: [
-                "Que tipo de trabajo haces?",
-                "Por que construiste este sitio?",
-                "Como eres en un equipo?",
-                "Como puedo contactarte?"
+                "Que tipo de trabajo hace?",
+                "Por que construyo este sitio?",
+                "Como es en un equipo?",
+                "Como puedo contactarlo?"
             ],
             ar: [
-                "What kind of work do you do?",
-                "Why did you build this site?",
-                "What are you like on a team?",
-                "How can I reach you?"
+                "What kind of work does he do?",
+                "Why did he build this site?",
+                "What is he like on a team?",
+                "How can I reach him?"
             ]
         },
         contextualSuggestions: {
             en: {
-                skills: ["What projects have you worked on?", "Tell me about your experience", "What are you learning currently?", "How do you approach problem-solving?", "What's your favorite skill to use?", "How do you stay motivated in your work?"],
-                background: ["What are your main skills?", "Tell me about your education", "What industries have you worked in?", "What inspired you to get into tech?", "What's your professional journey been like?", "Any mentors who influenced you?"],
-                projects: ["Can you show me your code?", "What technologies did you use?", "How long did it take to build?", "What challenges did you overcome?", "Did you work with a team?", "What are your future plans for this project?"],
-                contact: ["Are you available for freelance work?", "What's your typical response time?", "Do you work remotely?", "How can I best reach you?", "What's your preferred way of communication?", "Are you open to collaborations?"],
-                education: ["What certifications do you have?", "What's your favorite programming language?", "How do you stay updated with technology?", "What was your most challenging course?", "How has your education shaped your career?", "Any online courses or self-learning?"],
-                projectResponse: ["Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?", "What was the most interesting part?", "How did you test it?", "Would you do anything differently now?"],
-                skillResponse: ["How did you learn that?", "Have you used it in projects?", "What's your proficiency level?", "What's your favorite way to apply this skill?", "Any tips for beginners?", "How has this skill evolved for you?"],
-                early: ["What are your main skills?", "Tell me about your background", "What projects are you proud of?", "What's something unique about you?", "Why did you choose this field?", "What's your biggest achievement?"]
+                skills: ["What projects has he worked on?", "Tell me about his experience", "What is he learning right now?", "How does he approach problem-solving?", "What is his favorite skill to use?", "How does he stay motivated in his work?"],
+                background: ["What are his main skills?", "Tell me about his education", "What industries has he worked in?", "What inspired him to get into tech?", "What has his professional journey been like?", "Any mentors who influenced him?"],
+                projects: ["Can you show me his code?", "What technologies did he use?", "How long did it take him to build?", "What challenges did he overcome?", "Did he work with a team?", "What are his future plans for this project?"],
+                contact: ["Is he available for freelance work?", "What is his typical response time?", "Does he work remotely?", "How can I best reach him?", "What is his preferred way of communication?", "Is he open to collaborations?"],
+                education: ["What certifications does he have?", "What is his favorite programming language?", "How does he stay updated with technology?", "What was his most challenging course?", "How has his education shaped his career?", "Any online courses or self-learning?"],
+                projectResponse: ["Can you tell me more about that project?", "What challenges did he face?", "What did he learn from it?", "What was the most interesting part?", "How did he test it?", "Would he do anything differently now?"],
+                skillResponse: ["How did he learn that?", "Has he used it in projects?", "What is his proficiency level?", "What is his favorite way to apply this skill?", "Any tips for beginners?", "How has this skill evolved for him?"],
+                early: ["What are his main skills?", "Tell me about his background", "What projects is he proud of?", "What is something unique about him?", "Why did he choose this field?", "What is his biggest achievement?"]
             },
             es: {
-                skills: ["En que proyectos has trabajado?", "Hablame de tu experiencia", "Que estas aprendiendo ahora?", "Como abordas la resolucion de problemas?", "Cual es tu habilidad favorita?", "Como te mantienes motivado en tu trabajo?"],
-                background: ["Cuales son tus habilidades principales?", "Hablame de tu educacion", "En que industrias has trabajado?", "Que te inspiro a entrar en tecnologia?", "Como ha sido tu trayectoria profesional?", "Algun mentor que te haya influido?"],
-                projects: ["Puedes mostrarme tu codigo?", "Que tecnologias usaste?", "Cuanto tiempo tomo construirlo?", "Que desafios superaste?", "Trabajaste con un equipo?", "Cuales son tus planes futuros para este proyecto?"],
-                contact: ["Estas disponible para trabajo freelance?", "Cual es tu tiempo tipico de respuesta?", "Trabajas de forma remota?", "Como puedo contactarte mejor?", "Cual es tu forma preferida de comunicacion?", "Estas abierto a colaboraciones?"],
-                education: ["Que certificaciones tienes?", "Cual es tu lenguaje de programacion favorito?", "Como te mantienes actualizado con tecnologia?", "Cual fue tu curso mas desafiante?", "Como ha moldeado tu educacion tu carrera?", "Algun curso en linea o autoaprendizaje?"],
-                projectResponse: ["Puedes contarme mas sobre ese proyecto?", "Que desafios enfrentaste?", "Que aprendiste de ello?", "Cual fue la parte mas interesante?", "Como lo probaste?", "Harias algo diferente ahora?"],
-                skillResponse: ["Como aprendiste eso?", "Lo has usado en proyectos?", "Cual es tu nivel de competencia?", "Cual es tu forma favorita de aplicar esta habilidad?", "Algun consejo para principiantes?", "Como ha evolucionado esta habilidad para ti?"],
-                early: ["Cuales son tus habilidades principales?", "Hablame de tu experiencia", "De que proyectos estas orgulloso?", "Que hay de unico en ti?", "Por que elegiste este campo?", "Cual es tu mayor logro?"]
+                skills: ["En que proyectos ha trabajado?", "Hablame de su experiencia", "Que esta aprendiendo ahora?", "Como aborda la resolucion de problemas?", "Cual es su habilidad favorita?", "Como se mantiene motivado en su trabajo?"],
+                background: ["Cuales son sus habilidades principales?", "Hablame de su educacion", "En que industrias ha trabajado?", "Que lo inspiro a entrar en tecnologia?", "Como ha sido su trayectoria profesional?", "Algun mentor que lo haya influido?"],
+                projects: ["Puedes mostrarme su codigo?", "Que tecnologias uso?", "Cuanto tiempo le tomo construirlo?", "Que desafios supero?", "Trabajo con un equipo?", "Cuales son sus planes futuros para este proyecto?"],
+                contact: ["Esta disponible para trabajo freelance?", "Cual es su tiempo tipico de respuesta?", "Trabaja de forma remota?", "Como puedo contactarlo mejor?", "Cual es su forma preferida de comunicacion?", "Esta abierto a colaboraciones?"],
+                education: ["Que certificaciones tiene?", "Cual es su lenguaje de programacion favorito?", "Como se mantiene actualizado con tecnologia?", "Cual fue su curso mas desafiante?", "Como ha moldeado su educacion su carrera?", "Algun curso en linea o autoaprendizaje?"],
+                projectResponse: ["Puedes contarme mas sobre ese proyecto?", "Que desafios enfrento?", "Que aprendio de ello?", "Cual fue la parte mas interesante?", "Como lo probo?", "Haria algo diferente ahora?"],
+                skillResponse: ["Como aprendio eso?", "Lo ha usado en proyectos?", "Cual es su nivel de competencia?", "Cual es su forma favorita de aplicar esta habilidad?", "Algun consejo para principiantes?", "Como ha evolucionado esta habilidad para el?"],
+                early: ["Cuales son sus habilidades principales?", "Hablame de su experiencia", "De que proyectos esta orgulloso?", "Que hay de unico en el?", "Por que eligio este campo?", "Cual es su mayor logro?"]
             },
             ar: {
-                skills: ["What projects have you worked on?", "Tell me about your experience", "What are you learning currently?", "How do you approach problem-solving?", "What is your favorite skill to use?", "How do you stay motivated in your work?"],
-                background: ["What are your main skills?", "Tell me about your education", "What industries have you worked in?", "What inspired you to get into tech?", "What has your professional journey been like?", "Any mentors who influenced you?"],
-                projects: ["Can you show me your code?", "What technologies did you use?", "How long did it take to build?", "What challenges did you overcome?", "Did you work with a team?", "What are your future plans for this project?"],
-                contact: ["Are you available for freelance work?", "What is your typical response time?", "Do you work remotely?", "How can I best reach you?", "What is your preferred way of communication?", "Are you open to collaborations?"],
-                education: ["What certifications do you have?", "What is your favorite programming language?", "How do you stay updated with technology?", "What was your most challenging course?", "How has your education shaped your career?", "Any online courses or self-learning?"],
-                projectResponse: ["Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?", "What was the most interesting part?", "How did you test it?", "Would you do anything differently now?"],
-                skillResponse: ["How did you learn that?", "Have you used it in projects?", "What is your proficiency level?", "What is your favorite way to apply this skill?", "Any tips for beginners?", "How has this skill evolved for you?"],
-                early: ["What are your main skills?", "Tell me about your background", "What projects are you proud of?", "What is something unique about you?", "Why did you choose this field?", "What is your biggest achievement?"]
+                skills: ["What projects has he worked on?", "Tell me about his experience", "What is he learning right now?", "How does he approach problem-solving?", "What is his favorite skill to use?", "How does he stay motivated in his work?"],
+                background: ["What are his main skills?", "Tell me about his education", "What industries has he worked in?", "What inspired him to get into tech?", "What has his professional journey been like?", "Any mentors who influenced him?"],
+                projects: ["Can you show me his code?", "What technologies did he use?", "How long did it take him to build?", "What challenges did he overcome?", "Did he work with a team?", "What are his future plans for this project?"],
+                contact: ["Is he available for freelance work?", "What is his typical response time?", "Does he work remotely?", "How can I best reach him?", "What is his preferred way of communication?", "Is he open to collaborations?"],
+                education: ["What certifications does he have?", "What is his favorite programming language?", "How does he stay updated with technology?", "What was his most challenging course?", "How has his education shaped his career?", "Any online courses or self-learning?"],
+                projectResponse: ["Can you tell me more about that project?", "What challenges did he face?", "What did he learn from it?", "What was the most interesting part?", "How did he test it?", "Would he do anything differently now?"],
+                skillResponse: ["How did he learn that?", "Has he used it in projects?", "What is his proficiency level?", "What is his favorite way to apply this skill?", "Any tips for beginners?", "How has this skill evolved for him?"],
+                early: ["What are his main skills?", "Tell me about his background", "What projects is he proud of?", "What is something unique about him?", "Why did he choose this field?", "What is his biggest achievement?"]
             }
         },
         pinnedChips: {
@@ -2067,19 +2067,19 @@ const translations = {
         },
         pinnedFollowUps: {
             en: {
-                projects: ["Show me your top project", "What tech stack do you use most?", "Any detailed examples?"],
-                resume: ["Summarize your experience", "What roles are you targeting?", "What are your strongest skills?"],
-                contact: ["Email", "LinkedIn", "Best way to reach you?"]
+                projects: ["Show me his top project", "What tech stack does he use most?", "Any detailed examples?"],
+                resume: ["Summarize his experience", "What roles is he targeting?", "What are his strongest skills?"],
+                contact: ["Email", "LinkedIn", "Best way to reach him?"]
             },
             es: {
-                projects: ["Muestrame tu mejor proyecto", "Que stack tecnologico usas mas?", "Algun ejemplo detallado?"],
-                resume: ["Resume tu experiencia", "Que roles buscas?", "Cuales son tus habilidades mas fuertes?"],
-                contact: ["Email", "LinkedIn", "Mejor forma de contactarte?"]
+                projects: ["Muestrame su mejor proyecto", "Que stack tecnologico usa mas?", "Algun ejemplo detallado?"],
+                resume: ["Resume su experiencia", "Que roles busca?", "Cuales son sus habilidades mas fuertes?"],
+                contact: ["Email", "LinkedIn", "Mejor forma de contactarlo?"]
             },
             ar: {
-                projects: ["Show me your top project", "What tech stack do you use most?", "Any detailed examples?"],
-                resume: ["Summarize your experience", "What roles are you targeting?", "What are your strongest skills?"],
-                contact: ["Email", "LinkedIn", "Best way to reach you"]
+                projects: ["Show me his top project", "What tech stack does he use most?", "Any detailed examples?"],
+                resume: ["Summarize his experience", "What roles is he targeting?", "What are his strongest skills?"],
+                contact: ["Email", "LinkedIn", "Best way to reach him"]
             }
         }
     }
@@ -3464,7 +3464,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add welcome message only if no history
     if (chatHistory.length === 0) {
         const currentLang = document.documentElement.lang || 'en';
-        const welcomeMessage = translations.chat.welcome[currentLang] || "Hey, I'm Savonie. Ask about the work, the site, or the person behind it.";
+        const welcomeMessage = translations.chat.welcome[currentLang] || "Hey, I'm Savonie. Ask about Estivan, the work, or the site.";
         addMessageToUI(welcomeMessage, 'bot', false);
     }
 

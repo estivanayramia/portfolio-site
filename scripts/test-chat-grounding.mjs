@@ -76,6 +76,10 @@ function assertReplyNotContains(reply, parts) {
   }
 }
 
+function assertReplyUsesThirdPerson(reply) {
+  assert.ok(!/\b(i|i'm|i’ve|i'd|my|me|mine)\b/i.test(String(reply || "")), `expected third-person reply but got "${reply}"`);
+}
+
 async function testSurfaceFacts() {
   const prompts = [
     ["What is your favorite color?", ["brown", "beige", "cream"]],
@@ -95,13 +99,14 @@ async function testSurfaceFacts() {
     assert.equal(result.status, 200);
     assertReplyContains(result.data.reply, expected);
     assert.ok(!hasBannedLanguage(result.data.reply));
+    assertReplyUsesThirdPerson(result.data.reply);
   }
 }
 
 async function testRecruiterQuestions() {
   const recruiterChecks = [
     ["Why hire him over someone with more experience?", ["experience matters", "learning speed", "useful quickly"]],
-    ["Is this mostly AI doing the work?", ["i used ai", "judgment", "/projects/portfolio"]],
+    ["Is this mostly AI doing the work?", ["he used ai", "judgment", "/projects/portfolio"]],
     ["What is he like on a team?", ["adaptable", "respectful", "lead or support"]],
     ["What roles fit him best?", ["operations", "project coordination"]],
     ["What are his weaknesses?", ["gaps", "keep moving"]]
@@ -112,6 +117,7 @@ async function testRecruiterQuestions() {
     assert.equal(result.status, 200);
     assertReplyContains(result.data.reply, expected);
     assert.ok(!hasBannedLanguage(result.data.reply));
+    assertReplyUsesThirdPerson(result.data.reply);
   }
 }
 
@@ -119,26 +125,30 @@ async function testShallowQuestionHandling() {
   const result = await ask("So what's he about?");
   assert.equal(result.status, 200);
   assertReplyContains(result.data.reply, ["people", "process", "doing the work right"]);
+  assertReplyUsesThirdPerson(result.data.reply);
 }
 
 async function testBoundaryHandling() {
   const result = await ask("Does he have a girlfriend?");
   assert.equal(result.status, 200);
   assertReplyContains(result.data.reply, ["off the public version", "work", "site"]);
+  assertReplyUsesThirdPerson(result.data.reply);
 }
 
 async function testUnknownHandling() {
   const result = await ask("What is his exact SAT score?");
   assert.equal(result.status, 200);
-  assertReplyContains(result.data.reply, ["i can answer part of that", "/contact"]);
+  assertReplyContains(result.data.reply, ["better answered by estivan directly", "/contact"]);
   assertReplyNotContains(result.data.reply, ["1600", "1550", "1490"]);
   assert.equal(result.data.debug?.questionClass || "unknown", "unknown");
+  assertReplyUsesThirdPerson(result.data.reply);
 }
 
 async function testPageSpecificHandling() {
   const result = await ask("Tell me about the Endpoint playbook");
   assert.equal(result.status, 200);
   assertReplyContains(result.data.reply, ["endpoint competitive playbook", "/projects/endpoint-competitive-playbook"]);
+  assertReplyUsesThirdPerson(result.data.reply);
 }
 
 async function testFreshnessRefresh() {
@@ -167,7 +177,7 @@ async function testFreshnessRefresh() {
                 <h1>Overview</h1>
                 <p>Fresh runtime copy wins.</p>
                 <h2>Reliability</h2>
-                <p>I stay on the work and clean up after it.</p>
+                <p>He stays on the work and cleans up after it.</p>
               </section>
             </main>
           </body>
@@ -196,6 +206,7 @@ async function testFreshnessRefresh() {
     assert.equal(result.status, 200);
     assertReplyContains(result.data.reply, ["fresh runtime copy wins", "reliability"]);
     assert.equal(result.data.manifestStatus, "runtime_live_refresh");
+    assertReplyUsesThirdPerson(result.data.reply);
   } finally {
     global.fetch = originalFetch;
   }

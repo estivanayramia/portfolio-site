@@ -130,7 +130,7 @@ function getMinimalProfileFallback() {
   return {
     version: "fallback-public-profile",
     name: "Estivan Ayramia",
-    perspective: "first_person",
+    perspective: "third_person",
     contact: {
       email: "hello@estivanayramia.com",
       site: DEFAULT_BASE_URL,
@@ -149,11 +149,11 @@ function getMinimalProfileFallback() {
     },
     answerSeeds: {
       aboutGeneral: [
-        "I care about people, process, and doing the work right.",
+        "Estivan cares about people, process, and doing the work right.",
         "This site exists because a resume leaves too much out."
       ],
       outreach: [
-        "If you want the fuller version, reach out directly."
+        "If you want the fuller version, reaching out directly is the best move."
       ]
     }
   };
@@ -589,44 +589,44 @@ function formatSurfaceFactReply(key, profile) {
 
   switch (key) {
     case "favorite_color":
-      return "Brown, beige, and cream. I like earthy colors. They feel grounded without trying too hard.";
+      return "Brown, beige, and cream. He likes earthy colors. They feel grounded without trying too hard.";
     case "favorite_movie":
-      return "Iron Man. Part of it is just that the Tony Stark 'built this in a cave' energy still hits.";
+      return "Iron Man. Part of why it sticks is the Tony Stark 'built this in a cave' energy.";
     case "favorite_show":
-      return "White Collar, Burn Notice, Prison Break, and Psych are the main ones. Psych especially, because it notices details in a way that feels familiar.";
+      return "White Collar, Burn Notice, Prison Break, and Psych are the main ones. Psych stands out because of how closely it notices details.";
     case "favorite_book":
-      return "How to Win Friends and Influence People. The useful part for me is the genuine-interest side of it, not the cheesy version.";
+      return "How to Win Friends and Influence People. The useful part for him is the genuine-interest side of it, not the cheesy version.";
     case "favorite_music":
-      return "My music taste is broad, but Drake, Arctic Monkeys, The Marias, and The Neighbourhood are the easy standouts.";
+      return "His music taste is broad, but Drake, Arctic Monkeys, The Marias, and The Neighbourhood are easy standouts.";
     case "favorite_food":
-      return "Pizza and pasta are the safest answers. I lean savory, and the dessert pick is Ben & Jerry's strawberry cheesecake.";
+      return "Pizza and pasta are the safest answers. He leans savory, and the dessert pick is Ben & Jerry's strawberry cheesecake.";
     case "favorite_drink":
-      return "Water and Coke Zero are the regular go-tos. Caffeine usually makes me sleepy, which is not the most efficient setup.";
+      return "Water and Coke Zero are the regular go-tos. Caffeine usually makes him sleepy, which is not the most efficient setup.";
     case "favorite_sport":
-      return "Soccer is the favorite. I also play volleyball and pickleball for fun, but soccer wins.";
+      return "Soccer is the favorite. He also plays volleyball and pickleball for fun, but soccer wins.";
     case "favorite_team":
       return "FC Barcelona.";
     case "languages":
-      return "I speak Arabic, Chaldean, English, and Spanish. I write in English, Arabic, and Spanish, but not Chaldean.";
+      return "Estivan speaks Arabic, Chaldean, English, and Spanish. He writes in English, Arabic, and Spanish, but not Chaldean.";
     case "hometown":
-      return `I was born in ${identity.birthplace || "Baghdad, Iraq"} and grew up in ${identity.hometown || "El Cajon"}.`;
+      return `He was born in ${identity.birthplace || "Baghdad, Iraq"} and grew up in ${identity.hometown || "El Cajon"}.`;
     case "birthday":
       return "January 21, 2004.";
     case "height":
       return identity.height || "5'10\" barefoot.";
     case "style":
-      return `${preferences.style?.summary || "My style depends on the outing."} Favorite shoes are ${preferences.style?.shoes?.join(", ") || "Nike Dunks, Jordan 1s, and Air Forces"}, and yes, I care about cologne more than most people probably should.`;
+      return `${preferences.style?.summary || "His style depends on the outing."} Favorite shoes are ${preferences.style?.shoes?.join(", ") || "Nike Dunks, Jordan 1s, and Air Forces"}, and yes, he cares about cologne more than most people probably should.`;
     default:
       return "";
   }
 }
 
 function buildBoundaryReply() {
-  return "I keep some things off the public version on purpose. I am happy to talk about the work, the site, how I think, or anything already on the portfolio.";
+  return "Some things stay off the public version on purpose. The site can still help with the work, the site, how he thinks, or anything already on the portfolio.";
 }
 
 function buildUnknownReply(profile) {
-  return `I can answer part of that, but not fully on my own behalf. The cleanest move is to ask me directly through [Contact](/contact) or email ${profile.contact?.email || "hello@estivanayramia.com"}.`;
+  return `That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email ${profile.contact?.email || "hello@estivanayramia.com"}.`;
 }
 
 function buildPageSpecificReply(retrieval) {
@@ -673,11 +673,11 @@ function buildDeterministicReply({ questionClass, surfaceFactKey, profile, siteF
 
   switch (questionClass) {
     case QUESTION_CLASSES.GREETING:
-      return "Hey. I can help with the work, the site, how I think, or the quicker human stuff too. What do you actually want to know?";
+      return "Hey. Savonie can help with questions about Estivan, the work, or the site. What do you actually want to know?";
     case QUESTION_CLASSES.CONTACT:
       return `Best options are [Contact](/contact), ${profile.contact?.email || "hello@estivanayramia.com"}, or LinkedIn if that fits better.`;
     case QUESTION_CLASSES.RESUME:
-      return "You can grab the [resume PDF](/assets/docs/Estivan-Ayramia-Resume.pdf) directly if that is what you need.";
+      return "The [resume PDF](/assets/docs/Estivan-Ayramia-Resume.pdf) is the quickest source for that.";
     case QUESTION_CLASSES.HIRE_CASE:
       return `${(seeds.hireOverExperience || []).join(" ")} ${formatProjectList(siteFacts)}`;
     case QUESTION_CLASSES.SKEPTICAL_AI:
@@ -794,7 +794,7 @@ export function buildModelContext({
   // instead of defaulting to generic assistant niceness.
   return `
 SYSTEM: You are Savonie, the on-site chat voice for Estivan Ayramia.
-PERSPECTIVE: Speak in FIRST PERSON as Estivan by default.
+PERSPECTIVE: Speak about Estivan in THIRD PERSON by default.
 LANGUAGE: Reply in ${language || "English"}.
 REGISTER: ${buildRegisterInstruction(register)}
 QUESTION CLASS: ${questionClass}
@@ -815,7 +815,7 @@ NON-NEGOTIABLE RULES:
 - No corporate jargon, therapy-speak, fake-deep language, or resume perfume.
 - Avoid every entry in the approved never-say blacklist from the public profile.
 - Keep some mystery. Do not overexpose private details.
-- Never use third person for Estivan unless the user explicitly asks for that framing.
+- Never use first person for Estivan. Refer to him as Estivan, he, or his unless the user explicitly asks for a direct quote.
 
 PUBLIC PROFILE:
 - Name: ${profile.name}
@@ -857,11 +857,11 @@ ${message}
 `.trim();
 }
 
-function looksThirdPerson(reply) {
+function soundsTooFirstPerson(reply) {
   const lower = String(reply || "").toLowerCase();
   const firstPersonCount = (lower.match(/\b(i|i['’]m|i['’]ve|i['’]d|my|me|mine)\b/g) || []).length;
   const thirdPersonCount = (lower.match(/\b(estivan|he|his|him)\b/g) || []).length;
-  return thirdPersonCount > firstPersonCount;
+  return firstPersonCount > thirdPersonCount;
 }
 
 export function hasBannedLanguage(reply) {
@@ -883,32 +883,32 @@ export function postProcessReply(reply, fallbackReply) {
   const cleaned = stripUnsafeArtifacts(reply);
   if (!cleaned) return fallbackReply;
   if (hasBannedLanguage(cleaned)) return fallbackReply;
-  if (looksThirdPerson(cleaned)) return fallbackReply;
+  if (soundsTooFirstPerson(cleaned)) return fallbackReply;
   return cleaned;
 }
 
 export function buildChips(questionClass, retrieval) {
   if (questionClass === QUESTION_CLASSES.HIRE_CASE) {
-    return ["What roles fit you best?", "What are you like on a team?", "Show me the portfolio build"];
+    return ["What roles fit him best?", "What is he like on a team?", "Show me the portfolio build"];
   }
   if (questionClass === QUESTION_CLASSES.SKEPTICAL_AI) {
-    return ["How did you build the site?", "What does the site prove?", "Show me a project"];
+    return ["How did he build the site?", "What does the site prove?", "Show me a project"];
   }
   if (questionClass === QUESTION_CLASSES.TEAM) {
-    return ["What roles fit you best?", "What are your weaknesses?", "Show me the overview"];
+    return ["What roles fit him best?", "What are his weaknesses?", "Show me the overview"];
   }
   if (questionClass === QUESTION_CLASSES.PROJECT_LIST) {
-    return ["Show me the portfolio build", "Tell me about Endpoint", "How can I contact you?"];
+    return ["Show me the portfolio build", "Tell me about Endpoint", "How can I contact him?"];
   }
   if (questionClass === QUESTION_CLASSES.PAGE_SPECIFIC && retrieval.pages[0]) {
     return [
       `Tell me more about ${retrieval.pages[0].title}`,
-      "What projects have you done?",
-      "How can I contact you?"
+      "What projects has he done?",
+      "How can I contact him?"
     ];
   }
   if (questionClass === QUESTION_CLASSES.SURFACE_FACT) {
-    return ["What are you like on a team?", "What projects have you done?", "How did you build the site?"];
+    return ["What is he like on a team?", "What projects has he done?", "How did he build the site?"];
   }
   return ["Projects", "Resume", "Contact"];
 }

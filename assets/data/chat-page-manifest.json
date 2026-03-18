@@ -2,7 +2,7 @@
   "version": "page-grounding-v1",
   "source": "repo-crawl",
   "baseUrl": "https://www.estivanayramia.com",
-  "buildVersion": "20260317-586b5d8",
+  "buildVersion": "20260318-8265b72",
   "pageCount": 27,
   "pages": [
     {
@@ -13,7 +13,7 @@
       "pageType": "home",
       "title": "Estivan Ayramia | Built to Show More Than a Resume",
       "description": "I built this site to show how I think, learn, adapt, and execute so you can see more than a resume can hold.",
-      "buildVersion": "20260317-586b5d8",
+      "buildVersion": "20260318-8265b72",
       "summary": "I built this site to show how I think, learn, adapt, and execute so you can see more than a resume can hold.",
       "headings": [
         "Built to show what a resume can't.",
