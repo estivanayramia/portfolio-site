@@ -34,9 +34,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp" fetchpriority="high">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=41bc6d9">
+    <link rel="stylesheet" href="/assets/css/style.css?v=ae6016e">
     
-    <script src="/assets/js/site.min.js?v=41bc6d9" defer></script>
+    <script src="/assets/js/site.min.js?v=ae6016e" defer></script>
     
     <!-- Theme CSS -->
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
@@ -123,7 +123,7 @@
                 <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
 <!-- Dark Mode Toggle -->
-            <button id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">🔆</span></button>
+            <button id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">&#x2600;&#xFE0F;</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -208,28 +208,55 @@
                 <!-- Now Section -->
                 <div class="opacity-0 bg-indigodeep/5 rounded-2xl p-6 border border-indigodeep/10" data-gsap="fade-up" data-gsap-delay="0.1">
                     <h2 class="text-2xl lg:text-3xl font-bold text-indigodeep mb-4">What I Am Focused on Right Now</h2>
-                    <p class="text-sm text-chocolate/70 mb-4">Updated January 2025</p>
-                    <p class="text-base text-chocolate leading-relaxed mt-4">Jack of all trades, master of none; never the master and always the student.</p>
+                    <p class="text-sm text-chocolate/70 mb-4">Updated <span id="now-timestamp"></span>
+                        <script>
+                            (function () {
+                                var el = document.getElementById("now-timestamp");
+                                if (el) {
+                                    var d = new Date();
+                                    var months = [
+                                        "January",
+                                        "February",
+                                        "March",
+                                        "April",
+                                        "May",
+                                        "June",
+                                        "July",
+                                        "August",
+                                        "September",
+                                        "October",
+                                        "November",
+                                        "December"
+                                    ];
+                                    el.textContent = months[d.getMonth()] + " " + d.getFullYear();
+                                }
+                            })();
+                        </script>
+                    </p>
                     <ul class="space-y-3 mt-4">
                         <li class="flex items-start gap-3">
-                            <span class="text-indigodeep mt-1">•</span>
-                            <span class="text-base text-chocolate">SDSU Business Administration Graduate: Equipped with strategic insight and innovative drive to shape the future!</span>
+                            <span class="text-indigodeep mt-1">-</span>
+                            <span class="text-base text-chocolate">General Business graduate from SDSU, diploma in hand, LinkedIn updated, parents proud</span>
                         </li>
                         <li class="flex items-start gap-3">
-                            <span class="text-indigodeep mt-1">•</span>
+                            <span class="text-indigodeep mt-1">-</span>
+                            <span class="text-base text-chocolate">Open to opportunities and actively looking for the right role to put all of this to use</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="text-indigodeep mt-1">-</span>
                             <span class="text-base text-chocolate">Building this portfolio site to document projects and thinking</span>
                         </li>
                         <li class="flex items-start gap-3">
-                            <span class="text-indigodeep mt-1">•</span>
+                            <span class="text-indigodeep mt-1">-</span>
                             <span class="text-base text-chocolate">Exploring how AI tools can enhance personal productivity and learning</span>
                         </li>
                         <li class="flex items-start gap-3">
-                            <span class="text-indigodeep mt-1">•</span>
+                            <span class="text-indigodeep mt-1">-</span>
                             <span class="text-base text-chocolate">Training consistently at the gym and improving my nutrition habits</span>
                         </li>
                         <li class="flex items-start gap-3">
-                            <span class="text-indigodeep mt-1">•</span>
-                            <span class="text-base text-chocolate">Working on my car project and learning more about how to perfect my BMW.</span>
+                            <span class="text-indigodeep mt-1">-</span>
+                            <span class="text-base text-chocolate">Working on my BMW and appreciating every day that goes by. It is always a good day to be happy.</span>
                         </li>
                     </ul>
                 </div>
@@ -242,7 +269,7 @@
                         <div class="space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm">
                             <h3 class="text-lg font-semibold text-indigodeep">Reliability Over Flash</h3>
                             <p class="text-sm text-chocolate leading-relaxed">
-                                Consistency compounds. Showing up on time, delivering what's promised, and building backup systems isn't glamorous; it's what makes operations run and teams trust your word.
+                                Consistency is what actually moves things forward. Showing up on time, doing what you said you would, and having a backup plan when things go sideways. It is not exciting, but it is what makes people trust you and operations run smoothly.
                             </p>
                         </div>
                         
@@ -250,7 +277,7 @@
                         <div class="space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm">
                             <h3 class="text-lg font-semibold text-indigodeep">People Are the System</h3>
                             <p class="text-sm text-chocolate leading-relaxed">
-                                The best processes fail if people don't buy in. Cultural sensitivity, clear communication, and conflict resolution frameworks aren't soft skills; they're operational necessities.
+                                The best process in the world falls apart if the people running it are not on board. Understanding where someone is coming from, communicating clearly, and knowing how to work through friction with people. That stuff matters a lot more than most job descriptions let on.
                             </p>
                         </div>
                         
@@ -258,7 +285,7 @@
                         <div class="space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm">
                             <h3 class="text-lg font-semibold text-indigodeep">Execution Is Everything</h3>
                             <p class="text-sm text-chocolate leading-relaxed">
-                                Great ideas without follow-through are worthless. Checklists, time blocks, and review loops are unglamorous; they're the difference between projects that ship and projects that stall.
+                                A great idea with no follow-through is just a conversation. Checklists, time blocks, and honest review loops are what separate things that actually ship from things that live forever in a Notes app. (We all have that Notes app.)
                             </p>
                         </div>
                         
@@ -266,7 +293,7 @@
                         <div class="space-y-3 border border-indigodeep/20 rounded-lg p-6 bg-white/20 backdrop-blur-sm">
                             <h3 class="text-lg font-semibold text-indigodeep">Growth Through Discomfort</h3>
                             <p class="text-sm text-chocolate leading-relaxed">
-                                Learning happens at the edge of competence. Seek challenges that feel slightly out of reach, document the failures, iterate fast, and build the muscle memory that makes hard things routine.
+                                The best learning happens right at the edge of what you can actually do. Seek out challenges that feel just a bit out of reach, write down what goes wrong, adjust, and keep going. The hard things get easier. Then you find harder things.
                             </p>
                         </div>
                     </div>
@@ -276,12 +303,12 @@
         
         <!-- CTA Section -->
         <section class="max-w-4xl mx-auto px-6 lg:px-12 py-20 overflow-clip">
-            <div class="bg-gradient-to-br from-indigodeep to-chocolate rounded-3xl p-12 text-center space-y-6">
+            <div class="bg-gradient-to-br from-indigodeep to-chocolate rounded-3xl p-12 text-center space-y-6 isolate overflow-hidden">
                 <h2 class="text-3xl font-bold text-beige">See These Principles in Action</h2>
                 <p class="text-base text-beige/90 max-w-xl mx-auto leading-relaxed">
-                    Explore projects where systems thinking, execution, and continuous improvement drive real results.
+                    The projects section is where the values above stop being words on a page. Take a look.
                 </p>
-                <a href="/projects/" class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-110 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep">
+                <a href="/projects/" class="relative z-10 inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep">
                     View Projects →
                 </a>
             </div>
@@ -299,7 +326,7 @@
                         <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
-                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. SDSU General Business graduate. I care about people, process, and doing the work right.</p>
                 </div>
                 
                 <!-- Column 2: Quick Links -->

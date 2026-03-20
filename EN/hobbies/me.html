@@ -27,9 +27,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=41bc6d9">
-    <link rel="preload" href="/assets/css/style.css?v=41bc6d9" as="style">
-    <script src="/assets/js/site.min.js?v=41bc6d9" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=ae6016e">
+    <link rel="preload" href="/assets/css/style.css?v=ae6016e" as="style">
+    <script src="/assets/js/site.min.js?v=ae6016e" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
@@ -92,21 +92,33 @@
         .lightbox-nav:hover { background: rgba(0,0,0,0.8); }
         .lightbox-prev { left: 1rem; }
         .lightbox-next { right: 1rem; }
-        .gallery-carousel {
+                .gallery-carousel {
             position: relative;
             overflow: hidden;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
-        .carousel-track {
+                .carousel-track {
             display: flex;
+            width: 100%;
+            align-items: stretch;
             transition: transform 0.5s ease-out;
             gap: 1rem;
+            touch-action: pan-y pinch-zoom;
+            will-change: transform;
         }
-        .carousel-slide {
+                .carousel-slide {
             flex: 0 0 calc(50% - 0.5rem);
+            min-width: 0;
             aspect-ratio: 1;
         }
         @media (min-width: 768px) {
-            .carousel-slide { flex: 0 0 calc(33.333% - 0.667rem); }
+                    .carousel-slide {
+            flex: 0 0 calc(50% - 0.5rem);
+            min-width: 0;
+            aspect-ratio: 1;
+        }
         }
         .carousel-btn {
             position: absolute;
@@ -233,7 +245,7 @@
                 <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors">Contact</a></li>
             </ul>
 <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span aria-hidden="true">🔆</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span aria-hidden="true">&#x2600;&#xFE0F;</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -281,7 +293,7 @@
                     Me
                 </h1>
                 <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
-                    A personal gallery of moments that represent who I am outside work: family, campus life, progress, and everyday snapshots that still mean something later.
+                    This is the part of the site where I stop acting locked in and just look human for a minute.
                 </p>
             </div>
         </section>
@@ -291,15 +303,16 @@
             <div class="grid lg:grid-cols-3 gap-12">
                 
                 <!-- Main Content -->
-                <div class="lg:col-span-2 space-y-12">
+                <div class="lg:col-span-2 min-w-0 space-y-12">
                     
                     <!-- What This Section Captures -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">What This Section Captures</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>This page is less about a technical style and more about memory. These are personal snapshots from different moments, places, and moods that help tell the human side behind the portfolio.</p>
-                            <p>Some photos are candid, some are intentional, and some are just right-place-right-time. Together they form a timeline of experiences that shaped discipline, values, and perspective.</p>
-                            <p>I keep this section simple and real. No over-curation, just images that matter and still feel authentic when I look back at them.</p>
+                            <p>This one is less about trying to impress people and more about keeping the good stuff close.</p>
+                            <p>Some shots happened on purpose. Some were luck. Some came from me seeing something cool and taking the picture. A few were pure point-and-shoot wins.</p>
+                            <p>I am not a pro. This is just my life in a nutshell. Not LinkedIn worthy. Site worthy though.</p>
+                            <p>I did not want this page to feel overbuilt or too polished. It is personal, a little random, and real enough to still mean something later.</p>
                         </div>
                     </div>
                     
@@ -307,72 +320,72 @@
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">Why It Matters</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>A portfolio can show outcomes, but this section shows context. It reminds people there is a real person behind the work, not just bullet points and project summaries.</p>
-                            <p>These photos track growth over time. They reflect consistency, routines, and the environments that influenced how I think and execute.</p>
-                            <p>It is also a simple archive for myself. Progress is easier to see when moments are captured and revisited with clarity.</p>
+                            <p>The work matters. So does the person making it. This page is here for that.</p>
+                            <p>This is my quiet little record of growth, habits, good days, weird days, and everything in between.</p>
+                            <p>I wanted one corner of the site that felt personal and easy to come back to.</p>
                         </div>
                     </div>
                     
                     <!-- Me Gallery -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                    <div>
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">Gallery</h2>
-                        <p class="text-chocolate mb-6 text-sm">Personal moments from the me collection. Click any image to view larger.</p>
+                        <p class="text-chocolate mb-6 text-sm">Random real-life snapshots. Click a photo for a closer look.</p>
                         
-                        <div class="gallery-carousel" id="galleryCarousel">
+                        <div class="gallery-carousel" id="galleryCarousel" data-mini-carousel="true">
                             <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">←</button>
                             <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">→</button>
                             
                             <div class="carousel-track" id="carouselTrack">
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0551.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0551.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0573.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0573.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0634.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0634.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="eager" fetchpriority="high" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0637.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0637.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0803.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0803.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0805.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0805.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0837.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0837.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_1411.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_1411.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_1736.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_1736.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_3168.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_3168.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_3447.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_3447.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_3587.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_3587.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_3604.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_3604.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_4418.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_4418.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_4592.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_4592.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_4675.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_4675.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_8895.webp" alt="Personal photo from the me collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_8895.webp" alt="Real-life photo from my collection" class="w-full h-full object-cover" loading="lazy" decoding="async" width="1800" height="1800">
                                 </figure>
                             </div>
                             
@@ -391,23 +404,23 @@
                         <ul class="space-y-3 text-sm text-chocolate">
                             <li class="flex items-start">
                                 <span class="text-indigodeep mr-2">•</span>
-                                <span>Personal Milestones</span>
+                                <span>Evidence I Leave the House</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="text-indigodeep mr-2">•</span>
-                                <span>Identity and Character</span>
+                                <span>People I Like</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="text-indigodeep mr-2">•</span>
-                                <span>Campus and Daily Life</span>
+                                <span>School Stuff</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="text-indigodeep mr-2">•</span>
-                                <span>Growth Over Time</span>
+                                <span>Character Development</span>
                             </li>
                             <li class="flex items-start">
                                 <span class="text-indigodeep mr-2">•</span>
-                                <span>Authentic Snapshots</span>
+                                <span>Camera Roll Survivors</span>
                             </li>
                         </ul>
                     </div>
@@ -436,7 +449,7 @@
                         <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
-                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. SDSU General Business graduate. I care about people, process, and doing the work right.</p>
                 </div>
                 
                 <!-- Column 2: Quick Links -->
@@ -521,4 +534,3 @@
     <script src="/assets/js/lazy-loader.min.js" defer></script>
 </body>
 </html>
-

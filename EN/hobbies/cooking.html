@@ -27,9 +27,9 @@
     <!-- Preload Critical LCP (Largest Contentful Paint) Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=41bc6d9">
-    <link rel="preload" href="/assets/css/style.css?v=41bc6d9" as="style">
-    <script src="/assets/js/site.min.js?v=41bc6d9" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=ae6016e">
+    <link rel="preload" href="/assets/css/style.css?v=ae6016e" as="style">
+    <script src="/assets/js/site.min.js?v=ae6016e" defer></script>
     
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
@@ -91,28 +91,34 @@
         .lightbox-prev { left: 1rem; }
         .lightbox-next { right: 1rem; }
 
-        /* Your existing carousel CSS continues below */
-            border-radius: 0.5rem;
-            transition: background 0.2s;
-        }
-        .lightbox-nav:hover { background: rgba(0,0,0,0.8); }
-        .lightbox-prev { left: 1rem; }
-        .lightbox-next { right: 1rem; }
-        .gallery-carousel {
+
+                .gallery-carousel {
             position: relative;
             overflow: hidden;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
-        .carousel-track {
+                .carousel-track {
             display: flex;
+            width: 100%;
+            align-items: stretch;
             transition: transform 0.5s ease-out;
             gap: 1rem;
+            touch-action: pan-y pinch-zoom;
+            will-change: transform;
         }
-        .carousel-slide {
+                .carousel-slide {
             flex: 0 0 calc(50% - 0.5rem);
+            min-width: 0;
             aspect-ratio: 1;
         }
         @media (min-width: 768px) {
-            .carousel-slide { flex: 0 0 calc(33.333% - 0.667rem); }
+                    .carousel-slide {
+            flex: 0 0 calc(50% - 0.5rem);
+            min-width: 0;
+            aspect-ratio: 1;
+        }
         }
         .carousel-btn {
             position: absolute;
@@ -216,9 +222,9 @@
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox-overlay" aria-hidden="true">
         <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
-        <button class="lightbox-nav lightbox-prev" aria-label="Previous image">←</button>
+        <button class="lightbox-nav lightbox-prev" aria-label="Previous image">&larr;</button>
         <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" alt="" class="lightbox-content" id="lightbox-image">
-        <button class="lightbox-nav lightbox-next" aria-label="Next image">→</button>
+        <button class="lightbox-nav lightbox-next" aria-label="Next image">&rarr;</button>
     </div>
     
     <!-- Skip to main content for accessibility -->
@@ -241,7 +247,7 @@
                 <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors">Contact</a></li>
             </ul>
 <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span aria-hidden="true">🔆</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span aria-hidden="true">&#x2600;&#xFE0F;</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -299,15 +305,13 @@
             <div class="grid lg:grid-cols-3 gap-12">
                 
                 <!-- Main Content -->
-                <div class="lg:col-span-2 space-y-12">
+                <div class="lg:col-span-2 min-w-0 space-y-12">
                     
                     <!-- How I Plan Meals -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">How I Plan Meals</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>I treat the kitchen like a lab. Inputs and outputs. Protein targets, calorie ranges, prep time. Everything has a number attached, and I optimize for the best ratio of nutrition to effort.</p>
-                            <p>Sunday is prep day. I cook in bulk for the week. Proteins get portioned. Rice gets made. Vegetables get prepped. During the week, I'm assembling, not cooking from scratch. That saves hours.</p>
-                            <p>I track macros loosely. Not obsessively, but enough to know I'm hitting my protein targets. When you're trying to build muscle on a student schedule, you can't leave nutrition to chance. The gym is only half the equation.</p>
+                            <p>Cooking is just a fun activity for me, and I get a great reward out of the whole process. I treat the kitchen like a fun party rather than a science lab. I just go in, get busy, and feel highly productive. I force my brother to rate the final plate. I always know the food is delicious, but I expect him to give it a low score so I have a perfect excuse to cook for him again later.</p>
                         </div>
                     </div>
                     
@@ -315,30 +319,27 @@
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">Staple Meals</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>My rotation is simple because consistency beats variety when the goal is performance. Chicken thighs (cheaper and more flavorful than breast), ground beef, eggs, rice, potatoes, and whatever vegetables are on sale.</p>
-                            <p>Breakfast is usually eggs and toast, or Greek yogurt with oats. Quick, high protein, minimal cleanup. Lunch is whatever I prepped on Sunday. Dinner is where I might actually cook something fresh.</p>
-                            <p>I've learned to make a few things really well instead of being mediocre at many. A good stir fry. A solid rice bowl. Grilled meat that's actually seasoned properly. These basics, executed consistently, beat fancy recipes I'll never make twice.</p>
+                            <p>My meal choices change completely based on my current gym goals. If I just want to enjoy life, I cook with heavy cream and endless carbs. But if I need to hit a strict fitness goal, I lock in and change my diet. I cut out snacks, alcohol, and fast food. Then I switch to clean home-cooked meals with plenty of rice, meat, and vegetables. I keep a loose eye on my macros to hit my protein targets. You cannot build muscle on a bad diet, so the gym is only half the battle.</p>
+                            <p>I preach about fitness goals constantly, but I rarely eat a real breakfast. I never have a big appetite in the morning, so I usually just grab an Oikos yogurt and a protein bar.</p>
                         </div>
                     </div>
                     
                     <!-- The Kitchen as a System -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                    <div>
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">The Kitchen as a System</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>Cooking taught me about mise en place - having everything ready before you start. That principle applies everywhere. Preparation reduces friction. When everything is in place, execution becomes smooth.</p>
-                            <p>It also taught me about timing and parallel processing. While the rice cooks, prep the vegetables. While the meat rests, plate the sides. Finding those overlaps and using dead time is how you cook a full meal in 30 minutes.</p>
-                            <p>And cleanup as you go. Never let dishes pile up. The same discipline that keeps a kitchen functional keeps everything else functional too.</p>
+                            <p>I cook strictly for fun and my own taste buds. I refuse to treat my kitchen like a competition. If a meal turns out bad, I will still eat it so I do not waste the food or my effort. Luckily, my food rarely tastes bad. Chasing perfection turns a fun hobby into a stressful job, and I never want cooking to feel like a chore. The kitchen did teach me how to multitask, though. I prep my sides while the main dish cooks, and I wash the dishes as I go for peak efficiency. Getting everything organized first makes the entire process smooth.</p>
                         </div>
                     </div>
                     
                     <!-- Photo Gallery -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                    <div>
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">Gallery</h2>
                         <p class="text-chocolate mb-6 text-sm">Click any image to view larger. Use arrows or swipe to browse.</p>
                         
-                        <div class="gallery-carousel" id="galleryCarousel">
-                            <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">←</button>
-                            <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">→</button>
+                        <div class="gallery-carousel" id="galleryCarousel" data-mini-carousel="true">
+                            <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">&larr;</button>
+                            <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">&rarr;</button>
                             
                             <div class="carousel-track" id="carouselTrack">
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
@@ -381,66 +382,11 @@
                 
                 <!-- Sidebar -->
                 <div class="space-y-8">
-                    
-                    <!-- Weekly Staples -->
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
-                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Weekly Staples</h3>
-                        <ul class="space-y-3 text-sm text-chocolate">
-                            <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
-                                <span>Chicken thighs or breast</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
-                                <span>Ground beef 80/20</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
-                                <span>Eggs (lots of eggs)</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
-                                <span>Rice and potatoes</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
-                                <span>Greek yogurt</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">•</span>
-                                <span>Seasonal vegetables</span>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <!-- Principles -->
-                    <div class="bg-indigodeep/5 border border-indigodeep/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
-                        <h3 class="text-lg font-semibold text-indigodeep mb-4">Principles</h3>
-                        <ul class="space-y-3 text-sm text-chocolate">
-                            <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">1.</span>
-                                <span>Protein first, always</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">2.</span>
-                                <span>Prep in bulk on Sunday</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">3.</span>
-                                <span>Clean as you go</span>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-indigodeep mr-2">4.</span>
-                                <span>Simple, repeatable meals</span>
-                            </li>
-                        </ul>
-                    </div>
-                    
                     <!-- Back to Hobbies -->
                     <div class="bg-indigodeep rounded-xl p-6 text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
                         <p class="text-beige/90 text-sm mb-4">Explore more hobbies</p>
                         <a href="/hobbies/#hobby-cooking-card" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
-                            ← Back to All Hobbies
+                            &larr; Back to All Hobbies
                         </a>
                     </div>
                     
@@ -460,7 +406,7 @@
                         <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
-                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. SDSU General Business graduate. I care about people, process, and doing the work right.</p>
                 </div>
                 
                 <!-- Column 2: Quick Links -->
@@ -478,8 +424,8 @@
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
                     <ul class="space-y-2">
-                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
-                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn &rarr;</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub &rarr;</a></li>
                         <li><a href="/contact" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
                         <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
                         <li><a href="/privacy" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
@@ -488,7 +434,7 @@
             </div>
             
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">&copy; <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -522,7 +468,7 @@
 
             <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white dark:bg-[#362017] border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
                 <button type="button" id="suggestions-btn" data-chat-suggestions-toggle="button" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors">
-                    💡
+                    &#x1F4A1;
                 </button>
                 <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] dark:text-[#e1d4c2] dark:placeholder-[#e1d4c2]/60 focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
                 <button type="button" id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
@@ -533,7 +479,7 @@
 
         <!-- Welcome Bubble (anchored above toggle button) -->
         <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
-            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? &#x1F44B;</p>
         </div>
 
         <!-- Toggle Button (always stays in bottom-right corner) -->
@@ -545,4 +491,3 @@
     <script src="/assets/js/lazy-loader.min.js" defer></script>
 </body>
 </html>
-

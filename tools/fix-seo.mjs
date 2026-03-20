@@ -123,11 +123,12 @@ function generateRedirects() {
         { from: '/projects/documentation', to: '/projects/endpoint-linkedin-campaign' },
         { from: '/projects/multilingual', to: '/projects/endpoint-elosity-video' },
         { from: '/projects/competitive-strategy', to: '/projects/endpoint-competitive-playbook' },
-        { from: '/projects/conflict', to: '/projects/endpoint-competitive-playbook' },
+        { from: '/projects/conflict', to: '/projects/isa-grimes-interview' },
+        { from: '/projects/grimes-interview', to: '/projects/isa-grimes-interview' },
 
         // Historical legacy single-page routes
         { from: '/project-logistics.html', to: '/projects/loreal-maps-campaign' },
-        { from: '/project-conflict.html', to: '/projects/endpoint-competitive-playbook' },
+        { from: '/project-conflict.html', to: '/projects/isa-grimes-interview' },
     ];
 
     const legacyRedirectMap = new Map(legacyRedirects.map(({ from, to }) => [from, to]));

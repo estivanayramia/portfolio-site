@@ -27,9 +27,9 @@
     <!-- Preload Critical LCP (Largest Contentful Paint) Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=41bc6d9">
-    <link rel="preload" href="/assets/css/style.css?v=41bc6d9" as="style">
-    <script src="/assets/js/site.min.js?v=41bc6d9" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=ae6016e">
+    <link rel="preload" href="/assets/css/style.css?v=ae6016e" as="style">
+    <script src="/assets/js/site.min.js?v=ae6016e" defer></script>
     
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
@@ -91,21 +91,33 @@
         .lightbox-next { right: 1rem; }
 
         /* Keep your existing Whispers carousel + card CSS below this line (copy from your file) */
-        .gallery-carousel {
+                .gallery-carousel {
             position: relative;
             overflow: hidden;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
-        .carousel-track {
+                .carousel-track {
             display: flex;
+            width: 100%;
+            align-items: stretch;
             transition: transform 0.5s ease-out;
             gap: 1rem;
+            touch-action: pan-y pinch-zoom;
+            will-change: transform;
         }
-        .carousel-slide {
+                .carousel-slide {
             flex: 0 0 calc(50% - 0.5rem);
+            min-width: 0;
             aspect-ratio: 1;
         }
         @media (min-width: 768px) {
-            .carousel-slide { flex: 0 0 calc(33.333% - 0.667rem); }
+                    .carousel-slide {
+            flex: 0 0 calc(50% - 0.5rem);
+            min-width: 0;
+            aspect-ratio: 1;
+        }
         }
         .carousel-btn {
             position: absolute;
@@ -226,7 +238,7 @@
                 <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors">Contact</a></li>
             </ul>
 <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span aria-hidden="true">🔆</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span aria-hidden="true">&#x2600;&#xFE0F;</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -315,27 +327,26 @@
                 <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                     <h2 class="text-2xl font-bold text-indigodeep mb-4">Why I Do This</h2>
                     <div class="prose prose-lg text-chocolate leading-relaxed space-y-4 max-w-3xl">
-                        <p>College is hard. Everyone is stressed, rushing somewhere, thinking about exams or deadlines or relationships. I wanted to create small moments of pause. A reminder that someone out there is thinking about people they've never met, hoping they have a good day.</p>
-                        <p>The anonymity is the point. I don't sign them. I don't wait around to see reactions. It's not about me getting credit. It's about the note standing on its own, a small gift with no strings attached.</p>
-                        <p>Sometimes I wonder who finds them. A freshman having a rough week. A senior stressed about the future. A professor dealing with something I'll never know about. The notes don't discriminate. They're for whoever needs them in that moment.</p>
+                        <p>Every day, I write a handwritten note and hand it directly to a stranger on the SDSU campus. I never speak a single word. People try to talk to me, but I do not respond. I want the written message to hold all the importance. I hand a note to a different person every day. I have no idea if my notes change anything for anyone. That uncertainty is part of the fun. I just hope I make a positive difference in their life.</p>
+                        <p>College is hard. Everyone is stressed, rushing somewhere, and thinking about exams or relationships. I wanted to create small moments of pause. It is a reminder that someone out there hopes they have a good day. The anonymity is the point. I do not sign the notes. I hand the paper directly to a student and walk away. It is not about getting credit. The note stands entirely on its own as a small gift.</p>
+                        <p>I constantly wonder what the student is going through. A freshman might be having a rough week, or a senior might be stressed about the future. I hand them out hoping the person needs those exact words in that moment.</p>
                     </div>
                 </div>
                 
                 <!-- What I Write -->
-                <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                <div>
                     <h2 class="text-2xl font-bold text-indigodeep mb-4">What I Write</h2>
                     <div class="prose prose-lg text-chocolate leading-relaxed space-y-4 max-w-3xl">
-                        <p>Simple things. Not cheesy motivational quotes. Just honest reminders. "You're doing better than you think." "Take a breath. You'll figure it out." "Someone is proud of you." Things I would want to hear on a hard day.</p>
-                        <p>I try to make them feel personal even though they're universal. The handwriting matters. It's not typed or printed. Someone sat down and wrote this. That effort shows.</p>
+                        <p>I write what comes to mind, something I truly resonate with. Every message comes naturally from my own thoughts or daily experiences. I never look anything up online. This keeps the project highly personal. It may be hard to read, I tried my best, but give it a look, maybe something will resonate with you!</p>
                     </div>
                 </div>
                 
                 <!-- Note Gallery - Carousel -->
-                <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                <div>
                     <h2 class="text-2xl font-bold text-indigodeep mb-6">The Notes</h2>
                     <p class="text-chocolate mb-6">Swipe or use arrows to browse. Click any note to view it larger.</p>
                     
-                    <div class="gallery-carousel" id="notesCarousel">
+                    <div class="gallery-carousel whispers-carousel" id="notesCarousel" data-mini-carousel="true">
                         <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous notes">&#x2190;</button>
                         <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next notes">&#x2192;</button>
                         
@@ -451,59 +462,33 @@
                             <figure class="carousel-slide note-card rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
                                 <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 37.jpg" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
                             </figure>
+                                                        <!-- Generated by scripts/sync-whispers-late-notes.mjs -->
                             <figure class="carousel-slide note-card rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
-                                <picture>
-                                    <source srcset="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 38.webp" type="image/webp">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 38.HEIC" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
-                                </picture>
+                                <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 38.webp" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
                             </figure>
                             <figure class="carousel-slide note-card rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
-                                <picture>
-                                    <source srcset="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 39.webp" type="image/webp">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 39.HEIC" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
-                                </picture>
+                                <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 39.webp" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
                             </figure>
                             <figure class="carousel-slide note-card rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
-                                <picture>
-                                    <source srcset="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 40.webp" type="image/webp">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 40.HEIC" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
-                                </picture>
+                                <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 40.webp" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
                             </figure>
                             <figure class="carousel-slide note-card rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
-                                <picture>
-                                    <source srcset="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 41.webp" type="image/webp">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 41.HEIC" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
-                                </picture>
+                                <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 41.webp" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
                             </figure>
                             <figure class="carousel-slide note-card rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
-                                <picture>
-                                    <source srcset="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 42.webp" type="image/webp">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 42.HEIC" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
-                                </picture>
+                                <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 42.webp" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
                             </figure>
                             <figure class="carousel-slide note-card rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
-                                <picture>
-                                    <source srcset="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 43.webp" type="image/webp">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 43.HEIC" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
-                                </picture>
+                                <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 43.webp" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
                             </figure>
                             <figure class="carousel-slide note-card rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
-                                <picture>
-                                    <source srcset="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 44.webp" type="image/webp">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 44.HEIC" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
-                                </picture>
+                                <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 44.webp" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
                             </figure>
                             <figure class="carousel-slide note-card rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
-                                <picture>
-                                    <source srcset="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 45.webp" type="image/webp">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 45.HEIC" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
-                                </picture>
+                                <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 45.webp" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
                             </figure>
                             <figure class="carousel-slide note-card rounded-xl overflow-hidden bg-yellow-100/50 shadow-sm">
-                                <picture>
-                                    <source srcset="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 46.webp" type="image/webp">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 46.HEIC" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
-                                </picture>
+                                <img src="/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 46.webp" alt="Handwritten sticky note with words of encouragement" class="w-full h-full object-cover" loading="lazy" decoding="async" width="600" height="600">
                             </figure>
                         </div>
                         
@@ -533,7 +518,7 @@
                         <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
-                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. SDSU General Business graduate. I care about people, process, and doing the work right.</p>
                 </div>
                 
                 <!-- Column 2: Quick Links -->
@@ -618,4 +603,3 @@
     <script src="/assets/js/lazy-loader.min.js" defer></script>
 </body>
 </html>
-

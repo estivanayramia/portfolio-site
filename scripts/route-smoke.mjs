@@ -10,6 +10,9 @@ const TESTS = [
   { path: '/contact', status: 200, marker: '<title>' },
   { path: '/projects', status: 301, location: '/projects/' },
   { path: '/projects/', status: 200, marker: '<title>' },
+  { path: '/projects/isa-grimes-interview', status: 200, marker: '<title>' },
+  { path: '/projects/grimes-interview', status: 301, location: '/projects/isa-grimes-interview' },
+  { path: '/projects/conflict', status: 301, location: '/projects/isa-grimes-interview' },
   { path: '/hobbies', status: 301, location: '/hobbies/' },
   { path: '/hobbies/', status: 200, marker: '<title>' },
 ];

@@ -3,59 +3,67 @@
   "baseUrl": "https://www.estivanayramia.com",
   "projects": [
     {
-      "id": "taking-down-endpoint-almac-group-4g-clinical",
-      "title": "Taking Down Endpoint (Almac Group + 4G Clinical)",
-      "summary": "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.",
+      "id": "taking-down-endpoint",
+      "title": "Taking Down Endpoint",
+      "summary": "Almac + 4G Clinical positioning strategy against Endpoint.",
       "url": "/projects/endpoint-competitive-playbook",
       "fullUrl": "https://www.estivanayramia.com/projects/endpoint-competitive-playbook",
       "filePath": "/projects/endpoint-competitive-playbook.html",
-      "tags": [
-        "Strategy"
-      ]
+      "tags": []
     },
     {
-      "id": "endpoint-elosity-launch-video",
-      "title": "Endpoint Elosity Launch Video",
-      "summary": "Motion storyboard and full voiceover script showing bottlenecks shattering into a clean trial timeline. Built for silent autoplay with bold typography.",
+      "id": "endpoint-elosity-launch",
+      "title": "Endpoint Elosity Launch",
+      "summary": "Motion storyboard and voiceover script for LinkedIn autoplay.",
       "url": "/projects/endpoint-elosity-video",
       "fullUrl": "https://www.estivanayramia.com/projects/endpoint-elosity-video",
       "filePath": "/projects/endpoint-elosity-video.html",
-      "tags": [
-        "Video Concept"
-      ]
+      "tags": []
     },
     {
       "id": "endpoint-linkedin-campaign",
       "title": "EndPoint LinkedIn Campaign",
-      "summary": "15-page deck outlining Phase 2A and Phase 2B of an EndPoint LinkedIn retargeting campaign.",
+      "summary": "15-page deck outlining Phase 2A and 2B retargeting strategy.",
       "url": "/projects/endpoint-linkedin-campaign",
       "fullUrl": "https://www.estivanayramia.com/projects/endpoint-linkedin-campaign",
       "filePath": "/projects/endpoint-linkedin-campaign.html",
-      "tags": [
-        "Retargeting"
-      ]
+      "tags": []
     },
     {
-      "id": "franklin-templeton-class-concept",
-      "title": "Franklin Templeton Class Concept",
-      "summary": "17-page class concept deck for a Franklin Templeton 'Voice of Progress' campaign.",
+      "id": "franklin-templeton",
+      "title": "Franklin Templeton",
+      "summary": "Dual-language investment content strategy for English and Arabic audiences.",
       "url": "/projects/franklin-templeton-concept",
       "fullUrl": "https://www.estivanayramia.com/projects/franklin-templeton-concept",
       "filePath": "/projects/franklin-templeton-concept.html",
-      "tags": [
-        "Content Strategy"
-      ]
+      "tags": []
     },
     {
-      "id": "loral-cell-bioprint-maps-campaign",
-      "title": "L'Oréal Cell BioPrint MAPS Campaign",
-      "summary": "Class concept campaign deck for L'Oréal Cell BioPrint that maps three personas and their touchpoints across the funnel.",
+      "id": "isa-grimes-interview",
+      "title": "Isa Grimes Interview",
+      "summary": "A real conversation about your 20s, people skills, leadership, favoritism, support systems, and why the fastest route is not always the right one.",
+      "url": "/projects/isa-grimes-interview",
+      "fullUrl": "https://www.estivanayramia.com/projects/isa-grimes-interview",
+      "filePath": "/projects/isa-grimes-interview.html",
+      "tags": []
+    },
+    {
+      "id": "loral-cell-bioprint",
+      "title": "L'Oréal Cell BioPrint",
+      "summary": "MAPS campaign deck mapping personas across the funnel.",
       "url": "/projects/loreal-maps-campaign",
       "fullUrl": "https://www.estivanayramia.com/projects/loreal-maps-campaign",
       "filePath": "/projects/loreal-maps-campaign.html",
-      "tags": [
-        "Campaign Strategy"
-      ]
+      "tags": []
+    },
+    {
+      "id": "this-website",
+      "title": "This Website",
+      "summary": "Hand-coded with PWA support, service workers, Lighthouse 90+ scores.",
+      "url": "/projects/portfolio",
+      "fullUrl": "https://www.estivanayramia.com/projects/portfolio",
+      "filePath": "/projects/portfolio.html",
+      "tags": []
     }
   ],
   "hobbies": [
@@ -117,7 +125,7 @@
     }
   ],
   "meta": {
-    "projectCount": 5,
+    "projectCount": 7,
     "hobbyCount": 7,
     "source": "Generated from HTML content by scripts/generate-site-facts.js"
   }

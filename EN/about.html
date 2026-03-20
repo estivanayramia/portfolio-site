@@ -34,9 +34,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp" fetchpriority="high">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=41bc6d9">
+    <link rel="stylesheet" href="/assets/css/style.css?v=ae6016e">
     
-    <script src="/assets/js/site.min.js?v=41bc6d9" defer></script>
+    <script src="/assets/js/site.min.js?v=ae6016e" defer></script>
     <!-- Theme CSS -->
     <noscript></noscript>
 
@@ -56,7 +56,7 @@
     
     <!-- Schema.org Person Markup -->
 <!-- Luxury Coverflow Carousel V4 -->
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=41bc6d9-v4">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=ae6016e-v4">
                 <meta property="og:image" content="https://www.estivanayramia.com/assets/img/headshot.webp">
                 <meta name="twitter:image" content="https://www.estivanayramia.com/assets/img/headshot.webp">
 
@@ -149,7 +149,7 @@
                 <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
 <!-- Dark Mode Toggle -->
-            <button id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">🔆</span></button>
+            <button id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">&#x2600;&#xFE0F;</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -283,10 +283,8 @@
                         <article class="coverflow-card" role="listitem" data-index="1" data-title="Background">
                             <div class="card-inner">
                                 <div class="card-image-container">
-                                    <div class="card-bg" style="background: linear-gradient(135deg, #312e81, #6366f1);">
-                                        <svg width="80" height="80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                                        </svg>
+                                    <div class="card-bg" style="background: linear-gradient(135deg, #312e81, #6366f1); position: relative; overflow: hidden;">
+                                        <img src="/assets/img/Portolio-Media/Portfolio-Media/Estivan_and_Alen_in_Iraq.jpg" alt="Estivan with his brother" width="1290" height="952" loading="lazy" decoding="async" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; opacity: 0.65;" />
                                     </div>
                                     <div class="card-image-overlay"></div>
                                 </div>
@@ -520,7 +518,7 @@
                                     <h3 class="card-title">Games</h3>
                                     <p class="card-description">Chess, strategy games, competitive thinking. Because even hobbies teach systems.</p>
                                     <div class="card-actions">
-                                        <a href="/hobbies-games" class="card-link">
+                                        <a href="/EN/hobbies-games.html" class="card-link">
                                             <span>View Details</span>
                                             <svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
                                         </a>
@@ -569,7 +567,7 @@
                         <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
-                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. SDSU General Business graduate. I care about people, process, and doing the work right.</p>
                 </div>
                 
                 <!-- Column 2: Quick Links -->
@@ -667,12 +665,13 @@
                     infiniteLoop: true,
                     enableScroll: true,
                     autoplay: false,
-                    animationDuration: 0.55
+                    animationDuration: 0.55,
+                    rouletteAutoNavigateDelay: 1300
                 });
+
                 console.log('✨ About Carousel loaded successfully! 🎠');
             }
         });
     </script>
 </body>
 </html>
-

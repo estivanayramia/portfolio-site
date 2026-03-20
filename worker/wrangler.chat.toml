@@ -17,12 +17,15 @@ routes = [
 [vars]
 # Used for diagnostics/identification when debugging.
 SERVICE_NAME = "portfolio-chat"
+SITE_BASE_URL = "https://www.estivanayramia.com"
 
 # Secrets (set via Cloudflare dashboard or `wrangler secret put ... --config ...`):
 # - GEMINI_API_KEY
 
-# KV is used to store site-facts (site-facts:v1). If you decide you don't want
-# KV-backed facts, you can remove this binding and the worker will fall back.
+# KV stores the approved public profile, site facts, and page-grounding manifest:
+# - site-facts:v1
+# - profile:public:v1
+# - page-grounding:v1
 [[kv_namespaces]]
 binding = "SAVONIE_KV"
 id = "e723b1dbdc9a40a6b6ccd04764108d6c"

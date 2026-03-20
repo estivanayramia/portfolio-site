@@ -32,13 +32,16 @@ https://estivanayramia.com/*    https://www.estivanayramia.com/:splat    301
 /projects/competitive-strategy    /projects/endpoint-competitive-playbook    301
 /projects/competitive-strategy/    /projects/endpoint-competitive-playbook    301
 /projects/competitive-strategy.html    /projects/endpoint-competitive-playbook    301
-/projects/conflict    /projects/endpoint-competitive-playbook    301
-/projects/conflict/    /projects/endpoint-competitive-playbook    301
-/projects/conflict.html    /projects/endpoint-competitive-playbook    301
+/projects/conflict    /projects/isa-grimes-interview    301
+/projects/conflict/    /projects/isa-grimes-interview    301
+/projects/conflict.html    /projects/isa-grimes-interview    301
+/projects/grimes-interview    /projects/isa-grimes-interview    301
+/projects/grimes-interview/    /projects/isa-grimes-interview    301
+/projects/grimes-interview.html    /projects/isa-grimes-interview    301
 /project-logistics.html    /projects/loreal-maps-campaign    301
 /project-logistics.html/    /projects/loreal-maps-campaign    301
-/project-conflict.html    /projects/endpoint-competitive-playbook    301
-/project-conflict.html/    /projects/endpoint-competitive-playbook    301
+/project-conflict.html    /projects/isa-grimes-interview    301
+/project-conflict.html/    /projects/isa-grimes-interview    301
 
 # URL normalization (301)
 /about/    /about    301
@@ -78,6 +81,7 @@ https://estivanayramia.com/*    https://www.estivanayramia.com/:splat    301
 /projects/endpoint-elosity-video/    /projects/endpoint-elosity-video    301
 /projects/endpoint-linkedin-campaign/    /projects/endpoint-linkedin-campaign    301
 /projects/franklin-templeton-concept/    /projects/franklin-templeton-concept    301
+/projects/isa-grimes-interview/    /projects/isa-grimes-interview    301
 /projects/loreal-maps-campaign/    /projects/loreal-maps-campaign    301
 /projects/portfolio/    /projects/portfolio    301
 
@@ -119,6 +123,7 @@ https://estivanayramia.com/*    https://www.estivanayramia.com/:splat    301
 /projects/endpoint-elosity-video    /EN/projects/endpoint-elosity-video    200
 /projects/endpoint-linkedin-campaign    /EN/projects/endpoint-linkedin-campaign    200
 /projects/franklin-templeton-concept    /EN/projects/franklin-templeton-concept    200
+/projects/isa-grimes-interview    /EN/projects/isa-grimes-interview    200
 /projects/loreal-maps-campaign    /EN/projects/loreal-maps-campaign    200
 /projects/portfolio    /EN/projects/portfolio    200
 
@@ -186,8 +191,6 @@ https://estivanayramia.com/*    https://www.estivanayramia.com/:splat    301
 /EN/overview    /overview    301
 /EN/privacy.html    /privacy    301
 /EN/privacy    /privacy    301
-/EN/projects/conflict.html    /projects/endpoint-competitive-playbook    301
-/EN/projects/conflict    /projects/endpoint-competitive-playbook    301
 /EN/projects/endpoint-competitive-playbook.html    /projects/endpoint-competitive-playbook    301
 /EN/projects/endpoint-competitive-playbook    /projects/endpoint-competitive-playbook    301
 /EN/projects/endpoint-elosity-video.html    /projects/endpoint-elosity-video    301
@@ -197,6 +200,8 @@ https://estivanayramia.com/*    https://www.estivanayramia.com/:splat    301
 /EN/projects/franklin-templeton-concept.html    /projects/franklin-templeton-concept    301
 /EN/projects/franklin-templeton-concept    /projects/franklin-templeton-concept    301
 /EN/projects/index.html    /projects/    301
+/EN/projects/isa-grimes-interview.html    /projects/isa-grimes-interview    301
+/EN/projects/isa-grimes-interview    /projects/isa-grimes-interview    301
 /EN/projects/loreal-maps-campaign.html    /projects/loreal-maps-campaign    301
 /EN/projects/loreal-maps-campaign    /projects/loreal-maps-campaign    301
 /EN/projects/portfolio.html    /projects/portfolio    301

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import { execSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 
 function run(command) {
   return execSync(command, { stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8' }).trim();
@@ -27,8 +28,39 @@ function getAcceptableShas() {
 }
 
 function getTrackedHtmlFiles() {
-  const out = run('git ls-files "*.html"');
-  return out ? out.split(/\r?\n/).filter(Boolean) : [];
+  const rootDir = process.cwd();
+  const files = [];
+
+  for (const entry of readdirSync(rootDir, { withFileTypes: true })) {
+    if (entry.isFile() && entry.name.endsWith('.html')) {
+      files.push(entry.name);
+    }
+  }
+
+  const walk = (dirPath, prefix) => {
+    for (const entry of readdirSync(dirPath, { withFileTypes: true })) {
+      const absolutePath = path.join(dirPath, entry.name);
+      const relativePath = `${prefix}/${entry.name}`;
+
+      if (entry.isDirectory()) {
+        walk(absolutePath, relativePath);
+        continue;
+      }
+
+      if (entry.isFile() && entry.name.endsWith('.html')) {
+        files.push(relativePath);
+      }
+    }
+  };
+
+  for (const folder of ['EN', 'ar', 'es']) {
+    const absoluteDir = path.join(rootDir, folder);
+    if (existsSync(absoluteDir)) {
+      walk(absoluteDir, folder);
+    }
+  }
+
+  return files.sort((left, right) => left.localeCompare(right));
 }
 
 function getLineNumber(content, index) {

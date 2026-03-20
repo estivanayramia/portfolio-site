@@ -1,4 +1,4 @@
-import CombinedWorker from "./worker.js";
+import CombinedWorker from "./worker.mjs";
 
 function isChatPath(pathname) {
   return pathname === "/api/chat" || pathname === "/chat";

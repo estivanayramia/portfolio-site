@@ -12,7 +12,7 @@
  */
 
 import { execSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 function run(cmd) {
   return execSync(cmd, { stdio: ['ignore', 'pipe', 'pipe'], encoding: 'utf8' }).trim();
@@ -53,6 +53,7 @@ const allFiles = [...htmlFiles, ...jsFiles];
 let violations = 0;
 
 for (const file of allFiles) {
+  if (!existsSync(file)) continue;
   const content = readFileSync(file, 'utf8');
   const lines = content.split('\n');
 

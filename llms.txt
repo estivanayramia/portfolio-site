@@ -9,11 +9,11 @@ This is the personal portfolio website of Estivan Ayramia.
 ## Owner Information
 
 - Name: Estivan Ayramia
-- Role: General Business Student at San Diego State University (SDSU)
+- Role: SDSU General Business graduate
 - Location: El Cajon, CA (San Diego area)
 - Email: hello@estivanayramia.com
 - LinkedIn: https://www.linkedin.com/in/estivanayramia/
-- Expected Graduation: December 18, 2025
+- Graduated: December 2025
 - GPA: 3.8
 
 ## Site Purpose
@@ -21,29 +21,39 @@ This is the personal portfolio website of Estivan Ayramia.
 This portfolio showcases Estivan's projects, skills, and professional background.
 It is designed to help recruiters, hiring managers, and collaborators learn about his work.
 
-## Projects (5 total)
+## Projects (7 total)
 
-1. L'Oréal Cell BioPrint MAPS Campaign
+1. This Website
+   - URL: https://www.estivanayramia.com/projects/portfolio
+   - Type: Web Development
+   - Description: Hand-coded portfolio build with performance work, PWA support, and a clear content system.
+
+2. Isa Grimes Interview
+   - URL: https://www.estivanayramia.com/projects/isa-grimes-interview
+   - Type: Interview Project
+   - Description: Conversation about perspective, support systems, leadership, and how to think about your 20s without forcing the fastest path.
+
+3. L'Oréal Cell BioPrint MAPS Campaign
    - URL: https://www.estivanayramia.com/projects/loreal-maps-campaign
    - Type: Campaign Strategy
    - Description: Class concept campaign deck mapping three personas and their touchpoints across the funnel.
 
-2. Franklin Templeton Class Concept
+4. Franklin Templeton Class Concept
    - URL: https://www.estivanayramia.com/projects/franklin-templeton-concept
    - Type: Content Strategy
    - Description: 17-page class concept deck for a 'Voice of Progress' campaign.
 
-3. EndPoint LinkedIn Campaign
+5. EndPoint LinkedIn Campaign
    - URL: https://www.estivanayramia.com/projects/endpoint-linkedin-campaign
    - Type: Retargeting Strategy
    - Description: 15-page deck outlining Phase 2A and Phase 2B of a LinkedIn retargeting campaign.
 
-4. Endpoint Elosity Launch Video
+6. Endpoint Elosity Launch Video
    - URL: https://www.estivanayramia.com/projects/endpoint-elosity-video
    - Type: Video Concept
    - Description: Motion storyboard and voiceover script for product launch.
 
-5. Taking Down Endpoint (Almac Group + 4G Clinical)
+7. Taking Down Endpoint (Almac Group + 4G Clinical)
    - URL: https://www.estivanayramia.com/projects/endpoint-competitive-playbook
    - Type: Competitive Strategy
    - Description: Marketing strategy deck for competitive positioning.

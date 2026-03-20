@@ -27,9 +27,9 @@
     <!-- Preload Critical LCP (Largest Contentful Paint) Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=41bc6d9">
-    <link rel="preload" href="/assets/css/style.css?v=41bc6d9" as="style">
-    <script src="/assets/js/site.min.js?v=41bc6d9" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=ae6016e">
+    <link rel="preload" href="/assets/css/style.css?v=ae6016e" as="style">
+    <script src="/assets/js/site.min.js?v=ae6016e" defer></script>
     
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
@@ -93,21 +93,33 @@
 
         /* Your existing carousel CSS continues below */
         .lightbox-next { right: 1rem; }
-        .gallery-carousel {
+                .gallery-carousel {
             position: relative;
             overflow: hidden;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
         }
-        .carousel-track {
+                .carousel-track {
             display: flex;
+            width: 100%;
+            align-items: stretch;
             transition: transform 0.5s ease-out;
             gap: 1rem;
+            touch-action: pan-y pinch-zoom;
+            will-change: transform;
         }
-        .carousel-slide {
+                .carousel-slide {
             flex: 0 0 calc(50% - 0.5rem);
-            aspect-ratio: 16/9;
+            min-width: 0;
+            aspect-ratio: 1;
         }
         @media (min-width: 768px) {
-            .carousel-slide { flex: 0 0 calc(33.333% - 0.667rem); }
+                    .carousel-slide {
+            flex: 0 0 calc(50% - 0.5rem);
+            min-width: 0;
+            aspect-ratio: 1;
+        }
         }
         .carousel-btn {
             position: absolute;
@@ -236,7 +248,7 @@
                 <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors">Contact</a></li>
             </ul>
 <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span aria-hidden="true">🔆</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors" aria-label="Switch to light mode"><span aria-hidden="true">&#x2600;&#xFE0F;</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button id="mobile-menu-toggle" class="md:hidden text-chocolate p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -318,26 +330,24 @@
             <div class="grid lg:grid-cols-3 gap-12">
                 
                 <!-- Main Content -->
-                <div class="lg:col-span-2 space-y-12">
+                <div class="lg:col-span-2 min-w-0 space-y-12">
                     
                     <!-- Current Setup -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">Current Setup</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>The 540i runs the B58 engine, which is BMW's turbocharged inline-six. It's a solid platform with a lot of tuning potential. I'm running an MHD Stage 2 tune, which adjusts boost pressure, fueling, and timing for more aggressive power delivery.</p>
-                            <p>Hardware side: catless downpipe and a muffler delete. The downpipe removes the catalytic converter, reducing backpressure and letting the turbo spool faster. The muffler delete opens up the exhaust note. It's louder, but not obnoxious. You can actually hear the engine breathe.</p>
-                            <p>The result is sharper throttle response, more immediate turbo spool, and a sound that matches the performance. The car feels more alive, more connected to my inputs.</p>
+                            <p>I do not just want to drive fast. I love making this car fit my exact personality, and it thrills me to tweak the software and bolt on new parts. I just want to see what happens when I push the limits.</p>
+                            <p>The B58 engine offers a massive playground, so I flashed an MHD Stage 2 tune to wake it up. The tune alters the boost and timing, and the car pulls much harder now. Under the hood, I installed a cold air intake, a new turbo inlet, an upgraded charge pipe, and a catless downpipe. I chopped off the muffler to let the engine scream. I wrapped the glass in 5% tint all around and 20% on the windshield. The body sits wide with a front lip, side skirts, and a rear diffuser. Wheel spacers push the stance out flush, and a recent paint correction makes the whole thing shine.</p>
+                            <p>I want this raw experience in my 20s. My main goal is to have absolute fun, experiment, and do stupid things today. I can still get away with it right now. This car represents my first real taste of adult freedom. It showcases my deep passion for learning and tearing things apart.</p>
                         </div>
                     </div>
                     
                     <!-- What I Learned -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                    <div>
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">What I Learned from Modifying This Car</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>Cars are systems. Every component affects something else. Change the exhaust flow, and you change how the turbo behaves. Change the tune, and you change how the engine responds to every input. Understanding those relationships teaches you to think about consequences and trade-offs.</p>
-                            <p>I learned to research before spending money. Forums, dyno charts, real-world reviews from people who actually drive these cars. Not just marketing. Not just YouTube hype. Actual data from people who track their results.</p>
-                            <p>I also learned patience. You don't bolt on everything at once. You make one change, live with it, understand what it did. Then decide if the next change is worth it. Incremental improvement, just like everything else worth doing.</p>
-                            <p>The car also taught me about ownership. Taking care of something, maintaining it properly, keeping it clean. It's a daily reminder that the things you own require attention and respect.</p>
+                            <p>Building this car taught me a hard lesson about money. You must read real stories before buying expensive car parts. Real driver experiences matter far more than flashy ads. Forums like Bimmerpost and Reddit saved me from making bad choices. Real people gave me the exact answers I needed.</p>
+                            <p>Owning this car forces me to grow up no matter what. I love this car. It reminds me every day to respect my hard work and care for my things.</p>
                         </div>
                     </div>
                     
@@ -353,11 +363,11 @@
                     </div>
                     
                     <!-- Photo Gallery -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                    <div>
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">Gallery</h2>
                         <p class="text-chocolate mb-6 text-sm">Click any image to view larger. Use arrows or swipe to browse.</p>
                         
-                        <div class="gallery-carousel" id="galleryCarousel">
+                        <div class="gallery-carousel" id="galleryCarousel" data-mini-carousel="true">
                             <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">←</button>
                             <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">→</button>
                             
@@ -369,10 +379,10 @@
                                     <img src="/assets/img/Portolio-Media/Portfolio-Media/car-/car_back.jpg" alt="2017 BMW 540i rear view showing quad exhaust tips after muffler delete" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/car-/car_byOceanONE.jpg" alt="BMW 540i parked by the ocean with waves in the background" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450" style="transform: rotate(-90deg);">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/car-/car_byOceanONE.jpg" alt="BMW 540i parked by the ocean with waves in the background" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/car-/car_by_sunset.jpg" alt="540i silhouette against a California sunset" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450" style="transform: rotate(-90deg);">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/car-/car_by_sunset.jpg" alt="540i silhouette against a California sunset" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
                                     <img src="/assets/img/Portolio-Media/Portfolio-Media/car-/car_by370z.jpg" alt="BMW 540i parked next to a Nissan 370Z - car meet vibes" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450">
@@ -381,7 +391,7 @@
                                     <img src="/assets/img/Portolio-Media/Portfolio-Media/car-/car_mormon_chapel.jpg" alt="540i parked near a chapel - clean lines and architecture" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
-                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/car-/me_and_car.jpg" alt="Estivan with his BMW 540i - the daily driver" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450" style="transform: rotate(-90deg);">
+                                    <img src="/assets/img/Portolio-Media/Portfolio-Media/car-/me_and_car.jpg" alt="Estivan with his BMW 540i - the daily driver" class="w-full h-full object-cover" loading="lazy" decoding="async" width="533" height="800">
                                 </figure>
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
                                     <img src="/assets/img/Portolio-Media/Portfolio-Media/car-/bmws.jpg" alt="BMW lineup - multiple Bimmers in one shot" class="w-full h-full object-cover" loading="lazy" decoding="async" width="800" height="450">
@@ -443,7 +453,7 @@
                         <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
-                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. SDSU General Business graduate. I care about people, process, and doing the work right.</p>
                 </div>
                 
                 <!-- Column 2: Quick Links -->
@@ -528,4 +538,3 @@
     <script src="/assets/js/lazy-loader.min.js" defer></script>
 </body>
 </html>
-

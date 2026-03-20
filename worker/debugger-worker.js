@@ -1,4 +1,4 @@
-import CombinedWorker from "./worker.js";
+import CombinedWorker from "./worker.mjs";
 
 function isDebuggerPath(pathname) {
   if (pathname === "/api/error-report") return true;

@@ -33,29 +33,41 @@ if (!hasToken && !forceUpload) {
 const repoRoot = process.cwd();
 const workerDir = path.join(repoRoot, "worker");
 
-const result = spawnSync(
-  "npx",
-  [
-    "wrangler",
-    "kv",
-    "key",
-    "put",
-    "--remote",
-    "--binding",
-    "SAVONIE_KV",
-    "site-facts:v1",
-    "--path",
-    "../assets/data/site-facts.json",
-  ],
-  {
-    cwd: workerDir,
-    stdio: "inherit",
-    shell: process.platform === "win32",
-  },
-);
+const uploads = [
+  ["site-facts:v1", "../assets/data/site-facts.json"],
+  ["page-grounding:v1", "../assets/data/chat-page-manifest.json"],
+  ["profile:public:v1", "../data/chat/estivan-profile.public.json"],
+];
 
-if (result.error) {
-  fail(`Failed to run wrangler: ${result.error.message}`);
+for (const [key, relativePath] of uploads) {
+  log(`Uploading ${key} from ${relativePath}`);
+  const result = spawnSync(
+    "npx",
+    [
+      "wrangler",
+      "kv",
+      "key",
+      "put",
+      "--remote",
+      "--binding",
+      "SAVONIE_KV",
+      key,
+      "--path",
+      relativePath,
+    ],
+    {
+      cwd: workerDir,
+      stdio: "inherit",
+      shell: process.platform === "win32",
+    },
+  );
+
+  if (result.error) {
+    fail(`Failed to run wrangler for ${key}: ${result.error.message}`);
+  }
+
+  if ((result.status ?? 1) !== 0) {
+    process.exit(result.status ?? 1);
+  }
 }
-
-process.exit(result.status ?? 1);
+process.exit(0);

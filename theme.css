@@ -89,16 +89,6 @@ p, span, a, button, input, textarea, select, label {
    Branding: Selection & Caret
    ========================================================================== */
 
-::selection {
-    background-color: #212842;
-    color: #ffffff;
-}
-
-::-moz-selection {
-    background-color: #212842;
-    color: #ffffff;
-}
-
 input,
 textarea,
 [contenteditable] {
@@ -120,6 +110,10 @@ textarea,
     --color-text: #362017;
     --color-primary: #212842;
     --color-accent: #0a0a0a;
+    --color-selection-bg: #c8d7ff;
+    --color-selection-text: #1c2440;
+    --color-highlight-bg: #f4da88;
+    --color-highlight-text: #2a1c12;
     --color-bg-secondary: rgba(255, 255, 255, 0.5);
     --color-border: rgba(54, 32, 23, 0.1);
     --color-header-bg: rgba(225, 212, 194, 0.95);
@@ -135,6 +129,10 @@ textarea,
     --color-text: #e1d4c2;
     --color-primary: #e1d4c2;
     --color-accent: #e1d4c2;
+    --color-selection-bg: #94a8df;
+    --color-selection-text: #111827;
+    --color-highlight-bg: #f2d06c;
+    --color-highlight-text: #20150c;
     --color-bg-secondary: rgba(33, 40, 66, 0.3);
     --color-border: rgba(225, 212, 194, 0.2);
     --color-header-bg: rgba(10, 10, 10, 0.95);
@@ -143,6 +141,25 @@ textarea,
     /* Game canvas colors for dark theme */
     --game-fg: #ffffff;
     --game-btn-fg: #ffffff;
+}
+
+::selection {
+    background-color: var(--color-selection-bg);
+    color: var(--color-selection-text);
+}
+
+::-moz-selection {
+    background-color: var(--color-selection-bg);
+    color: var(--color-selection-text);
+}
+
+mark {
+    background-color: var(--color-highlight-bg);
+    color: var(--color-highlight-text);
+    padding: 0.05em 0.22em;
+    border-radius: 0.18em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
 }
 
 /* High-contrast fixes: ensure text and links meet contrast on indigodeep backgrounds */
@@ -2838,4 +2855,3 @@ footer {
     user-select: none;
     cursor: pointer;
 }
-

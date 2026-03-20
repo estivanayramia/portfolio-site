@@ -10,7 +10,8 @@
  */
 
 import { execSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
 
 function run(cmd) {
   return execSync(cmd, { stdio: ['ignore', 'pipe', 'pipe'] }).toString('utf8').trim();
@@ -35,11 +36,16 @@ function computeBuildVersion() {
     }
   }
 
-  const d = new Date();
-  const y = String(d.getUTCFullYear());
-  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(d.getUTCDate()).padStart(2, '0');
-  const date = `${y}${m}${day}`;
+  let date = '';
+  try {
+    date = run('git show -s --format=%cd --date=format:%Y%m%d HEAD');
+  } catch {
+    const d = new Date();
+    const y = String(d.getUTCFullYear());
+    const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    date = `${y}${m}${day}`;
+  }
 
   return `${date}-${shortSha}`;
 }
@@ -52,9 +58,39 @@ function updateFile(path, updater) {
 }
 
 function listTrackedHtmlFiles() {
-  // Avoid scanning node_modules; rely on git index.
-  const out = run('git ls-files "*.html"');
-  return out ? out.split(/\r?\n/).filter(Boolean) : [];
+  const rootDir = process.cwd();
+  const files = [];
+
+  for (const entry of readdirSync(rootDir, { withFileTypes: true })) {
+    if (entry.isFile() && entry.name.endsWith('.html')) {
+      files.push(entry.name);
+    }
+  }
+
+  const walk = (dirPath, prefix) => {
+    for (const entry of readdirSync(dirPath, { withFileTypes: true })) {
+      const absolutePath = path.join(dirPath, entry.name);
+      const relativePath = `${prefix}/${entry.name}`;
+
+      if (entry.isDirectory()) {
+        walk(absolutePath, relativePath);
+        continue;
+      }
+
+      if (entry.isFile() && entry.name.endsWith('.html')) {
+        files.push(relativePath);
+      }
+    }
+  };
+
+  for (const folder of ['EN', 'ar', 'es']) {
+    const absoluteDir = path.join(rootDir, folder);
+    if (existsSync(absoluteDir)) {
+      walk(absoluteDir, folder);
+    }
+  }
+
+  return files.sort((left, right) => left.localeCompare(right));
 }
 
 function stampHtmlBuildVersion(files, version) {

@@ -82,7 +82,13 @@ if (missingFiles.length > 0) {
 // Check if built files are up-to-date
 const sourceMtimes = stagedFiles
   .filter(f => f.endsWith('.js') && !f.endsWith('.min.js'))
+  .filter(f => fs.existsSync(f))
   .map(f => fs.statSync(f).mtimeMs);
+
+if (sourceMtimes.length === 0) {
+  console.log('✅ Only deleted or generated JS paths were staged, skipping timestamp check');
+  process.exit(0);
+}
 
 const builtMtimes = BUILT_FILES.map(f => fs.statSync(f).mtimeMs);
 
