@@ -1,20 +1,4 @@
-import "./telemetry-core.js";
-import { initDiagnosticsConsent } from "./diagnostics-consent.js";
-import { LuxuryCoverflow } from "./carousel/luxury-coverflow.js";
-
-// Expose consent init for the boot block
-window.__SavonieInitConsent = initDiagnosticsConsent;
-
-const CHAT_DEBUG = typeof window !== 'undefined'
-  && window.location
-  && window.location.search
-  && window.location.search.includes('chat-debug=1');
-
-const chatLog = (...args) => {
-    if (CHAT_DEBUG) console.log(...args);
-};
-
-chatLog('[Savonie DEBUG] site.js loaded');
+console.log('[Savonie DEBUG] site.js loaded');
 
 /**
  * ============================================================================
@@ -55,21 +39,13 @@ chatLog('[Savonie DEBUG] site.js loaded');
  * 4. All analytics code is defensive (checks typeof before calling)
  * 
  * To verify analytics:
- * - GA4: https://analytics.google.com -> Realtime -> Events
- * - Clarity: https://clarity.microsoft.com -> Dashboard -> Recordings
+ * - GA4: https://analytics.google.com → Realtime → Events
+ * - Clarity: https://clarity.microsoft.com → Dashboard → Recordings
  * 
  * @version 2.1.0
  * @author Estivan Ayramia
  * @license MIT
  */
-
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
-// bridge for any old code that expects globals
-window.gsap = gsap;
-window.ScrollTrigger = ScrollTrigger;
 
 // ============================================================================
 // CORE UTILITIES - User Interaction Tracking
@@ -156,483 +132,719 @@ const __initPreloadStylesheets = () => {
 };
 __initPreloadStylesheets();
 
-const ensureGalleryCoverflowStyles = () => {
+// Carousel + lightbox (CSP-friendly replacement for inline hobby page scripts)
+// Enables the hobby pages to avoid inline <script> blocks.
+const __initCarouselAndLightbox = () => {
     try {
-        if (document.getElementById('luxury-gallery-coverflow-stylesheet')) return;
+        const track = document.getElementById('carouselTrack');
+        if (!track) return;
+        if (track.dataset && track.dataset.carouselInit === '1') return;
 
-        const buildVersion = document
-            .querySelector('meta[name="build-version"]')
-            ?.getAttribute('content');
-        const stylesheet = document.createElement('link');
-        stylesheet.id = 'luxury-gallery-coverflow-stylesheet';
-        stylesheet.rel = 'stylesheet';
-        stylesheet.href = buildVersion
-            ? `/assets/css/components/luxury-coverflow.min.css?v=${encodeURIComponent(buildVersion)}`
-            : '/assets/css/components/luxury-coverflow.min.css';
-        document.head.appendChild(stylesheet);
-    } catch (error) {}
-};
+        const wrapMode = !!(track.dataset && track.dataset.carouselWrap === '1');
 
-const createGalleryLightboxController = () => {
-    const existingController = window.__galleryLightboxController;
-    if (existingController) return existingController;
+        const noteCardImages = Array.from(document.querySelectorAll('.note-card img'));
+        const isWhispersStyle = noteCardImages.length > 0;
 
-    const lightbox = document.getElementById('lightbox') || document.getElementById('carousel-lightbox');
-    const lightboxImg = lightbox && lightbox.querySelector('.lightbox-image, img');
-    const closeBtn = lightbox && lightbox.querySelector('.lightbox-close, [data-lightbox-close]');
-    const prevBtn = lightbox && lightbox.querySelector('.lightbox-prev, [data-lightbox-prev]');
-    const nextBtn = lightbox && lightbox.querySelector('.lightbox-next, [data-lightbox-next]');
+        const slides = Array.from(document.querySelectorAll('.carousel-slide'));
+        if (!slides.length) return;
 
-    if (!lightbox || !lightboxImg || !closeBtn || !prevBtn || !nextBtn) {
-        const noopController = { open() {}, close() {} };
-        window.__galleryLightboxController = noopController;
-        return noopController;
-    }
+        const prevBtn = document.getElementById('carouselPrev');
+        const nextBtn = document.getElementById('carouselNext');
+        const dotsContainer = document.getElementById('carouselDots');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-image');
+        const closeBtn = document.querySelector('.lightbox-close');
+        const prevLightboxBtn = document.querySelector('.lightbox-prev');
+        const nextLightboxBtn = document.querySelector('.lightbox-next');
 
-    let images = [];
-    let currentIndex = 0;
-    let wrapLightbox = true;
-    let lastFocusedElement = null;
+        if (!prevBtn || !nextBtn || !dotsContainer || !lightbox || !lightboxImg || !closeBtn || !prevLightboxBtn || !nextLightboxBtn) return;
 
-    const updateNavigation = () => {
-        const hasMultipleImages = images.length > 1;
-        prevBtn.style.display = hasMultipleImages ? 'block' : 'none';
-        nextBtn.style.display = hasMultipleImages ? 'block' : 'none';
-        prevBtn.disabled = !wrapLightbox && currentIndex === 0;
-        nextBtn.disabled = !wrapLightbox && currentIndex === images.length - 1;
-    };
+        const slideImages = slides.map(s => s.querySelector('img')).filter(Boolean);
+        const lightboxImages = isWhispersStyle ? noteCardImages : slideImages;
+        if (!lightboxImages.length) return;
 
-    const show = (index) => {
-        if (!images.length) return;
+        let currentIndex = 0;
+        let currentLightboxIndex = 0;
 
-        const normalizedIndex = wrapLightbox
-            ? ((index % images.length) + images.length) % images.length
-            : Math.max(0, Math.min(index, images.length - 1));
-        const image = images[normalizedIndex];
-        if (!image) return;
+        const getSlidesPerView = () => {
+            if (!isWhispersStyle) return (window.innerWidth >= 768 ? 3 : 2);
+            if (window.innerWidth >= 1024) return 5;
+            if (window.innerWidth >= 768) return 4;
+            if (window.innerWidth >= 640) return 3;
+            return 2;
+        };
+        let slidesPerView = getSlidesPerView();
 
-        currentIndex = normalizedIndex;
-        lightboxImg.src = image.currentSrc || image.src;
-        lightboxImg.alt = image.alt || '';
-        updateNavigation();
-    };
+        const clearDots = () => {
+            try { dotsContainer.innerHTML = ''; } catch (e) {
+                while (dotsContainer.firstChild) dotsContainer.removeChild(dotsContainer.firstChild);
+            }
+        };
 
-    const close = () => {
-        lightbox.classList.remove('active');
-        lightbox.setAttribute('aria-hidden', 'true');
-        if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
-            lastFocusedElement.focus();
-        }
-    };
+        const closeLightbox = () => {
+            try {
+                lightbox.classList.remove('active');
+                lightbox.setAttribute('aria-hidden', 'true');
+            } catch (e) {}
+        };
 
-    const controller = {
-        open({ imageList = [], startIndex = 0, shouldWrap = true } = {}) {
-            if (!imageList.length) return;
-            images = imageList;
-            wrapLightbox = shouldWrap;
-            lastFocusedElement = document.activeElement;
-            show(startIndex);
+        const getTotalPages = () => Math.ceil(slides.length / slidesPerView);
+
+        const updateCarousel = () => {
+            try {
+                const slideWidth = (slides[0] && slides[0].offsetWidth ? slides[0].offsetWidth : 0) + 16;
+                const totalPages = getTotalPages();
+
+                if (isWhispersStyle) {
+                    const maxStart = Math.max(0, slides.length - slidesPerView);
+                    currentIndex = Math.max(0, Math.min(currentIndex, maxStart));
+                    track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+                } else {
+                    currentIndex = Math.max(0, Math.min(currentIndex, totalPages - 1));
+                    track.style.transform = `translateX(-${currentIndex * slideWidth * slidesPerView}px)`;
+                }
+
+                Array.from(document.querySelectorAll('.carousel-dot')).forEach((d, i) => {
+                    const activeIndex = isWhispersStyle ? Math.floor(currentIndex / slidesPerView) : currentIndex;
+                    d.classList.toggle('active', i === activeIndex);
+                });
+            } catch (e) {}
+        };
+
+        const buildDots = () => {
+            clearDots();
+            const totalPages = getTotalPages();
+            for (let i = 0; i < totalPages; i++) {
+                const dot = document.createElement('button');
+                dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                try { dot.setAttribute('aria-label', `Go to page ${i + 1}`); } catch (e) {}
+                dot.addEventListener('click', () => {
+                    if (isWhispersStyle) {
+                        const maxStart = Math.max(0, slides.length - slidesPerView);
+                        currentIndex = Math.max(0, Math.min(i * slidesPerView, maxStart));
+                    } else {
+                        currentIndex = wrapMode ? ((i + totalPages) % totalPages) : Math.max(0, Math.min(i, totalPages - 1));
+                    }
+                    updateCarousel();
+                });
+                dotsContainer.appendChild(dot);
+            }
+            updateCarousel();
+        };
+
+        prevBtn.addEventListener('click', () => {
+            const totalPages = getTotalPages();
+
+            if (isWhispersStyle) {
+                const maxStart = Math.max(0, slides.length - slidesPerView);
+                if (wrapMode) {
+                    currentIndex = currentIndex - slidesPerView;
+                    if (currentIndex < 0) currentIndex = maxStart;
+                } else {
+                    currentIndex = Math.max(0, currentIndex - slidesPerView);
+                }
+            } else {
+                currentIndex = wrapMode ? ((currentIndex - 1 + totalPages) % totalPages) : Math.max(0, Math.min(currentIndex - 1, totalPages - 1));
+            }
+            updateCarousel();
+        });
+        nextBtn.addEventListener('click', () => {
+            const totalPages = getTotalPages();
+
+            if (isWhispersStyle) {
+                const maxStart = Math.max(0, slides.length - slidesPerView);
+                if (wrapMode) {
+                    currentIndex = currentIndex + slidesPerView;
+                    if (currentIndex > maxStart) currentIndex = 0;
+                } else {
+                    currentIndex = Math.min(maxStart, currentIndex + slidesPerView);
+                }
+            } else {
+                currentIndex = wrapMode ? ((currentIndex + 1) % totalPages) : Math.max(0, Math.min(currentIndex + 1, totalPages - 1));
+            }
+            updateCarousel();
+        });
+
+        const showLightboxImage = (index) => {
+            const img = lightboxImages[index];
+            if (!img) return;
+            currentLightboxIndex = index;
+            lightboxImg.src = img.src;
+            lightboxImg.alt = img.alt || '';
+            try { lightboxImg.style.transform = img.style && img.style.transform ? img.style.transform : ''; } catch (e) {}
+
+            if (isWhispersStyle) {
+                try { prevLightboxBtn.style.display = index > 0 ? 'block' : 'none'; } catch (e) {}
+                try { nextLightboxBtn.style.display = index < lightboxImages.length - 1 ? 'block' : 'none'; } catch (e) {}
+            }
+        };
+
+        const openLightboxAt = (index) => {
+            showLightboxImage(index);
             lightbox.classList.add('active');
             lightbox.setAttribute('aria-hidden', 'false');
-        },
-        close
-    };
+        };
 
-    if (lightbox.dataset.galleryLightboxBound !== 'true') {
-        closeBtn.addEventListener('click', close);
-        lightbox.addEventListener('click', (event) => {
-            if (event.target === lightbox) close();
-        });
-        prevBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            if (!prevBtn.disabled) show(currentIndex - 1);
-        });
-        nextBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            if (!nextBtn.disabled) show(currentIndex + 1);
-        });
-        document.addEventListener('keydown', (event) => {
-            if (!lightbox.classList.contains('active')) return;
-            if (event.key === 'Escape') close();
-            if (event.key === 'ArrowLeft') prevBtn.click();
-            if (event.key === 'ArrowRight') nextBtn.click();
-        });
-        lightbox.dataset.galleryLightboxBound = 'true';
-    }
+        if (isWhispersStyle) {
+            lightboxImages.forEach((img, i) => {
+                img.addEventListener('click', () => openLightboxAt(i));
+            });
+        } else {
+            slides.forEach((slide, i) => {
+                slide.addEventListener('click', () => openLightboxAt(i));
+            });
+        }
 
-    window.__galleryLightboxController = controller;
-    return controller;
-};
+        closeBtn.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
 
-const initGalleryCoverflows = () => {
-    try {
-        ensureGalleryCoverflowStyles();
-
-        const sections = document.querySelectorAll('[data-mini-carousel]');
-        const lightboxController = createGalleryLightboxController();
-
-        sections.forEach((section) => {
-            try {
-                if (!section || section.dataset.galleryCoverflowInit === 'true' || section.closest('[data-luxury-coverflow]')) return;
-
-                const track = section.querySelector('.carousel-track');
-                const slides = Array.from(section.querySelectorAll('.carousel-track .carousel-slide')).filter(Boolean);
-                const images = slides.map((slide) => slide.querySelector('img')).filter(Boolean);
-                if (!track || !slides.length || !images.length) return;
-
-                const isNotes = section.dataset.galleryVariant === 'notes' || section.classList.contains('whispers-carousel') || !!section.querySelector('.note-card');
-                const resolvedVariant = section.dataset.galleryVariant || (isNotes ? 'notes' : 'media');
-                const shouldWrapLightbox = section.dataset.lightboxWrap === 'true' || (!isNotes && section.dataset.lightboxWrap !== 'false');
-
-                section.dataset.galleryVariant = resolvedVariant;
-                section.dataset.miniCarouselMode = isNotes ? 'notes' : 'gallery';
-                section.dataset.gallerySurface = 'luxury-coverflow';
-                section.classList.add('is-luxury-gallery-coverflow');
-
-                if (!section.hasAttribute('role')) section.setAttribute('role', 'region');
-                if (!section.getAttribute('aria-label')) {
-                    section.setAttribute('aria-label', isNotes ? 'Notes gallery' : 'Image gallery');
-                }
-
-                const instance = new LuxuryCoverflow(section, {
-                    surface: 'luxury-coverflow',
-                    itemRoleDescription: isNotes ? 'note' : 'image',
-                    infiniteLoop: section.dataset.wrap !== 'false',
-                    maxVisibleDots: isNotes ? 7 : Math.min(7, slides.length),
-                    selectors: {
-                        track: '.carousel-track',
-                        items: '.carousel-slide',
-                        prevButton: '.carousel-btn-prev',
-                        nextButton: '.carousel-btn-next',
-                        dots: '.carousel-dots',
-                        paginationCurrent: null,
-                        paginationTotal: null
-                    },
-                    callbacks: {
-                        onActiveItemSelect: (_item, activeIndex) => {
-                            lightboxController.open({
-                                imageList: images,
-                                startIndex: activeIndex,
-                                shouldWrap: shouldWrapLightbox
-                            });
-                        },
-                        resolveItemTitle: (item, activeIndex) => item.dataset.title || item.querySelector('img')?.alt?.trim() || `Image ${activeIndex + 1}`
-                    }
-                });
-
-                section.__luxuryGalleryCoverflow = instance;
-                track.dataset.carouselInit = '1';
-                section.dataset.galleryCoverflowInit = 'true';
-            } catch (error) {}
-        });
-    } catch (error) {}
-};
-
-const initPdfPreviews = () => {
-    const pdfDebug = typeof window !== 'undefined'
-        && window.location
-        && window.location.search
-        && window.location.search.includes('pdf-debug=1');
-    const pdfLog = pdfDebug
-        ? (...args) => console.log('[PDF Preview]', ...args)
-        : () => {};
-
-    try {
-        const panels = document.querySelectorAll('.preview-panel');
-        pdfLog('panels found:', panels.length);
-
-        panels.forEach((panel, index) => {
-            try {
-                if (panel.dataset.pdfPreviewBound === 'true') return;
-
-                const iframe = panel.querySelector('.pdf-frame');
-                const loading = panel.querySelector('.pdf-loading');
-                const error = panel.querySelector('.pdf-error');
-                const section = panel.closest('section') || panel.parentElement;
-                const toggleBtn = section ? section.querySelector('.preview-toggle') : null;
-
-                if (!iframe || !loading || !error) {
-                    pdfLog(`panel[${index}] missing preview elements`);
-                    return;
-                }
-
-                panel.dataset.pdfPreviewBound = 'true';
-
-                let loadSettled = false;
-                let loadTimeout = null;
-
-                const showError = (reason) => {
-                    if (loadSettled) return;
-                    loadSettled = true;
-                    if (loadTimeout) {
-                        clearTimeout(loadTimeout);
-                        loadTimeout = null;
-                    }
-
-                    try {
-                        loading.style.display = 'none';
-                        iframe.style.display = 'none';
-                        iframe.style.opacity = '0';
-                        error.classList.remove('hidden');
-                        panel.dataset.pdfLoaded = 'false';
-                        if (typeof __logCollect === 'function') {
-                            __logCollect('pdf.preview.fallback', { reason });
-                        }
-                    } catch (errorState) {}
-                };
-
-                const showSuccess = () => {
-                    if (loadSettled) return;
-                    loadSettled = true;
-                    if (loadTimeout) {
-                        clearTimeout(loadTimeout);
-                        loadTimeout = null;
-                    }
-
-                    try {
-                        loading.style.display = 'none';
-                        iframe.style.display = 'block';
-                        iframe.style.opacity = '1';
-                        iframe.style.transition = 'opacity 0.3s ease';
-                        error.classList.add('hidden');
-                        panel.dataset.pdfLoaded = 'true';
-                        if (typeof __logCollect === 'function') {
-                            __logCollect('pdf.preview.loaded', { src: iframe.getAttribute('src') || '' });
-                        }
-                    } catch (successError) {}
-                };
-
-                if (!iframe.getAttribute('src')) {
-                    const pdfLink = section && (section.querySelector('a[href$=".pdf"]') || section.querySelector('a[href*=".pdf?"]'));
-                    const href = pdfLink ? pdfLink.getAttribute('href') : '';
-                    if (href) {
-                        iframe.setAttribute('src', `${href}#toolbar=1&navpanes=1&scrollbar=1&page=1&view=FitH`);
-                    }
-                }
-
-                if (!iframe.getAttribute('src')) {
-                    showError('missing_src');
-                    return;
-                }
-
-                iframe.addEventListener('load', () => {
-                    setTimeout(showSuccess, 100);
-                }, { once: true });
-
-                iframe.addEventListener('error', () => {
-                    showError('load_error');
-                }, { once: true });
-
-                loadTimeout = setTimeout(() => {
-                    showError('timeout');
-                }, 20000);
-
-                if (typeof __logCollect === 'function') {
-                    __logCollect('pdf.preview.attempt', { src: iframe.getAttribute('src') || '' });
-                }
-
-                if (toggleBtn && !toggleBtn.dataset.pdfToggleBound) {
-                    toggleBtn.dataset.pdfToggleBound = 'true';
-                    toggleBtn.textContent = panel.hidden ? 'Show preview' : 'Hide preview';
-                    toggleBtn.addEventListener('click', () => {
-                        panel.hidden = !panel.hidden;
-                        toggleBtn.textContent = panel.hidden ? 'Show preview' : 'Hide preview';
-                    });
-                }
-            } catch (panelError) {
-                pdfLog(`panel[${index}] init failed`, panelError);
+        prevLightboxBtn.addEventListener('click', (e) => {
+            if (e && e.stopPropagation) e.stopPropagation();
+            if (isWhispersStyle) {
+                if (currentLightboxIndex > 0) showLightboxImage(currentLightboxIndex - 1);
+            } else {
+                showLightboxImage((currentLightboxIndex - 1 + lightboxImages.length) % lightboxImages.length);
             }
         });
-    } catch (error) {}
-};
+        nextLightboxBtn.addEventListener('click', (e) => {
+            if (e && e.stopPropagation) e.stopPropagation();
+            if (isWhispersStyle) {
+                if (currentLightboxIndex < lightboxImages.length - 1) showLightboxImage(currentLightboxIndex + 1);
+            } else {
+                showLightboxImage((currentLightboxIndex + 1) % lightboxImages.length);
+            }
+        });
 
-const bootSiteMediaFeatures = () => {
-    try {
-        initGalleryCoverflows();
-        initPdfPreviews();
-    } catch (error) {}
+        document.addEventListener('keydown', (e) => {
+            if (!lightbox.classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') prevLightboxBtn.click();
+            if (e.key === 'ArrowRight') nextLightboxBtn.click();
+        });
+
+        window.addEventListener('resize', () => {
+            const next = getSlidesPerView();
+            if (next !== slidesPerView) {
+                slidesPerView = next;
+                buildDots();
+            } else {
+                updateCarousel();
+            }
+        });
+
+        try { track.dataset.carouselInit = '1'; } catch (e) {}
+        buildDots();
+    } catch (e) {}
 };
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bootSiteMediaFeatures);
+    document.addEventListener('DOMContentLoaded', __initCarouselAndLightbox);
 } else {
-    bootSiteMediaFeatures();
+    __initCarouselAndLightbox();
 }
 
-// ===== DIAGNOSTICS (Unified) =====
-// Core is always present, but stays idle unless consent is granted.
-// No wrappers, no observers, no timers until enable() is called by consent.
-try {
-  // Telemetry core singleton
-  // eslint-disable-next-line no-unused-expressions
-  window.__SavonieTelemetry || null;
-} catch {}
-
-// Backward compatibility: ?collect-logs maps to session-only diagnostics enable.
-// This does NOT create a second collector.
-(function bootDiagnostics() {
-  try {
-    // 1) Ensure core exists
-    // telemetry-core.js is bundled into site.min.js via esbuild (see package.json changes).
-    const tel = window.__SavonieTelemetry;
-    if (!tel) return;
-
-    // 2) Consent banner + consent-driven enable()
-    // diagnostics-consent.js is also bundled into site.min.js.
-    if (window.__SavonieInitConsent) {
-      window.__SavonieInitConsent();
-    }
-
-        const params = new URLSearchParams(location.search);
-
-        // Backward compatibility: old collector param
-        if (params.has('collect-logs')) {
-      tel.setConsentFlags({ sessionOnly: true });
-      tel.enable({ upload: false, mode: 'dev' });
-      tel.push({ kind: 'consent', level: 'info', msg: 'consent.granted', data: { upload: false, sessionOnly: true, via: 'collect-logs' } });
-    }
-
-    // Lazy HUD loader, off by default
-    const buildVersion = (function () {
-      const meta = document.querySelector('meta[name="build-version"]');
-      const v = meta && meta.getAttribute('content');
-      if (v) return v;
-      try {
-        const ls = localStorage.getItem('siteVersion');
-        if (ls) return ls;
-      } catch {}
-      return 'dev';
-    })();
-
-    let hudLoading = false;
-    function loadHUD() {
-      if (hudLoading) return;
-      hudLoading = true;
-
-      // HUD loads deterministically with a version query param.
-      const s = document.createElement('script');
-      s.src = `/assets/js/debugger-hud.min.js?v=${encodeURIComponent(buildVersion)}`;
-      s.defer = true;
-      s.onload = () => { hudLoading = false; };
-      s.onerror = () => { hudLoading = false; };
-      document.head.appendChild(s);
-    }
-
-        // HUD activation is now dashboard-only (no URL or hotkey triggers here).
-  } catch {}
-})();
-
-/**
- * Guarded Page Reload Utility
- * 
- * Attempts to reload the page only when the user is NOT actively interacting.
- * This prevents the scroll-jump bug on mobile devices (especially iOS Safari)
- * where a reload during scrolling causes the viewport to jump to an unexpected
- * position, often losing the user's place.
- * 
- * Mobile Safari Quirk:
- * ---------------------
- * Mobile Safari (and other mobile browsers) are aggressive about restoring
- * scroll position after reload. However, if a reload happens DURING user
- * interaction (especially scrolling), the browser can't accurately capture
- * the intended scroll position. This leads to a jarring "jump" where the
- * user ends up somewhere they didn't expect.
- * 
- * Solution:
- * ---------
- * We track user interaction state (__userInteracting flag) and only reload
- * when the user is idle. This gives the browser time to properly capture
- * scroll position before reload, resulting in smooth position restoration.
- * 
- * Usage:
- * ------
- * Instead of: location.reload()
- * Use:        guardedReload()
- * 
- * The function will either:
- * 1. Reload immediately if user is idle
- * 2. Wait for user to finish interacting, then reload
- * 3. Give up after 5 seconds and reload anyway (safety timeout)
- * 
- * @param {number} maxWaitMs - Maximum time to wait for user to idle (default: 5000ms)
- */
-const guardedReload = (maxWaitMs = 5000) => {
-  const startTime = Date.now();
-  const attemptReload = () => {
-    if (!__userInteracting) {
-      try { location.reload(); } catch (e) {}
-      return;
-    }
-    if (Date.now() - startTime >= maxWaitMs) {
-      try { location.reload(); } catch (e) {}
-      return;
-    }
-    setTimeout(attemptReload, 250);
-  };
-  attemptReload();
+// Lightweight remote-free log collector: enable with ?collect-logs=1
+const __collectLogsEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).has('collect-logs');
+const __collectedLogs = [];
+const __saveCollected = () => {
+    try { localStorage.setItem('site_collect_logs', JSON.stringify(__collectedLogs.slice(-1000))); } catch (e) {}
 };
-window.guardedReload = guardedReload;
-
-// ============================================================================
-// DEBUGGER HUD LOADER
-// ============================================================================
-
-/**
- * Debugger HUD Dynamic Loader
- * 
- * Loads full debugger UI when enabled via:
- * - ?debug=1 (enables and persists to localStorage)
- * - ?debug=0 (disables and clears localStorage)
- * - localStorage.site_debugger_enabled = "1"
- * 
- * Backwards compatible with ?collect-logs=1 (still works independently)
- * 
- * The debugger UI is loaded separately to keep main bundle small when disabled.
- */
-(function() {
+const __logCollect = (msg, data) => {
+    if (!__collectLogsEnabled) return;
     try {
-        const params = new URLSearchParams(window.location.search);
-        const debugParam = params.get('debug');
-        
-        // Handle ?debug=1 or ?debug=0
-        if (debugParam === '1') {
-            localStorage.setItem('site_debugger_enabled', '1');
-        } else if (debugParam === '0') {
-            localStorage.removeItem('site_debugger_enabled');
+        const entry = { t: Date.now(), msg: String(msg), data: data || null, scrollY: window.scrollY || 0 };
+        __collectedLogs.push(entry);
+        __saveCollected();
+    } catch (e) {}
+};
+
+// Determine if snapshot mode is requested: ?collect-logs=snapshots
+const __collectLogsParam = (typeof window !== 'undefined') ? new URLSearchParams(window.location.search).get('collect-logs') : null;
+const __collectSnapshots = !!(__collectLogsParam && /snapshot/i.test(__collectLogsParam));
+
+// Lightweight, privacy-conscious DOM snapshot helper
+const __maybeTakeSnapshot = (reason, target) => {
+    if (!__collectSnapshots) return;
+    try {
+        const active = document.activeElement;
+        const getElInfo = (el) => {
+            if (!el || !el.getBoundingClientRect) return null;
+            const r = el.getBoundingClientRect();
+            return {
+                tag: el.tagName || null,
+                id: el.id || null,
+                classes: el.className || null,
+                rect: { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height), top: Math.round(r.top), left: Math.round(r.left) },
+                focusable: typeof el.tabIndex === 'number' ? el.tabIndex : null,
+                ariaRole: el.getAttribute && (el.getAttribute('role') || null)
+            };
+        };
+
+        const payload = {
+            reason: reason || null,
+            ts: Date.now(),
+            scrollY: window.scrollY || 0,
+            innerWidth: window.innerWidth || 0,
+            innerHeight: window.innerHeight || 0,
+            docHeight: document.documentElement.scrollHeight || document.body.scrollHeight || 0,
+            target: getElInfo(target || document.activeElement) || null,
+            activeElement: getElInfo(active) || null
+        };
+        __logCollect('snapshot', payload);
+    } catch (e) {}
+};
+
+if (__collectLogsEnabled) {
+    // Throttled scroll logger
+    let __scrollTimer = null;
+    window.addEventListener('scroll', () => {
+        if (__scrollTimer) return;
+        __scrollTimer = setTimeout(() => {
+            __logCollect('scroll', { y: window.scrollY, innerHeight: window.innerHeight, docHeight: document.documentElement.scrollHeight });
+            __scrollTimer = null;
+        }, 200);
+    }, { passive: true });
+
+    // Service worker controller change
+    try {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                __logCollect('controllerchange', { controller: !!navigator.serviceWorker.controller });
+            });
         }
-        
-        // Check if debugger should be enabled
-        const isEnabled = debugParam === '1' || localStorage.getItem('site_debugger_enabled') === '1';
-        
-        if (!isEnabled) return;
-        
-        // Get cache-busting version
-        const getVersion = () => {
-            // 1. Try meta tag
-            const metaTag = document.querySelector('meta[name="build-version"]');
-            if (metaTag && metaTag.content) return metaTag.content;
-            
-            // 2. Try localStorage siteVersion
-            const lsVersion = localStorage.getItem('siteVersion');
-            if (lsVersion) return lsVersion;
-            
-            // 3. Fallback to date-based
-            return 'v' + new Date().toISOString().split('T')[0].replace(/-/g, '');
+    } catch (e) {}
+
+    // Wrap location.reload to log calls
+    try {
+        const __origReload = window.location.reload.bind(window.location);
+        window.location.reload = function() {
+            __logCollect('location.reload called');
+            return __origReload();
         };
-        
-        // Inject debugger script
-        const script = document.createElement('script');
-        script.src = `/assets/js/debugger.min.js?v=${getVersion()}`;
-        script.defer = true;
-        script.onerror = () => {
-            console.warn('[Debugger] Failed to load debugger.min.js');
-        };
-        document.head.appendChild(script);
-        
-    } catch (e) {
-        console.error('[Debugger] Loader error:', e);
-    }
-})();
+    } catch (e) {}
+
+    // Download button (small, non-intrusive)
+    const __createDownloadButton = () => {
+        const btn = document.createElement('button');
+        btn.id = 'collect-logs-btn';
+        btn.textContent = 'Logs';
+        Object.assign(btn.style, { position: 'fixed', left: '8px', bottom: '12px', zIndex: 99999, padding: '6px 8px', fontSize: '12px', background: 'rgba(33,40,66,0.85)', color: '#e1d4c2', border: '1px solid rgba(225,212,194,0.08)', borderRadius: '6px' });
+        btn.addEventListener('click', () => {
+            try {
+                const payload = JSON.stringify(__collectedLogs, null, 2);
+                const blob = new Blob([payload], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `site-logs-${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (e) {
+                // fallback: show in new window
+                const w = window.open();
+                if (w) {
+                    try {
+                        const payload = JSON.stringify(__collectedLogs, null, 2);
+                        const doc = w.document;
+                        doc.title = 'Site logs';
+                        doc.body.style.margin = '0';
+                        const pre = doc.createElement('pre');
+                        pre.style.margin = '0';
+                        pre.style.padding = '12px';
+                        pre.textContent = payload;
+                        doc.body.appendChild(pre);
+                    } catch (_) {}
+                }
+            }
+        });
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.appendChild(btn);
+        });
+    };
+    __createDownloadButton();
+    
+    // Additional non-intrusive diagnostics (only when collect-logs enabled)
+    try {
+        // Log visibility / focus / navigation events
+        document.addEventListener('visibilitychange', () => __logCollect('visibilitychange', { hidden: document.hidden }));
+        window.addEventListener('hashchange', (e) => __logCollect('hashchange', { oldURL: e.oldURL, newURL: e.newURL }));
+        window.addEventListener('popstate', (e) => __logCollect('popstate', { state: e.state }));
+        window.addEventListener('beforeunload', (e) => __logCollect('beforeunload', {}));
+
+        // Focus tracking (focusin bubbles; capture target)
+        window.addEventListener('focusin', (e) => {
+            try { __logCollect('focusin', { tag: e.target && e.target.tagName, id: e.target && e.target.id || null, class: e.target && e.target.className || null }); } catch (err) {}
+        });
+
+        // Wrap .focus to detect fallbacks or calls that might scroll
+        (function(){
+            const origFocus = HTMLElement.prototype.focus;
+            if (!origFocus.__wrappedByCollectLogs) {
+                HTMLElement.prototype.focus = function() {
+                    try { __logCollect('element.focus.called', { tag: this.tagName, id: this.id || null, options: arguments[0] || null }); } catch (e) {}
+                    try { __maybeTakeSnapshot && __maybeTakeSnapshot('focus', this); } catch (e) {}
+                    try { return origFocus.apply(this, arguments); } catch (e) { try { return origFocus.call(this); } catch(_) {} }
+                };
+                HTMLElement.prototype.focus.__wrappedByCollectLogs = true;
+            }
+        })();
+
+        // Wrap scrollIntoView to log calls
+        (function(){
+            const proto = Element.prototype;
+            if (!proto.__scrollIntoViewLogged) {
+                const orig = proto.scrollIntoView;
+                proto.scrollIntoView = function() {
+                    try { __logCollect('element.scrollIntoView', { tag: this.tagName, id: this.id || null, args: Array.from(arguments) }); } catch (e) {}
+                    try { __maybeTakeSnapshot && __maybeTakeSnapshot('scrollIntoView', this); } catch (e) {}
+                    return orig.apply(this, arguments);
+                };
+                proto.__scrollIntoViewLogged = true;
+            }
+        })();
+
+        // Wrap window.scrollTo and scrollBy to log programmatic scrolls
+        try {
+            const origScrollTo = window.scrollTo;
+            window.scrollTo = function() {
+                try { __logCollect('window.scrollTo', { args: Array.from(arguments) }); } catch (e) {}
+                try { __maybeTakeSnapshot && __maybeTakeSnapshot('window.scrollTo', null); } catch (e) {}
+                return origScrollTo.apply(window, arguments);
+            };
+        } catch (e) {}
+        try {
+            const origScrollBy = window.scrollBy;
+            window.scrollBy = function() {
+                try { __logCollect('window.scrollBy', { args: Array.from(arguments) }); } catch (e) {}
+                try { __maybeTakeSnapshot && __maybeTakeSnapshot('window.scrollBy', null); } catch (e) {}
+                return origScrollBy.apply(window, arguments);
+            };
+        } catch (e) {}
+
+        // Wrap fetch to log request/responses (lightweight)
+        try {
+            const origFetch = window.fetch;
+            window.fetch = function(input, init) {
+                try { __logCollect('fetch.start', { url: (input && input.url) || input, method: (init && init.method) || 'GET' }); } catch (e) {}
+                return origFetch.apply(this, arguments).then(res => {
+                    try { __logCollect('fetch.end', { url: (res && res.url) || input, status: res.status }); } catch (e) {}
+                    return res;
+                }).catch(err => { try { __logCollect('fetch.error', { url: input, message: err && err.message }); } catch(_){} throw err; });
+            };
+        } catch (e) {}
+
+        // Wrap XHR to log sends
+        try {
+            const OrigXHR = window.XMLHttpRequest;
+            function WrappedXHR() {
+                const xhr = new OrigXHR();
+                let _url = null;
+                const origOpen = xhr.open;
+                xhr.open = function(method, url) {
+                    _url = url;
+                    try { __logCollect('xhr.open', { method: method, url: url }); } catch (e) {}
+                    return origOpen.apply(xhr, arguments);
+                };
+                const origSend = xhr.send;
+                xhr.send = function() {
+                    try {
+                        __logCollect('xhr.send', { url: _url });
+                    } catch (e) {}
+                    xhr.addEventListener('loadend', function() {
+                        try { __logCollect('xhr.loadend', { url: _url, status: xhr.status }); } catch (e) {}
+                    });
+                    return origSend.apply(xhr, arguments);
+                };
+                return xhr;
+            }
+            WrappedXHR.prototype = OrigXHR.prototype;
+            window.XMLHttpRequest = WrappedXHR;
+        } catch (e) {}
+
+        // Log resize/orientation events
+        window.addEventListener('resize', () => __logCollect('resize', { innerWidth: window.innerWidth, innerHeight: window.innerHeight }));
+        window.addEventListener('orientationchange', () => __logCollect('orientationchange', { orientation: window.orientation }));
+
+        // Wrap serviceWorker.register to observe registration/updatefound if possible
+        try {
+            if (navigator.serviceWorker && navigator.serviceWorker.register) {
+                const origRegister = navigator.serviceWorker.register.bind(navigator.serviceWorker);
+                navigator.serviceWorker.register = function() {
+                    const args = arguments;
+                    try { __logCollect('sw.register.start', { scope: (args && args[1] && args[1].scope) || null, script: args && args[0] }); } catch(e){}
+                    return origRegister.apply(navigator.serviceWorker, arguments).then(reg => {
+                        try { __logCollect('sw.register.done', { scope: reg.scope }); } catch(e){}
+                        try {
+                            reg.addEventListener('updatefound', () => __logCollect('sw.updatefound', {}));
+                            if (reg.waiting) __logCollect('sw.waiting', {});
+                        } catch(e){}
+                        return reg;
+                    }).catch(err => { try { __logCollect('sw.register.error', { message: err && err.message }); } catch(e){} throw err; });
+                };
+            }
+        } catch (e) {}
+
+        // Hook ScrollTrigger.refresh if present to log refresh calls
+        try {
+            if (typeof ScrollTrigger !== 'undefined' && ScrollTrigger && ScrollTrigger.refresh) {
+                const origRefresh = ScrollTrigger.refresh.bind(ScrollTrigger);
+                ScrollTrigger.refresh = function() {
+                    try { __logCollect('ScrollTrigger.refresh', { args: Array.from(arguments) }); } catch(e){}
+                    return origRefresh.apply(this, arguments);
+                };
+            }
+        } catch (e) {}
+
+        // Touch/pointer end snapshots - helpful to know last user gesture
+        ['touchend','pointerup','mouseup'].forEach(ev => {
+            window.addEventListener(ev, (e) => {
+                try { __logCollect('gesture.'+ev, { x: (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientX) || e.clientX || null, y: (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientY) || e.clientY || null }); } catch(_) {}
+            }, { passive: true });
+        });
+
+        // Monitor body/document height changes via MutationObserver (log when height changes)
+        try {
+            let lastDocHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
+            const mo = new MutationObserver(() => {
+                try {
+                    const h = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
+                    if (h !== lastDocHeight) {
+                        __logCollect('docHeight.change', { from: lastDocHeight, to: h });
+                        try { __maybeTakeSnapshot && __maybeTakeSnapshot('docHeight.change', document.documentElement); } catch (e) {}
+                        lastDocHeight = h;
+                    }
+                } catch (e) {}
+            });
+            mo.observe(document.documentElement || document.body, { childList: true, subtree: true, attributes: true });
+        } catch (e) {}
+
+        // -- Extended safe instrumentation (privacy-conscious) -----------------
+        try {
+            const MAX_ENTRY_BYTES = 8 * 1024; // cap large entries
+
+            const safeStringify = (obj) => {
+                try {
+                    const s = JSON.stringify(obj, (k, v) => {
+                        // redact obvious sensitive keys
+                        if (typeof k === 'string' && /pass(word)?|token|secret|auth|credit|cc-number|card|ssn|cvv/i.test(k)) return '[REDACTED]';
+                        // avoid dumping large blobs
+                        if (typeof v === 'string' && v.length > 200) return v.slice(0, 200) + '…[truncated]';
+                        return v;
+                    });
+                    if (s.length > MAX_ENTRY_BYTES) return s.slice(0, MAX_ENTRY_BYTES) + '...[truncated]';
+                    return s;
+                } catch (e) { return String(obj); }
+            };
+
+            // Console wrapper
+            try {
+                ['log','info','warn','error','debug'].forEach(method => {
+                    const orig = console[method] && console[method].bind(console);
+                    if (!orig) return;
+                    console[method] = function() {
+                        try { __logCollect('console.'+method, { args: Array.from(arguments).map(a => (typeof a === 'object' ? safeStringify(a) : String(a))) }); } catch(e){}
+                        try { if (method === 'error' || method === 'warn') __maybeTakeSnapshot && __maybeTakeSnapshot('console.'+method, document.activeElement); } catch(e){}
+                        return orig.apply(console, arguments);
+                    };
+                });
+            } catch (e) {}
+
+            // Global error & unhandledrejection
+            window.addEventListener('error', (ev) => {
+                try {
+                    __logCollect('window.error', { message: ev.message, filename: ev.filename, lineno: ev.lineno, colno: ev.colno, stack: ev.error && ev.error.stack ? String(ev.error.stack).slice(0, 1000) : null });
+                    try { __maybeTakeSnapshot && __maybeTakeSnapshot('error', ev && ev.target ? ev.target : document.activeElement); } catch (e) {}
+                } catch (e) {}
+            });
+            window.addEventListener('unhandledrejection', (ev) => {
+                try { __logCollect('unhandledrejection', { reason: ev.reason && (ev.reason.stack ? String(ev.reason.stack).slice(0,1000) : String(ev.reason)) }); } catch (e) {}
+            });
+
+            // Storage wrappers (log keys only + length)
+            try {
+                const _lsSet = localStorage.setItem.bind(localStorage);
+                localStorage.setItem = function(k, v) {
+                    try { __logCollect('localStorage.setItem', { key: String(k), size: (v && v.length) || 0 }); } catch(e){}
+                    return _lsSet(k, v);
+                };
+            } catch (e) {}
+            try {
+                const _ssSet = sessionStorage.setItem.bind(sessionStorage);
+                sessionStorage.setItem = function(k, v) {
+                    try { __logCollect('sessionStorage.setItem', { key: String(k), size: (v && v.length) || 0 }); } catch(e){}
+                    return _ssSet(k, v);
+                };
+            } catch (e) {}
+
+            // navigator.sendBeacon wrapper
+            try {
+                if (navigator && navigator.sendBeacon) {
+                    const _sendBeacon = navigator.sendBeacon.bind(navigator);
+                    navigator.sendBeacon = function(url, data) {
+                        try { __logCollect('navigator.sendBeacon', { url: String(url), dataSize: (data && data.size) || null }); } catch(e){}
+                        return _sendBeacon(url, data);
+                    };
+                }
+            } catch (e) {}
+
+            // Delegate click and form events (avoid capturing form values)
+            try {
+                document.addEventListener('click', (e) => {
+                    try {
+                        const t = e.target && (e.target.closest ? e.target.closest('a,button,input,select,textarea,summary') : e.target);
+                        if (!t) return;
+                        const tag = (t.tagName || '').toLowerCase();
+                        const info = { tag, id: t.id || null, classes: t.className || null };
+                        if (tag === 'a' && t.href) info.href = (t.href.length>200? t.href.slice(0,200)+'…': t.href);
+                        __logCollect('dom.click', info);
+                        try {
+                            if (['a','button','input','textarea','select'].includes(tag)) {
+                                __maybeTakeSnapshot && __maybeTakeSnapshot('click', t);
+                            }
+                        } catch (e) {}
+                    } catch (e) {}
+                }, { passive: true });
+
+                document.addEventListener('submit', (e) => {
+                    try {
+                        const form = e.target;
+                        if (!form || !form.tagName || form.tagName.toLowerCase() !== 'form') return;
+                        const fields = Array.from(form.elements || []).filter(n => n.name).map(n => ({ name: n.name, type: n.type || n.tagName }));
+                        __logCollect('form.submit', { action: form.action || null, method: form.method || 'GET', fields });
+                    } catch (e) {}
+                }, true);
+            } catch (e) {}
+
+            // Input events: log type and length only (no values)
+            try {
+                document.addEventListener('input', (e) => {
+                    try {
+                        const el = e.target;
+                        if (!el) return;
+                        const tag = el.tagName && el.tagName.toLowerCase();
+                        if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+                            const info = { tag, type: el.type || null, name: el.name || null, valueLength: (el.value && el.value.length) || 0 };
+                            __logCollect('input', info);
+                        }
+                    } catch (e) {}
+                }, { passive: true });
+            } catch (e) {}
+
+            // Selection logging (length + container tag)
+            try {
+                document.addEventListener('selectionchange', () => {
+                    try {
+                        const sel = document.getSelection && document.getSelection();
+                        if (!sel) return;
+                        const txt = sel.toString();
+                        const container = sel.anchorNode && sel.anchorNode.parentElement && sel.anchorNode.parentElement.tagName;
+                        __logCollect('selectionchange', { length: txt.length, container: container || null });
+                    } catch (e) {}
+                });
+            } catch (e) {}
+
+            // Clipboard events (log action only)
+            try {
+                ['copy','cut','paste'].forEach(ev => {
+                    document.addEventListener(ev, (e) => { try { __logCollect('clipboard.'+ev, {}); } catch(_) {} });
+                });
+            } catch (e) {}
+
+            // Performance: longtask and resource observer (lightweight)
+            try {
+                if ('PerformanceObserver' in window) {
+                    try {
+                        const po = new PerformanceObserver((list) => {
+                            list.getEntries().forEach(en => {
+                                try {
+                                    if (en.entryType === 'longtask') {
+                                        __logCollect('perf.longtask', { duration: Math.round(en.duration) });
+                                    } else if (en.entryType === 'resource') {
+                                        __logCollect('perf.resource', { name: en.name, initiatorType: en.initiatorType, duration: Math.round(en.duration) });
+                                    }
+                                } catch(e) {}
+                            });
+                        });
+                        po.observe({ entryTypes: ['longtask','resource'] });
+                    } catch (e) {}
+                }
+            } catch (e) {}
+
+            // Log when event listeners are attached (helps find dynamic behavior)
+            try {
+                const origAdd = EventTarget.prototype.addEventListener;
+                EventTarget.prototype.addEventListener = function(type, listener, options) {
+                    try { __logCollect('addEventListener', { target: this && this.tagName ? this.tagName : (this && this.constructor && this.constructor.name) || 'unknown', type: type }); } catch(e) {}
+                    return origAdd.apply(this, arguments);
+                };
+            } catch (e) {}
+        } catch (e) {}
+        // ---------------------------------------------------------------------
+    } catch (e) {}
+    /**
+     * Guarded Page Reload Utility
+     * 
+     * Attempts to reload the page only when the user is NOT actively interacting.
+     * This prevents the scroll-jump bug on mobile devices (especially iOS Safari)
+     * where a reload during scrolling causes the viewport to jump to an unexpected
+     * position, often losing the user's place.
+     * 
+     * How it works:
+     * 1. Checks if user is currently interacting (scrolling, touching)
+     * 2. If idle, reloads immediately
+     * 3. If active, waits and retries after RETRY milliseconds
+     * 4. After MAX milliseconds, forces reload regardless (timeout)
+     * 
+     * @param {Object} opts - Configuration options
+     * @param {number} [opts.MAX=30000] - Maximum milliseconds to wait before forcing reload
+     * @param {number} [opts.RETRY=500] - Milliseconds between retry attempts
+     * @param {Function} [opts.fallback] - Fallback function if reload fails
+     * 
+     * @example
+     * // Standard usage
+     * window.tryGuardedReload({ MAX: 30000, RETRY: 500 });
+     * 
+     * @example
+     * // With custom fallback
+     * window.tryGuardedReload({ 
+     *   MAX: 30000, 
+     *   RETRY: 500, 
+     *   fallback: () => window.location.href = window.location.href 
+     * });
+     */
+    window.tryGuardedReload = function(opts) {
+        opts = opts || {};
+        const MAX = (typeof opts.MAX === 'number') ? opts.MAX : 30000;
+        const RETRY = (typeof opts.RETRY === 'number') ? opts.RETRY : 500;
+        const fallback = (opts && typeof opts.fallback === 'function') ? opts.fallback : null;
+        const start = Date.now();
+
+        (function attempt() {
+            try {
+                const interacting = (typeof window.__userInteracting !== 'undefined') ? window.__userInteracting : false;
+                if (!interacting) {
+                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
+                    return;
+                }
+                if (Date.now() - start < MAX) {
+                    setTimeout(attempt, RETRY);
+                    return;
+                }
+                // Timed out - fallback
+                if (fallback) {
+                    try { fallback(); } catch (e) { try { window.location.reload(); } catch(_) {} }
+                } else {
+                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
+                }
+            } catch (e) {
+                if (fallback) { try { fallback(); } catch(_) { try { window.location.reload(); } catch(_) {} } }
+                else { try { window.location.reload(); } catch(_) {} }
+            }
+        })();
+    };
+}
 
 // ============================================================================
 // FEATURE MODULES
@@ -661,7 +873,7 @@ window.guardedReload = guardedReload;
  * - Uses [data-theme="dark"] selectors for dark mode styles
  * - Tailwind dark: variants work through theme.css overrides
  */
-const legacyInitDarkMode = () => {
+const initDarkMode = () => {
     const toggleButton = document.getElementById('theme-toggle');
     if (!toggleButton) return;
 
@@ -680,7 +892,7 @@ const legacyInitDarkMode = () => {
     }
 
     // Set initial icon
-    toggleButton.innerHTML = currentTheme === 'dark' ? '<span aria-hidden="true">&#x1F319;</span>' : '<span aria-hidden="true">&#x2600;&#xFE0F;</span>';
+    toggleButton.innerHTML = currentTheme === 'dark' ? '<span style="color: #e1d4c2">🔆</span>' : '<span style="color: #212842">🌙</span>';
 
     // Toggle theme function
     const toggleTheme = () => {
@@ -691,12 +903,7 @@ const legacyInitDarkMode = () => {
         localStorage.setItem('theme', newTheme);
         
         // Update icon
-        toggleButton.innerHTML = newTheme === 'dark' ? '<span aria-hidden="true">&#x1F319;</span>' : '<span aria-hidden="true">&#x2600;&#xFE0F;</span>';
-        
-        // Achievement: Night Owl - Toggle dark mode
-        if (typeof window.ArcadeAchievements !== 'undefined' && window.ArcadeAchievements.unlock) {
-            window.ArcadeAchievements.unlock('nightOwl');
-        }
+        toggleButton.innerHTML = newTheme === 'dark' ? '<span style="color: #e1d4c2">🔆</span>' : '<span style="color: #212842">🌙</span>';
         
         // Track analytics (both Clarity and GA4)
         if (typeof clarity === 'function') {
@@ -713,7 +920,6 @@ const legacyInitDarkMode = () => {
         toggleButton.setAttribute('aria-label', `Switch to ${theme} mode`);
     };
 
-
     // Listen for system theme changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
         // Only auto-switch if user hasn't manually set a preference
@@ -721,7 +927,7 @@ const legacyInitDarkMode = () => {
             const newTheme = e.matches ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            toggleButton.innerHTML = newTheme === 'dark' ? '<span aria-hidden="true">&#x1F319;</span>' : '<span aria-hidden="true">&#x2600;&#xFE0F;</span>';
+            toggleButton.innerHTML = newTheme === 'dark' ? '<span style="color: #e1d4c2">🔆</span>' : '<span style="color: #212842">🌙</span>';
         }
     });
 
@@ -729,71 +935,6 @@ const legacyInitDarkMode = () => {
     toggleButton.addEventListener('click', () => {
         toggleTheme();
         // Mark that user has manually set theme preference
-        localStorage.setItem('theme_manual', 'true');
-    });
-};
-
-const THEME_ICON_MARKUP = {
-    dark: '<span aria-hidden="true">&#x1F319;</span>',
-    light: '<span aria-hidden="true">&#x2600;&#xFE0F;</span>'
-};
-
-const getThemeToggleIconMarkup = (theme) => (theme === 'dark' ? THEME_ICON_MARKUP.dark : THEME_ICON_MARKUP.light);
-
-const getThemeToggleLabel = (theme) => `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`;
-
-const initDarkMode = () => {
-    const toggleButton = document.getElementById('theme-toggle');
-    if (!toggleButton) return;
-
-    const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const savedTheme = localStorage.getItem('theme');
-    const currentTheme = savedTheme || (prefersDarkMode ? 'dark' : 'light');
-
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    if (!savedTheme) {
-        localStorage.setItem('theme', currentTheme);
-    }
-
-    toggleButton.innerHTML = getThemeToggleIconMarkup(currentTheme);
-    toggleButton.setAttribute('aria-label', getThemeToggleLabel(currentTheme));
-
-    const toggleTheme = () => {
-        const theme = document.documentElement.getAttribute('data-theme');
-        const newTheme = theme === 'light' ? 'dark' : 'light';
-
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        toggleButton.innerHTML = getThemeToggleIconMarkup(newTheme);
-        toggleButton.setAttribute('aria-label', getThemeToggleLabel(newTheme));
-
-        if (typeof window.ArcadeAchievements !== 'undefined' && window.ArcadeAchievements.unlock) {
-            window.ArcadeAchievements.unlock('nightOwl');
-        }
-
-        if (typeof clarity === 'function') {
-            clarity('event', 'theme_toggle', { theme: newTheme });
-        }
-        if (typeof gtag === 'function') {
-            gtag('event', 'theme_toggle', {
-                event_category: 'user_preference',
-                event_label: newTheme
-            });
-        }
-    };
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
-        if (!localStorage.getItem('theme_manual')) {
-            const newTheme = event.matches ? 'dark' : 'light';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            toggleButton.innerHTML = getThemeToggleIconMarkup(newTheme);
-            toggleButton.setAttribute('aria-label', getThemeToggleLabel(newTheme));
-        }
-    });
-
-    toggleButton.addEventListener('click', () => {
-        toggleTheme();
         localStorage.setItem('theme_manual', 'true');
     });
 };
@@ -955,43 +1096,6 @@ const initAriaCurrent = () => {
 // GSAP Animations
 // ==========================================================================
 
-const initRevealOnViewFallback = () => {
-    try {
-        const prefersReducedMotion = (typeof window !== 'undefined')
-            && (typeof window.matchMedia === 'function')
-            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        const targets = Array.from(document.querySelectorAll('[data-gsap], [data-reveal], .reveal'));
-        if (!targets.length) return;
-
-        targets.forEach((el) => {
-            try { el.classList.add('reveal'); } catch (e) {}
-        });
-
-        const show = (el) => {
-            try { el.classList.add('is-visible'); } catch (e) {}
-            try { el.classList.remove('opacity-0', 'translate-y-8'); } catch (e) {}
-        };
-
-        if (prefersReducedMotion || typeof IntersectionObserver === 'undefined') {
-            targets.forEach(show);
-            return;
-        }
-
-        const observer = new IntersectionObserver((entries, obs) => {
-            entries.forEach((entry) => {
-                if (!entry.isIntersecting) return;
-                show(entry.target);
-                try { obs.unobserve(entry.target); } catch (e) {}
-            });
-        }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
-
-        targets.forEach((el) => {
-            try { observer.observe(el); } catch (e) { show(el); }
-        });
-    } catch (e) {}
-};
-
 /**
  * Initialize GSAP ScrollTrigger Animations
  * 
@@ -1023,109 +1127,47 @@ const initAnimations = () => {
         && (typeof window.matchMedia === 'function')
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const hasGSAP = (typeof gsap !== 'undefined') && (typeof ScrollTrigger !== 'undefined');
+    // Always unhide elements first to avoid blank screens
+    const allAnimated = document.querySelectorAll('[data-gsap]');
+    allAnimated.forEach(el => {
+        el.classList.remove('opacity-0', 'translate-y-8');
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+    });
 
-    // Fallback reveal path for cases where we intentionally don't run ScrollTrigger.
-    // Important: don't run this when GSAP is present because it can fight with GSAP's
-    // initial set() and cause visible snapping/stutter.
-    if (!hasGSAP || prefersReducedMotion || isMobile) {
-        initRevealOnViewFallback();
+    // If GSAP unavailable, keep content visible and exit
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+        console.warn('GSAP or ScrollTrigger not loaded; revealing content without animations.');
         return;
     }
 
-    // Hard init-once guard to prevent double-init jitter.
-    if (window.__GSAP_REVEALS_INIT) return;
-    window.__GSAP_REVEALS_INIT = true;
+    // Reduced motion: keep layout stable (no transform-based entrance/scroll animations)
+    if (prefersReducedMotion) {
+        return;
+    }
 
     // Register ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
-
-    const root = document.documentElement;
-    let prepTimer;
-
-    // Temporarily suppress CSS transitions on GSAP targets during setup to avoid
-    // a brief flash when classes/inline styles change.
-    root.classList.add('gsap-prep');
-    prepTimer = setTimeout(() => root.classList.remove('gsap-prep'), 2000);
-
-    try {
-        // Stabilize refresh timing for font swaps/layout shifts (prevents surprise reflows).
-        try {
-            if (!window.__gsapScrollTriggerRefreshBound) {
-                window.__gsapScrollTriggerRefreshBound = true;
-                let refreshTimer = null;
-                const scheduleRefresh = () => {
-                    if (refreshTimer) clearTimeout(refreshTimer);
-                    refreshTimer = setTimeout(() => {
-                        try { ScrollTrigger.refresh(); } catch (e) {}
-                    }, 150);
-                };
-
-                window.addEventListener('load', scheduleRefresh, { once: true });
-                window.addEventListener('resize', scheduleRefresh);
-                if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function') {
-                    document.fonts.ready.then(scheduleRefresh).catch(() => {});
-                }
-            }
-        } catch (e) {}
-
-        const isNearViewport = (element) => {
-            try {
-                const rect = element.getBoundingClientRect();
-                const vh = window.innerHeight || document.documentElement.clientHeight || 0;
-                return rect.top < vh * 1.15;
-            } catch (e) {
-                return false;
-            }
-        };
 
     // Fade Up Animations
     const fadeElements = document.querySelectorAll('[data-gsap="fade-up"]');
     
     fadeElements.forEach(element => {
-        try {
-            if (element && element.dataset && element.dataset.gsapInit === '1') return;
-            if (element && element.dataset) element.dataset.gsapInit = '1';
-        } catch (e) {}
-
         const delay = element.getAttribute('data-gsap-delay') || 0;
 
-        // Ensure CSS-based fallback doesn't interfere with GSAP.
-        try { element.classList.remove('reveal', 'is-visible'); } catch (e) {}
-
-        // Non-destructive init: if it's already in/near the viewport on load, do not
-        // hide/offset it (prevents above-the-fold snapping/jitter).
-        if (isNearViewport(element)) {
-            try { element.classList.remove('opacity-0', 'translate-y-8'); } catch (e) {}
-            gsap.set(element, { autoAlpha: 1, y: 0, clearProps: 'willChange' });
-            return;
-        }
-
-        // Start hidden until the trigger point is reached.
-        gsap.set(element, { autoAlpha: 0, y: 12, force3D: true, willChange: 'opacity, transform' });
-
-        gsap.to(element, {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.5,
+        gsap.from(element, {
+            opacity: 0,
+            y: 20,
+            duration: 0.4,
             delay: parseFloat(delay) * 0.5,
             ease: 'power2.out',
-            overwrite: 'auto',
-            clearProps: 'willChange',
             scrollTrigger: {
                 trigger: element,
                 start: 'top 92%',
-                once: true,
-                invalidateOnRefresh: true,
-                fastScrollEnd: true,
                 toggleActions: 'play none none none'
             }
         });
     });
-    } finally {
-        if (prepTimer) clearTimeout(prepTimer);
-        root.classList.remove('gsap-prep');
-    }
 
     // Parallax effect for hero section (if exists)
     const heroSection = document.querySelector('section:first-of-type');
@@ -1156,15 +1198,39 @@ const initAnimations = () => {
 
 const loadGSAPAndInit = () => {
     const isMobile = (typeof window !== 'undefined') && (typeof window.matchMedia === 'function') && window.matchMedia('(max-width: 768px)').matches;
+    
+    const loadScripts = () => {
+        if (window.gsap && window.ScrollTrigger) {
+            initAnimations();
+            return;
+        }
+        const gsapScript = document.createElement('script');
+        gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+        gsapScript.onload = () => {
+            const stScript = document.createElement('script');
+            stScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
+            stScript.onload = () => {
+                initAnimations();
+            };
+            document.body.appendChild(stScript);
+        };
+        document.body.appendChild(gsapScript);
+    };
+
     if (isMobile) {
-        // Mobile: reveal content immediately and skip GSAP entirely
+        // Mobile: Reveal content immediately (static)
         initAnimations();
-        return;
+        
+        // Load GSAP on interaction
+        const onInteraction = () => {
+            ['scroll', 'touchstart', 'mousemove'].forEach(ev => window.removeEventListener(ev, onInteraction));
+            loadScripts();
+        };
+        ['scroll', 'touchstart', 'mousemove'].forEach(ev => window.addEventListener(ev, onInteraction, { once: true, passive: true }));
+    } else {
+        // Desktop: Load GSAP immediately (content stays hidden until loaded)
+        loadScripts();
     }
-    // Desktop: load GSAP for richer scroll animations
-    // Ensure a non-GSAP reveal path is active while GSAP scripts load.
-    try { initRevealOnViewFallback(); } catch (e) {}
-    initAnimations();
 };
 
 // ==========================================================================
@@ -1445,11 +1511,11 @@ const initMiniGame = (rootId) => {
             <div class="text-xs text-ink/60">Best: <span id="mg-best">${highScore}</span></div>
         </div>
         <div class="flex items-center justify-between mb-2">
-            <div class="text-xs text-ink/60">Lives: <span id="mg-lives">***</span></div>
+            <div class="text-xs text-ink/60">Lives: <span id="mg-lives">❤❤❤</span></div>
             <button id="mg-start" class="text-xs bg-indigodeep text-white px-3 py-1 rounded-full">Start</button>
         </div>
         <canvas id="mg-canvas" class="w-full rounded border border-chocolate/10" style="touch-action: none; height: 320px;"></canvas>
-        <p class="text-xs text-ink/60 mt-2">Catch the orbs. Golden orbs are bonus. Tap/drag on mobile, or use arrow keys.</p>
+        <p class="text-xs text-ink/60 mt-2">Catch the orbs. Golden orbs are bonus. Tap/drag on mobile, or use ◀ ▶.</p>
     `;
 
     const canvas = root.querySelector('#mg-canvas');
@@ -1494,7 +1560,7 @@ const initMiniGame = (rootId) => {
         draw();
     };
 
-    const heartStr = (n) => '*'.repeat(Math.max(0, n));
+    const heartStr = (n) => '❤❤❤'.slice(0, n);
     const vibrate = (ms) => { if (navigator.vibrate) navigator.vibrate(ms); };
 
     const addParticles = (x, y, color = '#212842', count = 10) => {
@@ -1833,22 +1899,97 @@ const initLazyLoading = () => {
  * Instrumentation:
  * - Logs attempts, successes, failures when ?collect-logs=1
  */
+const initPdfPreviews = () => {
+    try {
+        document.querySelectorAll('.preview-panel').forEach(panel => {
+            try {
+                const section = panel.closest('section') || panel.parentElement;
+                if (!section) return;
+                // find first PDF link within the same section
+                const pdfLink = section.querySelector('a[href$=".pdf"]');
+                if (!pdfLink) return;
+                const pdfUrl = pdfLink.href;
+
+                // Mark as loaded so other scripts don't try to load it again
+                panel.dataset.pdfLoaded = 'true';
+
+                // helper to show fallback message
+                const showFallback = (reason) => {
+                    try {
+                        panel.innerHTML = '<div class="rounded-xl border border-chocolate/20 bg-white/40 overflow-hidden p-8 text-center"><p class="text-sm text-chocolate/70">Inline PDF preview may be blocked by hosting or browser settings. Use the buttons below to open or download the deck.</p></div>';
+                        __logCollect && __logCollect('pdf.preview.fallback', { url: pdfUrl, reason: reason });
+                    } catch (e) {}
+                };
+
+                // prepare placeholder / spinner with stable background
+                panel.innerHTML = '<div class="py-12 bg-white/30 rounded-xl border border-chocolate/10 flex items-center justify-center min-h-[480px]">\n  <div class="text-sm text-chocolate/60 flex items-center gap-2"><svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Loading preview…</div>\n</div>';
+
+                // create iframe but keep it hidden until load confirmed
+                const iframe = document.createElement('iframe');
+                iframe.setAttribute('aria-label', 'PDF preview');
+                iframe.style.cssText = 'width:100%;height:480px;border:0;border-radius:12px;background:#fff;opacity:0;position:absolute;top:0;left:0;';
+                iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+                
+                // Set panel to relative positioning for absolute iframe
+                panel.style.position = 'relative';
+                panel.style.minHeight = '480px';
+
+                let loaded = false;
+                let settled = false;
+                
+                const finalize = (success) => {
+                    if (settled) return;
+                    settled = true;
+                    
+                    if (success) {
+                        // Smoothly fade in the iframe
+                        iframe.style.position = 'relative';
+                        iframe.style.opacity = '1';
+                        iframe.style.transition = 'opacity 0.3s ease';
+                        // Remove placeholder
+                        const placeholder = panel.querySelector('div');
+                        if (placeholder) placeholder.remove();
+                        __logCollect && __logCollect('pdf.preview.loaded', { url: pdfUrl });
+                    } else {
+                        try { iframe.remove(); } catch(_){}
+                        showFallback('load_failed');
+                    }
+                };
+
+                iframe.addEventListener('load', () => {
+                    loaded = true;
+                    // Give it a moment to actually render content
+                    setTimeout(() => finalize(true), 100);
+                });
+                
+                iframe.addEventListener('error', () => finalize(false));
+
+                // attempt to set src
+                try {
+                    iframe.src = pdfUrl;
+                    panel.appendChild(iframe);
+                    __logCollect && __logCollect('pdf.preview.attempt', { url: pdfUrl });
+                } catch (e) {
+                    finalize(false);
+                    return;
+                }
+
+                // fallback timeout: if not loaded within 5s, assume success (browser swallowed load event)
+                setTimeout(() => {
+                    if (!loaded) finalize(true);
+                }, 5000);
+            } catch (e) {}
+        });
+    } catch (e) {}
+};
+
+// ==========================================================================
+// Scroll to Top Button
+// ==========================================================================
+
 const initScrollToTop = () => {
     const scrollBtn = document.getElementById('scroll-to-top');
     if (!scrollBtn) return;
-
-    // Skip on pages that disable floating UI (e.g., arcade games)
-    if (document.body.hasAttribute('data-disable-floating-ui')) return;
-
-    const progressCircle = scrollBtn.querySelector('.scroll-progress-circle');
-    const radius = progressCircle ? parseFloat(progressCircle.getAttribute('r') || '22') : 0;
-    const circumference = radius > 0 ? (radius * 2 * Math.PI) : 0;
-
-    // Ensure ring works even if HTML doesn't include inline dash styles.
-    if (progressCircle && circumference > 0) {
-        progressCircle.style.strokeDasharray = `${circumference}`;
-        progressCircle.style.strokeDashoffset = `${circumference}`;
-    }
 
     // Show/hide button based on scroll position (25% of page height)
     const toggleButton = () => {
@@ -1860,13 +2001,6 @@ const initScrollToTop = () => {
             scrollBtn.classList.add('show');
         } else {
             scrollBtn.classList.remove('show');
-        }
-
-        // Update progress circle
-        if (progressCircle && circumference > 0 && pageHeight > 0) {
-            const scrollPercent = currentScroll / pageHeight;
-            const offset = circumference - (scrollPercent * circumference);
-            progressCircle.style.strokeDashoffset = offset;
         }
     };
 
@@ -1922,164 +2056,157 @@ const translations = {
             formFiller: { name: 'Messenger', description: 'Submitted the contact form' }
         },
         es: {
-            unlocked: 'Logro desbloqueado!',
-            explorer: { name: 'Explorador', description: 'Visito todas las paginas principales' },
-            reader: { name: 'Buzo profundo', description: 'LeyÃƒÆ’Ã‚Â³ la inmersion completa' },
-            gamer: { name: 'Maestro del juego', description: 'Jugo el juego del formulario de contacto' },
-            chatter: { name: 'Conversador', description: 'Abrio el chat' },
-            nightOwl: { name: 'Noctambulo', description: 'Activo el modo oscuro' },
-            konami: { name: 'Descubridor secreto', description: 'Encontro el codigo Konami' },
-            networker: { name: 'Conector', description: 'Visito perfiles sociales' },
-            formFiller: { name: 'Mensajero', description: 'Envio el formulario de contacto' }
+            unlocked: '¡Logro Desbloqueado!',
+            explorer: { name: 'Explorador', description: 'Visitó todas las páginas principales' },
+            reader: { name: 'Buzo Profundo', description: 'Leyó la inmersión completa' },
+            gamer: { name: 'Maestro del Juego', description: 'Jugó el juego del formulario de contacto' },
+            chatter: { name: 'Conversador', description: 'Abrió el chat' },
+            nightOwl: { name: 'Noctámbulo', description: 'Alternó el modo oscuro' },
+            konami: { name: 'Descubridor Secreto', description: 'Encontró el código Konami' },
+            networker: { name: 'Redactor', description: 'Visitó perfiles sociales' },
+            formFiller: { name: 'Mensajero', description: 'Envió el formulario de contacto' }
         },
         ar: {
-            unlocked: 'Achievement unlocked!',
-            explorer: { name: 'Explorer', description: 'Visited all main pages' },
-            reader: { name: 'Deep Diver', description: 'Read the full deep dive' },
-            gamer: { name: 'Game Master', description: 'Played the contact form game' },
-            chatter: { name: 'Conversationalist', description: 'Opened the chat' },
-            nightOwl: { name: 'Night Owl', description: 'Toggled dark mode' },
-            konami: { name: 'Secret Discoverer', description: 'Found the Konami code' },
-            networker: { name: 'Networker', description: 'Visited social profiles' },
-            formFiller: { name: 'Messenger', description: 'Submitted the contact form' }
+            unlocked: 'تم إلغاء قفل الإنجاز!',
+            explorer: { name: 'المستكشف', description: 'زار جميع الصفحات الرئيسية' },
+            reader: { name: 'الغواص العميق', description: 'قرأ الغوص الكامل' },
+            gamer: { name: 'سيد اللعبة', description: 'لعب لعبة نموذج الاتصال' },
+            chatter: { name: 'المحادث', description: 'فتح الدردشة' },
+            nightOwl: { name: 'بومة الليل', description: 'بدّل الوضع المظلم' },
+            konami: { name: 'المكتشف السري', description: 'وجد رمز كونامي' },
+            networker: { name: 'الشبكي', description: 'زار الملفات الشخصية الاجتماعية' },
+            formFiller: { name: 'الرسول', description: 'أرسل نموذج الاتصال' }
         }
     },
     // Konami code messages
     konami: {
         en: {
-            title: 'Secret Route Unlocked',
-            message: 'You found the hidden sequence. That means you actually explore interfaces properly.',
-            giftText: 'Pick a compliment. You earned it.',
-            stats: 'Top {percent}% of visitors ever find this.',
+            title: '🎮 You found the secret!',
+            message: 'Congratulations! You\'ve unlocked the Konami code.',
+            giftText: 'Click the gift for a surprise!',
+            stats: 'You\'re one of the {percent}% who found this!',
             compliments: [
-                'You have sharp pattern recognition.',
-                'You notice details most people miss.',
-                'You have real builder energy.',
-                'You bring calm focus to complexity.',
-                'You have excellent taste in hidden features.',
-                'You move through systems with intent.',
-                'You make curiosity look disciplined.',
-                'You have strong creative instincts.',
-                'You think like a product person.',
-                'You are good at finding signal fast.'
+                "You're absolutely amazing! 🌟",
+                "You're a coding wizard! 🧙‍♂️",
+                "You're incredibly talented! 🎨",
+                "You're a problem-solving genius! 🧠",
+                "You're making the world better! 🌍",
+                "You're a creative powerhouse! ⚡",
+                "You're inspiring others! 💫",
+                "You're a true innovator! 🚀",
+                "You're exceptionally skilled! 🏆",
+                "You're a digital artist! 🎭",
+                "You're building something incredible! 🏗️",
+                "You're a technology trailblazer! 🗺️",
+                "You're exceptionally creative! 🎨",
+                "You're a user experience master! 🎯",
+                "You're a design virtuoso! 🎨"
             ]
         },
         es: {
-            title: 'Ruta secreta desbloqueada',
-            message: 'Encontraste la secuencia oculta. Eso significa que si exploras las interfaces con intencion.',
-            giftText: 'Elige un cumplido. Te lo ganaste.',
-            stats: 'Solo el {percent}% superior de visitantes encuentra esto.',
+            title: '🎮 ¡Encontraste el secreto!',
+            message: '¡Felicitaciones! Has desbloqueado el código Konami.',
+            giftText: '¡Haz clic en el regalo para una sorpresa!',
+            stats: '¡Eres uno del {percent}% que encontró esto!',
             compliments: [
-                'Tienes un gran ojo para los patrones.',
-                'Notas detalles que otros pasan por alto.',
-                'Tienes energia real de constructor.',
-                'Aportas calma y enfoque a la complejidad.',
-                'Tienes muy buen gusto para funciones ocultas.',
-                'Recorres sistemas con intencion.',
-                'Tu curiosidad tiene disciplina.',
-                'Tienes instinto creativo fuerte.',
-                'Piensas como alguien de producto.',
-                'Encuentras senal rapido.'
+                "¡Eres absolutamente increíble! 🌟",
+                "¡Eres un mago de la programación! 🧙‍♂️",
+                "¡Eres increíblemente talentoso! 🎨",
+                "¡Eres un genio para resolver problemas! 🧠",
+                "¡Estás haciendo el mundo mejor! 🌍",
+                "¡Eres una potencia creativa! ⚡",
+                "¡Estás inspirando a otros! 💫",
+                "¡Eres un verdadero innovador! 🚀",
+                "¡Eres excepcionalmente hábil! 🏆",
+                "¡Eres un artista digital! 🎭",
+                "¡Estás construyendo algo increíble! 🏗️",
+                "¡Eres un pionero de la tecnología! 🗺️",
+                "¡Eres excepcionalmente creativo! 🎨",
+                "¡Eres un maestro de la experiencia del usuario! 🎯",
+                "¡Eres un virtuoso del diseño! 🎨"
             ]
         },
         ar: {
-            title: 'Secret route unlocked',
-            message: 'You found the hidden sequence. That means you explore interfaces with focus.',
-            giftText: 'Pick a compliment. You earned it.',
-            stats: 'Top {percent}% of visitors ever find this.',
+            title: '🎮 لقد وجدت السر!',
+            message: 'تهانينا! لقد قمت بفتح رمز كونامي.',
+            giftText: 'انقر على الهدية للحصول على مفاجأة!',
+            stats: 'أنت واحد من {percent}% الذين وجدوا هذا!',
             compliments: [
-                'You bring creative energy.',
-                'You inspire people around you.',
-                'You think like an innovator.',
-                'You are exceptionally skilled.',
-                'You have a strong design eye.',
-                'You build memorable things.',
-                'You move through systems with intent.',
-                'You notice details that matter.',
-                'You understand the user.',
-                'You turn curiosity into action.'
+                "أنت رائع تماماً! 🌟",
+                "أنت ساحر برمجة! 🧙‍♂️",
+                "أنت موهوب بشكل لا يصدق! 🎨",
+                "أنت عبقري في حل المشكلات! 🧠",
+                "أنت تجعل العالم أفضل! 🌍",
+                "أنت قوة إبداعية! ⚡",
+                "أنت تلهم الآخرين! 💫",
+                "أنت مبتكر حقيقي! 🚀",
+                "أنت ماهر بشكل استثنائي! 🏆",
+                "أنت فنان رقمي! 🎭",
+                "أنت تبني شيئاً مذهلاً! 🏗️",
+                "أنت رائد تكنولوجيا! 🗺️",
+                "أنت مبدع بشكل استثنائي! 🎨",
+                "أنت خبير في تجربة المستخدم! 🎯",
+                "أنت فنان تصميم! 🎨"
             ]
         }
     },
     // Chat messages and suggestions
     chat: {
         welcome: {
-            en: "Hey, I'm Savonie. Ask about Estivan, the work, or the site.",
-            es: "Hola. Soy Savonie. Puedes preguntarme sobre Estivan, su trabajo o el sitio.",
-            ar: "Hello. I'm Savonie. Ask about Estivan, the work, or the site.",
+            en: "Hello! I am Savonie. Ask me anything about Estivan.",
+            es: "¡Hola! Soy Savonie. Pregúntame cualquier cosa sobre Estivan.",
+            ar: "مرحباً! أنا سافوني. اسألني أي شيء عن استيفان."
         },
         defaultChips: {
             en: [
-                "What kind of work does he do?",
-                "Why did he build this site?",
-                "What is he like on a team?",
-                "How can I reach him?"
+                "What does Estivan do?",
+                "Tell me about his background",
+                "What are his skills?",
+                "How can I contact him?"
             ],
             es: [
-                "Que tipo de trabajo hace?",
-                "Por que construyo este sitio?",
-                "Como es en un equipo?",
-                "Como puedo contactarlo?"
+                "¿Qué hace Estivan?",
+                "Háblame de su experiencia",
+                "¿Cuáles son sus habilidades?",
+                "¿Cómo puedo contactarlo?"
             ],
             ar: [
-                "What kind of work does he do?",
-                "Why did he build this site?",
-                "What is he like on a team?",
-                "How can I reach him?"
+                "ماذا يفعل استيفان؟",
+                "أخبرني عن خلفيته",
+                "ما هي مهاراته؟",
+                "كيف يمكنني الاتصال به؟"
             ]
         },
         contextualSuggestions: {
             en: {
-                skills: ["What projects has he worked on?", "Tell me about his experience", "What is he learning right now?", "How does he approach problem-solving?", "What is his favorite skill to use?", "How does he stay motivated in his work?"],
-                background: ["What are his main skills?", "Tell me about his education", "What industries has he worked in?", "What inspired him to get into tech?", "What has his professional journey been like?", "Any mentors who influenced him?"],
-                projects: ["Can you show me his code?", "What technologies did he use?", "How long did it take him to build?", "What challenges did he overcome?", "Did he work with a team?", "What are his future plans for this project?"],
-                contact: ["Is he available for freelance work?", "What is his typical response time?", "Does he work remotely?", "How can I best reach him?", "What is his preferred way of communication?", "Is he open to collaborations?"],
-                education: ["What certifications does he have?", "What is his favorite programming language?", "How does he stay updated with technology?", "What was his most challenging course?", "How has his education shaped his career?", "Any online courses or self-learning?"],
-                projectResponse: ["Can you tell me more about that project?", "What challenges did he face?", "What did he learn from it?", "What was the most interesting part?", "How did he test it?", "Would he do anything differently now?"],
-                skillResponse: ["How did he learn that?", "Has he used it in projects?", "What is his proficiency level?", "What is his favorite way to apply this skill?", "Any tips for beginners?", "How has this skill evolved for him?"],
-                early: ["What are his main skills?", "Tell me about his background", "What projects is he proud of?", "What is something unique about him?", "Why did he choose this field?", "What is his biggest achievement?"]
+                skills: ["What projects have you worked on?", "Tell me about your experience", "What are you learning currently?"],
+                background: ["What are your main skills?", "Tell me about your education", "What industries have you worked in?"],
+                projects: ["Can you show me your code?", "What technologies did you use?", "How long did it take to build?"],
+                contact: ["Are you available for freelance work?", "What's your typical response time?", "Do you work remotely?"],
+                education: ["What certifications do you have?", "What's your favorite programming language?", "How do you stay updated with technology?"],
+                projectResponse: ["Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?"],
+                skillResponse: ["How did you learn that?", "Have you used it in projects?", "What's your proficiency level?"],
+                early: ["What are your main skills?", "Tell me about your background", "What projects are you proud of?"]
             },
             es: {
-                skills: ["En que proyectos ha trabajado?", "Hablame de su experiencia", "Que esta aprendiendo ahora?", "Como aborda la resolucion de problemas?", "Cual es su habilidad favorita?", "Como se mantiene motivado en su trabajo?"],
-                background: ["Cuales son sus habilidades principales?", "Hablame de su educacion", "En que industrias ha trabajado?", "Que lo inspiro a entrar en tecnologia?", "Como ha sido su trayectoria profesional?", "Algun mentor que lo haya influido?"],
-                projects: ["Puedes mostrarme su codigo?", "Que tecnologias uso?", "Cuanto tiempo le tomo construirlo?", "Que desafios supero?", "Trabajo con un equipo?", "Cuales son sus planes futuros para este proyecto?"],
-                contact: ["Esta disponible para trabajo freelance?", "Cual es su tiempo tipico de respuesta?", "Trabaja de forma remota?", "Como puedo contactarlo mejor?", "Cual es su forma preferida de comunicacion?", "Esta abierto a colaboraciones?"],
-                education: ["Que certificaciones tiene?", "Cual es su lenguaje de programacion favorito?", "Como se mantiene actualizado con tecnologia?", "Cual fue su curso mas desafiante?", "Como ha moldeado su educacion su carrera?", "Algun curso en linea o autoaprendizaje?"],
-                projectResponse: ["Puedes contarme mas sobre ese proyecto?", "Que desafios enfrento?", "Que aprendio de ello?", "Cual fue la parte mas interesante?", "Como lo probo?", "Haria algo diferente ahora?"],
-                skillResponse: ["Como aprendio eso?", "Lo ha usado en proyectos?", "Cual es su nivel de competencia?", "Cual es su forma favorita de aplicar esta habilidad?", "Algun consejo para principiantes?", "Como ha evolucionado esta habilidad para el?"],
-                early: ["Cuales son sus habilidades principales?", "Hablame de su experiencia", "De que proyectos esta orgulloso?", "Que hay de unico en el?", "Por que eligio este campo?", "Cual es su mayor logro?"]
+                skills: ["¿En qué proyectos has trabajado?", "Háblame de tu experiencia", "¿Qué estás aprendiendo actualmente?"],
+                background: ["¿Cuáles son tus principales habilidades?", "Háblame de tu educación", "¿En qué industrias has trabajado?"],
+                projects: ["¿Puedes mostrarme tu código?", "¿Qué tecnologías usaste?", "¿Cuánto tiempo tomó construirlo?"],
+                contact: ["¿Estás disponible para trabajo freelance?", "¿Cuál es tu tiempo típico de respuesta?", "¿Trabajas de forma remota?"],
+                education: ["¿Qué certificaciones tienes?", "¿Cuál es tu lenguaje de programación favorito?", "¿Cómo te mantienes actualizado con la tecnología?"],
+                projectResponse: ["¿Puedes contarme más sobre ese proyecto?", "¿Qué desafíos enfrentaste?", "¿Qué aprendiste de ello?"],
+                skillResponse: ["¿Cómo aprendiste eso?", "¿Lo has usado en proyectos?", "¿Cuál es tu nivel de competencia?"],
+                early: ["¿Cuáles son tus principales habilidades?", "Háblame de tu experiencia", "¿De qué proyectos estás orgulloso?"]
             },
             ar: {
-                skills: ["What projects has he worked on?", "Tell me about his experience", "What is he learning right now?", "How does he approach problem-solving?", "What is his favorite skill to use?", "How does he stay motivated in his work?"],
-                background: ["What are his main skills?", "Tell me about his education", "What industries has he worked in?", "What inspired him to get into tech?", "What has his professional journey been like?", "Any mentors who influenced him?"],
-                projects: ["Can you show me his code?", "What technologies did he use?", "How long did it take him to build?", "What challenges did he overcome?", "Did he work with a team?", "What are his future plans for this project?"],
-                contact: ["Is he available for freelance work?", "What is his typical response time?", "Does he work remotely?", "How can I best reach him?", "What is his preferred way of communication?", "Is he open to collaborations?"],
-                education: ["What certifications does he have?", "What is his favorite programming language?", "How does he stay updated with technology?", "What was his most challenging course?", "How has his education shaped his career?", "Any online courses or self-learning?"],
-                projectResponse: ["Can you tell me more about that project?", "What challenges did he face?", "What did he learn from it?", "What was the most interesting part?", "How did he test it?", "Would he do anything differently now?"],
-                skillResponse: ["How did he learn that?", "Has he used it in projects?", "What is his proficiency level?", "What is his favorite way to apply this skill?", "Any tips for beginners?", "How has this skill evolved for him?"],
-                early: ["What are his main skills?", "Tell me about his background", "What projects is he proud of?", "What is something unique about him?", "Why did he choose this field?", "What is his biggest achievement?"]
-            }
-        },
-        pinnedChips: {
-            en: ["Projects", "Resume", "Contact"],
-            es: ["Proyectos", "Curriculum", "Contacto"],
-            ar: ["Projects", "Resume", "Contact"]
-        },
-        pinnedFollowUps: {
-            en: {
-                projects: ["Show me his top project", "What tech stack does he use most?", "Any detailed examples?"],
-                resume: ["Summarize his experience", "What roles is he targeting?", "What are his strongest skills?"],
-                contact: ["Email", "LinkedIn", "Best way to reach him?"]
-            },
-            es: {
-                projects: ["Muestrame su mejor proyecto", "Que stack tecnologico usa mas?", "Algun ejemplo detallado?"],
-                resume: ["Resume su experiencia", "Que roles busca?", "Cuales son sus habilidades mas fuertes?"],
-                contact: ["Email", "LinkedIn", "Mejor forma de contactarlo?"]
-            },
-            ar: {
-                projects: ["Show me his top project", "What tech stack does he use most?", "Any detailed examples?"],
-                resume: ["Summarize his experience", "What roles is he targeting?", "What are his strongest skills?"],
-                contact: ["Email", "LinkedIn", "Best way to reach him"]
+                skills: ["ما هي المشاريع التي عملت عليها؟", "أخبرني عن تجربتك", "ماذا تتعلم حالياً؟"],
+                background: ["ما هي مهاراتك الرئيسية؟", "أخبرني عن تعليمك", "في أي صناعات عملت؟"],
+                projects: ["هل يمكنك إظهار كودك؟", "ما هي التقنيات التي استخدمتها؟", "كم من الوقت استغرق بناؤه؟"],
+                contact: ["هل أنت متاح للعمل الحر؟", "ما هو وقت ردك المعتاد؟", "هل تعمل عن بعد؟"],
+                education: ["ما هي الشهادات التي لديك؟", "ما هو لغة البرمجة المفضلة لديك؟", "كيف تحافظ على تحديث نفسك بالتكنولوجيا؟"],
+                projectResponse: ["هل يمكنك إخباري المزيد عن هذا المشروع؟", "ما هي التحديات التي واجهتها؟", "ماذا تعلمت منه؟"],
+                skillResponse: ["كيف تعلمت ذلك؟", "هل استخدمته في مشاريع؟", "ما هو مستوى مهارتك؟"],
+                early: ["ما هي مهاراتك الرئيسية؟", "أخبرني عن خلفيتك", "ما هي المشاريع التي تفخر بها؟"]
             }
         }
     }
@@ -2092,14 +2219,14 @@ const initAchievements = () => {
     
     // Achievement definitions (now using translations)
     const achievements = {
-        explorer: { id: 'explorer', icon: 'EXP' },
-        reader: { id: 'reader', icon: 'RD' },
-        gamer: { id: 'gamer', icon: 'GM' },
-        chatter: { id: 'chatter', icon: 'CH' },
-        nightOwl: { id: 'nightOwl', icon: 'NO' },
-        konami: { id: 'konami', icon: 'KN' },
-        networker: { id: 'networker', icon: 'NW' },
-        formFiller: { id: 'formFiller', icon: 'FF' }
+        explorer: { id: 'explorer', icon: '🗺️' },
+        reader: { id: 'reader', icon: '📖' },
+        gamer: { id: 'gamer', icon: '🎮' },
+        chatter: { id: 'chatter', icon: '💬' },
+        nightOwl: { id: 'nightOwl', icon: '🌙' },
+        konami: { id: 'konami', icon: '🎯' },
+        networker: { id: 'networker', icon: '🔗' },
+        formFiller: { id: 'formFiller', icon: '✉️' }
     };
 
     // Get achievements from storage
@@ -2198,7 +2325,7 @@ const initAchievements = () => {
             };
         }
 
-        const safeIcon = resolved.icon || 'OK';
+        const safeIcon = resolved.icon || '🏆';
         const safeName = resolved.name || 'Achievement';
         const safeDesc = resolved.description || '';
         const notification = document.createElement('div');
@@ -2210,7 +2337,7 @@ const initAchievements = () => {
                 <div class="achievement-name">${safeName}</div>
                 <div class="achievement-desc">${safeDesc}</div>
             </div>
-            <button class="achievement-close" aria-label="Close achievement notification">x</button>
+            <button class="achievement-close" aria-label="Close achievement notification">×</button>
         `;
         document.body.appendChild(notification);
 
@@ -2316,7 +2443,7 @@ const initKonamiCode = () => {
                 <div class="konami-body">
                     <p class="konami-message">${konamiText.message}</p>
                     <div class="konami-gift">
-                        <div class="gift-emoji">*</div>
+                        <div class="gift-emoji">🎁</div>
                         <p class="gift-text">${konamiText.giftText}</p>
                         <div class="compliment-container" style="display: none;">
                             <p class="compliment-text"></p>
@@ -2435,7 +2562,7 @@ const initPWA = () => {
         });
 
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js?v=v20260119-5')
+            navigator.serviceWorker.register('/sw.js')
                 .then((registration) => {
 
                     // Best-effort: check for updates at most once per session.
@@ -2722,7 +2849,11 @@ const initPerformanceMonitoring = () => {
                     clarity('set', 'lcp', Math.round(lastEntry.renderTime || lastEntry.loadTime));
                 }
                 
-                // Telemetry already captures poor LCP, so keep the browser console quiet here.
+                // Warn if LCP is poor (> 2.5s)
+                const lcp = lastEntry.renderTime || lastEntry.loadTime;
+                if (lcp > 2500) {
+                    console.warn('Poor LCP detected:', lcp, 'ms');
+                }
             });
             
             observer.observe({ type: 'largest-contentful-paint', buffered: true });
@@ -2786,7 +2917,7 @@ const initPhase2 = () => {
                 // Visual feedback: change text if link has inner text
                 if (link.innerText || link.textContent) {
                     const originalText = link.innerText || link.textContent;
-                    link.innerText = 'Copied! ';
+                    link.innerText = 'Copied! ✅';
                     
                     // Revert after 2 seconds
                     setTimeout(() => {
@@ -2858,30 +2989,30 @@ const __ensureStandardEnglishChrome = () => {
             header.className = 'fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10';
             header.innerHTML = `
         <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between gap-2">
-            <a href="/" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
+            <a href="/index.html" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
                 <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
                 <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
             </a>
             
             <!-- Main Navigation -->
             <ul class="hidden md:flex items-center space-x-8">
-                <li><a href="/" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="home">Home</a></li>
-                <li><a href="/projects/" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="projects">Projects</a></li>
-                <li><a href="/overview" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="overview">Overview</a></li>
-                <li><a href="/deep-dive" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="deep-dive">Deep Dive</a></li>
-                <li><a href="/about" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="about">About</a></li>
-                <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
+                <li><a href="/index.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="home">Home</a></li>
+                <li><a href="/projects.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="projects">Projects</a></li>
+                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="overview">Overview</a></li>
+                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="deep-dive">Deep Dive</a></li>
+                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="about">About</a></li>
+                <li><a href="/contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
             </ul>
             
             <!-- Language Switcher -->
             <div id="lang-switcher" class="flex items-center space-x-3 shrink-0" style="z-index: 20;">
                 <a href="#" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-lang-key="en">EN</a>
-                <a href="/es/" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
-                <a href="/ar/" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
+                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
+                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
             </div>
             
             <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span aria-hidden="true">&#x2600;&#xFE0F;</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -2894,24 +3025,18 @@ const __ensureStandardEnglishChrome = () => {
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
             <ul class="px-6 py-4 space-y-3">
-                <li><a href="/" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="home">Home</a></li>
-                <li><a href="/projects/" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="projects">Projects</a></li>
-                <li><a href="/overview" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="overview">Overview</a></li>
-                <li><a href="/deep-dive" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="deep-dive">Deep Dive</a></li>
-                <li><a href="/about" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="about">About</a></li>
-                <li><a href="/contact" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
+                <li><a href="/index.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="home">Home</a></li>
+                <li><a href="/projects.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="projects">Projects</a></li>
+                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="overview">Overview</a></li>
+                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="deep-dive">Deep Dive</a></li>
+                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="about">About</a></li>
+                <li><a href="/contact.html" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
             </ul>
         </div>
             `;
 
             if (document.body) {
                 document.body.insertBefore(header, document.body.firstChild);
-            }
-
-            const injectedThemeToggle = header.querySelector('#theme-toggle');
-            if (injectedThemeToggle) {
-                injectedThemeToggle.innerHTML = THEME_ICON_MARKUP.light;
-                injectedThemeToggle.setAttribute('aria-label', getThemeToggleLabel('light'));
             }
 
             // Ensure content isn't hidden under fixed header
@@ -2925,7 +3050,7 @@ const __ensureStandardEnglishChrome = () => {
                 const enLink = header.querySelector('[data-lang-key="en"]');
                 if (enLink) {
                     const p = window.location.pathname || '/';
-                    enLink.href = (p === '/' ? '/' : p.replace(/\/index\.html$/i, '/').replace(/\.html$/i, ''));
+                    enLink.href = (p === '/' ? '/index.html' : p);
                 }
             } catch (e) {}
         }
@@ -2945,30 +3070,30 @@ const __ensureStandardEnglishChrome = () => {
                         <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
-                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. SDSU General Business graduate. I care about people, process, and doing the work right.</p>
+                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
                 </div>
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a href="/overview" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
-                        <li><a href="/deep-dive" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/deep-dive.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
                         <li><a href="/projects/" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
-                        <li><a href="/about" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
                     </ul>
                 </div>
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
                     <ul class="space-y-2">
-                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn &rarr;</a></li>
-                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub &rarr;</a></li>
-                        <li><a href="/contact" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
+                        <li><a href="/contact.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
                         <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
-                        <li><a href="/privacy" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                        <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">&copy; <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
             `;
@@ -3069,20 +3194,21 @@ const __shuffleInPlace = (arr, rnd) => {
 };
 
 const __GAME_CATALOG = [
-    { id: 'snake', href: '/hobbies-games/snake', emoji: 'SN', title: 'Snake', subtitle: 'Classic growth game' },
-    { id: 'breaker', href: '/hobbies-games/block-breaker', emoji: 'BB', title: 'Block Breaker', subtitle: 'Smash the bricks' },
-    { id: '2048', href: '/hobbies-games/2048', emoji: '24', title: '2048', subtitle: 'Merge the numbers' },
-    { id: 'invaders', href: '/hobbies-games/space-invaders', emoji: 'SI', title: 'Space Invaders', subtitle: 'Defend the earth' },
-    { id: 'racer', href: '/hobbies-games/racer', emoji: 'RC', title: 'Racer', subtitle: 'Fast reflex racing' },
-    { id: 'oh-flip', href: '/hobbies-games/oh-flip', emoji: 'OF', title: 'Oh Flip', subtitle: 'Timing + tricks' },
-    { id: 'onoff', href: '/hobbies-games/onoff', emoji: 'ON', title: 'ON/OFF', subtitle: 'Switch-based puzzle' },
-    { id: '1024-moves', href: '/hobbies-games/1024-moves', emoji: '10', title: '1024 Moves', subtitle: 'Move-limited strategy' },
-    { id: 'nano-wirebot', href: '/hobbies-games/nano-wirebot', emoji: 'NW', title: 'Nano Wirebot', subtitle: 'Precision platforming' },
-    { id: 'off-the-line', href: '/hobbies-games/off-the-line', emoji: 'OL', title: 'Off The Line', subtitle: 'Do not cross the line' },
-    { id: 'pizza-undelivery', href: '/hobbies-games/pizza-undelivery', emoji: 'PU', title: 'Pizza Undelivery', subtitle: 'Fast food chaos' },
-    { id: 'the-matr13k', href: '/hobbies-games/the-matr13k', emoji: 'TM', title: 'The Matr13k', subtitle: 'Pattern puzzle' },
-    { id: 'triangle-back-to-home', href: '/hobbies-games/triangle-back-to-home', emoji: 'TB', title: 'Triangle: Back to Home', subtitle: 'Geometry adventure' },
-    { id: 'xx142-b2exe', href: '/hobbies-games/xx142-b2exe', emoji: 'XX', title: 'XX142-B2EXE', subtitle: 'Experimental arcade' }
+    { id: 'snake', href: '/snake.html', emoji: '🐍', title: 'Snake', subtitle: 'Classic growth game' },
+    { id: 'breaker', href: '/breaker.html', emoji: '🧱', title: 'Block Breaker', subtitle: 'Smash the bricks' },
+    { id: '2048', href: '/2048.html', emoji: '🧩', title: '2048', subtitle: 'Merge the numbers' },
+    { id: 'invaders', href: '/invaders.html', emoji: '👾', title: 'Space Invaders', subtitle: 'Defend the earth' },
+    { id: 'racer', href: '/hobbies-games/racer.html', emoji: '🏎️', title: 'Racer', subtitle: 'Fast reflex racing' },
+    { id: 'oh-flip', href: '/hobbies-games/oh-flip.html', emoji: '🤸', title: 'Oh Flip', subtitle: 'Timing + tricks' },
+    { id: 'onoff', href: '/hobbies-games/onoff.html', emoji: '⚡', title: 'ON/OFF', subtitle: 'Switch-based puzzle' },
+    { id: '1024-moves', href: '/hobbies-games/1024-moves.html', emoji: '🧠', title: '1024 Moves', subtitle: 'Move-limited strategy' },
+    { id: 'back-attacker', href: '/hobbies-games/back-attacker.html', emoji: '🛡️', title: 'Back Attacker', subtitle: 'Survive the attacks' },
+    { id: 'nano-wirebot', href: '/hobbies-games/nano-wirebot.html', emoji: '🤖', title: 'Nano Wirebot', subtitle: 'Precision platforming' },
+    { id: 'off-the-line', href: '/hobbies-games/off-the-line.html', emoji: '🧷', title: 'Off The Line', subtitle: 'Don’t cross the line' },
+    { id: 'pizza-undelivery', href: '/hobbies-games/pizza-undelivery.html', emoji: '🍕', title: 'Pizza Undelivery', subtitle: 'Fast food chaos' },
+    { id: 'the-matr13k', href: '/hobbies-games/the-matr13k.html', emoji: '🧬', title: 'The Matr13k', subtitle: 'Pattern puzzle' },
+    { id: 'triangle-back-to-home', href: '/hobbies-games/triangle-back-to-home.html', emoji: '🔺', title: 'Triangle: Back to Home', subtitle: 'Geometry adventure' },
+    { id: 'xx142-b2exe', href: '/hobbies-games/xx142-b2exe.html', emoji: '🧪', title: 'XX142-B2EXE', subtitle: 'Experimental arcade' }
 ];
 
 const __renderSuggestionGrid = (gridEl, opts) => {
@@ -3130,7 +3256,7 @@ const __renderSuggestionGrid = (gridEl, opts) => {
 
     gridEl.innerHTML = chosen.map(g => `
         <a href="${g.href}" class="${tileClass}" data-game-id="${g.id}">
-            <div class="${emojiClass}">${g.emoji || "OK"}</div>
+            <div class="${emojiClass}">${g.emoji || '🎮'}</div>
             <div class="font-bold text-sm">${g.title || g.id}</div>
             <div class="text-xs opacity-60 mt-1">${g.subtitle || ''}</div>
         </a>
@@ -3250,37 +3376,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configuration
     // ======================================================================
     
-    const CHAT_ENDPOINT = '/api/chat';
+    const CHAT_ENDPOINT = 'https://portfolio-chat.eayramia.workers.dev/chat';
     const RESUME_URL = '/assets/docs/Estivan-Ayramia-Resume.pdf';
     const LINKEDIN_URL = 'https://www.linkedin.com/in/estivanayramia';
     const WELCOME_DELAY = 2500;
 
-    // Skip chat initialization on pages that disable floating UI (e.g., arcade games)
-    if (document.body.hasAttribute('data-disable-floating-ui')) return;
-
     // Project Data Mapping
     const projectData = {
         logistics: {
-            title: "L'Oreal Cell BioPrint MAPS Campaign",
-            summary: 'Campaign concept deck mapping personas and touchpoints across the funnel.',
-            img: '/assets/img/projects/previews/loreal-maps-campaign.png',
-            link: '/projects/loreal-maps-campaign'
+            title: 'Logistics System',
+            summary: 'A systems-focused project centered on execution, coordination, and operational clarity.',
+            img: '/assets/img/project-logistics.jpg',
+            link: '/projects/logistics'
         },
         conflict: {
-            title: 'Endpoint Competitive Playbook',
-            summary: "Strategy deck proposing how Almac + 4G Clinical can pressure Endpoint Clinical's positioning.",
-            img: '/assets/img/projects/previews/endpoint-competitive-playbook.png',
-            link: '/projects/endpoint-competitive-playbook'
+            title: 'Conflict Playbook',
+            summary: 'A practical framework for navigating conflict with structure, empathy, and outcomes.',
+            img: '/assets/img/project-conflict.jpg',
+            link: '/deep-dive#conflict'
         },
         discipline: {
-            title: 'Franklin Templeton Class Concept',
-            summary: "17-page concept deck for a Voice of Progress campaign (EN + AR).",
-            img: '/assets/img/projects/previews/franklin-templeton-concept.png',
-            link: '/projects/franklin-templeton-concept'
+            title: 'Discipline Routine',
+            summary: 'A repeatable routine and mindset system for sustainable discipline and follow-through.',
+            img: '/assets/img/project-discipline.jpg',
+            link: '/projects/discipline'
         },
         website: {
             title: 'Portfolio Website',
-            summary: 'The site you are on, built for speed, clarity, and a clean browsing experience.',
+            summary: 'The site you’re on—built for speed, clarity, and a clean browsing experience.',
             img: '/assets/img/og-image.png',
             link: '/'
         }
@@ -3364,61 +3487,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // State
     let chatHistory = [];
     let isSending = false; // Prevent duplicate sends
-    let lastContext = null; // Store truncation tail logic
     let isInitialized = false;
 
-    // Chips state management - single source of truth
-    let dynamicChips = []; // Dynamic chips from worker responses or context
-    let currentLanguage = document.documentElement.lang || 'en';
-    let requestIdCounter = 0; // Race condition protection
-    let lastRequestId = 0;
-
-    // Cross-page chat memory
-    // Use sessionStorage so conversation persists across pages in the same tab.
-    // If you want memory across browser restarts, switch this to localStorage.
-    const historyStorageKey = `savonie_history:v1:${pageLang || 'en'}`;
+    const historyStorageKey = `savonie_history:${pageLang}:${window.location.pathname || '/'}`;
     const MAX_HISTORY_ITEMS = 50;
 
     function buildSafePageContext() {
         try {
+            const parts = [];
             const path = window.location.pathname || '/';
+            parts.push(`path: ${path}`);
+            parts.push(`title: ${document.title || ''}`);
+
             const headings = Array.from(document.querySelectorAll('h1, h2'))
                 .map((h) => (h.textContent || '').trim())
                 .filter(Boolean)
                 .slice(0, 10);
 
-            const description = document
-                .querySelector('meta[name="description"]')
-                ?.getAttribute('content') || '';
+            if (headings.length) {
+                parts.push('headings:');
+                headings.forEach((t) => parts.push(`- ${t}`));
+            }
 
-            const buildVersion = document
-                .querySelector('meta[name="build-version"]')
-                ?.getAttribute('content') || '';
-
-            const text = Array.from(document.querySelectorAll('main p'))
-                .map((node) => (node.textContent || '').trim())
-                .filter(Boolean)
-                .slice(0, 6)
-                .join(' ')
-                .slice(0, 1200);
-
-            return {
-                route: path,
-                title: document.title || '',
-                description,
-                buildVersion,
-                headings,
-                text
-            };
+            const combined = parts.join('\n');
+            // Cap to ~3.5k chars to avoid leaking too much content.
+            return combined.length > 3500 ? combined.slice(0, 3500) : combined;
         } catch (e) {
-            return {
-                route: window.location.pathname || '/',
-                title: document.title || '',
-                description: '',
-                buildVersion: '',
-                headings: [],
-                text: ''
-            };
+            return `${window.location.pathname || '/'} | ${document.title || ''}`;
         }
     }
     
@@ -3464,18 +3559,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add welcome message only if no history
     if (chatHistory.length === 0) {
         const currentLang = document.documentElement.lang || 'en';
-        const welcomeMessage = translations.chat.welcome[currentLang] || "Hey, I'm Savonie. Ask about Estivan, the work, or the site.";
+        const welcomeMessage = translations.chat.welcome[currentLang] || "Hello! I am Savonie. Ask me anything about Estivan.";
         addMessageToUI(welcomeMessage, 'bot', false);
     }
 
     // Always update chips based on current language, regardless of history
     if (els.chipsContainer) {
-        currentLanguage = document.documentElement.lang || 'en';
-        const defaultChipsForLang = translations.chat.defaultChips[currentLanguage] || translations.chat.defaultChips.en;
+        const currentLang = document.documentElement.lang || 'en';
+        const defaultChips = translations.chat.defaultChips[currentLang] || translations.chat.defaultChips['en'];
         
-        // Set initial dynamic chips
-        dynamicChips = defaultChipsForLang;
-        renderChips();
+        renderChips(defaultChips);
     }
     
     isInitialized = true;
@@ -3512,7 +3605,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function setSuggestionsVisible(isVisible) {
         if (!els.suggestionsContainer) {
-            chatLog('[Savonie DEBUG] setSuggestionsVisible called but no suggestions container');
+            console.log('[Savonie DEBUG] setSuggestionsVisible called but no suggestions container');
             return;
         }
 
@@ -3526,12 +3619,12 @@ document.addEventListener('DOMContentLoaded', () => {
             els.suggestionsContainer.style.display = 'none';
         }
 
-        chatLog('[Savonie DEBUG] setSuggestionsVisible ->', isVisible, 'classes:', els.suggestionsContainer.className);
+        console.log('[Savonie DEBUG] setSuggestionsVisible ->', isVisible, 'classes:', els.suggestionsContainer.className);
     }
 
     function attachSuggestionHandlers() {
         if (!els.suggestionsContainer) {
-            chatLog('[Savonie DEBUG] No suggestions container found on this page');
+            console.log('[Savonie DEBUG] No suggestions container found on this page');
             return;
         }
 
@@ -3541,14 +3634,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                  els.suggestionsContainer.hasAttribute('hidden') ||
                                  els.suggestionsContainer.style.display === 'none';
                 const nextVisible = isHidden;
-                chatLog('[Savonie DEBUG] Lightbulb clicked, nextVisible =', nextVisible);
+                console.log('[Savonie DEBUG] Lightbulb clicked, nextVisible =', nextVisible);
                 setSuggestionsVisible(nextVisible);
             });
         } else {
-            chatLog('[Savonie DEBUG] No suggestions toggle (lightbulb) found');
+            console.log('[Savonie DEBUG] No suggestions toggle (lightbulb) found');
         }
 
-        chatLog('[Savonie DEBUG] attachSuggestionHandlers complete');
+        console.log('[Savonie DEBUG] attachSuggestionHandlers complete');
     }
 
     // Attach handlers immediately (DOM is already ready due to DOMContentLoaded)
@@ -3626,38 +3719,58 @@ document.addEventListener('DOMContentLoaded', () => {
         const detectedLang = detectLanguage(lastUserMessage);
         const contextualSuggestions = translations.chat.contextualSuggestions;
         
-        // Analyze both user question AND bot response for better context detection
-        const combinedContext = lastUserMessage + ' ' + lastBotMessage;
-        
-        // More intelligent context detection based on both question and answer
-        if (combinedContext.match(/skill|technology|expertise|proficiency|technical|programming|coding|developer|engineer|habilidad|tecnologia|experiencia|programacion/i)) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.skills || contextualSuggestions.en.skills));
-        } else if (combinedContext.match(/background|experience|career|journey|history|education|degree|university|studied|fondo|experiencia|carrera|educacion|universidad/i)) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.background || contextualSuggestions.en.background));
-        } else if (combinedContext.match(/project|portfolio|work|built|created|developed|application|website|system|proyecto|trabajo|portafolio|construido|desarrollado|aplicacion/i)) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.projects || contextualSuggestions.en.projects));
-        } else if (combinedContext.match(/contact|reach|email|connect|hire|available|freelance|contacto|alcanzar|correo|conectar|contratar|disponible/i)) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.contact || contextualSuggestions.en.contact));
-        } else if (combinedContext.match(/education|study|learn|course|certification|degree|training|class|educacion|estudio|aprender|curso|certificacion|grado/i)) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.education || contextualSuggestions.en.education));
-        } else if (lastBotMessage.match(/project|portfolio|application|system|website|built|created|developed|proyecto|aplicacion|sistema|construido|desarrollado/i)) {
-            // Bot is talking about projects, offer project-related follow-ups
-            suggestions.push(...(contextualSuggestions[detectedLang]?.projectResponse || contextualSuggestions.en.projectResponse));
-        } else if (lastBotMessage.match(/skill|technology|proficiency|expertise|language|framework|tool|habilidad|tecnologia|lenguaje|herramienta/i)) {
-            // Bot is talking about skills, offer skill-related follow-ups
-            suggestions.push(...(contextualSuggestions[detectedLang]?.skillResponse || contextualSuggestions.en.skillResponse));
+        // Analyze conversation context and suggest relevant follow-ups
+        if (lastUserMessage.includes('skill') || lastUserMessage.includes('technology') || lastUserMessage.includes('expertise') ||
+            lastUserMessage.includes('habilidad') || lastUserMessage.includes('tecnología') || lastUserMessage.includes('experiencia') ||
+            lastUserMessage.includes('مهارة') || lastUserMessage.includes('تكنولوجيا') || lastUserMessage.includes('خبرة')) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.skills || [
+                "What projects have you worked on?", "Tell me about your experience", "What are you learning currently?"
+            ]));
+        } else if (lastUserMessage.includes('background') || lastUserMessage.includes('experience') || lastUserMessage.includes('career') ||
+                   lastUserMessage.includes('fondo') || lastUserMessage.includes('experiencia') || lastUserMessage.includes('carrera') ||
+                   lastUserMessage.includes('خلفية') || lastUserMessage.includes('خبرة') || lastUserMessage.includes('مسيرة')) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.background || [
+                "What are your main skills?", "Tell me about your education", "What industries have you worked in?"
+            ]));
+        } else if (lastUserMessage.includes('project') || lastUserMessage.includes('work') || lastUserMessage.includes('portfolio') ||
+                   lastUserMessage.includes('proyecto') || lastUserMessage.includes('trabajo') || lastUserMessage.includes('portafolio') ||
+                   lastUserMessage.includes('مشروع') || lastUserMessage.includes('عمل') || lastUserMessage.includes('محفظة')) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.projects || [
+                "Can you show me your code?", "What technologies did you use?", "How long did it take to build?"
+            ]));
+        } else if (lastUserMessage.includes('contact') || lastUserMessage.includes('reach') || lastUserMessage.includes('email') ||
+                   lastUserMessage.includes('contacto') || lastUserMessage.includes('alcanzar') || lastUserMessage.includes('correo') ||
+                   lastUserMessage.includes('اتصال') || lastUserMessage.includes('الوصول') || lastUserMessage.includes('بريد')) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.contact || [
+                "Are you available for freelance work?", "What's your typical response time?", "Do you work remotely?"
+            ]));
+        } else if (lastUserMessage.includes('education') || lastUserMessage.includes('study') || lastUserMessage.includes('learn') ||
+                   lastUserMessage.includes('educación') || lastUserMessage.includes('estudio') || lastUserMessage.includes('aprender') ||
+                   lastUserMessage.includes('تعليم') || lastUserMessage.includes('دراسة') || lastUserMessage.includes('تعلم')) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.education || [
+                "What certifications do you have?", "What's your favorite programming language?", "How do you stay updated with technology?"
+            ]));
+        } else if (lastBotMessage.includes('project') || lastBotMessage.includes('work') ||
+                   lastBotMessage.includes('proyecto') || lastBotMessage.includes('trabajo') ||
+                   lastBotMessage.includes('مشروع') || lastBotMessage.includes('عمل')) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.projectResponse || [
+                "Can you tell me more about that project?", "What challenges did you face?", "What did you learn from it?"
+            ]));
+        } else if (lastBotMessage.includes('skill') || lastBotMessage.includes('technology') ||
+                   lastBotMessage.includes('habilidad') || lastBotMessage.includes('tecnología') ||
+                   lastBotMessage.includes('مهارة') || lastBotMessage.includes('تكنولوجيا')) {
+            suggestions.push(...(contextualSuggestions[detectedLang]?.skillResponse || [
+                "How did you learn that?", "Have you used it in projects?", "What's your proficiency level?"
+            ]));
         } else if (history.length < 4) {
             // Early conversation - general suggestions
-            suggestions.push(...(contextualSuggestions[detectedLang]?.early || contextualSuggestions.en.early));
+            suggestions.push(...(contextualSuggestions[detectedLang]?.early || [
+                "What are your main skills?", "Tell me about your background", "What projects are you proud of?"
+            ]));
         }
         
-        // If no suggestions found, default to early conversation suggestions
-        if (suggestions.length === 0) {
-            suggestions.push(...(contextualSuggestions[detectedLang]?.early || contextualSuggestions.en.early));
-        }
-        
-        // Limit to 5 suggestions for more elaborate options
-        return suggestions.slice(0, 5);
+        // Limit to 3 suggestions and ensure variety
+        return suggestions.slice(0, 3);
     }
 
     // Simple language detection based on character patterns
@@ -3669,7 +3782,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (arabicChars.test(text)) return 'ar';
         
         // Spanish detection (common Spanish words and patterns)
-        const spanishWords = /\b(que|como|donde|cuando|por que|esta|son|tiene|trabajo|habilidades?|experiencia|proyecto|contacto)\b/i;
+        const spanishWords = /\b(qué|como|dónde|cuándo|por qué|está|son|tiene|trabajo|habilidades?|experiencia|proyecto|contacto)\b/i;
         if (spanishWords.test(text)) return 'es';
         
         // Default to English
@@ -3685,11 +3798,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const getSafeHttpUrl = (rawUrl) => {
             try {
-                const s = String(rawUrl).trim();
-                // Allow relative URLs starting with /
-                if (s.startsWith('/')) return s;
-                
-                const u = new URL(s);
+                const u = new URL(String(rawUrl));
                 if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
                 return u.toString();
             } catch (_) {
@@ -3700,11 +3809,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const createLink = (href, label) => {
             const a = document.createElement('a');
             a.href = href;
-            // Internal links open in same tab, external in new tab
-            const isInternal = href.startsWith('/');
-            a.target = isInternal ? '_self' : '_blank';
-            if (!isInternal) a.rel = 'noopener noreferrer';
-            
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
             a.className = 'text-[#212842] underline hover:text-[#362017] font-medium';
             a.textContent = label;
             return a;
@@ -3778,9 +3884,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const el = /** @type {HTMLElement} */ (child);
                     const tag = el.tagName;
 
-                    // Capture attributes we might want to keep before stripping.
-                    const originalHref = tag === 'A' ? el.getAttribute('href') : null;
-
                     if (!allowedTags.has(tag)) {
                         const replacement = document.createTextNode(el.textContent || '');
                         el.replaceWith(replacement);
@@ -3792,22 +3895,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (const a of attrs) el.removeAttribute(a.name);
 
                     if (tag === 'A') {
-                        const href = safeUrl(originalHref);
+                        const href = safeUrl(el.getAttribute('href'));
                         if (!href) {
                             const replacement = document.createTextNode(el.textContent || '');
                             el.replaceWith(replacement);
                             continue;
                         }
                         el.setAttribute('href', href);
-                        
-                        const isInternal = href.startsWith('/');
-                        if (isInternal) {
-                            el.setAttribute('target', '_self');
-                        } else {
-                            el.setAttribute('target', '_blank');
-                            el.setAttribute('rel', 'noopener noreferrer');
-                        }
-                        
+                        el.setAttribute('target', '_blank');
+                        el.setAttribute('rel', 'noopener noreferrer');
                         el.className = 'text-[#212842] underline hover:text-[#362017] font-medium';
                     }
 
@@ -3860,117 +3956,41 @@ document.addEventListener('DOMContentLoaded', () => {
         return out;
     };
 
-    // Helper: Render chips with dynamic + pinned structure
-    function renderChips(newDynamicChips = null) {
+    // Helper: Render chips and ensure close button exists
+    function renderChips(chips) {
         if (!els.chipsContainer) return;
         
-        // Update dynamic chips if provided
-        if (newDynamicChips && Array.isArray(newDynamicChips)) {
-            dynamicChips = newDynamicChips;
-        }
-        
-        // Get current language
-        currentLanguage = document.documentElement.lang || 'en';
-        
-        // Get pinned chips for current language
-        const pinnedChips = translations.chat.pinnedChips[currentLanguage] || translations.chat.pinnedChips.en;
-        
-        // Deduplicate: remove any dynamic chips that match pinned chips (case-insensitive)
-        const pinnedLower = pinnedChips.map(p => p.toLowerCase());
-        const uniqueDynamicChips = dynamicChips.filter(chip => 
-            !pinnedLower.includes(chip.toLowerCase())
-        );
-        
-        // Combine: dynamic first, then pinned
-        const allChips = [...uniqueDynamicChips, ...pinnedChips];
-        
-        // Clear and rebuild
         els.chipsContainer.innerHTML = '';
         
-        if (allChips.length === 0) {
+        if (!chips || chips.length === 0) {
             setSuggestionsVisible(false);
             return;
         }
 
-        // Define action labels for special handling
-        const projectLabels = ["Projects", "View Projects", "View projects", "Proyectos", "Ver proyectos"];
-        const resumeLabels = ["Resume", "Download Resume", "View Resume", "Get resume", "Curriculum", "Descargar curriculum"];
-        const contactLabels = ["Contact", "Email", "Email Estivan", "Contact Estivan", "Contacto", "Correo electronico"];
-        const linkedinLabels = ["LinkedIn", "Open LinkedIn"];
-
-        // Render all chips
-        allChips.forEach(chipText => {
+        // Render chips
+        chips.forEach(chipText => {
             const btn = document.createElement('button');
-            const isPinned = pinnedChips.some(p => p.toLowerCase() === chipText.toLowerCase());
-            
-            // Style pinned chips slightly differently (optional)
-            const pinnedStyle = isPinned ? 'font-medium' : '';
-            btn.className = `chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors ${pinnedStyle}`;
+            btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
             btn.textContent = chipText;
-            
             btn.addEventListener('click', () => {
-                // Handle pinned chip actions
-                if (projectLabels.includes(chipText)) {
-                    window.location.href = "/projects/";
-                    // Update dynamic chips with project-related follow-ups
-                    const followUps = translations.chat.pinnedFollowUps[currentLanguage]?.projects || 
-                                     translations.chat.pinnedFollowUps.en.projects;
-                    dynamicChips = followUps;
-                    renderChips();
-                    return;
-                }
-                if (resumeLabels.includes(chipText)) {
-                    try { window.open(RESUME_URL, '_blank', 'noopener'); } catch(e) {}
-                    // Update dynamic chips with resume-related follow-ups
-                    const followUps = translations.chat.pinnedFollowUps[currentLanguage]?.resume || 
-                                     translations.chat.pinnedFollowUps.en.resume;
-                    dynamicChips = followUps;
-                    renderChips();
-                    return;
-                }
-                if (contactLabels.includes(chipText)) {
-                    window.location.href = "/contact";
-                    // Update dynamic chips with contact-related follow-ups
-                    const followUps = translations.chat.pinnedFollowUps[currentLanguage]?.contact || 
-                                     translations.chat.pinnedFollowUps.en.contact;
-                    dynamicChips = followUps;
-                    renderChips();
-                    return;
-                }
-                if (linkedinLabels.includes(chipText)) {
-                    try { window.open(LINKEDIN_URL, '_blank', 'noopener'); } catch(e) {}
-                    return;
-                }
-
-                // Continuation Logic
-                if (chipText === "Continue reading...") {
-                    handleSend("Continue", lastContext);
-                    return;
-                }
-
-                // Default behavior: send text as message
                 if (els.input) {
                     els.input.value = chipText;
-                    // Clear input immediately after capturing the value
-                    setTimeout(() => {
-                        if (els.input) els.input.value = '';
-                    }, 0);
                     handleSend();
                 }
             });
             els.chipsContainer.appendChild(btn);
         });
 
-        // Always add close button
+        // Always add close button with proper data attribute
         const closeBtn = document.createElement('button');
         closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
         closeBtn.setAttribute('data-chat-suggestions-close', 'button');
-        closeBtn.innerHTML = 'x';
+        closeBtn.innerHTML = '×';
         closeBtn.title = 'Hide suggestions';
         closeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            chatLog('[Savonie DEBUG] Suggestions close X clicked, hiding suggestions');
+            console.log('[Savonie DEBUG] Suggestions close X clicked, hiding suggestions');
             setSuggestionsVisible(false);
         });
         els.chipsContainer.appendChild(closeBtn);
@@ -4080,17 +4100,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function handleSend(overrideText = null, overrideContext = null) {
+    async function handleSend() {
         if (!els.input) return;
-        const text = (typeof overrideText === 'string') ? overrideText : els.input.value.trim();
+        const text = els.input.value.trim();
         if (!text || isSending) return;
 
         isSending = true;
-        
-        // Generate unique request ID for race condition protection
-        requestIdCounter++;
-        const thisRequestId = requestIdCounter;
-        lastRequestId = thisRequestId;
 
         // Google Analytics event tracking
         if(typeof gtag === 'function') {
@@ -4108,14 +4123,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const online = await isActuallyOnline();
         if (!online) {
             addMessageToUI(text, 'user');
-            if(!overrideText) els.input.value = '';
+            els.input.value = '';
             addMessageToUI("You appear to be offline. Please check your connection and try again.", 'bot');
             isSending = false;
             return;
         }
 
         addMessageToUI(text, 'user');
-        if(!overrideText) els.input.value = '';
+        els.input.value = '';
         const loadingId = addMessageToUI('Thinking...', 'bot', true);
 
         // Enhanced fetch with timeout and retry logic
@@ -4127,7 +4142,6 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-            const pageContext = buildSafePageContext();
 
             try {
                 const response = await fetch(CHAT_ENDPOINT, {
@@ -4135,33 +4149,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         message: text,
-                        pageContext,
-                        pageContent: pageContext.text || '',
-                        language: pageLang,
-                        previousContext: overrideContext || null // Support continuation
+                        pageContent: buildSafePageContext(),
+                        language: pageLang
                     }),
                     signal: controller.signal
                 });
 
                 clearTimeout(timeoutId);
-                chatLog('[Chat Debug] Fetch completed. Status:', response.status, 'OK:', response.ok);
 
                 // Handle HTTP error responses
                 if (!response.ok) {
-                    // Try to parse error response body
-                    try {
-                        const errorData = await response.json();
-                        // If worker returned structured error with errorType, use it
-                        if (errorData && errorData.errorType) {
-                            data = errorData;
-                            lastError = null;
-                            break;
-                        }
-                    } catch (parseErr) {
-                        // Failed to parse, treat as generic error
-                    }
-                    
-                    if (response.status >= 500 || response.status === 503 || response.status === 504) {
+                    if (response.status >= 500) {
                         // Server error - may be worth retrying
                         lastError = { type: 'server', status: response.status };
                         if (attempt < MAX_RETRIES) {
@@ -4180,7 +4178,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 data = await response.json();
-                chatLog('[Chat Debug] Response parsed successfully:', data);
                 lastError = null; // Success!
                 break;
 
@@ -4229,132 +4226,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Success - process the response
         removeMessage(loadingId);
-        chatLog('[Chat Debug] Processing response. Data structure:', { hasData: !!data, hasErrorType: !!(data && data.errorType), hasReply: !!(data && data.reply) });
 
         // Contract-level error types (may be absent)
         if (data && data.errorType) {
             let friendly = 'Something went wrong. Please try again.';
-            let shouldRetry = false;
-            let retryDelay = 0;
-            
             if (data.errorType === 'RateLimit') {
                 friendly = 'Too many requests. Please wait a moment before trying again.';
             } else if (data.errorType === 'BadRequest') {
                 friendly = 'Please rephrase your question and try again.';
             } else if (data.errorType === 'UpstreamError') {
-                friendly = 'The AI service is temporarily unavailable. Please try again in a moment.';
-            } else if (data.errorType === 'UpstreamBusy') {
-                friendly = 'The AI service is experiencing high demand. Retrying automatically in 30 seconds...';
-                shouldRetry = true;
-                retryDelay = 30000; // 30 seconds from Retry-After header
-            } else if (data.errorType === 'AuthError' || data.errorType === 'ConfigError') {
-                friendly = 'The AI service is having configuration issues. Please try again later or explore projects directly.';
-            } else if (data.errorType === 'Timeout') {
-                friendly = 'The request timed out. Please try again with a shorter question.';
-            } else if (data.errorType === 'OfflineMode') {
-                // This is actually a fallback response, not an error
-                // Don't show error message, proceed to render the reply
-                friendly = null;
+                friendly = 'Service hiccup—please try again in a moment.';
             }
-            
-            if (friendly) {
-                addMessageToUI(friendly, 'bot');
-            }
-            
-            // For OfflineMode, still render the reply and chips even though errorType is set
-            if (data.errorType !== 'OfflineMode') {
-                // Handle chips for error states - PRESERVE dynamic chips, only add Retry temporarily
-                if (els.chipsContainer) {
-                    // For error responses, keep existing dynamic chips and just add "Retry" chip
-                    const errorChips = ["Retry"];
-                    
-                    // Preserve existing dynamic chips by not overwriting them
-                    // Just ensure the Retry chip is visible alongside current context
-                    if (dynamicChips.length > 0 && !dynamicChips.includes("Retry")) {
-                        // Add Retry to beginning of existing dynamic chips temporarily
-                        const tempChips = ["Retry", ...dynamicChips];
-                        renderChips(tempChips);
-                    } else {
-                        // No dynamic chips yet, just add Retry
-                        renderChips(errorChips);
-                    }
-                } else {
-                    // No chips container, just re-render
-                    renderChips();
-                }
-                
-                if (shouldRetry) {
-                    // Auto-retry after delay
-                    setTimeout(() => {
-                        handleSend(text, overrideContext); // Retry with same text and context
-                    }, retryDelay);
-                }
-                
-                isSending = false;
-                return;
-            }
-            // If OfflineMode, continue to render reply below
-        }
-
-        // Handle Smart Signals response
-        chatLog('[Chat Debug] About to check reply. data.reply exists:', !!data.reply, 'Value:', data.reply ? data.reply.substring(0, 100) + '...' : 'undefined');
-        if (data.reply) {
-            // SAFETY: Strip any trailing JSON blobs if the Worker ever leaks them
-            data.reply = data.reply.replace(/\n?\s*\{\s*"(reply|chips|action|card|errorType)"[\s\S]*$/, "").trim();
-            
-            addMessageToUI(data.reply, 'bot');
-        }
-        
-        // Handle Continuation context
-        if (data.truncated && (data.continuation_hint || data.reply)) {
-            // Store helpful context for the next request
-            lastContext = data.continuation_hint || data.reply.slice(-800);
-            
-            // Inject "Continue reading..." chip
-            if (!data.chips) data.chips = [];
-            // Remove any existing continue chips to avoid dupes
-            data.chips = data.chips.filter(c => c !== "Continue reading...");
-            data.chips.unshift("Continue reading...");
-        } else {
-            lastContext = null;
-        }
-
-        // Race condition protection: Only process if this is still the latest request
-        if (thisRequestId !== lastRequestId) {
-            chatLog('[Chat Debug] Ignoring stale response from request', thisRequestId);
+            addMessageToUI(friendly, 'bot');
             isSending = false;
             return;
         }
 
-        // Handle chips (suggestion buttons) with smart logic
+        // Handle Smart Signals response
+        if (data.reply) {
+            addMessageToUI(data.reply, 'bot');
+        }
+
+        // Handle chips (suggestion buttons)
         if (data.chips && Array.isArray(data.chips) && els.chipsContainer) {
-            // Get pinned chips for current language to check if response is pinned-only
-            const pinnedChips = translations.chat.pinnedChips[currentLanguage] || translations.chat.pinnedChips.en;
-            const pinnedLower = pinnedChips.map(p => p.toLowerCase());
-            
-            // Check if ALL chips are pinned chips (case-insensitive)
-            const allPinned = data.chips.every(chip => pinnedLower.includes(chip.toLowerCase()));
-            
-            if (allPinned && data.chips.length > 0) {
-                // Response contains ONLY pinned chips - don't wipe dynamic chips
-                chatLog('[Chat Debug] Response contains only pinned chips, keeping existing dynamic chips');
-                renderChips(); // Re-render with existing dynamic chips + pinned
-            } else {
-                // Response contains at least one non-pinned chip - update dynamic chips
-                renderChips(data.chips);
-            }
-        } else if (!data.chips && chatHistory.length > 0) {
-            // No chips from worker, generate contextual ones
-            const contextualChips = generateContextualChips(chatHistory);
-            if (contextualChips.length > 0 && els.chipsContainer) {
-                renderChips(contextualChips);
-            } else {
-                // No contextual chips either, keep current dynamic chips and re-render
-                renderChips();
-            }
-        } else {
-            // Ensure pinned chips are always visible
-            renderChips();
+            renderChips(data.chips);
         }
 
         // Handle actions
@@ -4386,6 +4281,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle card
         if (data.card) {
             addCardToUI(data.card);
+        }
+
+        // Generate contextual chips based on conversation
+        if (!data.chips && chatHistory.length > 0) {
+            const contextualChips = generateContextualChips(chatHistory);
+            if (contextualChips.length > 0 && els.chipsContainer) {
+                renderChips(contextualChips);
+            }
         }
 
         isSending = false;
@@ -4585,146 +4488,114 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// PDF preview behavior is handled by initPdfPreviews() in the main boot flow.
+// ==========================================================================
+// PDF Preview Toggle (for project pages)
+// ==========================================================================
 
-// ============================================================================
-// SITE-WIDE ACHIEVEMENT TRACKING
-// ============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Helper: produce the default fallback markup (keeps existing copy consistent)
+    const defaultFallback = () => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'rounded-xl border border-chocolate/20 bg-white/40 overflow-hidden p-8 text-center';
+        const p = document.createElement('p');
+        p.className = 'text-sm text-chocolate/70';
+        p.textContent = 'Inline PDF preview may be blocked by hosting or browser settings. Use the buttons below to open or download the deck.';
+        wrapper.appendChild(p);
+        return wrapper;
+    };
 
-/**
- * Site-Wide Achievement System
- * 
- * Tracks user interactions across the site and unlocks achievements:
- * - explorer: Visit all main pages
- * - networker: Click social links (LinkedIn/GitHub)
- * - chatter: Open chat widget
- * - formFiller: Submit contact form
- * - gamer: Play a game (tracked on hobbies-games page)
- * - reader: Visit Deep Dive page (auto-tracked by page visit)
- * - nightOwl: Toggle dark mode (wired into toggleTheme above)
- * - konami: Konami code (separate implementation if exists)
- */
+    // Try to load a PDF into an iframe; if it fails, show fallback
+    const tryLoadPdf = (panel, pdfUrl) => {
+        if (!panel || !pdfUrl) return;
+        if (panel.dataset.pdfLoaded) return; // already attempted
 
-// Achievement: Explorer - Visit all main pages
-(() => {
-    try {
-        const mainPages = ['/', '/about', '/projects', '/hobbies-games', '/contact'];
-        
-        // Function to normalize page paths for comparison
-        const normalizePath = (path) => {
-            // Remove .html extension
-            path = path.replace(/\.html$/, '');
-            // Remove trailing slash unless it's root
-            if (path.length > 1 && path.endsWith('/')) {
-                path = path.slice(0, -1);
-            }
-            // Remove /EN/ prefix if present
-            path = path.replace(/^\/EN/, '');
-            return path || '/';
-        };
-        
-        const currentPath = normalizePath(window.location.pathname);
-        
-        // Get visited pages from sessionStorage
-        let visited = [];
-        try {
-            const stored = sessionStorage.getItem('visited_pages');
-            visited = stored ? JSON.parse(stored) : [];
-        } catch (e) {
-            visited = [];
-        }
-        
-        // Add current page if it's a main page and not already visited
-        if (mainPages.includes(currentPath) && !visited.includes(currentPath)) {
-            visited.push(currentPath);
-            sessionStorage.setItem('visited_pages', JSON.stringify(visited));
+        // Insert a lightweight loading state
+        panel.innerHTML = '';
+        const loading = document.createElement('div');
+        loading.className = 'py-12 text-sm text-chocolate/60';
+        loading.textContent = 'Attempting to load inline preview…';
+        panel.appendChild(loading);
+
+        const iframe = document.createElement('iframe');
+        iframe.src = pdfUrl;
+        iframe.title = 'PDF preview';
+        iframe.style.width = '100%';
+        iframe.style.height = '480px';
+        iframe.style.border = '0';
+        iframe.loading = 'lazy';
+
+        let timedOut = false;
+        const timeout = setTimeout(() => {
+            timedOut = true;
+            // Loading took too long - assume success (browser swallowed load event for PDF)
+            console.log('PDF load timeout - assuming success');
             
-            // Check if all pages visited
-            const allVisited = mainPages.every(page => visited.includes(page));
-            if (allVisited && typeof window.ArcadeAchievements !== 'undefined') {
-                window.ArcadeAchievements.unlock('explorer');
-            }
-        }
-        
-        // Achievement: Reader - Visit Deep Dive page
-        if (currentPath === '/deep-dive' && typeof window.ArcadeAchievements !== 'undefined') {
-            window.ArcadeAchievements.unlock('reader');
-        }
-    } catch (e) {
-        console.warn('[Achievements] Explorer tracking error:', e);
-    }
-})();
+            // Clean up loading state
+            try { loading.remove(); } catch(e) {}
+            if (!panel.contains(iframe)) panel.appendChild(iframe);
+            panel.dataset.pdfLoaded = 'true';
+        }, 5000);
 
-// Achievement: Networker - Click social links
-(() => {
-    try {
-        document.addEventListener('click', (e) => {
-            const link = e.target.closest('a[href*="linkedin.com"], a[href*="github.com"]');
-            if (link && typeof window.ArcadeAchievements !== 'undefined') {
-                window.ArcadeAchievements.unlock('networker');
+        const onFail = () => {
+            clearTimeout(timeout);
+            try { iframe.remove(); } catch (e) {}
+            panel.innerHTML = '';
+            panel.appendChild(defaultFallback());
+            panel.dataset.pdfLoaded = 'false';
+        };
+
+        iframe.addEventListener('load', () => {
+            clearTimeout(timeout);
+            // If iframe content is accessible, treat as success.
+            try {
+                try { loading.remove(); } catch(e) {}
+                if (!panel.contains(iframe)) panel.appendChild(iframe);
+                panel.dataset.pdfLoaded = 'true';
+            } catch (e) {
+                // If something goes wrong, fallback
+                onFail();
             }
         });
-    } catch (e) {
-        console.warn('[Achievements] Networker tracking error:', e);
-    }
-})();
 
-// Achievement: Chatter - Open chat widget
-(() => {
-    try {
-        // Wait for DOM to ensure chat toggle exists
-        const wireChatter = () => {
-            const chatToggle = document.getElementById('chat-toggle');
-            if (chatToggle) {
-                chatToggle.addEventListener('click', () => {
-                    if (typeof window.ArcadeAchievements !== 'undefined') {
-                        window.ArcadeAchievements.unlock('chatter');
-                    }
-                });
+        iframe.addEventListener('error', onFail);
+
+        // Append iframe so browser begins loading
+        panel.appendChild(iframe);
+    };
+
+    // Initialize toggles and progressive load for every preview-toggle on the page
+    document.querySelectorAll('.preview-toggle').forEach((btn) => {
+        // Find the preview panel within the same section
+        const section = btn.closest('section');
+        const panel = section && section.querySelector('.preview-panel');
+
+        // Attempt to find a PDF link within the same section (first match)
+        let pdfLink = null;
+        if (section) {
+            pdfLink = section.querySelector('a[href$=".pdf"]') || section.querySelector('a[href*=".pdf?"]');
+        }
+        const pdfUrl = pdfLink ? pdfLink.getAttribute('href') : null;
+
+        // If a PDF URL exists, try to progressively load the iframe now (so the preview is ready).
+        // This preserves the user's expectation that an inline preview appears when possible.
+        if (panel && pdfUrl) {
+            tryLoadPdf(panel, pdfUrl);
+        }
+
+        btn.addEventListener('click', () => {
+            if (!panel) return;
+            panel.classList.toggle('hidden');
+            const isVisible = !panel.classList.contains('hidden');
+            btn.textContent = isVisible ? 'Hide preview' : 'Show preview';
+
+            // Track PDF toggle
+            if (typeof clarity === 'function') clarity('event', isVisible ? 'pdf_preview_show' : 'pdf_preview_hide');
+            if (typeof gtag === 'function') gtag('event', isVisible ? 'pdf_preview_show' : 'pdf_preview_hide', {'event_category': 'PDF'});
+
+            // If the panel becomes visible and we haven't attempted loading yet, try again
+            if (isVisible && !panel.dataset.pdfLoaded && pdfUrl) {
+                tryLoadPdf(panel, pdfUrl);
             }
-        };
-        
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', wireChatter);
-        } else {
-            wireChatter();
-        }
-    } catch (e) {
-        console.warn('[Achievements] Chatter tracking error:', e);
-    }
-})();
-
-// Achievement: Form Filler - Submit contact form
-(() => {
-    try {
-        const wireFormFiller = () => {
-            // Find contact form (look for common patterns)
-            const forms = document.querySelectorAll('form');
-            forms.forEach(form => {
-                // Check if it's likely a contact form
-                const hasNameField = form.querySelector('input[name*="name"], input[id*="name"]');
-                const hasEmailField = form.querySelector('input[type="email"], input[name*="email"]');
-                const hasMessageField = form.querySelector('textarea, input[name*="message"]');
-                
-                if (hasNameField && hasEmailField && hasMessageField) {
-                    form.addEventListener('submit', () => {
-                        if (typeof window.ArcadeAchievements !== 'undefined') {
-                            window.ArcadeAchievements.unlock('formFiller');
-                        }
-                    });
-                }
-            });
-        };
-        
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', wireFormFiller);
-        } else {
-            wireFormFiller();
-        }
-    } catch (e) {
-        console.warn('[Achievements] FormFiller tracking error:', e);
-    }
-})();
-
-// Achievement: Gamer - Play a game (wired on hobbies-games page)
-// This will be handled by individual game start logic in hobbies-games.html
+        });
+    });
+});

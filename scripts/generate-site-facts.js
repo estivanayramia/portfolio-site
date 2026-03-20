@@ -92,13 +92,13 @@ function extractDescription(html) {
 
 // Extract title from card in index page
 function extractCardTitle(cardHtml) {
-  const match = cardHtml.match(/<h2[^>]*>([^<]+)<\/h2>/);
+  const match = cardHtml.match(/<h[23][^>]*>([^<]+)<\/h[23]>/);
   return match ? cleanText(match[1]) : '';
 }
 
 // Extract summary from card in index page
 function extractCardSummary(cardHtml) {
-  const match = cardHtml.match(/<p class="text-sm[^>]*>([^<]+)<\/p>/);
+  const match = cardHtml.match(/<p class="(?:card-description|text-sm)[^"]*"[^>]*>([^<]+)<\/p>/);
   return match ? cleanText(match[1]) : '';
 }
 
@@ -164,16 +164,23 @@ function toContentFilePath(routePath) {
 function parseProjectsIndex(indexPath) {
   const html = fs.readFileSync(indexPath, 'utf-8');
   const projects = [];
-  
-  // Split by article tags
-  const articles = html.split(/<article[^>]*>/);
-  
-  for (let i = 1; i < articles.length; i++) {
-    const article = articles[i];
-    const endIdx = article.indexOf('</article>');
-    if (endIdx === -1) continue;
-    
-    const cardHtml = article.substring(0, endIdx);
+
+  const coverflowCards = Array.from(
+    html.matchAll(/<article[^>]*class="[^"]*coverflow-card[^"]*"[^>]*>([\s\S]*?)<\/article>/g)
+  ).map((match) => match[1]);
+
+  const cardBlocks = coverflowCards.length > 0
+    ? coverflowCards
+    : html
+        .split(/<article[^>]*>/)
+        .slice(1)
+        .map((article) => {
+          const endIdx = article.indexOf('</article>');
+          return endIdx === -1 ? '' : article.substring(0, endIdx);
+        })
+        .filter(Boolean);
+
+  for (const cardHtml of cardBlocks) {
     const title = extractCardTitle(cardHtml);
     const summary = extractCardSummary(cardHtml);
     const link = extractCardLink(cardHtml);

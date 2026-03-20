@@ -76,6 +76,10 @@ function checkLocalRateLimit(key) {
   return true;
 }
 
+function shouldBypassRateLimit(env) {
+  return env?.DISABLE_RATE_LIMIT === "1" || env?.__TEST_DISABLE_RATE_LIMIT === true;
+}
+
 function getContinuationHint(reply) {
   const input = String(reply || "");
   return input.slice(-700);
@@ -273,7 +277,7 @@ export default {
     }
 
     const clientKey = request.headers.get("CF-Connecting-IP") || request.headers.get("x-forwarded-for") || "unknown";
-    if (!checkLocalRateLimit(clientKey)) {
+    if (!shouldBypassRateLimit(env) && !checkLocalRateLimit(clientKey)) {
       return jsonReply({
         errorType: "RateLimit",
         reply: "Too many requests too quickly. Give me a minute and try again."

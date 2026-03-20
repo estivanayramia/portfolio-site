@@ -28,6 +28,7 @@ function logResult(ok, label, detail = "") {
 function baseEnv(overrides = {}) {
   return {
     SITE_BASE_URL: "https://www.estivanayramia.com",
+    __TEST_DISABLE_RATE_LIMIT: true,
     __CHAT_PROFILE: PROFILE,
     __SITE_FACTS: SITE_FACTS,
     __PAGE_MANIFEST: PAGE_MANIFEST,
@@ -149,6 +150,17 @@ async function testPageSpecificHandling() {
   assert.equal(result.status, 200);
   assertReplyContains(result.data.reply, ["endpoint competitive playbook", "/projects/endpoint-competitive-playbook"]);
   assertReplyUsesThirdPerson(result.data.reply);
+
+  const grimesResult = await ask("What is the Isa Grimes interview project about?");
+  assert.equal(grimesResult.status, 200);
+  assertReplyContains(grimesResult.data.reply, ["isa grimes interview", "/projects/isa-grimes-interview"]);
+  assertReplyUsesThirdPerson(grimesResult.data.reply);
+}
+
+async function testProjectFactsIntegrity() {
+  assert.equal(SITE_FACTS.meta?.projectCount, 7);
+  assert.ok(SITE_FACTS.projects.some((project) => project.url === "/projects/isa-grimes-interview"));
+  assert.ok(PAGE_MANIFEST.pages.some((page) => page.route === "/projects/isa-grimes-interview"));
 }
 
 async function testFreshnessRefresh() {
@@ -258,6 +270,7 @@ const tests = [
   ["Boundary handling", testBoundaryHandling],
   ["Unknown handling", testUnknownHandling],
   ["Page-specific handling", testPageSpecificHandling],
+  ["Project facts integrity", testProjectFactsIntegrity],
   ["Freshness refresh", testFreshnessRefresh],
   ["Prompt/output audit", testPromptAndOutputAudit]
 ];

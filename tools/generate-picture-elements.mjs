@@ -40,7 +40,7 @@ const SKIP_FILES = new Set([
   'EN/hobbies/whispers.html',
   'EN/index.html',
   'EN/overview.html',
-  'EN/projects/conflict.html',
+  'EN/projects/isa-grimes-interview.html',
   'EN/projects/endpoint-competitive-playbook.html',
   'EN/projects/endpoint-elosity-video.html',
   'EN/projects/endpoint-linkedin-campaign.html',

@@ -629,6 +629,10 @@ function buildUnknownReply(profile) {
   return `That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email ${profile.contact?.email || "hello@estivanayramia.com"}.`;
 }
 
+function containsFirstPerson(text) {
+  return /\b(i|i['â€™]m|i['â€™]ve|i['â€™]d|my|me|mine)\b/i.test(String(text || ""));
+}
+
 function buildPageSpecificReply(retrieval) {
   const [topPage] = retrieval.pages;
   if (!topPage) {
@@ -641,7 +645,6 @@ function buildPageSpecificReply(retrieval) {
     .filter((entry) => entry.page.route === topPage.route)
     .slice(0, 2)
     .map((entry) => {
-      if (!entry.section.text) return "";
       const sectionHeading = cleanTextFragment(entry.section.heading || "")
         .replace(/\s*\|\s*Estivan Ayramia\s*$/i, "")
         .trim();
@@ -649,9 +652,15 @@ function buildPageSpecificReply(retrieval) {
       const dedupedSnippet = sectionHeading && rawSnippet.toLowerCase().startsWith(sectionHeading.toLowerCase())
         ? rawSnippet.slice(sectionHeading.length).trim().replace(/^[:.\-–—]\s*/, "")
         : rawSnippet;
+      if (containsFirstPerson(dedupedSnippet)) {
+        return sectionHeading || "";
+      }
       const snippet = dedupedSnippet.length > 180
         ? `${dedupedSnippet.slice(0, 177).trimEnd()}...`
         : dedupedSnippet;
+      if (!snippet) {
+        return sectionHeading || "";
+      }
       if (!sectionHeading || sectionHeading.toLowerCase() === displayTitle.toLowerCase()) {
         return snippet;
       }

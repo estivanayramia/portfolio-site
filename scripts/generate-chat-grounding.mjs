@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
-import { execSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import {
   createPageRecord,
@@ -12,28 +11,38 @@ const ROOT_DIR = process.cwd();
 const BASE_URL = "https://www.estivanayramia.com";
 const OUTPUT_PATH = path.join(ROOT_DIR, "assets", "data", "chat-page-manifest.json");
 
-function run(command) {
-  return execSync(command, {
-    cwd: ROOT_DIR,
-    stdio: ["ignore", "pipe", "pipe"],
-    encoding: "utf8"
-  }).trim();
-}
-
 function listRelevantHtmlFiles() {
-  const files = run('git ls-files "*.html"')
-    .split(/\r?\n/)
-    .filter(Boolean)
-    .filter((file) => {
-      if (file === "404.html") return false;
-      if (file.startsWith("docs/")) return false;
-      if (file.startsWith("dist/")) return false;
-      if (file.startsWith("public/")) return false;
-      if (file.startsWith("EN/hobbies-games")) return false;
-      return file === "index.html" || file.startsWith("EN/") || file === "ar/index.html" || file === "es/index.html";
-    });
+  const files = new Set();
 
-  return files;
+  if (existsSync(path.join(ROOT_DIR, "index.html"))) {
+    files.add("index.html");
+  }
+
+  const walk = (dirPath, prefix = "") => {
+    for (const entry of readdirSync(dirPath, { withFileTypes: true })) {
+      const entryPrefix = prefix ? `${prefix}/${entry.name}` : entry.name;
+      const absolutePath = path.join(dirPath, entry.name);
+
+      if (entry.isDirectory()) {
+        walk(absolutePath, entryPrefix);
+        continue;
+      }
+
+      if (!entry.isFile() || !entry.name.endsWith(".html")) continue;
+      if (entryPrefix === "EN/404.html") continue;
+      if (entryPrefix.startsWith("EN/hobbies-games")) continue;
+      files.add(entryPrefix);
+    }
+  };
+
+  for (const folder of ["EN", "ar", "es"]) {
+    const absoluteDir = path.join(ROOT_DIR, folder);
+    if (existsSync(absoluteDir)) {
+      walk(absoluteDir, folder);
+    }
+  }
+
+  return [...files].sort((left, right) => left.localeCompare(right));
 }
 
 function inferRouteFromFile(filePath) {

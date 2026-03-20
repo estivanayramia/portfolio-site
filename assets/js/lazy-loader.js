@@ -31,31 +31,6 @@
 (function() {
     'use strict';
 
-    function logLazyLoaderDebug() {
-        try {
-            const search = window.location && window.location.search ? window.location.search : '';
-            if (!search.includes('debug-loader=1') && !search.includes('debug-analytics=1')) return;
-            console.log.apply(console, arguments);
-        } catch (e) {}
-    }
-
-    // Avoid delaying the window load event by injecting new subresources
-    // (analytics/CDN scripts) before the page has finished loading.
-    let pageLoaded = document.readyState === 'complete';
-    if (!pageLoaded) {
-        window.addEventListener('load', function() {
-            pageLoaded = true;
-        }, { once: true });
-    }
-
-    function runAfterLoad(callback) {
-        if (pageLoaded) {
-            callback();
-            return;
-        }
-        window.addEventListener('load', callback, { once: true });
-    }
-
     // ========================================================================
     // ANALYTICS CONFIGURATION
     // Edit these values to update tracking IDs site-wide
@@ -63,11 +38,6 @@
     
     const GA_MEASUREMENT_ID = 'G-MCN4RXCY6Q';  // Google Analytics 4 measurement ID
     const CLARITY_PROJECT_ID = 'uawk2g8xee';   // Microsoft Clarity project ID
-
-    // Skip analytics in automated/headless contexts (e.g., Lighthouse).
-    // This prevents long-running GA/ads requests from keeping the page in a
-    // perpetual “loading” state during audits, while keeping analytics for real users.
-    const isAutomated = typeof navigator !== 'undefined' && !!navigator.webdriver;
     
     // ========================================================================
     // INITIALIZATION STATE
@@ -122,7 +92,7 @@
     function loadGoogleAnalytics() {
         // Prevent duplicate initialization
         if (analyticsInitialized.ga4) {
-            logLazyLoaderDebug('[LazyLoader] Google Analytics already initialized, skipping');
+            console.log('[LazyLoader] Google Analytics already initialized, skipping');
             return;
         }
         
@@ -147,17 +117,13 @@
         gtag('config', GA_MEASUREMENT_ID, {
             'send_page_view': true,  // Automatically track page views
             'anonymize_ip': true,    // Privacy: anonymize IP addresses
-            // Reduce ad/remarketing requests and improve privacy/perf.
-            // Docs: https://developers.google.com/analytics/devguides/collection/ga4/reference/config
-            'allow_google_signals': false,
-            'allow_ad_personalization_signals': false,
             'cookie_flags': 'SameSite=None;Secure'  // Cookie security for Cloudflare Pages
         });
         
         // Load gtag.js script asynchronously
         injectScript(`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`);
         
-        logLazyLoaderDebug('[LazyLoader] Google Analytics 4 initialized:', GA_MEASUREMENT_ID);
+        console.log('[LazyLoader] ✓ Google Analytics 4 initialized:', GA_MEASUREMENT_ID);
     }
 
     // ========================================================================
@@ -180,7 +146,7 @@
     function loadClarity() {
         // Prevent duplicate initialization
         if (analyticsInitialized.clarity) {
-            logLazyLoaderDebug('[LazyLoader] Microsoft Clarity already initialized, skipping');
+            console.log('[LazyLoader] Microsoft Clarity already initialized, skipping');
             return;
         }
         
@@ -198,7 +164,7 @@
         // 2) loading the Clarity tag script directly.
         injectScript(`https://www.clarity.ms/tag/${CLARITY_PROJECT_ID}`);
         
-        logLazyLoaderDebug('[LazyLoader] Microsoft Clarity initialized:', CLARITY_PROJECT_ID);
+        console.log('[LazyLoader] ✓ Microsoft Clarity initialized:', CLARITY_PROJECT_ID);
     }
 
     // ========================================================================
@@ -216,7 +182,7 @@
     function loadMarkedJS() {
         // Prevent duplicate initialization
         if (analyticsInitialized.marked) {
-            logLazyLoaderDebug('[LazyLoader] Marked.js already loaded, skipping');
+            console.log('[LazyLoader] Marked.js already loaded, skipping');
             return;
         }
         
@@ -224,10 +190,10 @@
         analyticsInitialized.marked = true;
         
         injectScript(
-            '/assets/vendor/marked.min.js',
+            'https://cdn.jsdelivr.net/npm/marked/marked.min.js',
             true,
             function() {
-                logLazyLoaderDebug('[LazyLoader] Marked.js loaded for chat markdown parsing');
+                console.log('[LazyLoader] ✓ Marked.js loaded for chat markdown parsing');
             }
         );
     }
@@ -257,7 +223,7 @@
     function loadAllScripts() {
         // Prevent duplicate execution
         if (scriptsLoaded) {
-            logLazyLoaderDebug('[LazyLoader] Scripts already loaded, aborting');
+            console.log('[LazyLoader] Scripts already loaded, aborting');
             return;
         }
         
@@ -269,36 +235,27 @@
             document.removeEventListener(event, onFirstInteraction, { passive: true, capture: true });
         });
         
-        logLazyLoaderDebug('[LazyLoader] User interaction detected - initializing analytics...');
-
-        // To avoid delaying `window.load` (and to keep Lighthouse stable),
-        // only inject new external scripts after the page has finished loading.
-        runAfterLoad(function() {
-            // Load Marked.js (needed for chat)
-            loadMarkedJS();
-
-            if (isAutomated) {
-                logLazyLoaderDebug('[LazyLoader] Automated context detected - skipping analytics');
-                return;
-            }
-
-            // Use requestIdleCallback for analytics to minimize performance impact
-            // This tells the browser to run these when it has spare cycles
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(function() {
-                    logLazyLoaderDebug('[LazyLoader] Browser idle - loading analytics...');
-                    loadGoogleAnalytics();
-                    loadClarity();
-                }, { timeout: 3000 });  // Force load after 3s even if not idle
-            } else {
-                // Fallback for browsers without requestIdleCallback (older Safari)
-                setTimeout(function() {
-                    logLazyLoaderDebug('[LazyLoader] Using setTimeout fallback for analytics...');
-                    loadGoogleAnalytics();
-                    loadClarity();
-                }, 100);
-            }
-        });
+        console.log('[LazyLoader] 🚀 User interaction detected - initializing analytics...');
+        
+        // Load Marked.js first (lightweight, needed for chat)
+        loadMarkedJS();
+        
+        // Use requestIdleCallback for analytics to minimize performance impact
+        // This tells the browser to run these when it has spare cycles
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(function() {
+                console.log('[LazyLoader] Browser idle - loading analytics...');
+                loadGoogleAnalytics();
+                loadClarity();
+            }, { timeout: 3000 });  // Force load after 3s even if not idle
+        } else {
+            // Fallback for browsers without requestIdleCallback (older Safari)
+            setTimeout(function() {
+                console.log('[LazyLoader] Using setTimeout fallback for analytics...');
+                loadGoogleAnalytics();
+                loadClarity();
+            }, 100);
+        }
     }
 
     // ========================================================================
@@ -335,7 +292,7 @@
     function init() {
         // Check if already initialized (prevent duplicate initialization)
         if (window.__lazyLoaderInitialized) {
-            logLazyLoaderDebug('[LazyLoader] Already initialized, skipping');
+            console.log('[LazyLoader] Already initialized, skipping');
             return;
         }
         
@@ -355,8 +312,8 @@
             });
         });
         
-        logLazyLoaderDebug('[LazyLoader] Initialized - waiting for user interaction...');
-        logLazyLoaderDebug('[LazyLoader] Analytics will load on:', INTERACTION_EVENTS.join(', '));
+        console.log('[LazyLoader] ⏳ Initialized - waiting for user interaction...');
+        console.log('[LazyLoader] Analytics will load on:', INTERACTION_EVENTS.join(', '));
     }
 
     // ========================================================================

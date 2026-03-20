@@ -12,6 +12,7 @@ const path = require('path');
 
 const ROOT_DIR = path.join(__dirname, '..');
 const config   = require(path.join(ROOT_DIR, 'serve.json'));
+const REDIRECTS_PATH = path.join(ROOT_DIR, '_redirects');
 
 const PORT = Number(process.env.PORT) || 5500;
 
@@ -59,6 +60,21 @@ function compileRewrites(rewrites) {
 
 const compiledRewrites = compileRewrites(config.rewrites);
 
+function loadRedirectRules() {
+  if (!fs.existsSync(REDIRECTS_PATH)) return [];
+
+  return fs.readFileSync(REDIRECTS_PATH, 'utf8')
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(line => line && !line.startsWith('#'))
+    .map(line => line.split(/\s+/))
+    .filter(parts => parts.length >= 3)
+    .map(([from, to, status]) => ({ from, to, status: Number(status) }))
+    .filter(rule => Number.isInteger(rule.status) && rule.status >= 300 && rule.status < 400 && !rule.from.includes('*'));
+}
+
+const redirectRules = loadRedirectRules();
+
 function applyRewrite(pathname) {
   for (const rule of compiledRewrites) {
     const m = pathname.match(rule.regex);
@@ -72,6 +88,10 @@ function applyRewrite(pathname) {
     return dest;
   }
   return null;
+}
+
+function applyRedirect(pathname) {
+  return redirectRules.find(rule => rule.from === pathname) || null;
 }
 
 /* ── Helpers ───────────────────────────────────────────────── */
@@ -124,6 +144,11 @@ const server = http.createServer((req, res) => {
   if (pathname === '/hobbies')  return redirect(res, '/hobbies/');
   // /hobbies-games is canonical WITHOUT trailing slash
   if (pathname === '/hobbies-games/') return redirect(res, '/hobbies-games');
+
+  const redirectRule = applyRedirect(pathname);
+  if (redirectRule) {
+    return redirect(res, redirectRule.to, redirectRule.status);
+  }
 
   // 1. Try serve.json rewrites first
   const rewritten = applyRewrite(pathname);
