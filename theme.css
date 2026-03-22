@@ -1958,6 +1958,241 @@ select.border-red-500 {
     text-decoration: none !important;
 }
 
+/* ==========================================================================
+   Editorial Presentation System (Site-Wide)
+   ========================================================================== */
+
+:root {
+    --editorial-measure: 68ch;
+    --editorial-measure-tight: 58ch;
+    --editorial-gap: clamp(2rem, 3.5vw, 4.25rem);
+    --editorial-hero-space: clamp(3.5rem, 6vw, 7rem);
+}
+
+.page-hero {
+    position: relative;
+    isolation: isolate;
+    padding-top: var(--editorial-hero-space) !important;
+    padding-bottom: clamp(2.75rem, 5vw, 5rem) !important;
+}
+
+.page-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 1.75rem;
+    background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), transparent 36%),
+        linear-gradient(135deg, rgba(33, 40, 66, 0.08), rgba(255, 255, 255, 0.04));
+    pointer-events: none;
+}
+
+[data-theme="dark"] .page-hero::before {
+    background:
+        radial-gradient(circle at top left, rgba(225, 212, 194, 0.06), transparent 36%),
+        linear-gradient(135deg, rgba(225, 212, 194, 0.05), rgba(225, 212, 194, 0.01));
+}
+
+.page-hero > div {
+    position: relative;
+    max-width: var(--editorial-measure-tight);
+}
+
+.page-hero::after {
+    content: "";
+    display: block;
+    width: min(220px, 40vw);
+    height: 1px;
+    margin-top: clamp(1.2rem, 2.5vw, 2rem);
+    background: linear-gradient(90deg, rgba(33, 40, 66, 0.55), rgba(33, 40, 66, 0));
+}
+
+[data-theme="dark"] .page-hero::after {
+    background: linear-gradient(90deg, rgba(225, 212, 194, 0.55), rgba(225, 212, 194, 0));
+}
+
+.page-hero h1 {
+    max-width: 16ch;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+}
+
+.page-hero p {
+    max-width: var(--editorial-measure-tight);
+    font-size: clamp(1rem, 1.35vw, 1.22rem);
+    line-height: 1.82;
+}
+
+.proof-band {
+    border: 1px solid rgba(33, 40, 66, 0.1);
+    border-radius: 1.5rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.22)),
+        rgba(255, 255, 255, 0.24);
+    box-shadow: 0 18px 45px rgba(33, 40, 66, 0.08);
+}
+
+[data-theme="dark"] .proof-band {
+    border-color: rgba(225, 212, 194, 0.14);
+    background:
+        linear-gradient(180deg, rgba(225, 212, 194, 0.05), rgba(225, 212, 194, 0.02)),
+        rgba(255, 255, 255, 0.02);
+}
+
+.page-close {
+    position: relative;
+    margin-top: clamp(2.5rem, 5vw, 5rem);
+    padding-top: clamp(2.75rem, 5vw, 5rem) !important;
+    border-top: 1px solid rgba(33, 40, 66, 0.12);
+}
+
+[data-theme="dark"] .page-close {
+    border-top-color: rgba(225, 212, 194, 0.14);
+}
+
+main > section + section {
+    margin-top: var(--editorial-gap);
+}
+
+main p {
+    max-width: var(--editorial-measure);
+}
+
+main .grid p.text-sm,
+main footer p,
+main .text-xs,
+.coverflow-card p,
+.carousel-slide p {
+    max-width: none;
+}
+
+body[data-print-url] main {
+    padding-bottom: clamp(2.5rem, 5vw, 5rem);
+}
+
+body[data-print-url] main > section {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+body[data-print-url] main > section + section {
+    margin-top: var(--editorial-gap);
+}
+
+/* Premium hero rhythm */
+body[data-print-url] main > section:first-of-type {
+    padding-top: var(--editorial-hero-space) !important;
+    padding-bottom: clamp(2.5rem, 5vw, 5.5rem) !important;
+}
+
+body[data-print-url] .page-hero {
+    position: relative;
+}
+
+body[data-print-url] .page-hero::after {
+    content: "";
+    display: block;
+    width: min(220px, 40vw);
+    height: 1px;
+    margin-top: clamp(1.2rem, 2.5vw, 2rem);
+    background: linear-gradient(90deg, rgba(33, 40, 66, 0.55), rgba(33, 40, 66, 0));
+}
+
+body[data-print-url] main > section:first-of-type h1 {
+    max-width: 17.5ch;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
+}
+
+body[data-print-url] main > section:first-of-type p {
+    max-width: var(--editorial-measure-tight);
+}
+
+/* Editorial reading width */
+body[data-print-url*="/overview"] p,
+body[data-print-url*="/deep-dive"] p,
+body[data-print-url*="/about"] p,
+body[data-print-url*="/projects/"] p,
+body[data-print-url*="/hobbies/"] p,
+body[data-print-url*="/contact"] p,
+body[data-print-url="https://www.estivanayramia.com/"] p {
+    max-width: var(--editorial-measure);
+}
+
+/* Keep card and utility copy compact */
+body[data-print-url] .coverflow-card p,
+body[data-print-url] .carousel-slide p,
+body[data-print-url] .grid p.text-sm,
+body[data-print-url] footer p,
+body[data-print-url] .text-xs {
+    max-width: none;
+}
+
+/* Proof-strip / highlight band treatment */
+body[data-print-url] .bg-indigodeep\/5,
+body[data-print-url] .bg-white\/30.backdrop-blur-sm.border-y {
+    border-radius: 1rem;
+    border-width: 1px;
+    box-shadow: 0 12px 30px rgba(33, 40, 66, 0.08);
+}
+
+body[data-print-url] .proof-band {
+    border-radius: 1rem;
+    border: 1px solid rgba(33, 40, 66, 0.1);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.2));
+}
+
+/* CTA ending rhythm */
+body[data-print-url] main > section:last-of-type {
+    margin-top: clamp(2.5rem, 5vw, 5rem);
+    padding-top: clamp(2.75rem, 5vw, 5rem) !important;
+}
+
+body[data-print-url] .page-close {
+    border-top: 1px solid rgba(33, 40, 66, 0.12);
+}
+
+/* Project family: clearer metadata + narrative split */
+body[data-print-url*="/projects/"] h2 {
+    letter-spacing: -0.015em;
+}
+
+body[data-print-url*="/projects/"] .text-sm.uppercase,
+body[data-print-url*="/projects/"] .text-xs.uppercase {
+    letter-spacing: 0.08em;
+}
+
+/* Contact family: calmer conversion framing */
+body[data-print-url*="/contact"] form {
+    border-radius: 1rem;
+}
+
+body[data-print-url*="/contact"] form input,
+body[data-print-url*="/contact"] form textarea,
+body[data-print-url*="/contact"] form select {
+    box-shadow: 0 1px 0 rgba(33, 40, 66, 0.04);
+}
+
+/* Hobbies family: keep it human, less dashboard-like */
+body[data-print-url*="/hobbies/"] .grid article,
+body[data-print-url*="/hobbies/"] .bg-white\/50 {
+    border-radius: 1rem;
+}
+
+@media (max-width: 900px) {
+    body[data-print-url] main > section + section {
+        margin-top: clamp(1.75rem, 3.5vw, 2.75rem);
+    }
+
+    body[data-print-url] main > section:first-of-type h1 {
+        max-width: 100%;
+    }
+
+    body[data-print-url] p {
+        max-width: 100%;
+    }
+}
+
 /* Ensure links in user messages stay white */
 #chat-messages .bg-\[\#212842\] a {
     color: #e1d4c2 !important;
