@@ -28,9 +28,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=1e04203">
-    <link rel="preload" href="/assets/css/style.css?v=1e04203" as="style">
-    <script src="/assets/js/site.min.js?v=1e04203" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=edf1ce5">
+    <link rel="preload" href="/assets/css/style.css?v=edf1ce5" as="style">
+    <script src="/assets/js/site.min.js?v=edf1ce5" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
@@ -38,7 +38,7 @@
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
     
     <!-- Luxury Coverflow Carousel V4 -->
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=1e04203-v4">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=edf1ce5-v4">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -141,32 +141,62 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 spine-page">
         
         <!-- Hero Section -->
-        <section class="page-hero max-w-5xl mx-auto px-6 lg:px-12 py-20 lg:py-28">
-            <div class="space-y-6">
-                <div class="flex items-center gap-3">
+        <section class="page-hero max-w-6xl mx-auto px-6 lg:px-12 py-20 lg:py-28">
+            <div class="spine-hero-grid">
+                <div class="space-y-6">
+                    <p class="spine-kicker">Projects / flagship proof</p>
                     <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up">
                         Selected Work
                     </h1>
+                    <p class="text-lg text-chocolate leading-relaxed opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
+                        Systems built, teams coordinated, ideas tested, and real follow-through. Each project shows a different angle of how I think, learn, and execute.
+                    </p>
                 </div>
-                <p class="text-lg text-chocolate leading-relaxed max-w-2xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
-                    Systems built, teams coordinated, ideas tested, and real follow-through. Each project shows a different angle of how I think, learn, and execute.
-                </p>
+
+                <aside class="spine-hero-rail opacity-0" data-gsap="fade-up" data-gsap-delay="0.15">
+                    <p class="spine-eyebrow">Use this page to</p>
+                    <div class="spine-note-list text-sm text-chocolate">
+                        <div class="spine-note-item">Scan the strongest proof before opening the longer project write-ups.</div>
+                        <div class="spine-note-item">Use coverflow or roulette if you want to browse, and direct links if you already know the project you want.</div>
+                        <div class="spine-note-item">Treat this as the curated gateway, not the full explanation of every project.</div>
+                    </div>
+                </aside>
             </div>
         </section>
         
         <!-- Pattern Recognition -->
-        <section class="proof-band max-w-5xl mx-auto px-6 lg:px-12 pb-12">
-            <div class="bg-indigodeep/5 rounded-2xl p-6 border border-indigodeep/10 opacity-0" data-gsap="fade-up">
-                <h2 class="text-lg font-semibold text-indigodeep mb-3">What I Notice Across These Projects</h2>
-                <p class="text-sm text-chocolate leading-relaxed">
-                    Looking at these together, a pattern shows up fast: most problems come down to clarity, ownership, and whether somebody is willing to actually finish the job.
-                    The Isa Grimes interview reinforced that people judgment and perspective usually matter more than titles and theater.
-                    The Endpoint playbook showed how structure and positioning can shift a market story.
-                    Building this website proved the same mindset works in code too.
-                </p>
+        <section class="proof-band max-w-6xl mx-auto px-6 lg:px-12 pb-12">
+            <div class="spine-band opacity-0" data-gsap="fade-up">
+                <div class="spine-section-head is-split mb-0">
+                    <div>
+                        <p class="spine-eyebrow">How to read the proof</p>
+                        <h2 class="text-3xl font-bold text-indigodeep">Curated work, not a random archive.</h2>
+                    </div>
+                    <p class="text-sm text-chocolate/80 leading-relaxed">
+                        Looking at these together, a pattern shows up fast: most
+                        problems come down to clarity, ownership, and whether
+                        somebody is willing to actually finish the job.
+                    </p>
+                </div>
+                <div class="spine-fact-grid">
+                    <div class="spine-fact-card">
+                        <p class="spine-label">Visible set</p>
+                        <p class="text-2xl font-bold text-indigodeep">7 projects</p>
+                        <p class="text-sm text-chocolate/70 leading-relaxed">A focused proof set rather than every piece of work thrown onto one page.</p>
+                    </div>
+                    <div class="spine-fact-card">
+                        <p class="spine-label">Browse your way</p>
+                        <p class="text-2xl font-bold text-indigodeep">Coverflow + roulette</p>
+                        <p class="text-sm text-chocolate/70 leading-relaxed">The page supports browsing, direct picks, and a quick random entry point.</p>
+                    </div>
+                    <div class="spine-fact-card">
+                        <p class="spine-label">What connects them</p>
+                        <p class="text-base text-chocolate leading-relaxed">The Isa Grimes interview reinforced that people judgment and perspective matter more than titles and theater. The Endpoint playbook showed how structure and positioning can shift a market story. Building this website proved the same mindset works in code too.</p>
+                    </div>
+                </div>
             </div>
         </section>
         
@@ -565,13 +595,21 @@
         </section>
         
         <!-- CTA Section -->
-        <section class="page-close max-w-4xl mx-auto px-6 lg:px-12 py-20">
-            <div class="bg-indigodeep rounded-3xl p-12 text-center space-y-6">
-                <h2 class="text-3xl font-bold text-beige">Want to build something together?</h2>
-                <p class="text-base text-beige max-w-xl mx-auto leading-relaxed">Whether it's a system, a team coordination challenge, or an operational problem, let's talk.</p>
-                <a href="/contact" class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep">
-                    Get in Touch
-                </a>
+        <section class="page-close max-w-5xl mx-auto px-6 lg:px-12 py-20">
+            <div class="bg-indigodeep rounded-3xl p-12 spine-cta-card">
+                <div class="spine-cta-copy">
+                    <p class="spine-eyebrow text-beige/70">After the proof</p>
+                    <h2 class="text-3xl font-bold text-beige">Take the project read into a real conversation.</h2>
+                    <p class="text-base text-beige leading-relaxed">Whether it is a system, a team coordination challenge, or an operational problem, the next step is easy: contact me, or head back to Deep Dive for the longer context.</p>
+                </div>
+                <div class="spine-cta-actions">
+                    <a href="/contact" class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep">
+                        Contact Me
+                    </a>
+                    <a href="/deep-dive" class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep">
+                        Read Deep Dive
+                    </a>
+                </div>
             </div>
         </section>
         

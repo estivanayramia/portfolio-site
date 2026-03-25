@@ -27,9 +27,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=1e04203">
-    <link rel="preload" href="/assets/css/style.css?v=1e04203" as="style">
-    <script src="/assets/js/site.min.js?v=1e04203" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=edf1ce5">
+    <link rel="preload" href="/assets/css/style.css?v=edf1ce5" as="style">
+    <script src="/assets/js/site.min.js?v=edf1ce5" defer></script>
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -138,11 +138,11 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 project-page project-systems">
         
         <!-- Breadcrumb -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
-            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+            <nav aria-label="Breadcrumb" class="project-breadcrumb-shell opacity-0 translate-y-4" data-gsap="fade-up">
                 <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
                     <li><span class="text-chocolate/40">/</span></li>
                     <li><a href="/projects/" class="hover:text-indigodeep transition-colors">Projects</a></li>
@@ -153,8 +153,9 @@
         </section>
         
         <!-- Project Header -->
-        <section class="page-hero max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+        <section class="page-hero project-hero-shell max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
             <div class="space-y-6">
+                <p class="project-kicker opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.05">Systems / proof page</p>
                 <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
                     <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Development</span>
                     <span class="text-xs text-ink/60">2025</span>
@@ -165,6 +166,23 @@
                 <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
                     Started in late November 2025 with no coding background. 120+ hours of directing, reviewing, and shipping. No templates. No page builders. Talk is cheap, and this website was expensive.
                 </p>
+            </div>
+        </section>
+
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 pb-8">
+            <div class="project-proof-grid">
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.35">
+                    <p class="project-fact-label">What this proves</p>
+                    <p class="text-base text-chocolate leading-relaxed">I can define a standard, direct a technical build, review it critically, and keep pushing until the result is publishable.</p>
+                </article>
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                    <p class="project-fact-label">AI role</p>
+                    <p class="text-base text-chocolate leading-relaxed">AI wrote the code. I directed the work, tested it, found problems, and decided what was good enough to ship.</p>
+                </article>
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.45">
+                    <p class="project-fact-label">Fast proof</p>
+                    <p class="text-base text-chocolate leading-relaxed">Live site, repo, accessibility work, PWA support, and performance checks all exist as direct evidence, not just claims.</p>
+                </article>
             </div>
         </section>
         
@@ -179,10 +197,10 @@
         
         <!-- Project Details -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
-            <div class="grid lg:grid-cols-3 gap-12">
+            <div class="project-body-grid">
                 
                 <!-- Main Content -->
-                <div class="lg:col-span-2 space-y-12">
+                <div class="project-narrative">
                     
                     <!-- Overview -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
@@ -304,10 +322,10 @@
                 </div>
                 
                 <!-- Sidebar -->
-                <div class="space-y-8">
+                <div class="project-side-stack">
                     
                     <!-- Project Info -->
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                    <div class="project-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h3 class="text-lg font-semibold text-indigodeep mb-4">Project Info</h3>
                         <dl class="space-y-4 text-sm">
                             <div>
@@ -334,7 +352,7 @@
                     </div>
                     
                     <!-- Skills Applied -->
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                    <div class="project-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
                         <h3 class="text-lg font-semibold text-indigodeep mb-4">Skills Applied</h3>
                         <div class="flex flex-wrap gap-2">
                             <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">HTML5</span>
@@ -350,7 +368,7 @@
                     </div>
                     
                     <!-- CTA -->
-                    <div class="bg-indigodeep text-beige rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                    <div class="project-callout bg-indigodeep text-beige opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
                         <h3 class="text-lg font-semibold mb-3">Like what you see?</h3>
                         <p class="text-sm text-beige/80 mb-4">Reach out if you want to talk about a project or role.</p>
                         <a href="/contact" class="inline-block text-sm font-medium bg-beige text-indigodeep px-5 py-2 rounded-full hover:bg-chocolate hover:text-beige transition-colors focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-2 focus:ring-offset-indigodeep">
@@ -364,7 +382,7 @@
         </section>
         
         <!-- Related Projects -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10">
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10 project-divider">
             <h2 class="text-2xl font-bold text-indigodeep mb-8 opacity-0" data-gsap="fade-up">Related Projects</h2>
             <div class="grid md:grid-cols-3 gap-6">
                 <a href="/projects/endpoint-competitive-playbook" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">

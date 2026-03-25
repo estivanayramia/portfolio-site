@@ -28,9 +28,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=1e04203">
-    <link rel="preload" href="/assets/css/style.css?v=1e04203" as="style">
-    <script src="/assets/js/site.min.js?v=1e04203" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=edf1ce5">
+    <link rel="preload" href="/assets/css/style.css?v=edf1ce5" as="style">
+    <script src="/assets/js/site.min.js?v=edf1ce5" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
@@ -134,26 +134,33 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 hobby-page">
         
         <!-- Hero Section -->
         <section class="page-hero max-w-5xl mx-auto px-6 lg:px-12 py-20 lg:py-28">
-            <div class="space-y-6">
+            <div class="hobby-intro-grid">
+                <div class="space-y-6">
+                <p class="hobby-kicker opacity-0 translate-y-4" data-gsap="fade-up">Hobbies / identity side</p>
                 <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up">
                     Beyond Business
                 </h1>
                 <p class="text-lg text-chocolate leading-relaxed max-w-2xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
                     Curiosity doesn't stop at spreadsheets. These are the hobbies that fuel personal growth, physical discipline, and creative thinking outside the office.
                 </p>
+                </div>
+                <aside class="hobby-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.25">
+                    <p class="hobby-label">How to use this page</p>
+                    <p class="text-sm text-chocolate leading-relaxed">Think of this as the quieter identity layer of the site. These pages are not proof pages. They are the routines, interests, and personal angles that support the work.</p>
+                </aside>
             </div>
         </section>
         
         <!-- Hobbies Grid -->
         <section class="max-w-6xl mx-auto px-6 lg:px-12 py-16">
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="hobby-gateway-grid md:grid-cols-2 lg:grid-cols-3">
                 
                 <!-- Hobby Card 1: Gym -->
-                <article id="hobby-gym-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
+                <article id="hobby-gym-card" class="hobby-gateway-card overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
                     <div class="aspect-video bg-gradient-to-br from-indigodeep to-chocolate flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
@@ -174,7 +181,7 @@
                 </article>
                 
                 <!-- Hobby Card 2: Photography -->
-                <article id="hobby-photography-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
+                <article id="hobby-photography-card" class="hobby-gateway-card overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
                     <div class="aspect-video bg-gradient-to-br from-chocolate to-indigodeep flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
@@ -196,7 +203,7 @@
                 </article>
                 
                 <!-- Hobby Card 3: Car -->
-                <article id="hobby-car-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
+                <article id="hobby-car-card" class="hobby-gateway-card overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
                     <div class="aspect-video bg-gradient-to-br from-indigodeep/80 to-chocolate/80 flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10" stroke-width="1.5" />
@@ -219,7 +226,7 @@
                 </article>
                 
                 <!-- Hobby Card 4: Cooking -->
-                <article id="hobby-cooking-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                <article id="hobby-cooking-card" class="hobby-gateway-card overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
                     <div class="aspect-video bg-gradient-to-br from-chocolate/70 to-indigodeep/70 flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -240,7 +247,7 @@
                 </article>
                 
                 <!-- Hobby Card 5: Whispers -->
-                <article id="hobby-whispers-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                <article id="hobby-whispers-card" class="hobby-gateway-card overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                     <div class="aspect-video bg-gradient-to-br from-indigodeep/60 to-chocolate/90 flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -261,7 +268,7 @@
                 </article>
                 
                 <!-- Hobby Card 6: Reading -->
-                <article id="hobby-reading-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                <article id="hobby-reading-card" class="hobby-gateway-card overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
                     <div class="aspect-video bg-gradient-to-br from-chocolate/80 to-indigodeep/60 flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
@@ -282,7 +289,7 @@
                 </article>
 
                 <!-- Hobby Card 7: Me -->
-                <article id="hobby-me-card" class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                <article id="hobby-me-card" class="hobby-gateway-card overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
                     <div class="aspect-video bg-gradient-to-br from-indigodeep/70 to-chocolate/70 flex items-center justify-center">
                         <svg class="w-16 h-16 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5.121 17.804A7.5 7.5 0 0112 4.5a7.5 7.5 0 016.879 13.304M12 14a3 3 0 100-6 3 3 0 000 6zm0 0c-3.314 0-6 2.239-6 5h12c0-2.761-2.686-5-6-5z"></path>
@@ -306,13 +313,17 @@
         </section>
         
         <!-- CTA Section -->
-        <section class="page-close max-w-4xl mx-auto px-6 lg:px-12 py-20">
-            <div class="bg-indigodeep rounded-3xl p-12 text-center space-y-6">
-                <h2 class="text-3xl font-bold text-beige">Curious about the work side?</h2>
-                <p class="text-base text-beige max-w-xl mx-auto leading-relaxed">Explore projects that showcase systems thinking, operational coordination, and execution under pressure.</p>
-                <a href="/projects/" class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep">
-                    View Projects
-                </a>
+        <section class="page-close max-w-5xl mx-auto px-6 lg:px-12 py-20">
+            <div class="bg-indigodeep rounded-3xl p-12 hobby-close-card">
+                <div class="space-y-4">
+                    <p class="hobby-kicker text-beige/70">Next step</p>
+                    <h2 class="text-3xl font-bold text-beige">Take the quieter side back into the rest of the site.</h2>
+                    <p class="text-base text-beige leading-relaxed">If you want the work side, head to Projects. If you want the fuller personal and professional story, go back through About.</p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <a href="/projects/" class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep">View Projects</a>
+                    <a href="/about" class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep">Back to About</a>
+                </div>
             </div>
         </section>
         

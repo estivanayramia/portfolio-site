@@ -26,9 +26,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" data-media="(min-width: 769px)">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=1e04203">
-    <link rel="preload" href="/assets/css/style.css?v=1e04203" as="style">
-    <script src="/assets/js/site.min.js?v=1e04203" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=edf1ce5">
+    <link rel="preload" href="/assets/css/style.css?v=edf1ce5" as="style">
+    <script src="/assets/js/site.min.js?v=edf1ce5" defer></script>
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -137,11 +137,11 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 project-page project-campaign">
         
         <!-- Breadcrumb -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
-            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+            <nav aria-label="Breadcrumb" class="project-breadcrumb-shell opacity-0 translate-y-4" data-gsap="fade-up">
                 <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
                     <li><span class="text-chocolate/40">/</span></li>
                     <li><a href="/projects/" class="hover:text-indigodeep transition-colors">Projects</a></li>
@@ -152,8 +152,9 @@
         </section>
         
         <!-- Project Header -->
-        <section class="page-hero max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+        <section class="page-hero project-hero-shell max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
             <div class="space-y-6">
+                <p class="project-kicker opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.05">Campaign / concept page</p>
                 <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
                     <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Concept (class deck)</span>
                     <span class="text-xs bg-chocolate/10 text-chocolate px-3 py-1 rounded-full">Bilingual campaign concept (English + Arabic execution notes)</span>
@@ -164,6 +165,23 @@
                 <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
                     A 17-page class concept deck built in Interactive Marketing at SDSU. The group proposed a Franklin Templeton x Mashable ME partnership targeting women investors in the UAE. I built the Arabic version of the deck, reviewed by my family for accuracy.
                 </p>
+            </div>
+        </section>
+
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 pb-8">
+            <div class="project-meta-grid">
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.35">
+                    <p class="project-fact-label">What it was</p>
+                    <p class="text-base text-chocolate leading-relaxed">A bilingual class concept deck linking Franklin Templeton to Mashable ME for a UAE women-investor campaign idea.</p>
+                </article>
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                    <p class="project-fact-label">What mattered</p>
+                    <p class="text-base text-chocolate leading-relaxed">The useful part is the market logic, partner fit, and language execution notes, not pretending the deck represents live campaign performance.</p>
+                </article>
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.45">
+                    <p class="project-fact-label">Contribution</p>
+                    <p class="text-base text-chocolate leading-relaxed">I worked on the strategy with the group and built the Arabic version of the deck with family review for accuracy.</p>
+                </article>
             </div>
         </section>
         
@@ -177,7 +195,7 @@
         </section>
 
         <!-- PDF Preview Section (English) -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-4 opacity-0" data-gsap="fade-up" data-gsap-delay="0.45">
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-4 opacity-0 project-preview-shell" data-gsap="fade-up" data-gsap-delay="0.45">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-sm font-semibold tracking-wide text-chocolate/80">Deck preview</h2>
                 <button type="button" class="preview-toggle inline-flex items-center gap-1 rounded-full border border-chocolate/30 px-3 py-1 text-xs text-chocolate/70 hover:bg-chocolate/5 transition-colors">
@@ -220,7 +238,7 @@
         </section>
 
         <!-- PDF Preview Section (Arabic) -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-4 opacity-0" data-gsap="fade-up" data-gsap-delay="0.47">
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-4 opacity-0 project-preview-shell" data-gsap="fade-up" data-gsap-delay="0.47">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-sm font-semibold tracking-wide text-chocolate/80">
                     Arabic version: النسخة العربية
@@ -276,10 +294,10 @@
         
         <!-- Project Details -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
-            <div class="grid lg:grid-cols-3 gap-12">
+            <div class="project-body-grid">
                 
                 <!-- Main Content -->
-                <div class="lg:col-span-2 space-y-12">
+                <div class="project-narrative">
                     
                     <!-- Overview -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
@@ -367,10 +385,10 @@
                 </div>
                 
                 <!-- Sidebar -->
-                <div class="space-y-8">
+                <div class="project-side-stack">
                     
                     <!-- Project Info -->
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                    <div class="project-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h3 class="text-lg font-semibold text-indigodeep mb-4">Project Info</h3>
                         <dl class="space-y-4 text-sm">
                             <div>
@@ -409,7 +427,7 @@
                     </div>
                     
                     <!-- CTA -->
-                    <div class="bg-indigodeep text-beige rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                    <div class="project-callout bg-indigodeep text-beige opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
                         <h3 class="text-lg font-semibold mb-3">Want to discuss strategy?</h3>
                         <p class="text-sm text-beige/80 mb-4">Reach out if you want to talk about a project or role.</p>
                         <a href="/contact" class="inline-block text-sm font-medium bg-beige text-indigodeep px-5 py-2 rounded-full hover:bg-chocolate hover:text-beige transition-colors focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-2 focus:ring-offset-indigodeep">
@@ -423,7 +441,7 @@
         </section>
         
         <!-- Related Projects -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10">
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10 project-divider">
             <h2 class="text-2xl font-bold text-indigodeep mb-8 opacity-0" data-gsap="fade-up">Related Projects</h2>
             <div class="grid md:grid-cols-3 gap-6">
                 <a href="/projects/loreal-maps-campaign" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">

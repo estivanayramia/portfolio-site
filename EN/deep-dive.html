@@ -26,9 +26,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=1e04203">
-    <link rel="preload" href="/assets/css/style.css?v=1e04203" as="style">
-    <script src="/assets/js/site.min.js?v=1e04203" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=edf1ce5">
+    <link rel="preload" href="/assets/css/style.css?v=edf1ce5" as="style">
+    <script src="/assets/js/site.min.js?v=edf1ce5" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
@@ -134,43 +134,121 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 spine-page">
         
         <!-- Hero Section -->
-        <section class="page-hero max-w-4xl mx-auto px-6 lg:px-12 py-20 lg:py-28">
-            <div class="space-y-6">
-                <div class="inline-block px-4 py-2 bg-indigodeep/10 rounded-full">
-                    <span class="text-xs font-semibold text-indigodeep uppercase tracking-wider">5-Minute Deep Dive</span>
+        <section class="page-hero max-w-5xl mx-auto px-6 lg:px-12 py-20 lg:py-28">
+            <div class="spine-hero-grid">
+                <div class="space-y-6">
+                    <p class="spine-kicker">5-minute deep dive</p>
+                    <div class="space-y-5">
+                        <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up">
+                            Systems, timeline, and what's next
+                        </h1>
+                        <p class="text-lg text-chocolate leading-relaxed opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
+                            The real story so far: Baghdad to El Cajon. I build structure where it matters: how I learn, how I focus, and how I show proof of work.
+                        </p>
+                    </div>
                 </div>
-                <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up">
-                    Systems, timeline, and what's next
-                </h1>
-                <p class="text-lg text-chocolate leading-relaxed max-w-2xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
-                    The real story so far: Baghdad to El Cajon. I build structure where it matters: how I learn, how I focus, and how I show proof of work.
-                </p>
+
+                <aside class="spine-hero-rail opacity-0" data-gsap="fade-up" data-gsap-delay="0.15">
+                    <p class="spine-eyebrow">At a glance</p>
+                    <div class="spine-note-list text-sm text-chocolate">
+                        <div class="spine-note-item">Born in Baghdad. Lived in Syria as a refugee. Moved to El Cajon in 2008.</div>
+                        <div class="spine-note-item">General Business, graduated December 2025, GPA about 3.8.</div>
+                        <div class="spine-note-item">Current focus is reading, building the website, and moving into work with real ownership.</div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="proof-band max-w-6xl mx-auto px-6 lg:px-12 pb-12" aria-label="Deep Dive chapters">
+            <div class="spine-band opacity-0" data-gsap="fade-up">
+                <div class="spine-section-head is-split mb-0">
+                    <div>
+                        <p class="spine-eyebrow">Read in chapters</p>
+                        <h2 class="text-2xl lg:text-3xl font-bold text-indigodeep">Follow the page in the order that makes the most sense.</h2>
+                    </div>
+                    <p class="text-sm text-chocolate/80 leading-relaxed">
+                        If you are skimming, jump to the section you need. If
+                        you want the full story, read it straight through.
+                    </p>
+                </div>
+                <div class="spine-chapter-nav">
+                    <a href="#context" class="spine-chapter-link">
+                        <strong>Context</strong>
+                        <span class="text-sm text-chocolate/70">Quick background and where I am now.</span>
+                    </a>
+                    <a href="#systems" class="spine-chapter-link">
+                        <strong>Systems</strong>
+                        <span class="text-sm text-chocolate/70">The loops and habits I actually use.</span>
+                    </a>
+                    <a href="#baseline" class="spine-chapter-link">
+                        <strong>Baseline</strong>
+                        <span class="text-sm text-chocolate/70">What I am good at and what I am still working on.</span>
+                    </a>
+                    <a href="#decisions" class="spine-chapter-link">
+                        <strong>Decisions</strong>
+                        <span class="text-sm text-chocolate/70">The choices that changed the direction.</span>
+                    </a>
+                    <a href="#proof" class="spine-chapter-link">
+                        <strong>Proof</strong>
+                        <span class="text-sm text-chocolate/70">Projects that show the systems in practice.</span>
+                    </a>
+                </div>
             </div>
         </section>
 
         <!-- Systems Built Section -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
-            <div class="mb-12">
-                <h2 class="text-3xl font-bold text-indigodeep mb-4">Timeline</h2>
+        <section id="context" class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
+            <div class="spine-section-head is-split">
+                <div>
+                    <p class="spine-eyebrow">Context</p>
+                    <h2 class="text-3xl font-bold text-indigodeep mb-4">Quick background before the systems</h2>
+                </div>
+                <p class="spine-lead">
+                    The short version of the backstory is enough to orient the
+                    rest of the page: where I came from, what I finished, and
+                    what I am spending time on now.
+                </p>
+            </div>
+            <div class="spine-context-grid mb-12">
+                <div>
                 <ul class="space-y-2 text-base text-chocolate leading-relaxed">
                     <li>• Born in Baghdad. Lived in Syria as a refugee. Moved to El Cajon in 2008.</li>
                     <li>• General Business, graduated December 2025, GPA about 3.8.</li>
                     <li>• Time sinks now are mainly reading and building my website (not mindless scrolling).</li>
                 </ul>
+                </div>
+                <div class="spine-mini-facts">
+                    <div class="spine-mini-fact">
+                        <p class="spine-label">Where I am now</p>
+                        <p class="text-sm text-chocolate leading-relaxed">Based in El Cajon, California, near San Diego, and open to new opportunities that come with real ownership.</p>
+                    </div>
+                    <div class="spine-mini-fact">
+                        <p class="spine-label">What this page does</p>
+                        <p class="text-sm text-chocolate leading-relaxed">Context first, then systems, then the habits, decisions, and project proof behind them.</p>
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-12">
-                <h2 class="text-3xl font-bold text-indigodeep mb-4">Three systems I actually use</h2>
+            <div id="systems" class="spine-section-head is-split">
+                <div>
+                    <p class="spine-eyebrow">Systems</p>
+                    <h2 class="text-3xl font-bold text-indigodeep mb-4">Three systems I actually use</h2>
+                </div>
+                <p class="spine-lead">
+                    These are not theory. They are the loops I keep coming back
+                    to because they help me learn, focus, and produce work that
+                    someone else can actually evaluate.
+                </p>
             </div>
 
             <div class="space-y-16">
 
                 <!-- System 1: Proof-of-Work Loop -->
                 <article class="opacity-0" data-gsap="fade-up">
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-8">
+                    <div class="spine-system-card">
                         <div class="flex items-center space-x-3 mb-4">
                             <span class="text-sm font-semibold text-indigodeep bg-indigodeep/10 px-3 py-1 rounded-full">System 01</span>
                         </div>
@@ -184,7 +262,7 @@
                             </div>
                             <div>
                                 <h4 class="text-sm font-semibold text-indigodeep mb-2 uppercase tracking-wider">How it shows up</h4>
-                                <ul class="space-y-2 text-sm text-chocolate">
+                                <ul class="spine-system-list text-sm text-chocolate">
                                     <li class="flex items-start">
                                         <span class="mr-2">•</span>
                                         <span>I spend a lot of my "productive internet time" building my website.</span>
@@ -207,7 +285,7 @@
 
                 <!-- System 2: Learning System -->
                 <article class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-8">
+                    <div class="spine-system-card">
                         <div class="flex items-center space-x-3 mb-4">
                             <span class="text-sm font-semibold text-indigodeep bg-indigodeep/10 px-3 py-1 rounded-full">System 02</span>
                         </div>
@@ -221,7 +299,7 @@
                             </div>
                             <div>
                                 <h4 class="text-sm font-semibold text-indigodeep mb-2 uppercase tracking-wider">The system</h4>
-                                <ul class="space-y-2 text-sm text-chocolate">
+                                <ul class="spine-system-list text-sm text-chocolate">
                                     <li class="flex items-start">
                                         <span class="mr-2">•</span>
                                         <span>I learn by asking questions repeatedly and cycling the material until it sticks.</span>
@@ -244,7 +322,7 @@
 
                 <!-- System 3: Focus + Discipline Baseline -->
                 <article class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-8">
+                    <div class="spine-system-card">
                         <div class="flex items-center space-x-3 mb-4">
                             <span class="text-sm font-semibold text-indigodeep bg-indigodeep/10 px-3 py-1 rounded-full">System 03</span>
                         </div>
@@ -258,7 +336,7 @@
                             </div>
                             <div>
                                 <h4 class="text-sm font-semibold text-indigodeep mb-2 uppercase tracking-wider">The system</h4>
-                                <ul class="space-y-2 text-sm text-chocolate">
+                                <ul class="spine-system-list text-sm text-chocolate">
                                     <li class="flex items-start">
                                         <span class="mr-2">•</span>
                                         <span>Short-form social media: deleted because it is too easy to waste hours.</span>
@@ -292,8 +370,9 @@
                 </article>
 
                 <!-- System 4: What's Next -->
-                <article class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-8">
+                <article id="next" class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
+                    <div class="spine-system-card">
+                        <p class="spine-label">Next direction</p>
                         <h3 class="text-2xl font-bold text-indigodeep mb-4">What's next</h3>
                         <ul class="space-y-3 text-base text-chocolate leading-relaxed">
                             <li>• I'm open to new opportunities, remote or San Diego hybrid.</li>
@@ -306,8 +385,19 @@
         </section>
         
         <!-- Strengths and Working On Section -->
-        <section class="proof-band bg-white/30 backdrop-blur-sm border-y border-chocolate/10 py-16">
+        <section id="baseline" class="proof-band bg-white/30 backdrop-blur-sm border-y border-chocolate/10 py-16">
             <div class="max-w-5xl mx-auto px-6 lg:px-12">
+                <div class="spine-section-head is-split">
+                    <div>
+                        <p class="spine-eyebrow">Operating baseline</p>
+                        <h2 class="text-3xl font-bold text-indigodeep">What is already strong, and what I am still improving</h2>
+                    </div>
+                    <p class="spine-lead">
+                        This is the practical middle of the page: what I can
+                        already be trusted with, and the areas where I am still
+                        actively sharpening the work.
+                    </p>
+                </div>
                 <div class="grid md:grid-cols-2 gap-8">
                     <!-- What I am good at -->
                     <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-6 opacity-0" data-gsap="fade-up">
@@ -376,9 +466,12 @@
         
         <!-- Timeline Section -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
-            <div class="mb-12">
-                <h2 class="text-3xl font-bold text-indigodeep mb-4">How we got here</h2>
-                <p class="text-base text-chocolate leading-relaxed">The path from Baghdad to El Cajon (near San Diego), building adaptability early, then finishing a General Business degree (December 2025; diploma pending) and moving into roles with real ownership.</p>
+            <div class="spine-section-head is-split">
+                <div>
+                    <p class="spine-eyebrow">Full context</p>
+                    <h2 class="text-3xl font-bold text-indigodeep mb-4">How we got here, in sequence</h2>
+                </div>
+                <p class="spine-lead">The path from Baghdad to El Cajon, building adaptability early, then finishing a General Business degree and moving toward roles with real ownership.</p>
             </div>
 
             <div class="space-y-8">
@@ -458,11 +551,14 @@
         </section>
         
         <!-- Three Decisions Section -->
-        <section class="proof-band bg-white/30 backdrop-blur-sm border-y border-chocolate/10 py-16">
+        <section id="decisions" class="proof-band bg-white/30 backdrop-blur-sm border-y border-chocolate/10 py-16">
             <div class="max-w-5xl mx-auto px-6 lg:px-12">
-                <div class="mb-12">
-                    <h2 class="text-3xl font-bold text-indigodeep mb-4">Three decisions that shaped me</h2>
-                    <p class="text-base text-chocolate leading-relaxed">Looking back, these choices determined the trajectory more than anything else.</p>
+                <div class="spine-section-head is-split">
+                    <div>
+                        <p class="spine-eyebrow">Decisions</p>
+                        <h2 class="text-3xl font-bold text-indigodeep mb-4">Three decisions that shaped the direction</h2>
+                    </div>
+                    <p class="spine-lead">Looking back, these choices determined the trajectory more than anything else.</p>
                 </div>
                 
                 <div class="grid md:grid-cols-3 gap-6">
@@ -500,10 +596,13 @@
         <!-- FIX: This section was missing entirely — both target pages exist at
              /projects/endpoint-competitive-playbook and /projects/loreal-maps-campaign.
              The section linking to them simply was never added to this page. -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
-            <div class="mb-10">
-                <h2 class="text-3xl font-bold text-indigodeep mb-4">The work behind the systems</h2>
-                <p class="text-base text-chocolate leading-relaxed">Two projects that put these principles into practice. Each has a full write-up with the reasoning, tradeoffs, and outcomes.</p>
+        <section id="proof" class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
+            <div class="spine-section-head is-split">
+                <div>
+                    <p class="spine-eyebrow">Proof</p>
+                    <h2 class="text-3xl font-bold text-indigodeep mb-4">The work behind the systems</h2>
+                </div>
+                <p class="spine-lead">Two projects that put these principles into practice. Each has a full write-up with the reasoning, tradeoffs, and outcomes.</p>
             </div>
             <div class="grid md:grid-cols-2 gap-8">
 
@@ -543,11 +642,14 @@
         </section>
         
         <!-- CTA Section -->
-        <section class="page-close max-w-4xl mx-auto px-6 lg:px-12 py-20">
-            <div class="bg-indigodeep rounded-3xl p-12 text-center space-y-6">
-                <h2 class="text-3xl font-bold text-beige">Let's talk about what's next</h2>
-                <p class="text-base text-beige max-w-xl mx-auto leading-relaxed">Whether it's a role, a project, or just comparing notes on systems; reach out.</p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <section class="page-close max-w-5xl mx-auto px-6 lg:px-12 py-20">
+            <div class="bg-indigodeep rounded-3xl p-12 spine-cta-card">
+                <div class="spine-cta-copy">
+                    <p class="spine-eyebrow text-beige/70">Close the loop</p>
+                    <h2 class="text-3xl font-bold text-beige">Let's talk about what's next</h2>
+                    <p class="text-base text-beige leading-relaxed">Whether it's a role, a project, or just comparing notes on systems; reach out.</p>
+                </div>
+                <div class="spine-cta-actions">
                     <a href="/contact" class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep">
                         Contact
                     </a>
