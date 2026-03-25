@@ -16,7 +16,7 @@ const aboutSections = [
     category: 'Philosophy',
     title: 'Core Values',
     subtitle: 'What drives the work',
-    preview: 'Curiosity, execution, growth through discomfort. The principles that shape how I approach problems.',
+    preview: 'The standards I actually try to live by, and the stuff I learned the hard way.',
     icon: '⚖️',
     link: '/about/values',
     type: 'internal'
@@ -26,7 +26,7 @@ const aboutSections = [
     category: 'Identity',
     title: 'Background',
     subtitle: 'Baghdad → El Cajon',
-    preview: 'Chaldean heritage, first-gen American, 4 languages. The story behind the systems thinking.',
+    preview: 'Chaldean, Iraqi-American, four languages, family history, and the context I come from.',
     icon: '🏠',
     link: '/about/background',
     type: 'internal'
@@ -36,7 +36,7 @@ const aboutSections = [
     category: 'Professional',
     title: 'Working With Me',
     subtitle: 'How I operate',
-    preview: 'Clear communication, reliability, documentation. What you can expect when we collaborate.',
+    preview: 'Clear communication, follow-through, and what people can expect if we work together.',
     icon: '🤝',
     link: '/about/working-with-me',
     type: 'internal'
@@ -48,7 +48,7 @@ const aboutSections = [
     category: 'Physical',
     title: 'Gym & Strength Training',
     subtitle: 'Discipline through progressive overload',
-    preview: 'Building discipline through progressive overload. Tracking PRs, optimizing recovery, proving consistency beats intensity.',
+    preview: 'Training, PRs, and showing up even when I do not feel like it.',
     icon: '💪',
     link: '/hobbies/gym',
     type: 'hobby'
@@ -110,7 +110,7 @@ const aboutSections = [
     category: 'Strategy',
     title: 'Games',
     subtitle: 'If I\'m boring you...',
-    preview: 'Chess, strategy games, competitive thinking. Because even hobbies teach systems.',
+    preview: 'Chess, strategy games, and the part of me that likes figuring people out.',
     icon: '🎮',
     link: '/hobbies-games',
     type: 'hobby'
