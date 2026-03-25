@@ -92,6 +92,8 @@
   height: clamp(450px, 70vh, 800px);
   padding-bottom: 6.5rem;
   overflow: visible;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: contain;
 }
 
 .coverflow-perspective {
@@ -101,6 +103,7 @@
   perspective: 2500px;
   perspective-origin: 50% 50%;
   transform-style: preserve-3d;
+  touch-action: pan-y pinch-zoom;
 }
 
 /* V4: Floor horizon line */
@@ -133,6 +136,7 @@
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
+  overscroll-behavior: contain;
 }
 
 .coverflow-container.is-dragging {

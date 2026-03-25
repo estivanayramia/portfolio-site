@@ -2047,6 +2047,7 @@ select.border-red-500 {
     position: relative;
     margin-top: clamp(2.5rem, 5vw, 5rem);
     padding-top: clamp(2.75rem, 5vw, 5rem) !important;
+    padding-bottom: clamp(5.5rem, 10vw, 7.5rem) !important;
     border-top: 1px solid rgba(33, 40, 66, 0.12);
 }
 
@@ -2372,6 +2373,10 @@ body[data-print-url] main > section + section {
     gap: 0.75rem;
 }
 
+.spine-page .spine-cta-copy {
+    min-width: 0;
+}
+
 .spine-page .spine-chip {
     display: inline-flex;
     align-items: center;
@@ -2384,15 +2389,15 @@ body[data-print-url] main > section + section {
 }
 
 .spine-page .spine-cta-card {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 1.2rem;
+    min-height: clamp(18rem, 34vw, 23rem);
 }
 
-@media (min-width: 900px) {
-    .spine-page .spine-cta-card {
-        grid-template-columns: minmax(0, 1fr) auto;
-        align-items: center;
-    }
+.spine-page .spine-cta-actions {
+    margin-top: auto;
+    align-items: flex-start;
 }
 
 .spine-page .spine-chapter-link {
@@ -2798,6 +2803,9 @@ body[data-print-url*="/projects/"] .text-xs.uppercase {
     --project-panel: rgba(255, 255, 255, 0.62);
     --project-panel-soft: rgba(255, 255, 255, 0.34);
     --project-panel-strong: rgba(255, 255, 255, 0.78);
+    --project-quote-text: #212842;
+    --project-quote-eyebrow: rgba(54, 32, 23, 0.62);
+    --project-quote-surface: rgba(247, 239, 224, 0.92);
     --project-shadow: 0 18px 42px rgba(33, 40, 66, 0.08);
 }
 
@@ -2806,6 +2814,9 @@ body[data-print-url*="/projects/"] .text-xs.uppercase {
     --project-panel: rgba(225, 212, 194, 0.08);
     --project-panel-soft: rgba(225, 212, 194, 0.04);
     --project-panel-strong: rgba(225, 212, 194, 0.1);
+    --project-quote-text: #1c2338;
+    --project-quote-eyebrow: rgba(225, 212, 194, 0.72);
+    --project-quote-surface: rgba(247, 239, 224, 0.88);
 }
 
 .project-page .project-kicker {
@@ -2916,6 +2927,27 @@ body[data-print-url*="/projects/"] .text-xs.uppercase {
     border: 1px solid var(--project-line);
     background: linear-gradient(180deg, var(--project-panel-strong), var(--project-panel-soft));
     box-shadow: var(--project-shadow);
+}
+
+.project-page .project-eyebrow {
+    color: var(--project-quote-eyebrow) !important;
+}
+
+.project-page .project-quote.project-quote--light {
+    color: var(--project-quote-text);
+}
+
+.project-page .project-quote.project-quote--light p {
+    color: var(--project-quote-text) !important;
+}
+
+[data-theme="dark"] .project-page .project-quote.project-quote--light {
+    background: var(--project-quote-surface) !important;
+    border-color: rgba(225, 212, 194, 0.18) !important;
+}
+
+.project-page .project-quote.project-quote--inverse p {
+    color: #e1d4c2 !important;
 }
 
 .project-page .project-close-card {
@@ -3513,6 +3545,45 @@ body[data-print-url*="/hobbies/"] .bg-white\/50 {
 [data-theme="dark"] #scroll-to-top:focus .scroll-to-top-btn-tooltip::after,
 [data-theme="dark"] #scroll-to-top:focus-visible .scroll-to-top-btn-tooltip::after {
     border-color: #e1d4c2 transparent transparent transparent !important;
+}
+
+body.page-close-ui-guard #chat-widget,
+body.page-close-ui-guard #scroll-to-top {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(1rem) scale(0.96) !important;
+}
+
+body.page-close-ui-guard #welcome-bubble {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.project-eyebrow {
+    color: rgba(54, 32, 23, 0.62) !important;
+}
+
+[data-theme="dark"] .project-eyebrow {
+    color: rgba(225, 212, 194, 0.72) !important;
+}
+
+.project-quote--light p {
+    color: #212842 !important;
+}
+
+[data-theme="dark"] .project-quote--light {
+    background: rgba(247, 239, 224, 0.88) !important;
+    border-color: rgba(225, 212, 194, 0.18) !important;
+}
+
+[data-theme="dark"] .project-quote--light p {
+    color: #1c2338 !important;
+}
+
+.project-quote--inverse p {
+    color: #e1d4c2 !important;
 }
 
 /* Konami Code Gift Animations */

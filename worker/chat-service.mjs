@@ -273,6 +273,37 @@ async function loadPageManifest(env) {
   return setCacheEntry("manifest", normalizeManifest(kvManifest));
 }
 
+async function loadJsonFromUrl(url) {
+  if (!url) return null;
+  try {
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json"
+      }
+    });
+    if (!response?.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+async function primeFallbackGrounding(env, baseUrl) {
+  if (!env) return;
+
+  if (!env.__SITE_FACTS) {
+    env.__SITE_FACTS = await loadJsonFromUrl(`${withTrailingSlash(baseUrl)}/assets/data/site-facts.json`);
+  }
+
+  if (!env.__PAGE_MANIFEST) {
+    env.__PAGE_MANIFEST = await loadJsonFromUrl(`${withTrailingSlash(baseUrl)}/assets/data/chat-page-manifest.json`);
+  }
+
+  if (!env.__CHAT_PROFILE) {
+    env.__CHAT_PROFILE = await loadJsonFromUrl(`${withTrailingSlash(baseUrl)}/data/chat/estivan-profile.public.json`);
+  }
+}
+
 function chooseManifestBuildVersion(pages) {
   const counts = new Map();
   for (const page of pages) {
@@ -454,7 +485,7 @@ function classifyQuestion(message) {
   if (/\b(relationship|dating|girlfriend|boyfriend|ex|family drama|mental health|diagnosed|address|where exactly do you live|salary you make)\b/.test(lower)) {
     return QUESTION_CLASSES.BOUNDARY;
   }
-  if (/\b(what's he about|whats he about|what are you about|who are you|tell me about yourself|tell me about estivan)\b/.test(lower)) {
+  if (/\b(what's he about|whats he about|what are you about|who are you|tell me about yourself|tell me about estivan|what does estivan do|what does he do|what do you do)\b/.test(lower)) {
     return QUESTION_CLASSES.ABOUT_GENERAL;
   }
   if (/\b(page|site|homepage|overview|deep dive|about|project page|hobbies|whispers|portfolio build|loreal|endpoint|franklin|cooking|reading|photography|me page)\b/.test(lower)) {
@@ -710,7 +741,7 @@ function buildDeterministicReply({ questionClass, surfaceFactKey, profile, siteF
     case QUESTION_CLASSES.BOUNDARY:
       return buildBoundaryReply();
     case QUESTION_CLASSES.ABOUT_GENERAL:
-      return `${(seeds.aboutGeneral || []).join(" ")} ${(seeds.outreach || []).slice(1, 2).join(" ")}`.trim();
+      return `Estivan is an ${profile.identity?.education?.degree || "SDSU General Business"} graduate who leans toward systems, operations, people judgment, and cleaner workflows. He tends to look at how something runs, where it breaks down, and how to make it work better without adding extra theater. ${formatInternalLink("Projects", "/projects/")} is the quickest proof, and ${formatInternalLink("About", "/about")} gives the fuller picture.`;
     case QUESTION_CLASSES.UNKNOWN:
       return buildUnknownReply(profile);
     default:
@@ -866,6 +897,20 @@ ${message}
 `.trim();
 }
 
+export function isLikelyIncompleteReply(reply) {
+  const cleaned = stripUnsafeArtifacts(reply);
+  if (!cleaned) return true;
+
+  if (cleaned.length < 40) {
+    return !/[.!?]"?$/.test(cleaned);
+  }
+
+  if (/[.!?]"?$/.test(cleaned)) return false;
+  if (/[:;,]\s*$/.test(cleaned)) return true;
+
+  return /\b(and|or|but|because|especially|including|while|with|for|to|that|which|who|where|when|how|his|her|their|the)\s*$/i.test(cleaned);
+}
+
 function soundsTooFirstPerson(reply) {
   const lower = String(reply || "").toLowerCase();
   const firstPersonCount = (lower.match(/\b(i|i['’]m|i['’]ve|i['’]d|my|me|mine)\b/g) || []).length;
@@ -925,6 +970,10 @@ export function buildChips(questionClass, retrieval) {
 export async function prepareChatContext({ env, request, message, language, rawPageContext, legacyPageContent }) {
   const pageContext = parsePageContext(rawPageContext, legacyPageContent);
   const requestedBuildVersion = pageContext.buildVersion;
+  const baseUrl = inferBaseUrl(request, env);
+
+  await primeFallbackGrounding(env, baseUrl);
+
   const [profile, siteFacts, manifestFromKv] = await Promise.all([
     loadProfile(env),
     loadSiteFacts(env),

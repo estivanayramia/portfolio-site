@@ -1008,7 +1008,19 @@ class RouletteOverlayController {
     }
 
     await new Promise((resolve) => {
+      let resolved = false;
+      const finish = () => {
+        if (resolved) return;
+        resolved = true;
+        resolve();
+      };
+
       const stagger = this.carousel.motion.staggerDelay;
+      const fallbackMs = Math.max(220, this.carousel.motion.introMs + (this.pockets.length * stagger * 1000) + 180);
+      const fallbackTimeout = this.resources.timeout(() => {
+        finish();
+      }, fallbackMs);
+
       gsap.fromTo(
         this.pockets.map((pocket) => pocket.root),
         { opacity: 0, scale: 0.9 },
@@ -1018,7 +1030,10 @@ class RouletteOverlayController {
           duration: this.carousel.motion.introMs / 1000,
           stagger,
           ease: 'power2.out',
-          onComplete: resolve
+          onComplete: () => {
+            this.resources.clearTimeout(fallbackTimeout);
+            finish();
+          }
         }
       );
     });
@@ -1386,10 +1401,11 @@ export class LuxuryCoverflow {
     this.announce(`Now showing ${title}`);
   }
 
-  updatePagination() {
+  updatePagination(position = this.currentIndex) {
     const current = this.selectors.paginationCurrent ? this.container.querySelector(this.selectors.paginationCurrent) : null;
     const total = this.selectors.paginationTotal ? this.container.querySelector(this.selectors.paginationTotal) : null;
-    if (current) current.textContent = String(this.currentIndex + 1);
+    const activeIndex = this.getNearestIndex(position);
+    if (current) current.textContent = String(activeIndex + 1);
     if (total) total.textContent = String(this.items.length);
   }
 
@@ -1530,7 +1546,7 @@ export class LuxuryCoverflow {
       this.previewIndex = centerIndex;
       this.wheelState.previewPosition = centerIndex;
       applyTransforms(centerIndex);
-      this.updatePagination();
+      this.updatePagination(centerIndex);
       this.finishAnimation();
       return;
     }
@@ -1538,7 +1554,7 @@ export class LuxuryCoverflow {
     const startPosition = Number.isFinite(this.previewIndex) ? this.previewIndex : this.currentIndex;
     const tweenState = { position: startPosition };
     this.isAnimating = true;
-    this.updatePagination();
+    this.updatePagination(centerIndex);
 
     this.positionTween = gsap.to(tweenState, {
       position: centerIndex,
@@ -1548,12 +1564,14 @@ export class LuxuryCoverflow {
         this.previewIndex = tweenState.position;
         this.wheelState.previewPosition = tweenState.position;
         applyTransforms(tweenState.position);
+        this.updatePagination(tweenState.position);
       },
       onComplete: () => {
         this.positionTween = null;
         this.previewIndex = centerIndex;
         this.wheelState.previewPosition = centerIndex;
         applyTransforms(centerIndex);
+        this.updatePagination(centerIndex);
         this.finishAnimation();
       }
     });
@@ -1578,6 +1596,7 @@ export class LuxuryCoverflow {
       });
     });
     this.updateDots();
+    this.updatePagination(position);
   }
 
   setAnimating(durationMs) {
@@ -1772,6 +1791,7 @@ export class LuxuryCoverflow {
       if (absX < 6 || absX <= absY) return;
 
       event.preventDefault();
+      event.stopPropagation();
       this.stopAutoplay();
       this.wheelState.accumulator += event.deltaX;
 
@@ -1785,13 +1805,15 @@ export class LuxuryCoverflow {
 
       this.resources.clearTimeout(this.wheelState.settleTimeout);
       this.wheelState.settleTimeout = this.resources.timeout(() => {
-        let targetIndex = this.currentIndex;
-        if (Math.abs(this.wheelState.accumulator) >= this.motion.scrollThreshold) {
-          targetIndex = this.currentIndex + (this.wheelState.accumulator > 0 ? 1 : -1);
+        let targetIndex = this.motion.enableSmoothTracking
+          ? this.getNearestIndex(this.previewIndex)
+          : this.currentIndex;
+
+        if (!this.motion.enableSmoothTracking && Math.abs(this.wheelState.accumulator) >= this.motion.scrollThreshold) {
+          targetIndex += this.wheelState.accumulator > 0 ? 1 : -1;
         }
 
         this.wheelState.accumulator = 0;
-        this.previewIndex = normalizeIndex(targetIndex, this.items.length, this.config.infiniteLoop);
         this.goToSlide(targetIndex, { durationMs: this.motion.settleMs });
       }, 110);
     }, { passive: false });
@@ -1864,9 +1886,10 @@ export class LuxuryCoverflow {
     const velocity = this.physics.velocity;
     const hasMeaningfulMovement = Math.abs(deltaX) >= 24 || Math.abs(velocity) > 0.2;
     const direction = deltaX < 0 ? 1 : -1;
+    const settledIndex = this.getNearestIndex(this.previewIndex);
     const targetIndex = hasMeaningfulMovement
-      ? this.currentIndex + direction
-      : this.currentIndex;
+      ? settledIndex + direction
+      : settledIndex;
 
     this.dragState.isDragging = false;
     this.dragState.axisLocked = null;

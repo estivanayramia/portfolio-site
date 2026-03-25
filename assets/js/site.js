@@ -1990,6 +1990,29 @@ const initPdfPreviews = () => {
 const initScrollToTop = () => {
     const scrollBtn = document.getElementById('scroll-to-top');
     if (!scrollBtn) return;
+    const progressCircle = scrollBtn.querySelector('.scroll-progress-circle');
+
+    let ringCircumference = 0;
+
+    const updateProgressRing = () => {
+        if (!progressCircle || ringCircumference <= 0) return;
+
+        const pageHeight = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        const progress = pageHeight <= 0 ? 0 : Math.min(1, Math.max(0, window.scrollY / pageHeight));
+        progressCircle.style.strokeDashoffset = String(ringCircumference * (1 - progress));
+    };
+
+    const initializeProgressRing = () => {
+        if (!progressCircle) return;
+
+        const radius = parseFloat(progressCircle.getAttribute('r') || progressCircle.r?.baseVal?.value || '0');
+        ringCircumference = radius > 0 ? 2 * Math.PI * radius : 0;
+        if (ringCircumference <= 0) return;
+
+        progressCircle.style.strokeDasharray = String(ringCircumference);
+        progressCircle.style.strokeDashoffset = String(ringCircumference);
+        updateProgressRing();
+    };
 
     // Show/hide button based on scroll position (25% of page height)
     const toggleButton = () => {
@@ -2002,6 +2025,8 @@ const initScrollToTop = () => {
         } else {
             scrollBtn.classList.remove('show');
         }
+
+        updateProgressRing();
     };
 
     // Scroll to top smoothly
@@ -2025,9 +2050,14 @@ const initScrollToTop = () => {
 
     // Event listeners
     window.addEventListener('scroll', toggleButton);
+    window.addEventListener('resize', () => {
+        initializeProgressRing();
+        toggleButton();
+    });
     scrollBtn.addEventListener('click', scrollToTop);
 
     // Check initial position
+    initializeProgressRing();
     toggleButton();
 };
 
@@ -3376,7 +3406,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configuration
     // ======================================================================
     
-    const CHAT_ENDPOINT = 'https://portfolio-chat.eayramia.workers.dev/chat';
+    const CHAT_ENDPOINT = (() => {
+        const explicitEndpoint = document.documentElement.getAttribute('data-chat-endpoint') || window.__SAVONIE_CHAT_ENDPOINT;
+        if (explicitEndpoint) {
+            return explicitEndpoint;
+        }
+
+        const host = window.location.hostname;
+        if (/^(?:www\.)?estivanayramia\.com$/i.test(host)) {
+            return `${window.location.origin}/chat`;
+        }
+        return 'https://portfolio-chat.eayramia.workers.dev/chat';
+    })();
     const RESUME_URL = '/assets/docs/Estivan-Ayramia-Resume.pdf';
     const LINKEDIN_URL = 'https://www.linkedin.com/in/estivanayramia';
     const WELCOME_DELAY = 2500;
@@ -3570,6 +3611,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
         renderChips(defaultChips);
     }
+
+    syncHomeProofStats();
+    initPageCloseFloatingUiGuard();
     
     isInitialized = true;
 
@@ -3796,21 +3840,38 @@ document.addEventListener('DOMContentLoaded', () => {
         const frag = document.createDocumentFragment();
         if (!text) return frag;
 
-        const getSafeHttpUrl = (rawUrl) => {
+        const getSafeLinkTarget = (rawUrl) => {
+            const input = String(rawUrl || '').trim();
+            if (!input) return null;
+
+            if (input.startsWith('/')) {
+                return {
+                    href: input,
+                    external: false
+                };
+            }
+
             try {
-                const u = new URL(String(rawUrl));
+                const u = new URL(input, window.location.origin);
                 if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
-                return u.toString();
+
+                const sameOrigin = u.origin === window.location.origin;
+                return {
+                    href: sameOrigin ? `${u.pathname}${u.search}${u.hash}` : u.toString(),
+                    external: !sameOrigin
+                };
             } catch (_) {
                 return null;
             }
         };
 
-        const createLink = (href, label) => {
+        const createLink = (target, label) => {
             const a = document.createElement('a');
-            a.href = href;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
+            a.href = target.href;
+            if (target.external) {
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+            }
             a.className = 'text-[#212842] underline hover:text-[#362017] font-medium';
             a.textContent = label;
             return a;
@@ -3827,14 +3888,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (m[1] && m[2]) {
-                    const safe = getSafeHttpUrl(m[2]);
+                    const safe = getSafeLinkTarget(m[2]);
                     if (safe) {
                         parent.appendChild(createLink(safe, m[1]));
                     } else {
                         parent.appendChild(document.createTextNode(m[0]));
                     }
                 } else {
-                    const safe = getSafeHttpUrl(m[0]);
+                    const safe = getSafeLinkTarget(m[0]);
                     if (safe) {
                         parent.appendChild(createLink(safe, m[0]));
                     } else {
@@ -3864,19 +3925,6 @@ document.addEventListener('DOMContentLoaded', () => {
         template.innerHTML = String(html || '');
 
         const allowedTags = new Set(['P', 'BR', 'STRONG', 'EM', 'CODE', 'PRE', 'UL', 'OL', 'LI', 'A', 'BLOCKQUOTE']);
-        const safeUrl = (raw) => {
-            if (!raw) return null;
-            const s = String(raw).trim();
-            if (s.startsWith('/')) return s;
-            try {
-                const u = new URL(s);
-                if (u.protocol === 'http:' || u.protocol === 'https:') return u.toString();
-                return null;
-            } catch (_) {
-                return null;
-            }
-        };
-
         const walk = (node) => {
             const children = Array.from(node.childNodes);
             for (const child of children) {
@@ -3891,19 +3939,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     // Strip all attributes by default.
+                    const rawHref = tag === 'A' ? el.getAttribute('href') : null;
                     const attrs = Array.from(el.attributes);
                     for (const a of attrs) el.removeAttribute(a.name);
 
                     if (tag === 'A') {
-                        const href = safeUrl(el.getAttribute('href'));
-                        if (!href) {
+                        const safe = getSafeLinkTarget(rawHref);
+                        if (!safe) {
                             const replacement = document.createTextNode(el.textContent || '');
                             el.replaceWith(replacement);
                             continue;
                         }
-                        el.setAttribute('href', href);
-                        el.setAttribute('target', '_blank');
-                        el.setAttribute('rel', 'noopener noreferrer');
+                        el.setAttribute('href', safe.href);
+                        if (safe.external) {
+                            el.setAttribute('target', '_blank');
+                            el.setAttribute('rel', 'noopener noreferrer');
+                        }
                         el.className = 'text-[#212842] underline hover:text-[#362017] font-medium';
                     }
 
@@ -3932,6 +3983,24 @@ document.addEventListener('DOMContentLoaded', () => {
             return sanitizeMarkdownHtmlToFragment(html);
         } catch (e) {
             return parseMarkdown(raw);
+        }
+    }
+
+    async function syncHomeProofStats() {
+        const projectCountNode = document.querySelector('[data-home-proof-project-count]');
+        if (!projectCountNode) return;
+
+        try {
+            const response = await fetch('/assets/data/site-facts.json', { cache: 'no-cache' });
+            if (!response.ok) return;
+
+            const siteFacts = await response.json();
+            const projectCount = Array.isArray(siteFacts?.projects) ? siteFacts.projects.length : 0;
+            if (projectCount > 0) {
+                projectCountNode.textContent = String(projectCount);
+            }
+        } catch (_) {
+            // Keep the build-time fallback if the facts file is unavailable.
         }
     }
 
@@ -4000,6 +4069,39 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Show container
         setSuggestionsVisible(true);
+    }
+
+    function initPageCloseFloatingUiGuard() {
+        const pageCloseSections = Array.from(document.querySelectorAll('.page-close'));
+        if (!pageCloseSections.length) return;
+
+        const activeSections = new Set();
+        const syncFloatingUiGuard = () => {
+            const chatHidden = !!els.window?.classList.contains('hidden');
+            const pageCloseActive = activeSections.size > 0;
+            document.body.classList.toggle('page-close-ui-guard', pageCloseActive && chatHidden);
+            if (pageCloseActive && els.bubble) {
+                els.bubble.classList.add('opacity-0', 'translate-y-4');
+            }
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    activeSections.add(entry.target);
+                } else {
+                    activeSections.delete(entry.target);
+                }
+            });
+            syncFloatingUiGuard();
+        }, {
+            root: null,
+            threshold: 0.18,
+            rootMargin: '0px 0px -18% 0px'
+        });
+
+        pageCloseSections.forEach((section) => observer.observe(section));
+        syncFloatingUiGuard();
     }
 
     function toggleChat() {
@@ -4072,6 +4174,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     els.messages.scrollTop = els.messages.scrollHeight;
                 }
             }, 100);
+        }
+
+        if (!els.window?.classList.contains('hidden')) {
+            document.body.classList.remove('page-close-ui-guard');
+        } else {
+            const pageCloseActive = Array.from(document.querySelectorAll('.page-close')).some((section) => {
+                const rect = section.getBoundingClientRect();
+                return rect.top < window.innerHeight * 0.82 && rect.bottom > 0;
+            });
+            document.body.classList.toggle('page-close-ui-guard', pageCloseActive);
         }
     }
 

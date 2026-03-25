@@ -2,6 +2,7 @@ import {
   CHAT_VERSION,
   buildChips,
   buildModelContext,
+  isLikelyIncompleteReply,
   postProcessReply,
   prepareChatContext
 } from "./chat-service.mjs";
@@ -138,7 +139,10 @@ async function callGemini({ apiKey, model, context, message, maxTokens }) {
       ? candidate.content.parts.map((part) => part?.text || "").join("").trim()
       : "";
 
-    return reply;
+    return {
+      reply,
+      finishReason: candidate?.finishReason || ""
+    };
   } finally {
     clearTimeout(timeoutId);
   }
@@ -176,7 +180,15 @@ async function generateReply({ env, userMessage, language, chatContext }) {
       maxTokens
     });
 
-    const finalReply = postProcessReply(primaryReply, chatContext.fallbackReply);
+    const finalReply = postProcessReply(primaryReply.reply, chatContext.fallbackReply);
+    const needsRecovery = isLikelyIncompleteReply(finalReply) || /MAX_TOKENS/i.test(primaryReply.finishReason || "");
+    if (needsRecovery) {
+      return {
+        reply: chatContext.fallbackReply,
+        source: "deterministic_incomplete_primary"
+      };
+    }
+
     return {
       reply: finalReply,
       source: "gemini_primary"
@@ -191,7 +203,15 @@ async function generateReply({ env, userMessage, language, chatContext }) {
         maxTokens
       });
 
-      const finalReply = postProcessReply(fallbackModelReply, chatContext.fallbackReply);
+      const finalReply = postProcessReply(fallbackModelReply.reply, chatContext.fallbackReply);
+      const needsRecovery = isLikelyIncompleteReply(finalReply) || /MAX_TOKENS/i.test(fallbackModelReply.finishReason || "");
+      if (needsRecovery) {
+        return {
+          reply: chatContext.fallbackReply,
+          source: "deterministic_incomplete_fallback"
+        };
+      }
+
       return {
         reply: finalReply,
         source: "gemini_fallback"
