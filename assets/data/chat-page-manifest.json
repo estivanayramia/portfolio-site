@@ -2,7 +2,7 @@
   "version": "page-grounding-v1",
   "source": "repo-crawl",
   "baseUrl": "https://www.estivanayramia.com",
-  "buildVersion": "20260325-06b0364",
+  "buildVersion": "20260326-5e65787",
   "pageCount": 26,
   "pages": [
     {
@@ -13,7 +13,7 @@
       "pageType": "home",
       "title": "Estivan Ayramia | Built to Show More Than a Resume",
       "description": "A direct look at my work, how I think, and what I follow through on.",
-      "buildVersion": "20260325-06b0364",
+      "buildVersion": "20260326-5e65787",
       "summary": "A direct look at my work, how I think, and what I follow through on.",
       "headings": [
         "Estivan Ayramia | Built to Show More Than a Resume",
@@ -3244,8 +3244,10 @@
         "Gallery",
         "Mod List"
       ],
-      "links": [],
-      "checksum": "fnv1a-733a8671",
+      "links": [
+        "/about"
+      ],
+      "checksum": "fnv1a-8684a37f",
       "keywords": [
         "/hobbies/car",
         "car",
@@ -3268,13 +3270,12 @@
         {
           "heading": "Car Enthusiasm | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nCar\nHobby chapter / mechanical",
+          "text": "Car\nHobby chapter / mechanical",
           "keywords": [
             "car",
             "enthusiasm",
             "estivan",
             "ayramia",
-            "hobbies",
             "hobby",
             "chapter",
             "mechanical"
@@ -3424,8 +3425,10 @@
         "The Kitchen as a System",
         "Gallery"
       ],
-      "links": [],
-      "checksum": "fnv1a-3f712c95",
+      "links": [
+        "/about"
+      ],
+      "checksum": "fnv1a-96a32487",
       "keywords": [
         "/hobbies/cooking",
         "cooking",
@@ -3445,12 +3448,11 @@
         {
           "heading": "Cooking | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nCooking\nHobby chapter / everyday routine",
+          "text": "Cooking\nHobby chapter / everyday routine",
           "keywords": [
             "cooking",
             "estivan",
             "ayramia",
-            "hobbies",
             "hobby",
             "chapter",
             "everyday",
@@ -3614,8 +3616,10 @@
         "Gallery",
         "Quick Facts"
       ],
-      "links": [],
-      "checksum": "fnv1a-9a04de09",
+      "links": [
+        "/about"
+      ],
+      "checksum": "fnv1a-4811a0f3",
       "keywords": [
         "/hobbies/gym",
         "gym",
@@ -3636,13 +3640,12 @@
         {
           "heading": "Gym Training | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nGym\nHobby chapter / discipline",
+          "text": "Gym\nHobby chapter / discipline",
           "keywords": [
             "gym",
             "training",
             "estivan",
             "ayramia",
-            "hobbies",
             "hobby",
             "chapter",
             "discipline"
@@ -3817,8 +3820,10 @@
         "Gallery",
         "Section Focus"
       ],
-      "links": [],
-      "checksum": "fnv1a-a64b3508",
+      "links": [
+        "/about"
+      ],
+      "checksum": "fnv1a-b7357e0e",
       "keywords": [
         "/hobbies/me",
         "estivan",
@@ -3845,11 +3850,10 @@
         {
           "heading": "Me | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nHobby chapter / personal\nThis is the part of the site where I stop acting locked in and just look human for a minute.",
+          "text": "Hobby chapter / personal\nThis is the part of the site where I stop acting locked in and just look human for a minute.",
           "keywords": [
             "estivan",
             "ayramia",
-            "hobbies",
             "hobby",
             "chapter",
             "personal",
@@ -4180,8 +4184,10 @@
         "Books That Stuck With Me",
         "Reading Principles"
       ],
-      "links": [],
-      "checksum": "fnv1a-b49370c4",
+      "links": [
+        "/about"
+      ],
+      "checksum": "fnv1a-41b856e",
       "keywords": [
         "/hobbies/reading",
         "reading",
@@ -4209,12 +4215,11 @@
         {
           "heading": "Reading | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nReading\nHobby chapter / thinking",
+          "text": "Reading\nHobby chapter / thinking",
           "keywords": [
             "reading",
             "estivan",
             "ayramia",
-            "hobbies",
             "hobby",
             "chapter",
             "thinking"
@@ -4419,8 +4424,10 @@
         "What I Write",
         "The Notes"
       ],
-      "links": [],
-      "checksum": "fnv1a-f372ad78",
+      "links": [
+        "/about"
+      ],
+      "checksum": "fnv1a-620550ee",
       "keywords": [
         "/hobbies/whispers",
         "whispers",
@@ -4445,13 +4452,12 @@
         {
           "heading": "Whispers Notes | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nWhispers on Paper",
+          "text": "Whispers on Paper",
           "keywords": [
             "whispers",
             "notes",
             "estivan",
             "ayramia",
-            "hobbies",
             "paper"
           ]
         },
