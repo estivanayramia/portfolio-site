@@ -66,67 +66,10 @@
       "tags": []
     }
   ],
-  "hobbies": [
-    {
-      "id": "car-enthusiasm",
-      "title": "Car Enthusiasm",
-      "summary": "First car, first freedom. Not about speed; about ownership, maintenance, and the pride of keeping something running clean.",
-      "url": "/hobbies/car",
-      "fullUrl": "https://www.estivanayramia.com/hobbies/car",
-      "filePath": "/hobbies/car.html"
-    },
-    {
-      "id": "cooking",
-      "title": "Cooking",
-      "summary": "Steak, pasta, and everything in between. Not a chef; just someone who refuses to eat mediocre food when good ingredients are available.",
-      "url": "/hobbies/cooking",
-      "fullUrl": "https://www.estivanayramia.com/hobbies/cooking",
-      "filePath": "/hobbies/cooking.html"
-    },
-    {
-      "id": "gym-strength-training",
-      "title": "Gym & Strength Training",
-      "summary": "Building discipline through progressive overload. Tracking PRs, optimizing recovery, and proving that consistency beats intensity every time.",
-      "url": "/hobbies/gym",
-      "fullUrl": "https://www.estivanayramia.com/hobbies/gym",
-      "filePath": "/hobbies/gym.html"
-    },
-    {
-      "id": "me",
-      "title": "Me",
-      "summary": "Personal snapshots that capture identity, growth, and the moments behind the work.",
-      "url": "/hobbies/me",
-      "fullUrl": "https://www.estivanayramia.com/hobbies/me",
-      "filePath": "/hobbies/me.html"
-    },
-    {
-      "id": "photography",
-      "title": "Photography",
-      "summary": "Capturing moments worth remembering. iPhone shots that tell stories; no DSLR needed, just good lighting and better timing.",
-      "url": "/hobbies/photography",
-      "fullUrl": "https://www.estivanayramia.com/hobbies/photography",
-      "filePath": "/hobbies/photography.html"
-    },
-    {
-      "id": "reading",
-      "title": "Reading",
-      "summary": "Books are compressed experience. Reading is the cheapest way to access decades of wisdom without making the same mistakes yourself.",
-      "url": "/hobbies/reading",
-      "fullUrl": "https://www.estivanayramia.com/hobbies/reading",
-      "filePath": "/hobbies/reading.html"
-    },
-    {
-      "id": "whispers-sticky-notes",
-      "title": "Whispers (Sticky Notes)",
-      "summary": "Random thoughts captured on sticky notes. Ideas, observations, reminders. Low-tech brain dump that keeps the mental clutter organized.",
-      "url": "/hobbies/whispers",
-      "fullUrl": "https://www.estivanayramia.com/hobbies/whispers",
-      "filePath": "/hobbies/whispers.html"
-    }
-  ],
+  "hobbies": [],
   "meta": {
     "projectCount": 7,
-    "hobbyCount": 7,
+    "hobbyCount": 0,
     "source": "Generated from HTML content by scripts/generate-site-facts.js"
   }
 }
