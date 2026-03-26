@@ -1130,7 +1130,8 @@ const initAnimations = () => {
     // Always unhide elements first to avoid blank screens
     const allAnimated = document.querySelectorAll('[data-gsap]');
     allAnimated.forEach(el => {
-        el.classList.remove('opacity-0', 'translate-y-8');
+        el.classList.remove('opacity-0', 'translate-y-8', 'translate-y-6', 'translate-y-4');
+        el.dataset.gsapState = 'ready';
         el.style.opacity = '1';
         el.style.transform = 'none';
     });
@@ -1155,12 +1156,20 @@ const initAnimations = () => {
     fadeElements.forEach(element => {
         const delay = element.getAttribute('data-gsap-delay') || 0;
 
-        gsap.from(element, {
-            opacity: 0,
-            y: 20,
+        gsap.fromTo(element, {
+            autoAlpha: 0,
+            y: 20
+        }, {
+            autoAlpha: 1,
+            y: 0,
             duration: 0.4,
             delay: parseFloat(delay) * 0.5,
             ease: 'power2.out',
+            clearProps: 'opacity,visibility,transform',
+            onComplete: () => {
+                element.style.opacity = '1';
+                element.style.transform = 'none';
+            },
             scrollTrigger: {
                 trigger: element,
                 start: 'top 92%',
@@ -1170,7 +1179,7 @@ const initAnimations = () => {
     });
 
     // Parallax effect for hero section (if exists)
-    const heroSection = document.querySelector('section:first-of-type');
+    const heroSection = document.querySelector('section:first-of-type[data-hero-parallax="true"]');
     if (heroSection && !isMobile && !heroSection.classList.contains('no-parallax')) {
         gsap.to(heroSection, {
             yPercent: 20,
@@ -3539,6 +3548,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const path = window.location.pathname || '/';
             parts.push(`path: ${path}`);
             parts.push(`title: ${document.title || ''}`);
+            const metaDescription = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+            if (metaDescription) {
+                parts.push(`description: ${metaDescription}`);
+            }
 
             const headings = Array.from(document.querySelectorAll('h1, h2'))
                 .map((h) => (h.textContent || '').trim())
@@ -3555,6 +3568,33 @@ document.addEventListener('DOMContentLoaded', () => {
             return combined.length > 3500 ? combined.slice(0, 3500) : combined;
         } catch (e) {
             return `${window.location.pathname || '/'} | ${document.title || ''}`;
+        }
+    }
+
+    function buildStructuredPageContext() {
+        try {
+            const headings = Array.from(document.querySelectorAll('h1, h2'))
+                .map((h) => (h.textContent || '').trim())
+                .filter(Boolean)
+                .slice(0, 10);
+
+            return {
+                route: window.location.pathname || '/',
+                title: document.title || '',
+                buildVersion: document.querySelector('meta[name="build-version"]')?.getAttribute('content') || '',
+                description: document.querySelector('meta[name="description"]')?.getAttribute('content') || '',
+                headings,
+                text: buildSafePageContext()
+            };
+        } catch (e) {
+            return {
+                route: window.location.pathname || '/',
+                title: document.title || '',
+                buildVersion: '',
+                description: '',
+                headings: [],
+                text: buildSafePageContext()
+            };
         }
     }
     
@@ -3695,10 +3735,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (els.chipsContainer) {
         els.chipsContainer.querySelectorAll('.chip-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                if (els.input) {
-                    els.input.value = btn.textContent;
-                    handleSend();
-                }
+                handleSend(btn.textContent || '');
             });
         });
     }
@@ -3835,47 +3872,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Functions
     
+    function getSafeLinkTarget(rawUrl) {
+        const input = String(rawUrl || '').trim();
+        if (!input) return null;
+
+        if (input.startsWith('/')) {
+            return {
+                href: input,
+                external: false
+            };
+        }
+
+        try {
+            const u = new URL(input, window.location.origin);
+            if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+
+            const sameOrigin = u.origin === window.location.origin;
+            return {
+                href: sameOrigin ? `${u.pathname}${u.search}${u.hash}` : u.toString(),
+                external: !sameOrigin
+            };
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function createSafeLink(target, label) {
+        const a = document.createElement('a');
+        a.href = target.href;
+        if (target.external) {
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+        }
+        a.className = 'text-[#212842] underline hover:text-[#362017] font-medium';
+        a.textContent = label;
+        return a;
+    }
+
     // Helper: Parse simple markdown links into safe DOM nodes (no innerHTML)
     function parseMarkdown(text) {
         const frag = document.createDocumentFragment();
         if (!text) return frag;
-
-        const getSafeLinkTarget = (rawUrl) => {
-            const input = String(rawUrl || '').trim();
-            if (!input) return null;
-
-            if (input.startsWith('/')) {
-                return {
-                    href: input,
-                    external: false
-                };
-            }
-
-            try {
-                const u = new URL(input, window.location.origin);
-                if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
-
-                const sameOrigin = u.origin === window.location.origin;
-                return {
-                    href: sameOrigin ? `${u.pathname}${u.search}${u.hash}` : u.toString(),
-                    external: !sameOrigin
-                };
-            } catch (_) {
-                return null;
-            }
-        };
-
-        const createLink = (target, label) => {
-            const a = document.createElement('a');
-            a.href = target.href;
-            if (target.external) {
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
-            }
-            a.className = 'text-[#212842] underline hover:text-[#362017] font-medium';
-            a.textContent = label;
-            return a;
-        };
 
         const appendTextWithLinks = (parent, raw) => {
             const pattern = /\[([^\]]+)\]\(([^)\s]+)\)|\bhttps?:\/\/[^\s<]+/g;
@@ -3890,14 +3927,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (m[1] && m[2]) {
                     const safe = getSafeLinkTarget(m[2]);
                     if (safe) {
-                        parent.appendChild(createLink(safe, m[1]));
+                        parent.appendChild(createSafeLink(safe, m[1]));
                     } else {
                         parent.appendChild(document.createTextNode(m[0]));
                     }
                 } else {
                     const safe = getSafeLinkTarget(m[0]);
                     if (safe) {
-                        parent.appendChild(createLink(safe, m[0]));
+                        parent.appendChild(createSafeLink(safe, m[0]));
                     } else {
                         parent.appendChild(document.createTextNode(m[0]));
                     }
@@ -4042,10 +4079,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
             btn.textContent = chipText;
             btn.addEventListener('click', () => {
-                if (els.input) {
-                    els.input.value = chipText;
-                    handleSend();
-                }
+                handleSend(chipText);
             });
             els.chipsContainer.appendChild(btn);
         });
@@ -4072,14 +4106,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initPageCloseFloatingUiGuard() {
-        const pageCloseSections = Array.from(document.querySelectorAll('.page-close'));
-        if (!pageCloseSections.length) return;
+        const guardedSections = [
+            ...Array.from(document.querySelectorAll('.page-close')),
+            ...Array.from(document.querySelectorAll('footer'))
+        ];
+        if (!guardedSections.length) {
+            document.documentElement.style.setProperty('--floating-ui-lift', '0px');
+            return;
+        }
 
         const activeSections = new Set();
         const syncFloatingUiGuard = () => {
-            const chatHidden = !!els.window?.classList.contains('hidden');
-            const pageCloseActive = activeSections.size > 0;
-            document.body.classList.toggle('page-close-ui-guard', pageCloseActive && chatHidden);
+            const viewportBottom = window.innerHeight;
+            const floatingUiBaseLine = viewportBottom - 96;
+            let lift = 0;
+
+            guardedSections.forEach((section) => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top >= viewportBottom || rect.bottom <= 0) return;
+                const overlap = floatingUiBaseLine - rect.top;
+                if (overlap > 0) {
+                    lift = Math.max(lift, Math.min(240, overlap + 24));
+                }
+            });
+
+            const pageCloseActive = activeSections.size > 0 || lift > 0;
+            document.documentElement.style.setProperty('--floating-ui-lift', `${Math.round(lift)}px`);
+            document.body.classList.toggle('page-close-ui-guard', pageCloseActive);
             if (pageCloseActive && els.bubble) {
                 els.bubble.classList.add('opacity-0', 'translate-y-4');
             }
@@ -4100,7 +4153,9 @@ document.addEventListener('DOMContentLoaded', () => {
             rootMargin: '0px 0px -18% 0px'
         });
 
-        pageCloseSections.forEach((section) => observer.observe(section));
+        guardedSections.forEach((section) => observer.observe(section));
+        window.addEventListener('scroll', syncFloatingUiGuard, { passive: true });
+        window.addEventListener('resize', syncFloatingUiGuard);
         syncFloatingUiGuard();
     }
 
@@ -4178,12 +4233,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!els.window?.classList.contains('hidden')) {
             document.body.classList.remove('page-close-ui-guard');
-        } else {
-            const pageCloseActive = Array.from(document.querySelectorAll('.page-close')).some((section) => {
-                const rect = section.getBoundingClientRect();
-                return rect.top < window.innerHeight * 0.82 && rect.bottom > 0;
-            });
-            document.body.classList.toggle('page-close-ui-guard', pageCloseActive);
         }
     }
 
@@ -4212,12 +4261,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function handleSend() {
-        if (!els.input) return;
-        const text = els.input.value.trim();
+    async function handleSend(forcedText = '') {
+        const rawText = typeof forcedText === 'string' && forcedText.length
+            ? forcedText
+            : (els.input?.value || '');
+        const text = rawText.trim();
         if (!text || isSending) return;
 
         isSending = true;
+        if (els.input) {
+            els.input.value = '';
+        }
 
         // Google Analytics event tracking
         if(typeof gtag === 'function') {
@@ -4235,14 +4289,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const online = await isActuallyOnline();
         if (!online) {
             addMessageToUI(text, 'user');
-            els.input.value = '';
             addMessageToUI("You appear to be offline. Please check your connection and try again.", 'bot');
             isSending = false;
             return;
         }
 
         addMessageToUI(text, 'user');
-        els.input.value = '';
         const loadingId = addMessageToUI('Thinking...', 'bot', true);
 
         // Enhanced fetch with timeout and retry logic
@@ -4261,6 +4313,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         message: text,
+                        pageContext: buildStructuredPageContext(),
                         pageContent: buildSafePageContext(),
                         language: pageLang
                     }),
@@ -4417,23 +4470,39 @@ document.addEventListener('DOMContentLoaded', () => {
         
         els.messages.appendChild(div);
         
-        // Typewriter effect for bot messages (but not loading messages)
-        if (sender === 'bot' && !isLoading) {
+        const reducedMotion = typeof window.matchMedia === 'function'
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const typingText = String(text)
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+            .replace(/`([^`]+)`/g, '$1')
+            .replace(/\s+\n/g, '\n')
+            .trim();
+        const shouldTypewriter = sender === 'bot'
+            && !isLoading
+            && !reducedMotion
+            && typingText.length > 0;
+
+        // Stage bot replies so they feel generated in real time before final markdown rendering.
+        if (shouldTypewriter) {
             let charIndex = 0;
             div.textContent = '';
-            
+
+            const targetDuration = Math.min(2200, Math.max(720, typingText.length * 16));
+            const stepCount = Math.max(14, Math.min(72, Math.round(targetDuration / 28)));
+            const chunkSize = Math.max(1, Math.ceil(typingText.length / stepCount));
+            const stepDelay = Math.max(12, Math.round(targetDuration / Math.ceil(typingText.length / chunkSize)));
+
             const typeInterval = setInterval(() => {
-                if (charIndex < text.length) {
-                    div.textContent += text[charIndex];
-                    charIndex++;
+                if (charIndex < typingText.length) {
+                    charIndex = Math.min(typingText.length, charIndex + chunkSize);
+                    div.textContent = typingText.slice(0, charIndex);
                     els.messages.scrollTop = els.messages.scrollHeight;
                 } else {
                     clearInterval(typeInterval);
-                    // Convert to markdown after typing is complete
                     div.replaceChildren(renderBotContent(text));
                     els.messages.scrollTop = els.messages.scrollHeight;
                 }
-            }, 12);
+            }, stepDelay);
         } else {
             if (sender === 'bot') {
                 div.replaceChildren(renderBotContent(text));

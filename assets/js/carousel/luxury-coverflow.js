@@ -107,31 +107,31 @@ const MOBILE_POSITIONS = {
   adjacent1: {
     rotateY: 14,
     translateZ: -42,
-    translateX: 220,
-    scale: 0.9,
-    opacity: 0.82,
+    translateX: 160,
+    scale: 0.78,
+    opacity: 0,
     zIndex: 90,
-    blur: 0,
-    brightness: 0.92,
-    saturate: 1
+    blur: 1,
+    brightness: 0.78,
+    saturate: 0.9
   },
   adjacent2: {
     rotateY: 34,
-    translateZ: -190,
-    translateX: 430,
-    scale: 0.7,
-    opacity: 0.34,
+    translateZ: -220,
+    translateX: 280,
+    scale: 0.62,
+    opacity: 0,
     zIndex: 80,
-    blur: 1,
-    brightness: 0.84,
-    saturate: 0.95
+    blur: 2,
+    brightness: 0.68,
+    saturate: 0.86
   },
   adjacent3: {
     rotateY: 44,
     translateZ: -300,
-    translateX: 560,
+    translateX: 360,
     scale: 0.52,
-    opacity: 0.1,
+    opacity: 0,
     zIndex: 70,
     blur: 2,
     brightness: 0.68,
@@ -1043,9 +1043,10 @@ class RouletteOverlayController {
     const wheelSpin = this.wheelEngine.calculateWheelSpin(this.result.winnerPocketIndex);
     const durationSeconds = this.carousel.motion.spinMs / 1000;
     const wheelRadius = parseFloat(getComputedStyle(this.overlay).getPropertyValue('--roulette-wheel-radius')) || 220;
+    const initialBallAngle = 180;
     const frame = {
       wheelRotation: 0,
-      ballAngle: 180,
+      ballAngle: initialBallAngle,
       radius: wheelRadius * 1.13,
       progress: 0
     };
@@ -1060,7 +1061,13 @@ class RouletteOverlayController {
       const totalBallRotation = wheelSpin.spins * 360 + 300;
       const firstLeg = durationSeconds * 0.55;
       const secondLeg = durationSeconds * 0.30;
-      const finalLeg = Math.max(0.36, durationSeconds - firstLeg - secondLeg);
+      const finalLeg = Math.max(0.44, durationSeconds - firstLeg - secondLeg);
+      const legOneWheelRotation = -(wheelSpin.finalRotation * 0.72);
+      const legTwoWheelRotation = -(wheelSpin.finalRotation * 0.94);
+      const finalWheelRotation = -wheelSpin.finalRotation;
+      const legOneBallAngle = initialBallAngle - (totalBallRotation * 0.78);
+      const legTwoBallAngle = legOneBallAngle - (totalBallRotation * 0.19);
+      const finalBallAngle = initialBallAngle - totalBallRotation;
 
       this.spinTween = gsap.timeline({
         onComplete: () => {
@@ -1072,8 +1079,8 @@ class RouletteOverlayController {
 
       // Leg 1: Smooth acceleration (mimics real roulette wheel build-up)
       this.spinTween.to(frame, {
-        wheelRotation: -(wheelSpin.finalRotation * 0.72),
-        ballAngle: frame.ballAngle - (totalBallRotation * 0.78),
+        wheelRotation: legOneWheelRotation,
+        ballAngle: legOneBallAngle,
         radius: wheelRadius * 1.04,
         duration: firstLeg,
         ease: 'power1.in',
@@ -1082,21 +1089,21 @@ class RouletteOverlayController {
 
       // Leg 2: Deceleration (exponential slowdown)
       this.spinTween.to(frame, {
-        wheelRotation: -wheelSpin.finalRotation + 42,
-        ballAngle: frame.ballAngle - (totalBallRotation * 0.19),
+        wheelRotation: legTwoWheelRotation,
+        ballAngle: legTwoBallAngle,
         radius: wheelRadius * 0.9,
         duration: secondLeg,
         ease: 'power4.out',
         onUpdate: renderFrame
       });
 
-      // Leg 3: Settle with subtle elastic bounce (ball dropping into pocket)
+      // Leg 3: Clean settle into the winning pocket without reversing direction.
       this.spinTween.to(frame, {
-        wheelRotation: -wheelSpin.finalRotation,
-        ballAngle: frame.ballAngle - (totalBallRotation * 0.03),
+        wheelRotation: finalWheelRotation,
+        ballAngle: finalBallAngle,
         radius: wheelRadius * 0.82,
         duration: finalLeg,
-        ease: 'elastic.out(1, 0.3)',
+        ease: 'power3.out',
         onUpdate: renderFrame
       });
     });
@@ -1346,12 +1353,12 @@ export class LuxuryCoverflow {
   }
 
   getEngineConfig() {
-    const isMobile = window.innerWidth < 640;
+    const isCompactViewport = window.innerWidth < 960;
     const config = {
       infiniteLoop: this.config.infiniteLoop
     };
 
-    if (isMobile) {
+    if (isCompactViewport) {
       config.positions = MOBILE_POSITIONS;
     }
 

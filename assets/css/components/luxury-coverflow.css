@@ -91,9 +91,10 @@
   width: 100%;
   height: clamp(450px, 70vh, 800px);
   padding-bottom: 6.5rem;
-  overflow: visible;
-  overscroll-behavior-x: contain;
+  overflow: clip;
+  overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
+  contain: paint;
 }
 
 .coverflow-perspective {
@@ -137,6 +138,7 @@
   height: 100%;
   transform-style: preserve-3d;
   overscroll-behavior: contain;
+  touch-action: pan-y pinch-zoom;
 }
 
 .coverflow-container.is-dragging {
@@ -508,6 +510,7 @@
   transform-style: preserve-3d;
   perspective: 2200px;
   perspective-origin: 50% 50%;
+  touch-action: pan-y pinch-zoom;
 }
 
 .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-slide {

@@ -185,6 +185,7 @@ export function normalizeRoute(input) {
 export function isRelevantInternalRoute(route) {
   const normalized = normalizeRoute(route);
   if (!normalized) return false;
+  if (normalized === "/hobbies/" || normalized === "/hobbies") return false;
   if (normalized.startsWith("/assets/")) return false;
   if (normalized.startsWith("/api/")) return false;
   if (normalized.startsWith("/functions/")) return false;
@@ -204,7 +205,6 @@ export function classifyPageType(route) {
   if (normalized.startsWith("/about/")) return "about_detail";
   if (normalized === "/projects/") return "projects_index";
   if (normalized.startsWith("/projects/")) return "project_detail";
-  if (normalized === "/hobbies/") return "hobbies_index";
   if (normalized.startsWith("/hobbies/")) return "hobby_detail";
   if (normalized === "/contact") return "contact";
   if (normalized.startsWith("/es")) return "spanish";

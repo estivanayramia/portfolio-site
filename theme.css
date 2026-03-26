@@ -1209,10 +1209,16 @@ select {
    Scroll to Top Button
    ========================================================================== */
 
+:root {
+    --floating-ui-lift: 0px;
+    --floating-ui-edge: 1.5rem;
+    --chat-fab-size: 4rem;
+}
+
 #scroll-to-top {
     position: fixed;
-    bottom: 30px;
-    left: 30px;
+    bottom: calc(var(--floating-ui-edge) + var(--floating-ui-lift));
+    left: var(--floating-ui-edge);
     --scroll-to-top-size: 47px;
     --scroll-to-top-icon-size: 24px;
     width: var(--scroll-to-top-size);
@@ -1228,7 +1234,7 @@ select {
     opacity: 0;
     visibility: hidden;
     transform: translateY(20px);
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, bottom 0.3s ease;
     z-index: 10000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     /* Ensure padding doesn't affect centering */
@@ -1890,18 +1896,9 @@ select.border-red-500 {
 }
 /* Mobile chat widget adjustments */
 @media (max-width: 640px) {
-    #chat-widget {
-        bottom: 1rem !important;
-    }
-
-    :lang(ar) #chat-widget {
-        left: 1rem !important;
-        right: auto !important;
-    }
-
-    :not(:lang(ar)) #chat-widget {
-        right: 1rem !important;
-        left: auto !important;
+    :root {
+        --floating-ui-edge: 1rem;
+        --chat-fab-size: 3.5rem;
     }
 
     #chat-window {
@@ -1918,24 +1915,18 @@ select.border-red-500 {
     }
 }
     
-    #chat-toggle {
-        width: 56px !important;
-        height: 56px !important;
-    }
-    
     #welcome-bubble {
-        bottom: 80px !important;
-        max-width: calc(100vw - 100px);
+        max-width: min(15rem, calc(100vw - 6.5rem));
         font-size: 0.875rem;
     }
 
     :lang(ar) #welcome-bubble {
-        left: 20px !important;
+        left: var(--floating-ui-edge) !important;
         right: auto !important;
     }
 
     :not(:lang(ar)) #welcome-bubble {
-        right: 20px !important;
+        right: var(--floating-ui-edge) !important;
         left: auto !important;
     }
     
@@ -2025,6 +2016,12 @@ select.border-red-500 {
     max-width: var(--editorial-measure-tight);
     font-size: clamp(1rem, 1.35vw, 1.22rem);
     line-height: 1.82;
+}
+
+html.js [data-gsap][data-gsap-state="ready"] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
 }
 
 .proof-band {
@@ -2279,7 +2276,7 @@ body[data-print-url] main > section + section {
 
 .spine-page .spine-route-card.is-primary {
     box-shadow: 0 18px 40px rgba(33, 40, 66, 0.12);
-    transform: translateY(-2px);
+    transform: none;
 }
 
 .spine-page .spine-route-meta,
@@ -2393,11 +2390,49 @@ body[data-print-url] main > section + section {
     flex-direction: column;
     gap: 1.2rem;
     min-height: clamp(18rem, 34vw, 23rem);
+    position: relative;
+    overflow: clip;
+    box-shadow: 0 28px 58px rgba(12, 18, 34, 0.24);
+}
+
+.spine-page .spine-cta-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at top right, rgba(225, 212, 194, 0.16), transparent 34%),
+        linear-gradient(135deg, rgba(225, 212, 194, 0.08), transparent 48%);
+    pointer-events: none;
 }
 
 .spine-page .spine-cta-actions {
     margin-top: auto;
     align-items: flex-start;
+}
+
+.spine-page .spine-cta-actions > a {
+    min-height: 3.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-align: center;
+    white-space: normal;
+}
+
+.spine-page .spine-cta-actions > a.underline {
+    text-decoration: none !important;
+    border: 1px solid rgba(225, 212, 194, 0.28);
+    background: rgba(225, 212, 194, 0.08);
+    padding: 1rem 1.35rem;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px rgba(225, 212, 194, 0.04);
+}
+
+.spine-page .spine-cta-actions > a.underline:hover,
+.spine-page .spine-cta-actions > a.underline:focus-visible {
+    background: rgba(225, 212, 194, 0.14);
+    transform: translateY(-1px);
 }
 
 .spine-page .spine-chapter-link {
@@ -2582,13 +2617,13 @@ body[data-print-url] main > section + section {
 }
 
 .spine-page .spine-avatar-image {
-    width: 11rem;
-    height: 11rem;
+    width: clamp(9rem, 16vw, 10rem);
+    height: clamp(9rem, 16vw, 10rem);
     margin: 0 auto;
     border-radius: 999px;
     object-fit: cover;
-    box-shadow: 0 18px 40px rgba(33, 40, 66, 0.14);
-    border: 4px solid rgba(255, 255, 255, 0.82);
+    box-shadow: 0 22px 46px rgba(33, 40, 66, 0.12);
+    border: 3px solid rgba(255, 255, 255, 0.84);
 }
 
 .spine-page .spine-inline-actions {
@@ -2814,9 +2849,9 @@ body[data-print-url*="/projects/"] .text-xs.uppercase {
     --project-panel: rgba(225, 212, 194, 0.08);
     --project-panel-soft: rgba(225, 212, 194, 0.04);
     --project-panel-strong: rgba(225, 212, 194, 0.1);
-    --project-quote-text: #1c2338;
-    --project-quote-eyebrow: rgba(225, 212, 194, 0.72);
-    --project-quote-surface: rgba(247, 239, 224, 0.88);
+    --project-quote-text: #141a2b;
+    --project-quote-eyebrow: rgba(241, 230, 214, 0.82);
+    --project-quote-surface: rgba(247, 239, 224, 0.96);
 }
 
 .project-page .project-kicker {
@@ -2929,6 +2964,23 @@ body[data-print-url*="/projects/"] .text-xs.uppercase {
     box-shadow: var(--project-shadow);
 }
 
+.project-page .project-callout > * {
+    position: relative;
+    z-index: 1;
+}
+
+[data-theme="dark"] .project-page .project-callout {
+    background: linear-gradient(180deg, rgba(225, 212, 194, 0.14), rgba(225, 212, 194, 0.06));
+    color: #f4eadc;
+    border-color: rgba(225, 212, 194, 0.2);
+}
+
+[data-theme="dark"] .project-page .project-callout p,
+[data-theme="dark"] .project-page .project-callout h3,
+[data-theme="dark"] .project-page .project-callout a {
+    color: inherit !important;
+}
+
 .project-page .project-eyebrow {
     color: var(--project-quote-eyebrow) !important;
 }
@@ -2967,8 +3019,17 @@ body[data-print-url*="/projects/"] .text-xs.uppercase {
 }
 
 .project-page.project-editorial .project-side-card {
-    position: sticky;
-    top: 7rem;
+    position: static;
+    top: auto;
+}
+
+@media (min-width: 1280px) {
+    .project-page.project-editorial .project-side-card {
+        position: sticky;
+        top: 7rem;
+        max-height: calc(100vh - 8.5rem);
+        overflow: auto;
+    }
 }
 
 .project-page.project-editorial .project-meta-grid {
@@ -3079,6 +3140,12 @@ body[data-print-url*="/projects/"] .text-xs.uppercase {
 .hobby-page .hobby-side-stack {
     display: grid;
     gap: 1rem;
+}
+
+.hobby-page .hobby-side-card {
+    display: grid;
+    gap: 0.85rem;
+    box-shadow: 0 18px 42px rgba(33, 40, 66, 0.09);
 }
 
 .hobby-page .hobby-fact-grid {
@@ -3549,10 +3616,10 @@ body[data-print-url*="/hobbies/"] .bg-white\/50 {
 
 body.page-close-ui-guard #chat-widget,
 body.page-close-ui-guard #scroll-to-top {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    transform: translateY(1rem) scale(0.96) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: none !important;
 }
 
 body.page-close-ui-guard #welcome-bubble {
@@ -3725,6 +3792,39 @@ footer, .section-below-fold {
 /* Fix: Chat widget high z-index for mobile visibility */
 #chat-widget {
     z-index: 9999 !important;
+    bottom: calc(var(--floating-ui-edge) + var(--floating-ui-lift)) !important;
+    transition: bottom 0.3s ease, transform 0.3s ease;
+}
+
+:not(:lang(ar)) #chat-widget {
+    right: var(--floating-ui-edge) !important;
+    left: auto !important;
+}
+
+:lang(ar) #chat-widget {
+    left: var(--floating-ui-edge) !important;
+    right: auto !important;
+}
+
+#chat-toggle {
+    width: var(--chat-fab-size) !important;
+    height: var(--chat-fab-size) !important;
+}
+
+#welcome-bubble {
+    bottom: calc(var(--floating-ui-edge) + var(--chat-fab-size) + 0.625rem + var(--floating-ui-lift)) !important;
+    max-width: min(18rem, calc(100vw - 7.5rem));
+    transition: opacity 0.3s ease, transform 0.3s ease, bottom 0.3s ease;
+}
+
+:not(:lang(ar)) #welcome-bubble {
+    right: var(--floating-ui-edge) !important;
+    left: auto !important;
+}
+
+:lang(ar) #welcome-bubble {
+    left: var(--floating-ui-edge) !important;
+    right: auto !important;
 }
 
 /* Fix: Chat message links - bold and underlined */

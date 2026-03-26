@@ -34,7 +34,6 @@ const DEFAULT_START_ROUTES = [
   "/about",
   "/projects/",
   "/contact",
-  "/hobbies/",
   "/es/",
   "/ar/"
 ];
@@ -82,7 +81,7 @@ const SURFACE_FACT_PATTERNS = [
   { key: "favorite_sport", pattern: /\bsport|sports|soccer|football|volleyball|pickleball\b/i },
   { key: "languages", pattern: /\blanguages?|speak|write in|english|arabic|chaldean|spanish\b/i },
   { key: "hometown", pattern: /\bwhere.*from|hometown|grew up|el cajon|baghdad|born\b/i },
-  { key: "birthday", pattern: /\bbirthday\b|\bborn on\b|\bwhen.*born\b|\bage\b/i },
+  { key: "birthday", pattern: /\bbirthday\b|\bborn on\b|\bwhen.*born\b|\bage\b|\bhow old\b|\bold is\b/i },
   { key: "height", pattern: /\bheight|how tall|tall\b/i },
   { key: "style", pattern: /\bstyle|dress|clothes|fashion|shoes|cologne|jewelry\b/i }
 ];
@@ -485,7 +484,7 @@ function classifyQuestion(message) {
   if (/\b(relationship|dating|girlfriend|boyfriend|ex|family drama|mental health|diagnosed|address|where exactly do you live|salary you make)\b/.test(lower)) {
     return QUESTION_CLASSES.BOUNDARY;
   }
-  if (/\b(what's he about|whats he about|what are you about|who are you|tell me about yourself|tell me about estivan|what does estivan do|what does he do|what do you do)\b/.test(lower)) {
+  if (/\b(what's he about|whats he about|what is estivan about|what are you about|who are you|tell me about yourself|tell me about estivan|what does estivan do|what does he do|what do you do)\b/.test(lower)) {
     return QUESTION_CLASSES.ABOUT_GENERAL;
   }
   if (/\b(page|site|homepage|overview|deep dive|about|project page|hobbies|whispers|portfolio build|loreal|endpoint|franklin|cooking|reading|photography|me page)\b/.test(lower)) {
@@ -525,6 +524,8 @@ function scorePage(page, queryTokens, message, questionClass) {
     if (page.pageType === "project_detail" || page.pageType === "hobby_detail" || page.pageType === "about_detail") {
       score += 10;
     }
+    if (/\bprojects?\b|\bwork\b/.test(lower) && page.pageType === "projects_index") score += 18;
+    if (/\babout\b/.test(lower) && page.route === "/about") score += 12;
   }
 
   if (questionClass === QUESTION_CLASSES.PROJECT_LIST && page.pageType === "projects_index") score += 12;
@@ -614,6 +615,29 @@ function formatProjectList(siteFacts) {
   return `Right now the site shows ${list}.`;
 }
 
+function formatBirthdayWithAge(identity) {
+  const birthday = String(identity?.birthday || "").trim();
+  if (!birthday) return "";
+
+  const birthDate = new Date(birthday);
+  if (Number.isNaN(birthDate.getTime())) {
+    return birthday;
+  }
+
+  const now = new Date();
+  let age = now.getFullYear() - birthDate.getFullYear();
+  const hasHadBirthdayThisYear = (
+    now.getMonth() > birthDate.getMonth()
+    || (now.getMonth() === birthDate.getMonth() && now.getDate() >= birthDate.getDate())
+  );
+
+  if (!hasHadBirthdayThisYear) {
+    age -= 1;
+  }
+
+  return `He was born on ${birthday}, so he is ${age} right now.`;
+}
+
 function formatSurfaceFactReply(key, profile) {
   const preferences = profile.preferences || {};
   const identity = profile.identity || {};
@@ -642,7 +666,7 @@ function formatSurfaceFactReply(key, profile) {
     case "hometown":
       return `He was born in ${identity.birthplace || "Baghdad, Iraq"} and grew up in ${identity.hometown || "El Cajon"}.`;
     case "birthday":
-      return "January 21, 2004.";
+      return formatBirthdayWithAge(identity) || "January 21, 2004.";
     case "height":
       return identity.height || "5'10\" barefoot.";
     case "style":
@@ -661,7 +685,7 @@ function buildUnknownReply(profile) {
 }
 
 function containsFirstPerson(text) {
-  return /\b(i|i['â€™]m|i['â€™]ve|i['â€™]d|my|me|mine)\b/i.test(String(text || ""));
+  return /\b(i|i['\u2019]m|i['\u2019]ve|i['\u2019]d|my|me|mine)\b/i.test(String(text || ""));
 }
 
 function buildPageSpecificReply(retrieval) {
@@ -671,6 +695,38 @@ function buildPageSpecificReply(retrieval) {
   }
 
   const displayTitle = getDisplayPageTitle(topPage);
+
+  if (topPage.route === "/about") {
+    return `${formatInternalLink("About", "/about")} is the best place for that. It is the personal side of the site: background, values, and what it is like to work with him.`;
+  }
+
+  if (topPage.route === "/about/background") {
+    return `${formatInternalLink("Background", "/about/background")} is the best place for that. It covers Baghdad to El Cajon, family context, first-generation pressure, and where that still shows up in how he works.`;
+  }
+
+  if (topPage.route === "/about/values") {
+    return `${formatInternalLink("Values", "/about/values")} is the best place for that. It lays out the standards he actually uses: reliability, people, execution, and growth through discomfort.`;
+  }
+
+  if (topPage.route === "/about/working-with-me") {
+    return `${formatInternalLink("Working With Me", "/about/working-with-me")} is the best place for that. It shows how he collaborates, what he values on a team, and what people can usually expect from him in the work.`;
+  }
+
+  if (topPage.route === "/overview") {
+    return `${formatInternalLink("Overview", "/overview")} is the best place for that. It is the short read on how he works, what people can usually count on from him, and where to go next if you want more proof or context.`;
+  }
+
+  if (topPage.route === "/deep-dive") {
+    return `${formatInternalLink("Deep Dive", "/deep-dive")} is the best place for that. It is the longer version: background, habits, work, and the systems behind how he thinks.`;
+  }
+
+  if (topPage.route === "/contact") {
+    return `${formatInternalLink("Contact", "/contact")} is the best place for that. The form is the cleanest route if someone wants to send context, links, or an attachment in one place.`;
+  }
+
+  if (topPage.pageType === "projects_index") {
+    return `${formatInternalLink("Projects", "/projects/")} is the best place for that. It is the cleanest way to scan the full set and jump straight into the work that matters most.`;
+  }
 
   const sectionLines = retrieval.sections
     .filter((entry) => entry.page.route === topPage.route)
@@ -741,11 +797,11 @@ function buildDeterministicReply({ questionClass, surfaceFactKey, profile, siteF
     case QUESTION_CLASSES.BOUNDARY:
       return buildBoundaryReply();
     case QUESTION_CLASSES.ABOUT_GENERAL:
-      return `Estivan is an ${profile.identity?.education?.degree || "SDSU General Business"} graduate who leans toward systems, operations, people judgment, and cleaner workflows. He tends to look at how something runs, where it breaks down, and how to make it work better without adding extra theater. ${formatInternalLink("Projects", "/projects/")} is the quickest proof, and ${formatInternalLink("About", "/about")} gives the fuller picture.`;
+      return `Estivan is an SDSU ${profile.identity?.education?.degree || "General Business"} graduate who leans toward systems, operations, people judgment, and cleaner workflows. He usually looks at how something runs, where it breaks down, and how to make it work better without adding extra theater. ${formatInternalLink("Overview", "/overview")} is the short read, ${formatInternalLink("Projects", "/projects/")} is the quickest proof, and ${formatInternalLink("About", "/about")} gives the fuller picture.`;
     case QUESTION_CLASSES.UNKNOWN:
       return buildUnknownReply(profile);
     default:
-      return "";
+      return retrieval.pages.length > 0 ? buildPageSpecificReply(retrieval) : "";
   }
 }
 
@@ -771,6 +827,10 @@ function shouldUseDeterministicOnly(questionClass, retrieval) {
   }
 
   if (questionClass === QUESTION_CLASSES.PAGE_SPECIFIC && retrieval.pages.length > 0) {
+    return true;
+  }
+
+  if (questionClass === QUESTION_CLASSES.OPEN && retrieval.pages.length > 0) {
     return true;
   }
 
@@ -956,7 +1016,7 @@ export function buildChips(questionClass, retrieval) {
   }
   if (questionClass === QUESTION_CLASSES.PAGE_SPECIFIC && retrieval.pages[0]) {
     return [
-      `Tell me more about ${retrieval.pages[0].title}`,
+      `Tell me more about ${getDisplayPageTitle(retrieval.pages[0])}`,
       "What projects has he done?",
       "How can I contact him?"
     ];

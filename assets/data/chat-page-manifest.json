@@ -2,8 +2,8 @@
   "version": "page-grounding-v1",
   "source": "repo-crawl",
   "baseUrl": "https://www.estivanayramia.com",
-  "buildVersion": "20260319-ef0c6ff",
-  "pageCount": 27,
+  "buildVersion": "20260325-06b0364",
+  "pageCount": 26,
   "pages": [
     {
       "route": "/",
@@ -12,21 +12,23 @@
       "language": "en",
       "pageType": "home",
       "title": "Estivan Ayramia | Built to Show More Than a Resume",
-      "description": "I built this site to show how I think, learn, adapt, and execute so you can see more than a resume can hold.",
-      "buildVersion": "20260319-ef0c6ff",
-      "summary": "I built this site to show how I think, learn, adapt, and execute so you can see more than a resume can hold.",
+      "description": "A direct look at my work, how I think, and what I follow through on.",
+      "buildVersion": "20260325-06b0364",
+      "summary": "A direct look at my work, how I think, and what I follow through on.",
       "headings": [
+        "Estivan Ayramia | Built to Show More Than a Resume",
         "Built to show what a resume can't.",
+        "Go straight there.",
         "Pick the version that fits your time.",
         "30 Seconds",
         "1 Minute",
         "5 Minutes",
-        "What this site proves fast",
-        "Why this is easier to use than a normal portfolio",
+        "What you can check fast",
+        "Laid out so the point is easy to find",
         "Time-budget paths",
-        "Multilingual by design",
+        "Clear next steps",
         "Ask instead of hunt",
-        "How I used AI to make this real",
+        "How AI helps the site stay useful",
         "Teaching myself by building",
         "Improving with real signals",
         "Making the site more useful",
@@ -38,7 +40,7 @@
         "/projects/",
         "/deep-dive"
       ],
-      "checksum": "fnv1a-25ccf851",
+      "checksum": "fnv1a-20c77be6",
       "keywords": [
         "estivan",
         "ayramia",
@@ -47,15 +49,16 @@
         "more",
         "than",
         "resume",
-        "site",
+        "direct",
+        "look",
+        "work",
         "think",
-        "learn",
-        "adapt",
-        "execute",
-        "so",
+        "follow",
+        "through",
         "can",
-        "see",
-        "hold",
+        "go",
+        "straight",
+        "there",
         "pick",
         "version",
         "fits",
@@ -64,59 +67,96 @@
         "seconds",
         "minute",
         "minutes",
-        "proves",
+        "check",
         "fast",
-        "easier",
-        "use",
-        "normal",
-        "portfolio",
+        "laid",
+        "out",
+        "so",
+        "point",
+        "easy",
+        "find",
         "time-budget",
         "paths",
-        "multilingual",
-        "design",
+        "clear",
+        "next",
+        "steps",
         "ask",
-        "instead",
-        "hunt",
-        "used",
-        "ai",
-        "make"
+        "instead"
       ],
       "sections": [
         {
+          "heading": "Estivan Ayramia | Built to Show More Than a Resume",
+          "level": 1,
+          "text": "Start here\nA fast read, real work, and direct contact if you need it.\nMore than a resume",
+          "keywords": [
+            "estivan",
+            "ayramia",
+            "built",
+            "show",
+            "more",
+            "than",
+            "resume",
+            "start",
+            "fast",
+            "read",
+            "real",
+            "work",
+            "direct",
+            "contact",
+            "need"
+          ]
+        },
+        {
           "heading": "Built to show what a resume can't.",
           "level": 1,
-          "text": "I am an SDSU General Business graduate, and I built this site to show more than a list of bullet points. This is where I make the case with real work, clear thinking, and follow-through.\nI built this site because a resume can show the outline, not the real range. Pick the path that fits your time.",
+          "text": "I built this because a resume can show the outline, not the\n range. This is the work, the thinking behind it, and whether I\n actually follow through.\nQuick read\nIf you already know what you want",
           "keywords": [
             "built",
             "show",
             "resume",
             "can",
-            "am",
-            "sdsu",
-            "general",
-            "business",
-            "graduate",
-            "site",
-            "more",
-            "than",
-            "list",
-            "bullet",
-            "points",
-            "make",
-            "case",
-            "real",
-            "work",
-            "clear",
-            "thinking",
-            "follow-through",
             "because",
-            "outline"
+            "outline",
+            "not",
+            "range",
+            "work",
+            "thinking",
+            "behind",
+            "whether",
+            "actually",
+            "follow",
+            "through",
+            "quick",
+            "read",
+            "already",
+            "know",
+            "want"
+          ]
+        },
+        {
+          "heading": "Go straight there.",
+          "level": 2,
+          "text": "Overview is the short read. Projects is the proof. Contact is the direct route.\nTime-budget paths",
+          "keywords": [
+            "go",
+            "straight",
+            "there",
+            "overview",
+            "short",
+            "read",
+            "projects",
+            "proof",
+            "contact",
+            "direct",
+            "route",
+            "time-budget",
+            "paths"
           ]
         },
         {
           "heading": "Pick the version that fits your time.",
           "level": 2,
-          "text": "Same site. Different depth. Start where it makes sense.",
+          "text": "Same site. Different depth. Start where it makes sense, then keep\n going only if the signal holds up.",
           "keywords": [
             "pick",
             "version",
@@ -128,30 +168,43 @@
             "depth",
             "start",
             "makes",
-            "sense"
+            "sense",
+            "then",
+            "keep",
+            "going",
+            "only",
+            "signal",
+            "holds",
+            "up"
           ]
         },
         {
           "heading": "30 Seconds",
           "level": 3,
-          "text": "Fast proof and the short case for why I am worth a closer look.",
+          "text": "Start with proof and the short case for why I am worth a closer\n look.\nBest if you want the signal before anything else.",
           "keywords": [
             "30",
             "seconds",
-            "fast",
+            "start",
             "proof",
             "short",
             "case",
             "am",
             "worth",
             "closer",
-            "look"
+            "look",
+            "best",
+            "want",
+            "signal",
+            "before",
+            "anything",
+            "else"
           ]
         },
         {
           "heading": "1 Minute",
           "level": 3,
-          "text": "The clearest read on how I work, what I value, and what I can already do.",
+          "text": "The clearest read on how I work, what I value, and what I can\n already do.\nBest if you want the strongest bridge from Home into the rest of\n the site.",
           "keywords": [
             "minute",
             "clearest",
@@ -159,66 +212,93 @@
             "work",
             "value",
             "can",
-            "already"
+            "already",
+            "best",
+            "want",
+            "strongest",
+            "bridge",
+            "home",
+            "into",
+            "rest",
+            "site"
           ]
         },
         {
           "heading": "5 Minutes",
           "level": 3,
-          "text": "The longer version: background, build process, and the thinking behind the work.",
+          "text": "Background, build process, and the thinking\n behind the work.\nBest if you want the systems, context, and next direction.\nFast proof",
           "keywords": [
             "minutes",
-            "longer",
-            "version",
             "background",
             "build",
             "process",
             "thinking",
             "behind",
-            "work"
+            "work",
+            "best",
+            "want",
+            "systems",
+            "context",
+            "next",
+            "direction",
+            "fast",
+            "proof"
           ]
         },
         {
-          "heading": "What this site proves fast",
+          "heading": "What you can check fast",
           "level": 2,
-          "text": "I built it to show how I think, learn, and execute, not just say I do.",
+          "text": "I built this because a resume leaves too much out. The short\n version is simple: there is real work here, range, and enough\n detail to check the claims for yourself.\nWhy the structure works",
           "keywords": [
-            "site",
-            "proves",
+            "can",
+            "check",
             "fast",
             "built",
-            "show",
-            "think",
-            "learn",
-            "execute",
-            "not",
-            "just",
-            "say"
+            "because",
+            "resume",
+            "leaves",
+            "too",
+            "much",
+            "out",
+            "short",
+            "version",
+            "simple",
+            "there",
+            "real",
+            "work",
+            "range",
+            "enough",
+            "detail",
+            "claims",
+            "yourself",
+            "structure",
+            "works"
           ]
         },
         {
-          "heading": "Why this is easier to use than a normal portfolio",
+          "heading": "Laid out so the point is easy to find",
           "level": 2,
-          "text": "The structure is deliberate. It is built to help you get the signal fast.",
+          "text": "If you want the short version, it is easy to get. If you want the\n details, they are there too.",
           "keywords": [
-            "easier",
-            "use",
-            "than",
-            "normal",
-            "portfolio",
-            "structure",
-            "deliberate",
-            "built",
-            "help",
+            "laid",
+            "out",
+            "so",
+            "point",
+            "easy",
+            "find",
+            "want",
+            "short",
+            "version",
             "get",
-            "signal",
-            "fast"
+            "details",
+            "there",
+            "too"
           ]
         },
         {
           "heading": "Time-budget paths",
           "level": 3,
-          "text": "You should not have to dig for the point. The time paths let you get the short version or the full version without wasting clicks.",
+          "text": "You should not have to dig for the point. The time paths let you\n get the short version or the full version without wasting clicks.",
           "keywords": [
             "time-budget",
             "paths",
@@ -238,31 +318,27 @@
           ]
         },
         {
-          "heading": "Multilingual by design",
+          "heading": "Clear next steps",
           "level": 3,
-          "text": "If another language gets you closer to the point, switching should be simple. That matters more than a flashy toggle.",
+          "text": "If you want proof, context, or a direct conversation, the next\n move should be obvious.",
           "keywords": [
-            "multilingual",
-            "design",
-            "another",
-            "language",
-            "gets",
-            "closer",
-            "point",
-            "switching",
+            "clear",
+            "next",
+            "steps",
+            "want",
+            "proof",
+            "context",
+            "direct",
+            "conversation",
+            "move",
             "should",
-            "simple",
-            "matters",
-            "more",
-            "than",
-            "flashy",
-            "toggle"
+            "obvious"
           ]
         },
         {
           "heading": "Ask instead of hunt",
           "level": 3,
-          "text": "If you have a specific question, the chat gives you a direct answer instead of making you guess where it is buried.",
+          "text": "If you have a specific question, the chat gives you a direct\n answer instead of making you guess where it is buried.\nAI, used on purpose",
           "keywords": [
             "ask",
             "instead",
@@ -275,18 +351,22 @@
             "answer",
             "making",
             "guess",
-            "buried"
+            "buried",
+            "ai",
+            "used",
+            "purpose"
           ]
         },
         {
-          "heading": "How I used AI to make this real",
+          "heading": "How AI helps the site stay useful",
           "level": 2,
-          "text": "AI helped me learn faster, build faster, and improve faster. It was a tool, not a shortcut around judgment.",
+          "text": "AI helped me learn faster, build faster, and improve faster. It\n was a tool, not a shortcut around judgment.\nSavonie is here for the moments when browsing is slower than\n asking directly.",
           "keywords": [
-            "used",
             "ai",
-            "make",
-            "real",
+            "helps",
+            "site",
+            "stay",
+            "useful",
             "helped",
             "learn",
             "faster",
@@ -296,13 +376,20 @@
             "not",
             "shortcut",
             "around",
-            "judgment"
+            "judgment",
+            "savonie",
+            "moments",
+            "browsing",
+            "slower",
+            "than",
+            "asking",
+            "directly"
           ]
         },
         {
           "heading": "Teaching myself by building",
           "level": 3,
-          "text": "No one handed me this skill set. I used AI as a working partner while I learned how to structure pages, debug issues, and turn ideas into something real.",
+          "text": "No one handed me this skill set. I used AI as a working\n partner while I learned how to structure pages, debug issues,\n and turn ideas into something real.",
           "keywords": [
             "teaching",
             "myself",
@@ -332,7 +419,7 @@
         {
           "heading": "Improving with real signals",
           "level": 3,
-          "text": "I use Clarity and iteration to see where people drop, stall, or miss the point. Then I tighten the site until it is easier to use.",
+          "text": "I use Clarity and iteration to see where people drop, stall,\n or miss the point. Then I tighten the site until it is easier\n to use.",
           "keywords": [
             "improving",
             "real",
@@ -356,7 +443,7 @@
         {
           "heading": "Making the site more useful",
           "level": 3,
-          "text": "Savonie is there so people can get answers quickly. It keeps the site useful and makes it feel more like a conversation than a dead archive.",
+          "text": "Savonie is there so people can get answers quickly. It keeps\n the site useful and makes it feel more like a conversation\n than a dead archive.\nKeep going",
           "keywords": [
             "making",
             "site",
@@ -377,32 +464,33 @@
             "conversation",
             "than",
             "dead",
-            "archive"
+            "archive",
+            "keep",
+            "going"
           ]
         },
         {
           "heading": "If you want the longer version, keep going.",
           "level": 2,
-          "text": "I built this site because I wanted a better way to be seen than a PDF allows. If you want to talk directly, I am here.",
+          "text": "Overview is the short read. Deep Dive is the full story.\n If you already know enough, contact me directly.",
           "keywords": [
             "want",
             "longer",
             "version",
             "keep",
             "going",
-            "built",
-            "site",
-            "because",
-            "wanted",
-            "better",
-            "way",
-            "seen",
-            "than",
-            "pdf",
-            "allows",
-            "talk",
-            "directly",
-            "am"
+            "overview",
+            "short",
+            "read",
+            "deep",
+            "dive",
+            "full",
+            "story",
+            "already",
+            "know",
+            "enough",
+            "contact",
+            "directly"
           ]
         }
       ]
@@ -414,13 +502,13 @@
       "language": "en",
       "pageType": "about",
       "title": "About | Estivan Ayramia",
-      "description": "Learn about Estivan Ayramia",
+      "description": "Who I am, how I work, and what shaped the way I show up.",
       "buildVersion": "",
-      "summary": "Learn about Estivan Ayramia",
+      "summary": "Who I am, how I work, and what shaped the way I show up.",
       "headings": [
         "About | Estivan Ayramia",
-        "Always be addicted to bettering yourself",
-        "Beyond the Resume",
+        "About Me",
+        "Background, values, and working style first.",
         "Core Values",
         "Background",
         "Working With Me",
@@ -430,12 +518,14 @@
         "Cooking",
         "Whispers (Sticky Notes)",
         "Reading",
-        "Games"
+        "Games",
+        "Take the personal context back into the work."
       ],
       "links": [
-        "/EN/about/values",
-        "/EN/about/background",
-        "/EN/about/working-with-me",
+        "/projects/",
+        "/about/background",
+        "/about/values",
+        "/about/working-with-me",
         "/hobbies/gym",
         "/hobbies/photography",
         "/hobbies/car",
@@ -443,24 +533,26 @@
         "/hobbies/whispers",
         "/hobbies/reading",
         "/hobbies/me",
-        "/EN/hobbies-games"
+        "/overview",
+        "/contact"
       ],
-      "checksum": "fnv1a-68c66217",
+      "checksum": "fnv1a-4f53c040",
       "keywords": [
         "/about",
         "estivan",
         "ayramia",
-        "learn",
-        "always",
-        "addicted",
-        "bettering",
-        "yourself",
-        "beyond",
-        "resume",
-        "core",
-        "values",
+        "am",
+        "work",
+        "shaped",
+        "way",
+        "show",
+        "up",
         "background",
+        "values",
         "working",
+        "style",
+        "first",
+        "core",
         "gym",
         "strength",
         "training",
@@ -472,73 +564,75 @@
         "sticky",
         "notes",
         "reading",
-        "games"
+        "games",
+        "take",
+        "personal",
+        "context",
+        "back",
+        "into"
       ],
       "sections": [
         {
           "heading": "About | Estivan Ayramia",
           "level": 1,
-          "text": "Estivan Ayramia – General Business graduate focused on systems thinking, pattern recognition, and efficient workflows.",
+          "text": "Estivan Ayramia – Chaldean from El Cajon, General Business graduate from SDSU, and someone who likes work that actually gets finished.\nAbout / more than the work",
           "keywords": [
             "estivan",
             "ayramia",
+            "chaldean",
+            "el",
+            "cajon",
             "general",
             "business",
             "graduate",
-            "focused",
-            "systems",
-            "thinking",
-            "pattern",
-            "recognition",
-            "efficient",
-            "workflows"
+            "sdsu",
+            "someone",
+            "likes",
+            "work",
+            "actually",
+            "gets",
+            "finished",
+            "more",
+            "than"
           ]
         },
         {
-          "heading": "Always be addicted to bettering yourself",
+          "heading": "About Me",
           "level": 1,
-          "text": "That's the mission. Every day is a chance to learn something new, build better systems, and become a stronger version of yourself.\nIn a world full of good and evil, why be evil when you can be good?",
+          "text": "Who I am, what I care about, and how I work.\nThe projects matter. So does the person doing the work.\nWhat shapes the work\nStart with the three pages that matter most",
           "keywords": [
-            "always",
-            "addicted",
-            "bettering",
-            "yourself",
-            "mission",
-            "every",
-            "day",
-            "chance",
-            "learn",
-            "something",
-            "new",
-            "build",
-            "better",
-            "systems",
-            "become",
-            "stronger",
-            "version",
-            "world",
-            "full",
-            "good",
-            "evil",
-            "can"
-          ]
-        },
-        {
-          "heading": "Beyond the Resume",
-          "level": 2,
-          "text": "Who I am, what I care about, and what fuels the work. Spin the wheel or browse the cards below.",
-          "keywords": [
-            "beyond",
-            "resume",
             "am",
             "care",
-            "fuels",
             "work",
-            "spin",
-            "wheel",
-            "browse",
-            "cards",
-            "below"
+            "projects",
+            "matter",
+            "so",
+            "does",
+            "person",
+            "doing",
+            "shapes",
+            "start",
+            "three",
+            "pages",
+            "most"
+          ]
+        },
+        {
+          "heading": "Background, values, and working style first.",
+          "level": 2,
+          "text": "Start anywhere. Together they show what shaped me and how I show up.",
+          "keywords": [
+            "background",
+            "values",
+            "working",
+            "style",
+            "first",
+            "start",
+            "anywhere",
+            "together",
+            "show",
+            "shaped",
+            "up"
           ]
         },
         {
@@ -562,34 +656,34 @@
         {
           "heading": "Background",
           "level": 3,
-          "text": "Chaldean heritage, first-gen American, 4 languages. The story behind the systems thinking.",
+          "text": "Chaldean heritage, four languages, family history, and the context I come from.",
           "keywords": [
             "background",
             "chaldean",
             "heritage",
-            "first-gen",
-            "american",
+            "four",
             "languages",
-            "story",
-            "behind",
-            "systems",
-            "thinking"
+            "family",
+            "history",
+            "context",
+            "come"
           ]
         },
         {
           "heading": "Working With Me",
           "level": 3,
-          "text": "Clear communication, reliability, documentation. What you can expect when we collaborate.",
+          "text": "Clear communication, follow-through, and what people can expect if we work together.",
           "keywords": [
             "working",
             "clear",
             "communication",
-            "reliability",
-            "documentation",
+            "follow-through",
+            "people",
             "can",
             "expect",
             "we",
-            "collaborate"
+            "work",
+            "together"
           ]
         },
         {
@@ -714,7 +808,7 @@
         {
           "heading": "Games",
           "level": 3,
-          "text": "Chess, strategy games, competitive thinking. Because even hobbies teach systems.",
+          "text": "Chess, strategy games, competitive thinking. Because even hobbies teach systems.\nKeep going",
           "keywords": [
             "games",
             "chess",
@@ -725,7 +819,36 @@
             "even",
             "hobbies",
             "teach",
-            "systems"
+            "systems",
+            "keep",
+            "going"
+          ]
+        },
+        {
+          "heading": "Take the personal context back into the work.",
+          "level": 2,
+          "text": "If you have enough of the person, go to the projects. If you want the short professional summary, head to Overview. If you want to talk directly, reach out.",
+          "keywords": [
+            "take",
+            "personal",
+            "context",
+            "back",
+            "into",
+            "work",
+            "enough",
+            "person",
+            "go",
+            "projects",
+            "want",
+            "short",
+            "professional",
+            "summary",
+            "head",
+            "overview",
+            "talk",
+            "directly",
+            "reach",
+            "out"
           ]
         }
       ]
@@ -743,56 +866,74 @@
       "headings": [
         "Background | Estivan Ayramia",
         "Background",
-        "Working with Kids",
+        "What that background built",
+        "Current carry-forward",
         "Languages",
         "English",
         "Spanish",
         "Arabic",
         "Chaldean (Neo-Aramaic)",
-        "Let's Connect"
+        "Take the background into the rest of the About section."
       ],
       "links": [
         "/",
         "/about",
         "/about/values",
-        "/about/working-with-me",
-        "/contact"
+        "/about/working-with-me"
       ],
-      "checksum": "fnv1a-f0e20717",
+      "checksum": "fnv1a-93c127eb",
       "keywords": [
         "/about/background",
         "background",
         "estivan",
         "ayramia",
         "explore",
-        "working",
-        "kids",
+        "built",
+        "current",
+        "carry-forward",
         "languages",
         "english",
         "spanish",
         "arabic",
         "chaldean",
         "neo-aramaic",
-        "let",
-        "connect"
+        "take",
+        "into",
+        "rest",
+        "section"
       ],
       "sections": [
         {
           "heading": "Background | Estivan Ayramia",
           "level": 1,
-          "text": "Background",
+          "text": "Background\nAbout chapter / background",
           "keywords": [
             "background",
             "estivan",
-            "ayramia"
+            "ayramia",
+            "chapter"
           ]
         },
         {
           "heading": "Background",
           "level": 1,
-          "text": "Me with my brother Alen in Iraq, around 2006, before our family moved to the United States.\nI was born in Baghdad, Iraq. My family fled the war, spent time in Syria as refugees, and were eventually sponsored to come to the United States. We earned citizenship a few years in. I have lived in El Cajon, California since I was around four years old, which means El Cajon basically raised me, for better or worse.\nI am Chaldean, part of an ancient community that traces back to Mesopotamian times. We speak Chaldean, a dialect related to the language Jesus spoke. Growing up split between Middle Eastern culture at home and American culture everywhere else is a funny thing. You learn to code-switch before you even know that word exists. It builds adaptability, cultural sensitivity, and a genuine ability to connect with people who come from very different places than you.\nMy parents had an arranged marriage; starting off strong trying to assimilate, right?. My dad was an electrical engineer. My mom, restarted her education from scratch in the USA, and came out the other side with a Bachelor of Science in Business Administration from SDSU after nearly a decade of classes. I am the youngest of four brothers: Alen, Andrew, Evan, and then me, which means I had front row seats to everything before I even got started. Now it is time to see what I can make of myself given that privilege.\nThe Chaldean experience is rooted in survival and reinvention. Ancestors fled persecution, rebuilt lives in countries where they did not speak the language, and passed down a work ethic that does not really have an off switch. That history shapes how I see things. When my family's story involves losing everything and starting over more than once, complaining about hard problems feels a little off.\nBeing first-generation means figuring out systems that were not built with you in mind, often by trial and a fair amount of error. No family connections in corporate America, no inherited safety net, no one to call who has been there before. What that builds is resourcefulness, a deep appreciation for mentorship, and a very high tolerance for ambiguity.\nThis background is not a sob story. It is actually a pretty good one. It creates hunger, adaptability, and a refusal to settle for less than what you are capable of.\nI like figuring out how things actually work and then making them work better. That usually means looking at where things are not as efficient as they could be, where things fall through the cracks, and working to fix all of that. Not because it sounds impressive, but because watching a messy process get clean is genuinely satisfying. Knowing I had a part in it? Even better.",
+          "text": "The point of this page is simple: give the life context behind the work clearly, calmly, and without turning it into theater.\nMe with my brother Alen in Iraq, around 2006, before our family moved to the United States.\nI was born in Baghdad, Iraq. My family fled the war, spent time in Syria as refugees, and were eventually sponsored to come to the United States. We earned citizenship a few years in. I have lived in El Cajon, California since I was around four years old, which means El Cajon basically raised me, for better or worse.\nI am Chaldean, part of an ancient community that traces back to Mesopotamian times. We speak Chaldean, a dialect related to the language Jesus spoke. Growing up split between Middle Eastern culture at home and American culture everywhere else is a funny thing. You learn to code-switch before you even know that word exists. It builds adaptability, cultural sensitivity, and a genuine ability to connect with people who come from very different places than you.\nMy parents had an arranged marriage; starting off strong trying to assimilate, right?. My dad was an electrical engineer. My mom, restarted her education from scratch in the USA, and came out the other side with a Bachelor of Science in Business Administration from SDSU after nearly a decade of classes. I am the youngest of four brothers: Alen, Andrew, Evan, and then me, which means I had front row seats to everything before I even got started. Now it is time to see what I can make of myself given that privilege.\nInterpretation",
           "keywords": [
             "background",
+            "point",
+            "page",
+            "simple",
+            "give",
+            "life",
+            "context",
+            "behind",
+            "work",
+            "clearly",
+            "calmly",
+            "without",
+            "turning",
+            "into",
+            "theater",
             "brother",
             "alen",
             "iraq",
@@ -801,58 +942,75 @@
             "before",
             "our",
             "family",
-            "moved",
-            "united",
-            "states",
-            "born",
-            "baghdad",
-            "fled",
-            "war",
-            "spent",
-            "time",
-            "syria",
-            "refugees",
-            "were",
-            "eventually",
-            "sponsored",
-            "come"
+            "moved"
           ]
         },
         {
-          "heading": "Working with Kids",
+          "heading": "What that background built",
           "level": 2,
-          "text": "I work with kids in a coach and chaperone role. Within 14 months I moved into a lead position, which came with a promotion and a lot more responsibility than I expected. Kids are surprisingly good at calling out anything that does not add up, so you learn fast to just be straight with them. Being able to speak four languages helps more than I thought it would. A kid who barely speaks English lights up when you say something in Arabic or Spanish. Language breaks barriers that would otherwise take months to get past, and when you are trying to be a role model to kids from a dozen different backgrounds, that matters a lot.",
+          "text": "The Chaldean experience is rooted in survival and reinvention. Ancestors fled persecution, rebuilt lives in countries where they did not speak the language, and passed down a work ethic that does not really have an off switch. That history shapes how I see things. When my family's story involves losing everything and starting over more than once, complaining about hard problems feels a little off.\nBeing first-generation means figuring out systems that were not built with you in mind, often by trial and a fair amount of error. No family connections in corporate America, no inherited safety net, no one to call who has been there before. What that builds is resourcefulness, a deep appreciation for mentorship, and a very high tolerance for ambiguity.\nThis background is not a sob story. It is actually a pretty good one. It creates hunger, adaptability, and a refusal to settle for less than what you are capable of.\nWhere it shows up now",
           "keywords": [
-            "working",
-            "kids",
+            "background",
+            "built",
+            "chaldean",
+            "experience",
+            "rooted",
+            "survival",
+            "reinvention",
+            "ancestors",
+            "fled",
+            "persecution",
+            "rebuilt",
+            "lives",
+            "countries",
+            "did",
+            "not",
+            "speak",
+            "language",
+            "passed",
+            "down",
             "work",
-            "coach",
-            "chaperone",
-            "role",
-            "within",
-            "14",
-            "months",
-            "moved",
-            "into",
-            "lead",
-            "position",
-            "came",
-            "promotion",
-            "lot",
-            "more",
-            "responsibility",
-            "than",
-            "expected",
-            "surprisingly",
-            "good",
-            "calling",
-            "out"
+            "ethic",
+            "does",
+            "really",
+            "off"
+          ]
+        },
+        {
+          "heading": "Current carry-forward",
+          "level": 2,
+          "text": "I like figuring out how things actually work and then making them work better. That usually means looking at where things are not as efficient as they could be, where things fall through the cracks, and working to fix all of that. Not because it sounds impressive, but because watching a messy process get clean is genuinely satisfying. Knowing I had a part in it? Even better.\nI work with kids in a coach and chaperone role. Within 14 months I moved into a lead position, which came with a promotion and a lot more responsibility than I expected. Kids are surprisingly good at calling out anything that does not add up, so you learn fast to just be straight with them. Being able to speak four languages helps more than I thought it would. A kid who barely speaks English lights up when you say something in Arabic or Spanish. Language breaks barriers that would otherwise take months to get past, and when you are trying to be a role model to kids from a dozen different backgrounds, that matters a lot.\nLanguage context",
+          "keywords": [
+            "current",
+            "carry-forward",
+            "like",
+            "figuring",
+            "out",
+            "things",
+            "actually",
+            "work",
+            "then",
+            "making",
+            "better",
+            "usually",
+            "means",
+            "looking",
+            "not",
+            "efficient",
+            "could",
+            "fall",
+            "through",
+            "cracks",
+            "working",
+            "fix",
+            "all",
+            "because"
           ]
         },
         {
           "heading": "Languages",
           "level": 2,
-          "text": "Language is more than communication. It is access to a completely different way of thinking. Each one opens a door to specific communities, real conversations, and context that you simply cannot get any other way.",
+          "text": "Language is more than communication. It is access to communities, real conversations, and context you do not get any other way.",
           "keywords": [
             "languages",
             "language",
@@ -860,24 +1018,15 @@
             "than",
             "communication",
             "access",
-            "completely",
-            "different",
-            "way",
-            "thinking",
-            "each",
-            "one",
-            "opens",
-            "door",
-            "specific",
             "communities",
             "real",
             "conversations",
             "context",
-            "simply",
-            "cannot",
+            "not",
             "get",
             "any",
-            "other"
+            "other",
+            "way"
           ]
         },
         {
@@ -937,7 +1086,7 @@
         {
           "heading": "Chaldean (Neo-Aramaic)",
           "level": 3,
-          "text": "Fluent in speaking. An ancient community dialect that ties directly back to where my family comes from.",
+          "text": "Fluent in speaking. An ancient community dialect that ties directly back to where my family comes from.\nNext chapter",
           "keywords": [
             "chaldean",
             "neo-aramaic",
@@ -950,29 +1099,31 @@
             "directly",
             "back",
             "family",
-            "comes"
+            "comes",
+            "next",
+            "chapter"
           ]
         },
         {
-          "heading": "Let's Connect",
+          "heading": "Take the background into the rest of the About section.",
           "level": 2,
-          "text": "If any of this resonates and you think there is a fit, feel free to reach out. No pitch decks required.",
+          "text": "If you want the principles behind the story, go to Values. If you want the practical side of collaboration, go to Working With Me.",
           "keywords": [
-            "let",
-            "connect",
-            "any",
-            "resonates",
-            "think",
-            "there",
-            "fit",
-            "feel",
-            "free",
-            "reach",
-            "out",
-            "no",
-            "pitch",
-            "decks",
-            "required"
+            "take",
+            "background",
+            "into",
+            "rest",
+            "section",
+            "want",
+            "principles",
+            "behind",
+            "story",
+            "go",
+            "values",
+            "practical",
+            "side",
+            "collaboration",
+            "working"
           ]
         }
       ]
@@ -984,101 +1135,126 @@
       "language": "en",
       "pageType": "about_detail",
       "title": "Values | Estivan Ayramia",
-      "description": "See the core values that drive Estivan Ayramia",
+      "description": "How I make decisions, work with people, and keep improving without the fluff.",
       "buildVersion": "",
-      "summary": "See the core values that drive Estivan Ayramia",
+      "summary": "How I make decisions, work with people, and keep improving without the fluff.",
       "headings": [
         "Values | Estivan Ayramia",
-        "What Drives the Work",
+        "Values",
+        "How I Operate",
         "What I Am Focused on Right Now",
+        "Values that keep showing up",
         "Reliability Over Flash",
         "People Are the System",
         "Execution Is Everything",
         "Growth Through Discomfort",
-        "See These Principles in Action"
+        "See where these principles land in practice."
       ],
       "links": [
         "/",
         "/about",
         "/about/background",
+        "/about/working-with-me",
         "/projects/"
       ],
-      "checksum": "fnv1a-a825078c",
+      "checksum": "fnv1a-3e1b4643",
       "keywords": [
         "/about/values",
         "values",
         "estivan",
         "ayramia",
-        "see",
-        "core",
-        "drive",
-        "drives",
+        "make",
+        "decisions",
         "work",
+        "people",
+        "keep",
+        "improving",
+        "without",
+        "fluff",
+        "operate",
         "am",
         "focused",
         "right",
         "now",
+        "showing",
+        "up",
         "reliability",
         "over",
         "flash",
-        "people",
         "system",
         "execution",
         "everything",
         "growth",
         "through",
         "discomfort",
+        "see",
         "these",
         "principles",
-        "action"
+        "land",
+        "practice"
       ],
       "sections": [
         {
           "heading": "Values | Estivan Ayramia",
           "level": 1,
-          "text": "Core Values",
+          "text": "Values\nWhat I believe in",
           "keywords": [
             "values",
             "estivan",
             "ayramia",
-            "core"
+            "believe"
           ]
         },
         {
-          "heading": "What Drives the Work",
+          "heading": "Values",
           "level": 1,
-          "text": "Curiosity is the engine. Self-improvement is the outcome. Every day is an opportunity to ask better questions, challenge assumptions, and push beyond comfort zones. Growth isn't passive; it requires intentional effort, disciplined habits, and an honest assessment of what's working and what isn't.\nThis mindset shapes how I approach business problems, personal development, and leadership. It's not about having all the answers; it's about being obsessed with finding them. Reading widely, testing ideas through action, learning from failures, and building systems that compound over time.\nThe addiction to bettering yourself means treating life like a laboratory: experiment, measure, adjust, repeat. It means being uncomfortable on purpose, seeking feedback that stings, and committing to the daily grind of incremental improvement.",
+          "text": "These are the standards I use when I decide, work, and course-correct.\nHow I operate",
           "keywords": [
-            "drives",
+            "values",
+            "these",
+            "standards",
+            "use",
+            "decide",
             "work",
-            "curiosity",
-            "engine",
-            "self-improvement",
-            "outcome",
-            "every",
-            "day",
-            "opportunity",
-            "ask",
+            "course-correct",
+            "operate"
+          ]
+        },
+        {
+          "heading": "How I Operate",
+          "level": 2,
+          "text": "I do better work when I stay curious and stay honest about results. I question assumptions, test ideas, and pay attention to what actually works instead of what sounds good.\nIn practice, that means reading, shipping, reviewing mistakes, and improving the process each round. I do not need to pretend I have every answer; I need to keep learning fast and applying it.\nI care more about consistency than speeches: show up, do the work, take feedback, adjust, and repeat. That is how progress compounds for me.\nRight now",
+          "keywords": [
+            "operate",
             "better",
-            "questions",
-            "challenge",
+            "work",
+            "stay",
+            "curious",
+            "honest",
+            "results",
+            "question",
             "assumptions",
-            "push",
-            "beyond",
-            "comfort",
-            "zones",
-            "growth",
-            "isn",
-            "passive",
-            "requires",
-            "intentional",
-            "effort"
+            "test",
+            "ideas",
+            "pay",
+            "attention",
+            "actually",
+            "works",
+            "instead",
+            "sounds",
+            "good",
+            "practice",
+            "means",
+            "reading",
+            "shipping",
+            "reviewing",
+            "mistakes"
           ]
         },
         {
           "heading": "What I Am Focused on Right Now",
           "level": 2,
-          "text": "Updated\n- \n General Business graduate from SDSU, diploma in hand, LinkedIn updated, parents proud\n- \n Open to opportunities and actively looking for the right role to put all of this to use\n- \n Building this portfolio site to document projects and thinking\n- \n Exploring how AI tools can enhance personal productivity and learning\n- \n Training consistently at the gym and improving my nutrition habits\n- \n Working on my BMW and appreciating every day that goes by. It is always a good day to be happy.",
+          "text": "Updated\nGeneral Business graduate from SDSU, diploma in hand, LinkedIn updated, parents proud\nOpen to opportunities and actively looking for the right role to put all of this to use\nBuilding this portfolio site to document projects and thinking\nTesting AI tools where they actually save time and improve output\nTraining consistently at the gym and improving my nutrition habits\nWorking on my BMW and appreciating every day that goes by. It is always a good day to be happy.\nCore principles",
           "keywords": [
             "am",
             "focused",
@@ -1104,6 +1280,24 @@
             "use",
             "building",
             "portfolio"
+          ]
+        },
+        {
+          "heading": "Values that keep showing up",
+          "level": 2,
+          "text": "No branding language here, just the standards I actually use.",
+          "keywords": [
+            "values",
+            "keep",
+            "showing",
+            "up",
+            "no",
+            "branding",
+            "language",
+            "just",
+            "standards",
+            "actually",
+            "use"
           ]
         },
         {
@@ -1202,7 +1396,7 @@
         {
           "heading": "Growth Through Discomfort",
           "level": 3,
-          "text": "The best learning happens right at the edge of what you can actually do. Seek out challenges that feel just a bit out of reach, write down what goes wrong, adjust, and keep going. The hard things get easier. Then you find harder things.",
+          "text": "The best learning happens right at the edge of what you can actually do. Seek out challenges that feel just a bit out of reach, write down what goes wrong, adjust, and keep going. The hard things get easier. Then you find harder things.\nKeep going",
           "keywords": [
             "growth",
             "through",
@@ -1231,24 +1425,22 @@
           ]
         },
         {
-          "heading": "See These Principles in Action",
+          "heading": "See where these principles land in practice.",
           "level": 2,
-          "text": "The projects section is where the values above stop being words on a page. Take a look.",
+          "text": "Background gives the life context. Working With Me shows how it looks in practice.",
           "keywords": [
             "see",
             "these",
             "principles",
-            "action",
-            "projects",
-            "section",
-            "values",
-            "above",
-            "stop",
-            "being",
-            "words",
-            "page",
-            "take",
-            "look"
+            "land",
+            "practice",
+            "background",
+            "gives",
+            "life",
+            "context",
+            "working",
+            "shows",
+            "looks"
           ]
         }
       ]
@@ -1260,20 +1452,22 @@
       "language": "en",
       "pageType": "about_detail",
       "title": "Working With Me | Estivan Ayramia",
-      "description": "Understand how Estivan Ayramia collaborates: communication style, workflow expectations, and the standards used to deliver reliable outcomes with strong momentum.",
+      "description": "How Estivan Ayramia works with people: communication, follow-through, and what it feels like to work together.",
       "buildVersion": "",
-      "summary": "Understand how Estivan Ayramia collaborates: communication style, workflow expectations, and the standards used to deliver reliable outcomes with strong momentum.",
+      "summary": "How Estivan Ayramia works with people: communication, follow-through, and what it feels like to work together.",
       "headings": [
         "Working With Me | Estivan Ayramia",
-        "Business Operations & Systems Thinking",
-        "Leadership & People Management",
+        "Working With Me",
+        "How I operate when the work is real",
+        "What You Can Expect",
         "Reliability Over Heroics",
         "Continuous Improvement, Not Perfection",
         "Ownership, Not Excuses",
+        "Principles I Try to Live By",
         "If It's Not Documented, It Doesn't Exist",
         "Systems Beat Willpower",
         "Feedback Is a Gift, Not a Threat",
-        "Work With Me"
+        "If this working style fits, keep going."
       ],
       "links": [
         "/",
@@ -1282,32 +1476,24 @@
         "/projects/",
         "/contact"
       ],
-      "checksum": "fnv1a-75edc41d",
+      "checksum": "fnv1a-8ed3eba2",
       "keywords": [
         "/about/working-with-me",
         "working",
         "estivan",
         "ayramia",
-        "understand",
-        "collaborates",
-        "communication",
-        "style",
-        "workflow",
-        "expectations",
-        "standards",
-        "used",
-        "deliver",
-        "reliable",
-        "outcomes",
-        "strong",
-        "momentum",
-        "business",
-        "operations",
-        "systems",
-        "thinking",
-        "leadership",
+        "works",
         "people",
-        "management",
+        "communication",
+        "follow-through",
+        "feels",
+        "like",
+        "work",
+        "together",
+        "operate",
+        "real",
+        "can",
+        "expect",
         "reliability",
         "over",
         "heroics",
@@ -1317,40 +1503,71 @@
         "perfection",
         "ownership",
         "excuses",
+        "principles",
+        "try",
+        "live",
         "documented",
         "doesn",
         "exist",
+        "systems",
         "beat",
         "willpower",
         "feedback",
-        "gift"
+        "gift",
+        "threat",
+        "style",
+        "fits",
+        "keep"
       ],
       "sections": [
         {
           "heading": "Working With Me | Estivan Ayramia",
           "level": 1,
-          "text": "Working With Me",
+          "text": "Working With Me\nAbout chapter / collaboration",
           "keywords": [
             "working",
             "estivan",
-            "ayramia"
+            "ayramia",
+            "chapter",
+            "collaboration"
           ]
         },
         {
-          "heading": "Business Operations & Systems Thinking",
-          "level": 3,
-          "text": "I like figuring out how things actually work and then making them work better. That usually means looking at where things are not as efficient as they could be, where things fall through the cracks, and working to fix all of that. Not because it sounds impressive, but because watching a messy process get clean is genuinely satisfying. Knowing I had a part in it? Even better.",
+          "heading": "Working With Me",
+          "level": 1,
+          "text": "This page is for the practical side: what collaboration tends to feel like, what I value on a team, and what someone can expect from me in motion.\nOperating style",
           "keywords": [
-            "business",
-            "operations",
-            "systems",
-            "thinking",
+            "working",
+            "page",
+            "practical",
+            "side",
+            "collaboration",
+            "tends",
+            "feel",
+            "like",
+            "value",
+            "team",
+            "someone",
+            "can",
+            "expect",
+            "motion",
+            "operating",
+            "style"
+          ]
+        },
+        {
+          "heading": "How I operate when the work is real",
+          "level": 2,
+          "text": "I like figuring out how things actually work and then making them work better. That usually means looking at where things are not as efficient as they could be, where things fall through the cracks, and working to fix all of that. Not because it sounds impressive, but because watching a messy process get clean is genuinely satisfying. Knowing I had a part in it? Even better.\nPeople are the hardest part of anything. I learned that fast working with kids in a coach and chaperone role, where I moved into a lead position within 14 months. You cannot fake it with kids. They know when you are being straight with them and when you are not. What I took from that is pretty simple: be clear about what you expect, follow through on what you say, and show up the same way every time. Trust is just consistency over time.\nBest fit\nExpectations",
+          "keywords": [
+            "operate",
+            "work",
+            "real",
             "like",
             "figuring",
             "out",
             "things",
             "actually",
-            "work",
             "then",
             "making",
             "better",
@@ -1364,38 +1581,32 @@
             "through",
             "cracks",
             "working",
-            "fix"
+            "fix",
+            "all",
+            "because"
           ]
         },
         {
-          "heading": "Leadership & People Management",
-          "level": 3,
-          "text": "People are the hardest part of anything. I learned that fast working with kids in a coach and chaperone role, where I moved into a lead position within 14 months. You cannot fake it with kids. They know when you are being straight with them and when you are not. What I took from that is pretty simple: be clear about what you expect, follow through on what you say, and show up the same way every time. Trust is just consistency over time.",
+          "heading": "What You Can Expect",
+          "level": 2,
+          "text": "These are the standards I try to bring into shared work, especially when something matters enough to require real follow-through.",
           "keywords": [
-            "leadership",
-            "people",
-            "management",
-            "hardest",
-            "part",
-            "anything",
-            "learned",
-            "fast",
-            "working",
-            "kids",
-            "coach",
-            "chaperone",
-            "role",
-            "moved",
+            "can",
+            "expect",
+            "these",
+            "standards",
+            "try",
+            "bring",
             "into",
-            "lead",
-            "position",
-            "within",
-            "14",
-            "months",
-            "cannot",
-            "fake",
-            "know",
-            "being"
+            "shared",
+            "work",
+            "especially",
+            "something",
+            "matters",
+            "enough",
+            "require",
+            "real",
+            "follow-through"
           ]
         },
         {
@@ -1463,7 +1674,7 @@
         {
           "heading": "Ownership, Not Excuses",
           "level": 3,
-          "text": "If something is my responsibility and it goes wrong, that is on me. I am not going to look for someone else to blame. Fix it, understand what happened, and make sure it does not happen the same way again.",
+          "text": "If something is my responsibility and it goes wrong, that is on me. I am not going to look for someone else to blame. Fix it, understand what happened, and make sure it does not happen the same way again.\nWorking principles",
           "keywords": [
             "ownership",
             "not",
@@ -1487,7 +1698,28 @@
             "happen",
             "same",
             "way",
-            "again"
+            "again",
+            "working"
+          ]
+        },
+        {
+          "heading": "Principles I Try to Live By",
+          "level": 2,
+          "text": "These are the rules underneath the work style above. They are practical standards, not slogans.",
+          "keywords": [
+            "principles",
+            "try",
+            "live",
+            "these",
+            "rules",
+            "underneath",
+            "work",
+            "style",
+            "above",
+            "practical",
+            "standards",
+            "not",
+            "slogans"
           ]
         },
         {
@@ -1555,7 +1787,7 @@
         {
           "heading": "Feedback Is a Gift, Not a Threat",
           "level": 3,
-          "text": "Feedback that is actually honest is rare and worth a lot. The kind that stings a little is usually the kind that changes something. I would rather hear something uncomfortable and do something with it than get a thumbs up that means nothing.",
+          "text": "Feedback that is actually honest is rare and worth a lot. The kind that stings a little is usually the kind that changes something. I would rather hear something uncomfortable and do something with it than get a thumbs up that means nothing.\nKeep going",
           "keywords": [
             "feedback",
             "gift",
@@ -1584,24 +1816,21 @@
           ]
         },
         {
-          "heading": "Work With Me",
+          "heading": "If this working style fits, keep going.",
           "level": 2,
-          "text": "If how I work sounds like a fit, reach out. I am open to the right opportunity and always up for a real conversation.",
+          "text": "Go to Projects for examples, or Contact me if you want to talk.",
           "keywords": [
-            "work",
-            "sounds",
-            "like",
-            "fit",
-            "reach",
-            "out",
-            "am",
-            "open",
-            "right",
-            "opportunity",
-            "always",
-            "up",
-            "real",
-            "conversation"
+            "working",
+            "style",
+            "fits",
+            "keep",
+            "going",
+            "go",
+            "projects",
+            "examples",
+            "contact",
+            "want",
+            "talk"
           ]
         }
       ]
@@ -1694,7 +1923,10 @@
       "buildVersion": "",
       "summary": "Contact Estivan Ayramia for collaboration, project discussion, or professional opportunities through the official contact page and preferred channels.",
       "headings": [
+        "Contact | Estivan Ayramia",
         "Let's Talk",
+        "The page works for roles, projects, or direct questions.",
+        "Keep it simple and send the useful context.",
         "Send a Message",
         "Response Time",
         "Current Status"
@@ -1704,7 +1936,7 @@
         "/in/estivanayramia",
         "/estivanayramia"
       ],
-      "checksum": "fnv1a-d5ae1b60",
+      "checksum": "fnv1a-350b1ce5",
       "keywords": [
         "/contact",
         "contact",
@@ -1722,7 +1954,16 @@
         "channels",
         "let",
         "talk",
+        "works",
+        "roles",
+        "projects",
+        "direct",
+        "questions",
+        "keep",
+        "simple",
         "send",
+        "useful",
+        "context",
         "message",
         "response",
         "time",
@@ -1731,25 +1972,89 @@
       ],
       "sections": [
         {
+          "heading": "Contact | Estivan Ayramia",
+          "level": 1,
+          "text": "Contact / direct",
+          "keywords": [
+            "contact",
+            "estivan",
+            "ayramia",
+            "direct"
+          ]
+        },
+        {
           "heading": "Let's Talk",
           "level": 1,
-          "text": "Whether it's a role, a project, or a conversation about systems and operations; reach out. Responses typically within 24 hours.",
+          "text": "If it is a role, a project, or you just want to talk, reach out.\nIf you already know what you need, send it. If you do not, a direct note works too.\nWhat to expect\nWhy people reach out",
           "keywords": [
             "let",
             "talk",
-            "whether",
             "role",
             "project",
-            "conversation",
-            "systems",
-            "operations",
+            "just",
+            "want",
             "reach",
             "out",
-            "responses",
-            "typically",
-            "within",
-            "24",
-            "hours"
+            "already",
+            "know",
+            "need",
+            "send",
+            "not",
+            "direct",
+            "note",
+            "works",
+            "too",
+            "expect",
+            "people"
+          ]
+        },
+        {
+          "heading": "The page works for roles, projects, or direct questions.",
+          "level": 2,
+          "text": "The point is clarity, not pressure. Pick the lane that\n matches what you are trying to start.\nSend the message",
+          "keywords": [
+            "page",
+            "works",
+            "roles",
+            "projects",
+            "direct",
+            "questions",
+            "point",
+            "clarity",
+            "not",
+            "pressure",
+            "pick",
+            "lane",
+            "matches",
+            "trying",
+            "start",
+            "send",
+            "message"
+          ]
+        },
+        {
+          "heading": "Keep it simple and send the useful context.",
+          "level": 2,
+          "text": "The form stays front and center. The sidebar is only there to\n make direct options and availability easier to scan.",
+          "keywords": [
+            "keep",
+            "simple",
+            "send",
+            "useful",
+            "context",
+            "form",
+            "stays",
+            "front",
+            "center",
+            "sidebar",
+            "only",
+            "there",
+            "make",
+            "direct",
+            "options",
+            "availability",
+            "easier",
+            "scan"
           ]
         },
         {
@@ -1807,7 +2112,7 @@
         {
           "heading": "Current Status",
           "level": 3,
-          "text": "Actively seeking internships and entry-level operations roles for 2025. Open to project collaborations and consulting opportunities.",
+          "text": "Actively seeking internships and entry-level operations roles. Open to project collaborations and consulting opportunities.",
           "keywords": [
             "current",
             "status",
@@ -1817,7 +2122,6 @@
             "entry-level",
             "operations",
             "roles",
-            "2025",
             "open",
             "project",
             "collaborations",
@@ -1833,13 +2137,16 @@
       "sourceFile": "EN/deep-dive.html",
       "language": "en",
       "pageType": "deep_dive",
-      "title": "Deep Dive | Estivan Ayramia",
-      "description": "Dive into detailed context behind Estivan Ayramia",
+      "title": "How I Think and Work | Estivan Ayramia",
+      "description": "Background, habits, work, and the choices that shaped how I think.",
       "buildVersion": "",
-      "summary": "Dive into detailed context behind Estivan Ayramia",
+      "summary": "Background, habits, work, and the choices that shaped how I think.",
       "headings": [
-        "Systems, timeline, and what's next",
-        "Timeline",
+        "How I Think and Work | Estivan Ayramia",
+        "How I Think and Work",
+        "Start anywhere. It still adds up.",
+        "Quick background before the rest",
+        "Three systems I actually use",
         "What it is",
         "How it shows up",
         "Result",
@@ -1850,16 +2157,17 @@
         "The system",
         "Result",
         "What's next",
+        "What is already strong, and what I am still improving",
         "What I Am Good At",
         "What I Am Working On",
-        "How we got here",
+        "How we got here, in sequence",
         "Baghdad → Syria → United States (US)",
         "El Cajon / San Diego (Base)",
         "Education (General Business)",
         "Work (Coaching / Chaperone)",
         "How I operate",
         "What I'm targeting",
-        "Three decisions that shaped me",
+        "Three decisions that shaped the direction",
         "Choosing systems over shortcuts",
         "Leaning into discomfort",
         "Writing things down",
@@ -1874,81 +2182,124 @@
         "/contact",
         "/about"
       ],
-      "checksum": "fnv1a-b57f392c",
+      "checksum": "fnv1a-8df2767f",
       "keywords": [
         "/deep-dive",
-        "deep",
-        "dive",
+        "think",
+        "work",
         "estivan",
         "ayramia",
-        "into",
-        "detailed",
-        "context",
-        "behind",
-        "systems",
-        "timeline",
-        "next",
-        "shows",
+        "background",
+        "habits",
+        "choices",
+        "shaped",
+        "start",
+        "anywhere",
+        "still",
+        "adds",
         "up",
+        "quick",
+        "before",
+        "rest",
+        "three",
+        "systems",
+        "actually",
+        "use",
+        "shows",
         "result",
         "problem",
         "system",
+        "next",
+        "already",
+        "strong",
         "am",
+        "improving",
         "good",
         "working",
         "we",
         "got",
+        "sequence",
         "baghdad",
         "syria",
         "united",
         "states",
-        "us",
-        "el",
-        "cajon",
-        "san",
-        "diego",
-        "base",
-        "education",
-        "general",
-        "business",
-        "work",
-        "coaching",
-        "chaperone",
-        "operate",
-        "targeting"
+        "us"
       ],
       "sections": [
         {
-          "heading": "Systems, timeline, and what's next",
+          "heading": "How I Think and Work | Estivan Ayramia",
           "level": 1,
-          "text": "The real story so far: Baghdad to El Cajon. I build structure where it matters: how I learn, how I focus, and how I show proof of work.",
+          "text": "Deep read",
           "keywords": [
-            "systems",
-            "timeline",
-            "next",
-            "real",
-            "story",
-            "so",
-            "far",
-            "baghdad",
-            "el",
-            "cajon",
-            "build",
-            "structure",
-            "matters",
-            "learn",
-            "focus",
-            "show",
-            "proof",
-            "work"
+            "think",
+            "work",
+            "estivan",
+            "ayramia",
+            "deep",
+            "read"
           ]
         },
         {
-          "heading": "Timeline",
-          "level": 2,
-          "text": "• Born in Baghdad. Lived in Syria as a refugee. Moved to El Cajon in 2008.\n• General Business, graduated December 2025, GPA about 3.8.\n• Time sinks now are mainly reading and building my website (not mindless scrolling).",
+          "heading": "How I Think and Work",
+          "level": 1,
+          "text": "Baghdad to El Cajon, school, work, the habits I actually use, and the projects that show how I think.\nAt a glance\nIf you want to skip around",
           "keywords": [
-            "timeline",
+            "think",
+            "work",
+            "baghdad",
+            "el",
+            "cajon",
+            "school",
+            "habits",
+            "actually",
+            "use",
+            "projects",
+            "show",
+            "glance",
+            "want",
+            "skip",
+            "around"
+          ]
+        },
+        {
+          "heading": "Start anywhere. It still adds up.",
+          "level": 2,
+          "text": "Jump to the part you need, or read the whole thing from\n top to bottom.\nContext",
+          "keywords": [
+            "start",
+            "anywhere",
+            "still",
+            "adds",
+            "up",
+            "jump",
+            "part",
+            "need",
+            "read",
+            "whole",
+            "thing",
+            "top",
+            "bottom",
+            "context"
+          ]
+        },
+        {
+          "heading": "Quick background before the rest",
+          "level": 2,
+          "text": "Enough background to make the rest of the page make sense:\n where I came from, what I finished, and what I am doing now.\n• Born in Baghdad. Lived in Syria as a refugee. Moved to El Cajon in 2008.\n• General Business, graduated December 2025, GPA about 3.8.\n• Time sinks now are mainly reading and building my website (not mindless scrolling).\nWhere I am now\nBased in El Cajon, California, near San Diego, and open to new opportunities that come with real ownership.\nHow it runs\nBackground first, then habits, then the projects that back it up.\nSystems",
+          "keywords": [
+            "quick",
+            "background",
+            "before",
+            "rest",
+            "enough",
+            "make",
+            "page",
+            "sense",
+            "came",
+            "finished",
+            "am",
+            "doing",
+            "now",
             "born",
             "baghdad",
             "lived",
@@ -1959,19 +2310,35 @@
             "cajon",
             "2008",
             "general",
-            "business",
-            "graduated",
-            "december",
-            "2025",
-            "gpa",
-            "time",
-            "sinks",
-            "now",
-            "mainly",
-            "reading",
-            "building",
-            "website",
-            "not"
+            "business"
+          ]
+        },
+        {
+          "heading": "Three systems I actually use",
+          "level": 2,
+          "text": "These are not theory. They are the loops I keep coming back\n to because they help me learn, focus, and produce work that\n someone else can actually evaluate.",
+          "keywords": [
+            "three",
+            "systems",
+            "actually",
+            "use",
+            "these",
+            "not",
+            "theory",
+            "loops",
+            "keep",
+            "coming",
+            "back",
+            "because",
+            "help",
+            "learn",
+            "focus",
+            "produce",
+            "work",
+            "someone",
+            "else",
+            "can",
+            "evaluate"
           ]
         },
         {
@@ -1998,23 +2365,23 @@
         {
           "heading": "How it shows up",
           "level": 4,
-          "text": "• \n I spend a lot of my \"productive internet time\" building my website.\n• \n I prefer output people can verify instead of claims people have to trust. (That's the point of a portfolio.)",
+          "text": "• \n I spend a lot of my time building the site instead of burning it on junk.\n• \n I prefer output people can verify instead of claims people have to trust. (That's the point of a portfolio.)",
           "keywords": [
             "shows",
             "up",
             "spend",
             "lot",
-            "productive",
-            "internet",
             "time",
             "building",
-            "website",
+            "site",
+            "instead",
+            "burning",
+            "junk",
             "prefer",
             "output",
             "people",
             "can",
             "verify",
-            "instead",
             "claims",
             "trust",
             "point",
@@ -2155,7 +2522,7 @@
         {
           "heading": "Result",
           "level": 4,
-          "text": "Less wasted attention, more consistency, and a reliable baseline to keep progressing.",
+          "text": "Less wasted attention, more consistency, and a reliable baseline to keep progressing.\nNext direction",
           "keywords": [
             "result",
             "less",
@@ -2166,13 +2533,15 @@
             "reliable",
             "baseline",
             "keep",
-            "progressing"
+            "progressing",
+            "next",
+            "direction"
           ]
         },
         {
           "heading": "What's next",
           "level": 3,
-          "text": "• I'm open to new opportunities, remote or San Diego hybrid.\n• Best-fit environment: respectful accountability (not condescension), clear ownership, and real intellectual challenge.",
+          "text": "• I'm open to new opportunities, remote or San Diego hybrid.\n• Best-fit environment: respectful accountability (not condescension), clear ownership, and real intellectual challenge.\nOperating baseline",
           "keywords": [
             "next",
             "open",
@@ -2192,7 +2561,30 @@
             "ownership",
             "real",
             "intellectual",
-            "challenge"
+            "challenge",
+            "operating",
+            "baseline"
+          ]
+        },
+        {
+          "heading": "What is already strong, and what I am still improving",
+          "level": 2,
+          "text": "This is the practical middle of the page: what I can\n already be trusted with, and the areas where I am still\n actively sharpening the work.",
+          "keywords": [
+            "already",
+            "strong",
+            "am",
+            "still",
+            "improving",
+            "practical",
+            "middle",
+            "page",
+            "can",
+            "trusted",
+            "areas",
+            "actively",
+            "sharpening",
+            "work"
           ]
         },
         {
@@ -2229,7 +2621,7 @@
         {
           "heading": "What I Am Working On",
           "level": 2,
-          "text": "• \n Saying no to distractions and staying focused on high-impact work\n• \n Being more direct in communication rather than overexplaining\n• \n Delegating tasks instead of trying to do everything myself\n• \n Building patience for long-term projects that take months to see results\n• \n Getting better at public speaking and presenting in front of groups",
+          "text": "• \n Saying no to distractions and staying focused on high-impact work\n• \n Being more direct in communication rather than overexplaining\n• \n Delegating tasks instead of trying to do everything myself\n• \n Building patience for long-term projects that take months to see results\n• \n Getting better at public speaking and presenting in front of groups\nHow we got here",
           "keywords": [
             "am",
             "working",
@@ -2258,19 +2650,17 @@
           ]
         },
         {
-          "heading": "How we got here",
+          "heading": "How we got here, in sequence",
           "level": 2,
-          "text": "The path from Baghdad to El Cajon (near San Diego), building adaptability early, then finishing a General Business degree (December 2025; diploma pending) and moving into roles with real ownership.",
+          "text": "The path from Baghdad to El Cajon, building adaptability early, then finishing a General Business degree and moving toward roles with real ownership.",
           "keywords": [
             "we",
             "got",
+            "sequence",
             "path",
             "baghdad",
             "el",
             "cajon",
-            "near",
-            "san",
-            "diego",
             "building",
             "adaptability",
             "early",
@@ -2279,13 +2669,11 @@
             "general",
             "business",
             "degree",
-            "december",
-            "2025",
-            "diploma",
-            "pending",
             "moving",
-            "into",
-            "roles"
+            "toward",
+            "roles",
+            "real",
+            "ownership"
           ]
         },
         {
@@ -2399,7 +2787,7 @@
         {
           "heading": "What I'm targeting",
           "level": 3,
-          "text": "Operations and project coordination work where I can be trusted with real responsibility and execution.\n Not looking to be babysat. Give the goal, constraints, and timeline, and I'll drive it.",
+          "text": "Operations and project coordination work where I can be trusted with real responsibility and execution.\n Not looking to be babysat. Give the goal, constraints, and timeline, and I'll drive it.\nDecisions",
           "keywords": [
             "targeting",
             "operations",
@@ -2419,17 +2807,19 @@
             "constraints",
             "timeline",
             "ll",
-            "drive"
+            "drive",
+            "decisions"
           ]
         },
         {
-          "heading": "Three decisions that shaped me",
+          "heading": "Three decisions that shaped the direction",
           "level": 2,
           "text": "Looking back, these choices determined the trajectory more than anything else.",
           "keywords": [
             "three",
             "decisions",
             "shaped",
+            "direction",
             "looking",
             "back",
             "these",
@@ -2507,7 +2897,7 @@
         {
           "heading": "Writing things down",
           "level": 3,
-          "text": "Documenting processes, lessons learned, and reflections. Most people skip this step because it feels like extra work. But written records become reference material that compounds. This portfolio exists because I decided to document rather than just experience.",
+          "text": "Documenting processes, lessons learned, and reflections. Most people skip this step because it feels like extra work. But written records become reference material that compounds. This portfolio exists because I decided to document rather than just experience.\nProof",
           "keywords": [
             "writing",
             "things",
@@ -2592,7 +2982,7 @@
         {
           "heading": "L'Oréal Cell BioPrint",
           "level": 3,
-          "text": "A full MAPS campaign deck mapping three personas across the marketing funnel. Designed for a class project but built to real-world spec, with clear audience segmentation, touchpoint logic, and a content-to-conversion path.",
+          "text": "A full MAPS campaign deck mapping three personas across the marketing funnel. Designed for a class project but built to real-world spec, with clear audience segmentation, touchpoint logic, and a content-to-conversion path.\nWhat's next",
           "keywords": [
             "al",
             "cell",
@@ -2623,18 +3013,16 @@
         {
           "heading": "Let's talk about what's next",
           "level": 2,
-          "text": "Whether it's a role, a project, or just comparing notes on systems; reach out.",
+          "text": "If you want to talk about a role, a project, or anything on the site, reach out.",
           "keywords": [
             "let",
             "talk",
             "next",
-            "whether",
+            "want",
             "role",
             "project",
-            "just",
-            "comparing",
-            "notes",
-            "systems",
+            "anything",
+            "site",
             "reach",
             "out"
           ]
@@ -2839,251 +3227,6 @@
       ]
     },
     {
-      "route": "/hobbies/",
-      "canonical": "/hobbies/",
-      "sourceFile": "EN/hobbies/index.html",
-      "language": "en",
-      "pageType": "hobbies_index",
-      "title": "Hobbies | Estivan Ayramia",
-      "description": "Explore Estivan Ayramia",
-      "buildVersion": "",
-      "summary": "Explore Estivan Ayramia",
-      "headings": [
-        "Beyond Business",
-        "Gym & Strength Training",
-        "Photography",
-        "Car Enthusiasm",
-        "Cooking",
-        "Whispers (Sticky Notes)",
-        "Reading",
-        "Curious about the work side?"
-      ],
-      "links": [
-        "/hobbies/gym",
-        "/hobbies/photography",
-        "/hobbies/car",
-        "/hobbies/cooking",
-        "/hobbies/whispers",
-        "/hobbies/reading",
-        "/hobbies/me",
-        "/projects/"
-      ],
-      "checksum": "fnv1a-7b1385bf",
-      "keywords": [
-        "/hobbies/",
-        "hobbies",
-        "estivan",
-        "ayramia",
-        "explore",
-        "beyond",
-        "business",
-        "gym",
-        "strength",
-        "training",
-        "photography",
-        "car",
-        "enthusiasm",
-        "cooking",
-        "whispers",
-        "sticky",
-        "notes",
-        "reading",
-        "curious",
-        "work",
-        "side"
-      ],
-      "sections": [
-        {
-          "heading": "Beyond Business",
-          "level": 1,
-          "text": "Curiosity doesn't stop at spreadsheets. These are the hobbies that fuel personal growth, physical discipline, and creative thinking outside the office.",
-          "keywords": [
-            "beyond",
-            "business",
-            "curiosity",
-            "doesn",
-            "stop",
-            "spreadsheets",
-            "these",
-            "hobbies",
-            "fuel",
-            "personal",
-            "growth",
-            "physical",
-            "discipline",
-            "creative",
-            "thinking",
-            "outside",
-            "office"
-          ]
-        },
-        {
-          "heading": "Gym & Strength Training",
-          "level": 2,
-          "text": "Building discipline through progressive overload. Tracking PRs, optimizing recovery, and proving that consistency beats intensity every time.",
-          "keywords": [
-            "gym",
-            "strength",
-            "training",
-            "building",
-            "discipline",
-            "through",
-            "progressive",
-            "overload",
-            "tracking",
-            "prs",
-            "optimizing",
-            "recovery",
-            "proving",
-            "consistency",
-            "beats",
-            "intensity",
-            "every",
-            "time"
-          ]
-        },
-        {
-          "heading": "Photography",
-          "level": 2,
-          "text": "Capturing moments worth remembering. iPhone shots that tell stories; no DSLR needed, just good lighting and better timing.",
-          "keywords": [
-            "photography",
-            "capturing",
-            "moments",
-            "worth",
-            "remembering",
-            "iphone",
-            "shots",
-            "tell",
-            "stories",
-            "no",
-            "dslr",
-            "needed",
-            "just",
-            "good",
-            "lighting",
-            "better",
-            "timing"
-          ]
-        },
-        {
-          "heading": "Car Enthusiasm",
-          "level": 2,
-          "text": "First car, first freedom. Not about speed; about ownership, maintenance, and the pride of keeping something running clean.",
-          "keywords": [
-            "car",
-            "enthusiasm",
-            "first",
-            "freedom",
-            "not",
-            "speed",
-            "ownership",
-            "maintenance",
-            "pride",
-            "keeping",
-            "something",
-            "running",
-            "clean"
-          ]
-        },
-        {
-          "heading": "Cooking",
-          "level": 2,
-          "text": "Steak, pasta, and everything in between. Not a chef; just someone who refuses to eat mediocre food when good ingredients are available.",
-          "keywords": [
-            "cooking",
-            "steak",
-            "pasta",
-            "everything",
-            "between",
-            "not",
-            "chef",
-            "just",
-            "someone",
-            "refuses",
-            "eat",
-            "mediocre",
-            "food",
-            "good",
-            "ingredients",
-            "available"
-          ]
-        },
-        {
-          "heading": "Whispers (Sticky Notes)",
-          "level": 2,
-          "text": "Random thoughts captured on sticky notes. Ideas, observations, reminders. Low-tech brain dump that keeps the mental clutter organized.",
-          "keywords": [
-            "whispers",
-            "sticky",
-            "notes",
-            "random",
-            "thoughts",
-            "captured",
-            "ideas",
-            "observations",
-            "reminders",
-            "low-tech",
-            "brain",
-            "dump",
-            "keeps",
-            "mental",
-            "clutter",
-            "organized"
-          ]
-        },
-        {
-          "heading": "Reading",
-          "level": 2,
-          "text": "Books are compressed experience. Reading is the cheapest way to access decades of wisdom without making the same mistakes yourself.\nPersonal snapshots that capture identity, growth, and the moments behind the work.",
-          "keywords": [
-            "reading",
-            "books",
-            "compressed",
-            "experience",
-            "cheapest",
-            "way",
-            "access",
-            "decades",
-            "wisdom",
-            "without",
-            "making",
-            "same",
-            "mistakes",
-            "yourself",
-            "personal",
-            "snapshots",
-            "capture",
-            "identity",
-            "growth",
-            "moments",
-            "behind",
-            "work"
-          ]
-        },
-        {
-          "heading": "Curious about the work side?",
-          "level": 2,
-          "text": "Explore projects that showcase systems thinking, operational coordination, and execution under pressure.",
-          "keywords": [
-            "curious",
-            "work",
-            "side",
-            "explore",
-            "projects",
-            "showcase",
-            "systems",
-            "thinking",
-            "operational",
-            "coordination",
-            "execution",
-            "under",
-            "pressure"
-          ]
-        }
-      ]
-    },
-    {
       "route": "/hobbies/car",
       "canonical": "/hobbies/car",
       "sourceFile": "EN/hobbies/car.html",
@@ -3101,10 +3244,8 @@
         "Gallery",
         "Mod List"
       ],
-      "links": [
-        "/hobbies/"
-      ],
-      "checksum": "fnv1a-2ca5b3f6",
+      "links": [],
+      "checksum": "fnv1a-733a8671",
       "keywords": [
         "/hobbies/car",
         "car",
@@ -3127,13 +3268,16 @@
         {
           "heading": "Car Enthusiasm | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nCar",
+          "text": "Hobbies\nCar\nHobby chapter / mechanical",
           "keywords": [
             "car",
             "enthusiasm",
             "estivan",
             "ayramia",
-            "hobbies"
+            "hobbies",
+            "hobby",
+            "chapter",
+            "mechanical"
           ]
         },
         {
@@ -3280,10 +3424,8 @@
         "The Kitchen as a System",
         "Gallery"
       ],
-      "links": [
-        "/hobbies/"
-      ],
-      "checksum": "fnv1a-18e4970",
+      "links": [],
+      "checksum": "fnv1a-3f712c95",
       "keywords": [
         "/hobbies/cooking",
         "cooking",
@@ -3303,12 +3445,16 @@
         {
           "heading": "Cooking | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nCooking",
+          "text": "Hobbies\nCooking\nHobby chapter / everyday routine",
           "keywords": [
             "cooking",
             "estivan",
             "ayramia",
-            "hobbies"
+            "hobbies",
+            "hobby",
+            "chapter",
+            "everyday",
+            "routine"
           ]
         },
         {
@@ -3468,10 +3614,8 @@
         "Gallery",
         "Quick Facts"
       ],
-      "links": [
-        "/hobbies/"
-      ],
-      "checksum": "fnv1a-fb7c0fb7",
+      "links": [],
+      "checksum": "fnv1a-9a04de09",
       "keywords": [
         "/hobbies/gym",
         "gym",
@@ -3492,13 +3636,16 @@
         {
           "heading": "Gym Training | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nGym",
+          "text": "Hobbies\nGym\nHobby chapter / discipline",
           "keywords": [
             "gym",
             "training",
             "estivan",
             "ayramia",
-            "hobbies"
+            "hobbies",
+            "hobby",
+            "chapter",
+            "discipline"
           ]
         },
         {
@@ -3670,10 +3817,8 @@
         "Gallery",
         "Section Focus"
       ],
-      "links": [
-        "/hobbies/"
-      ],
-      "checksum": "fnv1a-18f6196c",
+      "links": [],
+      "checksum": "fnv1a-a64b3508",
       "keywords": [
         "/hobbies/me",
         "estivan",
@@ -3700,11 +3845,14 @@
         {
           "heading": "Me | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nThis is the part of the site where I stop acting locked in and just look human for a minute.",
+          "text": "Hobbies\nHobby chapter / personal\nThis is the part of the site where I stop acting locked in and just look human for a minute.",
           "keywords": [
             "estivan",
             "ayramia",
             "hobbies",
+            "hobby",
+            "chapter",
+            "personal",
             "part",
             "site",
             "stop",
@@ -3826,61 +3974,75 @@
       "language": "en",
       "pageType": "hobby_detail",
       "title": "Photography | Estivan Ayramia",
-      "description": "Explore Estivan Ayramia",
+      "description": "Photos Estivan Ayramia has taken and the kind of frames he likes to catch.",
       "buildVersion": "",
-      "summary": "Explore Estivan Ayramia",
+      "summary": "Photos Estivan Ayramia has taken and the kind of frames he likes to catch.",
       "headings": [
         "Photography | Estivan Ayramia",
         "Photography",
         "What I Like to Shoot",
         "How I Think About Composition",
-        "Gallery"
+        "Gallery",
+        "Return to the personal side"
       ],
       "links": [
-        "/hobbies/"
+        "/about"
       ],
-      "checksum": "fnv1a-27c5e7ea",
+      "checksum": "fnv1a-b82b1c75",
       "keywords": [
         "/hobbies/photography",
         "photography",
         "estivan",
         "ayramia",
-        "explore",
+        "photos",
+        "taken",
+        "kind",
+        "frames",
+        "likes",
+        "catch",
         "like",
         "shoot",
         "think",
         "composition",
-        "gallery"
+        "gallery",
+        "return",
+        "personal",
+        "side"
       ],
       "sections": [
         {
           "heading": "Photography | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nPhotography",
+          "text": "Photography\nHobby chapter / visual attention",
           "keywords": [
             "photography",
             "estivan",
             "ayramia",
-            "hobbies"
+            "hobby",
+            "chapter",
+            "visual",
+            "attention"
           ]
         },
         {
           "heading": "Photography",
           "level": 1,
-          "text": "Not about documenting everything. It's about seeing patterns and systems in motion, then capturing the moment where everything aligns.",
+          "text": "I like catching a frame that actually feels like something. Good light, strong lines, and the right moment are enough.",
           "keywords": [
             "photography",
-            "not",
-            "documenting",
-            "everything",
-            "seeing",
-            "patterns",
-            "systems",
-            "motion",
-            "then",
-            "capturing",
+            "like",
+            "catching",
+            "frame",
+            "actually",
+            "feels",
+            "something",
+            "good",
+            "light",
+            "strong",
+            "lines",
+            "right",
             "moment",
-            "aligns"
+            "enough"
           ]
         },
         {
@@ -3948,7 +4110,7 @@
         {
           "heading": "Gallery",
           "level": 2,
-          "text": "This gallery shows how I see things, and you get to look through my eyes for a few minutes. These photos highlight the everyday details that catch my attention. It is a fun way to introduce myself.\nExplore more hobbies",
+          "text": "This gallery shows how I see things, and you get to look through my eyes for a few minutes. These photos highlight the everyday details that catch my attention. It is a fun way to introduce myself.\nNavigate back",
           "keywords": [
             "gallery",
             "shows",
@@ -3971,9 +4133,29 @@
             "way",
             "introduce",
             "myself",
-            "explore",
-            "more",
-            "hobbies"
+            "navigate",
+            "back"
+          ]
+        },
+        {
+          "heading": "Return to the personal side",
+          "level": 2,
+          "text": "Photography still lives inside the About carousel. That is the cleanest place to keep the rest of the personal pages together.",
+          "keywords": [
+            "return",
+            "personal",
+            "side",
+            "photography",
+            "still",
+            "lives",
+            "inside",
+            "carousel",
+            "cleanest",
+            "place",
+            "keep",
+            "rest",
+            "pages",
+            "together"
           ]
         }
       ]
@@ -3985,9 +4167,9 @@
       "language": "en",
       "pageType": "hobby_detail",
       "title": "Reading | Estivan Ayramia",
-      "description": "Discover how reading supports Estivan Ayramia",
+      "description": "What Estivan Ayramia reads, what sticks, and the kinds of ideas he keeps coming back to.",
       "buildVersion": "",
-      "summary": "Discover how reading supports Estivan Ayramia",
+      "summary": "What Estivan Ayramia reads, what sticks, and the kinds of ideas he keeps coming back to.",
       "headings": [
         "Reading | Estivan Ayramia",
         "Reading",
@@ -3998,17 +4180,20 @@
         "Books That Stuck With Me",
         "Reading Principles"
       ],
-      "links": [
-        "/hobbies/"
-      ],
-      "checksum": "fnv1a-1e84471f",
+      "links": [],
+      "checksum": "fnv1a-b49370c4",
       "keywords": [
         "/hobbies/reading",
         "reading",
         "estivan",
         "ayramia",
-        "discover",
-        "supports",
+        "reads",
+        "sticks",
+        "kinds",
+        "ideas",
+        "keeps",
+        "coming",
+        "back",
         "read",
         "changes",
         "thinking",
@@ -4024,12 +4209,15 @@
         {
           "heading": "Reading | Estivan Ayramia",
           "level": 1,
-          "text": "Hobbies\nReading",
+          "text": "Hobbies\nReading\nHobby chapter / thinking",
           "keywords": [
             "reading",
             "estivan",
             "ayramia",
-            "hobbies"
+            "hobbies",
+            "hobby",
+            "chapter",
+            "thinking"
           ]
         },
         {
@@ -4061,7 +4249,7 @@
         {
           "heading": "What I Read and Why",
           "level": 2,
-          "text": "I lean toward non-fiction. Business, psychology, strategy, history. Books that explain why people do what they do, why systems work, and why they fall apart.\nI am usually looking for patterns I can use, not facts I will forget next week.\nRobert Greene stays in heavy rotation. His books are packed with strategy, power, human nature, and stories that make the point stick. The 48 Laws of Power, The 33 Strategies of War, Mastery. Each one gives me a different lens.\nI read biographies too. I like seeing how people thought under pressure, made calls, got things right, and got things wrong. That part teaches more than a polished success story.",
+          "text": "I lean toward non-fiction. Business, psychology, strategy, history. Books that explain why people do what they do and how things go right or wrong.\nI am usually looking for patterns I can use, not facts I will forget next week.\nRobert Greene stays in heavy rotation. His books are packed with strategy, power, human nature, and stories that make the point stick. The 48 Laws of Power, The 33 Strategies of War, Mastery. Each one gives me a different lens.\nI read biographies too. I like seeing how people thought under pressure, made calls, got things right, and got things wrong. That part teaches more than a polished success story.",
           "keywords": [
             "read",
             "lean",
@@ -4074,10 +4262,10 @@
             "books",
             "explain",
             "people",
-            "systems",
-            "work",
-            "fall",
-            "apart",
+            "things",
+            "go",
+            "right",
+            "wrong",
             "am",
             "usually",
             "looking",
@@ -4123,32 +4311,32 @@
         {
           "heading": "Current Focus Areas",
           "level": 2,
-          "text": "Right now I am focused on systems and operations. How teams run. How processes stay clean. How things grow without turning into chaos.\nI am into communication and influence too. Not weird manipulation stuff. I care about saying things clearly, getting buy-in, and leading well even when the title is not yours.",
+          "text": "Right now I keep gravitating toward operations, communication, influence, and how teams actually run when real people are involved.\nI am into communication and influence too. Not weird manipulation stuff. I care about saying things clearly, getting buy-in, and leading well even when the title is not yours.",
           "keywords": [
             "current",
             "focus",
             "areas",
             "right",
             "now",
-            "am",
-            "focused",
-            "systems",
+            "keep",
+            "gravitating",
+            "toward",
             "operations",
-            "teams",
-            "run",
-            "processes",
-            "stay",
-            "clean",
-            "things",
-            "grow",
-            "without",
-            "turning",
-            "into",
-            "chaos",
             "communication",
             "influence",
+            "teams",
+            "actually",
+            "run",
+            "real",
+            "people",
+            "involved",
+            "am",
+            "into",
             "too",
-            "not"
+            "not",
+            "weird",
+            "manipulation",
+            "stuff"
           ]
         },
         {
@@ -4231,9 +4419,7 @@
         "What I Write",
         "The Notes"
       ],
-      "links": [
-        "/hobbies/"
-      ],
+      "links": [],
       "checksum": "fnv1a-f372ad78",
       "keywords": [
         "/hobbies/whispers",
@@ -4384,17 +4570,21 @@
       "language": "en",
       "pageType": "overview",
       "title": "Overview | Estivan Ayramia",
-      "description": "Get a concise overview of Estivan Ayramia",
+      "description": "The short read on how Estivan Ayramia works and what people can usually count on from him.",
       "buildVersion": "",
-      "summary": "Get a concise overview of Estivan Ayramia",
+      "summary": "The short read on how Estivan Ayramia works and what people can usually count on from him.",
       "headings": [
+        "Overview | Estivan Ayramia",
         "What you can count on from me",
+        "Start here, then go where it gets useful.",
+        "What keeps showing up in how I work",
         "Reliability",
         "People",
         "Execution",
+        "What makes the short read more complete",
         "Languages",
         "Identity",
-        "Want more depth?"
+        "Keep it short, or keep going."
       ],
       "links": [
         "/deep-dive",
@@ -4403,35 +4593,56 @@
         "/projects/loreal-maps-campaign",
         "/projects/endpoint-competitive-playbook",
         "/projects/isa-grimes-interview",
-        "/projects/portfolio",
-        "/es/",
-        "/ar/",
-        "/projects/franklin-templeton-concept"
+        "/projects/portfolio"
       ],
-      "checksum": "fnv1a-ad8b1ada",
+      "checksum": "fnv1a-722a3998",
       "keywords": [
         "/overview",
         "overview",
         "estivan",
         "ayramia",
-        "get",
-        "concise",
-        "can",
-        "count",
-        "reliability",
+        "short",
+        "read",
+        "works",
         "people",
+        "can",
+        "usually",
+        "count",
+        "start",
+        "then",
+        "go",
+        "gets",
+        "useful",
+        "keeps",
+        "showing",
+        "up",
+        "work",
+        "reliability",
         "execution",
+        "makes",
+        "more",
+        "complete",
         "languages",
         "identity",
-        "want",
-        "more",
-        "depth"
+        "keep",
+        "going"
       ],
       "sections": [
         {
+          "heading": "Overview | Estivan Ayramia",
+          "level": 1,
+          "text": "1-minute overview",
+          "keywords": [
+            "overview",
+            "estivan",
+            "ayramia",
+            "1-minute"
+          ]
+        },
+        {
           "heading": "What you can count on from me",
           "level": 1,
-          "text": "This is the short version of how I work. Not the polished pitch. Just the patterns that keep showing up.\nHow to use this site\nIf you want the fast read, stay here.\nIf you want the longer version, head to Deep Dive .\nIf you want examples, go to Projects .\nIf you want to talk, use the chat widget or contact me directly .",
+          "text": "This is the short version of how I work. Not the cleaned-up pitch. Just the things people can usually count on from me.\nQuick read\nStart here",
           "keywords": [
             "can",
             "count",
@@ -4439,24 +4650,66 @@
             "version",
             "work",
             "not",
-            "polished",
+            "cleaned-up",
             "pitch",
             "just",
-            "patterns",
-            "keep",
+            "things",
+            "people",
+            "usually",
+            "quick",
+            "read",
+            "start"
+          ]
+        },
+        {
+          "heading": "Start here, then go where it gets useful.",
+          "level": 2,
+          "text": "This page answers the basics quickly, then points to\n deeper context, projects, or direct contact.\nCore patterns",
+          "keywords": [
+            "start",
+            "then",
+            "go",
+            "gets",
+            "useful",
+            "page",
+            "answers",
+            "basics",
+            "quickly",
+            "points",
+            "deeper",
+            "context",
+            "projects",
+            "direct",
+            "contact",
+            "core",
+            "patterns"
+          ]
+        },
+        {
+          "heading": "What keeps showing up in how I work",
+          "level": 2,
+          "text": "The short version is reliability, calm with people, and\n follow-through. The list below keeps the substance, but\n stages it in the order I would want someone to read it.",
+          "keywords": [
+            "keeps",
             "showing",
             "up",
-            "use",
-            "site",
+            "work",
+            "short",
+            "version",
+            "reliability",
+            "calm",
+            "people",
+            "follow-through",
+            "list",
+            "below",
+            "substance",
+            "but",
+            "stages",
+            "order",
+            "would",
             "want",
-            "fast",
-            "read",
-            "stay",
-            "longer",
-            "head",
-            "deep",
-            "dive",
-            "examples"
+            "someone",
+            "read"
           ]
         },
         {
@@ -4524,7 +4777,7 @@
         {
           "heading": "Execution",
           "level": 2,
-          "text": "I like ideas. I like finished work more. Plans are nice. Shipping is better. I break big things into smaller moves, keep track of details, and stay with it through the boring part, the hard part, and the cleanup after. That is usually where good intentions fall apart. I try not to let them.\nShown in: portfolio site , scroll progress , PWA support , AI assistant",
+          "text": "I like ideas. I like finished work more. Plans are nice. Shipping is better. I break big things into smaller moves, keep track of details, and stay with it through the boring part, the hard part, and the cleanup after. That is usually where good intentions fall apart. I try not to let them.\nShown in: portfolio site , scroll progress , PWA support , AI assistant\nContext that adds range",
           "keywords": [
             "execution",
             "like",
@@ -4553,9 +4806,30 @@
           ]
         },
         {
+          "heading": "What makes the short read more complete",
+          "level": 2,
+          "text": "Language and background are part of the summary too.\n They change how I connect with people and how I read a\n situation.",
+          "keywords": [
+            "makes",
+            "short",
+            "read",
+            "more",
+            "complete",
+            "language",
+            "background",
+            "part",
+            "summary",
+            "too",
+            "change",
+            "connect",
+            "people",
+            "situation"
+          ]
+        },
+        {
           "heading": "Languages",
           "level": 2,
-          "text": "I speak four languages, and that changes a conversation fast. English and Chaldean are fluent. I can read, write, and speak Spanish and Arabic too. When people get to speak in the language that feels natural to them, the whole dynamic shifts. Trust builds faster. Things get clearer. People tell you more.\nShown in: Spanish version of this portfolio , Arabic version of this portfolio , Franklin Templeton dual-language concept decks",
+          "text": "I speak four languages, and that changes a conversation fast. English and Chaldean are fluent. I can read, write, and speak Spanish and Arabic too. When people get to speak in the language that feels natural to them, the whole dynamic shifts. Trust builds faster. Things get clearer. People tell you more.\nShown in: Arabic and Spanish conversations, Franklin Templeton dual-language concept work",
           "keywords": [
             "languages",
             "speak",
@@ -4586,7 +4860,7 @@
         {
           "heading": "Identity",
           "level": 2,
-          "text": "I am Chaldean and Iraqi-American. I graduated from SDSU in General Business. A lot of how I work came from home. I watched my mom go back to school for years and finish her degree the hard way. That set the tone for me. I do the work, keep moving, and try not to make a whole production out of it.\nShown in: systems designed with diverse teams in mind, retail staff, clinical trial operators",
+          "text": "I am Chaldean and Iraqi-American. I graduated from SDSU in General Business. A lot of how I work came from home. I watched my mom go back to school for years and finish her degree the hard way. That set the tone for me. I do the work, keep moving, and try not to make a whole production out of it.\nShown in: systems designed with diverse teams in mind, retail staff, clinical trial operators\nKeep going",
           "keywords": [
             "identity",
             "am",
@@ -4615,19 +4889,20 @@
           ]
         },
         {
-          "heading": "Want more depth?",
+          "heading": "Keep it short, or keep going.",
           "level": 2,
-          "text": "If you want the longer story, head to Deep Dive. If you want the proof, head to Projects. If you want to talk, reach out.",
+          "text": "If you want the longer story, head to Deep Dive. If you want examples, head to Projects. If you want to talk, reach out.",
           "keywords": [
+            "keep",
+            "short",
+            "going",
             "want",
-            "more",
-            "depth",
             "longer",
             "story",
             "head",
             "deep",
             "dive",
-            "proof",
+            "examples",
             "projects",
             "talk",
             "reach",
@@ -5041,12 +5316,13 @@
       "language": "en",
       "pageType": "projects_index",
       "title": "Projects | Estivan Ayramia",
-      "description": "Browse selected projects by Estivan Ayramia across strategy, operations, documentation, and systems design, with outcomes, process notes, and execution details.",
+      "description": "Selected work: what it was, what I made, and why it mattered.",
       "buildVersion": "",
-      "summary": "Browse selected projects by Estivan Ayramia across strategy, operations, documentation, and systems design, with outcomes, process notes, and execution details.",
+      "summary": "Selected work: what it was, what I made, and why it mattered.",
       "headings": [
+        "Projects | Estivan Ayramia",
         "Selected Work",
-        "What I Notice Across These Projects",
+        "Not everything I have done. The pages that matter most.",
         "This Website",
         "Isa Grimes Interview",
         "L'Oréal Cell BioPrint",
@@ -5061,7 +5337,7 @@
         "EndPoint LinkedIn Campaign",
         "Endpoint Elosity Launch Video",
         "Taking Down Endpoint (Almac Group + 4G Clinical)",
-        "Want to build something together?"
+        "Take the project read into a real conversation."
       ],
       "links": [
         "/projects/portfolio",
@@ -5071,30 +5347,25 @@
         "/projects/endpoint-linkedin-campaign",
         "/projects/endpoint-elosity-video",
         "/projects/endpoint-competitive-playbook",
-        "/contact"
+        "/contact",
+        "/deep-dive"
       ],
-      "checksum": "fnv1a-7ee4e29d",
+      "checksum": "fnv1a-937041e9",
       "keywords": [
         "/projects/",
         "projects",
         "estivan",
         "ayramia",
-        "browse",
         "selected",
-        "across",
-        "strategy",
-        "operations",
-        "documentation",
-        "systems",
-        "design",
-        "outcomes",
-        "process",
-        "notes",
-        "execution",
-        "details",
         "work",
-        "notice",
-        "these",
+        "made",
+        "mattered",
+        "not",
+        "everything",
+        "done",
+        "pages",
+        "matter",
+        "most",
         "website",
         "isa",
         "grimes",
@@ -5114,63 +5385,77 @@
         "maps",
         "class",
         "concept",
-        "video"
+        "video",
+        "almac",
+        "group",
+        "4g",
+        "clinical",
+        "take",
+        "project"
       ],
       "sections": [
         {
-          "heading": "Selected Work",
+          "heading": "Projects | Estivan Ayramia",
           "level": 1,
-          "text": "Systems built, teams coordinated, ideas tested, and real follow-through. Each project shows a different angle of how I think, learn, and execute.",
+          "text": "Selected work",
           "keywords": [
+            "projects",
+            "estivan",
+            "ayramia",
             "selected",
-            "work",
-            "systems",
-            "built",
-            "teams",
-            "coordinated",
-            "ideas",
-            "tested",
-            "real",
-            "follow-through",
-            "each",
-            "project",
-            "shows",
-            "different",
-            "angle",
-            "think",
-            "learn",
-            "execute"
+            "work"
           ]
         },
         {
-          "heading": "What I Notice Across These Projects",
-          "level": 2,
-          "text": "Looking at these together, a pattern shows up fast: most problems come down to clarity, ownership, and whether somebody is willing to actually finish the job.\n The Isa Grimes interview reinforced that people judgment and perspective usually matter more than titles and theater.\n The Endpoint playbook showed how structure and positioning can shift a market story.\n Building this website proved the same mindset works in code too.",
+          "heading": "Selected Work",
+          "level": 1,
+          "text": "Different kinds of work, same pattern: figure it out, structure it, finish it.\nHow to browse\nWhat ties these together",
           "keywords": [
-            "notice",
-            "across",
-            "these",
-            "projects",
-            "looking",
-            "together",
+            "selected",
+            "work",
+            "different",
+            "kinds",
+            "same",
             "pattern",
-            "shows",
-            "up",
-            "fast",
-            "most",
-            "problems",
-            "come",
-            "down",
-            "clarity",
-            "ownership",
-            "whether",
-            "somebody",
-            "willing",
-            "actually",
+            "figure",
+            "out",
+            "structure",
             "finish",
-            "job",
-            "isa",
-            "grimes"
+            "browse",
+            "ties",
+            "these",
+            "together"
+          ]
+        },
+        {
+          "heading": "Not everything I have done. The pages that matter most.",
+          "level": 2,
+          "text": "Taken together, these pages tell you how I think faster\n\n than a resume does.\nCurrent set\n7 projects\nThe strongest projects to open first, not every old file in one pile.\nBrowse your way\nCoverflow + roulette\nThe page supports browsing, direct picks, and a quick random entry point.\nWhat connects them\nThe Isa Grimes interview reinforced that people judgment and perspective matter more than titles and theater. The Endpoint playbook showed how structure and positioning can shift a market story. Building this website proved the same mindset works in code too.",
+          "keywords": [
+            "not",
+            "everything",
+            "done",
+            "pages",
+            "matter",
+            "most",
+            "taken",
+            "together",
+            "these",
+            "tell",
+            "think",
+            "faster",
+            "than",
+            "resume",
+            "does",
+            "current",
+            "set",
+            "projects",
+            "strongest",
+            "open",
+            "first",
+            "every",
+            "old",
+            "file"
           ]
         },
         {
@@ -5420,7 +5705,7 @@
         {
           "heading": "Taking Down Endpoint (Almac Group + 4G Clinical)",
           "level": 2,
-          "text": "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.",
+          "text": "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.\nKeep going",
           "keywords": [
             "taking",
             "down",
@@ -5436,18 +5721,22 @@
             "could",
             "position",
             "together",
-            "against"
+            "against",
+            "keep",
+            "going"
           ]
         },
         {
-          "heading": "Want to build something together?",
+          "heading": "Take the project read into a real conversation.",
           "level": 2,
-          "text": "Whether it's a system, a team coordination challenge, or an operational problem, let's talk.",
+          "text": "Whether it is a system, a team coordination challenge, or an operational problem, the next step is easy: contact me, or head back to Deep Dive for the longer context.",
           "keywords": [
-            "want",
-            "build",
-            "something",
-            "together",
+            "take",
+            "project",
+            "read",
+            "into",
+            "real",
+            "conversation",
             "whether",
             "system",
             "team",
@@ -5455,8 +5744,16 @@
             "challenge",
             "operational",
             "problem",
-            "let",
-            "talk"
+            "next",
+            "step",
+            "easy",
+            "contact",
+            "head",
+            "back",
+            "deep",
+            "dive",
+            "longer",
+            "context"
           ]
         }
       ]
@@ -5481,7 +5778,7 @@
         "Key Insights",
         "Why It Worked",
         "Want to talk about this?",
-        "L'Oréal Cell BioPrint MAPS Campaign",
+        "L'Or&eacute;al Cell BioPrint MAPS Campaign",
         "This Website"
       ],
       "links": [
@@ -5490,7 +5787,7 @@
         "/projects/loreal-maps-campaign",
         "/projects/portfolio"
       ],
-      "checksum": "fnv1a-4d070ab9",
+      "checksum": "fnv1a-a17a8b37",
       "keywords": [
         "/projects/endpoint-competitive-playbook",
         "endpoint",
@@ -5529,15 +5826,15 @@
         "worked",
         "want",
         "talk",
+        "eacute",
         "al",
-        "cell",
-        "bioprint"
+        "cell"
       ],
       "sections": [
         {
           "heading": "Endpoint Competitive Playbook | Estivan Ayramia",
           "level": 1,
-          "text": "Taking Down Endpoint (Almac Group + 4G Clinical)",
+          "text": "Taking Down Endpoint (Almac Group + 4G Clinical)\nSystems / strategy page",
           "keywords": [
             "endpoint",
             "competitive",
@@ -5549,13 +5846,16 @@
             "almac",
             "group",
             "4g",
-            "clinical"
+            "clinical",
+            "systems",
+            "strategy",
+            "page"
           ]
         },
         {
           "heading": "Taking Down Endpoint (Almac Group + 4G Clinical)",
           "level": 1,
-          "text": "A 37-page competitive strategy deck built in MKTG 476 at SDSU. The frame: how could Almac Group and 4G Clinical, two of Endpoint Clinical's real competitors in the RTSM and IRT space, combine into a single strategic alliance to take Endpoint's market position? Led by Group Tekier, a name I made as an anagram of all six members' names.",
+          "text": "A 37-page competitive strategy deck built in MKTG 476 at SDSU. The frame: how could Almac Group and 4G Clinical, two of Endpoint Clinical's real competitors in the RTSM and IRT space, combine into a single strategic alliance to take Endpoint's market position? Led by Group Tekier, a name I made as an anagram of all six members' names.\nStrategic frame\nThe core move was not a slide trick. It was the alliance logic: Almac plus 4G as a more unified alternative to Endpoint.\nWhat I owned\nI led the social and display section, helped shape the overall strategy, and created the Tekier team identity used across the deck.\nWhy it matters\nThe page works best when the reader can see the context, the strategic move, and the evidence structure separately instead of all at once.",
           "keywords": [
             "taking",
             "down",
@@ -5781,10 +6081,11 @@
           ]
         },
         {
-          "heading": "L'Oréal Cell BioPrint MAPS Campaign",
+          "heading": "L'Or&eacute;al Cell BioPrint MAPS Campaign",
           "level": 3,
-          "text": "Class concept campaign deck for L'Oréal Cell BioPrint personas.",
+          "text": "Class concept campaign deck for L'Or&eacute;al Cell BioPrint personas.",
           "keywords": [
+            "eacute",
             "al",
             "cell",
             "bioprint",
@@ -5799,10 +6100,11 @@
         {
           "heading": "This Website",
           "level": 3,
-          "text": "120+ hours of hand-coded work. Built from scratch.\nView all projects",
+          "text": "Over 300 hours of hand-coded work. Built from scratch.\nView all projects",
           "keywords": [
             "website",
-            "120+",
+            "over",
+            "300",
             "hours",
             "hand-coded",
             "work",
@@ -5843,7 +6145,7 @@
         "/projects/loreal-maps-campaign",
         "/projects/endpoint-competitive-playbook"
       ],
-      "checksum": "fnv1a-af5ea752",
+      "checksum": "fnv1a-51b04f31",
       "keywords": [
         "/projects/endpoint-elosity-video",
         "endpoint",
@@ -5884,19 +6186,22 @@
         {
           "heading": "Endpoint Elosity Video | Estivan Ayramia",
           "level": 1,
-          "text": "Endpoint Elosity Video",
+          "text": "Endpoint Elosity Video\nCampaign / concept page",
           "keywords": [
             "endpoint",
             "elosity",
             "video",
             "estivan",
-            "ayramia"
+            "ayramia",
+            "campaign",
+            "concept",
+            "page"
           ]
         },
         {
           "heading": "Endpoint Elosity Video Concept",
           "level": 1,
-          "text": "A 49-second video concept built for Endpoint's Elosity platform. Made solo with no prior video production experience, using Google Gemini Veo 3.0, CapCut Pro, and audio tools. Never run as a paid ad. The video is unlisted on YouTube.\nElosity: Bottleneck Breaker - concept video, YouTube (youtu.be/q8RmdNRzx1g)",
+          "text": "A 49-second video concept built for Endpoint's Elosity platform. Made solo with no prior video production experience, using Google Gemini Veo 3.0, CapCut Pro, and audio tools. Never run as a paid ad. The video is unlisted on YouTube.\nWhat it was\nA 49-second solo video concept built for a campaign plan, not a live paid ad placement.\nWhy it matters\nThe value is in the metaphor, the messaging discipline, and the platform-fit logic, not in pretending the video had real distribution results.\nBuild context\nI made it solo with no prior video production experience, using Veo 3.0, CapCut Pro, and audio tools to get it over the line.\nElosity: Bottleneck Breaker - concept video, YouTube (youtu.be/q8RmdNRzx1g)",
           "keywords": [
             "endpoint",
             "elosity",
@@ -6158,7 +6463,7 @@
         "/projects/loreal-maps-campaign",
         "/projects/franklin-templeton-concept"
       ],
-      "checksum": "fnv1a-8b3701be",
+      "checksum": "fnv1a-ad94e728",
       "keywords": [
         "/projects/endpoint-linkedin-campaign",
         "endpoint",
@@ -6201,19 +6506,21 @@
         {
           "heading": "Endpoint LinkedIn Campaign | Estivan Ayramia",
           "level": 1,
-          "text": "EndPoint LinkedIn Campaign",
+          "text": "EndPoint LinkedIn Campaign\nCampaign / concept page",
           "keywords": [
             "endpoint",
             "linkedin",
             "campaign",
             "estivan",
-            "ayramia"
+            "ayramia",
+            "concept",
+            "page"
           ]
         },
         {
           "heading": "EndPoint LinkedIn Campaign",
           "level": 1,
-          "text": "A 15-page LinkedIn campaign plan built for Endpoint Clinical, where Isa Grimes served as Chief Marketing Officer and taught the Interactive Marketing class at SDSU. Phase 1 was a real prior campaign. This deck planned Phase 2A and 2B on top of it. The group covered audience strategy, creative formats, metrics tables, kill/scale rules, and two experiment hypotheses.",
+          "text": "A 15-page LinkedIn campaign plan built for Endpoint Clinical, where Isa Grimes served as Chief Marketing Officer and taught the Interactive Marketing class at SDSU. Phase 1 was a real prior campaign. This deck planned Phase 2A and 2B on top of it. The group covered audience strategy, creative formats, metrics tables, kill/scale rules, and two experiment hypotheses.\nWhat it was\nA Phase 2 LinkedIn retargeting plan built on top of real prior campaign context from Endpoint Clinical.\nWhat mattered\nThe page needs to separate real campaign context from class-built planning so the conceptual parts stay honest and clear.\nContribution\nI contributed to the group plan and built the Ad 2 video concept on my own, which now has its own project page.",
           "keywords": [
             "endpoint",
             "linkedin",
@@ -6445,7 +6752,7 @@
         "/projects/loreal-maps-campaign",
         "/projects/endpoint-linkedin-campaign"
       ],
-      "checksum": "fnv1a-9b94e1dc",
+      "checksum": "fnv1a-b203fb80",
       "keywords": [
         "/projects/franklin-templeton-concept",
         "franklin",
@@ -6486,20 +6793,22 @@
         {
           "heading": "Franklin Templeton Concept | Estivan Ayramia",
           "level": 1,
-          "text": "Franklin Templeton x Mashable ME",
+          "text": "Franklin Templeton x Mashable ME\nCampaign / concept page",
           "keywords": [
             "franklin",
             "templeton",
             "concept",
             "estivan",
             "ayramia",
-            "mashable"
+            "mashable",
+            "campaign",
+            "page"
           ]
         },
         {
           "heading": "Franklin Templeton x Mashable ME",
           "level": 1,
-          "text": "A 17-page class concept deck built in Interactive Marketing at SDSU. The group proposed a Franklin Templeton x Mashable ME partnership targeting women investors in the UAE. I built the Arabic version of the deck, reviewed by my family for accuracy.",
+          "text": "A 17-page class concept deck built in Interactive Marketing at SDSU. The group proposed a Franklin Templeton x Mashable ME partnership targeting women investors in the UAE. I built the Arabic version of the deck, reviewed by my family for accuracy.\nWhat it was\nA bilingual class concept deck linking Franklin Templeton to Mashable ME for a UAE women-investor campaign idea.\nWhat mattered\nThe useful part is the market logic, partner fit, and language execution notes, not pretending the deck represents live campaign performance.\nContribution\nI worked on the strategy with the group and built the Arabic version of the deck with family review for accuracy.",
           "keywords": [
             "franklin",
             "templeton",
@@ -6523,7 +6832,8 @@
             "version",
             "reviewed",
             "family",
-            "accuracy"
+            "accuracy",
+            "bilingual"
           ]
         },
         {
@@ -6811,7 +7121,7 @@
         "/",
         "/projects/"
       ],
-      "checksum": "fnv1a-9ad56e29",
+      "checksum": "fnv1a-e6e975f1",
       "keywords": [
         "/projects/isa-grimes-interview",
         "isa",
@@ -6849,13 +7159,15 @@
         {
           "heading": "Isa Grimes Interview | Estivan Ayramia",
           "level": 1,
-          "text": "Isa Grimes Interview",
+          "text": "Isa Grimes Interview\nEditorial / interview page",
           "keywords": [
             "isa",
             "grimes",
             "interview",
             "estivan",
-            "ayramia"
+            "ayramia",
+            "editorial",
+            "page"
           ]
         },
         {
@@ -6923,7 +7235,7 @@
         {
           "heading": "What Actually Hit",
           "level": 2,
-          "text": "Your 20s are for exposure, not certainty\nWhen I asked him what he would tell a person uncertain about the future, he did not give me some polished five-step plan. He said the first five years after graduation should be full of different roles, industries, and people.\nThat mattered to me because it kills the lie that you are supposed to know everything at 22.\nHis answer was basically this: most people in their 20s do not know yet, so stop pretending certainty is the goal. Get exposure instead. Put yourself in different rooms. Learn different industries. Learn different communication styles. Figure out what actually fits you by living more of life, not less of it.\n&ldquo;The first 5 years of graduation, you have to be in as many different roles and industries and around people as possible.&rdquo;\nDo not rush the route just because you are scared of falling behind\nWhen I pushed him on what advice he would give his younger self to become who he is now, but quicker, I expected some answer about efficiency.\nThat is not what he gave me.\nHe basically said he would not change the route just to get there faster. He talked about enjoying his 20s, living through things, making mistakes, and becoming the kind of person who could actually carry the role later.\nThat was one of the strongest answers in the whole interview for me, because it rejected the fake obsession with speed. He did not talk like someone desperate to erase the years that formed him. He talked like someone who understood that the route mattered because it made him ready.\n&ldquo;During your 20s, have fun. That&rsquo;s what it&rsquo;s for. But at the same time, expose yourself to different opportunities that are out there.&rdquo;\n&ldquo;I wouldn&rsquo;t change it at all.&rdquo;\nPeople beat process\nWhen I asked him what mattered more in his growth &mdash; understanding the organization or knowing how to manage people &mdash; he answered quickly: people.\nThat answer carried the whole page.\nHe made it clear that a lot of organizational knowledge can be learned. What is harder to fake is knowing how to deal with people well. Knowing what makes someone tick. Knowing how to read strengths, weaknesses, timing, ego, confidence, communication style, and what someone actually needs from you.\nThat is what separates a title from actual leadership.\n&ldquo;People, right. Most people don&rsquo;t know how to manage people.&rdquo;\nFavoritism ruins leadership\nOne of the cleanest answers in the interview came when I asked what he learned from people by watching how not to be.\nHe did not dodge. He said favoritism.\nI liked that because it was concrete. Not some vague answer about &ldquo;poor leadership.&rdquo; Favoritism. Giving people room, credit, or movement because you like them, not because they are right for the moment. Once you do that, you poison the room. You make trust thinner. You make standards weaker. You make people feel the hierarchy before they feel the purpose.\n&ldquo;I see a lot of people have favoritism.&rdquo;\nBuild a round table, not a throne\nThe best leadership image he gave me was not corporate at all. It was a round table.\nHe talked about leadership like King Arthur, the Justice League, a room where everybody brings a different angle and different value. The leader still has to make the final call, but the room is not supposed to revolve around one ego.\nThat answer worked because it matched how he talked the whole time. He did not sound like someone obsessed with status. He sounded like someone who actually believes that people matter, no matter where they sit.\n&ldquo;Everyone is equal. I don&rsquo;t care if you&rsquo;re the garbage man. I don&rsquo;t care if you&rsquo;re a CMO.&rdquo;\nThe most human answer had nothing to do with work\nWhen I asked him what experience taught him something real about leadership, he did not go straight to a job. He went to marriage, growing up, and realizing life was not just about him.\nThat was probably the most human answer in the interview.\nThe way I took it was simple: leadership is shallow if it only exists at work. If you still move through life like your choices only affect you, then the title does not mean much. The real shift came when he started asking a harder question: not &ldquo;am I technically wrong?&rdquo; but &ldquo;what does this do to the other person?&rdquo;\nThat answer had more leadership in it than most leadership answers do.\nLeadership starts before the title does\nI also liked what he said about who he used to be as an employee.\nHe admitted that earlier in his career he was more of a blind doer. He was getting tasks done without really understanding the bigger meaning behind them. Then he started changing the way he carried himself. He started dressing like he wanted to lead. Looking for stretch work. Shadowing other functions. Reading more. Asking bigger questions. Acting like the next role before he had it.\nThat answer mattered because too many people talk about leadership like it begins the day they get authority. It does not. It starts way earlier than that &mdash; in how you learn, how you carry yourself, what extra weight you take on, and whether people can trust you before you are in charge of anything.\nRoots. Trees. Forest.\n&ldquo;There&rsquo;s three levels in life: roots, trees, and forest.&rdquo;\nThis was one of the best frameworks in the entire conversation.\nHe said life has three levels: roots, trees, and forest.\nSometimes you are down in the roots doing the immediate work. Sometimes you are in the trees looking at the next level up. Sometimes you are in the forest asking where all of this is going. What I liked is that he did not present those like fixed ranks. He treated them like positions you move through depending on the situation.\nThat made the idea useful instead of decorative.\nNo one is omnipresent\nThe introspection part of the interview was strong because it was honest about trade-offs.\nHe basically said you cannot be everywhere for everyone. You are going to give time to one thing and take time from another. You are going to disappoint somebody. You are going to make choices that help one responsibility and cost another one.\nThat is real life.\nWhat mattered was not pretending balance is easy. What mattered was knowing that trade-offs are unavoidable and still trying to make the right call for the people and responsibilities that matter most in that moment.\n&ldquo;No one is omnipresent.&rdquo;\n&ldquo;Spend time with the ones you love.&rdquo;",
+          "text": "Your 20s are for exposure, not certainty\nWhen I asked him what he would tell a person uncertain about the future, he did not give me some polished five-step plan. He said the first five years after graduation should be full of different roles, industries, and people.\nIt kills the lie that you are supposed to know everything at 22.\nHis point was clear: most people in their 20s do not know yet, so stop pretending certainty is the goal. Get exposure instead. Put yourself in different rooms. Learn different industries. Learn different communication styles. Figure out what actually fits you by living more of life, not less of it.\n&ldquo;The first 5 years of graduation, you have to be in as many different roles and industries and around people as possible.&rdquo;\nDo not rush the route just because you are scared of falling behind\nWhen I pushed him on what advice he would give his younger self to become who he is now, but quicker, I expected some answer about efficiency.\nThat is not what he gave me.\nHe said he would not change the route just to get there faster. He talked about enjoying his 20s, living through things, making mistakes, and becoming the kind of person who could actually carry the role later.\nThat was one of the strongest answers in the whole interview for me, because it rejected the fake obsession with speed. He did not talk like someone desperate to erase the years that formed him. He talked like someone who understood that the route mattered because it made him ready.\n&ldquo;During your 20s, have fun. That&rsquo;s what it&rsquo;s for. But at the same time, expose yourself to different opportunities that are out there.&rdquo;\nPeople beat process\nWhen I asked him what mattered more in his growth &mdash; understanding the organization or knowing how to manage people &mdash; he answered quickly: people.\nThat answer carried the whole page.\nHe made it clear that a lot of organizational knowledge can be learned. What is harder to fake is knowing how to deal with people well. Knowing what makes someone tick. Knowing how to read strengths, weaknesses, timing, ego, confidence, communication style, and what someone actually needs from you.\nThat is what separates a title from actual leadership.\n&ldquo;People, right. Most people don&rsquo;t know how to manage people.&rdquo;\nFavoritism ruins leadership\nOne of the cleanest answers in the interview came when I asked what he learned from people by watching how not to be.\nHe did not dodge. He said favoritism.\nI liked that because it was concrete. Not some vague answer about &ldquo;poor leadership.&rdquo; Favoritism. Giving people room, credit, or movement because you like them, not because they are right for the moment. Once you do that, you poison the room. You make trust thinner. You make standards weaker. You make people feel the hierarchy before they feel the purpose.\n&ldquo;I see a lot of people have favoritism.&rdquo;\nBuild a round table, not a throne\nThe best leadership image he gave me was not corporate at all. It was a round table.\nHe talked about leadership like King Arthur, the Justice League, a room where everybody brings a different angle and different value. The leader still has to make the final call, but the room is not supposed to revolve around one ego.\nIt matched the way he talked the whole time. He did not sound like someone obsessed with status. He sounded like someone who actually believes that people matter, no matter where they sit.\n&ldquo;Everyone is equal. I don&rsquo;t care if you&rsquo;re the garbage man. I don&rsquo;t care if you&rsquo;re a CMO.&rdquo;\nThe most human answer had nothing to do with work\nWhen I asked him what experience taught him something real about leadership, he did not go straight to a job. He went to marriage, growing up, and realizing life was not just about him.\nThat was probably the most human answer in the interview.\nLeadership is shallow if it only exists at work. If you still move through life like your choices only affect you, then the title does not mean much. The real shift came when he started asking a harder question: not &ldquo;am I technically wrong?&rdquo; but &ldquo;what does this do to the other person?&rdquo;\nThat answer had more leadership in it than most leadership answers do.\nLeadership starts before the title does\nI also liked what he said about who he used to be as an employee.\nHe admitted that earlier in his career he was more of a blind doer. He was getting tasks done without really understanding the bigger meaning behind them. Then he started changing the way he carried himself. He started dressing like he wanted to lead. Looking for stretch work. Shadowing other functions. Reading more. Asking bigger questions. Acting like the next role before he had it.\nThat answer mattered because too many people talk about leadership like it begins the day they get authority. It does not. It starts way earlier than that &mdash; in how you learn, how you carry yourself, what extra weight you take on, and whether people can trust you before you are in charge of anything.\nRoots. Trees. Forest.\n&ldquo;There&rsquo;s three levels in life: roots, trees, and forest.&rdquo;\nThis was one of the best frameworks in the entire conversation.\nHe said life has three levels: roots, trees, and forest.\nSometimes you are down in the roots doing the immediate work. Sometimes you are in the trees looking at the next level up. Sometimes you are in the forest asking where all of this is going. What I liked is that he did not present those like fixed ranks. He treated them like positions you move through depending on the situation.\nThat made the idea useful instead of decorative.\nNo one is omnipresent\nThe introspection part of the interview was strong because it was honest about trade-offs.\nHe said you cannot be everywhere for everyone. You are going to give time to one thing and take time from another. You are going to disappoint somebody. You are going to make choices that help one responsibility and cost another one.\nThat is real life.\nWhat mattered was not pretending balance is easy. What mattered was knowing that trade-offs are unavoidable and still trying to make the right call for the people and responsibilities that matter most in that moment.\n&ldquo;No one is omnipresent.&rdquo;\n&ldquo;Spend time with the ones you love.&rdquo;",
           "keywords": [
             "actually",
             "hit",
@@ -6985,7 +7297,7 @@
         {
           "heading": "Selected Lines",
           "level": 2,
-          "text": "These are the lines I would keep even if the rest of the page disappeared.\n&ldquo;The first 5 years of graduation, you have to be in as many different roles and industries and around people as possible.&rdquo;\n&ldquo;During your 20s, have fun. That&rsquo;s what it&rsquo;s for. But at the same time, expose yourself to different opportunities that are out there.&rdquo;\n&ldquo;I wouldn&rsquo;t change it at all.&rdquo;\n&ldquo;People, right. Most people don&rsquo;t know how to manage people.&rdquo;\n&ldquo;I see a lot of people have favoritism.&rdquo;\n&ldquo;Everyone is equal. I don&rsquo;t care if you&rsquo;re the garbage man. I don&rsquo;t care if you&rsquo;re a CMO.&rdquo;\n&ldquo;There&rsquo;s three levels in life: roots, trees, and forest.&rdquo;\n&ldquo;Spend time with the ones you love.&rdquo;",
+          "text": "These are the lines I would keep even if the rest of the page disappeared.\n&ldquo;The first 5 years of graduation, you have to be in as many different roles and industries and around people as possible.&rdquo;\n&ldquo;During your 20s, have fun. That&rsquo;s what it&rsquo;s for. But at the same time, expose yourself to different opportunities that are out there.&rdquo;\n&ldquo;People, right. Most people don&rsquo;t know how to manage people.&rdquo;\n&ldquo;I see a lot of people have favoritism.&rdquo;\n&ldquo;Everyone is equal. I don&rsquo;t care if you&rsquo;re the garbage man. I don&rsquo;t care if you&rsquo;re a CMO.&rdquo;\n&ldquo;There&rsquo;s three levels in life: roots, trees, and forest.&rdquo;\n&ldquo;Spend time with the ones you love.&rdquo;",
           "keywords": [
             "selected",
             "lines",
@@ -7016,7 +7328,7 @@
         {
           "heading": "Why I Kept This",
           "level": 2,
-          "text": "I kept this interview because it says more than &ldquo;be a leader&rdquo; ever could.\nIt says get around more people. Learn earlier. Pay attention. Stop worshipping titles. Build a real support system. Be careful who you keep close. Do not rush your life just because somebody else looks ahead of you. Learn how to deal with people before you start acting like you know how to lead them.\nThat is a lot more useful to me than another polished success story.\nBack to projects\nIn this conversation\nWhy I Asked for This Interview\nWhat Actually Hit\nDo not rush the route\nPeople beat process\nFavoritism ruins leadership\nBuild a round table, not a throne\nThe most human answer\nLeadership starts before the title\nRoots. Trees. Forest.\nNo one is omnipresent\nThe Part I Respected Most\nSelected Lines\nWhy I Kept This",
+          "text": "I kept this interview because it says more than &ldquo;be a leader&rdquo; ever could.\nIt says get around more people. Learn earlier. Pay attention. Stop worshipping titles. Build a real support system. Be careful who you keep close. Do not rush your life just because somebody else looks ahead of you. Learn how to deal with people before you start acting like you know how to lead them.\nThat is a lot more useful to me than another polished success story.\nIn this conversation\nWhy I Asked for This Interview\nWhat Actually Hit\nDo not rush the route\nPeople beat process\nFavoritism ruins leadership\nBuild a round table, not a throne\nThe most human answer\nLeadership starts before the title\nRoots. Trees. Forest.\nNo one is omnipresent\nThe Part I Respected Most\nSelected Lines\nWhy I Kept This",
           "keywords": [
             "kept",
             "interview",
@@ -7073,7 +7385,7 @@
         "/contact",
         "/projects/endpoint-linkedin-campaign"
       ],
-      "checksum": "fnv1a-dd18cc82",
+      "checksum": "fnv1a-4d2b6ccf",
       "keywords": [
         "/projects/loreal-maps-campaign",
         "loreal",
@@ -7116,7 +7428,7 @@
         {
           "heading": "Loreal Maps Campaign | Estivan Ayramia",
           "level": 1,
-          "text": "L'Oréal Cell BioPrint MAPS Campaign",
+          "text": "L'Oréal Cell BioPrint MAPS Campaign\nCampaign / concept page",
           "keywords": [
             "loreal",
             "maps",
@@ -7125,13 +7437,15 @@
             "ayramia",
             "al",
             "cell",
-            "bioprint"
+            "bioprint",
+            "concept",
+            "page"
           ]
         },
         {
           "heading": "L'Oréal Cell BioPrint MAPS Campaign",
           "level": 1,
-          "text": "This is a class concept deck built for L'Oréal Cell BioPrint in Interactive Marketing at SDSU, taught by Isa Grimes (Chief Marketing Officer at Endpoint Clinical). The team had no prior knowledge of the product. We researched it from scratch and built the full campaign concept in Canva over one to two weeks.",
+          "text": "This is a class concept deck built for L'Oréal Cell BioPrint in Interactive Marketing at SDSU, taught by Isa Grimes (Chief Marketing Officer at Endpoint Clinical). The team had no prior knowledge of the product. We researched it from scratch and built the full campaign concept in Canva over one to two weeks.\nWhat it was\nA class concept deck built around three personas, one funnel, and a campaign system the team had to build from zero product familiarity.\nWhy it matters\nThe useful part is the audience logic, touchpoint sequencing, and retention structure, not pretending the campaign ran live.\nContribution\nI contributed to persona development, visual consistency, and slide layout inside a team campaign build.",
           "keywords": [
             "al",
             "cell",
@@ -7387,14 +7701,20 @@
       "language": "en",
       "pageType": "project_detail",
       "title": "Portfolio Build | Estivan Ayramia",
-      "description": "See how this portfolio was designed and built by Estivan Ayramia, from information architecture and performance tuning to accessibility and maintainable systems.",
+      "description": "How Estivan built this site, what changed along the way, and what was worth figuring out to make it work.",
       "buildVersion": "",
-      "summary": "See how this portfolio was designed and built by Estivan Ayramia, from information architecture and performance tuning to accessibility and maintainable systems.",
+      "summary": "How Estivan built this site, what changed along the way, and what was worth figuring out to make it work.",
       "headings": [
         "Portfolio Build | Estivan Ayramia",
         "This Website",
         "Why This Way",
         "What I Built",
+        "Static HTML, Tailwind CSS, vanilla JavaScript",
+        "GSAP with ScrollTrigger",
+        "Offline-ready build",
+        "WCAG-minded foundation",
+        "Savonie on-site chat",
+        "Achievement system and hidden details",
         "The Numbers",
         "Tech Stack",
         "What I Learned",
@@ -7410,56 +7730,68 @@
         "/projects/endpoint-competitive-playbook",
         "/projects/loreal-maps-campaign"
       ],
-      "checksum": "fnv1a-4995aa21",
+      "checksum": "fnv1a-e5035990",
       "keywords": [
         "/projects/portfolio",
         "portfolio",
         "build",
         "estivan",
         "ayramia",
-        "see",
-        "designed",
         "built",
-        "information",
-        "architecture",
-        "performance",
-        "tuning",
-        "accessibility",
-        "maintainable",
-        "systems",
-        "website",
+        "site",
+        "changed",
+        "along",
         "way",
+        "worth",
+        "figuring",
+        "out",
+        "make",
+        "work",
+        "website",
+        "static",
+        "html",
+        "tailwind",
+        "css",
+        "vanilla",
+        "javascript",
+        "gsap",
+        "scrolltrigger",
+        "offline-ready",
+        "wcag-minded",
+        "foundation",
+        "savonie",
+        "on-site",
+        "chat",
+        "achievement",
+        "system",
+        "hidden",
+        "details",
         "numbers",
         "tech",
         "stack",
         "learned",
         "like",
-        "endpoint",
-        "competitive",
-        "playbook",
-        "al",
-        "cell",
-        "bioprint",
-        "maps",
-        "campaign"
+        "see"
       ],
       "sections": [
         {
           "heading": "Portfolio Build | Estivan Ayramia",
           "level": 1,
-          "text": "This Website",
+          "text": "This Website\nProject page / this website",
           "keywords": [
             "portfolio",
             "build",
             "estivan",
             "ayramia",
-            "website"
+            "website",
+            "project",
+            "page"
           ]
         },
         {
           "heading": "This Website",
           "level": 1,
-          "text": "Started in late November 2025 with no coding background. 120+ hours of directing, reviewing, and shipping. No templates. No page builders. Talk is cheap, and this website was expensive.\nYou are looking at it. This site was built with AI writing every line of code. I had no coding background before this project. Not a tutorial. Not a class. Zero.\nMy job was to direct the build: decide what to make, how it should look and work, review every change, find every problem, and hold the bar on quality. That took 120+ hours starting in late November 2025.",
+          "text": "Started in late November 2025 with no coding background. Over 300 hours of directing, reviewing, and shipping. No templates. No page builders. Talk is cheap, and this website was expensive.\nWhat this proves\nI can define a standard, direct a technical build, review it critically, and keep pushing until the result is publishable.\nAI role\nAI wrote the code. I directed the work, tested it, found problems, and decided what was good enough to ship.\nFast proof\nLive site, repo, accessibility work, PWA support, and performance checks all exist as direct evidence, not just claims.\nYou are looking at it. This site was built with AI writing every line of code. I had no coding background before this project. Not a tutorial. Not a class. Zero.\nMy job was to direct the build: decide what to make, how it should look and work, review every change, find every problem, and hold the bar on quality. That took over 300 hours starting in late November 2025.",
           "keywords": [
             "website",
             "started",
@@ -7469,7 +7801,8 @@
             "no",
             "coding",
             "background",
-            "120+",
+            "over",
+            "300",
             "hours",
             "directing",
             "reviewing",
@@ -7480,11 +7813,10 @@
             "talk",
             "cheap",
             "expensive",
-            "looking",
-            "site",
-            "built",
-            "ai",
-            "writing"
+            "proves",
+            "can",
+            "define",
+            "standard"
           ]
         },
         {
@@ -7521,9 +7853,18 @@
         {
           "heading": "What I Built",
           "level": 2,
-          "text": "1. Static HTML, Tailwind CSS, Vanilla JavaScript\nNo React. No Next.js. No build step dependencies that break in six months. Just files that work in any browser, forever.\n2. GSAP Animations with ScrollTrigger\nEvery animation was spec'd to serve the content. They do not distract from it.\n3. PWA with Offline Support\nService worker, manifest.json, installable on mobile. Works without internet after the first visit.\n4. WCAG (Web Content Accessibility Guidelines) 2.1 Accessibility\nSemantic HTML, ARIA (Accessible Rich Internet Applications) labels, keyboard navigation, screen reader tested, dark mode toggle with system preference detection.\n5. AI Chat Integration\nSavonie lets visitors ask questions about my work directly on the page.\n6. Achievement System\nEight unlockable achievements and three easter eggs, including a Konami code and a mini-game.",
+          "text": "01 / Stack",
           "keywords": [
             "built",
+            "01",
+            "stack"
+          ]
+        },
+        {
+          "heading": "Static HTML, Tailwind CSS, vanilla JavaScript",
+          "level": 3,
+          "text": "No React. No Next.js. No build-step pile that breaks in six months. Just files that work in any browser.\n02 / Motion",
+          "keywords": [
             "static",
             "html",
             "tailwind",
@@ -7534,10 +7875,9 @@
             "react",
             "next",
             "js",
-            "build",
-            "step",
-            "dependencies",
-            "break",
+            "build-step",
+            "pile",
+            "breaks",
             "six",
             "months",
             "just",
@@ -7545,8 +7885,124 @@
             "work",
             "any",
             "browser",
-            "forever",
-            "gsap"
+            "02",
+            "motion"
+          ]
+        },
+        {
+          "heading": "GSAP with ScrollTrigger",
+          "level": 3,
+          "text": "Animations were spec'd to support the page rhythm, not pull attention away from the content.\n03 / PWA",
+          "keywords": [
+            "gsap",
+            "scrolltrigger",
+            "animations",
+            "were",
+            "spec",
+            "support",
+            "page",
+            "rhythm",
+            "not",
+            "pull",
+            "attention",
+            "away",
+            "content",
+            "03",
+            "pwa"
+          ]
+        },
+        {
+          "heading": "Offline-ready build",
+          "level": 3,
+          "text": "Service worker, manifest, install prompt support, and a setup that still works after the first visit.\n04 / Accessibility",
+          "keywords": [
+            "offline-ready",
+            "build",
+            "service",
+            "worker",
+            "manifest",
+            "install",
+            "prompt",
+            "support",
+            "setup",
+            "still",
+            "works",
+            "after",
+            "first",
+            "visit",
+            "04",
+            "accessibility"
+          ]
+        },
+        {
+          "heading": "WCAG-minded foundation",
+          "level": 3,
+          "text": "Semantic HTML, ARIA labels, keyboard handling, screen reader checks, and theme support that holds up.\n05 / AI",
+          "keywords": [
+            "wcag-minded",
+            "foundation",
+            "semantic",
+            "html",
+            "aria",
+            "labels",
+            "keyboard",
+            "handling",
+            "screen",
+            "reader",
+            "checks",
+            "theme",
+            "support",
+            "holds",
+            "up",
+            "05",
+            "ai"
+          ]
+        },
+        {
+          "heading": "Savonie on-site chat",
+          "level": 3,
+          "text": "Visitors can ask direct questions about the work instead of hunting through the site for a specific detail.\n06 / Extras",
+          "keywords": [
+            "savonie",
+            "on-site",
+            "chat",
+            "visitors",
+            "can",
+            "ask",
+            "direct",
+            "questions",
+            "work",
+            "instead",
+            "hunting",
+            "through",
+            "site",
+            "specific",
+            "detail",
+            "06",
+            "extras"
+          ]
+        },
+        {
+          "heading": "Achievement system and hidden details",
+          "level": 3,
+          "text": "Eight unlockable achievements, easter eggs, and small systems that reward curiosity without turning gimmicky.",
+          "keywords": [
+            "achievement",
+            "system",
+            "hidden",
+            "details",
+            "eight",
+            "unlockable",
+            "achievements",
+            "easter",
+            "eggs",
+            "small",
+            "systems",
+            "reward",
+            "curiosity",
+            "without",
+            "turning",
+            "gimmicky"
           ]
         },
         {
@@ -7640,7 +8096,7 @@
         {
           "heading": "How This Was Built",
           "level": 2,
-          "text": "AI wrote every line of code on this site. That is not a shortcut. It is a different kind of work.\nSpec first: Every feature started with a clear brief - what it does, how it behaves, what done looks like\nActive review: I tested every change on desktop and mobile. I ran Lighthouse and PageSpeed on every major update. I caught regressions and sent them back.\nQuality control: When AI produced code that looked wrong, scored badly, or broke something, I found it and flagged it. AI diagnosed and fixed it.\nNo autopilot: 120+ hours of concentrated work went into this site. The code is AI's. The decisions, the standards, and the outcome are mine.\nTalk is cheap, and this website was expensive.",
+          "text": "AI wrote every line of code on this site. That is not a shortcut. It is a different kind of work.\nSpec first: Every feature started with a clear brief - what it does, how it behaves, what done looks like\nActive review: I tested every change on desktop and mobile. I ran Lighthouse and PageSpeed on every major update. I caught regressions and sent them back.\nQuality control: When AI produced code that looked wrong, scored badly, or broke something, I found it and flagged it. AI diagnosed and fixed it.\nNo autopilot: Over 300 hours of concentrated work went into this site. The code is AI's. The decisions, the standards, and the outcome are mine.\nTalk is cheap, and this website was expensive.",
           "keywords": [
             "built",
             "ai",

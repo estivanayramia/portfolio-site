@@ -31,6 +31,7 @@ function listRelevantHtmlFiles() {
       if (!entry.isFile() || !entry.name.endsWith(".html")) continue;
       if (entryPrefix === "EN/404.html") continue;
       if (entryPrefix.startsWith("EN/hobbies-games")) continue;
+      if (entryPrefix === "EN/hobbies/index.html") continue;
       files.add(entryPrefix);
     }
   };
@@ -104,7 +105,7 @@ function buildRouteMap(files) {
 }
 
 function crawlRelevantPages(routeMap) {
-  const queue = ["/", "/overview", "/deep-dive", "/about", "/projects/", "/contact", "/hobbies/", "/es/", "/ar/"];
+  const queue = ["/", "/overview", "/deep-dive", "/about", "/projects/", "/contact", "/es/", "/ar/"];
   const visited = new Set();
   const pages = [];
 
@@ -118,6 +119,9 @@ function crawlRelevantPages(routeMap) {
     pages.push(page);
 
     for (const link of page.links || []) {
+      if (link === "/hobbies/" || link === "/hobbies") {
+        continue;
+      }
       if (!visited.has(link) && routeMap.has(link)) {
         queue.push(link);
       }

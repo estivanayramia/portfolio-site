@@ -66,7 +66,7 @@ https://estivanayramia.com/*    https://www.estivanayramia.com/:splat    301
 /hobbies-games/the-matr13k/    /hobbies-games/the-matr13k    301
 /hobbies-games/triangle-back-to-home/    /hobbies-games/triangle-back-to-home    301
 /hobbies-games/xx142-b2exe/    /hobbies-games/xx142-b2exe    301
-/hobbies    /hobbies/    301
+/hobbies    /about    301
 /hobbies/car/    /hobbies/car    301
 /hobbies/cooking/    /hobbies/cooking    301
 /hobbies/gym/    /hobbies/gym    301
@@ -108,7 +108,7 @@ https://estivanayramia.com/*    https://www.estivanayramia.com/:splat    301
 /hobbies-games/the-matr13k    /EN/hobbies-games/the-matr13k    200
 /hobbies-games/triangle-back-to-home    /EN/hobbies-games/triangle-back-to-home    200
 /hobbies-games/xx142-b2exe    /EN/hobbies-games/xx142-b2exe    200
-/hobbies/    /EN/hobbies/    200
+/hobbies/    /about    301
 /hobbies/car    /EN/hobbies/car    200
 /hobbies/cooking    /EN/hobbies/cooking    200
 /hobbies/gym    /EN/hobbies/gym    200
@@ -178,7 +178,7 @@ https://estivanayramia.com/*    https://www.estivanayramia.com/:splat    301
 /EN/hobbies/cooking    /hobbies/cooking    301
 /EN/hobbies/gym.html    /hobbies/gym    301
 /EN/hobbies/gym    /hobbies/gym    301
-/EN/hobbies/index.html    /hobbies/    301
+/EN/hobbies/index.html    /about    301
 /EN/hobbies/me.html    /hobbies/me    301
 /EN/hobbies/me    /hobbies/me    301
 /EN/hobbies/photography.html    /hobbies/photography    301
