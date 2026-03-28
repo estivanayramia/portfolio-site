@@ -1219,6 +1219,7 @@ select {
     position: fixed;
     bottom: calc(var(--floating-ui-edge) + var(--floating-ui-lift));
     left: var(--floating-ui-edge);
+    pointer-events: none;
     --scroll-to-top-size: 47px;
     --scroll-to-top-icon-size: 24px;
     width: var(--scroll-to-top-size);
@@ -1235,7 +1236,7 @@ select {
     visibility: hidden;
     transform: translateY(20px);
     transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, bottom 0.3s ease;
-    z-index: 10000;
+    z-index: 2000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     /* Ensure padding doesn't affect centering */
     padding: 0;
@@ -1250,9 +1251,16 @@ select {
 }
 
 #scroll-to-top.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: translateY(0) !important;
+    pointer-events: auto !important;
+}
+
+html #scroll-to-top.show,
+body #scroll-to-top.show {
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 #scroll-to-top .scroll-to-top-icon {
@@ -3812,9 +3820,10 @@ footer, .section-below-fold {
 }
 
 #welcome-bubble {
-    bottom: calc(var(--floating-ui-edge) + var(--chat-fab-size) + 0.625rem + var(--floating-ui-lift)) !important;
+    bottom: calc(var(--floating-ui-edge) + var(--chat-fab-size) + 1.25rem + var(--floating-ui-lift)) !important;
     max-width: min(18rem, calc(100vw - 7.5rem));
     transition: opacity 0.3s ease, transform 0.3s ease, bottom 0.3s ease;
+    z-index: 2147483599;
 }
 
 :not(:lang(ar)) #welcome-bubble {
