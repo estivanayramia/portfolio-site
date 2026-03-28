@@ -3820,7 +3820,7 @@ footer, .section-below-fold {
 }
 
 #welcome-bubble {
-    bottom: calc(var(--floating-ui-edge) + var(--chat-fab-size) + 1.25rem + var(--floating-ui-lift)) !important;
+    bottom: calc(var(--floating-ui-edge) + var(--chat-fab-size) + 1.75rem + var(--floating-ui-lift)) !important;
     max-width: min(18rem, calc(100vw - 7.5rem));
     transition: opacity 0.3s ease, transform 0.3s ease, bottom 0.3s ease;
     z-index: 2147483599;

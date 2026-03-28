@@ -2028,11 +2028,24 @@ const initScrollToTop = () => {
         const pageHeight = document.documentElement.scrollHeight - window.innerHeight;
         const scrollThreshold = pageHeight * 0.25;
         const currentScroll = window.scrollY;
+        
+        // Check if button is near footer; if so, hide to avoid overlap
+        const buttonRect = scrollBtn.getBoundingClientRect();
+        const footer = document.querySelector('footer');
+        const footerRect = footer ? footer.getBoundingClientRect() : null;
+        
+        const isNearFooter = footerRect && buttonRect.bottom > (footerRect.top - 10);
 
-        if (currentScroll > scrollThreshold) {
+        if (currentScroll > scrollThreshold && !isNearFooter) {
             scrollBtn.classList.add('show');
+            scrollBtn.style.opacity = '1';
+            scrollBtn.style.visibility = 'visible';
+            scrollBtn.style.pointerEvents = 'auto';
         } else {
             scrollBtn.classList.remove('show');
+            scrollBtn.style.opacity = '0';
+            scrollBtn.style.visibility = 'hidden';
+            scrollBtn.style.pointerEvents = 'none';
         }
 
         updateProgressRing();
