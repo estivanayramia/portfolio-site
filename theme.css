@@ -1235,7 +1235,7 @@ select {
     opacity: 0;
     visibility: hidden;
     transform: translateY(20px);
-    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease, bottom 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
     z-index: 2000;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     /* Ensure padding doesn't affect centering */
@@ -1336,7 +1336,7 @@ body #scroll-to-top.show {
 
 @media (max-width: 768px) {
     #scroll-to-top {
-        bottom: 20px;
+        bottom: calc(20px + var(--floating-ui-lift));
         left: 20px;
         --scroll-to-top-size: 42px;
     }
@@ -3801,7 +3801,7 @@ footer, .section-below-fold {
 #chat-widget {
     z-index: 9999 !important;
     bottom: calc(var(--floating-ui-edge) + var(--floating-ui-lift)) !important;
-    transition: bottom 0.3s ease, transform 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
 :not(:lang(ar)) #chat-widget {
@@ -3822,7 +3822,7 @@ footer, .section-below-fold {
 #welcome-bubble {
     bottom: calc(var(--floating-ui-edge) + var(--chat-fab-size) + 1.75rem + var(--floating-ui-lift)) !important;
     max-width: min(18rem, calc(100vw - 7.5rem));
-    transition: opacity 0.3s ease, transform 0.3s ease, bottom 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease;
     z-index: 2147483599;
 }
 

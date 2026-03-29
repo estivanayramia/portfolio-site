@@ -1,5 +1,3 @@
-console.log('[Savonie DEBUG] site.js loaded');
-
 /**
  * ============================================================================
  * PORTFOLIO SITE - MAIN JAVASCRIPT
@@ -11,17 +9,15 @@ console.log('[Savonie DEBUG] site.js loaded');
  * - GSAP animations with ScrollTrigger
  * - Progressive PDF preview loading with graceful fallbacks
  * - Savonie AI chatbot integration
- * - Client-side diagnostics (opt-in with ?collect-logs=1)
  * - PWA support with service worker
  * - Achievement system
  * - Custom analytics event tracking (theme changes, scroll depth, interactions)
  * 
  * Architecture Overview:
  * 1. Core Utilities (user interaction tracking, guarded reload)
- * 2. Instrumentation Module (diagnostic logging, gated by URL param)
- * 3. Feature Modules (theme, animations, PDFs, chat, etc.)
- * 4. Analytics Integration (custom events sent to GA4 & Clarity)
- * 5. Initialization & Startup
+ * 2. Feature Modules (theme, animations, PDFs, chat, etc.)
+ * 3. Analytics Integration (custom events sent to GA4 & Clarity)
+ * 4. Initialization & Startup
  * 
  * Analytics Integration:
  * ----------------------
@@ -343,508 +339,51 @@ if (document.readyState === 'loading') {
     __initCarouselAndLightbox();
 }
 
-// Lightweight remote-free log collector: enable with ?collect-logs=1
-const __collectLogsEnabled = (typeof window !== 'undefined') && new URLSearchParams(window.location.search).has('collect-logs');
-const __collectedLogs = [];
-const __saveCollected = () => {
-    try { localStorage.setItem('site_collect_logs', JSON.stringify(__collectedLogs.slice(-1000))); } catch (e) {}
-};
-const __logCollect = (msg, data) => {
-    if (!__collectLogsEnabled) return;
-    try {
-        const entry = { t: Date.now(), msg: String(msg), data: data || null, scrollY: window.scrollY || 0 };
-        __collectedLogs.push(entry);
-        __saveCollected();
-    } catch (e) {}
-};
+// Diagnostic collectors intentionally removed from runtime build.
+// Keep a no-op hook so existing safe calls remain harmless.
+const __logCollect = () => {};
 
-// Determine if snapshot mode is requested: ?collect-logs=snapshots
-const __collectLogsParam = (typeof window !== 'undefined') ? new URLSearchParams(window.location.search).get('collect-logs') : null;
-const __collectSnapshots = !!(__collectLogsParam && /snapshot/i.test(__collectLogsParam));
+/**
+ * Guarded Page Reload Utility
+ *
+ * Attempts to reload the page only when the user is NOT actively interacting.
+ * This prevents the scroll-jump bug on mobile devices (especially iOS Safari)
+ * where a reload during scrolling causes the viewport to jump unexpectedly.
+ *
+ * @param {Object} opts - Configuration options
+ * @param {number} [opts.MAX=30000] - Maximum milliseconds to wait before forcing reload
+ * @param {number} [opts.RETRY=500] - Milliseconds between retry attempts
+ * @param {Function} [opts.fallback] - Fallback function if reload fails
+ */
+window.tryGuardedReload = function(opts) {
+    opts = opts || {};
+    const MAX = (typeof opts.MAX === 'number') ? opts.MAX : 30000;
+    const RETRY = (typeof opts.RETRY === 'number') ? opts.RETRY : 500;
+    const fallback = (opts && typeof opts.fallback === 'function') ? opts.fallback : null;
+    const start = Date.now();
 
-// Lightweight, privacy-conscious DOM snapshot helper
-const __maybeTakeSnapshot = (reason, target) => {
-    if (!__collectSnapshots) return;
-    try {
-        const active = document.activeElement;
-        const getElInfo = (el) => {
-            if (!el || !el.getBoundingClientRect) return null;
-            const r = el.getBoundingClientRect();
-            return {
-                tag: el.tagName || null,
-                id: el.id || null,
-                classes: el.className || null,
-                rect: { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height), top: Math.round(r.top), left: Math.round(r.left) },
-                focusable: typeof el.tabIndex === 'number' ? el.tabIndex : null,
-                ariaRole: el.getAttribute && (el.getAttribute('role') || null)
-            };
-        };
-
-        const payload = {
-            reason: reason || null,
-            ts: Date.now(),
-            scrollY: window.scrollY || 0,
-            innerWidth: window.innerWidth || 0,
-            innerHeight: window.innerHeight || 0,
-            docHeight: document.documentElement.scrollHeight || document.body.scrollHeight || 0,
-            target: getElInfo(target || document.activeElement) || null,
-            activeElement: getElInfo(active) || null
-        };
-        __logCollect('snapshot', payload);
-    } catch (e) {}
-};
-
-if (__collectLogsEnabled) {
-    // Throttled scroll logger
-    let __scrollTimer = null;
-    window.addEventListener('scroll', () => {
-        if (__scrollTimer) return;
-        __scrollTimer = setTimeout(() => {
-            __logCollect('scroll', { y: window.scrollY, innerHeight: window.innerHeight, docHeight: document.documentElement.scrollHeight });
-            __scrollTimer = null;
-        }, 200);
-    }, { passive: true });
-
-    // Service worker controller change
-    try {
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-                __logCollect('controllerchange', { controller: !!navigator.serviceWorker.controller });
-            });
+    (function attempt() {
+        try {
+            const interacting = !!__userInteracting;
+            if (!interacting) {
+                try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch (_) {} }
+                return;
+            }
+            if (Date.now() - start < MAX) {
+                setTimeout(attempt, RETRY);
+                return;
+            }
+            if (fallback) {
+                try { fallback(); } catch (e) { try { window.location.reload(); } catch (_) {} }
+            } else {
+                try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch (_) {} }
+            }
+        } catch (e) {
+            if (fallback) { try { fallback(); } catch (_) { try { window.location.reload(); } catch (_) {} } }
+            else { try { window.location.reload(); } catch (_) {} }
         }
-    } catch (e) {}
-
-    // Wrap location.reload to log calls
-    try {
-        const __origReload = window.location.reload.bind(window.location);
-        window.location.reload = function() {
-            __logCollect('location.reload called');
-            return __origReload();
-        };
-    } catch (e) {}
-
-    // Download button (small, non-intrusive)
-    const __createDownloadButton = () => {
-        const btn = document.createElement('button');
-        btn.id = 'collect-logs-btn';
-        btn.textContent = 'Logs';
-        Object.assign(btn.style, { position: 'fixed', left: '8px', bottom: '12px', zIndex: 99999, padding: '6px 8px', fontSize: '12px', background: 'rgba(33,40,66,0.85)', color: '#e1d4c2', border: '1px solid rgba(225,212,194,0.08)', borderRadius: '6px' });
-        btn.addEventListener('click', () => {
-            try {
-                const payload = JSON.stringify(__collectedLogs, null, 2);
-                const blob = new Blob([payload], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `site-logs-${Date.now()}.json`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                URL.revokeObjectURL(url);
-            } catch (e) {
-                // fallback: show in new window
-                const w = window.open();
-                if (w) {
-                    try {
-                        const payload = JSON.stringify(__collectedLogs, null, 2);
-                        const doc = w.document;
-                        doc.title = 'Site logs';
-                        doc.body.style.margin = '0';
-                        const pre = doc.createElement('pre');
-                        pre.style.margin = '0';
-                        pre.style.padding = '12px';
-                        pre.textContent = payload;
-                        doc.body.appendChild(pre);
-                    } catch (_) {}
-                }
-            }
-        });
-        document.addEventListener('DOMContentLoaded', () => {
-            document.body.appendChild(btn);
-        });
-    };
-    __createDownloadButton();
-    
-    // Additional non-intrusive diagnostics (only when collect-logs enabled)
-    try {
-        // Log visibility / focus / navigation events
-        document.addEventListener('visibilitychange', () => __logCollect('visibilitychange', { hidden: document.hidden }));
-        window.addEventListener('hashchange', (e) => __logCollect('hashchange', { oldURL: e.oldURL, newURL: e.newURL }));
-        window.addEventListener('popstate', (e) => __logCollect('popstate', { state: e.state }));
-        window.addEventListener('beforeunload', (e) => __logCollect('beforeunload', {}));
-
-        // Focus tracking (focusin bubbles; capture target)
-        window.addEventListener('focusin', (e) => {
-            try { __logCollect('focusin', { tag: e.target && e.target.tagName, id: e.target && e.target.id || null, class: e.target && e.target.className || null }); } catch (err) {}
-        });
-
-        // Wrap .focus to detect fallbacks or calls that might scroll
-        (function(){
-            const origFocus = HTMLElement.prototype.focus;
-            if (!origFocus.__wrappedByCollectLogs) {
-                HTMLElement.prototype.focus = function() {
-                    try { __logCollect('element.focus.called', { tag: this.tagName, id: this.id || null, options: arguments[0] || null }); } catch (e) {}
-                    try { __maybeTakeSnapshot && __maybeTakeSnapshot('focus', this); } catch (e) {}
-                    try { return origFocus.apply(this, arguments); } catch (e) { try { return origFocus.call(this); } catch(_) {} }
-                };
-                HTMLElement.prototype.focus.__wrappedByCollectLogs = true;
-            }
-        })();
-
-        // Wrap scrollIntoView to log calls
-        (function(){
-            const proto = Element.prototype;
-            if (!proto.__scrollIntoViewLogged) {
-                const orig = proto.scrollIntoView;
-                proto.scrollIntoView = function() {
-                    try { __logCollect('element.scrollIntoView', { tag: this.tagName, id: this.id || null, args: Array.from(arguments) }); } catch (e) {}
-                    try { __maybeTakeSnapshot && __maybeTakeSnapshot('scrollIntoView', this); } catch (e) {}
-                    return orig.apply(this, arguments);
-                };
-                proto.__scrollIntoViewLogged = true;
-            }
-        })();
-
-        // Wrap window.scrollTo and scrollBy to log programmatic scrolls
-        try {
-            const origScrollTo = window.scrollTo;
-            window.scrollTo = function() {
-                try { __logCollect('window.scrollTo', { args: Array.from(arguments) }); } catch (e) {}
-                try { __maybeTakeSnapshot && __maybeTakeSnapshot('window.scrollTo', null); } catch (e) {}
-                return origScrollTo.apply(window, arguments);
-            };
-        } catch (e) {}
-        try {
-            const origScrollBy = window.scrollBy;
-            window.scrollBy = function() {
-                try { __logCollect('window.scrollBy', { args: Array.from(arguments) }); } catch (e) {}
-                try { __maybeTakeSnapshot && __maybeTakeSnapshot('window.scrollBy', null); } catch (e) {}
-                return origScrollBy.apply(window, arguments);
-            };
-        } catch (e) {}
-
-        // Wrap fetch to log request/responses (lightweight)
-        try {
-            const origFetch = window.fetch;
-            window.fetch = function(input, init) {
-                try { __logCollect('fetch.start', { url: (input && input.url) || input, method: (init && init.method) || 'GET' }); } catch (e) {}
-                return origFetch.apply(this, arguments).then(res => {
-                    try { __logCollect('fetch.end', { url: (res && res.url) || input, status: res.status }); } catch (e) {}
-                    return res;
-                }).catch(err => { try { __logCollect('fetch.error', { url: input, message: err && err.message }); } catch(_){} throw err; });
-            };
-        } catch (e) {}
-
-        // Wrap XHR to log sends
-        try {
-            const OrigXHR = window.XMLHttpRequest;
-            function WrappedXHR() {
-                const xhr = new OrigXHR();
-                let _url = null;
-                const origOpen = xhr.open;
-                xhr.open = function(method, url) {
-                    _url = url;
-                    try { __logCollect('xhr.open', { method: method, url: url }); } catch (e) {}
-                    return origOpen.apply(xhr, arguments);
-                };
-                const origSend = xhr.send;
-                xhr.send = function() {
-                    try {
-                        __logCollect('xhr.send', { url: _url });
-                    } catch (e) {}
-                    xhr.addEventListener('loadend', function() {
-                        try { __logCollect('xhr.loadend', { url: _url, status: xhr.status }); } catch (e) {}
-                    });
-                    return origSend.apply(xhr, arguments);
-                };
-                return xhr;
-            }
-            WrappedXHR.prototype = OrigXHR.prototype;
-            window.XMLHttpRequest = WrappedXHR;
-        } catch (e) {}
-
-        // Log resize/orientation events
-        window.addEventListener('resize', () => __logCollect('resize', { innerWidth: window.innerWidth, innerHeight: window.innerHeight }));
-        window.addEventListener('orientationchange', () => __logCollect('orientationchange', { orientation: window.orientation }));
-
-        // Wrap serviceWorker.register to observe registration/updatefound if possible
-        try {
-            if (navigator.serviceWorker && navigator.serviceWorker.register) {
-                const origRegister = navigator.serviceWorker.register.bind(navigator.serviceWorker);
-                navigator.serviceWorker.register = function() {
-                    const args = arguments;
-                    try { __logCollect('sw.register.start', { scope: (args && args[1] && args[1].scope) || null, script: args && args[0] }); } catch(e){}
-                    return origRegister.apply(navigator.serviceWorker, arguments).then(reg => {
-                        try { __logCollect('sw.register.done', { scope: reg.scope }); } catch(e){}
-                        try {
-                            reg.addEventListener('updatefound', () => __logCollect('sw.updatefound', {}));
-                            if (reg.waiting) __logCollect('sw.waiting', {});
-                        } catch(e){}
-                        return reg;
-                    }).catch(err => { try { __logCollect('sw.register.error', { message: err && err.message }); } catch(e){} throw err; });
-                };
-            }
-        } catch (e) {}
-
-        // Hook ScrollTrigger.refresh if present to log refresh calls
-        try {
-            if (typeof ScrollTrigger !== 'undefined' && ScrollTrigger && ScrollTrigger.refresh) {
-                const origRefresh = ScrollTrigger.refresh.bind(ScrollTrigger);
-                ScrollTrigger.refresh = function() {
-                    try { __logCollect('ScrollTrigger.refresh', { args: Array.from(arguments) }); } catch(e){}
-                    return origRefresh.apply(this, arguments);
-                };
-            }
-        } catch (e) {}
-
-        // Touch/pointer end snapshots - helpful to know last user gesture
-        ['touchend','pointerup','mouseup'].forEach(ev => {
-            window.addEventListener(ev, (e) => {
-                try { __logCollect('gesture.'+ev, { x: (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientX) || e.clientX || null, y: (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientY) || e.clientY || null }); } catch(_) {}
-            }, { passive: true });
-        });
-
-        // Monitor body/document height changes via MutationObserver (log when height changes)
-        try {
-            let lastDocHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
-            const mo = new MutationObserver(() => {
-                try {
-                    const h = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
-                    if (h !== lastDocHeight) {
-                        __logCollect('docHeight.change', { from: lastDocHeight, to: h });
-                        try { __maybeTakeSnapshot && __maybeTakeSnapshot('docHeight.change', document.documentElement); } catch (e) {}
-                        lastDocHeight = h;
-                    }
-                } catch (e) {}
-            });
-            mo.observe(document.documentElement || document.body, { childList: true, subtree: true, attributes: true });
-        } catch (e) {}
-
-        // -- Extended safe instrumentation (privacy-conscious) -----------------
-        try {
-            const MAX_ENTRY_BYTES = 8 * 1024; // cap large entries
-
-            const safeStringify = (obj) => {
-                try {
-                    const s = JSON.stringify(obj, (k, v) => {
-                        // redact obvious sensitive keys
-                        if (typeof k === 'string' && /pass(word)?|token|secret|auth|credit|cc-number|card|ssn|cvv/i.test(k)) return '[REDACTED]';
-                        // avoid dumping large blobs
-                        if (typeof v === 'string' && v.length > 200) return v.slice(0, 200) + '…[truncated]';
-                        return v;
-                    });
-                    if (s.length > MAX_ENTRY_BYTES) return s.slice(0, MAX_ENTRY_BYTES) + '...[truncated]';
-                    return s;
-                } catch (e) { return String(obj); }
-            };
-
-            // Console wrapper
-            try {
-                ['log','info','warn','error','debug'].forEach(method => {
-                    const orig = console[method] && console[method].bind(console);
-                    if (!orig) return;
-                    console[method] = function() {
-                        try { __logCollect('console.'+method, { args: Array.from(arguments).map(a => (typeof a === 'object' ? safeStringify(a) : String(a))) }); } catch(e){}
-                        try { if (method === 'error' || method === 'warn') __maybeTakeSnapshot && __maybeTakeSnapshot('console.'+method, document.activeElement); } catch(e){}
-                        return orig.apply(console, arguments);
-                    };
-                });
-            } catch (e) {}
-
-            // Global error & unhandledrejection
-            window.addEventListener('error', (ev) => {
-                try {
-                    __logCollect('window.error', { message: ev.message, filename: ev.filename, lineno: ev.lineno, colno: ev.colno, stack: ev.error && ev.error.stack ? String(ev.error.stack).slice(0, 1000) : null });
-                    try { __maybeTakeSnapshot && __maybeTakeSnapshot('error', ev && ev.target ? ev.target : document.activeElement); } catch (e) {}
-                } catch (e) {}
-            });
-            window.addEventListener('unhandledrejection', (ev) => {
-                try { __logCollect('unhandledrejection', { reason: ev.reason && (ev.reason.stack ? String(ev.reason.stack).slice(0,1000) : String(ev.reason)) }); } catch (e) {}
-            });
-
-            // Storage wrappers (log keys only + length)
-            try {
-                const _lsSet = localStorage.setItem.bind(localStorage);
-                localStorage.setItem = function(k, v) {
-                    try { __logCollect('localStorage.setItem', { key: String(k), size: (v && v.length) || 0 }); } catch(e){}
-                    return _lsSet(k, v);
-                };
-            } catch (e) {}
-            try {
-                const _ssSet = sessionStorage.setItem.bind(sessionStorage);
-                sessionStorage.setItem = function(k, v) {
-                    try { __logCollect('sessionStorage.setItem', { key: String(k), size: (v && v.length) || 0 }); } catch(e){}
-                    return _ssSet(k, v);
-                };
-            } catch (e) {}
-
-            // navigator.sendBeacon wrapper
-            try {
-                if (navigator && navigator.sendBeacon) {
-                    const _sendBeacon = navigator.sendBeacon.bind(navigator);
-                    navigator.sendBeacon = function(url, data) {
-                        try { __logCollect('navigator.sendBeacon', { url: String(url), dataSize: (data && data.size) || null }); } catch(e){}
-                        return _sendBeacon(url, data);
-                    };
-                }
-            } catch (e) {}
-
-            // Delegate click and form events (avoid capturing form values)
-            try {
-                document.addEventListener('click', (e) => {
-                    try {
-                        const t = e.target && (e.target.closest ? e.target.closest('a,button,input,select,textarea,summary') : e.target);
-                        if (!t) return;
-                        const tag = (t.tagName || '').toLowerCase();
-                        const info = { tag, id: t.id || null, classes: t.className || null };
-                        if (tag === 'a' && t.href) info.href = (t.href.length>200? t.href.slice(0,200)+'…': t.href);
-                        __logCollect('dom.click', info);
-                        try {
-                            if (['a','button','input','textarea','select'].includes(tag)) {
-                                __maybeTakeSnapshot && __maybeTakeSnapshot('click', t);
-                            }
-                        } catch (e) {}
-                    } catch (e) {}
-                }, { passive: true });
-
-                document.addEventListener('submit', (e) => {
-                    try {
-                        const form = e.target;
-                        if (!form || !form.tagName || form.tagName.toLowerCase() !== 'form') return;
-                        const fields = Array.from(form.elements || []).filter(n => n.name).map(n => ({ name: n.name, type: n.type || n.tagName }));
-                        __logCollect('form.submit', { action: form.action || null, method: form.method || 'GET', fields });
-                    } catch (e) {}
-                }, true);
-            } catch (e) {}
-
-            // Input events: log type and length only (no values)
-            try {
-                document.addEventListener('input', (e) => {
-                    try {
-                        const el = e.target;
-                        if (!el) return;
-                        const tag = el.tagName && el.tagName.toLowerCase();
-                        if (tag === 'input' || tag === 'textarea' || tag === 'select') {
-                            const info = { tag, type: el.type || null, name: el.name || null, valueLength: (el.value && el.value.length) || 0 };
-                            __logCollect('input', info);
-                        }
-                    } catch (e) {}
-                }, { passive: true });
-            } catch (e) {}
-
-            // Selection logging (length + container tag)
-            try {
-                document.addEventListener('selectionchange', () => {
-                    try {
-                        const sel = document.getSelection && document.getSelection();
-                        if (!sel) return;
-                        const txt = sel.toString();
-                        const container = sel.anchorNode && sel.anchorNode.parentElement && sel.anchorNode.parentElement.tagName;
-                        __logCollect('selectionchange', { length: txt.length, container: container || null });
-                    } catch (e) {}
-                });
-            } catch (e) {}
-
-            // Clipboard events (log action only)
-            try {
-                ['copy','cut','paste'].forEach(ev => {
-                    document.addEventListener(ev, (e) => { try { __logCollect('clipboard.'+ev, {}); } catch(_) {} });
-                });
-            } catch (e) {}
-
-            // Performance: longtask and resource observer (lightweight)
-            try {
-                if ('PerformanceObserver' in window) {
-                    try {
-                        const po = new PerformanceObserver((list) => {
-                            list.getEntries().forEach(en => {
-                                try {
-                                    if (en.entryType === 'longtask') {
-                                        __logCollect('perf.longtask', { duration: Math.round(en.duration) });
-                                    } else if (en.entryType === 'resource') {
-                                        __logCollect('perf.resource', { name: en.name, initiatorType: en.initiatorType, duration: Math.round(en.duration) });
-                                    }
-                                } catch(e) {}
-                            });
-                        });
-                        po.observe({ entryTypes: ['longtask','resource'] });
-                    } catch (e) {}
-                }
-            } catch (e) {}
-
-            // Log when event listeners are attached (helps find dynamic behavior)
-            try {
-                const origAdd = EventTarget.prototype.addEventListener;
-                EventTarget.prototype.addEventListener = function(type, listener, options) {
-                    try { __logCollect('addEventListener', { target: this && this.tagName ? this.tagName : (this && this.constructor && this.constructor.name) || 'unknown', type: type }); } catch(e) {}
-                    return origAdd.apply(this, arguments);
-                };
-            } catch (e) {}
-        } catch (e) {}
-        // ---------------------------------------------------------------------
-    } catch (e) {}
-    /**
-     * Guarded Page Reload Utility
-     * 
-     * Attempts to reload the page only when the user is NOT actively interacting.
-     * This prevents the scroll-jump bug on mobile devices (especially iOS Safari)
-     * where a reload during scrolling causes the viewport to jump to an unexpected
-     * position, often losing the user's place.
-     * 
-     * How it works:
-     * 1. Checks if user is currently interacting (scrolling, touching)
-     * 2. If idle, reloads immediately
-     * 3. If active, waits and retries after RETRY milliseconds
-     * 4. After MAX milliseconds, forces reload regardless (timeout)
-     * 
-     * @param {Object} opts - Configuration options
-     * @param {number} [opts.MAX=30000] - Maximum milliseconds to wait before forcing reload
-     * @param {number} [opts.RETRY=500] - Milliseconds between retry attempts
-     * @param {Function} [opts.fallback] - Fallback function if reload fails
-     * 
-     * @example
-     * // Standard usage
-     * window.tryGuardedReload({ MAX: 30000, RETRY: 500 });
-     * 
-     * @example
-     * // With custom fallback
-     * window.tryGuardedReload({ 
-     *   MAX: 30000, 
-     *   RETRY: 500, 
-     *   fallback: () => window.location.href = window.location.href 
-     * });
-     */
-    window.tryGuardedReload = function(opts) {
-        opts = opts || {};
-        const MAX = (typeof opts.MAX === 'number') ? opts.MAX : 30000;
-        const RETRY = (typeof opts.RETRY === 'number') ? opts.RETRY : 500;
-        const fallback = (opts && typeof opts.fallback === 'function') ? opts.fallback : null;
-        const start = Date.now();
-
-        (function attempt() {
-            try {
-                const interacting = (typeof window.__userInteracting !== 'undefined') ? window.__userInteracting : false;
-                if (!interacting) {
-                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
-                    return;
-                }
-                if (Date.now() - start < MAX) {
-                    setTimeout(attempt, RETRY);
-                    return;
-                }
-                // Timed out - fallback
-                if (fallback) {
-                    try { fallback(); } catch (e) { try { window.location.reload(); } catch(_) {} }
-                } else {
-                    try { window.location.reload(); } catch (e) { try { window.location.href = window.location.href; } catch(_) {} }
-                }
-            } catch (e) {
-                if (fallback) { try { fallback(); } catch(_) { try { window.location.reload(); } catch(_) {} } }
-                else { try { window.location.reload(); } catch(_) {} }
-            }
-        })();
-    };
-}
+    })();
+};
 
 // ============================================================================
 // FEATURE MODULES
@@ -1904,9 +1443,6 @@ const initLazyLoading = () => {
  * - 3-second timeout for slow connections
  * - 100ms render delay after load for content stability
  * - Uses CSS transitions for smooth UX
- * 
- * Instrumentation:
- * - Logs attempts, successes, failures when ?collect-logs=1
  */
 const initPdfPreviews = () => {
     try {
@@ -2023,29 +1559,22 @@ const initScrollToTop = () => {
         updateProgressRing();
     };
 
-    // Show/hide button based on scroll position (25% of page height)
+    // Show/hide button based on scroll position.
     const toggleButton = () => {
-        const pageHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const pageHeight = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
         const scrollThreshold = pageHeight * 0.25;
-        const currentScroll = window.scrollY;
-        
-        // Check if button is near footer; if so, hide to avoid overlap
-        const buttonRect = scrollBtn.getBoundingClientRect();
-        const footer = document.querySelector('footer');
-        const footerRect = footer ? footer.getBoundingClientRect() : null;
-        
-        const isNearFooter = footerRect && buttonRect.bottom > (footerRect.top - 10);
+        const currentScroll = window.scrollY || document.documentElement.scrollTop || 0;
 
-        if (currentScroll > scrollThreshold && !isNearFooter) {
+        if (currentScroll > scrollThreshold) {
             scrollBtn.classList.add('show');
-            scrollBtn.style.opacity = '1';
-            scrollBtn.style.visibility = 'visible';
-            scrollBtn.style.pointerEvents = 'auto';
+            scrollBtn.style.setProperty('opacity', '1', 'important');
+            scrollBtn.style.setProperty('visibility', 'visible', 'important');
+            scrollBtn.style.setProperty('pointer-events', 'auto', 'important');
         } else {
             scrollBtn.classList.remove('show');
-            scrollBtn.style.opacity = '0';
-            scrollBtn.style.visibility = 'hidden';
-            scrollBtn.style.pointerEvents = 'none';
+            scrollBtn.style.setProperty('opacity', '0', 'important');
+            scrollBtn.style.setProperty('visibility', 'hidden', 'important');
+            scrollBtn.style.setProperty('pointer-events', 'none', 'important');
         }
 
         updateProgressRing();
@@ -2662,23 +2191,14 @@ const initPWA = () => {
 // All analytics calls are defensive (checks if functions exist before calling).
 // This ensures no errors if analytics fail to load or are blocked by ad blockers.
 //
-// Debug mode: Add ?debug-analytics=1 to URL to see events in console
 // ==========================================================================
 
 /**
- * Debug helper: logs analytics events when ?debug-analytics=1 is in URL
+ * Analytics debug hook intentionally kept as a no-op in production.
  * @param {string} tag - Event name
  * @param {Object} payload - Optional event data
  */
-const trackEventDebug = (tag, payload) => {
-    try {
-        if (window.location.search.includes('debug-analytics=1')) {
-            console.log('[Analytics Event]', tag, payload || null);
-        }
-    } catch (e) {
-        // Fail silently
-    }
-};
+const trackEventDebug = () => {};
 
 /**
  * Initialize custom analytics event tracking
@@ -3337,9 +2857,6 @@ const __initDynamicGameSuggestions = () => {
 };
 
 const init = () => {
-    // Developer signature
-    console.log('%c Designed by Estivan Ayramia ', 'background: #212842; color: #e1d4c2; padding: 4px; border-radius: 4px;');
-    
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
@@ -3702,7 +3219,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function setSuggestionsVisible(isVisible) {
         if (!els.suggestionsContainer) {
-            console.log('[Savonie DEBUG] setSuggestionsVisible called but no suggestions container');
             return;
         }
 
@@ -3716,12 +3232,10 @@ document.addEventListener('DOMContentLoaded', () => {
             els.suggestionsContainer.style.display = 'none';
         }
 
-        console.log('[Savonie DEBUG] setSuggestionsVisible ->', isVisible, 'classes:', els.suggestionsContainer.className);
     }
 
     function attachSuggestionHandlers() {
         if (!els.suggestionsContainer) {
-            console.log('[Savonie DEBUG] No suggestions container found on this page');
             return;
         }
 
@@ -3731,14 +3245,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                  els.suggestionsContainer.hasAttribute('hidden') ||
                                  els.suggestionsContainer.style.display === 'none';
                 const nextVisible = isHidden;
-                console.log('[Savonie DEBUG] Lightbulb clicked, nextVisible =', nextVisible);
                 setSuggestionsVisible(nextVisible);
             });
-        } else {
-            console.log('[Savonie DEBUG] No suggestions toggle (lightbulb) found');
         }
-
-        console.log('[Savonie DEBUG] attachSuggestionHandlers complete');
     }
 
     // Attach handlers immediately (DOM is already ready due to DOMContentLoaded)
@@ -4054,27 +3563,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Console helper: quickly verify link/HTML safety without needing the backend.
-    // Usage: window.__savonieXssSelfTest()
-    window.__savonieXssSelfTest = function () {
-        const samples = [
-            '<img src=x onerror=alert(1)>',
-            '[bad](javascript:alert(1))',
-            '[ok](https://example.com)',
-            'https://example.com/test?x=<script>alert(1)</script>',
-            'Line 1\nLine 2 with https://example.com'
-        ];
-
-        const out = samples.map((s) => {
-            const wrapper = document.createElement('div');
-            wrapper.appendChild(parseMarkdown(s));
-            return wrapper.innerHTML;
-        });
-
-        console.log('[Savonie] XSS self-test rendered HTML:', out);
-        return out;
-    };
-
     // Helper: Render chips and ensure close button exists
     function renderChips(chips) {
         if (!els.chipsContainer) return;
@@ -4106,7 +3594,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('[Savonie DEBUG] Suggestions close X clicked, hiding suggestions');
             setSuggestionsVisible(false);
         });
         els.chipsContainer.appendChild(closeBtn);
@@ -4123,50 +3610,61 @@ document.addEventListener('DOMContentLoaded', () => {
             ...Array.from(document.querySelectorAll('.page-close')),
             ...Array.from(document.querySelectorAll('footer'))
         ];
-        if (!guardedSections.length) {
-            document.documentElement.style.setProperty('--floating-ui-lift', '0px');
-            return;
-        }
+        const scrollBtn = document.getElementById('scroll-to-top');
+        const chatToggle = document.getElementById('chat-toggle');
+        const SAFE_GAP = 12;
+        const MAX_LIFT = 2000;
 
-        const activeSections = new Set();
-        const syncFloatingUiGuard = () => {
-            const viewportBottom = window.innerHeight;
-            const floatingUiBaseLine = viewportBottom - 96;
-            let lift = 0;
+        const isVisible = (el) => {
+            if (!el) return false;
+            const style = window.getComputedStyle(el);
+            return style.display !== 'none'
+                && style.visibility !== 'hidden'
+                && Number(style.opacity || '1') > 0.01;
+        };
 
+        const getGuardTop = () => {
+            let nearestTop = Number.POSITIVE_INFINITY;
             guardedSections.forEach((section) => {
                 const rect = section.getBoundingClientRect();
-                if (rect.top >= viewportBottom || rect.bottom <= 0) return;
-                const overlap = floatingUiBaseLine - rect.top;
-                if (overlap > 0) {
-                    lift = Math.max(lift, Math.min(240, overlap + 24));
-                }
+                if (!rect || rect.height <= 0 || rect.bottom <= 0) return;
+                nearestTop = Math.min(nearestTop, rect.top);
             });
+            return Number.isFinite(nearestTop) ? nearestTop : null;
+        };
 
-            const pageCloseActive = activeSections.size > 0 || lift > 0;
+        const syncFloatingUiGuard = () => {
+            const guardTop = getGuardTop();
+            const currentLift = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--floating-ui-lift')) || 0;
+            let lift = 0;
+
+            if (guardTop !== null && guardTop < window.innerHeight) {
+                const tracked = [scrollBtn, chatToggle];
+                tracked.forEach((el) => {
+                    if (!isVisible(el)) return;
+                    const rect = el.getBoundingClientRect();
+                    if (!rect || rect.height <= 0) return;
+                    const overlap = rect.bottom + SAFE_GAP - guardTop;
+                    if (overlap > lift) {
+                        lift = currentLift + overlap;
+                    }
+                });
+            }
+
+            lift = Math.min(MAX_LIFT, Math.max(0, Math.round(lift)));
+
+            const pageCloseActive = lift > 0;
             document.documentElement.style.setProperty('--floating-ui-lift', `${Math.round(lift)}px`);
             document.body.classList.toggle('page-close-ui-guard', pageCloseActive);
-            if (pageCloseActive && els.bubble) {
-                els.bubble.classList.add('opacity-0', 'translate-y-4');
+            if (els.bubble) {
+                if (pageCloseActive) {
+                    els.bubble.classList.add('opacity-0', 'translate-y-4');
+                } else {
+                    els.bubble.classList.remove('opacity-0', 'translate-y-4');
+                }
             }
         };
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    activeSections.add(entry.target);
-                } else {
-                    activeSections.delete(entry.target);
-                }
-            });
-            syncFloatingUiGuard();
-        }, {
-            root: null,
-            threshold: 0.18,
-            rootMargin: '0px 0px -18% 0px'
-        });
-
-        guardedSections.forEach((section) => observer.observe(section));
         window.addEventListener('scroll', syncFloatingUiGuard, { passive: true });
         window.addEventListener('resize', syncFloatingUiGuard);
         syncFloatingUiGuard();
@@ -4722,8 +4220,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const timeout = setTimeout(() => {
             timedOut = true;
             // Loading took too long - assume success (browser swallowed load event for PDF)
-            console.log('PDF load timeout - assuming success');
-            
+
             // Clean up loading state
             try { loading.remove(); } catch(e) {}
             if (!panel.contains(iframe)) panel.appendChild(iframe);
