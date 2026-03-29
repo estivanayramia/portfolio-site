@@ -101,7 +101,7 @@
   position: relative;
   width: 100%;
   height: 100%;
-  perspective: 2500px;
+  perspective: 1900px;
   perspective-origin: 50% 50%;
   transform-style: preserve-3d;
   touch-action: pan-y pinch-zoom;
@@ -262,9 +262,9 @@
   overflow: visible;
   
   box-shadow:
-    0 0 calc(24px * var(--luxury-glow-strength, 1)) rgba(201, 167, 109, 0.22),
-    0 0 calc(64px * var(--luxury-glow-strength, 1)) rgba(201, 167, 109, 0.12),
-    0 44px 112px rgba(0, 0, 0, 0.78),
+    0 0 calc(28px * var(--luxury-glow-strength, 1)) rgba(201, 167, 109, 0.24),
+    0 0 calc(84px * var(--luxury-glow-strength, 1)) rgba(201, 167, 109, 0.16),
+    0 54px 138px rgba(0, 0, 0, 0.82),
     inset 0 0 28px rgba(201, 167, 109, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 
@@ -855,6 +855,9 @@
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0.06), rgba(0, 0, 0, 0.7)),
     var(--preview-bg, linear-gradient(135deg, #212842, #3d4666));
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .luxury-roulette-pocket__preview--flying {

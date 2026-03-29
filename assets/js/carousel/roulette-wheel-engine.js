@@ -170,17 +170,19 @@ export class RouletteWheelEngine {
   /**
    * Calculate wheel spin parameters
    */
-  calculateWheelSpin(winnerPocketIndex) {
-    const pocketAngle = (360 / this.pocketCount) * winnerPocketIndex;
-    const spins = this.config.minSpins + Math.random() * 
-                  (this.config.maxSpins - this.config.minSpins);
-    
-    const finalRotation = (spins * 360) + (360 - pocketAngle);
-    
-    const duration = this.config.spinDuration.min + 
+  calculateWheelSpin(winnerPocketIndex, options = {}) {
+    const pocketAngle = ((360 / this.pocketCount) * winnerPocketIndex) - 90;
+    const landingAngle = Number.isFinite(options.landingAngle) ? options.landingAngle : -92;
+    const spinRange = Math.max(1, this.config.maxSpins - this.config.minSpins + 1);
+    const spins = this.config.minSpins + Math.floor(Math.random() * spinRange);
+
+    // Align selected pocket to a deterministic landing angle after full turns.
+    const finalRotation = (landingAngle - pocketAngle) - (spins * 360);
+
+    const duration = this.config.spinDuration.min +
                      Math.random() * (this.config.spinDuration.max - this.config.spinDuration.min);
-    
-    return { finalRotation, duration, spins: Math.round(spins) };
+
+    return { finalRotation, duration, spins, landingAngle, pocketAngle };
   }
   
   /**

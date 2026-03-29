@@ -68,6 +68,7 @@
   "author": "Estivan Ayramia",
   "license": "MIT",
   "devDependencies": {
+    "@napi-rs/canvas": "^0.1.97",
     "@playwright/test": "^1.58.2",
     "autoprefixer": "^10.4.27",
     "browserslist": "^4.28.1",
@@ -76,11 +77,13 @@
     "esbuild": "^0.27.4",
     "lighthouse": "12.6.1",
     "lightningcss": "^1.32.0",
+    "pdfjs-dist": "^5.5.207",
     "pixelmatch": "^7.1.0",
     "playwright": "^1.58.2",
     "pngjs": "^7.0.0",
     "postcss": "^8.5.8",
     "puppeteer": "^24.40.0",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.19",
     "terser": "^5.46.1",
     "wrangler": "^4.78.0"

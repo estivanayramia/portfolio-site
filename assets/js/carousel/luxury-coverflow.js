@@ -95,51 +95,51 @@ const MOTION_PROFILES = {
 const MOBILE_POSITIONS = {
   center: {
     rotateY: 0,
-    translateZ: 0,
+    translateZ: 46,
     translateX: 0,
-    scale: 1,
+    scale: 1.04,
     opacity: 1,
     zIndex: 100,
     blur: 0,
-    brightness: 1.04,
-    saturate: 1.04
+    brightness: 1.08,
+    saturate: 1.06
   },
   adjacent1: {
-    rotateY: 14,
-    translateZ: -42,
-    translateX: 160,
-    scale: 0.78,
-    opacity: 0,
+    rotateY: 22,
+    translateZ: -120,
+    translateX: 188,
+    scale: 0.82,
+    opacity: 0.66,
     zIndex: 90,
-    blur: 1,
-    brightness: 0.78,
-    saturate: 0.9
+    blur: 0.6,
+    brightness: 0.86,
+    saturate: 0.95
   },
   adjacent2: {
     rotateY: 34,
-    translateZ: -220,
-    translateX: 280,
-    scale: 0.62,
-    opacity: 0,
+    translateZ: -280,
+    translateX: 300,
+    scale: 0.66,
+    opacity: 0.32,
     zIndex: 80,
-    blur: 2,
-    brightness: 0.68,
-    saturate: 0.86
+    blur: 1.4,
+    brightness: 0.72,
+    saturate: 0.9
   },
   adjacent3: {
     rotateY: 44,
-    translateZ: -300,
-    translateX: 360,
+    translateZ: -420,
+    translateX: 390,
     scale: 0.52,
-    opacity: 0,
+    opacity: 0.12,
     zIndex: 70,
     blur: 2,
-    brightness: 0.68,
-    saturate: 0.9
+    brightness: 0.62,
+    saturate: 0.82
   },
   far: {
     rotateY: 50,
-    translateZ: -380,
+    translateZ: -560,
     translateX: 660,
     scale: 0.4,
     opacity: 0,
@@ -238,6 +238,12 @@ function buildStableMixedOrder(items) {
     }))
     .sort((left, right) => left.weight - right.weight || left.index - right.index)
     .map((entry) => entry.index);
+}
+
+function buildPreviewBackground(previewImage, fallbackBackground) {
+  if (!previewImage) return fallbackBackground;
+  const safeUrl = encodeURI(previewImage).replace(/'/g, '%27');
+  return `linear-gradient(160deg, rgba(8, 10, 17, 0.14), rgba(8, 10, 17, 0.46)), url('${safeUrl}')`;
 }
 
 function isCoarsePointerDevice() {
@@ -629,15 +635,21 @@ class RouletteOverlayController {
     }
 
     this.previewCache = this.carousel.items.map((item) => {
+      const previewImageNode = item.querySelector('.card-bg img.card-image, .card-image-container img.card-image, img.card-image');
+      const previewImage = item.dataset.previewImage
+        || previewImageNode?.getAttribute('src')
+        || '';
+
       const backgroundNode = item.querySelector('.card-bg');
       const backgroundStyle = backgroundNode ? window.getComputedStyle(backgroundNode) : null;
-      const background = backgroundStyle
+      const fallbackBackground = backgroundStyle
         ? (backgroundStyle.backgroundImage !== 'none' ? backgroundStyle.backgroundImage : backgroundStyle.background)
         : 'linear-gradient(135deg, #212842, #3d4666)';
+      const background = buildPreviewBackground(previewImage, fallbackBackground);
       const title = item.dataset.title || item.querySelector('.card-title')?.textContent?.trim() || 'Project';
       const category = item.querySelector('.card-category')?.textContent?.trim() || 'Selected Work';
       const link = item.querySelector('.card-link, a[href]')?.getAttribute('href') || '';
-      return { background, title, category, link };
+      return { background, previewImage, title, category, link };
     });
 
     return this.previewCache;
@@ -1040,10 +1052,13 @@ class RouletteOverlayController {
   }
 
   async runSpinAnimation() {
-    const wheelSpin = this.wheelEngine.calculateWheelSpin(this.result.winnerPocketIndex);
+    const wheelSpin = this.wheelEngine.calculateWheelSpin(this.result.winnerPocketIndex, {
+      landingAngle: -92
+    });
     const durationSeconds = this.carousel.motion.spinMs / 1000;
     const wheelRadius = parseFloat(getComputedStyle(this.overlay).getPropertyValue('--roulette-wheel-radius')) || 220;
-    const initialBallAngle = 180;
+    const totalBallRotation = wheelSpin.spins * 360 + 280 + Math.random() * 90;
+    const initialBallAngle = wheelSpin.landingAngle + totalBallRotation;
     const frame = {
       wheelRotation: 0,
       ballAngle: initialBallAngle,
@@ -1058,16 +1073,15 @@ class RouletteOverlayController {
 
     await new Promise((resolve) => {
       this.isSpinning = true;
-      const totalBallRotation = wheelSpin.spins * 360 + 300;
       const firstLeg = durationSeconds * 0.55;
       const secondLeg = durationSeconds * 0.30;
       const finalLeg = Math.max(0.44, durationSeconds - firstLeg - secondLeg);
-      const legOneWheelRotation = -(wheelSpin.finalRotation * 0.72);
-      const legTwoWheelRotation = -(wheelSpin.finalRotation * 0.94);
-      const finalWheelRotation = -wheelSpin.finalRotation;
+      const legOneWheelRotation = wheelSpin.finalRotation * 0.68;
+      const legTwoWheelRotation = wheelSpin.finalRotation * 0.92;
+      const finalWheelRotation = wheelSpin.finalRotation;
       const legOneBallAngle = initialBallAngle - (totalBallRotation * 0.78);
-      const legTwoBallAngle = legOneBallAngle - (totalBallRotation * 0.19);
-      const finalBallAngle = initialBallAngle - totalBallRotation;
+      const legTwoBallAngle = initialBallAngle - (totalBallRotation * 0.95);
+      const finalBallAngle = wheelSpin.landingAngle;
 
       this.spinTween = gsap.timeline({
         onComplete: () => {
@@ -1083,7 +1097,7 @@ class RouletteOverlayController {
         ballAngle: legOneBallAngle,
         radius: wheelRadius * 1.04,
         duration: firstLeg,
-        ease: 'power1.in',
+        ease: 'power2.in',
         onUpdate: renderFrame
       });
 
@@ -1093,7 +1107,7 @@ class RouletteOverlayController {
         ballAngle: legTwoBallAngle,
         radius: wheelRadius * 0.9,
         duration: secondLeg,
-        ease: 'power4.out',
+        ease: 'expo.out',
         onUpdate: renderFrame
       });
 
@@ -1101,9 +1115,9 @@ class RouletteOverlayController {
       this.spinTween.to(frame, {
         wheelRotation: finalWheelRotation,
         ballAngle: finalBallAngle,
-        radius: wheelRadius * 0.82,
+        radius: wheelRadius * 0.79,
         duration: finalLeg,
-        ease: 'power3.out',
+        ease: 'power4.out',
         onUpdate: renderFrame
       });
     });
