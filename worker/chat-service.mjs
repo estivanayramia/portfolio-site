@@ -80,8 +80,9 @@ const SURFACE_FACT_PATTERNS = [
   { key: "favorite_team", pattern: /\bbarcelona|fc barcelona|favorite team|sports team\b/i },
   { key: "favorite_sport", pattern: /\bsport|sports|soccer|football|volleyball|pickleball\b/i },
   { key: "languages", pattern: /\blanguages?|speak|write in|english|arabic|chaldean|spanish\b/i },
-  { key: "hometown", pattern: /\bwhere.*from|hometown|grew up|el cajon|baghdad|born\b/i },
+  { key: "education", pattern: /\b(graduat(e|ed|ion)|degree|college|university|school|sdsu|major)\b/i },
   { key: "birthday", pattern: /\bbirthday\b|\bborn on\b|\bwhen.*born\b|\bage\b|\bhow old\b|\bold is\b/i },
+  { key: "hometown", pattern: /\bwhere.*from|hometown|grew up|el cajon|baghdad|born in\b/i },
   { key: "height", pattern: /\bheight|how tall|tall\b/i },
   { key: "style", pattern: /\bstyle|dress|clothes|fashion|shoes|cologne|jewelry\b/i }
 ];
@@ -240,7 +241,7 @@ function normalizeManifest(manifest) {
           : tokenizeText(`${section.heading || ""} ${section.text || ""}`).slice(0, 24)
       })).filter((section) => section.heading || section.text) : []
     }))
-    .filter((page) => page.route);
+    .filter((page) => page.route && isRelevantInternalRoute(page.route));
 
   return {
     ...manifest,
@@ -524,6 +525,14 @@ function scorePage(page, queryTokens, message, questionClass) {
     if (page.pageType === "project_detail" || page.pageType === "hobby_detail" || page.pageType === "about_detail") {
       score += 10;
     }
+
+    // If the user asks for a hobbies hub/gateway, prefer /about over a single hobby detail page.
+    if (/\bhobbies?\b/.test(lower) && /\b(hub|gateway|overview|main)\b/.test(lower)) {
+      if (route === "/about") score += 30;
+      if (route.startsWith("/about/") && route !== "/about") score += 8;
+      if (page.pageType === "hobby_detail") score -= 18;
+    }
+
     if (/\bprojects?\b|\bwork\b/.test(lower) && page.pageType === "projects_index") score += 18;
     if (/\babout\b/.test(lower) && page.route === "/about") score += 12;
   }
@@ -663,6 +672,8 @@ function formatSurfaceFactReply(key, profile) {
       return "FC Barcelona.";
     case "languages":
       return "Estivan speaks Arabic, Chaldean, English, and Spanish. He writes in English, Arabic, and Spanish, but not Chaldean.";
+    case "education":
+      return `He graduated from ${identity?.education?.school || "San Diego State University"} with a ${identity?.education?.degree || "General Business"} degree.`;
     case "hometown":
       return `He was born in ${identity.birthplace || "Baghdad, Iraq"} and grew up in ${identity.hometown || "El Cajon"}.`;
     case "birthday":
@@ -688,13 +699,25 @@ function containsFirstPerson(text) {
   return /\b(i|i['\u2019]m|i['\u2019]ve|i['\u2019]d|my|me|mine)\b/i.test(String(text || ""));
 }
 
-function buildPageSpecificReply(retrieval) {
+function buildPageSpecificReply(retrieval, message = "") {
   const [topPage] = retrieval.pages;
   if (!topPage) {
     return "";
   }
 
+  const lowerMessage = String(message || "").toLowerCase();
+  const asksHobbiesHub = /\bhobbies?\b/.test(lowerMessage) && /\b(hub|gateway|overview|main)\b/.test(lowerMessage);
+  const asksGames = /\b(game|games|arcade|mini\s*-?\s*games?)\b/.test(lowerMessage);
+
+  if (asksHobbiesHub && !asksGames) {
+    return `${formatInternalLink("About", "/about")} is the best place for that. The hobbies section moved into the About flow, where each personal page is linked directly.`;
+  }
+
   const displayTitle = getDisplayPageTitle(topPage);
+
+  if (topPage.route === "/hobbies" || topPage.route === "/hobbies/") {
+    return `${formatInternalLink("About", "/about")} is the best place for that. The hobbies section moved into the About flow, where each personal page is linked directly.`;
+  }
 
   if (topPage.route === "/about") {
     return `${formatInternalLink("About", "/about")} is the best place for that. It is the personal side of the site: background, values, and what it is like to work with him.`;
@@ -764,7 +787,7 @@ function buildPageSpecificReply(retrieval) {
   return `${intro} The clearest parts are ${sectionLines.join(" ")}`.trim();
 }
 
-function buildDeterministicReply({ questionClass, surfaceFactKey, profile, siteFacts, retrieval }) {
+function buildDeterministicReply({ message, questionClass, surfaceFactKey, profile, siteFacts, retrieval }) {
   const seeds = profile.answerSeeds || {};
 
   switch (questionClass) {
@@ -793,7 +816,7 @@ function buildDeterministicReply({ questionClass, surfaceFactKey, profile, siteF
     case QUESTION_CLASSES.PROJECT_LIST:
       return formatProjectList(siteFacts);
     case QUESTION_CLASSES.PAGE_SPECIFIC:
-      return buildPageSpecificReply(retrieval);
+      return buildPageSpecificReply(retrieval, message);
     case QUESTION_CLASSES.BOUNDARY:
       return buildBoundaryReply();
     case QUESTION_CLASSES.ABOUT_GENERAL:
@@ -801,7 +824,7 @@ function buildDeterministicReply({ questionClass, surfaceFactKey, profile, siteF
     case QUESTION_CLASSES.UNKNOWN:
       return buildUnknownReply(profile);
     default:
-      return retrieval.pages.length > 0 ? buildPageSpecificReply(retrieval) : "";
+      return retrieval.pages.length > 0 ? buildPageSpecificReply(retrieval, message) : "";
   }
 }
 
@@ -1053,6 +1076,7 @@ export async function prepareChatContext({ env, request, message, language, rawP
   const retrieval = retrieveGrounding(message, manifest, questionClass, pageContext.route);
   const surfaceFactKey = questionClass === QUESTION_CLASSES.SURFACE_FACT ? detectSurfaceFactKey(message) : "";
   const fallbackReply = buildDeterministicReply({
+    message,
     questionClass,
     surfaceFactKey,
     profile,
