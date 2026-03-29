@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v20260329-9e22283-dashboard-bypass';
+const CACHE_VERSION = 'v20260329-f4ae379-dashboard-bypass';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
