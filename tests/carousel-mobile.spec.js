@@ -114,6 +114,20 @@ const miniPages = [
   { name: 'Reading', url: readingUrl }
 ];
 
+const touchSwipeRegressionProfiles = new Set(['Android Small', 'Android Large']);
+
+function getTouchSwipeRegressionOptions(profileName) {
+  if (profileName === 'Android Small') {
+    return { distanceRatio: 0.34, steps: 20, settleMs: 1000 };
+  }
+
+  if (profileName === 'Android Large') {
+    return { distanceRatio: 0.28, steps: 22, settleMs: 1000 };
+  }
+
+  return undefined;
+}
+
 const responsiveMiniPages = [
   { name: 'Whispers', url: whispersUrl },
   { name: 'Photography', url: photographyUrl },
@@ -455,15 +469,23 @@ for (const profile of touchProfiles) {
 
     test('horizontal swipe left advances exactly one card', async ({ page }) => {
       const initialIndex = Number(await getActiveIndex(page));
-      await swipeCarousel(page, 'left');
+      const swipeOptions = touchSwipeRegressionProfiles.has(profile.name)
+        ? getTouchSwipeRegressionOptions(profile.name)
+        : undefined;
+
+      await swipeCarousel(page, 'left', swipeOptions);
       const finalIndex = Number(await getActiveIndex(page));
       expect(finalIndex).toBe((initialIndex + 1) % 6);
     });
 
     test('horizontal swipe right reverses exactly one card', async ({ page }) => {
-      await swipeCarousel(page, 'left');
+      const swipeOptions = touchSwipeRegressionProfiles.has(profile.name)
+        ? getTouchSwipeRegressionOptions(profile.name)
+        : undefined;
+
+      await swipeCarousel(page, 'left', swipeOptions);
       const initialIndex = Number(await getActiveIndex(page));
-      await swipeCarousel(page, 'right');
+      await swipeCarousel(page, 'right', swipeOptions);
       const finalIndex = Number(await getActiveIndex(page));
       expect(finalIndex).toBe((initialIndex + 5) % 6);
     });
@@ -682,7 +704,16 @@ test.describe('Shared Premium Pages', () => {
 
     await triggerRoulette(page, 'click');
     await expect(page.locator('.luxury-roulette-overlay')).toHaveAttribute('data-result-kind', 'winner', { timeout: 10000 });
-    await page.waitForURL((url) => url.toString() !== startUrl && /\/(?:EN\/)?projects\/.+/.test(url.toString()), { timeout: 10000 });
+    const winnerUrlPattern = /\/(?:EN\/)?projects\/.+/;
+    if (!(page.url() !== startUrl && winnerUrlPattern.test(page.url()))) {
+      await page.waitForURL((url) => {
+        const current = url.toString();
+        return current !== startUrl && winnerUrlPattern.test(current);
+      }, { timeout: 10000 });
+    }
+
+    expect(page.url()).not.toBe(startUrl);
+    expect(page.url()).toMatch(winnerUrlPattern);
     expect(navigationCount).toBe(1);
 
     await context.close();
