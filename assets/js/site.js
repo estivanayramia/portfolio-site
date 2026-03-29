@@ -666,34 +666,64 @@ const initAnimations = () => {
         && (typeof window.matchMedia === 'function')
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Always unhide elements first to avoid blank screens
     const allAnimated = document.querySelectorAll('[data-gsap]');
-    allAnimated.forEach(el => {
-        el.classList.remove('opacity-0', 'translate-y-8', 'translate-y-6', 'translate-y-4');
-        el.dataset.gsapState = 'ready';
-        el.style.opacity = '1';
-        el.style.transform = 'none';
-    });
+    const revealWithoutAnimation = () => {
+        allAnimated.forEach(el => {
+            el.classList.remove('opacity-0', 'translate-y-8', 'translate-y-6', 'translate-y-4');
+            el.dataset.gsapState = 'fallback-visible';
+            el.style.opacity = '1';
+            el.style.visibility = 'visible';
+            el.style.transform = 'none';
+        });
+    };
 
     // If GSAP unavailable, keep content visible and exit
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
         console.warn('GSAP or ScrollTrigger not loaded; revealing content without animations.');
+        revealWithoutAnimation();
         return;
     }
 
     // Reduced motion: keep layout stable (no transform-based entrance/scroll animations)
     if (prefersReducedMotion) {
+        revealWithoutAnimation();
         return;
     }
 
+    allAnimated.forEach((el) => {
+        el.classList.remove('opacity-0', 'translate-y-8', 'translate-y-6', 'translate-y-4');
+        el.style.removeProperty('opacity');
+        el.style.removeProperty('visibility');
+        el.style.removeProperty('transform');
+    });
+
     // Register ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
+    if (typeof ScrollTrigger.getAll === 'function') {
+        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    }
 
     // Fade Up Animations
     const fadeElements = document.querySelectorAll('[data-gsap="fade-up"]');
+    gsap.killTweensOf(fadeElements);
     
     fadeElements.forEach(element => {
-        const delay = element.getAttribute('data-gsap-delay') || 0;
+        const delay = parseFloat(element.getAttribute('data-gsap-delay') || '0') * 0.5;
+        const hadFallbackVisible = element.dataset.gsapState === 'fallback-visible';
+        const rect = element.getBoundingClientRect();
+        const keepVisibleFromFallback = hadFallbackVisible && rect.top < window.innerHeight;
+
+        element.removeAttribute('data-gsap-state');
+
+        // On mobile, do not re-hide elements that were already visible before GSAP loaded.
+        if (keepVisibleFromFallback) {
+            gsap.set(element, {
+                autoAlpha: 1,
+                y: 0,
+                clearProps: 'opacity,visibility,transform'
+            });
+            return;
+        }
 
         gsap.fromTo(element, {
             autoAlpha: 0,
@@ -702,7 +732,7 @@ const initAnimations = () => {
             autoAlpha: 1,
             y: 0,
             duration: 0.4,
-            delay: parseFloat(delay) * 0.5,
+            delay,
             ease: 'power2.out',
             clearProps: 'opacity,visibility,transform',
             onComplete: () => {
@@ -3606,10 +3636,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initPageCloseFloatingUiGuard() {
-        const guardedSections = [
-            ...Array.from(document.querySelectorAll('.page-close')),
-            ...Array.from(document.querySelectorAll('footer'))
-        ];
+        // Guard against footer overlap while keeping controls pinned to viewport corners.
+        const guardedSections = Array.from(document.querySelectorAll('footer'));
         const scrollBtn = document.getElementById('scroll-to-top');
         const chatToggle = document.getElementById('chat-toggle');
         const SAFE_GAP = 12;
@@ -3645,8 +3673,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const rect = el.getBoundingClientRect();
                     if (!rect || rect.height <= 0) return;
                     const overlap = rect.bottom + SAFE_GAP - guardTop;
-                    if (overlap > lift) {
-                        lift = currentLift + overlap;
+                    const candidateLift = currentLift + overlap;
+                    if (candidateLift > lift) {
+                        lift = candidateLift;
                     }
                 });
             }

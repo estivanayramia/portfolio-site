@@ -2026,7 +2026,7 @@ select.border-red-500 {
     line-height: 1.82;
 }
 
-html.js [data-gsap][data-gsap-state="ready"] {
+html.js [data-gsap][data-gsap-state="fallback-visible"] {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
