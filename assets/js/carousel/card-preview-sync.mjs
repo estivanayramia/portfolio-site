@@ -35,6 +35,18 @@ function setTextContent(node, value) {
   if (node.textContent !== value) node.textContent = value;
 }
 
+function getPreviewSurfaceBackground(cardData) {
+  if (!cardData?.id) {
+    return 'linear-gradient(165deg, rgba(244, 235, 223, 0.96) 0%, rgba(224, 208, 186, 0.92) 100%)';
+  }
+
+  if (cardData.id.startsWith('project-')) {
+    return 'linear-gradient(165deg, rgba(240, 232, 220, 0.98) 0%, rgba(211, 196, 177, 0.94) 54%, rgba(188, 166, 143, 0.9) 100%)';
+  }
+
+  return 'linear-gradient(165deg, rgba(244, 236, 226, 0.98) 0%, rgba(223, 210, 192, 0.94) 56%, rgba(200, 181, 157, 0.9) 100%)';
+}
+
 function ensurePreviewImageNode(container, cardData) {
   if (!container) return null;
 
@@ -50,9 +62,13 @@ function ensurePreviewImageNode(container, cardData) {
 
   image.src = cardData.previewImage;
   image.alt = `${cardData.title} preview`;
+  image.style.width = '100%';
+  image.style.height = '100%';
+  image.style.objectFit = 'contain';
+  image.style.objectPosition = 'center';
 
-  container.style.background = `url('${cardData.previewImage}') center / cover no-repeat`;
-  container.style.backgroundImage = `url('${cardData.previewImage}')`;
+  container.style.background = getPreviewSurfaceBackground(cardData);
+  container.style.backgroundImage = 'none';
   container.style.backgroundPosition = 'center';
   container.style.backgroundSize = 'cover';
   container.style.backgroundRepeat = 'no-repeat';
@@ -99,8 +115,9 @@ function applyToLegacyGridCard(cardNode, cardData) {
   if (mediaNode) {
     mediaNode.style.backgroundImage = `url('${cardData.previewImage}')`;
     mediaNode.style.backgroundPosition = 'center';
-    mediaNode.style.backgroundSize = 'cover';
+    mediaNode.style.backgroundSize = 'contain';
     mediaNode.style.backgroundRepeat = 'no-repeat';
+    mediaNode.style.background = getPreviewSurfaceBackground(cardData);
 
     let image = mediaNode.querySelector('img.card-image');
     if (!image) {
@@ -110,7 +127,8 @@ function applyToLegacyGridCard(cardNode, cardData) {
       image.decoding = 'async';
       image.style.width = '100%';
       image.style.height = '100%';
-      image.style.objectFit = 'cover';
+      image.style.objectFit = 'contain';
+      image.style.objectPosition = 'center';
 
       mediaNode.replaceChildren(image);
     }

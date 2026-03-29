@@ -1,4 +1,4 @@
-export const CARD_PREVIEW_VERSION = '2026-03-29-v1';
+export const CARD_PREVIEW_VERSION = '2026-03-29-v4';
 export const CARD_PREVIEW_OUTPUT_DIR = '/assets/img/generated/card-previews';
 
 export const PROJECT_CARD_PREVIEWS = [
@@ -11,8 +11,9 @@ export const PROJECT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-portfolio-cover.webp`,
     generation: {
       type: 'screenshot',
+      treatment: 'web-build-cover',
       routePath: '/EN/projects/portfolio.html',
-      selectors: ['section.page-hero', 'main']
+      selectors: ['main', 'section.page-hero']
     }
   },
   {
@@ -24,8 +25,10 @@ export const PROJECT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-isa-grimes-cover.webp`,
     generation: {
       type: 'screenshot',
+      treatment: 'conversation-quote',
+      quote: 'What leadership sounds like once life stops being theoretical.',
       routePath: '/EN/projects/isa-grimes-interview.html',
-      selectors: ['section.page-hero', 'main']
+      selectors: ['main', 'section.page-hero']
     }
   },
   {
@@ -37,6 +40,7 @@ export const PROJECT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-loreal-pdf-cover.webp`,
     generation: {
       type: 'pdf',
+      treatment: 'document-poster',
       source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/loreal-maps-retail-playbook.pdf'
     }
   },
@@ -49,6 +53,7 @@ export const PROJECT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-franklin-pdf-cover.webp`,
     generation: {
       type: 'pdf',
+      treatment: 'document-poster',
       source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/franklin-templeton-concept.pdf'
     }
   },
@@ -61,6 +66,7 @@ export const PROJECT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-endpoint-linkedin-pdf-cover.webp`,
     generation: {
       type: 'pdf',
+      treatment: 'document-poster',
       source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/endpoint-linkedin-campaign.pdf'
     }
   },
@@ -72,8 +78,10 @@ export const PROJECT_CARD_PREVIEWS = [
     link: '/projects/endpoint-elosity-video',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-endpoint-elosity-cover.webp`,
     generation: {
-      type: 'image',
-      source: 'https://i.ytimg.com/vi/q8RmdNRzx1g/maxresdefault.jpg'
+      type: 'screenshot',
+      treatment: 'motion-storyboard',
+      routePath: '/EN/projects/endpoint-elosity-video.html',
+      selectors: ['main', 'section.page-hero']
     }
   },
   {
@@ -85,6 +93,7 @@ export const PROJECT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-endpoint-competitive-pdf-cover.webp`,
     generation: {
       type: 'pdf',
+      treatment: 'document-poster',
       source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/endpoint-competitive-playbook.pdf'
     }
   }
@@ -100,8 +109,9 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/about-values-cover.webp`,
     generation: {
       type: 'screenshot',
+      treatment: 'chapter-opener-cover',
       routePath: '/EN/about/values.html',
-      selectors: ['section.page-hero', 'main']
+      selectors: ['main', 'section.page-hero']
     }
   },
   {
@@ -113,10 +123,11 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/about-background-collage.webp`,
     generation: {
       type: 'collage',
+      treatment: 'identity-led-composition',
       sources: [
-        '/assets/img/Portolio-Media/Portfolio-Media/Estivan_and_Alen_in_Iraq.jpg',
+        '/assets/img/Portolio-Media/Portfolio-Media/Estivan_and_Alen_in_Iraq.webp',
         '/assets/img/headshot.webp',
-        '/assets/img/logo-ea.webp'
+        '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_3447.webp'
       ]
     }
   },
@@ -129,8 +140,9 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/about-working-with-me-cover.webp`,
     generation: {
       type: 'screenshot',
+      treatment: 'chapter-opener-cover',
       routePath: '/EN/about/working-with-me.html',
-      selectors: ['section.page-hero', 'main']
+      selectors: ['main', 'section.page-hero']
     }
   },
   {
@@ -142,6 +154,7 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-gym-collage.webp`,
     generation: {
       type: 'collage',
+      treatment: 'hero-detail-triptych',
       sources: [
         '/assets/img/Portolio-Media/Portfolio-Media/gym-/beach_in_pb.jpg',
         '/assets/img/Portolio-Media/Portfolio-Media/gym-/hip_thrust_pr.jpg',
@@ -158,6 +171,7 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-photography-collage.webp`,
     generation: {
       type: 'collage',
+      treatment: 'photography-contact-sheet',
       sources: [
         '/assets/img/Portolio-Media/Portfolio-Media/photography-/IMG_0799.webp',
         '/assets/img/Portolio-Media/Portfolio-Media/photography-/IMG_2957.webp',
@@ -175,11 +189,12 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-car-collage.webp`,
     generation: {
       type: 'collage',
+      treatment: 'hero-detail-triptych',
       sources: [
-        '/assets/img/Portolio-Media/Portfolio-Media/car-/car_front.jpg',
-        '/assets/img/Portolio-Media/Portfolio-Media/car-/car_back.jpg',
-        '/assets/img/Portolio-Media/Portfolio-Media/car-/car_by_sunset.jpg',
-        '/assets/img/Portolio-Media/Portfolio-Media/car-/me_and_car.jpg'
+        '/assets/img/Portolio-Media/Portfolio-Media/car-/car_by_ocean.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/car-/me_and_car.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/car-/car_front.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/car-/car_by_sunset.webp'
       ]
     }
   },
@@ -192,11 +207,12 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-cooking-collage.webp`,
     generation: {
       type: 'collage',
+      treatment: 'hero-detail-triptych',
       sources: [
-        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/avocado_steak_eggs_smoothie.jpg',
-        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/steaks.jpg',
-        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/chicken_alfredo_pasta.jpg',
-        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/vodka_pasta.jpg'
+        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/avocado_steak_eggs_smoothie.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/steaks.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/chicken_alfredo_pasta.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/vodka_pasta.webp'
       ]
     }
   },
@@ -209,11 +225,12 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-whispers-collage.webp`,
     generation: {
       type: 'collage',
+      treatment: 'reflective-note-cover',
       sources: [
-        '/assets/img/Portolio-Media/Portfolio-Media/whispers-/note 1.jpg',
-        '/assets/img/Portolio-Media/Portfolio-Media/whispers-/note 2.jpg',
         '/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 10.jpg',
-        '/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 38.webp'
+        '/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 24.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 38.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 41.webp'
       ]
     }
   },
@@ -226,11 +243,12 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-reading-collage.webp`,
     generation: {
       type: 'collage',
+      treatment: 'reading-editorial',
       sources: [
-        '/assets/img/Portolio-Media/Portfolio-Media/reading-/48_laws_of_power_cover.webp',
-        '/assets/img/Portolio-Media/Portfolio-Media/reading-/Ego_Is_The_Enemy_Ryan_Holiday_Book_Cover.webp',
-        '/assets/img/Portolio-Media/Portfolio-Media/reading-/fourth_wing_cover.webp',
-        '/assets/img/Portolio-Media/Portfolio-Media/reading-/the_catcher_in_the_rye_cover.webp'
+        '/assets/img/Portolio-Media/Portfolio-Media/reading-/reading_by_beach.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/reading-/dead_kindle_3.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/reading-/Advice_From_Aristotle.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/reading-/How_To_Win_Friends_and_Influence_People_Dale_Carnegie.webp'
       ]
     }
   },
@@ -243,6 +261,7 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-me-collage.webp`,
     generation: {
       type: 'collage',
+      treatment: 'hero-detail-triptych',
       sources: [
         '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0551.webp',
         '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_1411.webp',
@@ -260,8 +279,9 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-games-cover.webp`,
     generation: {
       type: 'screenshot',
+      treatment: 'chapter-opener-cover',
       routePath: '/EN/hobbies-games.html',
-      selectors: ['#arcade-featured-carousel', 'main']
+      selectors: ['main', '#arcade-featured-carousel']
     }
   }
 ];
