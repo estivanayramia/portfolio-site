@@ -95,6 +95,18 @@ function withTrailingSlash(baseUrl) {
   return String(baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, "");
 }
 
+function normalizeComparableText(value) {
+  return String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[’‘`']/g, "")
+    .replace(/[^a-z0-9\s/'-]+/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase()
+    .replace(/\bloral\b/g, "loreal");
+}
+
 function getCacheEntry(name) {
   const value = GROUNDING_CACHE[name];
   const timestamp = GROUNDING_CACHE[`${name}Timestamp`];
@@ -217,16 +229,9 @@ function buildHistoryAwareQuery(message, history) {
   const previousUser = [...history]
     .reverse()
     .find((entry) => entry.kind === "text" && entry.sender === "user" && cleanTextFragment(entry.text) !== current);
-  const previousBot = [...history]
-    .reverse()
-    .find((entry) => entry.kind === "text" && entry.sender === "bot");
-
   const parts = [current];
   if (previousUser?.text) {
     parts.push(`Previous user question: ${previousUser.text}`);
-  }
-  if (previousBot?.text) {
-    parts.push(`Previous answer context: ${previousBot.text.slice(0, 260)}`);
   }
 
   return cleanTextFragment(parts.join(" "));
@@ -478,7 +483,7 @@ async function refreshManifestIfNeeded(env, request, requestedBuildVersion, mani
 }
 
 function detectRegister(message) {
-  const lower = String(message || "").toLowerCase();
+  const lower = normalizeComparableText(message);
 
   if (/(actually|be honest|seriously|mostly ai|just ai|real skill|why should|convince me)/i.test(lower)) {
     return "skeptical";
@@ -500,7 +505,7 @@ function detectRegister(message) {
 }
 
 function classifyQuestion(message) {
-  const lower = String(message || "").toLowerCase().trim();
+  const lower = normalizeComparableText(message);
 
   if (!lower) return QUESTION_CLASSES.UNKNOWN;
   if (/^(hi|hello|hey|yo|what's up|whats up|good morning|good afternoon|good evening)\b/.test(lower)) {
@@ -548,37 +553,39 @@ function classifyQuestion(message) {
   if (/\b(what's he about|whats he about|what is estivan about|what are you about|who are you|tell me about yourself|tell me about estivan|what does estivan do|what does he do|what do you do)\b/.test(lower)) {
     return QUESTION_CLASSES.ABOUT_GENERAL;
   }
-  if (/\b(page|site|homepage|overview|deep dive|about|project page|hobbies|whispers|portfolio build|loreal|endpoint|franklin|cooking|reading|photography|me page)\b/.test(lower)) {
+  if (/\b(page|site|homepage|overview|deep dive|about|project page|hobbies|whispers|portfolio build|l[' ]?oreal|loreal|endpoint|franklin|cooking|reading|photography|me page)\b/.test(lower)) {
     return QUESTION_CLASSES.PAGE_SPECIFIC;
   }
   return QUESTION_CLASSES.OPEN;
 }
 
 function detectSurfaceFactKey(message) {
-  const lower = String(message || "").toLowerCase();
+  const lower = normalizeComparableText(message);
   const match = SURFACE_FACT_PATTERNS.find((entry) => entry.pattern.test(lower));
   return match ? match.key : "";
 }
 
 function scorePage(page, queryTokens, message, questionClass) {
-  const lower = String(message || "").toLowerCase();
+  const lower = normalizeComparableText(message);
   let score = 0;
   const route = String(page.route || "");
-  const title = String(page.title || "").toLowerCase();
-  const summary = String(page.summary || "").toLowerCase();
-  const description = String(page.description || "").toLowerCase();
-  const headings = (page.headings || []).join(" ").toLowerCase();
+  const title = normalizeComparableText(page.title || "");
+  const summary = normalizeComparableText(page.summary || "");
+  const description = normalizeComparableText(page.description || "");
+  const headings = normalizeComparableText((page.headings || []).join(" "));
 
   if (lower.includes(route.replace(/\/$/, "")) && route !== "/") score += 30;
   if (title && lower.includes(title)) score += 24;
 
   for (const token of queryTokens) {
-    if (route.includes(token)) score += 7;
-    if (title.includes(token)) score += 9;
-    if (headings.includes(token)) score += 6;
-    if (summary.includes(token)) score += 5;
-    if (description.includes(token)) score += 4;
-    if ((page.keywords || []).includes(token)) score += 3;
+    const normalizedToken = normalizeComparableText(token);
+    if (!normalizedToken) continue;
+    if (route.includes(normalizedToken)) score += 7;
+    if (title.includes(normalizedToken)) score += 9;
+    if (headings.includes(normalizedToken)) score += 6;
+    if (summary.includes(normalizedToken)) score += 5;
+    if (description.includes(normalizedToken)) score += 4;
+    if ((page.keywords || []).map((keyword) => normalizeComparableText(keyword)).includes(normalizedToken)) score += 3;
   }
 
   if (questionClass === QUESTION_CLASSES.PAGE_SPECIFIC) {
@@ -605,16 +612,24 @@ function scorePage(page, queryTokens, message, questionClass) {
   if (/\bfranklin\b/i.test(lower) && route.includes("franklin")) score += 30;
   if (/\bisa\b|\bgrimes\b/i.test(lower) && route.includes("isa-grimes")) score += 30;
   if (/\bportfolio\b|\bthis website\b|\bsite build\b/i.test(lower) && route.includes("/projects/portfolio")) score += 34;
+  if (/\bbackground\b|\bhis background\b|\btell me about his background\b/i.test(lower) && route === "/about/background") score += 36;
   if (/\bworking with people\b|\bworking with him\b|\bteam\b|\bcollaborat/i.test(lower) && route === "/about/working-with-me") score += 22;
+  if (/\bl[' ]?oreal\b|\bloreal\b/.test(lower) && route.includes("loreal")) score += 48;
+  if (/previous user question: .*background/.test(lower) && route === "/about/background") score += 56;
+  if (/previous user question: .*working with/.test(lower) && route === "/about/working-with-me") score += 48;
+  if (/previous user question: .*values?/.test(lower) && route === "/about/values") score += 44;
+  if (/(previous user question: .*l[' ]?oreal|previous user question: .*loreal)/.test(lower) && route.includes("loreal")) score += 60;
+  if (/(previous user question: .*portfolio|previous user question: .*this website|previous user question: .*site build)/.test(lower) && route.includes("/projects/portfolio")) score += 54;
+  if (/\bl[' ]?oreal\b|\bloreal\b/.test(lower) && page.pageType === "projects_index") score -= 18;
 
   return score;
 }
 
 function scoreSection(page, section, queryTokens, message) {
-  const lower = String(message || "").toLowerCase();
+  const lower = normalizeComparableText(message);
   let score = 0;
-  const heading = String(section.heading || "").toLowerCase();
-  const text = String(section.text || "").toLowerCase();
+  const heading = normalizeComparableText(section.heading || "");
+  const text = normalizeComparableText(section.text || "");
 
   if (heading && lower.includes(heading)) score += 10;
   for (const token of queryTokens) {
@@ -806,12 +821,31 @@ function containsFirstPerson(text) {
 }
 
 function buildPageSpecificReply(retrieval, message = "") {
-  const [topPage] = retrieval.pages;
+  let [topPage] = retrieval.pages;
   if (!topPage) {
     return "";
   }
 
-  const lowerMessage = String(message || "").toLowerCase();
+  const rawMessage = String(message || "");
+  const lowerMessage = normalizeComparableText(message);
+  const preferredPage = (matcher) => retrieval.pages.find((page) => matcher(page));
+
+  if (/\bloreal\b/.test(lowerMessage) || /l.?or.?e?al|bio.?print/i.test(rawMessage)) {
+    topPage = preferredPage((page) => page.route.includes("loreal")) || topPage;
+  } else if (/\bfranklin\b/.test(lowerMessage)) {
+    topPage = preferredPage((page) => page.route.includes("franklin")) || topPage;
+  } else if (/\bisa\b|\bgrimes\b/.test(lowerMessage)) {
+    topPage = preferredPage((page) => page.route.includes("isa-grimes")) || topPage;
+  } else if (/\bbackground\b/.test(lowerMessage)) {
+    topPage = preferredPage((page) => page.route === "/about/background") || topPage;
+  } else if (/\bvalues?\b/.test(lowerMessage)) {
+    topPage = preferredPage((page) => page.route === "/about/values") || topPage;
+  } else if (/\bworking with people\b|\bworking with him\b|\bworking with me\b|\bcollaborat/.test(lowerMessage)) {
+    topPage = preferredPage((page) => page.route === "/about/working-with-me") || topPage;
+  } else if (/\bportfolio\b|\bthis website\b|\bsite build\b/.test(lowerMessage)) {
+    topPage = preferredPage((page) => page.route.includes("/projects/portfolio")) || topPage;
+  }
+
   const asksHobbiesHub = /\bhobbies?\b/.test(lowerMessage) && /\b(hub|gateway|overview|main)\b/.test(lowerMessage);
   const asksGames = /\b(game|games|arcade|mini\s*-?\s*games?)\b/.test(lowerMessage);
 
