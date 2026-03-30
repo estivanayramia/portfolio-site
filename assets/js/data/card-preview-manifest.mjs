@@ -10,10 +10,8 @@ export const PROJECT_CARD_PREVIEWS = [
     link: '/projects/portfolio',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-portfolio-cover.webp`,
     generation: {
-      type: 'screenshot',
-      treatment: 'web-build-cover',
-      routePath: '/EN/projects/portfolio.html',
-      selectors: ['main', 'section.page-hero']
+      type: 'synthetic',
+      treatment: 'editorial-web-cover'
     }
   },
   {
@@ -108,10 +106,8 @@ export const ABOUT_CARD_PREVIEWS = [
     link: '/about/values',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/about-values-cover.webp`,
     generation: {
-      type: 'screenshot',
-      treatment: 'chapter-opener-cover',
-      routePath: '/EN/about/values.html',
-      selectors: ['main', 'section.page-hero']
+      type: 'synthetic',
+      treatment: 'editorial-values-cover'
     }
   },
   {
@@ -135,10 +131,8 @@ export const ABOUT_CARD_PREVIEWS = [
     link: '/about/working-with-me',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/about-working-with-me-cover.webp`,
     generation: {
-      type: 'screenshot',
-      treatment: 'chapter-opener-cover',
-      routePath: '/EN/about/working-with-me.html',
-      selectors: ['main', 'section.page-hero']
+      type: 'synthetic',
+      treatment: 'editorial-collaboration-cover'
     }
   },
   {
@@ -275,7 +269,7 @@ export const ABOUT_CARD_PREVIEWS = [
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-games-cover.webp`,
     generation: {
       type: 'synthetic',
-      treatment: 'arcade-cover-art'
+      treatment: 'arcade-cover-art-v2'
     }
   }
 ];

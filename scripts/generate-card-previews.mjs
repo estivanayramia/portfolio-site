@@ -349,6 +349,10 @@ function getLayoutFrames(treatment) {
           sourceIndex: 0
         }
       ];
+    case 'editorial-values-cover':
+    case 'editorial-collaboration-cover':
+    case 'editorial-web-cover':
+      return [];
     case 'document-poster':
       return [
         {
@@ -1100,6 +1104,147 @@ function buildArcadeCover(card) {
     .toBuffer();
 }
 
+function buildEditorialSyntheticCover(card, treatment) {
+  const theme = pickTheme(card.id);
+  const canvas = createCanvas(CARD_WIDTH, CARD_HEIGHT);
+  const context = canvas.getContext('2d');
+
+  const base = context.createLinearGradient(0, 0, 0, CARD_HEIGHT);
+  base.addColorStop(0, '#f4ead9');
+  base.addColorStop(0.52, '#ead9c0');
+  base.addColorStop(1, '#27324d');
+  context.fillStyle = base;
+  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+
+  const indigoPanel = context.createLinearGradient(0, CARD_HEIGHT * 0.42, 0, CARD_HEIGHT);
+  indigoPanel.addColorStop(0, 'rgba(39, 50, 77, 0)');
+  indigoPanel.addColorStop(1, 'rgba(33, 40, 66, 0.94)');
+  context.fillStyle = indigoPanel;
+  context.fillRect(0, CARD_HEIGHT * 0.32, CARD_WIDTH, CARD_HEIGHT * 0.68);
+
+  const topGlow = context.createRadialGradient(CARD_WIDTH * 0.82, CARD_HEIGHT * 0.12, 10, CARD_WIDTH * 0.82, CARD_HEIGHT * 0.12, CARD_WIDTH * 0.4);
+  topGlow.addColorStop(0, 'rgba(245, 226, 187, 0.56)');
+  topGlow.addColorStop(1, 'rgba(245, 226, 187, 0)');
+  context.fillStyle = topGlow;
+  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+
+  for (let i = 0; i < 7; i += 1) {
+    context.strokeStyle = `rgba(39, 50, 77, ${0.06 + (i * 0.01)})`;
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(80 + (i * 36), 110 + (i * 22));
+    context.lineTo(840 - (i * 22), 1040 + (i * 12));
+    context.stroke();
+  }
+
+  drawTopChip(context, theme, card);
+
+  const panelX = 112;
+  const panelY = 174;
+  const panelWidth = 736;
+  const panelHeight = 714;
+  drawRoundedRectPath(context, panelX, panelY, panelWidth, panelHeight, 32);
+  context.fillStyle = 'rgba(247, 240, 229, 0.78)';
+  context.fill();
+  context.strokeStyle = 'rgba(111, 87, 66, 0.12)';
+  context.lineWidth = 2;
+  context.stroke();
+
+  if (treatment === 'editorial-values-cover') {
+    drawTagRow(context, theme, ['principles', 'standards'], { x: 122, y: 116 });
+    context.font = `600 24px ${FONT_FAMILY}`;
+    context.fillStyle = '#2f3854';
+    context.fillText('01', 156, 292);
+    context.fillText('02', 156, 384);
+    context.fillText('03', 156, 476);
+    context.fillText('04', 156, 568);
+    context.font = `600 28px ${FONT_FAMILY}`;
+    context.fillStyle = '#523d31';
+    context.fillText('Curiosity over posturing', 236, 292);
+    context.fillText('Execution over theater', 236, 384);
+    context.fillText('Growth through discomfort', 236, 476);
+    context.fillText('People still matter most', 236, 568);
+  } else if (treatment === 'editorial-collaboration-cover') {
+    drawTagRow(context, theme, ['clarity', 'follow-through'], { x: 122, y: 116 });
+    drawRoundedRectPath(context, 152, 258, 276, 218, 24);
+    context.fillStyle = 'rgba(33, 40, 66, 0.92)';
+    context.fill();
+    drawRoundedRectPath(context, 456, 324, 214, 158, 24);
+    context.fillStyle = 'rgba(188, 148, 96, 0.9)';
+    context.fill();
+    drawRoundedRectPath(context, 396, 518, 286, 182, 24);
+    context.fillStyle = 'rgba(247, 240, 229, 0.98)';
+    context.fill();
+    context.font = `600 24px ${FONT_FAMILY}`;
+    context.fillStyle = '#f7efe3';
+    context.fillText('clear expectations', 186, 334);
+    context.fillText('calm communication', 186, 382);
+    context.fillStyle = '#1d1810';
+    context.fillText('no drama', 502, 404);
+    context.fillStyle = '#2f3854';
+    context.fillText('reliable handoff', 434, 604);
+    context.fillText('better than extra noise', 434, 652);
+  } else {
+    drawTagRow(context, theme, ['system', 'craft', 'build'], { x: 122, y: 116 });
+    drawRoundedRectPath(context, 146, 248, 670, 388, 28);
+    context.fillStyle = 'rgba(33, 40, 66, 0.9)';
+    context.fill();
+    context.strokeStyle = 'rgba(247, 239, 227, 0.18)';
+    context.lineWidth = 2;
+    context.stroke();
+    context.fillStyle = 'rgba(247, 239, 227, 0.9)';
+    context.fillRect(190, 296, 236, 18);
+    context.fillRect(450, 296, 106, 18);
+    context.fillRect(572, 296, 94, 18);
+    context.fillStyle = 'rgba(247, 239, 227, 0.12)';
+    context.fillRect(190, 346, 582, 188);
+    context.fillRect(190, 556, 168, 44);
+    context.fillRect(378, 556, 168, 44);
+    context.fillRect(566, 556, 168, 44);
+    context.strokeStyle = 'rgba(188, 148, 96, 0.42)';
+    context.lineWidth = 1.5;
+    for (let y = 348; y <= 534; y += 38) {
+      context.beginPath();
+      context.moveTo(190, y);
+      context.lineTo(772, y);
+      context.stroke();
+    }
+  }
+
+  drawRoundedRectPath(context, 96, 1002, 768, 206, 28);
+  context.fillStyle = 'rgba(33, 40, 66, 0.88)';
+  context.fill();
+  context.strokeStyle = 'rgba(239, 224, 197, 0.28)';
+  context.lineWidth = 1.5;
+  context.stroke();
+
+  drawWrappedText(context, {
+    text: card.title,
+    x: 132,
+    y: 1058,
+    maxWidth: 696,
+    lineHeight: 60,
+    maxLines: 2,
+    font: `700 56px ${FONT_FAMILY}`,
+    fillStyle: theme.textTitle
+  });
+
+  drawWrappedText(context, {
+    text: card.description,
+    x: 132,
+    y: 1142,
+    maxWidth: 670,
+    lineHeight: 34,
+    maxLines: 2,
+    font: `500 24px ${FONT_FAMILY}`,
+    fillStyle: theme.textBody
+  });
+
+  return sharp(Buffer.from(canvas.toBuffer('image/png')))
+    .webp({ quality: 90, effort: 6 })
+    .toBuffer();
+}
+
 async function composeEditorialCover(options) {
   const {
     card,
@@ -1329,8 +1474,14 @@ async function generateNonScreenshotCards(cards) {
     } else if (generation.type === 'image') {
       outputBuffer = await buildPhotoCover(card, generation.source, treatment);
     } else if (generation.type === 'synthetic') {
-      if (treatment === 'arcade-cover-art') {
+      if (treatment === 'arcade-cover-art' || treatment === 'arcade-cover-art-v2') {
         outputBuffer = await buildArcadeCover(card);
+      } else if (
+        treatment === 'editorial-values-cover'
+        || treatment === 'editorial-collaboration-cover'
+        || treatment === 'editorial-web-cover'
+      ) {
+        outputBuffer = await buildEditorialSyntheticCover(card, treatment);
       } else {
         throw new Error(`Unknown synthetic treatment for ${card.id}: ${treatment}`);
       }
