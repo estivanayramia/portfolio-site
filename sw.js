@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v20260330-aa383d6c-remaining-issues-gate-1';
+const CACHE_VERSION = 'v20260330-ab04ad25-remaining-issues-gate-2';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
