@@ -66,10 +66,75 @@
       "tags": []
     }
   ],
-  "hobbies": [],
+  "hobbies": [
+    {
+      "id": "games",
+      "title": "Games",
+      "summary": "Chess, strategy games, competitive thinking. Because even hobbies teach systems.",
+      "url": "/hobbies-games",
+      "fullUrl": "https://www.estivanayramia.com/hobbies-games",
+      "filePath": "/hobbies-games"
+    },
+    {
+      "id": "car-enthusiasm",
+      "title": "Car Enthusiasm",
+      "summary": "First car, first freedom. About ownership, maintenance, pride of keeping something running clean.",
+      "url": "/hobbies/car",
+      "fullUrl": "https://www.estivanayramia.com/hobbies/car",
+      "filePath": "/hobbies/car.html"
+    },
+    {
+      "id": "cooking",
+      "title": "Cooking",
+      "summary": "Steak, pasta, everything in between. Not a chef; just someone who refuses to eat mediocre food.",
+      "url": "/hobbies/cooking",
+      "fullUrl": "https://www.estivanayramia.com/hobbies/cooking",
+      "filePath": "/hobbies/cooking.html"
+    },
+    {
+      "id": "gym-strength-training",
+      "title": "Gym & Strength Training",
+      "summary": "Building discipline through progressive overload. Tracking PRs, optimizing recovery.",
+      "url": "/hobbies/gym",
+      "fullUrl": "https://www.estivanayramia.com/hobbies/gym",
+      "filePath": "/hobbies/gym.html"
+    },
+    {
+      "id": "me",
+      "title": "Me",
+      "summary": "Personal snapshots that capture identity, growth, and the moments behind the work.",
+      "url": "/hobbies/me",
+      "fullUrl": "https://www.estivanayramia.com/hobbies/me",
+      "filePath": "/hobbies/me.html"
+    },
+    {
+      "id": "photography",
+      "title": "Photography",
+      "summary": "iPhone shots that tell stories. No DSLR needed, just good lighting and better timing.",
+      "url": "/hobbies/photography",
+      "fullUrl": "https://www.estivanayramia.com/hobbies/photography",
+      "filePath": "/hobbies/photography.html"
+    },
+    {
+      "id": "reading",
+      "title": "Reading",
+      "summary": "Books are compressed experience. Cheapest way to access decades of wisdom.",
+      "url": "/hobbies/reading",
+      "fullUrl": "https://www.estivanayramia.com/hobbies/reading",
+      "filePath": "/hobbies/reading.html"
+    },
+    {
+      "id": "whispers-sticky-notes",
+      "title": "Whispers (Sticky Notes)",
+      "summary": "Random thoughts on sticky notes. Ideas, observations, reminders. Mental clutter organized.",
+      "url": "/hobbies/whispers",
+      "fullUrl": "https://www.estivanayramia.com/hobbies/whispers",
+      "filePath": "/hobbies/whispers.html"
+    }
+  ],
   "meta": {
     "projectCount": 7,
-    "hobbyCount": 0,
+    "hobbyCount": 8,
     "source": "Generated from HTML content by scripts/generate-site-facts.js"
   }
 }

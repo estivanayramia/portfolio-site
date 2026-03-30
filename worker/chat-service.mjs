@@ -6,7 +6,7 @@ import {
   tokenizeText
 } from "./chat-grounding-utils.mjs";
 
-export const CHAT_VERSION = "v2026.03.18-fresh-grounding";
+export const CHAT_VERSION = "v2026.03.29-grounded-inference";
 
 const FACTS_KEY = "site-facts:v1";
 const PROFILE_KEY = "profile:public:v1";
@@ -70,15 +70,15 @@ const BANNED_LANGUAGE = [
 ];
 
 const SURFACE_FACT_PATTERNS = [
-  { key: "favorite_color", pattern: /\b(favo[u]?rite|what color).*color|\bcolor\b/i },
-  { key: "favorite_movie", pattern: /\b(favo[u]?rite|best).*movie|\bmovie\b/i },
-  { key: "favorite_show", pattern: /\b(favo[u]?rite|best).*(show|shows|series)|\b(show|series)\b/i },
-  { key: "favorite_book", pattern: /\b(favo[u]?rite|best).*book|\bbook\b/i },
-  { key: "favorite_music", pattern: /\bmusic|artist|artists|band|bands|listen to\b/i },
-  { key: "favorite_food", pattern: /\bfood|foods|eat|eating|meal|pizza|pasta|dessert\b/i },
-  { key: "favorite_drink", pattern: /\bdrink|drinks|coffee|caffeine|coke zero|water\b/i },
+  { key: "favorite_color", pattern: /\b(favo[u]?rite|like).*(color|colour)|what.*(color|colour).*(like|favorite)\b/i },
+  { key: "favorite_movie", pattern: /\b(favo[u]?rite|best).*movie|what.*movie.*(favorite|like)\b/i },
+  { key: "favorite_show", pattern: /\b(favo[u]?rite|best).*(show|shows|series)|what.*(tv|show|series).*(favorite|watch)\b/i },
+  { key: "favorite_book", pattern: /\b(favo[u]?rite|best).*book|what.*book.*(favorite|like)\b/i },
+  { key: "favorite_music", pattern: /\b(favo[u]?rite|best).*(music|artist|artists|band|bands)|what.*(listen to|music|artist|band)\b/i },
+  { key: "favorite_food", pattern: /\b(favo[u]?rite|best).*(food|foods|meal)|what.*(eat|food|meal|dessert|pizza|pasta)\b/i },
+  { key: "favorite_drink", pattern: /\b(favo[u]?rite|best).*(drink|drinks)|what.*(drink|coffee|caffeine|coke zero|water)\b/i },
   { key: "favorite_team", pattern: /\bbarcelona|fc barcelona|favorite team|sports team\b/i },
-  { key: "favorite_sport", pattern: /\bsport|sports|soccer|football|volleyball|pickleball\b/i },
+  { key: "favorite_sport", pattern: /\b(favo[u]?rite|best).*(sport|sports)|what.*sport.*(favorite|play)\b/i },
   { key: "languages", pattern: /\blanguages?|speak|write in|english|arabic|chaldean|spanish\b/i },
   { key: "education", pattern: /\b(graduat(e|ed|ion)|degree|college|university|school|sdsu|major)\b/i },
   { key: "birthday", pattern: /\bbirthday\b|\bborn on\b|\bwhen.*born\b|\bage\b|\bhow old\b|\bold is\b/i },
@@ -170,6 +170,66 @@ function getMinimalFactsFallback() {
       source: "Minimal fallback"
     }
   };
+}
+
+function sanitizeConversationHistory(rawHistory) {
+  if (!Array.isArray(rawHistory)) return [];
+
+  return rawHistory
+    .slice(-8)
+    .map((entry) => {
+      if (!entry || typeof entry !== "object") return null;
+
+      if (entry.kind === "card" && entry.cardId) {
+        return {
+          kind: "card",
+          cardId: cleanTextFragment(entry.cardId).slice(0, 120)
+        };
+      }
+
+      if (entry.kind === "text" && entry.sender && entry.text) {
+        return {
+          kind: "text",
+          sender: cleanTextFragment(entry.sender).slice(0, 16),
+          text: cleanTextFragment(entry.text).slice(0, 500)
+        };
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+}
+
+function isAmbiguousFollowUp(message) {
+  const lower = String(message || "").toLowerCase().trim();
+  if (!lower) return false;
+  if (lower.length <= 72 && /\b(it|that|this|those|them|he|his|him|more|deeper|why|how so|what about that|and that|tell me more)\b/i.test(lower)) {
+    return true;
+  }
+  return /^(and|also|more|why|how|what about that|tell me more)/i.test(lower);
+}
+
+function buildHistoryAwareQuery(message, history) {
+  const current = cleanTextFragment(message || "");
+  if (!history.length) return current;
+  if (!isAmbiguousFollowUp(current)) return current;
+
+  const previousUser = [...history]
+    .reverse()
+    .find((entry) => entry.kind === "text" && entry.sender === "user" && cleanTextFragment(entry.text) !== current);
+  const previousBot = [...history]
+    .reverse()
+    .find((entry) => entry.kind === "text" && entry.sender === "bot");
+
+  const parts = [current];
+  if (previousUser?.text) {
+    parts.push(`Previous user question: ${previousUser.text}`);
+  }
+  if (previousBot?.text) {
+    parts.push(`Previous answer context: ${previousBot.text.slice(0, 260)}`);
+  }
+
+  return cleanTextFragment(parts.join(" "));
 }
 
 function parsePageContext(rawPageContext, legacyPageContent) {
@@ -541,6 +601,11 @@ function scorePage(page, queryTokens, message, questionClass) {
   if (questionClass === QUESTION_CLASSES.TEAM && (route === "/overview" || route === "/deep-dive" || route === "/about")) score += 8;
   if (questionClass === QUESTION_CLASSES.LANGUAGES && (route === "/overview" || route === "/about" || route === "/deep-dive" || route === "/es/" || route === "/ar/")) score += 8;
   if (questionClass === QUESTION_CLASSES.SITE_PROOF && (route === "/" || route === "/projects/portfolio")) score += 12;
+  if (/\bl[’']?or[ée]al|\bloreal\b/i.test(lower) && route.includes("loreal")) score += 40;
+  if (/\bfranklin\b/i.test(lower) && route.includes("franklin")) score += 30;
+  if (/\bisa\b|\bgrimes\b/i.test(lower) && route.includes("isa-grimes")) score += 30;
+  if (/\bportfolio\b|\bthis website\b|\bsite build\b/i.test(lower) && route.includes("/projects/portfolio")) score += 34;
+  if (/\bworking with people\b|\bworking with him\b|\bteam\b|\bcollaborat/i.test(lower) && route === "/about/working-with-me") score += 22;
 
   return score;
 }
@@ -695,6 +760,47 @@ function buildUnknownReply(profile) {
   return `That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email ${profile.contact?.email || "hello@estivanayramia.com"}.`;
 }
 
+function buildGroundedSectionLines(topPage, retrieval) {
+  return retrieval.sections
+    .filter((entry) => entry.page.route === topPage.route)
+    .slice(0, 3)
+    .map((entry) => {
+      const heading = cleanTextFragment(entry.section.heading || "")
+        .replace(/\s*\|\s*Estivan Ayramia\s*$/i, "")
+        .trim();
+      const snippet = cleanTextFragment(entry.section.text || "")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (!snippet) return "";
+      if (/view all projects/i.test(snippet)) return "";
+
+      const clipped = snippet.length > 170 ? `${snippet.slice(0, 167).trimEnd()}...` : snippet;
+      if (!heading || heading.toLowerCase() === cleanTextFragment(topPage.title || "").toLowerCase()) {
+        return clipped;
+      }
+      return `${heading}: ${clipped}`;
+    })
+    .filter(Boolean);
+}
+
+function buildGroundedPageAnswer(topPage, retrieval, options = {}) {
+  if (!topPage) return "";
+
+  const displayTitle = getDisplayPageTitle(topPage);
+  const summary = cleanTextFragment(topPage.summary || topPage.description || "");
+  const sectionLines = buildGroundedSectionLines(topPage, retrieval);
+  const intro = options.intro
+    || (summary
+      ? `${displayTitle}: ${summary}`
+      : `${displayTitle} is the relevant page here`);
+
+  if (!sectionLines.length) {
+    return `${intro} ${formatInternalLink(displayTitle, topPage.route)} has the full page.`;
+  }
+
+  return `${intro} ${sectionLines.join(" ")} ${formatInternalLink(displayTitle, topPage.route)} has the full version.`;
+}
+
 function containsFirstPerson(text) {
   return /\b(i|i['\u2019]m|i['\u2019]ve|i['\u2019]d|my|me|mine)\b/i.test(String(text || ""));
 }
@@ -710,81 +816,60 @@ function buildPageSpecificReply(retrieval, message = "") {
   const asksGames = /\b(game|games|arcade|mini\s*-?\s*games?)\b/.test(lowerMessage);
 
   if (asksHobbiesHub && !asksGames) {
-    return `${formatInternalLink("About", "/about")} is the best place for that. The hobbies section moved into the About flow, where each personal page is linked directly.`;
+    return "The hobbies material lives inside the About flow now. That section links out to the personal pages directly instead of hiding them behind a separate hub. [About](/about) is the cleanest starting point.";
   }
 
-  const displayTitle = getDisplayPageTitle(topPage);
-
   if (topPage.route === "/hobbies" || topPage.route === "/hobbies/") {
-    return `${formatInternalLink("About", "/about")} is the best place for that. The hobbies section moved into the About flow, where each personal page is linked directly.`;
+    return "The hobbies material was folded into the About flow. [About](/about) is the right entry point, then each hobby page branches out from there.";
   }
 
   if (topPage.route === "/about") {
-    return `${formatInternalLink("About", "/about")} is the best place for that. It is the personal side of the site: background, values, and what it is like to work with him.`;
+    return buildGroundedPageAnswer(topPage, retrieval, {
+      intro: "The About page is the personal side of the site: background, values, and what it is like to work with him"
+    });
   }
 
   if (topPage.route === "/about/background") {
-    return `${formatInternalLink("Background", "/about/background")} is the best place for that. It covers Baghdad to El Cajon, family context, first-generation pressure, and where that still shows up in how he works.`;
+    return buildGroundedPageAnswer(topPage, retrieval, {
+      intro: "The Background page explains the family and cultural context behind how he works"
+    });
   }
 
   if (topPage.route === "/about/values") {
-    return `${formatInternalLink("Values", "/about/values")} is the best place for that. It lays out the standards he actually uses: reliability, people, execution, and growth through discomfort.`;
+    return buildGroundedPageAnswer(topPage, retrieval, {
+      intro: "The Values page lays out the standards he actually uses"
+    });
   }
 
   if (topPage.route === "/about/working-with-me") {
-    return `${formatInternalLink("Working With Me", "/about/working-with-me")} is the best place for that. It shows how he collaborates, what he values on a team, and what people can usually expect from him in the work.`;
+    return buildGroundedPageAnswer(topPage, retrieval, {
+      intro: "The Working With Me page shows how he collaborates and what people can usually expect from him in the work"
+    });
   }
 
   if (topPage.route === "/overview") {
-    return `${formatInternalLink("Overview", "/overview")} is the best place for that. It is the short read on how he works, what people can usually count on from him, and where to go next if you want more proof or context.`;
+    return buildGroundedPageAnswer(topPage, retrieval, {
+      intro: "Overview is the short read on how he works and what people can usually count on from him"
+    });
   }
 
   if (topPage.route === "/deep-dive") {
-    return `${formatInternalLink("Deep Dive", "/deep-dive")} is the best place for that. It is the longer version: background, habits, work, and the systems behind how he thinks.`;
+    return buildGroundedPageAnswer(topPage, retrieval, {
+      intro: "Deep Dive is the longer version of the site"
+    });
   }
 
   if (topPage.route === "/contact") {
-    return `${formatInternalLink("Contact", "/contact")} is the best place for that. The form is the cleanest route if someone wants to send context, links, or an attachment in one place.`;
+    return "The Contact page is straightforward: it is the cleanest route if someone wants to send context, links, or an attachment in one place. [Contact](/contact) is the direct path.";
   }
 
   if (topPage.pageType === "projects_index") {
-    return `${formatInternalLink("Projects", "/projects/")} is the best place for that. It is the cleanest way to scan the full set and jump straight into the work that matters most.`;
+    return buildGroundedPageAnswer(topPage, retrieval, {
+      intro: "The Projects page is the main scan of the work set"
+    });
   }
 
-  const sectionLines = retrieval.sections
-    .filter((entry) => entry.page.route === topPage.route)
-    .slice(0, 2)
-    .map((entry) => {
-      const sectionHeading = cleanTextFragment(entry.section.heading || "")
-        .replace(/\s*\|\s*Estivan Ayramia\s*$/i, "")
-        .trim();
-      const rawSnippet = cleanTextFragment(entry.section.text || "");
-      const dedupedSnippet = sectionHeading && rawSnippet.toLowerCase().startsWith(sectionHeading.toLowerCase())
-        ? rawSnippet.slice(sectionHeading.length).trim().replace(/^[:.\-–—]\s*/, "")
-        : rawSnippet;
-      if (containsFirstPerson(dedupedSnippet)) {
-        return sectionHeading || "";
-      }
-      const snippet = dedupedSnippet.length > 180
-        ? `${dedupedSnippet.slice(0, 177).trimEnd()}...`
-        : dedupedSnippet;
-      if (!snippet) {
-        return sectionHeading || "";
-      }
-      if (!sectionHeading || sectionHeading.toLowerCase() === displayTitle.toLowerCase()) {
-        return snippet;
-      }
-      return `${sectionHeading}: ${snippet}`;
-    })
-    .filter(Boolean);
-
-  const intro = topPage.summary
-    ? `${formatInternalLink(displayTitle, topPage.route)} is the best place for that. ${topPage.summary}`
-    : `${formatInternalLink(displayTitle, topPage.route)} is the best page for that question.`;
-
-  if (!sectionLines.length) return intro;
-
-  return `${intro} The clearest parts are ${sectionLines.join(" ")}`.trim();
+  return buildGroundedPageAnswer(topPage, retrieval);
 }
 
 function buildDeterministicReply({ message, questionClass, surfaceFactKey, profile, siteFacts, retrieval }) {
@@ -802,9 +887,16 @@ function buildDeterministicReply({ message, questionClass, surfaceFactKey, profi
     case QUESTION_CLASSES.SKEPTICAL_AI:
       return `${(seeds.aiSkeptical || []).join(" ")} ${formatInternalLink("The portfolio build page", "/projects/portfolio")} is the cleanest proof.`;
     case QUESTION_CLASSES.TEAM:
-      return (seeds.team || []).join(" ");
+      return [
+        ...(seeds.team || []),
+        "The grounded version of that answer is that the site consistently points to clear communication, adaptability, and not making other people's jobs harder."
+      ].join(" ");
     case QUESTION_CLASSES.ROLE_FIT:
-      return (seeds.roles || []).join(" ");
+      return [
+        "Based on the site, the strongest fit is in roles that combine operations, coordination, communication, and structured problem-solving.",
+        "The work points toward project coordination, operations support, client-facing execution, growth/marketing support, and similar roles where he can turn messy inputs into a cleaner system.",
+        "That pattern shows up across the portfolio build, the campaign decks, and the About pages."
+      ].join(" ");
     case QUESTION_CLASSES.WEAKNESS:
       return (seeds.weakness || []).join(" ");
     case QUESTION_CLASSES.LANGUAGES:
@@ -812,7 +904,11 @@ function buildDeterministicReply({ message, questionClass, surfaceFactKey, profi
     case QUESTION_CLASSES.SURFACE_FACT:
       return formatSurfaceFactReply(surfaceFactKey, profile);
     case QUESTION_CLASSES.SITE_PROOF:
-      return `${(seeds.siteProof || []).join(" ")} ${formatInternalLink("The site build page", "/projects/portfolio")} goes deeper.`;
+      return [
+        ...(seeds.siteProof || []),
+        "The strongest proof is not just that he launched a site. It is that the site, the projects, and the About material all show the same pattern: structure, judgment, iteration, and follow-through.",
+        `${formatInternalLink("The site build page", "/projects/portfolio")} is the clearest single example.`
+      ].join(" ");
     case QUESTION_CLASSES.PROJECT_LIST:
       return formatProjectList(siteFacts);
     case QUESTION_CLASSES.PAGE_SPECIFIC:
@@ -820,7 +916,11 @@ function buildDeterministicReply({ message, questionClass, surfaceFactKey, profi
     case QUESTION_CLASSES.BOUNDARY:
       return buildBoundaryReply();
     case QUESTION_CLASSES.ABOUT_GENERAL:
-      return `Estivan is an SDSU ${profile.identity?.education?.degree || "General Business"} graduate who leans toward systems, operations, people judgment, and cleaner workflows. He usually looks at how something runs, where it breaks down, and how to make it work better without adding extra theater. ${formatInternalLink("Overview", "/overview")} is the short read, ${formatInternalLink("Projects", "/projects/")} is the quickest proof, and ${formatInternalLink("About", "/about")} gives the fuller picture.`;
+      return [
+        `Estivan is an SDSU ${profile.identity?.education?.degree || "General Business"} graduate who leans toward systems, operations, people judgment, and cleaner workflows.`,
+        "Across the site, he comes across as someone who notices where things break down, communicates clearly, and keeps pushing until the work is actually usable.",
+        `${formatInternalLink("Overview", "/overview")} is the short read, ${formatInternalLink("Projects", "/projects/")} is the quickest proof, and ${formatInternalLink("About", "/about")} gives the fuller picture.`
+      ].join(" ");
     case QUESTION_CLASSES.UNKNOWN:
       return buildUnknownReply(profile);
     default:
@@ -843,17 +943,8 @@ function shouldUseDeterministicOnly(questionClass, retrieval) {
     questionClass === QUESTION_CLASSES.SITE_PROOF ||
     questionClass === QUESTION_CLASSES.PROJECT_LIST ||
     questionClass === QUESTION_CLASSES.BOUNDARY ||
-    questionClass === QUESTION_CLASSES.ABOUT_GENERAL ||
     questionClass === QUESTION_CLASSES.UNKNOWN
   ) {
-    return true;
-  }
-
-  if (questionClass === QUESTION_CLASSES.PAGE_SPECIFIC && retrieval.pages.length > 0) {
-    return true;
-  }
-
-  if (questionClass === QUESTION_CLASSES.OPEN && retrieval.pages.length > 0) {
     return true;
   }
 
@@ -885,7 +976,8 @@ export function buildModelContext({
   retrieval,
   questionClass,
   register,
-  manifestStatus
+  manifestStatus,
+  conversationHistory = []
 }) {
   const retrievedPages = retrieval.pages
     .map((page) => {
@@ -911,6 +1003,14 @@ export function buildModelContext({
   const hobbyList = Array.isArray(siteFacts?.hobbies)
     ? siteFacts.hobbies.map((hobby) => `- ${hobby.title} (${hobby.url})`).join("\n")
     : "";
+  const conversationSummary = conversationHistory.length
+    ? conversationHistory
+      .map((entry) => {
+        if (entry.kind === "card") return `- card_shown: ${entry.cardId}`;
+        return `- ${entry.sender}: ${entry.text}`;
+      })
+      .join("\n")
+    : "No prior conversation context.";
 
   // Behavioral design is deliberate here: adaptive register, active attention, and
   // layered disclosure are applied as output rules so the bot stays socially smart
@@ -961,6 +1061,9 @@ ${projectList || "- No verified project list available."}
 Hobbies:
 ${hobbyList || "- No verified hobby list available."}
 
+RECENT CONVERSATION:
+${conversationSummary}
+
 CURRENT PAGE CONTEXT:
 - Route: ${pageContext.route || "/"}
 - Title: ${pageContext.title || "Unknown"}
@@ -971,7 +1074,9 @@ OUTPUT SHAPE:
 - Default to 2-5 sentences.
 - For recruiter or skeptical questions, answer directly and let proof carry the weight.
 - For light personal questions, answer briefly with one line of flavor.
-- For page-specific questions, anchor the answer in the retrieved page and link to it naturally.
+- For page-specific questions, answer the question first using grounded page evidence, then link naturally.
+- Do not reduce a good answer to “the best place for that is…”.
+- If a link helps, use it as support, not as a substitute for answering.
 - If the question is shallow, you can gently invite a better one, but do not sound annoyed.
 - Use markdown links for internal routes when useful.
 
@@ -1050,10 +1155,11 @@ export function buildChips(questionClass, retrieval) {
   return ["Projects", "Resume", "Contact"];
 }
 
-export async function prepareChatContext({ env, request, message, language, rawPageContext, legacyPageContent }) {
+export async function prepareChatContext({ env, request, message, language, rawPageContext, legacyPageContent, conversationHistory }) {
   const pageContext = parsePageContext(rawPageContext, legacyPageContent);
   const requestedBuildVersion = pageContext.buildVersion;
   const baseUrl = inferBaseUrl(request, env);
+  const sanitizedHistory = sanitizeConversationHistory(conversationHistory);
 
   await primeFallbackGrounding(env, baseUrl);
 
@@ -1073,7 +1179,8 @@ export async function prepareChatContext({ env, request, message, language, rawP
 
   const questionClass = classifyQuestion(message);
   const register = detectRegister(message);
-  const retrieval = retrieveGrounding(message, manifest, questionClass, pageContext.route);
+  const retrievalQuery = buildHistoryAwareQuery(message, sanitizedHistory);
+  const retrieval = retrieveGrounding(retrievalQuery, manifest, questionClass, pageContext.route);
   const surfaceFactKey = questionClass === QUESTION_CLASSES.SURFACE_FACT ? detectSurfaceFactKey(message) : "";
   const fallbackReply = buildDeterministicReply({
     message,
@@ -1093,6 +1200,7 @@ export async function prepareChatContext({ env, request, message, language, rawP
     questionClass,
     register,
     retrieval,
+    conversationHistory: sanitizedHistory,
     surfaceFactKey,
     fallbackReply,
     deterministicOnly: shouldUseDeterministicOnly(questionClass, retrieval)

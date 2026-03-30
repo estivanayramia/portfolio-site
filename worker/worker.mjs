@@ -165,7 +165,8 @@ async function generateReply({ env, userMessage, language, chatContext }) {
     retrieval: chatContext.retrieval,
     questionClass: chatContext.questionClass,
     register: chatContext.register,
-    manifestStatus: chatContext.manifestStatus
+    manifestStatus: chatContext.manifestStatus,
+    conversationHistory: chatContext.conversationHistory
   });
 
   const wantsDepth = /\b(detailed|detail|deeper|explain|walk me through|step by step)\b/i.test(userMessage);
@@ -310,7 +311,8 @@ export default {
       message: userMessage,
       language,
       rawPageContext: body?.pageContext || null,
-      legacyPageContent: body?.pageContent || ""
+      legacyPageContent: body?.pageContent || "",
+      conversationHistory: body?.history || []
     });
 
     const replyResult = await generateReply({
