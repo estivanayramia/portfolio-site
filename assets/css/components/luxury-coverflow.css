@@ -50,6 +50,7 @@
     linear-gradient(180deg, #24304c 0%, #1c253b 42%, #2f241b 100%);
   isolation: isolate;
   overflow: hidden;
+  overscroll-behavior-x: none;
 }
 
 .coverflow-header {
@@ -99,6 +100,14 @@
   contain: paint;
 }
 
+.coverflow-section--no-header {
+  padding-top: clamp(1rem, 3vw, 1.5rem);
+}
+
+.coverflow-section--no-header .coverflow-container {
+  padding-top: 0.75rem;
+}
+
 .coverflow-perspective {
   position: relative;
   width: 100%;
@@ -107,6 +116,7 @@
   perspective-origin: 50% 50%;
   transform-style: preserve-3d;
   touch-action: pan-y pinch-zoom;
+  overscroll-behavior-x: none;
 }
 
 /* V4: Floor horizon line */
@@ -140,6 +150,7 @@
   height: 100%;
   transform-style: preserve-3d;
   overscroll-behavior: contain;
+  overscroll-behavior-x: none;
   touch-action: pan-y pinch-zoom;
 }
 
@@ -1046,6 +1057,10 @@
     min-height: 400px;
     padding-bottom: 7rem;
     padding-top: 4rem;
+  }
+
+  .coverflow-section--no-header .coverflow-container {
+    padding-top: 2.5rem;
   }
 
   .coverflow-controls {

@@ -34,14 +34,14 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp" fetchpriority="high">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=17dec603">
+    <link rel="stylesheet" href="/assets/css/style.css?v=3978b78e">
     
-    <script src="/assets/js/site.min.js?v=17dec603" defer></script>
+    <script src="/assets/js/site.min.js?v=3978b78e" defer></script>
     <!-- Theme CSS -->
     <noscript></noscript>
 
     <!-- Theme CSS - loads reliably for all viewports -->
-    <link rel="stylesheet" href="/theme.css?v=17dec603">
+    <link rel="stylesheet" href="/theme.css?v=3978b78e">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -56,7 +56,7 @@
     
     <!-- Schema.org Person Markup -->
 <!-- Luxury Coverflow Carousel V4 -->
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=17dec603-v4">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=3978b78e-v4">
                 <meta property="og:image" content="https://www.estivanayramia.com/assets/img/headshot.webp">
                 <meta name="twitter:image" content="https://www.estivanayramia.com/assets/img/headshot.webp">
 
@@ -185,13 +185,13 @@
                         </figure>
                         <div class="space-y-5">
                             <p class="spine-kicker">About / more than the work</p>
-                            <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up">
+                            <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight" data-gsap="fade-up">
                                 About Me
                             </h1>
-                            <p class="text-lg text-chocolate leading-relaxed opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
+                            <p class="text-lg text-chocolate leading-relaxed" data-gsap="fade-up" data-gsap-delay="0.2">
                                 Who I am, what I care about, and how I work.
                             </p>
-                            <p class="text-base text-chocolate/80 leading-relaxed opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
+                            <p class="text-base text-chocolate/80 leading-relaxed" data-gsap="fade-up" data-gsap-delay="0.3">
                                 The projects matter. So does the person doing the work.
                             </p>
                             <div class="spine-inline-actions">
@@ -211,7 +211,7 @@
                     </div>
                 </div>
 
-                <aside class="spine-hero-rail opacity-0" data-gsap="fade-up" data-gsap-delay="0.15">
+                <aside class="spine-hero-rail" data-gsap="fade-up" data-gsap-delay="0.15">
                     <p class="spine-eyebrow">What shapes the work</p>
                     <div class="spine-note-list text-sm text-chocolate">
                         <div class="spine-note-item">Where I come from and what shaped my pace.</div>
@@ -224,7 +224,7 @@
         
         <!-- Carousel Introduction -->
         <section class="proof-band max-w-5xl mx-auto px-6 lg:px-12 py-12">
-            <div class="spine-band opacity-0" data-gsap="fade-up">
+            <div class="spine-band" data-gsap="fade-up">
                 <div class="spine-section-head is-split mb-0">
                     <div>
                         <p class="spine-eyebrow">Start with the three pages that matter most</p>
@@ -257,18 +257,11 @@
         <!-- Luxury Coverflow Carousel -->
         <section 
             id="about-carousel-section" 
-            class="coverflow-section"
+            class="coverflow-section coverflow-section--no-header"
             data-luxury-coverflow
             aria-label="About Me Carousel"
             role="region"
         >
-            <div class="coverflow-header">
-                <h2 class="coverflow-title">
-                    <span class="title-main">About Me</span>
-                    <span class="title-sub">Interactive Cards</span>
-                </h2>
-            </div>
-            
             <div class="coverflow-container">
                 <!-- Roulette Button -->
                 <button 

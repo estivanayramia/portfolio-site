@@ -246,6 +246,36 @@ function buildPreviewBackground(previewImage, fallbackBackground) {
   return `linear-gradient(160deg, rgba(8, 10, 17, 0.14), rgba(8, 10, 17, 0.46)), url('${safeUrl}')`;
 }
 
+function resolveLocalPreviewLink(link) {
+  const raw = String(link || '').trim();
+  if (!raw) return raw;
+
+  try {
+    const locationUrl = new URL(window.location.href);
+    const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(locationUrl.hostname);
+    if (!isLocal || !raw.startsWith('/')) return raw;
+
+    const isEnglishPage = locationUrl.pathname.startsWith('/EN/');
+    if (!isEnglishPage) return raw;
+
+    if (raw === '/projects/') return '/EN/projects/index.html';
+    if (raw === '/about') return '/EN/about.html';
+    if (raw === '/overview') return '/EN/overview.html';
+    if (raw === '/deep-dive') return '/EN/deep-dive.html';
+    if (raw === '/contact') return '/EN/contact.html';
+    if (raw === '/privacy') return '/EN/privacy.html';
+    if (raw === '/hobbies-games') return '/EN/hobbies-games.html';
+
+    if (raw.startsWith('/projects/')) return `/EN${raw}.html`;
+    if (raw.startsWith('/about/')) return `/EN${raw}.html`;
+    if (raw.startsWith('/hobbies/')) return `/EN${raw}.html`;
+
+    return raw;
+  } catch {
+    return raw;
+  }
+}
+
 function isCoarsePointerDevice() {
   const coarse = safeMatchMedia('(pointer: coarse)');
   return !!(coarse && coarse.matches);
@@ -675,7 +705,7 @@ class RouletteOverlayController {
   navigateToResultLink(link) {
     if (!link) return;
     this.clearAutoNavigateTimer();
-    window.location.href = link;
+    window.location.href = resolveLocalPreviewLink(link);
   }
 
   prepareSpinResult() {
@@ -848,15 +878,17 @@ class RouletteOverlayController {
     const angleInRadians = (frame.ballAngle * Math.PI) / 180;
     const x = Math.cos(angleInRadians) * radius;
     const y = Math.sin(angleInRadians) * radius;
+    const depthRatio = (Math.sin(angleInRadians - Math.PI / 2) + 1) / 2;
+    const ballScale = 0.84 + (depthRatio * 0.34);
 
     gsap.set(this.elements.wheel, { rotation: frame.wheelRotation });
-    gsap.set(this.elements.ball, { x, y });
-    gsap.set(this.elements.ballHighlight, { x: x - 5, y: y - 5, opacity: 0.75 });
+    gsap.set(this.elements.ball, { x, y, scale: ballScale, zIndex: 1000 + Math.round(depthRatio * 100) });
+    gsap.set(this.elements.ballHighlight, { x: x - (5 * ballScale), y: y - (5 * ballScale), opacity: 0.52 + (depthRatio * 0.34), scale: ballScale });
     gsap.set(this.elements.ballShadow, {
       x,
-      y: y + 18,
-      opacity: 0.45,
-      scale: 0.82 + frame.progress * 0.18
+      y: y + (20 - (depthRatio * 8)),
+      opacity: 0.32 + ((1 - depthRatio) * 0.26),
+      scale: 0.72 + ((1 - depthRatio) * 0.44)
     });
 
     let phase = 'final';
@@ -1171,14 +1203,11 @@ class RouletteOverlayController {
       this.carousel.items[this.result.winnerCardIndex]?.focus?.({ preventScroll: true });
 
       if (preview.link && this.carousel.config.rouletteAutoNavigate !== false) {
-        const delayMs = Number.isFinite(this.carousel.config.rouletteAutoNavigateDelay)
-          ? this.carousel.config.rouletteAutoNavigateDelay
-          : 1200;
-
+        const delayMs = 220;
+        this.closeOverlay({ restoreFocus: false });
         this.autoNavigateTimer = this.resources.timeout(() => {
-          if (!this.isActive || this.isSpinning) return;
           this.navigateToResultLink(preview.link);
-        }, Math.max(400, delayMs));
+        }, delayMs);
       }
       return;
     }
@@ -1830,7 +1859,7 @@ export class LuxuryCoverflow {
   setupWheelNavigation() {
     if (!this.config.enableScroll) return;
 
-    this.resources.listen(this.container, 'wheel', (event) => {
+    const handleWheel = (event) => {
       if (this.roulette?.isActive) return;
 
       const absX = Math.abs(event.deltaX);
@@ -1863,7 +1892,11 @@ export class LuxuryCoverflow {
         this.wheelState.accumulator = 0;
         this.goToSlide(targetIndex, { durationMs: this.motion.settleMs });
       }, 110);
-    }, { passive: false });
+    };
+
+    [this.container, this.track, this.container.closest('.coverflow-section')].filter(Boolean).forEach((node) => {
+      this.resources.listen(node, 'wheel', handleWheel, { passive: false });
+    });
   }
 
   startDrag(clientX, clientY, target) {

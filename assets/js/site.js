@@ -798,45 +798,12 @@ const initAnimations = () => {
     // Fade Up Animations
     const fadeElements = document.querySelectorAll('[data-gsap="fade-up"]');
     gsap.killTweensOf(fadeElements);
-    
-    fadeElements.forEach(element => {
-        const delay = parseFloat(element.getAttribute('data-gsap-delay') || '0') * 0.5;
-        const hadFallbackVisible = element.dataset.gsapState === 'fallback-visible';
-        const rect = element.getBoundingClientRect();
-        const isAlreadyInView = rect.top < window.innerHeight * 0.92 && rect.bottom > 0;
-        const keepVisibleFromFallback = hadFallbackVisible && rect.top < window.innerHeight;
-
+    fadeElements.forEach((element) => {
         element.removeAttribute('data-gsap-state');
-
-        // Never re-hide content that is already onscreen when GSAP initializes.
-        if (keepVisibleFromFallback || isAlreadyInView) {
-            gsap.set(element, {
-                autoAlpha: 1,
-                y: 0,
-                clearProps: 'opacity,visibility,transform'
-            });
-            return;
-        }
-
-        gsap.fromTo(element, {
-            autoAlpha: 0,
-            y: 20
-        }, {
+        gsap.set(element, {
             autoAlpha: 1,
             y: 0,
-            duration: 0.4,
-            delay,
-            ease: 'power2.out',
-            clearProps: 'opacity,visibility,transform',
-            onComplete: () => {
-                element.style.opacity = '1';
-                element.style.transform = 'none';
-            },
-            scrollTrigger: {
-                trigger: element,
-                start: 'top 92%',
-                toggleActions: 'play none none none'
-            }
+            clearProps: 'opacity,visibility,transform'
         });
     });
 
@@ -3204,6 +3171,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function positionWelcomeBubble() {
+        if (!els.bubble || !els.toggleBtn) return;
+
+        const toggleRect = els.toggleBtn.getBoundingClientRect();
+        const bubbleRect = els.bubble.getBoundingClientRect();
+        if (!toggleRect.width || !bubbleRect.width) {
+            els.bubble.removeAttribute('data-positioned');
+            return;
+        }
+
+        const minViewportLeft = 12;
+        const maxViewportLeft = window.innerWidth - bubbleRect.width - 12;
+        const desiredLeft = toggleRect.left + (toggleRect.width / 2) - (bubbleRect.width / 2);
+        let resolvedLeft = desiredLeft;
+
+        if (resolvedLeft + bubbleRect.width > window.innerWidth - 12) {
+            resolvedLeft = toggleRect.right - bubbleRect.width;
+        }
+
+        if (resolvedLeft < minViewportLeft) {
+            resolvedLeft = toggleRect.left;
+        }
+
+        const clampedLeft = Math.max(minViewportLeft, Math.min(resolvedLeft, maxViewportLeft));
+        const top = Math.max(12, toggleRect.top - bubbleRect.height - 12);
+
+        els.bubble.setAttribute('data-positioned', 'true');
+        els.bubble.style.left = `${Math.round(clampedLeft)}px`;
+        els.bubble.style.right = 'auto';
+        els.bubble.style.top = `${Math.round(top)}px`;
+        els.bubble.style.bottom = 'auto';
+    }
+
+    function positionWelcomeBubbleDeferred() {
+        requestAnimationFrame(() => {
+            positionWelcomeBubble();
+            requestAnimationFrame(positionWelcomeBubble);
+        });
+    }
+
+    function attachWelcomeBubblePositioning() {
+        if (!els.bubble || !els.toggleBtn) return;
+
+        if (typeof ResizeObserver === 'function') {
+            const observer = new ResizeObserver(() => {
+                positionWelcomeBubbleDeferred();
+            });
+
+            observer.observe(els.bubble);
+            observer.observe(els.toggleBtn);
+        }
+
+        window.addEventListener('load', positionWelcomeBubbleDeferred, { once: true });
+    }
+
     // State
     let chatHistory = [];
     let isSending = false; // Prevent duplicate sends
@@ -3348,6 +3370,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     syncHomeProofStats();
     initPageCloseFloatingUiGuard();
+    attachWelcomeBubblePositioning();
+    positionWelcomeBubbleDeferred();
     
     isInitialized = true;
 
@@ -3358,10 +3382,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (els.window?.classList.contains('hidden') && chatHistory.length === 0) {
                 els.bubble?.classList.remove('opacity-0', 'translate-y-4');
                 els.bubble?.classList.add('opacity-100', 'translate-y-0');
+                positionWelcomeBubbleDeferred();
                 sessionStorage.setItem('savonie_bubble_count', (bubbleShowCount + 1).toString());
             }
         }, WELCOME_DELAY);
     }
+
+    window.addEventListener('resize', positionWelcomeBubbleDeferred, { passive: true });
 
     // 3. Event Listeners
     els.toggleBtn?.addEventListener('click', toggleChat);
@@ -3800,6 +3827,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (!els.window?.classList.contains('hidden')) {
+            positionWelcomeBubbleDeferred();
             // Chat window is now visible
             if (wasHidden) {
                 // Position the chat window relative to the chat widget button
