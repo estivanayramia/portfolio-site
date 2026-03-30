@@ -334,6 +334,21 @@ async function createPanelComposite(sourceBuffer, frame) {
 
 function getLayoutFrames(treatment) {
   switch (treatment) {
+    case 'single-image-editorial':
+      return [
+        {
+          left: 92,
+          top: 148,
+          width: 776,
+          height: 980,
+          fit: 'cover',
+          position: 'attention',
+          radius: 30,
+          border: 'rgba(239, 225, 199, 0.68)',
+          borderWidth: 2,
+          sourceIndex: 0
+        }
+      ];
     case 'document-poster':
       return [
         {
@@ -891,6 +906,12 @@ function buildTextOverlay(card, theme, treatment, quoteText = '') {
     case 'identity-led-composition':
       drawTagRow(context, theme, ['family', 'heritage'], { y: 104 });
       break;
+    case 'single-image-editorial':
+      drawTagRow(context, theme, ['family archive'], { y: 104, gap: 0 });
+      break;
+    case 'arcade-cover-art':
+      drawTagRow(context, theme, ['arcade', 'strategy'], { y: 104 });
+      break;
     case 'reflective-note-cover':
       drawTagRow(context, theme, ['quiet thoughts'], { y: 104, gap: 0 });
       break;
@@ -899,6 +920,184 @@ function buildTextOverlay(card, theme, treatment, quoteText = '') {
   }
 
   return Buffer.from(canvas.toBuffer('image/png'));
+}
+
+function buildArcadeCover(card) {
+  const theme = pickTheme(card.id);
+  const canvas = createCanvas(CARD_WIDTH, CARD_HEIGHT);
+  const context = canvas.getContext('2d');
+
+  const vertical = context.createLinearGradient(0, 0, 0, CARD_HEIGHT);
+  vertical.addColorStop(0, '#f3e8d6');
+  vertical.addColorStop(0.56, '#d8c3a4');
+  vertical.addColorStop(1, '#25314c');
+  context.fillStyle = vertical;
+  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+
+  const halo = context.createRadialGradient(
+    CARD_WIDTH * 0.5,
+    CARD_HEIGHT * 0.26,
+    CARD_WIDTH * 0.03,
+    CARD_WIDTH * 0.5,
+    CARD_HEIGHT * 0.26,
+    CARD_WIDTH * 0.42
+  );
+  halo.addColorStop(0, 'rgba(255, 242, 221, 0.98)');
+  halo.addColorStop(0.45, 'rgba(255, 242, 221, 0.54)');
+  halo.addColorStop(1, 'rgba(255, 242, 221, 0)');
+  context.fillStyle = halo;
+  context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+
+  drawTopChip(context, theme, card);
+  drawTagRow(context, theme, ['arcade', 'strategy'], { y: 104 });
+
+  const marqueeGradient = context.createLinearGradient(0, 0, CARD_WIDTH, 0);
+  marqueeGradient.addColorStop(0, '#2b3754');
+  marqueeGradient.addColorStop(1, '#4c2945');
+  drawRoundedRectPath(context, 120, 170, 720, 148, 28);
+  context.fillStyle = marqueeGradient;
+  context.fill();
+  context.shadowColor = 'rgba(36, 26, 18, 0.22)';
+  context.shadowBlur = 24;
+  context.shadowOffsetY = 12;
+  context.strokeStyle = 'rgba(239, 224, 197, 0.54)';
+  context.lineWidth = 3;
+  context.stroke();
+  context.shadowColor = 'transparent';
+  context.shadowBlur = 0;
+  context.shadowOffsetY = 0;
+
+  context.fillStyle = '#f5ead7';
+  context.font = `700 54px ${FONT_FAMILY}`;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText('GAMES', CARD_WIDTH / 2, 244);
+  context.font = `500 18px ${FONT_FAMILY}`;
+  context.fillStyle = 'rgba(245, 234, 215, 0.82)';
+  context.fillText('mini arcade + systems thinking', CARD_WIDTH / 2, 286);
+
+  const cabinetX = 188;
+  const cabinetY = 390;
+  const cabinetWidth = 584;
+  const cabinetHeight = 520;
+
+  drawRoundedRectPath(context, cabinetX, cabinetY, cabinetWidth, cabinetHeight, 40);
+  context.fillStyle = '#212842';
+  context.fill();
+  context.strokeStyle = 'rgba(239, 224, 197, 0.22)';
+  context.lineWidth = 2;
+  context.stroke();
+
+  drawRoundedRectPath(context, cabinetX + 40, cabinetY + 44, cabinetWidth - 80, 272, 26);
+  const screenGradient = context.createLinearGradient(cabinetX, cabinetY + 44, cabinetX + cabinetWidth, cabinetY + 316);
+  screenGradient.addColorStop(0, '#1d2338');
+  screenGradient.addColorStop(0.5, '#2d4465');
+  screenGradient.addColorStop(1, '#1b2f50');
+  context.fillStyle = screenGradient;
+  context.fill();
+
+  context.strokeStyle = 'rgba(191, 206, 232, 0.28)';
+  context.lineWidth = 1.5;
+  for (let x = cabinetX + 64; x < cabinetX + cabinetWidth - 32; x += 42) {
+    context.beginPath();
+    context.moveTo(x, cabinetY + 60);
+    context.lineTo(x, cabinetY + 302);
+    context.stroke();
+  }
+  for (let y = cabinetY + 62; y < cabinetY + 300; y += 38) {
+    context.beginPath();
+    context.moveTo(cabinetX + 54, y);
+    context.lineTo(cabinetX + cabinetWidth - 54, y);
+    context.stroke();
+  }
+
+  context.fillStyle = 'rgba(240, 224, 194, 0.92)';
+  context.font = `700 34px ${FONT_FAMILY}`;
+  context.textAlign = 'left';
+  context.textBaseline = 'alphabetic';
+  context.fillText('01', cabinetX + 84, cabinetY + 118);
+  context.fillText('02', cabinetX + 84, cabinetY + 196);
+  context.fillText('03', cabinetX + 84, cabinetY + 274);
+  context.font = `600 24px ${FONT_FAMILY}`;
+  context.fillText('arcade instinct', cabinetX + 164, cabinetY + 118);
+  context.fillText('strategy bias', cabinetX + 164, cabinetY + 196);
+  context.fillText('built for play', cabinetX + 164, cabinetY + 274);
+
+  context.save();
+  context.translate(cabinetX + 470, cabinetY + 196);
+  context.fillStyle = '#efdcb6';
+  context.beginPath();
+  context.moveTo(-10, 28);
+  context.lineTo(28, 10);
+  context.lineTo(10, -14);
+  context.lineTo(18, -48);
+  context.lineTo(-8, -26);
+  context.lineTo(-34, -46);
+  context.lineTo(-28, -12);
+  context.lineTo(-50, 10);
+  context.lineTo(-14, 20);
+  context.closePath();
+  context.fill();
+  context.restore();
+
+  drawRoundedRectPath(context, cabinetX + 52, cabinetY + 352, cabinetWidth - 104, 118, 24);
+  context.fillStyle = 'rgba(244, 235, 223, 0.1)';
+  context.fill();
+  context.strokeStyle = 'rgba(239, 224, 197, 0.18)';
+  context.lineWidth = 1.5;
+  context.stroke();
+
+  context.beginPath();
+  context.arc(cabinetX + 186, cabinetY + 410, 28, 0, Math.PI * 2);
+  context.fillStyle = '#bc9460';
+  context.fill();
+  context.beginPath();
+  context.arc(cabinetX + 186, cabinetY + 410, 12, 0, Math.PI * 2);
+  context.fillStyle = '#f6ead6';
+  context.fill();
+
+  context.fillStyle = '#f6ead6';
+  context.fillRect(cabinetX + 320, cabinetY + 392, 76, 16);
+  context.fillRect(cabinetX + 404, cabinetY + 392, 76, 16);
+  context.fillRect(cabinetX + 362, cabinetY + 350, 16, 100);
+
+  context.font = `600 24px ${FONT_FAMILY}`;
+  context.fillStyle = 'rgba(246, 234, 214, 0.88)';
+  context.fillText('Playful enough to invite you in.', cabinetX + 72, cabinetY + 534);
+  context.fillText('Structured enough to still feel like the site.', cabinetX + 72, cabinetY + 572);
+
+  drawRoundedRectPath(context, 96, 1020, 768, 172, 28);
+  context.fillStyle = 'rgba(33, 40, 66, 0.82)';
+  context.fill();
+  context.strokeStyle = 'rgba(239, 224, 197, 0.32)';
+  context.lineWidth = 1.5;
+  context.stroke();
+
+  drawWrappedText(context, {
+    text: card.title,
+    x: 132,
+    y: 1062,
+    maxWidth: 696,
+    lineHeight: 62,
+    maxLines: 2,
+    font: `700 54px ${FONT_FAMILY}`,
+    fillStyle: theme.textTitle
+  });
+
+  drawWrappedText(context, {
+    text: 'Arcade energy, strategy bias, and systems thinking turned into a custom cover instead of another weak page screenshot.',
+    x: 132,
+    y: 1136,
+    maxWidth: 676,
+    lineHeight: 34,
+    maxLines: 2,
+    font: `500 24px ${FONT_FAMILY}`,
+    fillStyle: theme.textBody
+  });
+
+  return sharp(Buffer.from(canvas.toBuffer('image/png')))
+    .webp({ quality: 90, effort: 6 })
+    .toBuffer();
 }
 
 async function composeEditorialCover(options) {
@@ -981,7 +1180,9 @@ async function buildPdfCover(card, pdfSourcePath, treatment) {
 }
 
 async function buildCollageCover(card, sourcePaths, treatment) {
-  const effectiveSources = Array.isArray(sourcePaths) ? sourcePaths.slice(0, 8) : [];
+  const effectiveSources = Array.isArray(sourcePaths)
+    ? [...new Set(sourcePaths.filter(Boolean))].slice(0, 8)
+    : [];
   if (effectiveSources.length === 0) {
     throw new Error(`Collage generation requires at least one source for ${card.id}`);
   }
@@ -1127,6 +1328,12 @@ async function generateNonScreenshotCards(cards) {
       outputBuffer = await buildCollageCover(card, generation.sources || [], treatment);
     } else if (generation.type === 'image') {
       outputBuffer = await buildPhotoCover(card, generation.source, treatment);
+    } else if (generation.type === 'synthetic') {
+      if (treatment === 'arcade-cover-art') {
+        outputBuffer = await buildArcadeCover(card);
+      } else {
+        throw new Error(`Unknown synthetic treatment for ${card.id}: ${treatment}`);
+      }
     } else {
       throw new Error(`Unknown generation type for ${card.id}: ${generation.type}`);
     }

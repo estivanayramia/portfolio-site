@@ -1,4 +1,4 @@
-export const CARD_PREVIEW_VERSION = '2026-03-29-v4';
+export const CARD_PREVIEW_VERSION = '2026-03-29-v5';
 export const CARD_PREVIEW_OUTPUT_DIR = '/assets/img/generated/card-previews';
 
 export const PROJECT_CARD_PREVIEWS = [
@@ -122,13 +122,9 @@ export const ABOUT_CARD_PREVIEWS = [
     link: '/about/background',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/about-background-collage.webp`,
     generation: {
-      type: 'collage',
-      treatment: 'identity-led-composition',
-      sources: [
-        '/assets/img/Portolio-Media/Portfolio-Media/Estivan_and_Alen_in_Iraq.webp',
-        '/assets/img/headshot.webp',
-        '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_3447.webp'
-      ]
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/Estivan_and_Alen_in_Iraq.webp'
     }
   },
   {
@@ -265,7 +261,7 @@ export const ABOUT_CARD_PREVIEWS = [
       sources: [
         '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0551.webp',
         '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_1411.webp',
-        '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_3447.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_4675.webp',
         '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_8895.webp'
       ]
     }
@@ -278,10 +274,8 @@ export const ABOUT_CARD_PREVIEWS = [
     link: '/hobbies-games',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-games-cover.webp`,
     generation: {
-      type: 'screenshot',
-      treatment: 'chapter-opener-cover',
-      routePath: '/EN/hobbies-games.html',
-      selectors: ['main', '#arcade-featured-carousel']
+      type: 'synthetic',
+      treatment: 'arcade-cover-art'
     }
   }
 ];
