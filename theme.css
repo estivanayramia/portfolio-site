@@ -2033,6 +2033,11 @@ html.js [data-gsap][data-gsap-state="fallback-visible"] {
     transition: none !important;
 }
 
+html.js [data-gsap] {
+    opacity: 1 !important;
+    transform: none !important;
+}
+
 .proof-band {
     border: 1px solid rgba(33, 40, 66, 0.1);
     border-radius: 1.5rem;
