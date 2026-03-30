@@ -132,22 +132,24 @@ __initPreloadStylesheets();
 // Enables the hobby pages to avoid inline <script> blocks.
 const __initCarouselAndLightbox = () => {
     try {
-        const track = document.getElementById('carouselTrack');
+        const galleryRoot = document.querySelector('.gallery-carousel[data-mini-carousel="true"]');
+        if (!galleryRoot) return;
+        if (galleryRoot.dataset && galleryRoot.dataset.carouselInit === '1') return;
+
+        const track = galleryRoot.querySelector('.carousel-track');
         if (!track) return;
-        if (track.dataset && track.dataset.carouselInit === '1') return;
 
         const wrapMode = !!(track.dataset && track.dataset.carouselWrap === '1');
-        const galleryRoot = track.closest('.gallery-carousel');
 
-        const noteCardImages = Array.from(document.querySelectorAll('.note-card img'));
+        const noteCardImages = Array.from(galleryRoot.querySelectorAll('.note-card img'));
         const isWhispersStyle = noteCardImages.length > 0;
 
-        const slides = Array.from(document.querySelectorAll('.carousel-slide'));
+        const slides = Array.from(galleryRoot.querySelectorAll('.carousel-slide'));
         if (!slides.length) return;
 
-        const prevBtn = document.getElementById('carouselPrev');
-        const nextBtn = document.getElementById('carouselNext');
-        const dotsContainer = document.getElementById('carouselDots');
+        const prevBtn = galleryRoot.querySelector('.carousel-btn-prev');
+        const nextBtn = galleryRoot.querySelector('.carousel-btn-next');
+        const dotsContainer = galleryRoot.querySelector('.carousel-dots');
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-image');
         const closeBtn = document.querySelector('.lightbox-close');
@@ -257,7 +259,7 @@ const __initCarouselAndLightbox = () => {
                         track.style.transform = `translateX(-${currentIndex * slideWidth * slidesPerView}px)`;
                     }
 
-                    Array.from(document.querySelectorAll('.carousel-dot')).forEach((dot, index) => {
+                    Array.from(dotsContainer.querySelectorAll('.carousel-dot')).forEach((dot, index) => {
                         const activeIndex = isWhispersStyle ? Math.floor(currentIndex / slidesPerView) : currentIndex;
                         dot.classList.toggle('active', index === activeIndex);
                     });
@@ -348,20 +350,19 @@ const __initCarouselAndLightbox = () => {
 
         const initLuxuryMiniCarousel = async () => {
             if (!galleryRoot || !galleryRoot.dataset || galleryRoot.dataset.miniCarousel !== 'true') return false;
-            if (isWhispersStyle) return false;
             if (galleryRoot.dataset.luxuryMiniInit === '1') return true;
 
             const existingStylesheet = document.querySelector('link[data-luxury-mini-carousel="1"]');
             if (!existingStylesheet) {
                 const link = document.createElement('link');
                 link.rel = 'stylesheet';
-                link.href = '/assets/css/components/luxury-coverflow.min.css?v=f4ae379-v8';
+                link.href = '/assets/css/components/luxury-coverflow.min.css';
                 link.setAttribute('data-luxury-mini-carousel', '1');
                 document.head.appendChild(link);
             }
 
             galleryRoot.setAttribute('data-gallery-surface', 'luxury-coverflow');
-            galleryRoot.setAttribute('data-mini-carousel-mode', 'gallery');
+            galleryRoot.setAttribute('data-mini-carousel-mode', isWhispersStyle ? 'notes' : 'gallery');
             galleryRoot.classList.add('is-luxury-gallery-coverflow');
 
             slides.forEach((slide, index) => {
@@ -403,6 +404,8 @@ const __initCarouselAndLightbox = () => {
 
             galleryRoot.__luxuryMiniCarousel = instance;
             galleryRoot.dataset.luxuryMiniInit = '1';
+            galleryRoot.dataset.galleryCoverflowInit = 'true';
+            galleryRoot.dataset.coverflowReady = 'true';
             return true;
         };
 
@@ -415,7 +418,10 @@ const __initCarouselAndLightbox = () => {
                 initLegacyCarousel();
             });
 
-        try { track.dataset.carouselInit = '1'; } catch (e) {}
+        try {
+            track.dataset.carouselInit = '1';
+            galleryRoot.dataset.carouselInit = '1';
+        } catch (e) {}
     } catch (e) {}
 };
 
@@ -797,12 +803,13 @@ const initAnimations = () => {
         const delay = parseFloat(element.getAttribute('data-gsap-delay') || '0') * 0.5;
         const hadFallbackVisible = element.dataset.gsapState === 'fallback-visible';
         const rect = element.getBoundingClientRect();
+        const isAlreadyInView = rect.top < window.innerHeight * 0.92 && rect.bottom > 0;
         const keepVisibleFromFallback = hadFallbackVisible && rect.top < window.innerHeight;
 
         element.removeAttribute('data-gsap-state');
 
-        // On mobile, do not re-hide elements that were already visible before GSAP loaded.
-        if (keepVisibleFromFallback) {
+        // Never re-hide content that is already onscreen when GSAP initializes.
+        if (keepVisibleFromFallback || isAlreadyInView) {
             gsap.set(element, {
                 autoAlpha: 1,
                 y: 0,
@@ -860,8 +867,19 @@ const initAnimations = () => {
     });
 };
 
+const revealGsapElementsImmediately = () => {
+    document.querySelectorAll('[data-gsap]').forEach((el) => {
+        el.classList.remove('opacity-0', 'translate-y-8', 'translate-y-6', 'translate-y-4');
+        el.style.opacity = '1';
+        el.style.visibility = 'visible';
+        el.style.transform = 'none';
+        el.dataset.gsapState = 'fallback-visible';
+    });
+};
+
 const loadGSAPAndInit = () => {
     const isMobile = (typeof window !== 'undefined') && (typeof window.matchMedia === 'function') && window.matchMedia('(max-width: 768px)').matches;
+    revealGsapElementsImmediately();
     
     const loadScripts = () => {
         if (window.gsap && window.ScrollTrigger) {
@@ -870,11 +888,17 @@ const loadGSAPAndInit = () => {
         }
         const gsapScript = document.createElement('script');
         gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+        gsapScript.onerror = () => {
+            revealGsapElementsImmediately();
+        };
         gsapScript.onload = () => {
             const stScript = document.createElement('script');
             stScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
             stScript.onload = () => {
                 initAnimations();
+            };
+            stScript.onerror = () => {
+                revealGsapElementsImmediately();
             };
             document.body.appendChild(stScript);
         };
@@ -3243,6 +3267,30 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
     }
+
+    function buildConversationHistoryPayload() {
+        try {
+            return chatHistory
+                .slice(-8)
+                .map((item) => {
+                    if (!item || typeof item !== 'object') return null;
+                    if (item.kind === 'card' && item.cardId) {
+                        return { kind: 'card', cardId: item.cardId };
+                    }
+                    if (item.kind === 'text' && item.text && item.sender) {
+                        return {
+                            kind: 'text',
+                            sender: item.sender,
+                            text: String(item.text).slice(0, 500)
+                        };
+                    }
+                    return null;
+                })
+                .filter(Boolean);
+        } catch (e) {
+            return [];
+        }
+    }
     
     // Helper function to add close button to chips container - DEPRECATED (handled by renderChips)
     // function addChipsCloseButton() { ... }
@@ -3722,67 +3770,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initPageCloseFloatingUiGuard() {
-        // Guard against footer overlap while keeping controls pinned to viewport corners.
-        const guardedSections = Array.from(document.querySelectorAll('footer'));
-        const scrollBtn = document.getElementById('scroll-to-top');
-        const chatToggle = document.getElementById('chat-toggle');
-        const SAFE_GAP = 12;
-        const MAX_LIFT = 2000;
-
-        const isVisible = (el) => {
-            if (!el) return false;
-            const style = window.getComputedStyle(el);
-            return style.display !== 'none'
-                && style.visibility !== 'hidden'
-                && Number(style.opacity || '1') > 0.01;
-        };
-
-        const getGuardTop = () => {
-            let nearestTop = Number.POSITIVE_INFINITY;
-            guardedSections.forEach((section) => {
-                const rect = section.getBoundingClientRect();
-                if (!rect || rect.height <= 0 || rect.bottom <= 0) return;
-                nearestTop = Math.min(nearestTop, rect.top);
-            });
-            return Number.isFinite(nearestTop) ? nearestTop : null;
-        };
-
-        const syncFloatingUiGuard = () => {
-            const guardTop = getGuardTop();
-            const currentLift = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--floating-ui-lift')) || 0;
-            let lift = 0;
-
-            if (guardTop !== null && guardTop < window.innerHeight) {
-                const tracked = [scrollBtn, chatToggle];
-                tracked.forEach((el) => {
-                    if (!isVisible(el)) return;
-                    const rect = el.getBoundingClientRect();
-                    if (!rect || rect.height <= 0) return;
-                    const overlap = rect.bottom + SAFE_GAP - guardTop;
-                    const candidateLift = currentLift + overlap;
-                    if (candidateLift > lift) {
-                        lift = candidateLift;
-                    }
-                });
-            }
-
-            lift = Math.min(MAX_LIFT, Math.max(0, Math.round(lift)));
-
-            const pageCloseActive = lift > 0;
-            document.documentElement.style.setProperty('--floating-ui-lift', `${Math.round(lift)}px`);
-            document.body.classList.toggle('page-close-ui-guard', pageCloseActive);
-            if (els.bubble) {
-                if (pageCloseActive) {
-                    els.bubble.classList.add('opacity-0', 'translate-y-4');
-                } else {
-                    els.bubble.classList.remove('opacity-0', 'translate-y-4');
-                }
-            }
-        };
-
-        window.addEventListener('scroll', syncFloatingUiGuard, { passive: true });
-        window.addEventListener('resize', syncFloatingUiGuard);
-        syncFloatingUiGuard();
+        document.documentElement.style.setProperty('--floating-ui-lift', '0px');
+        document.body.classList.remove('page-close-ui-guard');
+        if (els.bubble) {
+            els.bubble.classList.remove('opacity-0', 'translate-y-4');
+        }
     }
 
     function toggleChat() {
@@ -3941,6 +3933,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         message: text,
                         pageContext: buildStructuredPageContext(),
                         pageContent: buildSafePageContext(),
+                        history: buildConversationHistoryPayload(),
                         language: pageLang
                     }),
                     signal: controller.signal

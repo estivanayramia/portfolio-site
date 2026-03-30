@@ -803,6 +803,9 @@ class RouletteOverlayController {
     this.clearAutoNavigateTimer();
     this.isActive = false;
     this.isSpinning = false;
+    this.resources.clearTimeout(this.interactionsUnlockTimer);
+    this.interactionsUnlockTimer = null;
+    this.interactionsLocked = false;
     this.overlay.classList.remove('is-active');
     this.overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('roulette-overlay-open');
@@ -977,6 +980,7 @@ class RouletteOverlayController {
     gsap.set(activeItem, { clearProps: 'opacity,scale,filter' });
     gsap.set(overlayBackground, { clearProps: 'backgroundColor,backdropFilter' });
     gsap.set(overlayWheelTargets, { clearProps: 'opacity' });
+    this.closeOverlay({ restoreFocus: false });
   }
 
   async waitForCarouselSettle() {
@@ -1073,14 +1077,17 @@ class RouletteOverlayController {
 
     await new Promise((resolve) => {
       this.isSpinning = true;
-      const firstLeg = durationSeconds * 0.55;
-      const secondLeg = durationSeconds * 0.30;
-      const finalLeg = Math.max(0.44, durationSeconds - firstLeg - secondLeg);
-      const legOneWheelRotation = wheelSpin.finalRotation * 0.68;
-      const legTwoWheelRotation = wheelSpin.finalRotation * 0.92;
+      const firstLeg = durationSeconds * 0.44;
+      const secondLeg = durationSeconds * 0.28;
+      const thirdLeg = durationSeconds * 0.16;
+      const finalLeg = Math.max(0.42, durationSeconds - firstLeg - secondLeg - thirdLeg);
+      const legOneWheelRotation = wheelSpin.finalRotation * 0.58;
+      const legTwoWheelRotation = wheelSpin.finalRotation * 0.84;
+      const legThreeWheelRotation = wheelSpin.finalRotation * 0.96;
       const finalWheelRotation = wheelSpin.finalRotation;
-      const legOneBallAngle = initialBallAngle - (totalBallRotation * 0.78);
-      const legTwoBallAngle = initialBallAngle - (totalBallRotation * 0.95);
+      const legOneBallAngle = initialBallAngle - (totalBallRotation * 0.72);
+      const legTwoBallAngle = initialBallAngle - (totalBallRotation * 0.9);
+      const legThreeBallAngle = initialBallAngle - (totalBallRotation * 0.975);
       const finalBallAngle = wheelSpin.landingAngle;
 
       this.spinTween = gsap.timeline({
@@ -1091,31 +1098,41 @@ class RouletteOverlayController {
         }
       });
 
-      // Leg 1: Smooth acceleration (mimics real roulette wheel build-up)
+      // Leg 1: fast outward run while the wheel builds speed.
       this.spinTween.to(frame, {
         wheelRotation: legOneWheelRotation,
         ballAngle: legOneBallAngle,
-        radius: wheelRadius * 1.04,
+        radius: wheelRadius * 1.15,
         duration: firstLeg,
-        ease: 'power2.in',
+        ease: 'power2.inOut',
         onUpdate: renderFrame
       });
 
-      // Leg 2: Deceleration (exponential slowdown)
+      // Leg 2: long deceleration around the outer rail.
       this.spinTween.to(frame, {
         wheelRotation: legTwoWheelRotation,
         ballAngle: legTwoBallAngle,
-        radius: wheelRadius * 0.9,
+        radius: wheelRadius * 1.02,
         duration: secondLeg,
         ease: 'expo.out',
         onUpdate: renderFrame
       });
 
-      // Leg 3: Clean settle into the winning pocket without reversing direction.
+      // Leg 3: ball starts dropping inward toward the winning sector.
+      this.spinTween.to(frame, {
+        wheelRotation: legThreeWheelRotation,
+        ballAngle: legThreeBallAngle,
+        radius: wheelRadius * 0.88,
+        duration: thirdLeg,
+        ease: 'power2.in',
+        onUpdate: renderFrame
+      });
+
+      // Leg 4: final pocket settle without reversing direction.
       this.spinTween.to(frame, {
         wheelRotation: finalWheelRotation,
         ballAngle: finalBallAngle,
-        radius: wheelRadius * 0.79,
+        radius: wheelRadius * 0.78,
         duration: finalLeg,
         ease: 'power4.out',
         onUpdate: renderFrame
@@ -1647,6 +1664,7 @@ export class LuxuryCoverflow {
       return;
     }
 
+    this.pendingTarget = null;
     this.currentIndex = normalizedTarget;
     this.updateAllItems(continuousTarget, durationMs);
     this.resetAutoplay();
@@ -1660,10 +1678,18 @@ export class LuxuryCoverflow {
   }
 
   next() {
+    if (this.isAnimating) {
+      this.pendingTarget = (typeof this.pendingTarget === 'number' ? this.pendingTarget : this.currentIndex) + 1;
+      return;
+    }
     this.goToSlide(this.currentIndex + 1, { durationMs: this.getDiscreteNavigationDuration() });
   }
 
   prev() {
+    if (this.isAnimating) {
+      this.pendingTarget = (typeof this.pendingTarget === 'number' ? this.pendingTarget : this.currentIndex) - 1;
+      return;
+    }
     this.goToSlide(this.currentIndex - 1, { durationMs: this.getDiscreteNavigationDuration() });
   }
 

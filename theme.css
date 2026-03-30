@@ -603,8 +603,8 @@ body {
    ========================================================================== */
 
 .js [data-gsap="fade-up"] {
-    opacity: 0;
-    transform: translateY(30px);
+    opacity: 1;
+    transform: none;
 }
 
 /* ==========================================================================
@@ -1217,7 +1217,7 @@ select {
 
 #scroll-to-top {
     position: fixed;
-    bottom: calc(var(--floating-ui-edge) + var(--floating-ui-lift));
+    bottom: calc(var(--floating-ui-edge) + env(safe-area-inset-bottom, 0px));
     left: var(--floating-ui-edge);
     pointer-events: none;
     --scroll-to-top-size: 47px;
@@ -1336,7 +1336,7 @@ body #scroll-to-top.show {
 
 @media (max-width: 768px) {
     #scroll-to-top {
-        bottom: calc(20px + var(--floating-ui-lift));
+        bottom: calc(20px + env(safe-area-inset-bottom, 0px));
         left: 20px;
         --scroll-to-top-size: 42px;
     }
@@ -3800,7 +3800,7 @@ footer, .section-below-fold {
 /* Fix: Chat widget high z-index for mobile visibility */
 #chat-widget {
     z-index: 9999 !important;
-    bottom: calc(var(--floating-ui-edge) + var(--floating-ui-lift)) !important;
+    bottom: calc(var(--floating-ui-edge) + env(safe-area-inset-bottom, 0px)) !important;
     transition: transform 0.3s ease;
 }
 
@@ -3820,7 +3820,7 @@ footer, .section-below-fold {
 }
 
 #welcome-bubble {
-    bottom: calc(var(--floating-ui-edge) + var(--chat-fab-size) + 1.75rem + var(--floating-ui-lift)) !important;
+    bottom: calc(var(--floating-ui-edge) + var(--chat-fab-size) + 1.75rem + env(safe-area-inset-bottom, 0px)) !important;
     max-width: min(18rem, calc(100vw - 7.5rem));
     transition: opacity 0.3s ease, transform 0.3s ease;
     z-index: 2147483599;
