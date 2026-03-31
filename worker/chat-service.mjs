@@ -15,8 +15,8 @@ const DEFAULT_BASE_URL = "https://www.estivanayramia.com";
 const IN_MEMORY_TTL_MS = 5 * 60 * 1000;
 const LIVE_REFRESH_TTL_MS = 6 * 60 * 60 * 1000;
 const MAX_CRAWL_PAGES = 48;
-const MAX_RETRIEVED_PAGES = 4;
-const MAX_RETRIEVED_SECTIONS = 6;
+const MAX_RETRIEVED_PAGES = 6;
+const MAX_RETRIEVED_SECTIONS = 10;
 
 const GROUNDING_CACHE = globalThis.__savonieGroundingCache || (globalThis.__savonieGroundingCache = {
   profile: null,
@@ -56,6 +56,7 @@ const QUESTION_CLASSES = {
   SITE_PROOF: "site_proof",
   BOUNDARY: "boundary",
   UNKNOWN: "unknown",
+  COMPLEX_OPEN: "complex_open",
   OPEN: "open"
 };
 
@@ -460,6 +461,12 @@ function classifyQuestion(message) {
   if (/\b(page|site|homepage|overview|deep dive|about|project page|hobbies|whispers|portfolio build|loreal|endpoint|franklin|cooking|reading|photography|me page)\b/.test(lower)) {
     return QUESTION_CLASSES.PAGE_SPECIFIC;
   }
+  // Detect complex multi-part or analytical questions
+  const wordCount = lower.split(/\s+/).length;
+  if (wordCount > 15 || /\b(and also|as well as|in addition|furthermore|compare|contrast|relationship between|how does.*relate|what.*connection)\b/.test(lower)) {
+    return QUESTION_CLASSES.COMPLEX_OPEN;
+  }
+
   return QUESTION_CLASSES.OPEN;
 }
 
@@ -713,36 +720,23 @@ function buildDeterministicReply({ questionClass, surfaceFactKey, profile, siteF
       return `${(seeds.aboutGeneral || []).join(" ")} ${(seeds.outreach || []).slice(1, 2).join(" ")}`.trim();
     case QUESTION_CLASSES.UNKNOWN:
       return buildUnknownReply(profile);
+    case QUESTION_CLASSES.COMPLEX_OPEN:
+      return "";
     default:
       return "";
   }
 }
 
 function shouldUseDeterministicOnly(questionClass, retrieval) {
+  // Only these truly static responses should bypass Gemini
   if (
     questionClass === QUESTION_CLASSES.GREETING ||
     questionClass === QUESTION_CLASSES.CONTACT ||
     questionClass === QUESTION_CLASSES.RESUME ||
-    questionClass === QUESTION_CLASSES.HIRE_CASE ||
-    questionClass === QUESTION_CLASSES.SKEPTICAL_AI ||
-    questionClass === QUESTION_CLASSES.TEAM ||
-    questionClass === QUESTION_CLASSES.ROLE_FIT ||
-    questionClass === QUESTION_CLASSES.WEAKNESS ||
-    questionClass === QUESTION_CLASSES.SURFACE_FACT ||
-    questionClass === QUESTION_CLASSES.LANGUAGES ||
-    questionClass === QUESTION_CLASSES.SITE_PROOF ||
-    questionClass === QUESTION_CLASSES.PROJECT_LIST ||
-    questionClass === QUESTION_CLASSES.BOUNDARY ||
-    questionClass === QUESTION_CLASSES.ABOUT_GENERAL ||
-    questionClass === QUESTION_CLASSES.UNKNOWN
+    questionClass === QUESTION_CLASSES.BOUNDARY
   ) {
     return true;
   }
-
-  if (questionClass === QUESTION_CLASSES.PAGE_SPECIFIC && retrieval.pages.length > 0) {
-    return true;
-  }
-
   return false;
 }
 
@@ -797,6 +791,11 @@ export function buildModelContext({
   const hobbyList = Array.isArray(siteFacts?.hobbies)
     ? siteFacts.hobbies.map((hobby) => `- ${hobby.title} (${hobby.url})`).join("\n")
     : "";
+
+  const allFactsContext = [
+    projectList ? `PROJECTS ON SITE:\n${projectList}` : "",
+    hobbyList ? `HOBBIES ON SITE:\n${hobbyList}` : ""
+  ].filter(Boolean).join("\n\n");
 
   // Behavioral design is deliberate here: adaptive register, active attention, and
   // layered disclosure are applied as output rules so the bot stays socially smart
@@ -853,13 +852,23 @@ CURRENT PAGE CONTEXT:
 - Build version: ${pageContext.buildVersion || "Unknown"}
 - Headings: ${(pageContext.headings || []).join(" | ") || "None provided"}
 
+${allFactsContext}
+
+INFERENCE RULES:
+- You CAN make reasonable inferences when the retrieved content supports them. For example, if a project page describes strategy work for a clinical trial company, you can describe the nature of that work.
+- You CANNOT invent specifics not found in the pages: no fake metrics, no made-up quotes, no fabricated timelines.
+- When you make an inference, frame it naturally without hedging excessively. Don't say "based on the available information" — just answer naturally.
+- If someone asks a complex question that spans multiple topics (e.g., "what's his experience and what kind of roles would suit him?"), pull from multiple retrieved pages to build a complete answer.
+
 OUTPUT SHAPE:
-- Default to 2-5 sentences.
-- For recruiter or skeptical questions, answer directly and let proof carry the weight.
-- For light personal questions, answer briefly with one line of flavor.
-- For page-specific questions, anchor the answer in the retrieved page and link to it naturally.
-- If the question is shallow, you can gently invite a better one, but do not sound annoyed.
-- Use markdown links for internal routes when useful.
+- For simple factual questions (favorite color, contact info), keep it to 1-3 sentences.
+- For complex or multi-part questions, give a thorough answer: 3-8 sentences, organized clearly.
+- For "why hire" / "what makes him different" / analytical questions, go deeper: use specific examples from the retrieved pages, reference actual projects and results, and build a case. Aim for a full paragraph or more.
+- For page-specific questions, anchor the answer in the retrieved page content and quote specific details.
+- Use markdown links for internal routes when useful (e.g., [Projects](/projects/)).
+- If the question asks about something not covered by the retrieved pages or profile data, clearly say that specific detail isn't on the site and suggest reaching out: "That specific detail isn't covered on the site. The best way to get that answer is reaching out directly at hello@estivanayramia.com or through [Contact](/contact)."
+- Never fabricate details. If you only have partial info, share what you know and flag what you don't.
+- Match depth to the question: shallow question = brief answer, deep question = thorough answer.
 
 USER QUESTION:
 ${message}

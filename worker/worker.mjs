@@ -8,7 +8,7 @@ import {
 
 const GEMINI_TIMEOUT_MS = 25000;
 const MAX_MESSAGE_LENGTH = 2000;
-const MAX_REPLY_CHARS = 3200;
+const MAX_REPLY_CHARS = 6000;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 20;
 const PRIMARY_MODEL = "gemini-2.5-flash";
@@ -164,8 +164,9 @@ async function generateReply({ env, userMessage, language, chatContext }) {
     manifestStatus: chatContext.manifestStatus
   });
 
-  const wantsDepth = /\b(detailed|detail|deeper|explain|walk me through|step by step)\b/i.test(userMessage);
-  const maxTokens = wantsDepth ? 800 : 500;
+  const wantsDepth = /\b(detailed|detail|deeper|explain|walk me through|step by step|comprehensive|elaborate|in depth|thoroughly|tell me everything|full breakdown)\b/i.test(userMessage);
+  const isComplex = userMessage.split(/\s+/).length > 12 || /\b(how|why|what makes|compare|difference|relationship between|walk me through)\b/i.test(userMessage);
+  const maxTokens = (wantsDepth || isComplex) ? 1200 : 700;
 
   try {
     const primaryReply = await callGemini({
