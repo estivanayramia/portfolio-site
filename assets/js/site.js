@@ -797,9 +797,9 @@ const initAnimations = () => {
 
     // Fade Up Animations
     const fadeElements = document.querySelectorAll('[data-gsap="fade-up"]');
-    const fadeDistance = isMobile ? 18 : 24;
-    const fadeDuration = isMobile ? 0.48 : 0.62;
-    const fadeStart = isMobile ? 'top 92%' : 'top 88%';
+    const fadeDistance = isMobile ? 20 : 28;
+    const fadeDuration = isMobile ? 0.72 : 0.86;
+    const fadeStart = isMobile ? 'top 93%' : 'top 90%';
     const viewportThreshold = (typeof window !== 'undefined' && window.innerHeight)
         ? window.innerHeight * (isMobile ? 0.92 : 0.88)
         : 0;
@@ -821,7 +821,7 @@ const initAnimations = () => {
                     y: 0,
                     duration: fadeDuration,
                     delay: delaySeconds,
-                    ease: 'power2.out',
+                    ease: 'power3.out',
                     overwrite: 'auto',
                     clearProps: 'opacity,visibility,transform',
                     onStart: () => {
@@ -843,7 +843,7 @@ const initAnimations = () => {
             y: 0,
             duration: fadeDuration,
             delay: delaySeconds,
-            ease: 'power2.out',
+            ease: 'power3.out',
             overwrite: 'auto',
             clearProps: 'opacity,visibility,transform',
             onStart: () => {
