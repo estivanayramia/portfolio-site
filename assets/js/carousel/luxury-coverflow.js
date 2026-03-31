@@ -97,7 +97,7 @@ const MOBILE_POSITIONS = {
     rotateY: 0,
     translateZ: 46,
     translateX: 0,
-    scale: 1.04,
+    scale: 1.01,
     opacity: 1,
     zIndex: 100,
     blur: 0,

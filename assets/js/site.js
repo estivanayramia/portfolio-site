@@ -797,13 +797,68 @@ const initAnimations = () => {
 
     // Fade Up Animations
     const fadeElements = document.querySelectorAll('[data-gsap="fade-up"]');
+    const fadeDistance = isMobile ? 18 : 24;
+    const fadeDuration = isMobile ? 0.48 : 0.62;
+    const fadeStart = isMobile ? 'top 92%' : 'top 88%';
+    const viewportThreshold = (typeof window !== 'undefined' && window.innerHeight)
+        ? window.innerHeight * (isMobile ? 0.92 : 0.88)
+        : 0;
     gsap.killTweensOf(fadeElements);
     fadeElements.forEach((element) => {
+        const delay = Number.parseFloat(element.dataset.gsapDelay || '0');
         element.removeAttribute('data-gsap-state');
-        gsap.set(element, {
+        const delaySeconds = Number.isFinite(delay) ? delay : 0;
+        const isInitiallyInView = element.getBoundingClientRect().top <= viewportThreshold;
+
+        if (isInitiallyInView) {
+            gsap.fromTo(element,
+                {
+                    autoAlpha: 0,
+                    y: fadeDistance
+                },
+                {
+                    autoAlpha: 1,
+                    y: 0,
+                    duration: fadeDuration,
+                    delay: delaySeconds,
+                    ease: 'power2.out',
+                    overwrite: 'auto',
+                    clearProps: 'opacity,visibility,transform',
+                    onStart: () => {
+                        element.dataset.gsapState = 'animating';
+                    },
+                    onComplete: () => {
+                        element.dataset.gsapState = 'animated';
+                    }
+                });
+            return;
+        }
+
+        element.style.opacity = '0';
+        element.style.visibility = 'hidden';
+        element.style.transform = `translate3d(0, ${fadeDistance}px, 0)`;
+
+        gsap.to(element, {
             autoAlpha: 1,
             y: 0,
-            clearProps: 'opacity,visibility,transform'
+            duration: fadeDuration,
+            delay: delaySeconds,
+            ease: 'power2.out',
+            overwrite: 'auto',
+            clearProps: 'opacity,visibility,transform',
+            onStart: () => {
+                element.dataset.gsapState = 'animating';
+            },
+            onComplete: () => {
+                element.dataset.gsapState = 'animated';
+            },
+            scrollTrigger: {
+                trigger: element,
+                start: fadeStart,
+                once: true,
+                fastScrollEnd: true,
+                invalidateOnRefresh: true
+            }
         });
     });
 

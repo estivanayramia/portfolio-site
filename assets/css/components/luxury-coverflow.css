@@ -302,14 +302,18 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  gap: clamp(0.75rem, 1.4vw, 1rem);
   border-radius: inherit;
   overflow: hidden;
+  padding: clamp(0.8rem, 1.8vw, 1rem);
 }
 
 .card-image-container {
   position: relative;
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: hidden;
+  border-radius: clamp(0.95rem, 1.6vw, 1.15rem);
 }
 
 .card-image {
@@ -327,6 +331,8 @@
   align-items: center;
   justify-content: center;
   background: linear-gradient(165deg, rgba(244, 236, 225, 0.98) 0%, rgba(225, 210, 189, 0.94) 58%, rgba(198, 176, 151, 0.92) 100%);
+  border-radius: inherit;
+  overflow: hidden;
 }
 
 .card-bg svg {
@@ -343,25 +349,29 @@
   background: linear-gradient(
     to bottom,
     rgba(12, 16, 28, 0) 0%,
-    rgba(12, 16, 28, 0.08) 48%,
-    rgba(22, 28, 45, 0.56) 100%
+    rgba(12, 16, 28, 0.04) 62%,
+    rgba(22, 28, 45, 0.2) 100%
   );
   pointer-events: none;
 }
 
 .card-content {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: clamp(1.25rem, 3vw, 2rem);
-  
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.55rem, 1.1vw, 0.8rem);
+  min-height: clamp(10rem, 32%, 11.5rem);
+  padding: clamp(1rem, 2.4vw, 1.55rem);
+  border-radius: clamp(1rem, 1.6vw, 1.2rem);
   background: linear-gradient(
-    to top,
-    rgba(19, 26, 44, 0.9) 0%,
-    rgba(26, 33, 53, 0.72) 68%,
-    transparent 100%
+    180deg,
+    rgba(19, 26, 44, 0.92) 0%,
+    rgba(26, 33, 53, 0.98) 100%
   );
+  border: 1px solid rgba(255, 245, 231, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 12px 24px rgba(12, 16, 27, 0.14);
 }
 
 .card-category {
@@ -375,14 +385,14 @@
   background: rgba(239, 224, 197, 0.08);
   border: 1px solid rgba(239, 224, 197, 0.16);
   border-radius: 20px;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 .card-title {
   font-size: clamp(1.1rem, 2.5vw, 1.75rem);
   font-weight: 600;
   color: #ffffff;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0;
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
@@ -391,14 +401,15 @@
   font-size: clamp(0.8rem, 1.5vw, 0.95rem);
   color: rgba(255, 244, 230, 0.78);
   line-height: 1.6;
-  margin-bottom: 1.25rem;
-  max-height: 3em;
+  margin-bottom: 0;
+  max-height: 4.8em;
   overflow: hidden;
 }
 
 .card-actions {
   display: flex;
   gap: 1rem;
+  margin-top: auto;
 }
 
 .card-link {
@@ -1078,6 +1089,16 @@
   /* Hide reflections on mobile for performance */
   .coverflow-card::after {
     display: none !important;
+  }
+
+  .card-inner {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .card-content {
+    min-height: 9rem;
+    padding: 0.95rem 1rem 1rem;
   }
   
   .roulette-trigger-btn {
