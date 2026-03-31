@@ -8,7 +8,7 @@ import {
 
 const GEMINI_TIMEOUT_MS = 25000;
 const MAX_MESSAGE_LENGTH = 2000;
-const MAX_REPLY_CHARS = 3200;
+const MAX_REPLY_CHARS = 8000;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 20;
 const PRIMARY_MODEL = "gemini-2.5-flash";
@@ -164,8 +164,10 @@ async function generateReply({ env, userMessage, language, chatContext }) {
     manifestStatus: chatContext.manifestStatus
   });
 
-  const wantsDepth = /\b(detailed|detail|deeper|explain|walk me through|step by step)\b/i.test(userMessage);
-  const maxTokens = wantsDepth ? 800 : 500;
+  const wantsDepth = /\b(detailed|detail|deeper|explain|walk me through|step by step|comprehensive|elaborate|in depth|thoroughly|tell me everything|full breakdown|break it down|unpack|expand on)\b/i.test(userMessage);
+  const isComplex = userMessage.split(/\s+/).length > 10 || /\b(how|why|what makes|compare|difference|relationship|walk me through|strengths? and|tell me about.*and|as well as|in addition|also tell)\b/i.test(userMessage);
+  const isRecruiterDeep = /\b(hiring manager|recruiter|candidate|operations|why.*strong|walk me through.*why|evaluate|assessment|fit for)\b/i.test(userMessage);
+  const maxTokens = (wantsDepth || isRecruiterDeep) ? 1500 : (isComplex ? 1100 : 800);
 
   try {
     const primaryReply = await callGemini({
@@ -177,6 +179,25 @@ async function generateReply({ env, userMessage, language, chatContext }) {
     });
 
     const finalReply = postProcessReply(primaryReply, chatContext.fallbackReply);
+
+    // Self-healing: if Gemini returned something too short or is just the fallback, try once more with a nudge
+    if (finalReply === chatContext.fallbackReply && primaryReply && primaryReply.length > 20) {
+      // Gemini gave a real reply but it got filtered — try fallback model
+      try {
+        const retryReply = await callGemini({
+          apiKey: env.GEMINI_API_KEY,
+          model: FALLBACK_MODEL,
+          context: prompt + "\n\nIMPORTANT: Your previous answer was filtered. Make sure you speak in third person about Estivan, avoid banned phrases, and stay grounded in the provided facts.",
+          message: userMessage,
+          maxTokens
+        });
+        const retryFinal = postProcessReply(retryReply, chatContext.fallbackReply);
+        return { reply: retryFinal, source: "gemini_self_healed" };
+      } catch {
+        // Fall through to normal fallback
+      }
+    }
+
     return {
       reply: finalReply,
       source: "gemini_primary"
@@ -226,7 +247,9 @@ function buildDebugPayload(chatContext, modelSource) {
     manifestBuildVersion: chatContext.manifest?.buildVersion || "",
     currentPage: chatContext.pageContext,
     retrievedRoutes: chatContext.retrieval.pages.map((page) => page.route),
-    modelSource
+    modelSource,
+    replyLength: modelSource === "deterministic" ? "n/a" : "see_response",
+    selfHealed: modelSource === "gemini_self_healed"
   };
 }
 

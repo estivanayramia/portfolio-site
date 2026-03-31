@@ -6,7 +6,7 @@ import {
   tokenizeText
 } from "./chat-grounding-utils.mjs";
 
-export const CHAT_VERSION = "v2026.03.18-fresh-grounding";
+export const CHAT_VERSION = "v2026.03.30-savonie-v2";
 
 const FACTS_KEY = "site-facts:v1";
 const PROFILE_KEY = "profile:public:v1";
@@ -15,8 +15,8 @@ const DEFAULT_BASE_URL = "https://www.estivanayramia.com";
 const IN_MEMORY_TTL_MS = 5 * 60 * 1000;
 const LIVE_REFRESH_TTL_MS = 6 * 60 * 60 * 1000;
 const MAX_CRAWL_PAGES = 48;
-const MAX_RETRIEVED_PAGES = 4;
-const MAX_RETRIEVED_SECTIONS = 6;
+const MAX_RETRIEVED_PAGES = 8;
+const MAX_RETRIEVED_SECTIONS = 12;
 
 const GROUNDING_CACHE = globalThis.__savonieGroundingCache || (globalThis.__savonieGroundingCache = {
   profile: null,
@@ -56,6 +56,7 @@ const QUESTION_CLASSES = {
   SITE_PROOF: "site_proof",
   BOUNDARY: "boundary",
   UNKNOWN: "unknown",
+  COMPLEX_OPEN: "complex_open",
   OPEN: "open"
 };
 
@@ -69,6 +70,139 @@ const BANNED_LANGUAGE = [
   "vibe hire",
   "family culture"
 ];
+
+const PERSONAL_KNOWLEDGE = {
+  identity: {
+    fullName: "Estivan Ayramia",
+    heritage: "Chaldean, Iraqi-American",
+    birthplace: "Baghdad, Iraq",
+    refugeeHistory: "Lived in Syria as a refugee, moved to El Cajon, California in 2008 at age 4",
+    hometown: "El Cajon, California (near San Diego)",
+    birthday: "January 21, 2004",
+    height: "5'10\" barefoot",
+    education: {
+      school: "San Diego State University (SDSU)",
+      degree: "General Business",
+      graduationDate: "December 2025",
+      gpa: "approximately 3.8",
+      focus: "Practical execution: taking messy situations and making them clearer and more manageable"
+    },
+    chaldeanContext: "Part of an ancient community tracing back to Mesopotamian times. Chaldean is a dialect related to the language Jesus spoke. First-generation American. Parents had an arranged marriage. Dad was an electrical engineer. Mom restarted her education from scratch in the USA and earned a BS in Business Administration from SDSU after nearly a decade.",
+    firstGenContext: "Being first-generation means figuring out systems not built with you in mind. No family connections in corporate America, no inherited safety net. What that builds is resourcefulness and a deep appreciation for every inch of progress."
+  },
+  languages: {
+    spoken: ["English (native-level)", "Chaldean/Neo-Aramaic (fluent speaking)", "Arabic (fluent)", "Spanish (conversational to professional)"],
+    written: ["English", "Arabic", "Spanish"],
+    note: "Cannot write in Chaldean. Spanish comes up constantly in San Diego and with kids from Spanish-speaking families."
+  },
+  work: {
+    current: "Coach and chaperone role working with kids. Moved into a lead position within 14 months with a promotion and significantly more responsibility.",
+    workLessons: "Kids call out anything that doesn't add up, so you learn to be straight with them. Being able to hold attention, de-escalate, and improvise in real time is like a crash course in leadership.",
+    seeking: "Operations and project coordination work. Open to new opportunities, remote or San Diego hybrid. Looking for respectful accountability, clear ownership, and real intellectual challenge. Not looking to be babysat."
+  },
+  preferences: {
+    favoriteColor: {
+      answer: "Brown, beige, and cream — earthy colors",
+      why: "They feel grounded without trying too hard. That grounded, low-key aesthetic runs through the site design too — warm tones, clean layouts, no flashy gradients."
+    },
+    favoriteMovie: {
+      answer: "Iron Man",
+      why: "Part of why it sticks is the Tony Stark 'built this in a cave' energy — the idea of building something real with limited resources and pure will."
+    },
+    favoriteShows: {
+      answer: "White Collar, Burn Notice, Prison Break, and Psych",
+      why: "Psych stands out because of how closely it notices details. There's a pattern: shows about people who are resourceful, observant, and solve problems using what they have."
+    },
+    favoriteBook: {
+      answer: "How to Win Friends and Influence People",
+      why: "The useful part is the genuine-interest side of it, not the cheesy version. It's about actually listening and caring about what the other person needs."
+    },
+    favoriteMusic: {
+      answer: "Drake, Arctic Monkeys, The Marias, and The Neighbourhood",
+      why: "Broad taste overall, but those are easy standouts. The range says something about not being boxed into one identity."
+    },
+    favoriteFood: {
+      answer: "Pizza and pasta (savory-leaning)",
+      dessert: "Ben & Jerry's strawberry cheesecake",
+      why: "He leans savory. Not a chef, but refuses to eat mediocre food when good ingredients are available."
+    },
+    favoriteDrink: {
+      answer: "Water and Coke Zero",
+      why: "Caffeine usually makes him sleepy, which is not the most efficient setup."
+    },
+    favoriteSport: {
+      answer: "Soccer is the favorite",
+      others: "Also plays volleyball and pickleball for fun",
+      favoriteTeam: "FC Barcelona"
+    },
+    style: {
+      summary: "Style depends on the outing",
+      shoes: "Nike Dunks, Jordan 1s, and Air Forces",
+      note: "He cares about cologne more than most people probably should."
+    }
+  },
+  strengths: [
+    "Building systems that reduce chaos and create repeatable processes",
+    "Cultural sensitivity and bridging communication gaps between different groups",
+    "Showing up consistently and delivering on commitments",
+    "Translating complex ideas into clear, actionable steps",
+    "Self-directed learning and quickly picking up new tools",
+    "Pattern recognition",
+    "Four languages enabling cross-cultural communication"
+  ],
+  workingOn: [
+    "Saying no to distractions and staying focused on high-impact work",
+    "Being more direct in communication rather than overexplaining",
+    "Delegating tasks instead of trying to do everything myself",
+    "Building patience for long-term projects that take months to see results",
+    "Getting better at public speaking and presenting in front of groups"
+  ],
+  systems: {
+    proofOfWorkLoop: "Build something real, document it clearly, iterate until it is good enough, then move on. A recruiter can evaluate actual work instead of reading inflated bullet points.",
+    learningSystem: "Learns by asking questions repeatedly and cycling material until it sticks. Almost never takes notes because it does not help much. Matches how his brain works.",
+    focusDiscipline: "Deleted short-form social media. Phone time down to 3-5 hours/day (used to be way higher). Eliminated most notifications. Daily reminder: 'Do not say anything negative today.' Trains 4-5 days/week at the gym."
+  },
+  values: {
+    reliabilityOverFlash: "Consistency moves things forward. Showing up on time, doing what you said you would, having a backup plan.",
+    peopleAreTheSystem: "Best process falls apart if people running it are not on board. Understanding where someone is coming from matters more than most job descriptions let on.",
+    executionIsEverything: "A great idea with no follow-through is just a conversation. Checklists, time blocks, honest review loops.",
+    growthThroughDiscomfort: "Best learning happens at the edge of what you can do. Seek challenges just out of reach.",
+    documentationMatters: "If it only exists in someone's head, it does not really exist.",
+    systemsBeatWillpower: "Having a setup that makes it easier to do the right thing than to skip it.",
+    feedbackIsAGift: "Honest feedback is rare and worth a lot. The kind that stings is usually the kind that changes something."
+  },
+  workingWithMe: {
+    reliabilityOverHeroics: "Would rather show up every day and do what they said than pull off something spectacular once and disappear. If something is slipping, will tell you before it becomes a problem.",
+    continuousImprovement: "Good enough to ship beats perfect and stuck. Put things out, see what happens, fix what needs fixing.",
+    ownershipNotExcuses: "If something is my responsibility and it goes wrong, that is on me.",
+    leadershipStyle: "Learned from working with kids: be straight, hold attention, de-escalate, improvise in real time."
+  },
+  threeDecisions: {
+    systemsOverShortcuts: "Quick fixes create debt. Building repeatable processes compounds over time.",
+    leaningIntoDiscomfort: "Taking on projects that felt too big, having conversations that felt too hard. Growth only happened at the edges.",
+    writingThingsDown: "Documenting processes, lessons learned, and reflections. This portfolio exists because he decided to document rather than just experience."
+  },
+  timeline: [
+    "Born in Baghdad",
+    "Lived in Syria as a refugee",
+    "Moved to El Cajon in 2008 at age 4",
+    "General Business at SDSU, graduated December 2025, GPA ~3.8",
+    "Coaching/chaperone work with kids, promoted to lead within 14 months",
+    "Built this portfolio site from scratch with PWA support, service workers, Lighthouse 90+ scores, and an AI assistant"
+  ],
+  siteInfo: {
+    url: "https://www.estivanayramia.com",
+    builtBy: "Estivan, hand-coded",
+    features: "PWA support, service workers, Lighthouse 90+ scores, AI assistant (Savonie), scroll progress, coverflow carousel, multi-language (English, Spanish, Arabic)",
+    purpose: "A resume leaves too much out. This site exists so people can see the actual work, thinking, and personality."
+  },
+  contact: {
+    email: "hello@estivanayramia.com",
+    linkedin: "https://www.linkedin.com/in/estivanayramia/",
+    contactPage: "/contact",
+    resumePdf: "/assets/docs/Estivan-Ayramia-Resume.pdf"
+  }
+};
 
 const SURFACE_FACT_PATTERNS = [
   { key: "favorite_color", pattern: /\b(favo[u]?rite|what color).*color|\bcolor\b/i },
@@ -460,6 +594,12 @@ function classifyQuestion(message) {
   if (/\b(page|site|homepage|overview|deep dive|about|project page|hobbies|whispers|portfolio build|loreal|endpoint|franklin|cooking|reading|photography|me page)\b/.test(lower)) {
     return QUESTION_CLASSES.PAGE_SPECIFIC;
   }
+  // Detect complex multi-part or analytical questions
+  const wordCount = lower.split(/\s+/).length;
+  if (wordCount > 12 || /\b(and also|as well as|in addition|furthermore|compare|contrast|relationship between|how does.*relate|what.*connection|walk me through|break down|strengths? and weaknesses?|tell me about.*and)\b/.test(lower)) {
+    return QUESTION_CLASSES.COMPLEX_OPEN;
+  }
+
   return QUESTION_CLASSES.OPEN;
 }
 
@@ -545,7 +685,7 @@ function retrieveGrounding(message, manifest, questionClass, currentRoute) {
         score: scoreSection(entry.page, section, queryTokens, message)
       }))
       .sort((left, right) => right.score - left.score)
-      .slice(0, 2);
+      .slice(0, 3);
 
     sections.push(...pageSections);
   }
@@ -584,38 +724,37 @@ function formatProjectList(siteFacts) {
 }
 
 function formatSurfaceFactReply(key, profile) {
-  const preferences = profile.preferences || {};
-  const identity = profile.identity || {};
+  const pk = PERSONAL_KNOWLEDGE;
 
   switch (key) {
     case "favorite_color":
-      return "Brown, beige, and cream. He likes earthy colors. They feel grounded without trying too hard.";
+      return `${pk.preferences.favoriteColor.answer}. ${pk.preferences.favoriteColor.why}`;
     case "favorite_movie":
-      return "Iron Man. Part of why it sticks is the Tony Stark 'built this in a cave' energy.";
+      return `${pk.preferences.favoriteMovie.answer}. ${pk.preferences.favoriteMovie.why}`;
     case "favorite_show":
-      return "White Collar, Burn Notice, Prison Break, and Psych are the main ones. Psych stands out because of how closely it notices details.";
+      return `${pk.preferences.favoriteShows.answer}. ${pk.preferences.favoriteShows.why}`;
     case "favorite_book":
-      return "How to Win Friends and Influence People. The useful part for him is the genuine-interest side of it, not the cheesy version.";
+      return `${pk.preferences.favoriteBook.answer}. ${pk.preferences.favoriteBook.why}`;
     case "favorite_music":
-      return "His music taste is broad, but Drake, Arctic Monkeys, The Marias, and The Neighbourhood are easy standouts.";
+      return `${pk.preferences.favoriteMusic.answer}. ${pk.preferences.favoriteMusic.why}`;
     case "favorite_food":
-      return "Pizza and pasta are the safest answers. He leans savory, and the dessert pick is Ben & Jerry's strawberry cheesecake.";
+      return `${pk.preferences.favoriteFood.answer}. Dessert pick is ${pk.preferences.favoriteFood.dessert}. ${pk.preferences.favoriteFood.why}`;
     case "favorite_drink":
-      return "Water and Coke Zero are the regular go-tos. Caffeine usually makes him sleepy, which is not the most efficient setup.";
+      return `${pk.preferences.favoriteDrink.answer}. ${pk.preferences.favoriteDrink.why}`;
     case "favorite_sport":
-      return "Soccer is the favorite. He also plays volleyball and pickleball for fun, but soccer wins.";
+      return `${pk.preferences.favoriteSport.answer}. ${pk.preferences.favoriteSport.others}. Team: ${pk.preferences.favoriteSport.favoriteTeam}.`;
     case "favorite_team":
-      return "FC Barcelona.";
+      return `${pk.preferences.favoriteSport.favoriteTeam}.`;
     case "languages":
-      return "Estivan speaks Arabic, Chaldean, English, and Spanish. He writes in English, Arabic, and Spanish, but not Chaldean.";
+      return `Estivan speaks ${pk.languages.spoken.join(", ")}. He writes in ${pk.languages.written.join(", ")}. ${pk.languages.note}`;
     case "hometown":
-      return `He was born in ${identity.birthplace || "Baghdad, Iraq"} and grew up in ${identity.hometown || "El Cajon"}.`;
+      return `He was born in ${pk.identity.birthplace} and grew up in ${pk.identity.hometown}. ${pk.identity.refugeeHistory}.`;
     case "birthday":
-      return "January 21, 2004.";
+      return `${pk.identity.birthday}.`;
     case "height":
-      return identity.height || "5'10\" barefoot.";
+      return `${pk.identity.height}.`;
     case "style":
-      return `${preferences.style?.summary || "His style depends on the outing."} Favorite shoes are ${preferences.style?.shoes?.join(", ") || "Nike Dunks, Jordan 1s, and Air Forces"}, and yes, he cares about cologne more than most people probably should.`;
+      return `${pk.preferences.style.summary}. Favorite shoes are ${pk.preferences.style.shoes}. ${pk.preferences.style.note}`;
     default:
       return "";
   }
@@ -711,6 +850,8 @@ function buildDeterministicReply({ questionClass, surfaceFactKey, profile, siteF
       return buildBoundaryReply();
     case QUESTION_CLASSES.ABOUT_GENERAL:
       return `${(seeds.aboutGeneral || []).join(" ")} ${(seeds.outreach || []).slice(1, 2).join(" ")}`.trim();
+    case QUESTION_CLASSES.COMPLEX_OPEN:
+      return "";
     case QUESTION_CLASSES.UNKNOWN:
       return buildUnknownReply(profile);
     default:
@@ -719,30 +860,15 @@ function buildDeterministicReply({ questionClass, surfaceFactKey, profile, siteF
 }
 
 function shouldUseDeterministicOnly(questionClass, retrieval) {
+  // Only truly static/link responses stay deterministic
   if (
     questionClass === QUESTION_CLASSES.GREETING ||
     questionClass === QUESTION_CLASSES.CONTACT ||
     questionClass === QUESTION_CLASSES.RESUME ||
-    questionClass === QUESTION_CLASSES.HIRE_CASE ||
-    questionClass === QUESTION_CLASSES.SKEPTICAL_AI ||
-    questionClass === QUESTION_CLASSES.TEAM ||
-    questionClass === QUESTION_CLASSES.ROLE_FIT ||
-    questionClass === QUESTION_CLASSES.WEAKNESS ||
-    questionClass === QUESTION_CLASSES.SURFACE_FACT ||
-    questionClass === QUESTION_CLASSES.LANGUAGES ||
-    questionClass === QUESTION_CLASSES.SITE_PROOF ||
-    questionClass === QUESTION_CLASSES.PROJECT_LIST ||
-    questionClass === QUESTION_CLASSES.BOUNDARY ||
-    questionClass === QUESTION_CLASSES.ABOUT_GENERAL ||
-    questionClass === QUESTION_CLASSES.UNKNOWN
+    questionClass === QUESTION_CLASSES.BOUNDARY
   ) {
     return true;
   }
-
-  if (questionClass === QUESTION_CLASSES.PAGE_SPECIFIC && retrieval.pages.length > 0) {
-    return true;
-  }
-
   return false;
 }
 
@@ -777,89 +903,172 @@ export function buildModelContext({
     .map((page) => {
       const sections = retrieval.sections
         .filter((entry) => entry.page.route === page.route)
-        .slice(0, 2)
-        .map((entry) => `- ${entry.section.heading}: ${entry.section.text}`)
+        .slice(0, 3)
+        .map((entry) => `  - ${entry.section.heading}: ${entry.section.text}`)
         .join("\n");
 
       return [
-        `PAGE ${page.route}`,
-        `Title: ${page.title}`,
-        `Summary: ${page.summary}`,
-        sections ? `Sections:\n${sections}` : ""
+        `PAGE: ${page.route}`,
+        `  Title: ${page.title}`,
+        `  Summary: ${page.summary}`,
+        sections ? `  Sections:\n${sections}` : ""
       ].filter(Boolean).join("\n");
     })
     .join("\n\n");
 
   const projectList = Array.isArray(siteFacts?.projects)
-    ? siteFacts.projects.map((project) => `- ${project.title} (${project.url})`).join("\n")
+    ? siteFacts.projects.map((project) => `- ${project.title}: ${project.summary} (${project.url})`).join("\n")
     : "";
 
   const hobbyList = Array.isArray(siteFacts?.hobbies)
-    ? siteFacts.hobbies.map((hobby) => `- ${hobby.title} (${hobby.url})`).join("\n")
+    ? siteFacts.hobbies.map((hobby) => `- ${hobby.title}: ${hobby.summary} (${hobby.url})`).join("\n")
     : "";
 
-  // Behavioral design is deliberate here: adaptive register, active attention, and
-  // layered disclosure are applied as output rules so the bot stays socially smart
-  // instead of defaulting to generic assistant niceness.
+  const pk = PERSONAL_KNOWLEDGE;
+
   return `
-SYSTEM: You are Savonie, the on-site chat voice for Estivan Ayramia.
-PERSPECTIVE: Speak about Estivan in THIRD PERSON by default.
+SYSTEM: You are Savonie, the on-site AI for Estivan Ayramia's portfolio. You know Estivan deeply and can speak about him with warmth, specificity, and honesty.
+
+PERSPECTIVE: Always speak about Estivan in THIRD PERSON (he/him/his). Never use first person (I/me/my) for Estivan.
 LANGUAGE: Reply in ${language || "English"}.
 REGISTER: ${buildRegisterInstruction(register)}
 QUESTION CLASS: ${questionClass}
 GROUNDING STATUS: ${manifestStatus}
 
-SOURCE-OF-TRUTH ORDER:
-1. Retrieved current site pages
-2. Approved public profile
-3. Verified generated site facts
-4. Minimal inference only when clearly marked
+═══════════════════════════════════════════
+COMPLETE VERIFIED KNOWLEDGE BASE
+Everything below is confirmed fact. Use it freely.
+═══════════════════════════════════════════
 
-NON-NEGOTIABLE RULES:
-- Do not guess.
-- Do not invent facts, metrics, page details, opinions, or preferences.
-- If something is not confirmed, say so clearly and suggest direct outreach.
-- Protect credibility. Let proof do the work.
-- Keep answers grounded, useful, and human.
-- No corporate jargon, therapy-speak, fake-deep language, or resume perfume.
-- Avoid every entry in the approved never-say blacklist from the public profile.
-- Keep some mystery. Do not overexpose private details.
-- Never use first person for Estivan. Refer to him as Estivan, he, or his unless the user explicitly asks for a direct quote.
+IDENTITY:
+- Full name: ${pk.identity.fullName}
+- Heritage: ${pk.identity.heritage}
+- Born: ${pk.identity.birthplace} on ${pk.identity.birthday}
+- Path: ${pk.identity.refugeeHistory}
+- Based in: ${pk.identity.hometown}
+- Height: ${pk.identity.height}
+- Education: ${pk.identity.education.school} — ${pk.identity.education.degree}, graduated ${pk.identity.education.graduationDate}, GPA ${pk.identity.education.gpa}
+- Chaldean context: ${pk.identity.chaldeanContext}
+- First-gen context: ${pk.identity.firstGenContext}
 
-PUBLIC PROFILE:
-- Name: ${profile.name}
-- Hometown: ${profile.identity?.hometown || "El Cajon, California"}
-- Background: ${(profile.identity?.background || []).join(", ")}
-- Education: ${profile.identity?.education?.school || "SDSU"} / ${profile.identity?.education?.degree || "General Business"}
-- Languages spoken: ${(profile.identity?.languages?.spoken || []).join(", ")}
-- Contact email: ${profile.contact?.email || "hello@estivanayramia.com"}
-- Core drive: ${profile.goals?.drive || ""}
-- Team view: ${profile.behavior?.teamFit || ""}
-- AI view: ${profile.behavior?.aiView || ""}
+LANGUAGES:
+- Speaks: ${pk.languages.spoken.join(", ")}
+- Writes in: ${pk.languages.written.join(", ")}
+- Note: ${pk.languages.note}
 
-RETRIEVED CURRENT PAGES:
-${retrievedPages || "No current page retrieval available."}
+WORK:
+- Current: ${pk.work.current}
+- Lessons: ${pk.work.workLessons}
+- Seeking: ${pk.work.seeking}
 
-VERIFIED SITE FACTS:
-Projects:
-${projectList || "- No verified project list available."}
+PERSONAL PREFERENCES (answer AND elaborate with the "why"):
+- Favorite color: ${pk.preferences.favoriteColor.answer}. Why: ${pk.preferences.favoriteColor.why}
+- Favorite movie: ${pk.preferences.favoriteMovie.answer}. Why: ${pk.preferences.favoriteMovie.why}
+- Favorite shows: ${pk.preferences.favoriteShows.answer}. Why: ${pk.preferences.favoriteShows.why}
+- Favorite book: ${pk.preferences.favoriteBook.answer}. Why: ${pk.preferences.favoriteBook.why}
+- Favorite music: ${pk.preferences.favoriteMusic.answer}. Why: ${pk.preferences.favoriteMusic.why}
+- Favorite food: ${pk.preferences.favoriteFood.answer}. Dessert: ${pk.preferences.favoriteFood.dessert}. Why: ${pk.preferences.favoriteFood.why}
+- Favorite drink: ${pk.preferences.favoriteDrink.answer}. Why: ${pk.preferences.favoriteDrink.why}
+- Favorite sport: ${pk.preferences.favoriteSport.answer}. Others: ${pk.preferences.favoriteSport.others}. Team: ${pk.preferences.favoriteSport.favoriteTeam}
+- Style: ${pk.preferences.style.summary}. Shoes: ${pk.preferences.style.shoes}. ${pk.preferences.style.note}
 
-Hobbies:
-${hobbyList || "- No verified hobby list available."}
+STRENGTHS:
+${pk.strengths.map((s) => "- " + s).join("\n")}
 
-CURRENT PAGE CONTEXT:
+ACTIVELY WORKING ON (honest growth areas):
+${pk.workingOn.map((s) => "- " + s).join("\n")}
+
+THREE SYSTEMS HE USES:
+- Proof-of-Work Loop: ${pk.systems.proofOfWorkLoop}
+- Learning System: ${pk.systems.learningSystem}
+- Focus & Discipline: ${pk.systems.focusDiscipline}
+
+CORE VALUES:
+- Reliability over flash: ${pk.values.reliabilityOverFlash}
+- People are the system: ${pk.values.peopleAreTheSystem}
+- Execution is everything: ${pk.values.executionIsEverything}
+- Growth through discomfort: ${pk.values.growthThroughDiscomfort}
+- Documentation matters: ${pk.values.documentationMatters}
+- Systems beat willpower: ${pk.values.systemsBeatWillpower}
+- Feedback is a gift: ${pk.values.feedbackIsAGift}
+
+WORKING WITH HIM:
+- ${pk.workingWithMe.reliabilityOverHeroics}
+- ${pk.workingWithMe.continuousImprovement}
+- ${pk.workingWithMe.ownershipNotExcuses}
+- ${pk.workingWithMe.leadershipStyle}
+
+THREE DECISIONS THAT SHAPED HIM:
+- Systems over shortcuts: ${pk.threeDecisions.systemsOverShortcuts}
+- Leaning into discomfort: ${pk.threeDecisions.leaningIntoDiscomfort}
+- Writing things down: ${pk.threeDecisions.writingThingsDown}
+
+TIMELINE:
+${pk.timeline.map((t) => "- " + t).join("\n")}
+
+CONTACT:
+- Email: ${pk.contact.email}
+- LinkedIn: ${pk.contact.linkedin}
+- Contact page: ${pk.contact.contactPage}
+- Resume: ${pk.contact.resumePdf}
+
+SITE INFO:
+- URL: ${pk.siteInfo.url}
+- Built by: ${pk.siteInfo.builtBy}
+- Features: ${pk.siteInfo.features}
+- Purpose: ${pk.siteInfo.purpose}
+
+═══════════════════════════════════════════
+RETRIEVED SITE PAGES (live content)
+═══════════════════════════════════════════
+${retrievedPages || "No pages retrieved for this query."}
+
+ALL PROJECTS ON SITE:
+${projectList || "No project data available."}
+
+ALL HOBBIES ON SITE:
+${hobbyList || "No hobby data available."}
+
+CURRENT PAGE THE USER IS VIEWING:
 - Route: ${pageContext.route || "/"}
 - Title: ${pageContext.title || "Unknown"}
-- Build version: ${pageContext.buildVersion || "Unknown"}
-- Headings: ${(pageContext.headings || []).join(" | ") || "None provided"}
 
-OUTPUT SHAPE:
-- Default to 2-5 sentences.
-- For recruiter or skeptical questions, answer directly and let proof carry the weight.
-- For light personal questions, answer briefly with one line of flavor.
-- For page-specific questions, anchor the answer in the retrieved page and link to it naturally.
-- If the question is shallow, you can gently invite a better one, but do not sound annoyed.
-- Use markdown links for internal routes when useful.
+═══════════════════════════════════════════
+ANTI-HALLUCINATION RULES (NON-NEGOTIABLE)
+═══════════════════════════════════════════
+1. ONLY use facts from the knowledge base above and the retrieved pages. Do not invent ANY detail — no fake metrics, no made-up quotes, no fabricated timelines, no imagined project outcomes.
+2. If you are unsure or the knowledge base does not cover something, say so honestly: "That specific detail isn't covered on the site. The best way to get that answer is reaching out directly at ${pk.contact.email} or through [Contact](${pk.contact.contactPage})."
+3. Do not guess at things like: specific job titles, salary expectations, exact dates not listed, technical skills not mentioned, personal relationships, or health details.
+4. Never say "based on available information" or "from what I can see." Just answer naturally or defer.
+5. When you combine facts to build an argument (e.g., "why hire him"), every claim must trace back to a specific fact above. No generic filler.
+
+═══════════════════════════════════════════
+RESPONSE BEHAVIOR RULES
+═══════════════════════════════════════════
+ELABORATION RULES:
+- When someone asks about a preference (favorite color, movie, etc.), give the answer AND the why. Don't just list — explain what it reveals about him.
+- When someone asks "why hire him" or evaluative questions, build a real case: cite specific projects, values, systems, and traits. Aim for 4-8 sentences minimum.
+- When someone asks about projects, don't just list titles. Describe what each project actually involved and what skill it demonstrates.
+- When someone asks complex multi-part questions, address EVERY part. Don't skip sub-questions.
+- For page-specific questions, quote real content from the retrieved sections and link to the page.
+
+TONE RULES:
+- Voice: warm, sharp, grounded, low-ego. Like talking to a friend who respects the person they're describing.
+- Never use: ${BANNED_LANGUAGE.map((p) => '"' + p + '"').join(", ")}
+- No corporate jargon, therapy-speak, fake-deep language, or resume perfume.
+- Keep some mystery. Don't overexpose private details.
+- If the question is shallow, answer it well but you can gently invite a deeper one.
+
+LENGTH RULES:
+- Simple factual question (favorite color, birthday) → 2-4 sentences with the "why"
+- Medium question (tell me about a project, what's he good at) → 4-6 sentences with specifics
+- Complex/recruiter question (why hire, evaluate, compare) → 6-12 sentences building a complete case
+- If the user explicitly asks for depth ("walk me through", "elaborate", "detailed") → go as deep as the knowledge allows
+
+LINKING RULES:
+- Use markdown links for internal routes: [Page Name](/route)
+- When referencing a project, link to it: [Taking Down Endpoint](/projects/endpoint-competitive-playbook)
+- Always link to [Contact](/contact) when suggesting outreach
 
 USER QUESTION:
 ${message}
