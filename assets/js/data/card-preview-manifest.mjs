@@ -8,10 +8,11 @@ export const PROJECT_CARD_PREVIEWS = [
     title: 'This Website',
     description: 'Hand-coded with PWA support, service workers, Lighthouse 90+ scores.',
     link: '/projects/portfolio',
-    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-portfolio-cover.webp`,
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/home-portrait-native-v3.jpg',
     generation: {
-      type: 'synthetic',
-      treatment: 'editorial-web-cover'
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/home-portrait-native-v3.jpg'
     }
   },
   {
