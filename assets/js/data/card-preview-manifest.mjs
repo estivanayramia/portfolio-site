@@ -9,6 +9,10 @@ export const PROJECT_CARD_PREVIEWS = [
     description: 'Hand-coded with PWA support, service workers, Lighthouse 90+ scores.',
     link: '/projects/portfolio',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/home-portrait-native-v3.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 20%'
+    },
     generation: {
       type: 'image',
       treatment: 'single-image-editorial',
@@ -22,6 +26,10 @@ export const PROJECT_CARD_PREVIEWS = [
     description: 'A real conversation about your 20s, people skills, leadership, favoritism, support systems, and why the fastest route is not always the right one.',
     link: '/projects/isa-grimes-interview',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/isa_grimes.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 18%'
+    },
     generation: {
       type: 'image',
       treatment: 'single-image-editorial',
@@ -35,6 +43,10 @@ export const PROJECT_CARD_PREVIEWS = [
     description: 'MAPS campaign deck mapping personas across the funnel.',
     link: '/projects/loreal-maps-campaign',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/06-project-loreal-maps.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 14%'
+    },
     generation: {
       type: 'image',
       treatment: 'single-image-editorial',
@@ -48,6 +60,10 @@ export const PROJECT_CARD_PREVIEWS = [
     description: 'Dual-language investment content strategy for English and Arabic audiences.',
     link: '/projects/franklin-templeton-concept',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/05-project-franklin-templeton.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 12%'
+    },
     generation: {
       type: 'image',
       treatment: 'single-image-editorial',
@@ -61,6 +77,10 @@ export const PROJECT_CARD_PREVIEWS = [
     description: '15-page deck outlining Phase 2A and 2B retargeting strategy.',
     link: '/projects/endpoint-linkedin-campaign',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/04-project-endpoint-linkedin.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 12%'
+    },
     generation: {
       type: 'image',
       treatment: 'single-image-editorial',
@@ -74,6 +94,10 @@ export const PROJECT_CARD_PREVIEWS = [
     description: 'Motion storyboard and voiceover script for LinkedIn autoplay.',
     link: '/projects/endpoint-elosity-video',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/03-project-elosity-video.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 20%'
+    },
     generation: {
       type: 'image',
       treatment: 'single-image-editorial',
@@ -87,6 +111,10 @@ export const PROJECT_CARD_PREVIEWS = [
     description: 'Almac + 4G Clinical positioning strategy against Endpoint.',
     link: '/projects/endpoint-competitive-playbook',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/02-project-competitive-playbook.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 10%'
+    },
     generation: {
       type: 'image',
       treatment: 'single-image-editorial',
@@ -103,6 +131,10 @@ export const ABOUT_CARD_PREVIEWS = [
     description: 'Curiosity, execution, growth through discomfort. The principles that shape how I approach problems.',
     link: '/about/values',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/values-portrait-native-v3.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 16%'
+    },
     generation: {
       type: 'image',
       treatment: 'single-image-editorial',
@@ -116,6 +148,10 @@ export const ABOUT_CARD_PREVIEWS = [
     description: 'Chaldean heritage, four languages, family history, and the context I come from.',
     link: '/about/background',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/01-about-background.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 30%'
+    },
     generation: {
       type: 'image',
       treatment: 'single-image-editorial',
@@ -129,6 +165,10 @@ export const ABOUT_CARD_PREVIEWS = [
     description: 'Clear communication, follow-through, and what people can expect if we work together.',
     link: '/about/working-with-me',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/working-portrait-native-v3.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 18%'
+    },
     generation: {
       type: 'image',
       treatment: 'single-image-editorial',

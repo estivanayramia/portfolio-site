@@ -47,6 +47,16 @@ function getPreviewSurfaceBackground(cardData) {
   return 'linear-gradient(165deg, rgba(244, 236, 226, 0.98) 0%, rgba(223, 210, 192, 0.94) 56%, rgba(200, 181, 157, 0.9) 100%)';
 }
 
+function getPreviewPresentation(cardData) {
+  const explicit = cardData?.presentation || {};
+  const treatment = cardData?.generation?.treatment || '';
+
+  return {
+    fit: explicit.fit || 'cover',
+    position: explicit.position || (treatment === 'single-image-editorial' ? '50% 18%' : 'center center')
+  };
+}
+
 function ensurePreviewImageNode(container, cardData) {
   if (!container) return null;
 
@@ -64,8 +74,9 @@ function ensurePreviewImageNode(container, cardData) {
   image.alt = `${cardData.title} preview`;
   image.style.width = '100%';
   image.style.height = '100%';
-  image.style.objectFit = 'contain';
-  image.style.objectPosition = 'center';
+  const presentation = getPreviewPresentation(cardData);
+  image.style.objectFit = presentation.fit;
+  image.style.objectPosition = presentation.position;
 
   container.style.background = getPreviewSurfaceBackground(cardData);
   container.style.backgroundImage = 'none';
@@ -113,11 +124,11 @@ function applyToLegacyGridCard(cardNode, cardData) {
   linkNode.setAttribute('href', cardData.link);
 
   if (mediaNode) {
-    mediaNode.style.backgroundImage = `url('${cardData.previewImage}')`;
-    mediaNode.style.backgroundPosition = 'center';
-    mediaNode.style.backgroundSize = 'contain';
-    mediaNode.style.backgroundRepeat = 'no-repeat';
     mediaNode.style.background = getPreviewSurfaceBackground(cardData);
+    mediaNode.style.backgroundImage = 'none';
+    mediaNode.style.backgroundPosition = 'center';
+    mediaNode.style.backgroundSize = 'cover';
+    mediaNode.style.backgroundRepeat = 'no-repeat';
 
     let image = mediaNode.querySelector('img.card-image');
     if (!image) {
@@ -135,6 +146,9 @@ function applyToLegacyGridCard(cardNode, cardData) {
 
     image.src = cardData.previewImage;
     image.alt = `${cardData.title} preview`;
+    const presentation = getPreviewPresentation(cardData);
+    image.style.objectFit = presentation.fit;
+    image.style.objectPosition = presentation.position;
   }
 
   cardNode.dataset.previewImage = cardData.previewImage;
