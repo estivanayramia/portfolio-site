@@ -1,4 +1,4 @@
-export const CARD_PREVIEW_VERSION = '2026-03-29-v5';
+export const CARD_PREVIEW_VERSION = '2026-03-30-v6';
 export const CARD_PREVIEW_OUTPUT_DIR = '/assets/img/generated/card-previews';
 
 export const PROJECT_CARD_PREVIEWS = [
@@ -20,13 +20,11 @@ export const PROJECT_CARD_PREVIEWS = [
     title: 'Isa Grimes Interview',
     description: 'A real conversation about your 20s, people skills, leadership, favoritism, support systems, and why the fastest route is not always the right one.',
     link: '/projects/isa-grimes-interview',
-    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-isa-grimes-cover.webp`,
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/isa_grimes.jpg',
     generation: {
-      type: 'screenshot',
-      treatment: 'conversation-quote',
-      quote: 'What leadership sounds like once life stops being theoretical.',
-      routePath: '/EN/projects/isa-grimes-interview.html',
-      selectors: ['main', 'section.page-hero']
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/isa_grimes.jpg'
     }
   },
   {
@@ -35,11 +33,11 @@ export const PROJECT_CARD_PREVIEWS = [
     title: "L'Oréal Cell BioPrint",
     description: 'MAPS campaign deck mapping personas across the funnel.',
     link: '/projects/loreal-maps-campaign',
-    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-loreal-pdf-cover.webp`,
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/06-project-loreal-maps.jpg',
     generation: {
-      type: 'pdf',
-      treatment: 'document-poster',
-      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/loreal-maps-retail-playbook.pdf'
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/06-project-loreal-maps.jpg'
     }
   },
   {
@@ -48,11 +46,11 @@ export const PROJECT_CARD_PREVIEWS = [
     title: 'Franklin Templeton',
     description: 'Dual-language investment content strategy for English and Arabic audiences.',
     link: '/projects/franklin-templeton-concept',
-    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-franklin-pdf-cover.webp`,
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/05-project-franklin-templeton.jpg',
     generation: {
-      type: 'pdf',
-      treatment: 'document-poster',
-      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/franklin-templeton-concept.pdf'
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/05-project-franklin-templeton.jpg'
     }
   },
   {
@@ -61,11 +59,11 @@ export const PROJECT_CARD_PREVIEWS = [
     title: 'EndPoint LinkedIn Campaign',
     description: '15-page deck outlining Phase 2A and 2B retargeting strategy.',
     link: '/projects/endpoint-linkedin-campaign',
-    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-endpoint-linkedin-pdf-cover.webp`,
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/04-project-endpoint-linkedin.jpg',
     generation: {
-      type: 'pdf',
-      treatment: 'document-poster',
-      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/endpoint-linkedin-campaign.pdf'
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/04-project-endpoint-linkedin.jpg'
     }
   },
   {
@@ -74,12 +72,11 @@ export const PROJECT_CARD_PREVIEWS = [
     title: 'Endpoint Elosity Launch',
     description: 'Motion storyboard and voiceover script for LinkedIn autoplay.',
     link: '/projects/endpoint-elosity-video',
-    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-endpoint-elosity-cover.webp`,
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/03-project-elosity-video.jpg',
     generation: {
-      type: 'screenshot',
-      treatment: 'motion-storyboard',
-      routePath: '/EN/projects/endpoint-elosity-video.html',
-      selectors: ['main', 'section.page-hero']
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/03-project-elosity-video.jpg'
     }
   },
   {
@@ -88,11 +85,11 @@ export const PROJECT_CARD_PREVIEWS = [
     title: 'Taking Down Endpoint',
     description: 'Almac + 4G Clinical positioning strategy against Endpoint.',
     link: '/projects/endpoint-competitive-playbook',
-    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/projects-endpoint-competitive-pdf-cover.webp`,
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/02-project-competitive-playbook.jpg',
     generation: {
-      type: 'pdf',
-      treatment: 'document-poster',
-      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/endpoint-competitive-playbook.pdf'
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/02-project-competitive-playbook.jpg'
     }
   }
 ];
@@ -104,10 +101,11 @@ export const ABOUT_CARD_PREVIEWS = [
     title: 'Core Values',
     description: 'Curiosity, execution, growth through discomfort. The principles that shape how I approach problems.',
     link: '/about/values',
-    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/about-values-cover.webp`,
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/values-portrait-native-v3.jpg',
     generation: {
-      type: 'synthetic',
-      treatment: 'editorial-values-cover'
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/values-portrait-native-v3.jpg'
     }
   },
   {
@@ -116,11 +114,11 @@ export const ABOUT_CARD_PREVIEWS = [
     title: 'Background',
     description: 'Chaldean heritage, four languages, family history, and the context I come from.',
     link: '/about/background',
-    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/about-background-collage.webp`,
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/01-about-background.jpg',
     generation: {
       type: 'image',
       treatment: 'single-image-editorial',
-      source: '/assets/img/Portolio-Media/Portfolio-Media/Estivan_and_Alen_in_Iraq.webp'
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/01-about-background.jpg'
     }
   },
   {
@@ -129,10 +127,11 @@ export const ABOUT_CARD_PREVIEWS = [
     title: 'Working With Me',
     description: 'Clear communication, follow-through, and what people can expect if we work together.',
     link: '/about/working-with-me',
-    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/about-working-with-me-cover.webp`,
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/working-portrait-native-v3.jpg',
     generation: {
-      type: 'synthetic',
-      treatment: 'editorial-collaboration-cover'
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/working-portrait-native-v3.jpg'
     }
   },
   {
