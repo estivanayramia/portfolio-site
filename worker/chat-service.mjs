@@ -192,7 +192,7 @@ const PERSONAL_KNOWLEDGE = {
     "Moved to El Cajon, California in 2008 at age 4",
     "General Business at SDSU, graduated December 2025, GPA approximately 3.8",
     "Coaching/chaperone work with kids — promoted to lead within 14 months",
-    "Built this portfolio site from scratch with PWA support, service workers, Lighthouse 90+ scores, and an AI assistant (Savonie)"
+    "Directed this portfolio site using AI development tools (Claude, Copilot, Gemini) with PWA support, service workers, Lighthouse 90+ scores, and an AI assistant (Savonie)"
   ],
   siteInfo: {
     url: "https://www.estivanayramia.com",

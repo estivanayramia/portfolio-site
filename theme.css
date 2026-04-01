@@ -214,7 +214,7 @@ mark {
 }
 
 [data-theme="dark"] .dark\:text-chocolate {
-    color: #362017 !important;
+    color: #e1d4c2 !important;
 }
 
 [data-theme="dark"] .dark\:text-indigodeep {
@@ -1955,6 +1955,34 @@ select.border-red-500 {
 #chat-messages a:hover {
     color: #362017 !important;
     text-decoration: none !important;
+}
+
+/* Page navigation dark mode */
+[data-theme="dark"] .page-navigation a,
+[data-theme="dark"] .spine-subnav a {
+    color: #e1d4c2;
+}
+[data-theme="dark"] .page-navigation a:hover,
+[data-theme="dark"] .spine-subnav a:hover {
+    color: white;
+}
+
+/* Breadcrumb dark mode */
+[data-theme="dark"] nav[aria-label="Breadcrumb"] a,
+[data-theme="dark"] .spine-crumbs a {
+    color: #e1d4c2;
+}
+[data-theme="dark"] nav[aria-label="Breadcrumb"] span[aria-current="page"],
+[data-theme="dark"] .spine-crumbs .font-medium {
+    color: white;
+}
+
+/* Select dropdown dark mode */
+[data-theme="dark"] .page-navigation select,
+[data-theme="dark"] .spine-subnav select {
+    background-color: #2a3050;
+    color: #e1d4c2;
+    border-color: rgba(225, 212, 194, 0.2);
 }
 
 /* ==========================================================================
