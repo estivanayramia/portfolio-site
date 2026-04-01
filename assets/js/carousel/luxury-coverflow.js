@@ -24,15 +24,15 @@ const ROOT_TIER_CLASSES = [
 const MOTION_PROFILES = {
   premium: {
     tierClass: 'premium',
-    slideMs: 420,
-    settleMs: 240,
-    introMs: 260,
-    spinMs: 4400,
-    dialogMs: 260,
-    scrollSensitivity: 0.0038,
+    slideMs: 560,
+    settleMs: 320,
+    introMs: 340,
+    spinMs: 5200,
+    dialogMs: 320,
+    scrollSensitivity: 0.0035,
     scrollThreshold: 34,
     dragPixelsPerSlide: 255,
-    staggerDelay: 0.016,
+    staggerDelay: 0.02,
     reflectionOpacity: 0.22,
     glowStrength: 1,
     rouletteMode: 'premium',
@@ -41,15 +41,15 @@ const MOTION_PROFILES = {
   },
   enhanced: {
     tierClass: 'enhanced',
-    slideMs: 400,
-    settleMs: 220,
-    introMs: 220,
-    spinMs: 3900,
-    dialogMs: 240,
-    scrollSensitivity: 0.0034,
+    slideMs: 500,
+    settleMs: 280,
+    introMs: 280,
+    spinMs: 4600,
+    dialogMs: 280,
+    scrollSensitivity: 0.0032,
     scrollThreshold: 32,
     dragPixelsPerSlide: 245,
-    staggerDelay: 0.012,
+    staggerDelay: 0.015,
     reflectionOpacity: 0.16,
     glowStrength: 0.82,
     rouletteMode: 'full',
@@ -58,15 +58,15 @@ const MOTION_PROFILES = {
   },
   baseline: {
     tierClass: 'baseline',
-    slideMs: 340,
-    settleMs: 180,
-    introMs: 180,
-    spinMs: 2900,
-    dialogMs: 200,
+    slideMs: 420,
+    settleMs: 220,
+    introMs: 220,
+    spinMs: 3400,
+    dialogMs: 220,
     scrollSensitivity: 0.0028,
     scrollThreshold: 28,
     dragPixelsPerSlide: 228,
-    staggerDelay: 0.004,
+    staggerDelay: 0.006,
     reflectionOpacity: 0,
     glowStrength: 0.3,
     rouletteMode: 'lite',
@@ -75,11 +75,11 @@ const MOTION_PROFILES = {
   },
   reduced: {
     tierClass: 'reduced',
-    slideMs: 180,
-    settleMs: 120,
-    introMs: 140,
-    spinMs: 1200,
-    dialogMs: 140,
+    slideMs: 200,
+    settleMs: 140,
+    introMs: 160,
+    spinMs: 1400,
+    dialogMs: 160,
     scrollSensitivity: 0.0024,
     scrollThreshold: 24,
     dragPixelsPerSlide: 210,
@@ -1026,26 +1026,32 @@ class RouletteOverlayController {
 
   async runSpinAnimation() {
     const wheelSpin = this.wheelEngine.calculateWheelSpin(this.result.winnerPocketIndex);
-    const durationSeconds = this.carousel.motion.spinMs / 1000;
+    // Slow the spin down for a more cinematic, premium feel
+    const durationSeconds = Math.max(this.carousel.motion.spinMs / 1000, 5.2);
     const wheelRadius = parseFloat(getComputedStyle(this.overlay).getPropertyValue('--roulette-wheel-radius')) || 220;
     const frame = {
       wheelRotation: 0,
       ballAngle: 180,
-      radius: wheelRadius * 1.13,
-      progress: 0
+      radius: wheelRadius * 1.16,
+      progress: 0,
+      wobble: 0
     };
 
     const renderFrame = () => {
       frame.progress = this.spinTween ? this.spinTween.progress() : frame.progress;
-      this.renderSpinFrame(frame);
+      // Add realistic ball wobble during deceleration phase
+      const wobbleAmount = Math.sin(frame.ballAngle * 0.15) * frame.wobble;
+      const adjustedRadius = frame.radius + wobbleAmount;
+      this.renderSpinFrame({ ...frame, radius: adjustedRadius });
     };
 
     await new Promise((resolve) => {
       this.isSpinning = true;
-      const totalBallRotation = wheelSpin.spins * 360 + 300;
-      const firstLeg = durationSeconds * 0.55;
-      const secondLeg = durationSeconds * 0.30;
-      const finalLeg = Math.max(0.36, durationSeconds - firstLeg - secondLeg);
+      const totalBallRotation = wheelSpin.spins * 360 + 340;
+      const firstLeg = durationSeconds * 0.45;
+      const secondLeg = durationSeconds * 0.28;
+      const thirdLeg = durationSeconds * 0.15;
+      const finalLeg = Math.max(0.5, durationSeconds - firstLeg - secondLeg - thirdLeg);
 
       this.spinTween = gsap.timeline({
         onComplete: () => {
@@ -1055,33 +1061,47 @@ class RouletteOverlayController {
         }
       });
 
-      // Leg 1: Smooth acceleration (mimics real roulette wheel build-up)
+      // Leg 1: Smooth, powerful acceleration — the croupier's launch
       this.spinTween.to(frame, {
-        wheelRotation: -(wheelSpin.finalRotation * 0.72),
-        ballAngle: frame.ballAngle - (totalBallRotation * 0.78),
-        radius: wheelRadius * 1.04,
+        wheelRotation: -(wheelSpin.finalRotation * 0.62),
+        ballAngle: frame.ballAngle - (totalBallRotation * 0.68),
+        radius: wheelRadius * 1.08,
+        wobble: 0,
         duration: firstLeg,
-        ease: 'power1.in',
+        ease: 'power2.in',
         onUpdate: renderFrame
       });
 
-      // Leg 2: Deceleration (exponential slowdown)
+      // Leg 2: Graceful deceleration — the ball begins to spiral inward
       this.spinTween.to(frame, {
-        wheelRotation: -wheelSpin.finalRotation + 42,
-        ballAngle: frame.ballAngle - (totalBallRotation * 0.19),
-        radius: wheelRadius * 0.9,
+        wheelRotation: -(wheelSpin.finalRotation * 0.88),
+        ballAngle: frame.ballAngle - (totalBallRotation * 0.22),
+        radius: wheelRadius * 0.92,
+        wobble: 4,
         duration: secondLeg,
-        ease: 'power4.out',
+        ease: 'power3.out',
         onUpdate: renderFrame
       });
 
-      // Leg 3: Settle with subtle elastic bounce (ball dropping into pocket)
+      // Leg 3: Tension — the ball skips across pockets (realistic bouncing phase)
+      this.spinTween.to(frame, {
+        wheelRotation: -wheelSpin.finalRotation + 18,
+        ballAngle: frame.ballAngle - (totalBallRotation * 0.07),
+        radius: wheelRadius * 0.84,
+        wobble: 6,
+        duration: thirdLeg,
+        ease: 'power2.out',
+        onUpdate: renderFrame
+      });
+
+      // Leg 4: Final settle — ball drops into pocket with satisfying weight
       this.spinTween.to(frame, {
         wheelRotation: -wheelSpin.finalRotation,
         ballAngle: frame.ballAngle - (totalBallRotation * 0.03),
-        radius: wheelRadius * 0.82,
+        radius: wheelRadius * 0.80,
+        wobble: 0,
         duration: finalLeg,
-        ease: 'elastic.out(1, 0.3)',
+        ease: 'elastic.out(1.1, 0.35)',
         onUpdate: renderFrame
       });
     });
@@ -1090,16 +1110,29 @@ class RouletteOverlayController {
   async presentResult() {
     const winningPocket = this.pockets[this.result.winnerPocketIndex]?.root;
     if (winningPocket) {
-      // Step 1: Winner pocket scales up with a glow
+      // Step 1: Winner pocket scales up with a dramatic golden glow reveal
       gsap.fromTo(
         winningPocket,
         { scale: 1, boxShadow: '0 0 0px rgba(201,167,109,0)' },
         {
-          scale: 1.15,
-          boxShadow: '0 0 28px rgba(201,167,109,0.6)',
-          duration: 0.3,
+          scale: 1.2,
+          boxShadow: '0 0 48px rgba(201,167,109,0.75), 0 0 96px rgba(201,167,109,0.3)',
+          duration: 0.5,
           repeat: 1,
           yoyo: true,
+          ease: 'power2.inOut'
+        }
+      );
+
+      // Flash highlight on the stage for cinematic reveal feel
+      gsap.fromTo(
+        this.elements.stage,
+        { boxShadow: '0 0 0 0 rgba(201,167,109,0)' },
+        {
+          boxShadow: '0 0 80px 20px rgba(201,167,109,0.15)',
+          duration: 0.6,
+          yoyo: true,
+          repeat: 1,
           ease: 'power2.out'
         }
       );
@@ -1764,14 +1797,25 @@ export class LuxuryCoverflow {
   setupWheelNavigation() {
     if (!this.config.enableScroll) return;
 
+    // Prevent browser back/forward swipe gestures from leaking through the carousel
+    this.container.style.overscrollBehaviorX = 'contain';
+    this.container.style.touchAction = 'pan-y';
+
     this.resources.listen(this.container, 'wheel', (event) => {
       if (this.roulette?.isActive) return;
 
       const absX = Math.abs(event.deltaX);
       const absY = Math.abs(event.deltaY);
+
+      // Prevent any horizontal wheel event on the carousel from becoming a browser
+      // back/forward navigation gesture. Even small deltaX values can trigger it.
+      if (absX > 1 && absX > absY * 0.5) {
+        event.preventDefault();
+      }
+
+      // Only drive the carousel for significant horizontal intent
       if (absX < 6 || absX <= absY) return;
 
-      event.preventDefault();
       this.stopAutoplay();
       this.wheelState.accumulator += event.deltaX;
 
