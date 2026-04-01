@@ -786,6 +786,10 @@ class RouletteOverlayController {
   resetWheelVisuals() {
     gsap.killTweensOf([this.elements.stage, this.elements.wheel, this.elements.ball, this.elements.ballShadow, this.elements.ballHighlight, this.elements.dialog]);
     gsap.killTweensOf(this.pockets.map((pocket) => pocket.root));
+    if (this._spinFrame) {
+      gsap.killTweensOf(this._spinFrame);
+      this._spinFrame = null;
+    }
 
     gsap.set(this.elements.wheel, { rotation: 0 });
     gsap.set(this.elements.ball, { x: 0, y: 0, opacity: 1, scale: 1 });
@@ -874,31 +878,60 @@ class RouletteOverlayController {
   }
 
   renderSpinFrame(frame) {
-    const radius = frame.radius;
+    // --- pocket-bounce radial modulation ---
+    // The ball rattles over pocket dividers: a sinusoidal radial
+    // perturbation whose amplitude fades as the spin decelerates.
+    const bounceOffset = this.wheelEngine.getPocketBounceOffset(
+      frame.ballAngle,
+      frame.progress,
+      frame.bounceAmplitude ?? 6
+    );
+    const effectiveRadius = frame.radius + bounceOffset;
+
     const angleInRadians = (frame.ballAngle * Math.PI) / 180;
-    const x = Math.cos(angleInRadians) * radius;
-    const y = Math.sin(angleInRadians) * radius;
+    const x = Math.cos(angleInRadians) * effectiveRadius;
+    // Vertical lift: during bounces the ball lifts slightly above the
+    // track plane.  The lift is proportional to the bounce offset.
+    const liftY = -bounceOffset * 0.45;
+    const y = Math.sin(angleInRadians) * effectiveRadius + liftY;
+
     const depthRatio = (Math.sin(angleInRadians - Math.PI / 2) + 1) / 2;
     const ballScale = 0.84 + (depthRatio * 0.34);
 
     gsap.set(this.elements.wheel, { rotation: frame.wheelRotation });
-    gsap.set(this.elements.ball, { x, y, scale: ballScale, zIndex: 1000 + Math.round(depthRatio * 100) });
-    gsap.set(this.elements.ballHighlight, { x: x - (5 * ballScale), y: y - (5 * ballScale), opacity: 0.52 + (depthRatio * 0.34), scale: ballScale });
-    gsap.set(this.elements.ballShadow, {
-      x,
-      y: y + (20 - (depthRatio * 8)),
-      opacity: 0.32 + ((1 - depthRatio) * 0.26),
-      scale: 0.72 + ((1 - depthRatio) * 0.44)
+    gsap.set(this.elements.ball, {
+      x, y,
+      scale: ballScale,
+      zIndex: 1000 + Math.round(depthRatio * 100)
+    });
+    gsap.set(this.elements.ballHighlight, {
+      x: x - (5 * ballScale),
+      y: y - (5 * ballScale),
+      opacity: 0.52 + (depthRatio * 0.34),
+      scale: ballScale
     });
 
+    // Shadow stretches away when the ball lifts off the surface
+    const shadowStretch = 1 + (bounceOffset / 30);
+    gsap.set(this.elements.ballShadow, {
+      x,
+      y: y + (20 - (depthRatio * 8)) + bounceOffset * 0.6,
+      opacity: Math.max(0.12, (0.32 + ((1 - depthRatio) * 0.26)) - bounceOffset * 0.015),
+      scale: (0.72 + ((1 - depthRatio) * 0.44)) * shadowStretch
+    });
+
+    // Status announcements (accessibility)
     let phase = 'final';
     let message = 'Picking the final pocket';
-    if (frame.progress < 0.25) {
+    if (frame.progress < 0.20) {
       phase = 'fast';
       message = 'Wheel at full speed';
-    } else if (frame.progress < 0.65) {
+    } else if (frame.progress < 0.55) {
       phase = 'settling';
       message = 'Settling into position';
+    } else if (frame.progress < 0.85) {
+      phase = 'approaching';
+      message = 'Approaching final pocket';
     }
 
     if (phase !== this.lastStatusPhase) {
@@ -1095,81 +1128,184 @@ class RouletteOverlayController {
     const wheelRadius = parseFloat(getComputedStyle(this.overlay).getPropertyValue('--roulette-wheel-radius')) || 220;
     const totalBallRotation = wheelSpin.spins * 360 + 280 + Math.random() * 90;
     const initialBallAngle = wheelSpin.landingAngle + totalBallRotation;
+
+    // Bounce amplitude starts high and the frame-renderer fades it with progress
     const frame = {
       wheelRotation: 0,
       ballAngle: initialBallAngle,
       radius: wheelRadius * 1.13,
-      progress: 0
+      progress: 0,
+      bounceAmplitude: 7
     };
+    // Expose frame so cancelSpin can kill in-flight tweens on it
+    this._spinFrame = frame;
 
     const renderFrame = () => {
       frame.progress = this.spinTween ? this.spinTween.progress() : frame.progress;
       this.renderSpinFrame(frame);
     };
 
+    // --- Phase 1: main spin with exponential deceleration ----------------
     await new Promise((resolve) => {
       this.isSpinning = true;
-      const firstLeg = durationSeconds * 0.44;
-      const secondLeg = durationSeconds * 0.28;
-      const thirdLeg = durationSeconds * 0.16;
-      const finalLeg = Math.max(0.42, durationSeconds - firstLeg - secondLeg - thirdLeg);
-      const legOneWheelRotation = wheelSpin.finalRotation * 0.58;
-      const legTwoWheelRotation = wheelSpin.finalRotation * 0.84;
-      const legThreeWheelRotation = wheelSpin.finalRotation * 0.96;
-      const finalWheelRotation = wheelSpin.finalRotation;
-      const legOneBallAngle = initialBallAngle - (totalBallRotation * 0.72);
-      const legTwoBallAngle = initialBallAngle - (totalBallRotation * 0.9);
-      const legThreeBallAngle = initialBallAngle - (totalBallRotation * 0.975);
-      const finalBallAngle = wheelSpin.landingAngle;
+
+      // 6-leg timeline for richer momentum feel
+      //   Leg 1 – explosive launch (power build)
+      //   Leg 2 – sustained high speed on outer rail
+      //   Leg 3 – primary exponential deceleration
+      //   Leg 4 – ball drops inward, big slowdown
+      //   Leg 5 – "hanging" moment — near-stop, tease pocket
+      //   Leg 6 – final creep into the winning pocket
+
+      const leg1Dur = durationSeconds * 0.18;
+      const leg2Dur = durationSeconds * 0.22;
+      const leg3Dur = durationSeconds * 0.22;
+      const leg4Dur = durationSeconds * 0.16;
+      const leg5Dur = durationSeconds * 0.12;         // hanging tease
+      const leg6Dur = Math.max(0.36, durationSeconds - leg1Dur - leg2Dur - leg3Dur - leg4Dur - leg5Dur);
+
+      // Wheel rotation keyframes (cumulative, negative = counter-clockwise)
+      const wR1 = wheelSpin.finalRotation * 0.30;
+      const wR2 = wheelSpin.finalRotation * 0.58;
+      const wR3 = wheelSpin.finalRotation * 0.78;
+      const wR4 = wheelSpin.finalRotation * 0.91;
+      const wR5 = wheelSpin.finalRotation * 0.975;
+      const wRFinal = wheelSpin.finalRotation;
+
+      // Ball angle keyframes
+      const bA1 = initialBallAngle - (totalBallRotation * 0.36);
+      const bA2 = initialBallAngle - (totalBallRotation * 0.64);
+      const bA3 = initialBallAngle - (totalBallRotation * 0.84);
+      const bA4 = initialBallAngle - (totalBallRotation * 0.94);
+      const bA5 = initialBallAngle - (totalBallRotation * 0.982);
+      const bAFinal = wheelSpin.landingAngle;
 
       this.spinTween = gsap.timeline({
         onComplete: () => {
           this.spinTween = null;
-          this.isSpinning = false;
           resolve();
         }
       });
 
-      // Leg 1: fast outward run while the wheel builds speed.
+      // Leg 1: explosive launch — ball flings outward
       this.spinTween.to(frame, {
-        wheelRotation: legOneWheelRotation,
-        ballAngle: legOneBallAngle,
-        radius: wheelRadius * 1.15,
-        duration: firstLeg,
-        ease: 'power2.inOut',
+        wheelRotation: wR1,
+        ballAngle: bA1,
+        radius: wheelRadius * 1.18,
+        bounceAmplitude: 8,
+        duration: leg1Dur,
+        ease: 'power3.in',
         onUpdate: renderFrame
       });
 
-      // Leg 2: long deceleration around the outer rail.
+      // Leg 2: sustained full speed on the outer rim
       this.spinTween.to(frame, {
-        wheelRotation: legTwoWheelRotation,
-        ballAngle: legTwoBallAngle,
+        wheelRotation: wR2,
+        ballAngle: bA2,
+        radius: wheelRadius * 1.14,
+        bounceAmplitude: 7,
+        duration: leg2Dur,
+        ease: 'none',               // linear at top speed
+        onUpdate: renderFrame
+      });
+
+      // Leg 3: primary exponential deceleration — visible slowdown
+      this.spinTween.to(frame, {
+        wheelRotation: wR3,
+        ballAngle: bA3,
         radius: wheelRadius * 1.02,
-        duration: secondLeg,
+        bounceAmplitude: 5,
+        duration: leg3Dur,
         ease: 'expo.out',
         onUpdate: renderFrame
       });
 
-      // Leg 3: ball starts dropping inward toward the winning sector.
+      // Leg 4: ball drops inward toward the pocket ring
       this.spinTween.to(frame, {
-        wheelRotation: legThreeWheelRotation,
-        ballAngle: legThreeBallAngle,
+        wheelRotation: wR4,
+        ballAngle: bA4,
         radius: wheelRadius * 0.88,
-        duration: thirdLeg,
-        ease: 'power2.in',
+        bounceAmplitude: 3,
+        duration: leg4Dur,
+        ease: 'power3.out',
         onUpdate: renderFrame
       });
 
-      // Leg 4: final pocket settle without reversing direction.
+      // Leg 5: "hanging" moment — ball almost stops, teasing a pocket
       this.spinTween.to(frame, {
-        wheelRotation: finalWheelRotation,
-        ballAngle: finalBallAngle,
+        wheelRotation: wR5,
+        ballAngle: bA5,
+        radius: wheelRadius * 0.82,
+        bounceAmplitude: 1.5,
+        duration: leg5Dur,
+        ease: 'sine.inOut',          // butter-smooth near-stop
+        onUpdate: renderFrame
+      });
+
+      // Leg 6: final creep — slow glide into the winning pocket
+      this.spinTween.to(frame, {
+        wheelRotation: wRFinal,
+        ballAngle: bAFinal,
         radius: wheelRadius * 0.78,
-        duration: finalLeg,
+        bounceAmplitude: 0,
+        duration: leg6Dur,
         ease: 'power4.out',
         onUpdate: renderFrame
       });
     });
+
+    // --- Phase 2: dampened settle bounces --------------------------------
+    // The ball has reached the winning pocket's neighbourhood.  Now it
+    // bounces 3-4 times with decreasing height before coming to rest —
+    // like a real ball rattling between the frets.
+    const bounces = this.wheelEngine.getBounceSequence();
+    const settleBaseRadius = wheelRadius * 0.78;
+    let currentAngle = wheelSpin.landingAngle;
+    const currentWheelRotation = wheelSpin.finalRotation;
+
+    for (const bounce of bounces) {
+      // Each bounce: lift outward then drop back in, advancing the angle
+      // slightly as if the ball skips forward across a pocket or two.
+      const peakRadius = settleBaseRadius + bounce.height;
+      const halfDur = bounce.duration / 2;
+      const angleAdvance = bounce.angularTravel;
+
+      // Upward arc (ball lifts)
+      await new Promise((resolve) => {
+        gsap.to(frame, {
+          radius: peakRadius,
+          ballAngle: currentAngle - angleAdvance * 0.6,
+          bounceAmplitude: 0,
+          duration: halfDur,
+          ease: bounce.ease,
+          onUpdate: () => {
+            frame.wheelRotation = currentWheelRotation;
+            this.renderSpinFrame(frame);
+          },
+          onComplete: resolve
+        });
+      });
+
+      // Downward arc (ball drops back)
+      currentAngle -= angleAdvance;
+      await new Promise((resolve) => {
+        gsap.to(frame, {
+          radius: settleBaseRadius,
+          ballAngle: currentAngle,
+          bounceAmplitude: 0,
+          duration: halfDur,
+          ease: bounce.ease.replace('.out', '.in'),
+          onUpdate: () => {
+            frame.wheelRotation = currentWheelRotation;
+            this.renderSpinFrame(frame);
+          },
+          onComplete: resolve
+        });
+      });
+    }
+
+    this.isSpinning = false;
+    this._spinFrame = null;
   }
 
   async presentResult() {
@@ -1242,6 +1378,11 @@ class RouletteOverlayController {
     this.clearAutoNavigateTimer();
     gsap.killTweensOf([this.elements.wheel, this.elements.ball, this.elements.ballShadow, this.elements.ballHighlight, this.elements.dialog]);
     gsap.killTweensOf(this.pockets.map((pocket) => pocket.root));
+    // Kill settle-bounce tweens that target the frame object directly
+    if (this._spinFrame) {
+      gsap.killTweensOf(this._spinFrame);
+      this._spinFrame = null;
+    }
     this.isSpinning = false;
     this.spinTween = null;
     this.setStatus(message, 'assertive');
@@ -1864,7 +2005,7 @@ export class LuxuryCoverflow {
 
       const absX = Math.abs(event.deltaX);
       const absY = Math.abs(event.deltaY);
-      if (absX < 6 || absX <= absY) return;
+      if (absX < 10 || absX <= absY * 1.2) return;
 
       event.preventDefault();
       event.stopPropagation();

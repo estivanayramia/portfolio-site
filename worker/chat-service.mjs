@@ -196,7 +196,7 @@ const PERSONAL_KNOWLEDGE = {
   ],
   siteInfo: {
     url: "https://www.estivanayramia.com",
-    builtBy: "Estivan, hand-coded",
+    builtBy: "Estivan directing AI tools — AI wrote every line of code, Estivan designed, reviewed, and shipped",
     features: "PWA support, service workers, Lighthouse 90+ scores, AI chatbot (Savonie), scroll progress, coverflow carousel, multi-language support (English, Spanish, Arabic), dark/light theme",
     purpose: "A resume leaves too much out. This site exists so people can see the actual work, thinking, and personality — not just bullet points."
   },

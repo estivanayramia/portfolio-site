@@ -820,7 +820,7 @@ function buildTextOverlay(card, theme, treatment, quoteText = '') {
       context.lineWidth = 1.5;
       context.stroke();
       drawWrappedText(context, {
-        text: 'Editorial UI, canonical preview sync, and hand-coded polish.',
+        text: 'Editorial UI, canonical preview sync, and AI-assisted polish.',
         x: 124,
         y: 1144,
         maxWidth: 700,

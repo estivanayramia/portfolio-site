@@ -50,7 +50,6 @@
     linear-gradient(180deg, #24304c 0%, #1c253b 42%, #2f241b 100%);
   isolation: isolate;
   overflow: hidden;
-  overscroll-behavior-x: none;
 }
 
 .coverflow-header {
@@ -92,10 +91,10 @@
 .coverflow-container {
   position: relative;
   width: 100%;
-  height: clamp(580px, 78vh, 860px);
+  height: clamp(620px, 82vh, 920px);
   padding-bottom: 6.5rem;
-  overflow: clip;
-  overscroll-behavior-x: none;
+  overflow: visible;
+  overscroll-behavior-x: contain;
   overscroll-behavior-y: contain;
   contain: paint;
 }
@@ -105,11 +104,11 @@
 }
 
 .coverflow-section--no-header .coverflow-container {
-  padding-top: clamp(2.75rem, 5vw, 3.5rem);
+  padding-top: clamp(3.5rem, 6vw, 4.5rem);
 }
 
 .coverflow-section--no-header .coverflow-track {
-  top: calc(50% + clamp(0.75rem, 1.6vw, 1rem));
+  top: calc(50% + clamp(1rem, 2vw, 1.5rem));
 }
 
 .coverflow-perspective {
@@ -120,7 +119,7 @@
   perspective-origin: 50% 50%;
   transform-style: preserve-3d;
   touch-action: pan-y pinch-zoom;
-  overscroll-behavior-x: none;
+  overscroll-behavior-x: contain;
 }
 
 /* V4: Floor horizon line */
@@ -154,7 +153,6 @@
   height: 100%;
   transform-style: preserve-3d;
   overscroll-behavior: contain;
-  overscroll-behavior-x: none;
   touch-action: pan-y pinch-zoom;
 }
 
@@ -596,11 +594,20 @@
 }
 
 .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-btn-prev {
-  left: 0.4rem;
+  left: clamp(-2.5rem, -4vw, -1rem);
 }
 
 .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-btn-next {
-  right: 0.4rem;
+  right: clamp(-2.5rem, -4vw, -1rem);
+}
+
+@media (max-width: 640px) {
+  .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-btn-prev {
+    left: 0.25rem;
+  }
+  .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-btn-next {
+    right: 0.25rem;
+  }
 }
 
 .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-dots {
