@@ -85,9 +85,30 @@ function getContinuationHint(reply) {
   return input.slice(-700);
 }
 
-async function callGemini({ apiKey, model, context, message, maxTokens }) {
+async function callGemini({ apiKey, model, context, message, maxTokens, history }) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+
+  // Build multi-turn contents: system context + recent conversation history + current question
+  const contents = [
+    { role: "user", parts: [{ text: context }] },
+    { role: "model", parts: [{ text: "Understood. I am Savonie, Estivan's on-site assistant. I will answer in third person, answer first and route second, and use the correct age and facts." }] }
+  ];
+
+  // Append recent conversation history for follow-up coherence (last 6 turns max)
+  if (Array.isArray(history) && history.length > 0) {
+    const recentHistory = history.slice(-6);
+    for (const turn of recentHistory) {
+      if (turn.role === "user" && turn.text) {
+        contents.push({ role: "user", parts: [{ text: String(turn.text).slice(0, 500) }] });
+      } else if (turn.role === "assistant" && turn.text) {
+        contents.push({ role: "model", parts: [{ text: String(turn.text).slice(0, 800) }] });
+      }
+    }
+  }
+
+  // Current question
+  contents.push({ role: "user", parts: [{ text: message }] });
 
   try {
     const response = await fetch(
@@ -99,16 +120,7 @@ async function callGemini({ apiKey, model, context, message, maxTokens }) {
           "x-goog-api-key": apiKey
         },
         body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: `${context}\n\nUSER QUESTION:\n${message}`
-                }
-              ]
-            }
-          ],
+          contents,
           generationConfig: {
             temperature: 0.55,
             topP: 0.9,
@@ -144,7 +156,7 @@ async function callGemini({ apiKey, model, context, message, maxTokens }) {
   }
 }
 
-async function generateReply({ env, userMessage, language, chatContext }) {
+async function generateReply({ env, userMessage, language, chatContext, history }) {
   if (chatContext.deterministicOnly || !env.GEMINI_API_KEY) {
     return {
       reply: chatContext.fallbackReply,
@@ -173,7 +185,8 @@ async function generateReply({ env, userMessage, language, chatContext }) {
       model: PRIMARY_MODEL,
       context: prompt,
       message: userMessage,
-      maxTokens
+      maxTokens,
+      history
     });
 
     const finalReply = postProcessReply(primaryReply, chatContext.fallbackReply);
@@ -188,7 +201,8 @@ async function generateReply({ env, userMessage, language, chatContext }) {
         model: FALLBACK_MODEL,
         context: prompt,
         message: userMessage,
-        maxTokens
+        maxTokens,
+        history
       });
 
       const finalReply = postProcessReply(fallbackModelReply, chatContext.fallbackReply);
@@ -293,11 +307,14 @@ export default {
       legacyPageContent: body?.pageContent || ""
     });
 
+    const history = Array.isArray(body?.history) ? body.history.slice(-6) : [];
+
     const replyResult = await generateReply({
       env,
       userMessage,
       language,
-      chatContext
+      chatContext,
+      history
     });
 
     const finalReply = safeTruncate(replyResult.reply, MAX_REPLY_CHARS);

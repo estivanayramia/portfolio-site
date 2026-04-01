@@ -6,7 +6,7 @@ import {
   tokenizeText
 } from "./chat-grounding-utils.mjs";
 
-export const CHAT_VERSION = "v2026.03.18-fresh-grounding";
+export const CHAT_VERSION = "v2026.04.01-reasoning-upgrade";
 
 const FACTS_KEY = "site-facts:v1";
 const PROFILE_KEY = "profile:public:v1";
@@ -610,8 +610,14 @@ function formatSurfaceFactReply(key, profile) {
       return "Estivan speaks Arabic, Chaldean, English, and Spanish. He writes in English, Arabic, and Spanish, but not Chaldean.";
     case "hometown":
       return `He was born in ${identity.birthplace || "Baghdad, Iraq"} and grew up in ${identity.hometown || "El Cajon"}.`;
-    case "birthday":
-      return "January 21, 2004.";
+    case "birthday": {
+      const bday = new Date(2004, 0, 21);
+      const today = new Date();
+      let age = today.getFullYear() - bday.getFullYear();
+      const monthDiff = today.getMonth() - bday.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < bday.getDate())) age--;
+      return `Estivan was born on January 21, 2004. He is currently ${age} years old.`;
+    }
     case "height":
       return identity.height || "5'10\" barefoot.";
     case "style":
@@ -719,30 +725,18 @@ function buildDeterministicReply({ questionClass, surfaceFactKey, profile, siteF
 }
 
 function shouldUseDeterministicOnly(questionClass, retrieval) {
+  // These classes have reliable deterministic answers that don't benefit from LLM reasoning
   if (
     questionClass === QUESTION_CLASSES.GREETING ||
     questionClass === QUESTION_CLASSES.CONTACT ||
     questionClass === QUESTION_CLASSES.RESUME ||
-    questionClass === QUESTION_CLASSES.HIRE_CASE ||
-    questionClass === QUESTION_CLASSES.SKEPTICAL_AI ||
-    questionClass === QUESTION_CLASSES.TEAM ||
-    questionClass === QUESTION_CLASSES.ROLE_FIT ||
-    questionClass === QUESTION_CLASSES.WEAKNESS ||
-    questionClass === QUESTION_CLASSES.SURFACE_FACT ||
-    questionClass === QUESTION_CLASSES.LANGUAGES ||
-    questionClass === QUESTION_CLASSES.SITE_PROOF ||
-    questionClass === QUESTION_CLASSES.PROJECT_LIST ||
-    questionClass === QUESTION_CLASSES.BOUNDARY ||
-    questionClass === QUESTION_CLASSES.ABOUT_GENERAL ||
-    questionClass === QUESTION_CLASSES.UNKNOWN
+    questionClass === QUESTION_CLASSES.BOUNDARY
   ) {
     return true;
   }
 
-  if (questionClass === QUESTION_CLASSES.PAGE_SPECIFIC && retrieval.pages.length > 0) {
-    return true;
-  }
-
+  // Everything else benefits from LLM reasoning for deeper, more coherent answers.
+  // The deterministic reply is still used as a fallback if the LLM fails.
   return false;
 }
 
@@ -798,6 +792,14 @@ export function buildModelContext({
     ? siteFacts.hobbies.map((hobby) => `- ${hobby.title} (${hobby.url})`).join("\n")
     : "";
 
+  // Compute age at runtime so the model always has the correct number
+  const bday = new Date(2004, 0, 21);
+  const todayDate = new Date();
+  let currentAge = todayDate.getFullYear() - bday.getFullYear();
+  const mDiff = todayDate.getMonth() - bday.getMonth();
+  if (mDiff < 0 || (mDiff === 0 && todayDate.getDate() < bday.getDate())) currentAge--;
+  const todayStr = todayDate.toISOString().split("T")[0];
+
   // Behavioral design is deliberate here: adaptive register, active attention, and
   // layered disclosure are applied as output rules so the bot stays socially smart
   // instead of defaulting to generic assistant niceness.
@@ -808,6 +810,7 @@ LANGUAGE: Reply in ${language || "English"}.
 REGISTER: ${buildRegisterInstruction(register)}
 QUESTION CLASS: ${questionClass}
 GROUNDING STATUS: ${manifestStatus}
+TODAY: ${todayStr}
 
 SOURCE-OF-TRUTH ORDER:
 1. Retrieved current site pages
@@ -815,9 +818,12 @@ SOURCE-OF-TRUTH ORDER:
 3. Verified generated site facts
 4. Minimal inference only when clearly marked
 
-NON-NEGOTIABLE RULES:
-- Do not guess.
-- Do not invent facts, metrics, page details, opinions, or preferences.
+CRITICAL FACTUAL RULES:
+- Estivan was born on January 21, 2004. Today is ${todayStr}. He is ${currentAge} years old. Do NOT compute a different age. Use ${currentAge}.
+- ANSWER FIRST. When the user asks a question, give a direct substantive answer using facts from the site. Do NOT just say "check this page" or redirect without answering.
+- For follow-up questions like "tell me about it" or "go on" or "what about that", continue discussing the SAME topic from your previous answer. Do NOT switch topics or recommend a random page.
+- When recommending a project, NAME one specific project first and explain why it fits, then mention the projects page for more.
+- Do not guess. Do not invent facts, metrics, page details, opinions, or preferences.
 - If something is not confirmed, say so clearly and suggest direct outreach.
 - Protect credibility. Let proof do the work.
 - Keep answers grounded, useful, and human.
@@ -828,7 +834,9 @@ NON-NEGOTIABLE RULES:
 
 PUBLIC PROFILE:
 - Name: ${profile.name}
+- Birthday: January 21, 2004 (age ${currentAge} as of ${todayStr})
 - Hometown: ${profile.identity?.hometown || "El Cajon, California"}
+- Birthplace: ${profile.identity?.birthplace || "Baghdad, Iraq"}
 - Background: ${(profile.identity?.background || []).join(", ")}
 - Education: ${profile.identity?.education?.school || "SDSU"} / ${profile.identity?.education?.degree || "General Business"}
 - Languages spoken: ${(profile.identity?.languages?.spoken || []).join(", ")}
@@ -855,9 +863,11 @@ CURRENT PAGE CONTEXT:
 
 OUTPUT SHAPE:
 - Default to 2-5 sentences.
+- ALWAYS answer the question substantively before suggesting a page link. Answer first, route second.
 - For recruiter or skeptical questions, answer directly and let proof carry the weight.
 - For light personal questions, answer briefly with one line of flavor.
-- For page-specific questions, anchor the answer in the retrieved page and link to it naturally.
+- For page-specific questions, anchor the answer in the retrieved page facts and link to it naturally.
+- For project recommendation questions, name the single best-fit project first with a reason, then mention the full list.
 - If the question is shallow, you can gently invite a better one, but do not sound annoyed.
 - Use markdown links for internal routes when useful.
 
