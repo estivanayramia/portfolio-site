@@ -523,7 +523,7 @@ const initDarkMode = () => {
     }
 
     // Set initial icon
-    toggleButton.innerHTML = currentTheme === 'dark' ? '<span style="color: #e1d4c2">🔆</span>' : '<span style="color: #212842">🌙</span>';
+    toggleButton.innerHTML = currentTheme === 'dark' ? '<span style="color: #e1d4c2">☀️</span>' : '<span style="color: #212842">🌙</span>';
 
     // Toggle theme function
     const toggleTheme = () => {
@@ -534,7 +534,7 @@ const initDarkMode = () => {
         localStorage.setItem('theme', newTheme);
         
         // Update icon
-        toggleButton.innerHTML = newTheme === 'dark' ? '<span style="color: #e1d4c2">🔆</span>' : '<span style="color: #212842">🌙</span>';
+        toggleButton.innerHTML = newTheme === 'dark' ? '<span style="color: #e1d4c2">☀️</span>' : '<span style="color: #212842">🌙</span>';
         
         // Track analytics (both Clarity and GA4)
         if (typeof clarity === 'function') {
@@ -558,7 +558,7 @@ const initDarkMode = () => {
             const newTheme = e.matches ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
-            toggleButton.innerHTML = newTheme === 'dark' ? '<span style="color: #e1d4c2">🔆</span>' : '<span style="color: #212842">🌙</span>';
+            toggleButton.innerHTML = newTheme === 'dark' ? '<span style="color: #e1d4c2">☀️</span>' : '<span style="color: #212842">🌙</span>';
         }
     });
 
@@ -613,6 +613,11 @@ const initMobileMenu = () => {
     };
 
     const openMenu = () => {
+        // Close chat if open when hamburger menu opens
+        const chatWindow = document.getElementById('chat-window');
+        if (chatWindow && !chatWindow.classList.contains('hidden')) {
+            chatWindow.classList.add('hidden');
+        }
         scrollY = window.scrollY;
         // Prevent background interaction while menu is open
         try {
@@ -2746,7 +2751,7 @@ const __ensureStandardEnglishChrome = () => {
             </div>
             
             <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">🔆</span></button>
+            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">☀️</span></button>
             
             <!-- Mobile Menu Toggle -->
             <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">

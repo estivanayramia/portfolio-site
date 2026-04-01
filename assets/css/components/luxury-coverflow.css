@@ -1229,3 +1229,16 @@
 .cf-tier-reduced .luxury-roulette-shell {
   box-shadow: none;
 }
+
+/* Card description text: proper truncation with ellipsis on mobile */
+@media (max-width: 767px) {
+    .coverflow-card .card-description,
+    .coverflow-card .card-text,
+    .coverflow-card p:not(.card-category) {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}

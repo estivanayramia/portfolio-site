@@ -2857,3 +2857,14 @@ footer {
     position: relative;
     z-index: 40;
 }
+
+/* Desktop: ensure chat widget clears footer */
+#chat-widget {
+    bottom: 28px;
+}
+/* When scrolled near bottom, lift chat higher to avoid footer overlap */
+@media (min-width: 641px) {
+    #chat-widget {
+        bottom: 28px;
+    }
+}
