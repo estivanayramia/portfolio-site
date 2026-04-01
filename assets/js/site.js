@@ -140,6 +140,20 @@ const __initCarouselAndLightbox = () => {
         if (!track) return;
         if (track.dataset && track.dataset.carouselInit === '1') return;
 
+        // Prevent browser back/forward swipe gestures from leaking through mini carousels
+        const carouselContainer = track.closest('.carousel-container, [data-carousel]') || track.parentElement;
+        if (carouselContainer) {
+            carouselContainer.style.overscrollBehaviorX = 'contain';
+            carouselContainer.style.touchAction = 'pan-y';
+            carouselContainer.addEventListener('wheel', (e) => {
+                const absX = Math.abs(e.deltaX);
+                const absY = Math.abs(e.deltaY);
+                if (absX > 1 && absX > absY * 0.5 && e.cancelable) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        }
+
         const wrapMode = !!(track.dataset && track.dataset.carouselWrap === '1');
 
         const noteCardImages = Array.from(document.querySelectorAll('.note-card img'));
@@ -1157,13 +1171,13 @@ const initAnimations = () => {
 
         gsap.from(element, {
             opacity: 0,
-            y: 20,
-            duration: 0.4,
-            delay: parseFloat(delay) * 0.5,
-            ease: 'power2.out',
+            y: 28,
+            duration: 0.85,
+            delay: parseFloat(delay) * 0.6,
+            ease: 'power3.out',
             scrollTrigger: {
                 trigger: element,
-                start: 'top 92%',
+                start: 'top 90%',
                 toggleActions: 'play none none none'
             }
         });
@@ -1188,10 +1202,10 @@ const initAnimations = () => {
     const cards = document.querySelectorAll('.card-hover');
     cards.forEach(card => {
         card.addEventListener('mouseenter', () => {
-            gsap.to(card, { y: -8, duration: 0.3, ease: 'power2.out' });
+            gsap.to(card, { y: -6, duration: 0.5, ease: 'power3.out' });
         });
         card.addEventListener('mouseleave', () => {
-            gsap.to(card, { y: 0, duration: 0.3, ease: 'power2.out' });
+            gsap.to(card, { y: 0, duration: 0.6, ease: 'power3.out' });
         });
     });
 };
@@ -2983,6 +2997,10 @@ const __ensureStandardEnglishChrome = () => {
 
     // Header: inject only if missing (avoid clobbering per-page scripts)
     try {
+        // Remove empty placeholder headers left by game/hobby pages
+        document.querySelectorAll('header').forEach(h => {
+            if (!h.innerHTML.trim()) h.remove();
+        });
         const hasStandardHeader = !!document.querySelector('header #brand-logo, header #mobile-menu-toggle');
         if (!hasStandardHeader) {
             const header = document.createElement('header');
@@ -4144,13 +4162,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
             try {
+                // Build conversation history for follow-up coherence
+                const recentHistory = chatHistory
+                    .filter(item => item && item.kind === 'text')
+                    .slice(-6)
+                    .map(item => ({
+                        role: item.sender === 'user' ? 'user' : 'assistant',
+                        text: item.text
+                    }));
+
                 const response = await fetch(CHAT_ENDPOINT, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         message: text,
                         pageContent: buildSafePageContext(),
-                        language: pageLang
+                        language: pageLang,
+                        history: recentHistory
                     }),
                     signal: controller.signal
                 });
