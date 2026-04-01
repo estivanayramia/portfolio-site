@@ -1,0 +1,215 @@
+{
+  "total": 20,
+  "passes": 2,
+  "fails": 18,
+  "results": [
+    {
+      "q": "Which project should I look at first?",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "specific project"
+      ],
+      "banned": []
+    },
+    {
+      "q": "What should I start with if I care about strategy?",
+      "answer": "[Endpoint Competitive Playbook](/projects/endpoint-competitive-playbook) is the best place for that. Review the Endpoint Competitive Playbook project: positioning strategy, account planning, and messaging structure designed to improve win probability in enterprise sales. The clearest parts are What ",
+      "score": 80.0,
+      "pass": true,
+      "missing": [],
+      "banned": []
+    },
+    {
+      "q": "What's the strongest project?",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "specific project"
+      ],
+      "banned": []
+    },
+    {
+      "q": "What was the L'Or\u00e9al deck about?",
+      "answer": "[Loreal Maps Campaign](/projects/loreal-maps-campaign) is the best place for that. Read the Loreal MAPS campaign case by Estivan Ayramia, covering strategic mapping, positioning choices, and how campaign planning aligned with brand goals. The clearest parts are L'Or\u00e9al Cell BioPrint MAPS Campaign: T",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "persona",
+        "funnel"
+      ],
+      "banned": []
+    },
+    {
+      "q": "Who is Isa Grimes?",
+      "answer": "Isa Grimes is the subject of an interview Estivan conducted, focusing on topics such as leadership, people skills, navigating one's 20s, support systems, and the value of lived perspective. Estivan sought to understand how Isa Grimes thinks and leads, rather than just discussing a title. You can fin",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "CMO",
+        "Endpoint"
+      ],
+      "banned": []
+    },
+    {
+      "q": "What was Phase 2A in the LinkedIn campaign?",
+      "answer": "Best options are [Contact](/contact), hello@estivanayramia.com, or LinkedIn if that fits better.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "carousel",
+        "retargeting"
+      ],
+      "banned": []
+    },
+    {
+      "q": "Did he code this site himself?",
+      "answer": "[Endpoint Competitive Playbook](/projects/endpoint-competitive-playbook) is the best place for that. Review the Endpoint Competitive Playbook project: positioning strategy, account planning, and messaging structure designed to improve win probability in enterprise sales. The clearest parts are This ",
+      "score": -20.0,
+      "pass": false,
+      "missing": [
+        "AI",
+        "directed"
+      ],
+      "banned": [
+        "hand-coded"
+      ]
+    },
+    {
+      "q": "Can he actually code?",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 40.0,
+      "pass": false,
+      "missing": [
+        "no coding background"
+      ],
+      "banned": []
+    },
+    {
+      "q": "How old is Estivan?",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "22"
+      ],
+      "banned": []
+    },
+    {
+      "q": "What languages does he speak?",
+      "answer": "Estivan speaks Arabic, Chaldean, English, and Spanish. He writes in English, Arabic, and Spanish, but not Chaldean.",
+      "score": 80.0,
+      "pass": true,
+      "missing": [],
+      "banned": []
+    },
+    {
+      "q": "What CRM tools does he know?",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "Salesforce",
+        "HubSpot"
+      ],
+      "banned": []
+    },
+    {
+      "q": "What's his GPA?",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "3.7"
+      ],
+      "banned": []
+    },
+    {
+      "q": "what's his vibe",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "grounded"
+      ],
+      "banned": []
+    },
+    {
+      "q": "is this guy cool",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "personality"
+      ],
+      "banned": []
+    },
+    {
+      "q": "Everyone uses AI now, what makes him special?",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "300 hours",
+        "quality"
+      ],
+      "banned": []
+    },
+    {
+      "q": "What's his phone number?",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "contact page",
+        "professional"
+      ],
+      "banned": []
+    },
+    {
+      "q": "I'm a recruiter, give me the quick pitch",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "strengths",
+        "specific"
+      ],
+      "banned": []
+    },
+    {
+      "q": "Tell me about his education",
+      "answer": "[Franklin Templeton Concept](/projects/franklin-templeton-concept) is the best place for that. See the Franklin Templeton concept project by Estivan Ayramia, focused on strategic communication, concept development, and practical business storytelling. The clearest parts are Arabic version: \u0627\u0644\u0646\u0633\u062e\u0629 \u0627\u0644",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "SDSU",
+        "General Business"
+      ],
+      "banned": []
+    },
+    {
+      "q": "What's the difference between Overview and Deep Dive?",
+      "answer": "[Deep Dive](/deep-dive) is the best place for that. Dive into detailed context behind Estivan Ayramia The clearest parts are What I Am Good At: \u2022 \n Building systems that reduce chaos and create repeatable processes\n\u2022 \n Cultural sensitivity and bridging communication gaps between different groups\n\u2022 \n",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "short",
+        "long"
+      ],
+      "banned": []
+    },
+    {
+      "q": "What was his internship at Google like?",
+      "answer": "That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email hello@estivanayramia.com.",
+      "score": 0.0,
+      "pass": false,
+      "missing": [
+        "no Google"
+      ],
+      "banned": []
+    }
+  ]
+}

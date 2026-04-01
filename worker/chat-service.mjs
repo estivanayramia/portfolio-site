@@ -223,7 +223,18 @@ const SURFACE_FACT_PATTERNS = [
   { key: "birthday", pattern: /\bbirthday\b|\bborn on\b|\bwhen.*born\b|\bage\b|\bhow old\b|\bold is\b/i },
   { key: "hometown", pattern: /\bwhere.*from|hometown|grew up|el cajon|baghdad|born in\b/i },
   { key: "height", pattern: /\bheight|how tall|tall\b/i },
-  { key: "style", pattern: /\bstyle|dress|clothes|fashion|shoes|cologne|jewelry\b/i }
+  { key: "style", pattern: /\bstyle|dress|clothes|fashion|shoes|cologne|jewelry\b/i },
+  { key: "work", pattern: /\bcurrent (job|role|work)|what does he do for (work|a living)|where does he work|coach|549 sports\b/i },
+  { key: "gpa", pattern: /\bgpa|grade point|grades\b/i },
+  { key: "strengths", pattern: /\bstrengths?|good at|best at|strongest\b/i },
+  { key: "weaknesses", pattern: /\bweakness(es)?|working on|improving|growth area\b/i },
+  { key: "hobbies", pattern: /\bhobb(y|ies)|free time|fun|do for fun|outside work\b/i },
+  { key: "car", pattern: /\bcar|bmw|540i|drive|vehicle|mods|modification\b/i },
+  { key: "skills", pattern: /\bskills?|crm|salesforce|hubspot|tools|certif\b/i },
+  { key: "heritage", pattern: /\bchaldean|heritage|background|refugee|iraq\b/i },
+  { key: "family", pattern: /\bbrother|sibling|parent|mom|dad|father|mother|family\b/i },
+  { key: "values", pattern: /\bvalues?|believe|principl|philosophy|work ethic\b/i },
+  { key: "zodiac", pattern: /\bzodiac|star sign|astrolog|aquarius\b/i }
 ];
 
 function now() {
@@ -984,6 +995,28 @@ function formatSurfaceFactReply(key) {
       return `${pk.identity.height}.`;
     case "style":
       return `${pk.preferences.style.summary}. Favorite shoes are ${pk.preferences.style.shoes}. ${pk.preferences.style.note}`;
+    case "work":
+      return `${pk.work.current} ${pk.work.workLessons} He is looking for: ${pk.work.seeking}`;
+    case "gpa":
+      return `His GPA is ${pk.identity.education.gpa}. He graduated from ${pk.identity.education.school} in ${pk.identity.education.graduationDate} with a ${pk.identity.education.degree} degree.`;
+    case "strengths":
+      return `His main strengths: ${pk.strengths.slice(0, 4).join("; ")}. The pattern across the site is systems thinking, clear communication, and consistent execution.`;
+    case "weaknesses":
+      return `What he is working on: ${pk.workingOn.slice(0, 3).join("; ")}. He is honest about growth areas, which is itself a strength.`;
+    case "hobbies":
+      return `His hobbies include gym and strength training (4-5 days/week), photography, car enthusiasm (BMW with mods), cooking, and reading. He also has an [arcade games section](/hobbies-games) on the site.`;
+    case "car":
+      return `He drives a BMW that he has modified: MHD Stage 2 tune, cold air intake, upgraded CTS charge pipe, MAD turbo inlet, catless downpipe, muffler delete, front lip, side skirts, rear diffuser, and hubcentric spacers. The full story is on the [Car page](/hobbies/car).`;
+    case "skills":
+      return `Key skills from his resume: ${pk.resume.coreSkills.slice(0, 6).join(", ")}. He has Google Analytics Certification and exposure to Salesforce, HubSpot, and Pardot.`;
+    case "heritage":
+      return `${pk.identity.heritage}. Born in ${pk.identity.birthplace}. ${pk.identity.refugeeHistory}. ${pk.identity.chaldeanContext.split(".").slice(0, 2).join(".")}.`;
+    case "family":
+      return `He is the youngest of four brothers: Alen, Andrew, Evan, and Estivan. His dad was an electrical engineer. His mom earned a BS in Business Administration from SDSU after nearly a decade of classes. The family story is covered in detail on the [Background page](/about/background).`;
+    case "values":
+      return `His core values: ${Object.keys(pk.values).slice(0, 4).map(k => pk.values[k].split(".")[0]).join(". ")}. The full picture is on the [Values page](/about/values).`;
+    case "zodiac":
+      return `Aquarius. Born January 21, 2004.`;
     default:
       return "";
   }
@@ -994,7 +1027,7 @@ function buildBoundaryReply() {
 }
 
 function buildUnknownReply() {
-  return `That specific detail is not covered on the site. The best way to get that answer is reaching out directly at ${PERSONAL_KNOWLEDGE.contact.email} or through [Contact](${PERSONAL_KNOWLEDGE.contact.contactPage}).`;
+  return `That is a fair question. Here is what the site does cover: Estivan is a ${PERSONAL_KNOWLEDGE.identity.education.degree} graduate from ${PERSONAL_KNOWLEDGE.identity.education.school} (GPA ${PERSONAL_KNOWLEDGE.identity.education.gpa}), Chaldean from El Cajon. He has 7 projects spanning strategy, marketing campaigns, and an editorial interview. For anything more specific, the best route is ${PERSONAL_KNOWLEDGE.contact.email} or [Contact](${PERSONAL_KNOWLEDGE.contact.contactPage}).`;
 }
 
 function buildGroundedSectionLines(topPage, retrieval) {
@@ -1190,16 +1223,16 @@ function buildDeterministicReply({ message, questionClass, surfaceFactKey, profi
 // ROUTING DECISION: What goes to Gemini vs. what stays deterministic
 // ═══════════════════════════════════════════════════════════════════════
 function shouldUseDeterministicOnly(questionClass, retrieval) {
-  // Only truly static/link responses bypass Gemini
-  if (
-    questionClass === QUESTION_CLASSES.GREETING ||
-    questionClass === QUESTION_CLASSES.CONTACT ||
-    questionClass === QUESTION_CLASSES.RESUME ||
-    questionClass === QUESTION_CLASSES.BOUNDARY
-  ) {
-    return true;
-  }
-  return false;
+  // These questions have strong enough deterministic answers to skip Gemini
+  const deterministicClasses = [
+    QUESTION_CLASSES.GREETING,
+    QUESTION_CLASSES.CONTACT,
+    QUESTION_CLASSES.RESUME,
+    QUESTION_CLASSES.BOUNDARY,
+    QUESTION_CLASSES.SURFACE_FACT,
+    QUESTION_CLASSES.LANGUAGES
+  ];
+  return deterministicClasses.includes(questionClass);
 }
 
 function buildRegisterInstruction(register) {

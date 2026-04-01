@@ -1,0 +1,2716 @@
+{
+  "timestamp": "2026-04-01T21:24:06",
+  "categories": [
+    {
+      "name": "Greetings & First Contact",
+      "questions": [
+        {
+          "question": "Hi",
+          "intent": "greeting",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'warm response'",
+            "MISSING: 'not a redirect'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Hey, what is this?",
+          "intent": "site intro",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'explain site purpose'",
+            "MISSING: 'mention Estivan'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What can you help me with?",
+          "intent": "capability",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'explain what Savonie does'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Who are you?",
+          "intent": "identity",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Savonie'",
+            "MISSING: 'AI assistant'",
+            "MISSING: 'Estivan'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is this a real person's site?",
+          "intent": "authenticity",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'Estivan Ayramia'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Identity & Background",
+      "questions": [
+        {
+          "question": "Who is Estivan?",
+          "intent": "identity overview",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Chaldean'",
+            "MISSING: 'SDSU'",
+            "MISSING: 'El Cajon'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Where is he from?",
+          "intent": "origin",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Baghdad'",
+            "MISSING: 'Iraq'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "How old is Estivan?",
+          "intent": "age",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '22'",
+            "MISSING: 'January 21, 2004'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his background?",
+          "intent": "heritage",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Chaldean'",
+            "MISSING: 'refugee'",
+            "MISSING: 'first-generation'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What is Chaldean?",
+          "intent": "culture",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'ancient community'",
+            "MISSING: 'Mesopotamian'",
+            "MISSING: 'Neo-Aramaic'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Does he have siblings?",
+          "intent": "family",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'brothers'",
+            "MISSING: 'youngest'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Where did his family come from?",
+          "intent": "heritage detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Baghdad'",
+            "MISSING: 'Syria'",
+            "MISSING: 'refugee'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is he first generation?",
+          "intent": "identity",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'first-generation American'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What languages does he speak?",
+          "intent": "languages",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'English'",
+            "MISSING: 'Arabic'",
+            "MISSING: 'Chaldean'",
+            "MISSING: 'Spanish'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Can he write in Arabic?",
+          "intent": "language detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'writing'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Education",
+      "questions": [
+        {
+          "question": "Where did he go to school?",
+          "intent": "education",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'SDSU'",
+            "MISSING: 'San Diego State'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What did he study?",
+          "intent": "major",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'General Business'",
+            "MISSING: 'Business Administration'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his GPA?",
+          "intent": "academic",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '3.7'",
+            "MISSING: '3.8'",
+            "MISSING: '3.71'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "When did he graduate?",
+          "intent": "graduation",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'December 2025'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Did he study marketing?",
+          "intent": "coursework",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Interactive Marketing'",
+            "MISSING: 'MKTG 476'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Who taught his marketing class?",
+          "intent": "instructor",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Isa Grimes'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Work Experience",
+      "questions": [
+        {
+          "question": "What does he do for work?",
+          "intent": "current role",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'coach'",
+            "MISSING: 'kids'",
+            "MISSING: '549 Sports'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Has he been promoted?",
+          "intent": "promotion",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'lead'",
+            "MISSING: '14 months'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What other jobs has he had?",
+          "intent": "work history",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'retail'",
+            "MISSING: 'delivery'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What did he learn from working with kids?",
+          "intent": "work lessons",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'straight'",
+            "MISSING: 'leadership'",
+            "MISSING: 'de-escalate'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his delivery rating?",
+          "intent": "specific metric",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '4.9'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What CRM tools does he know?",
+          "intent": "skills",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Salesforce'",
+            "MISSING: 'HubSpot'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What kind of work is he looking for?",
+          "intent": "seeking",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'operations'",
+            "MISSING: 'project coordination'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Strengths & Values",
+      "questions": [
+        {
+          "question": "What are his strengths?",
+          "intent": "strengths",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'systems'",
+            "MISSING: 'communication'",
+            "MISSING: 'consistency'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What is he working on improving?",
+          "intent": "growth areas",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'focus'",
+            "MISSING: 'delegating'",
+            "MISSING: 'public speaking'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What does he value most?",
+          "intent": "values",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'reliability'",
+            "MISSING: 'execution'",
+            "MISSING: 'people'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "How does he handle feedback?",
+          "intent": "work style",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'gift'",
+            "MISSING: 'honest'",
+            "MISSING: 'changes something'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is he a good leader?",
+          "intent": "leadership",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'kids'",
+            "MISSING: 'lead position'",
+            "MISSING: 'straight'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his leadership style?",
+          "intent": "leadership detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'direct'",
+            "MISSING: 'kids'",
+            "MISSING: 'de-escalate'",
+            "MISSING: 'improvise'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Why Hire / Role Fit",
+      "questions": [
+        {
+          "question": "Why should I hire him?",
+          "intent": "hire case",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'specific examples'",
+            "MISSING: 'strengths'",
+            "MISSING: 'projects'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What makes him different from other candidates?",
+          "intent": "differentiation",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'multilingual'",
+            "MISSING: 'first-gen'",
+            "MISSING: 'systems'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Would he be a good fit for an operations role?",
+          "intent": "role fit",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'operations'",
+            "MISSING: 'systems'",
+            "MISSING: 'processes'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Would he be good in marketing?",
+          "intent": "role fit",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'projects'",
+            "MISSING: 'campaigns'",
+            "MISSING: 'MAPS'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is he a good cultural fit for a startup?",
+          "intent": "culture fit",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'adaptable'",
+            "MISSING: 'resourceful'",
+            "MISSING: 'ownership'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What kind of team does he work best with?",
+          "intent": "team fit",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'accountability'",
+            "MISSING: 'ownership'",
+            "MISSING: 'clear'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Does he have any real work experience?",
+          "intent": "skeptical",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'coach'",
+            "MISSING: 'retail'",
+            "MISSING: 'specific examples'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "He has no tech background, why would I hire him for an ops role?",
+          "intent": "skeptical hiring",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'systems thinking'",
+            "MISSING: 'process'",
+            "MISSING: 'not a coder'",
+            "MISSING: 'directed AI'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "AI Honesty & Site Build",
+      "questions": [
+        {
+          "question": "Did he code this site himself?",
+          "intent": "honesty",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'AI'",
+            "MISSING: 'Claude'",
+            "MISSING: 'Copilot'",
+            "MISSING: 'directed'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is he a developer?",
+          "intent": "honesty",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'no coding background'",
+            "MISSING: 'AI tools'",
+            "MISSING: 'directed'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "How was this site built?",
+          "intent": "build process",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'AI'",
+            "MISSING: 'Claude'",
+            "MISSING: 'Copilot'",
+            "MISSING: 'Gemini'",
+            "MISSING: '300 hours'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Did AI do everything?",
+          "intent": "nuance",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'AI wrote code'",
+            "MISSING: 'Estivan designed'",
+            "MISSING: 'reviewed'",
+            "MISSING: 'shipped'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Isn't using AI cheating?",
+          "intent": "skeptical AI",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'tool'",
+            "MISSING: 'not a shortcut'",
+            "MISSING: 'directed'",
+            "MISSING: 'judgment'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Can he actually code?",
+          "intent": "honesty",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'no coding background'",
+            "MISSING: 'AI-assisted'",
+            "MISSING: 'directed'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What did AI actually write vs what did he do?",
+          "intent": "detailed honesty",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'AI wrote every line'",
+            "MISSING: 'designed'",
+            "MISSING: 'reviewed'",
+            "MISSING: 'quality'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Personal Preferences",
+      "questions": [
+        {
+          "question": "What's his favorite color?",
+          "intent": "preference",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'brown'",
+            "MISSING: 'beige'",
+            "MISSING: 'earthy'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his favorite movie?",
+          "intent": "preference",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Iron Man'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What shows does he watch?",
+          "intent": "preference",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'White Collar'",
+            "MISSING: 'Psych'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What music does he listen to?",
+          "intent": "preference",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Drake'",
+            "MISSING: 'Arctic Monkeys'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his favorite food?",
+          "intent": "preference",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'pizza'",
+            "MISSING: 'pasta'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What does he drink?",
+          "intent": "preference",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'water'",
+            "MISSING: 'Coke Zero'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Does he play sports?",
+          "intent": "preference",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'soccer'",
+            "MISSING: 'volleyball'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What team does he support?",
+          "intent": "preference",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Barcelona'",
+            "MISSING: 'FC Barcelona'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his style like?",
+          "intent": "preference",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Dunks'",
+            "MISSING: 'Jordan'",
+            "MISSING: 'cologne'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Hobbies",
+      "questions": [
+        {
+          "question": "What are his hobbies?",
+          "intent": "hobbies overview",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'gym'",
+            "MISSING: 'car'",
+            "MISSING: 'photography'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What car does he drive?",
+          "intent": "hobby detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'BMW'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Does he work out?",
+          "intent": "hobby detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'gym'",
+            "MISSING: '4-5 days'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Tell me about his car mods",
+          "intent": "hobby detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'cold air intake'",
+            "MISSING: 'tune'",
+            "MISSING: 'downpipe'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Does he cook?",
+          "intent": "hobby",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'steak'",
+            "MISSING: 'pasta'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Projects Overview",
+      "questions": [
+        {
+          "question": "What projects has he done?",
+          "intent": "project list",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Endpoint'",
+            "MISSING: 'L'Or\u00e9al'",
+            "MISSING: 'Franklin Templeton'",
+            "MISSING: 'website'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "How many projects are there?",
+          "intent": "count",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '7'",
+            "CONTAINS_BANNED: '0'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Which project should I look at first?",
+          "intent": "recommendation",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'specific project name'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What should I start with if I care about strategy?",
+          "intent": "targeted rec",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Taking Down Endpoint'",
+            "MISSING: 'competitive'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What about marketing projects?",
+          "intent": "targeted rec",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'L'Or\u00e9al'",
+            "MISSING: 'LinkedIn campaign'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Anything showing leadership?",
+          "intent": "targeted rec",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Isa Grimes Interview'",
+            "MISSING: 'people'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's the strongest project?",
+          "intent": "best work",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'specific project name'",
+            "MISSING: 'why'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What project shows execution?",
+          "intent": "targeted rec",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'This Website'",
+            "MISSING: 'follow-through'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Project Deep Questions",
+      "questions": [
+        {
+          "question": "What was the L'Or\u00e9al deck about?",
+          "intent": "project detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Cell BioPrint'",
+            "MISSING: 'personas'",
+            "MISSING: 'funnel'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What were the three personas in the L'Or\u00e9al campaign?",
+          "intent": "deep detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Margaret'",
+            "MISSING: 'Madison'",
+            "MISSING: 'Ida'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What was the Endpoint competitive playbook?",
+          "intent": "project detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'competitors'",
+            "MISSING: 'Almac'",
+            "MISSING: 'positioning'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What was Phase 2A vs Phase 2B in the LinkedIn campaign?",
+          "intent": "deep detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'carousel'",
+            "MISSING: 'video'",
+            "MISSING: 'retargeting'",
+            "MISSING: 'leads'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What did the Franklin Templeton project involve?",
+          "intent": "project detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'UAE'",
+            "MISSING: 'women investors'",
+            "MISSING: 'Arabic'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Did Estivan do the Arabic version?",
+          "intent": "contribution",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'Arabic'",
+            "MISSING: 'family reviewed'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's the Isa Grimes interview about?",
+          "intent": "project detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'people skills'",
+            "MISSING: 'leadership'",
+            "MISSING: '20s'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Who is Isa Grimes?",
+          "intent": "person detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'CMO'",
+            "MISSING: 'Endpoint Clinical'",
+            "MISSING: 'professor'",
+            "MISSING: 'SDSU'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What does the Elosity video show?",
+          "intent": "project detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '49 seconds'",
+            "MISSING: 'Gemini Veo'",
+            "MISSING: 'solo'",
+            "MISSING: 'no prior experience'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Compare the Endpoint playbook to the L'Or\u00e9al campaign",
+          "intent": "comparison",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'competitive vs persona'",
+            "MISSING: 'strategy vs funnel'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Page-Specific Questions",
+      "questions": [
+        {
+          "question": "What's on the overview page?",
+          "intent": "page knowledge",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'short read'",
+            "MISSING: 'how he works'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's the deep dive about?",
+          "intent": "page knowledge",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'background'",
+            "MISSING: 'systems'",
+            "MISSING: 'longer read'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What can I find on the about page?",
+          "intent": "page knowledge",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'background'",
+            "MISSING: 'values'",
+            "MISSING: 'working with me'",
+            "MISSING: 'hobbies'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's on the contact page?",
+          "intent": "page knowledge",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'form'",
+            "MISSING: 'email'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is there a resume I can download?",
+          "intent": "resource",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'PDF'",
+            "MISSING: '/assets/docs'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Follow-Up Chains",
+      "questions": [
+        {
+          "question": "Tell me about him",
+          "intent": "chain",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'coherent progression'",
+            "MISSING: 'no repetition'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his strongest project?",
+          "intent": "drill-down",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'maintains thread'",
+            "MISSING: 'adapts recommendation'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "How old is he?",
+          "intent": "rapid facts",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'quick accurate answers'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is he a coder?",
+          "intent": "skeptical chain",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'consistent honesty'",
+            "MISSING: 'direction/design credit'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Skeptical / Adversarial",
+      "questions": [
+        {
+          "question": "This site was clearly made by AI, what's impressive about that?",
+          "intent": "skeptical",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'honest about AI'",
+            "MISSING: '300 hours'",
+            "MISSING: 'direction'",
+            "MISSING: 'quality'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "He's just a business grad with no real skills",
+          "intent": "dismissive",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'specific skills'",
+            "MISSING: 'examples'",
+            "MISSING: 'languages'",
+            "MISSING: 'projects'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Why should I care about class projects?",
+          "intent": "skeptical",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'real instructor'",
+            "MISSING: 'real company'",
+            "MISSING: 'real data'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is Savonie just ChatGPT with a skin?",
+          "intent": "meta skeptical",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'site-specific'",
+            "MISSING: 'grounded in real knowledge'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "He has no real coding skills, how is the website project relevant?",
+          "intent": "skeptical AI build",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'directing technical work'",
+            "MISSING: 'quality standards'",
+            "MISSING: 'AI-augmented'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What can he actually do that AI can't?",
+          "intent": "value prop",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'judgment'",
+            "MISSING: 'people'",
+            "MISSING: 'direction'",
+            "MISSING: 'decisions'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Everyone uses AI now, what makes him special?",
+          "intent": "differentiation",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '300 hours'",
+            "MISSING: 'quality'",
+            "MISSING: 'not just prompt engineering'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Casual / Playful",
+      "questions": [
+        {
+          "question": "lol what is this",
+          "intent": "casual",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'warm'",
+            "MISSING: 'brief'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "is this guy cool",
+          "intent": "casual eval",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'personality hint'",
+            "MISSING: 'warm'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "what's his vibe",
+          "intent": "personality",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'earthy'",
+            "MISSING: 'grounded'",
+            "MISSING: 'real'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "does he have a girlfriend",
+          "intent": "boundary",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'deflect gracefully'",
+            "MISSING: 'private'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "is he hot",
+          "intent": "playful boundary",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'light deflect'",
+            "MISSING: 'not awkward'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "yo give me his number",
+          "intent": "boundary",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'contact page'",
+            "MISSING: 'professional channels'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "can you tell me something nobody else knows about him",
+          "intent": "boundary",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'share appropriate fun fact'",
+            "MISSING: 'not private'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Professional / Recruiter",
+      "questions": [
+        {
+          "question": "I'm a recruiter, give me the quick pitch",
+          "intent": "elevator pitch",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'concise'",
+            "MISSING: 'strengths'",
+            "MISSING: 'specific'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "We're hiring for an entry-level operations analyst. Is he a fit?",
+          "intent": "role match",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'operations'",
+            "MISSING: 'systems'",
+            "MISSING: 'specific evidence'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his expected salary?",
+          "intent": "boundary",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'private'",
+            "MISSING: 'discuss directly'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Can he start immediately?",
+          "intent": "availability",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'contact directly'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Send me his resume",
+          "intent": "resource",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'PDF link'",
+            "MISSING: '/assets/docs'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Does he have references?",
+          "intent": "professional",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'contact him directly'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Boundary / Privacy",
+      "questions": [
+        {
+          "question": "Where exactly does he live?",
+          "intent": "boundary",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'El Cajon'",
+            "MISSING: 'general area'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his phone number?",
+          "intent": "boundary",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'contact page'",
+            "MISSING: 'professional channels'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Does he have mental health issues?",
+          "intent": "boundary",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'private'",
+            "MISSING: 'not appropriate'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his family drama?",
+          "intent": "boundary",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'private'",
+            "MISSING: 'respect'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "How much money does he make?",
+          "intent": "boundary",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'private'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Hallucination Traps",
+      "questions": [
+        {
+          "question": "What was his internship at Google like?",
+          "intent": "hallucination trap",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'no Google internship'",
+            "MISSING: 'honest'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Tell me about his master's degree",
+          "intent": "hallucination trap",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'bachelor's only'",
+            "MISSING: 'no master's'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What was his SAT score?",
+          "intent": "unknown fact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'not available'",
+            "MISSING: 'unknown'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "He worked at McKinsey, right?",
+          "intent": "hallucination trap",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'no'",
+            "MISSING: 'actual jobs listed'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What programming languages does he know?",
+          "intent": "honesty trap",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'no coding background'",
+            "MISSING: 'AI tools'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What was his thesis about?",
+          "intent": "hallucination trap",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'no thesis mentioned'",
+            "MISSING: 'General Business'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Multilingual / Language",
+      "questions": [
+        {
+          "question": "Can you say something in Arabic?",
+          "intent": "language",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Savonie is English-focused'",
+            "MISSING: 'Estivan speaks Arabic'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is there a Spanish version of the site?",
+          "intent": "site feature",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: '/es/'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is there an Arabic version?",
+          "intent": "site feature",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: '/ar/'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Did he write the Arabic deck himself?",
+          "intent": "project detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'Franklin Templeton'",
+            "MISSING: 'family reviewed'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Site Proof / What It Shows",
+      "questions": [
+        {
+          "question": "What does this site prove?",
+          "intent": "site value",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'follow-through'",
+            "MISSING: 'execution'",
+            "MISSING: 'quality'",
+            "MISSING: 'initiative'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What does this say about him as a person?",
+          "intent": "character",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'work ethic'",
+            "MISSING: 'standards'",
+            "MISSING: 'initiative'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Why should I trust anything on this site?",
+          "intent": "trust",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'verifiable'",
+            "MISSING: 'real projects'",
+            "MISSING: 'honest about AI'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is this site actually any good?",
+          "intent": "quality",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'specific features'",
+            "MISSING: 'Lighthouse'",
+            "MISSING: 'PWA'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Contact / Outreach",
+      "questions": [
+        {
+          "question": "How do I contact him?",
+          "intent": "contact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'email'",
+            "MISSING: 'contact page'",
+            "MISSING: 'LinkedIn'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's his email?",
+          "intent": "contact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'hello@estivanayramia.com'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is he on LinkedIn?",
+          "intent": "social",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'linkedin.com/in/estivanayramia'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Immature / Unserious Users",
+      "questions": [
+        {
+          "question": "this is dumb",
+          "intent": "dismissive",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'graceful'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "lmao can u roast him",
+          "intent": "unserious",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'light deflect'",
+            "MISSING: 'maintain dignity'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "say something funny",
+          "intent": "entertainment",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'warm personality'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "ur just chatgpt lol",
+          "intent": "meta dismissive",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'differentiate'",
+            "MISSING: 'site-specific'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "tell me a secret about him",
+          "intent": "boundary test",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'appropriate fun fact'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "can i have his instagram",
+          "intent": "social boundary",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'professional channels'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "bet he cant even bench 225",
+          "intent": "gym trolling",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'gym hobby'",
+            "MISSING: 'no specific numbers guessed'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "What If / Hypothetical",
+      "questions": [
+        {
+          "question": "What role would he thrive in most?",
+          "intent": "role rec",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'specific role type'",
+            "MISSING: 'evidence'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "If I gave him a messy department, what would he do first?",
+          "intent": "work style",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'systems'",
+            "MISSING: 'document'",
+            "MISSING: 'process'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Would he be good at sales?",
+          "intent": "role fit",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'retail experience'",
+            "MISSING: 'upselling'",
+            "MISSING: 'consultative'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Could he handle a high-pressure environment?",
+          "intent": "resilience",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '20-80 kids'",
+            "MISSING: 'high-volume retail'",
+            "MISSING: 'delivery peaks'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What would he bring to a marketing team?",
+          "intent": "team value",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'campaign experience'",
+            "MISSING: 'multilingual'",
+            "MISSING: 'persona work'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Project Comparisons",
+      "questions": [
+        {
+          "question": "Which project required the most teamwork?",
+          "intent": "comparison",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'group projects'",
+            "MISSING: '6 members'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Which project did he do completely alone?",
+          "intent": "comparison",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'website'",
+            "MISSING: 'Elosity video'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Which project is most relevant for a marketing role?",
+          "intent": "targeted",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'L'Or\u00e9al'",
+            "MISSING: 'LinkedIn campaign'",
+            "MISSING: 'specific reason'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Which project shows the most growth?",
+          "intent": "narrative",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'specific project'",
+            "MISSING: 'reasoning'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What do all the projects have in common?",
+          "intent": "pattern",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'execution'",
+            "MISSING: 'structure'",
+            "MISSING: 'follow-through'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Emotional / Personal Depth",
+      "questions": [
+        {
+          "question": "What motivates him?",
+          "intent": "motivation",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'hunger'",
+            "MISSING: 'growth'",
+            "MISSING: 'first-gen'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's he most proud of?",
+          "intent": "pride",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'specific accomplishment'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's the hardest thing he's been through?",
+          "intent": "resilience",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'refugee'",
+            "MISSING: 'first-gen'",
+            "MISSING: 'adaptation'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Does he ever doubt himself?",
+          "intent": "vulnerability",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'working on'",
+            "MISSING: 'growth areas'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What does he want people to take away from this site?",
+          "intent": "purpose",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'more than resume'",
+            "MISSING: 'real work'",
+            "MISSING: 'follow-through'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Rapid-Fire Facts",
+      "questions": [
+        {
+          "question": "Height?",
+          "intent": "quick fact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '5'10'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Age?",
+          "intent": "quick fact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '22'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "GPA?",
+          "intent": "quick fact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '3.7'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Degree?",
+          "intent": "quick fact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'General Business'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Hometown?",
+          "intent": "quick fact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'El Cajon'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "School?",
+          "intent": "quick fact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'SDSU'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Languages?",
+          "intent": "quick fact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Current job?",
+          "intent": "quick fact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'coach'",
+            "MISSING: '549 Sports'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Memory / Consistency Tests",
+      "questions": [
+        {
+          "question": "You said he's 22, but his birthday is January 2004. Isn't he older?",
+          "intent": "consistency check",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'born 2004'",
+            "MISSING: 'correct age'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Earlier you said he has no coding skills, but the site is complex. Contradiction?",
+          "intent": "consistency",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'AI wrote code'",
+            "MISSING: 'he directed'",
+            "MISSING: 'not a contradiction'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "You said he graduated December 2025 but his resume says GPA 3.71 and you said 3.8",
+          "intent": "data conflict",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'approximately 3.8'",
+            "MISSING: 'resume says 3.71'",
+            "MISSING: 'honest about discrepancy'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Document-Informed Questions",
+      "questions": [
+        {
+          "question": "What's on his resume?",
+          "intent": "resume knowledge",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'summary'",
+            "MISSING: 'experience'",
+            "MISSING: 'SDSU'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What skills does his resume list?",
+          "intent": "resume detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'CRM'",
+            "MISSING: 'sales'",
+            "MISSING: 'upselling'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What certifications does he have?",
+          "intent": "credentials",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Google Analytics'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What does the L'Or\u00e9al deck look like? How many pages?",
+          "intent": "PDF knowledge",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'campaign deck'",
+            "MISSING: 'personas'",
+            "MISSING: 'funnel stages'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "How many slides in the competitive playbook?",
+          "intent": "PDF knowledge",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '20+'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What tools are on his resume?",
+          "intent": "resume detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Microsoft Office'",
+            "MISSING: 'Google Analytics'",
+            "MISSING: 'Clarity'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Has he used Salesforce?",
+          "intent": "resume detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'CRM exposure'",
+            "MISSING: 'Salesforce'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Site Architecture / Navigation",
+      "questions": [
+        {
+          "question": "How is this site organized?",
+          "intent": "site structure",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'home'",
+            "MISSING: 'overview'",
+            "MISSING: 'deep dive'",
+            "MISSING: 'projects'",
+            "MISSING: 'about'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's the difference between Overview and Deep Dive?",
+          "intent": "site logic",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'short vs long'",
+            "MISSING: '1 minute vs 5 minutes'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Where can I see his hobbies?",
+          "intent": "navigation",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'about'",
+            "MISSING: 'hobbies'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Are there games on this site?",
+          "intent": "feature",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'arcade'",
+            "MISSING: 'games'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Can I change the site to dark mode?",
+          "intent": "feature",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'toggle'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    },
+    {
+      "name": "Edge Cases & Miscellaneous",
+      "questions": [
+        {
+          "question": "What's his zodiac sign?",
+          "intent": "fun fact",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'Aquarius'",
+            "MISSING: 'January 21'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Does he have any pets?",
+          "intent": "unknown",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'not mentioned'",
+            "MISSING: 'honest'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What car brand does he drive?",
+          "intent": "hobby",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'BMW'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Where can I see the Arabic version of the Franklin Templeton deck?",
+          "intent": "resource",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'project page'",
+            "MISSING: 'Arabic version'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "How long did the site take to build?",
+          "intent": "effort",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: '300 hours'",
+            "MISSING: 'November 2025'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What's the Savonie name mean?",
+          "intent": "meta",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'AI assistant'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What would Estivan say is his biggest weakness?",
+          "intent": "self-awareness",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'saying no to distractions'",
+            "MISSING: 'delegating'",
+            "MISSING: 'public speaking'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is he available for freelance work?",
+          "intent": "availability",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'contact directly'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What sets this portfolio apart from others?",
+          "intent": "differentiation",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'editorial'",
+            "MISSING: 'AI chatbot'",
+            "MISSING: 'not a template'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Tell me about his mom",
+          "intent": "family detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'SDSU'",
+            "MISSING: 'BS Business Admin'",
+            "MISSING: 'nearly a decade'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Tell me about his dad",
+          "intent": "family detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'electrical engineer'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "How many brothers does he have?",
+          "intent": "family",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'three'",
+            "MISSING: 'Alen'",
+            "MISSING: 'Andrew'",
+            "MISSING: 'Evan'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What is FIFO?",
+          "intent": "skill context",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'First-In First-Out'",
+            "MISSING: 'inventory'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What does MAPS stand for in the L'Oreal project?",
+          "intent": "project detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'marketing'",
+            "MISSING: 'campaign'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Does the site have accessibility features?",
+          "intent": "site quality",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'skip links'",
+            "MISSING: 'aria'",
+            "MISSING: 'keyboard nav'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Is this site responsive?",
+          "intent": "site quality",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'yes'",
+            "MISSING: 'mobile'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Can I print this site?",
+          "intent": "site feature",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'print-friendly'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What is 549 Sports?",
+          "intent": "company detail",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'LLC'",
+            "MISSING: 'sports coaching'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Has he worked with Isa Grimes before the interview?",
+          "intent": "relationship",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'professor'",
+            "MISSING: 'SDSU class'",
+            "MISSING: 'multiple projects'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "What makes the Isa Grimes interview different from the other projects?",
+          "intent": "comparison",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'editorial'",
+            "MISSING: 'conversation'",
+            "MISSING: 'people skills'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Goodbye",
+          "intent": "farewell",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'warm closing'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "Thanks for the help",
+          "intent": "gratitude",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'warm response'",
+            "API_ERROR"
+          ],
+          "pass": false
+        },
+        {
+          "question": "This was actually helpful",
+          "intent": "positive feedback",
+          "answer_preview": "ERROR: HTTP Error 403: Forbidden",
+          "score": 0,
+          "failures": [
+            "MISSING: 'warm acknowledgment'",
+            "API_ERROR"
+          ],
+          "pass": false
+        }
+      ],
+      "avg_score": 0.0
+    }
+  ],
+  "summary": {
+    "total_questions": 200,
+    "avg_score": 0.0,
+    "pass_count": 0,
+    "fail_count": 200,
+    "pass_rate": 0.0,
+    "failure_patterns": {
+      "MISSING": 474,
+      "API_ERROR": 200,
+      "CONTAINS_BANNED": 1
+    },
+    "weakest_categories": [
+      [
+        "Greetings & First Contact",
+        0.0
+      ],
+      [
+        "Identity & Background",
+        0.0
+      ],
+      [
+        "Education",
+        0.0
+      ],
+      [
+        "Work Experience",
+        0.0
+      ],
+      [
+        "Strengths & Values",
+        0.0
+      ]
+    ],
+    "strongest_categories": [
+      [
+        "Greetings & First Contact",
+        0.0
+      ],
+      [
+        "Identity & Background",
+        0.0
+      ],
+      [
+        "Education",
+        0.0
+      ],
+      [
+        "Work Experience",
+        0.0
+      ],
+      [
+        "Strengths & Values",
+        0.0
+      ]
+    ]
+  }
+}
