@@ -3,13 +3,14 @@ import {
   buildChips,
   buildModelContext,
   isLikelyIncompleteReply,
+  isRedirectOnlyReply,
   postProcessReply,
   prepareChatContext
 } from "./chat-service.mjs";
 
 const GEMINI_TIMEOUT_MS = 25000;
 const MAX_MESSAGE_LENGTH = 2000;
-const MAX_REPLY_CHARS = 4800;
+const MAX_REPLY_CHARS = 8000;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const RATE_LIMIT_MAX = 20;
 const PRIMARY_MODEL = "gemini-2.5-flash";
@@ -86,9 +87,73 @@ function getContinuationHint(reply) {
   return input.slice(-700);
 }
 
-async function callGemini({ apiKey, model, context, message, maxTokens }) {
+// ── Temperature strategy based on question class ──────────────────────────────
+// Factual/deterministic → lower temp (less hallucination risk)
+// Complex/analytical → medium temp (balanced)
+// Personality/open → standard temp (more natural)
+function resolveTemperature(questionClass) {
+  switch (questionClass) {
+    case "surface_fact":
+    case "contact":
+    case "resume":
+    case "languages":
+    case "education":
+      return 0.3;
+    case "complex_open":
+    case "hire_case":
+    case "role_fit":
+    case "skeptical_ai":
+    case "weakness":
+    case "site_proof":
+    case "team":
+      return 0.4;
+    case "about_general":
+    case "open":
+    case "greeting":
+    case "project_list":
+    case "page_specific":
+    default:
+      return 0.55;
+  }
+}
+
+// ── Thinking budget strategy based on question class ─────────────────────────
+// Simple factual → 0 (skip thinking, just answer)
+// Complex/analytical → 1024+ (let Gemini reason properly)
+// Default → undefined (use Gemini's dynamic default)
+function resolveThinkingBudget(questionClass) {
+  switch (questionClass) {
+    case "surface_fact":
+    case "greeting":
+    case "contact":
+    case "resume":
+    case "languages":
+      return 0;
+    case "complex_open":
+    case "hire_case":
+    case "role_fit":
+    case "skeptical_ai":
+    case "weakness":
+    case "site_proof":
+    case "team":
+      return 1024;
+    default:
+      return undefined;
+  }
+}
+
+// ── callGemini ────────────────────────────────────────────────────────────────
+// Accepts optional temperature and thinkingBudget to tune per question class.
+// thinkingBudget=0 disables internal reasoning for simple factual queries.
+// thinkingBudget>=1 enables Gemini 2.5 Flash extended thinking.
+async function callGemini({ apiKey, model, context, message, maxTokens, temperature, thinkingBudget }) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+
+  // Resolve temperature with fallback to 0.55
+  const resolvedTemperature = (typeof temperature === "number" && isFinite(temperature))
+    ? temperature
+    : 0.55;
 
   try {
     const response = await fetch(
@@ -111,10 +176,11 @@ async function callGemini({ apiKey, model, context, message, maxTokens }) {
             }
           ],
           generationConfig: {
-            temperature: 0.55,
+            temperature: resolvedTemperature,
             topP: 0.9,
             topK: 24,
-            maxOutputTokens: maxTokens
+            maxOutputTokens: maxTokens,
+            ...(thinkingBudget !== undefined ? { thinkingConfig: { thinkingBudget } } : {})
           }
         }),
         signal: controller.signal
@@ -169,59 +235,128 @@ async function generateReply({ env, userMessage, language, chatContext }) {
     conversationHistory: chatContext.conversationHistory
   });
 
-  const wantsDepth = /\b(detailed|detail|deeper|explain|walk me through|step by step)\b/i.test(userMessage);
-  const maxTokens = wantsDepth ? 1000 : 700;
+  // ── Tiered token budget ──────────────────────────────────────────────────
+  const wantsDepth = /\b(detailed|detail|deeper|explain|walk me through|step by step|comprehensive|elaborate|in depth|thoroughly|tell me everything|full breakdown|break it down|unpack|expand on)\b/i.test(userMessage);
+  const isComplex = userMessage.split(/\s+/).length > 10 || /\b(how|why|what makes|compare|difference|relationship|walk me through|strengths? and|tell me about.*and|as well as|in addition|also tell)\b/i.test(userMessage);
+  const isRecruiterDeep = /\b(hiring manager|recruiter|candidate|operations|why.*strong|walk me through.*why|evaluate|assessment|fit for)\b/i.test(userMessage);
+  const maxTokens = (wantsDepth || isRecruiterDeep) ? 1500 : (isComplex ? 1100 : 800);
 
+  // ── Per-question-class tuning ────────────────────────────────────────────
+  const temperature = resolveTemperature(chatContext.questionClass);
+  const thinkingBudget = resolveThinkingBudget(chatContext.questionClass);
+
+  // ── Primary model attempt ────────────────────────────────────────────────
   try {
-    const primaryReply = await callGemini({
+    const primaryResult = await callGemini({
       apiKey: env.GEMINI_API_KEY,
       model: PRIMARY_MODEL,
       context: prompt,
       message: userMessage,
-      maxTokens
+      maxTokens,
+      temperature,
+      thinkingBudget
     });
 
-    const finalReply = postProcessReply(primaryReply.reply, chatContext.fallbackReply);
-    const needsRecovery = isLikelyIncompleteReply(finalReply) || /MAX_TOKENS/i.test(primaryReply.finishReason || "");
-    if (needsRecovery) {
-      return {
-        reply: chatContext.fallbackReply,
-        source: "deterministic_incomplete_primary"
-      };
+    const primaryCleaned = postProcessReply(primaryResult.reply, chatContext.fallbackReply);
+    const primaryIncomplete = isLikelyIncompleteReply(primaryCleaned) || /MAX_TOKENS/i.test(primaryResult.finishReason || "");
+
+    // ── Self-healing path A: reply was filtered (banned language / first-person) ──
+    if (primaryCleaned === chatContext.fallbackReply && primaryResult.reply && primaryResult.reply.length > 20) {
+      try {
+        const healResult = await callGemini({
+          apiKey: env.GEMINI_API_KEY,
+          model: FALLBACK_MODEL,
+          context: prompt + "\n\nIMPORTANT: Your previous answer was filtered because it used first-person pronouns for Estivan or contained banned phrases. Rewrite your answer using ONLY third person (he/him/his). Do NOT use: I, me, my, mine. Refer to him as Estivan or he. Stay grounded in the facts provided.",
+          message: userMessage,
+          maxTokens,
+          temperature,
+          thinkingBudget
+        });
+        const healCleaned = postProcessReply(healResult.reply, chatContext.fallbackReply);
+        if (healCleaned !== chatContext.fallbackReply && !isLikelyIncompleteReply(healCleaned)) {
+          return { reply: healCleaned, source: "gemini_self_healed" };
+        }
+      } catch {
+        // Self-heal failed, continue to fallback below
+      }
     }
 
-    return {
-      reply: finalReply,
-      source: "gemini_primary"
-    };
+    // ── Self-healing path B: reply was truncated / incomplete ──────────────
+    if (primaryIncomplete && !primaryCleaned.startsWith(chatContext.fallbackReply)) {
+      try {
+        const truncHealResult = await callGemini({
+          apiKey: env.GEMINI_API_KEY,
+          model: FALLBACK_MODEL,
+          context: prompt + "\n\nIMPORTANT: Your previous answer was cut off mid-sentence. Give a COMPLETE answer. If you must be brief, end on a full sentence. Do not trail off.",
+          message: userMessage,
+          maxTokens: Math.min(maxTokens + 400, 2000),
+          temperature,
+          thinkingBudget
+        });
+        const truncHealCleaned = postProcessReply(truncHealResult.reply, chatContext.fallbackReply);
+        if (truncHealCleaned !== chatContext.fallbackReply && !isLikelyIncompleteReply(truncHealCleaned)) {
+          return { reply: truncHealCleaned, source: "gemini_self_healed_truncation" };
+        }
+      } catch {
+        // Self-heal failed, continue to fallback below
+      }
+      return { reply: chatContext.fallbackReply, source: "deterministic_incomplete_primary" };
+    }
+
+    if (primaryIncomplete) {
+      return { reply: chatContext.fallbackReply, source: "deterministic_incomplete_primary" };
+    }
+
+    // ── Self-healing path C: redirect-only answer (new in V3) ─────────────
+    // Detects when Gemini just says "check out this page" without substance,
+    // then retries with an explicit instruction to answer directly.
+    if (isRedirectOnlyReply(primaryCleaned)) {
+      try {
+        const redirectHealResult = await callGemini({
+          apiKey: env.GEMINI_API_KEY,
+          model: FALLBACK_MODEL,
+          context: prompt + "\n\nIMPORTANT: Your previous answer was a redirect-only response — it told the user to 'check out' a page without actually answering the question. Do NOT just redirect to a page. Answer the question directly using the knowledge base, then optionally link to a page for more detail at the end.",
+          message: userMessage,
+          maxTokens,
+          temperature,
+          thinkingBudget
+        });
+        const redirectHealCleaned = postProcessReply(redirectHealResult.reply, chatContext.fallbackReply);
+        if (
+          redirectHealCleaned !== chatContext.fallbackReply &&
+          !isLikelyIncompleteReply(redirectHealCleaned) &&
+          !isRedirectOnlyReply(redirectHealCleaned)
+        ) {
+          return { reply: redirectHealCleaned, source: "gemini_self_healed_redirect" };
+        }
+      } catch {
+        // Redirect self-heal failed, use the original (redirect) reply
+      }
+    }
+
+    return { reply: primaryCleaned, source: "gemini_primary" };
   } catch {
+    // ── Fallback model attempt ─────────────────────────────────────────────
     try {
-      const fallbackModelReply = await callGemini({
+      const fallbackResult = await callGemini({
         apiKey: env.GEMINI_API_KEY,
         model: FALLBACK_MODEL,
         context: prompt,
         message: userMessage,
-        maxTokens
+        maxTokens,
+        temperature,
+        thinkingBudget
       });
 
-      const finalReply = postProcessReply(fallbackModelReply.reply, chatContext.fallbackReply);
-      const needsRecovery = isLikelyIncompleteReply(finalReply) || /MAX_TOKENS/i.test(fallbackModelReply.finishReason || "");
-      if (needsRecovery) {
-        return {
-          reply: chatContext.fallbackReply,
-          source: "deterministic_incomplete_fallback"
-        };
+      const fallbackCleaned = postProcessReply(fallbackResult.reply, chatContext.fallbackReply);
+      const fallbackIncomplete = isLikelyIncompleteReply(fallbackCleaned) || /MAX_TOKENS/i.test(fallbackResult.finishReason || "");
+      if (fallbackIncomplete) {
+        return { reply: chatContext.fallbackReply, source: "deterministic_incomplete_fallback" };
       }
 
-      return {
-        reply: finalReply,
-        source: "gemini_fallback"
-      };
+      return { reply: fallbackCleaned, source: "gemini_fallback" };
     } catch {
-      return {
-        reply: chatContext.fallbackReply,
-        source: "deterministic_model_error"
-      };
+      return { reply: chatContext.fallbackReply, source: "deterministic_model_error" };
     }
   }
 }
@@ -247,7 +382,9 @@ function buildDebugPayload(chatContext, modelSource) {
     manifestBuildVersion: chatContext.manifest?.buildVersion || "",
     currentPage: chatContext.pageContext,
     retrievedRoutes: chatContext.retrieval.pages.map((page) => page.route),
-    modelSource
+    modelSource,
+    selfHealed: modelSource.includes("self_healed"),
+    conversationDepth: chatContext.conversationHistory?.length || 0
   };
 }
 
