@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <script>document.documentElement.classList.add('js')</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Hex Memory - A beautiful hexagonal pattern memory game with glowing tiles and zen-like ambient visuals">
+    <title>Hex Memory | Estivan Ayramia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin>
+    <link rel="stylesheet" href="/assets/css/style.css?v=3dedd48e">
+    <link rel="stylesheet" href="/theme.css?v=v20260119-5">
+    <link rel="stylesheet" href="/assets/css/arcade.css?v=3dedd48e">
+    <script src="/assets/js/site.min.js?v=3dedd48e" defer></script>
+    <link rel="icon" href="/assets/img/icon-192.png" type="image/png">
+</head>
+<body class="bg-[#f5ede0] text-[#362017] dark:bg-[#212842] dark:text-[#e1d4c2] font-sans antialiased">
+    <main class="max-w-3xl mx-auto px-4 py-8 pt-24">
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+            <div>
+                <a href="/hobbies-games" class="text-sm text-chocolate/70 dark:text-[#e1d4c2]/70 hover:text-indigodeep transition-colors mb-1 inline-block">&larr; Back to Arcade</a>
+                <h1 class="text-3xl font-bold text-indigodeep dark:text-[#e1d4c2]">Hex Memory</h1>
+            </div>
+            <button id="sound-toggle-hexmem" class="px-4 py-2 rounded-lg bg-indigodeep/10 text-indigodeep dark:bg-white/10 dark:text-[#e1d4c2] font-medium hover:opacity-80 transition-all" title="Toggle Sound">🔊</button>
+        </div>
+        <div id="game-container" class="relative">
+            <canvas id="game-canvas" class="w-full rounded-xl border border-chocolate/10 dark:border-white/10 shadow-lg" style="touch-action: none;"></canvas>
+        </div>
+        <div class="mt-8 text-center">
+          <a href="/about" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigodeep to-[#362017] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+            <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            <span>Back to About</span>
+          </a>
+        </div>
+    </main>
+    <script type="module">
+        import '/assets/js/arcade/games/hex-memory.js';
+    </script>
+</body>
+</html>

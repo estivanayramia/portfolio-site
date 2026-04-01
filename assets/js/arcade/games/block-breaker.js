@@ -42,10 +42,10 @@ const prefersReducedMotion = () => {
 
 // Brick type colors and properties
 const BRICK_TYPES = {
-  normal:      { hits: 1, color: 'rgba(168,85,247,0.9)',  border: 'rgba(255,255,255,0.25)', points: 10, label: '' },
-  tough:       { hits: 2, color: 'rgba(59,130,246,0.9)',   border: 'rgba(147,197,253,0.4)',  points: 25, label: '2' },
-  gold:        { hits: 3, color: 'rgba(234,179,8,0.9)',    border: 'rgba(253,224,71,0.5)',   points: 50, label: '3' },
-  diamond:     { hits: 99,color: 'rgba(209,213,219,0.95)', border: 'rgba(255,255,255,0.6)',  points: 100,label: '💎' },
+  normal:      { hits: 1, color: 'rgba(168,85,247,0.9)',  colorAlt: 'rgba(139,92,246,0.95)', border: 'rgba(255,255,255,0.25)', glow: 'rgba(168,85,247,0.6)', points: 10, label: '' },
+  tough:       { hits: 2, color: 'rgba(59,130,246,0.9)',   colorAlt: 'rgba(96,165,250,0.95)', border: 'rgba(147,197,253,0.4)',  glow: 'rgba(59,130,246,0.6)', points: 25, label: '2' },
+  gold:        { hits: 3, color: 'rgba(234,179,8,0.9)',    colorAlt: 'rgba(250,204,21,0.95)', border: 'rgba(253,224,71,0.5)',   glow: 'rgba(234,179,8,0.6)', points: 50, label: '3' },
+  diamond:     { hits: 99,color: 'rgba(209,213,219,0.95)', colorAlt: 'rgba(243,244,246,1)',   border: 'rgba(255,255,255,0.6)',  glow: 'rgba(255,255,255,0.5)', points: 100,label: '💎' },
 };
 
 function setText(el, value) {
@@ -415,22 +415,62 @@ function draw() {
   }
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // background
-  const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  bg.addColorStop(0, "rgba(15,23,42,0.95)");
-  bg.addColorStop(1, "rgba(30,10,60,0.95)");
+  // background with richer gradient
+  const bg = ctx.createLinearGradient(0, 0, canvas.width * 0.3, canvas.height);
+  bg.addColorStop(0, "rgba(10,10,35,0.97)");
+  bg.addColorStop(0.4, "rgba(15,20,50,0.97)");
+  bg.addColorStop(0.7, "rgba(25,12,55,0.97)");
+  bg.addColorStop(1, "rgba(12,8,40,0.97)");
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // bricks
+  // Subtle ambient glow at center
+  ctx.save();
+  const ambientGlow = ctx.createRadialGradient(canvas.width / 2, canvas.height * 0.3, 0, canvas.width / 2, canvas.height * 0.3, canvas.width * 0.6);
+  ambientGlow.addColorStop(0, 'rgba(100, 60, 180, 0.06)');
+  ambientGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = ambientGlow;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  // bricks with gradient fills
   bricks.forEach(b => {
     if (!b.alive) return;
     const def = BRICK_TYPES[b.type];
-    ctx.shadowColor = def.color;
-    ctx.shadowBlur = 6;
-    ctx.fillStyle = def.color;
-    ctx.fillRect(b.x, b.y, b.w, b.h);
-    ctx.shadowBlur = 0;
+
+    // Gradient fill for bricks
+    const brickGrad = ctx.createLinearGradient(b.x, b.y, b.x, b.y + b.h);
+    brickGrad.addColorStop(0, def.colorAlt);
+    brickGrad.addColorStop(1, def.color);
+
+    ctx.save();
+    ctx.shadowColor = def.glow;
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = brickGrad;
+
+    // Rounded rectangle for bricks
+    const br = 3;
+    ctx.beginPath();
+    ctx.moveTo(b.x + br, b.y);
+    ctx.lineTo(b.x + b.w - br, b.y);
+    ctx.quadraticCurveTo(b.x + b.w, b.y, b.x + b.w, b.y + br);
+    ctx.lineTo(b.x + b.w, b.y + b.h - br);
+    ctx.quadraticCurveTo(b.x + b.w, b.y + b.h, b.x + b.w - br, b.y + b.h);
+    ctx.lineTo(b.x + br, b.y + b.h);
+    ctx.quadraticCurveTo(b.x, b.y + b.h, b.x, b.y + b.h - br);
+    ctx.lineTo(b.x, b.y + br);
+    ctx.quadraticCurveTo(b.x, b.y, b.x + br, b.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Inner highlight for 3D look
+    ctx.save();
+    ctx.globalAlpha = 0.2;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(b.x + 2, b.y + 1, b.w - 4, b.h * 0.35);
+    ctx.restore();
+
     ctx.strokeStyle = def.border;
     ctx.strokeRect(b.x, b.y, b.w, b.h);
 
@@ -460,11 +500,27 @@ function draw() {
     ctx.shadowBlur = 0;
   });
 
-  // power drops
+  // power drops with glow
   powerDrops.forEach(p => {
     if (!p.alive) return;
+    ctx.save();
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 10;
     ctx.fillStyle = p.color;
-    ctx.fillRect(p.x, p.y, p.w, p.h);
+    const pR = 3;
+    ctx.beginPath();
+    ctx.moveTo(p.x + pR, p.y);
+    ctx.lineTo(p.x + p.w - pR, p.y);
+    ctx.quadraticCurveTo(p.x + p.w, p.y, p.x + p.w, p.y + pR);
+    ctx.lineTo(p.x + p.w, p.y + p.h - pR);
+    ctx.quadraticCurveTo(p.x + p.w, p.y + p.h, p.x + p.w - pR, p.y + p.h);
+    ctx.lineTo(p.x + pR, p.y + p.h);
+    ctx.quadraticCurveTo(p.x, p.y + p.h, p.x, p.y + p.h - pR);
+    ctx.lineTo(p.x, p.y + pR);
+    ctx.quadraticCurveTo(p.x, p.y, p.x + pR, p.y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 10px Inter, system-ui, sans-serif';
     ctx.textAlign = 'center';
@@ -485,31 +541,68 @@ function draw() {
     ctx.restore();
   });
 
-  // paddle
-  ctx.shadowColor = laserAmmo > 0 ? "rgba(239,68,68,0.8)" : "rgba(168,85,247,0.8)";
-  ctx.shadowBlur = 14;
-  ctx.fillStyle = laserAmmo > 0 ? 'rgba(239,68,68,1)' : "rgba(168,85,247,1)";
-  ctx.fillRect(paddle.x, 480, paddle.w, paddle.h);
+  // paddle with gradient
+  ctx.save();
+  const paddleGrad = ctx.createLinearGradient(paddle.x, 480, paddle.x + paddle.w, 480);
+  if (laserAmmo > 0) {
+    paddleGrad.addColorStop(0, 'rgba(239,68,68,0.85)');
+    paddleGrad.addColorStop(0.5, 'rgba(255,100,100,1)');
+    paddleGrad.addColorStop(1, 'rgba(239,68,68,0.85)');
+    ctx.shadowColor = "rgba(239,68,68,0.8)";
+  } else {
+    paddleGrad.addColorStop(0, 'rgba(139,92,246,0.85)');
+    paddleGrad.addColorStop(0.5, 'rgba(192,132,252,1)');
+    paddleGrad.addColorStop(1, 'rgba(139,92,246,0.85)');
+    ctx.shadowColor = "rgba(168,85,247,0.8)";
+  }
+  ctx.shadowBlur = 16;
+  ctx.fillStyle = paddleGrad;
+  // Rounded paddle
+  const pr = 5;
+  ctx.beginPath();
+  ctx.moveTo(paddle.x + pr, 480);
+  ctx.lineTo(paddle.x + paddle.w - pr, 480);
+  ctx.quadraticCurveTo(paddle.x + paddle.w, 480, paddle.x + paddle.w, 480 + pr);
+  ctx.lineTo(paddle.x + paddle.w, 480 + paddle.h - pr);
+  ctx.quadraticCurveTo(paddle.x + paddle.w, 480 + paddle.h, paddle.x + paddle.w - pr, 480 + paddle.h);
+  ctx.lineTo(paddle.x + pr, 480 + paddle.h);
+  ctx.quadraticCurveTo(paddle.x, 480 + paddle.h, paddle.x, 480 + paddle.h - pr);
+  ctx.lineTo(paddle.x, 480 + pr);
+  ctx.quadraticCurveTo(paddle.x, 480, paddle.x + pr, 480);
+  ctx.closePath();
+  ctx.fill();
   ctx.shadowBlur = 0;
+  ctx.restore();
 
-  // balls
+  // balls with neon glow trail
   balls.forEach(b => {
+    // Neon trail
     b._trail.forEach((pt, i) => {
-      const alpha = ((i + 1) / b._trail.length) * 0.35;
+      const alpha = ((i + 1) / b._trail.length) * 0.45;
+      ctx.save();
       ctx.globalAlpha = alpha;
-      ctx.fillStyle = "#fff";
+      ctx.shadowColor = 'rgba(120, 200, 255, 0.8)';
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = `rgba(180, 220, 255, ${alpha})`;
       ctx.beginPath();
-      ctx.arc(pt.x, pt.y, b.r * (0.4 + i * 0.12), 0, Math.PI * 2);
+      ctx.arc(pt.x, pt.y, b.r * (0.35 + i * 0.13), 0, Math.PI * 2);
       ctx.fill();
+      ctx.restore();
     });
     ctx.globalAlpha = 1;
-    ctx.shadowColor = "rgba(255,255,255,0.9)";
-    ctx.shadowBlur = 12;
-    ctx.fillStyle = "rgba(255,255,255,0.95)";
+    // Ball with radial gradient
+    const ballGrad = ctx.createRadialGradient(b.x - 1, b.y - 1, 0, b.x, b.y, b.r);
+    ballGrad.addColorStop(0, 'rgba(255,255,255,1)');
+    ballGrad.addColorStop(0.6, 'rgba(200,220,255,0.95)');
+    ballGrad.addColorStop(1, 'rgba(140,180,255,0.8)');
+    ctx.save();
+    ctx.shadowColor = "rgba(140,180,255,0.9)";
+    ctx.shadowBlur = 14;
+    ctx.fillStyle = ballGrad;
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
     ctx.fill();
-    ctx.shadowBlur = 0;
+    ctx.restore();
   });
 
   // HUD: Ball count & Laser ammo

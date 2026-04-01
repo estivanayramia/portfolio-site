@@ -32,6 +32,44 @@ let boss = null;         // { x, y, w, h, hp, maxHp, alive, shootTimer }
 let bossesKilled = 0;
 let spreadUses = 0;
 
+// ── Star field background ──
+const stars = [];
+for (let i = 0; i < 80; i++) {
+  stars.push({
+    x: Math.random() * 400,
+    y: Math.random() * 500,
+    r: 0.3 + Math.random() * 1.2,
+    speed: 0.15 + Math.random() * 0.4,
+    brightness: 0.3 + Math.random() * 0.7,
+  });
+}
+
+// ── Explosion particles ──
+let explosionParticles = [];
+
+function emitExplosion(x, y, color, count) {
+  try {
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  } catch (e) { /* proceed */ }
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.6;
+    const speed = 1.5 + Math.random() * 3;
+    explosionParticles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 1,
+      decay: 0.03 + Math.random() * 0.04,
+      r: 1.5 + Math.random() * 2.5,
+      color,
+      alive: true,
+    });
+  }
+  if (explosionParticles.length > 200) {
+    explosionParticles.splice(0, explosionParticles.length - 200);
+  }
+}
+
 const input = { left: false, right: false, shootHeld: false, autoFire: false };
 
 function setText(el, value) {
@@ -209,6 +247,9 @@ function update() {
           setText(scoreEl, score);
           unlock("invaders:boss_killer");
           playBeep(440, 0.15, 'triangle', 0.25);
+          emitExplosion(boss.x + boss.w / 2, boss.y + boss.h / 2, 'rgba(255,80,50,0.95)', 24);
+          emitExplosion(boss.x + 15, boss.y + 10, 'rgba(255,200,50,0.9)', 12);
+          emitExplosion(boss.x + boss.w - 15, boss.y + 10, 'rgba(255,200,50,0.9)', 12);
 
           // Drop multiple power-ups from boss
           spawnPowerup(boss.x + 15, boss.y + boss.h);
@@ -227,6 +268,7 @@ function update() {
           aliensKilled++;
           setText(scoreEl, score);
           playBeep(160, 0.06, "sawtooth", 0.18);
+          emitExplosion(a.x + a.w / 2, a.y + a.h / 2, 'rgba(255,120,80,0.9)', 10);
 
           if (Math.random() < 0.12) spawnPowerup(a.x + a.w / 2, a.y + a.h / 2);
 
@@ -347,31 +389,104 @@ function draw() {
   if (!ctx) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "rgba(0,0,0,0.25)";
+  // Deep space gradient background
+  const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  bg.addColorStop(0, 'rgba(2, 5, 20, 0.97)');
+  bg.addColorStop(0.5, 'rgba(8, 12, 35, 0.97)');
+  bg.addColorStop(1, 'rgba(5, 2, 25, 0.97)');
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // player
-  ctx.fillStyle = "rgba(34,197,94,1)";
+  // Scrolling star field
+  for (const star of stars) {
+    star.y += star.speed;
+    if (star.y > canvas.height) {
+      star.y = 0;
+      star.x = Math.random() * canvas.width;
+    }
+    const twinkle = star.brightness + 0.15 * Math.sin(Date.now() / 400 + star.x);
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, twinkle);
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Update & draw explosion particles
+  for (let i = explosionParticles.length - 1; i >= 0; i--) {
+    const p = explosionParticles[i];
+    if (!p.alive) continue;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.06;
+    p.life -= p.decay;
+    if (p.life <= 0) { p.alive = false; continue; }
+    ctx.save();
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 6;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  explosionParticles = explosionParticles.filter(p => p.alive);
+
+  // Player ship with gradient and glow
+  ctx.save();
+  const playerGrad = ctx.createLinearGradient(player.x, player.y + 20, player.x + 15, player.y);
+  playerGrad.addColorStop(0, 'rgba(20, 160, 80, 0.9)');
+  playerGrad.addColorStop(0.5, 'rgba(34, 220, 94, 1)');
+  playerGrad.addColorStop(1, 'rgba(80, 255, 140, 1)');
+  ctx.shadowColor = 'rgba(34, 197, 94, 0.6)';
+  ctx.shadowBlur = 12;
+  ctx.fillStyle = playerGrad;
   ctx.beginPath();
   ctx.moveTo(player.x + 15, player.y);
   ctx.lineTo(player.x + 30, player.y + 20);
   ctx.lineTo(player.x, player.y + 20);
   ctx.closePath();
   ctx.fill();
+  ctx.restore();
+  // Engine glow
+  ctx.save();
+  const enginePulse = 0.5 + 0.3 * Math.sin(Date.now() / 80);
+  ctx.globalAlpha = enginePulse;
+  ctx.fillStyle = 'rgba(100, 200, 255, 0.8)';
+  ctx.shadowColor = 'rgba(100, 200, 255, 0.9)';
+  ctx.shadowBlur = 8;
+  ctx.beginPath();
+  ctx.arc(player.x + 15, player.y + 22, 3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
 
-  // shield indicator
+  // Shield indicator with glow
   if (shieldCharges > 0) {
-    ctx.strokeStyle = "rgba(59,130,246,0.9)";
+    ctx.save();
+    ctx.strokeStyle = "rgba(59,130,246,0.8)";
+    ctx.shadowColor = 'rgba(59,130,246,0.6)';
+    ctx.shadowBlur = 10;
     ctx.lineWidth = 2;
     ctx.strokeRect(player.x - 3, player.y - 3, player.w + 6, player.h + 6);
-    ctx.lineWidth = 1;
+    ctx.restore();
   }
 
-  // Boss
+  // Boss with glow
   if (boss && boss.alive) {
-    // Body
-    ctx.fillStyle = 'rgba(239,68,68,0.95)';
+    ctx.save();
+    ctx.shadowColor = 'rgba(239, 68, 68, 0.6)';
+    ctx.shadowBlur = 16;
+    // Body gradient
+    const bossGrad = ctx.createLinearGradient(boss.x, boss.y, boss.x + boss.w, boss.y + boss.h);
+    bossGrad.addColorStop(0, 'rgba(220, 50, 50, 0.95)');
+    bossGrad.addColorStop(0.5, 'rgba(255, 80, 80, 1)');
+    bossGrad.addColorStop(1, 'rgba(200, 40, 40, 0.95)');
+    ctx.fillStyle = bossGrad;
     ctx.fillRect(boss.x, boss.y, boss.w, boss.h);
+    ctx.restore();
     // Menacing eyes
     ctx.fillStyle = '#fff';
     ctx.fillRect(boss.x + 12, boss.y + 8, 8, 8);
@@ -379,7 +494,10 @@ function draw() {
     ctx.fillStyle = '#000';
     ctx.fillRect(boss.x + 16, boss.y + 12, 4, 4);
     ctx.fillRect(boss.x + 44, boss.y + 12, 4, 4);
-    // Crown
+    // Crown with glow
+    ctx.save();
+    ctx.shadowColor = 'rgba(234, 179, 8, 0.7)';
+    ctx.shadowBlur = 10;
     ctx.fillStyle = 'rgba(234,179,8,0.9)';
     ctx.beginPath();
     ctx.moveTo(boss.x + 10, boss.y);
@@ -389,6 +507,7 @@ function draw() {
     ctx.lineTo(boss.x + 50, boss.y);
     ctx.closePath();
     ctx.fill();
+    ctx.restore();
 
     // HP bar
     const hpFrac = boss.hp / boss.maxHp;
@@ -397,44 +516,80 @@ function draw() {
     const barY = boss.y - 14;
     ctx.fillStyle = 'rgba(75,85,99,0.6)';
     ctx.fillRect(barX, barY, barW, 6);
-    ctx.fillStyle = hpFrac > 0.5 ? 'rgba(34,197,94,0.9)' : hpFrac > 0.25 ? 'rgba(234,179,8,0.9)' : 'rgba(239,68,68,0.9)';
+    const hpColor = hpFrac > 0.5 ? 'rgba(34,197,94,0.9)' : hpFrac > 0.25 ? 'rgba(234,179,8,0.9)' : 'rgba(239,68,68,0.9)';
+    ctx.save();
+    ctx.shadowColor = hpColor;
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = hpColor;
     ctx.fillRect(barX, barY, barW * hpFrac, 6);
+    ctx.restore();
 
     // Boss label
     ctx.fillStyle = 'rgba(255,255,255,0.8)';
     ctx.font = 'bold 10px Inter, system-ui, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('👹 BOSS', boss.x + boss.w / 2, barY - 4);
+    ctx.fillText('BOSS', boss.x + boss.w / 2, barY - 4);
   }
 
-  // aliens
-  ctx.fillStyle = "rgba(239,68,68,0.95)";
+  // Aliens with gradient and slight glow
   aliens.forEach((a) => {
     if (!a.alive) return;
+    ctx.save();
+    const alienGrad = ctx.createLinearGradient(a.x, a.y, a.x + a.w, a.y + a.h);
+    alienGrad.addColorStop(0, 'rgba(255,80,80,0.95)');
+    alienGrad.addColorStop(1, 'rgba(200,40,60,0.9)');
+    ctx.shadowColor = 'rgba(255,80,80,0.3)';
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = alienGrad;
     ctx.fillRect(a.x, a.y, a.w, a.h);
+    // Inner detail: eyes
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fillRect(a.x + 4, a.y + 5, 4, 4);
+    ctx.fillRect(a.x + 12, a.y + 5, 4, 4);
+    ctx.restore();
   });
 
-  // bullets
+  // Bullets with glow effects
   bullets.forEach((b) => {
     if (!b.alive) return;
+    ctx.save();
     if (b.boss) {
-      ctx.fillStyle = 'rgba(234,179,8,0.95)';
+      ctx.shadowColor = 'rgba(234,179,8,0.8)';
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = 'rgba(255,200,50,0.95)';
       ctx.beginPath();
       ctx.arc(b.x + 3, b.y + 3, 4, 0, Math.PI * 2);
       ctx.fill();
+    } else if (b.enemy) {
+      ctx.shadowColor = 'rgba(248,113,113,0.7)';
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = "rgba(255,120,120,0.95)";
+      ctx.fillRect(b.x, b.y, b.w, b.h);
     } else {
-      ctx.fillStyle = b.enemy ? "rgba(248,113,113,0.95)" : "rgba(250,204,21,0.95)";
+      // Player bullet with neon glow
+      ctx.shadowColor = 'rgba(250,220,50,0.8)';
+      ctx.shadowBlur = 10;
+      const bulletGrad = ctx.createLinearGradient(b.x, b.y + b.h, b.x, b.y);
+      bulletGrad.addColorStop(0, 'rgba(250,204,21,0.7)');
+      bulletGrad.addColorStop(1, 'rgba(255,255,150,1)');
+      ctx.fillStyle = bulletGrad;
       ctx.fillRect(b.x, b.y, b.w, b.h);
     }
+    ctx.restore();
   });
 
-  // powerups
+  // Powerups with glow
   powerups.forEach((p) => {
     if (!p.alive) return;
     const color = p.type === "rapid" ? "rgba(59,130,246,0.95)" : p.type === "spread" ? "rgba(168,85,247,0.95)" : p.type === "shield" ? "rgba(34,211,238,0.95)" : "rgba(250,204,21,0.95)";
+    const glowColor = p.type === "rapid" ? "rgba(59,130,246,0.6)" : p.type === "spread" ? "rgba(168,85,247,0.6)" : p.type === "shield" ? "rgba(34,211,238,0.6)" : "rgba(250,204,21,0.6)";
     const label = p.type === "rapid" ? "R" : p.type === "spread" ? "S" : p.type === "shield" ? "H" : "L";
+    ctx.save();
+    ctx.shadowColor = glowColor;
+    ctx.shadowBlur = 10;
     ctx.fillStyle = color;
     ctx.fillRect(p.x, p.y, p.w, p.h);
+    ctx.restore();
     ctx.fillStyle = "rgba(0,0,0,0.75)";
     ctx.font = "bold 10px Inter, system-ui, sans-serif";
     ctx.textAlign = "center";
@@ -449,7 +604,7 @@ function draw() {
   let hudY = 14;
   if (shieldCharges > 0) {
     ctx.fillStyle = 'rgba(59,130,246,0.9)';
-    ctx.fillText(`Shield: ${'█'.repeat(shieldCharges)}`, canvas.width - 8, hudY);
+    ctx.fillText(`Shield: ${'\u2588'.repeat(shieldCharges)}`, canvas.width - 8, hudY);
     hudY += 14;
   }
   const now = performance.now();
