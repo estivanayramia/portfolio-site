@@ -2342,6 +2342,16 @@ body[data-print-url] main > section + section {
     font-weight: 700;
     line-height: 0.95;
     color: var(--color-primary);
+    opacity: 1;
+}
+
+/* Ensure GSAP-animated proof stats are fully visible after animation */
+.spine-page .spine-proof-stat[data-gsap][style*="opacity"] {
+    color: var(--color-primary);
+}
+.spine-page .spine-proof-stat .spine-stat-number {
+    opacity: 1 !important;
+    color: var(--color-primary) !important;
 }
 
 .spine-page .spine-proof-note {

@@ -1186,6 +1186,32 @@
   }
 }
 
+/* Mobile fix: reposition roulette button below carousel to prevent overlap */
+@media (max-width: 767px) {
+  .roulette-trigger-btn {
+    position: static !important;
+    display: flex;
+    margin: 1rem auto 0;
+    float: none;
+    width: auto;
+    height: auto;
+    padding: 0.75rem 1.25rem;
+    border-radius: clamp(12px, 1.5vw, 16px);
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+
+  .roulette-trigger-btn .roulette-text,
+  .roulette-trigger-btn .roulette-subtext {
+    display: inline !important;
+  }
+
+  .roulette-icon {
+    width: 20px;
+    height: 20px;
+  }
+}
+
 .cf-tier-baseline .coverflow-card,
 .cf-tier-reduced .coverflow-card {
   -webkit-backdrop-filter: none;

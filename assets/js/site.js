@@ -3439,6 +3439,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 els.bubble?.classList.add('opacity-100', 'translate-y-0');
                 positionWelcomeBubbleDeferred();
                 sessionStorage.setItem('savonie_bubble_count', (bubbleShowCount + 1).toString());
+                // Auto-dismiss bubble after 5 seconds
+                setTimeout(() => {
+                    if (els.bubble) {
+                        els.bubble.classList.add('opacity-0', 'translate-y-4');
+                        els.bubble.classList.remove('opacity-100', 'translate-y-0');
+                    }
+                }, 5000);
             }
         }, WELCOME_DELAY);
     }
