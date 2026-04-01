@@ -1,0 +1,441 @@
+/**
+ * ============================================================================
+ * CINEMATIC FIRST-VISIT INTRO
+ * ============================================================================
+ * 
+ * A premium motion-driven intro sequence for first-time visitors.
+ * Uses the site's own palette: indigodeep (#212842), beige (#e1d4c2),
+ * chocolate (#362017), and white.
+ *
+ * Architecture:
+ * - Full-viewport overlay (#cinematic-intro) sits above everything
+ * - Body scroll is locked during intro via .intro-active
+ * - All animation driven by GSAP timeline in cinematic-intro.js
+ * - Reduced-motion: instant fade to site, no animation
+ * - Skip: elegantly transitions out at any point
+ *
+ * @version 1.0.0
+ */
+
+/* ==========================================================================
+   Body lock during intro
+   ========================================================================== */
+
+html.intro-active,
+html.intro-active body {
+  overflow: hidden !important;
+  height: 100% !important;
+  position: relative;
+}
+
+/* Hide main content during intro for clean reveal */
+html.intro-active #main-content,
+html.intro-active header,
+html.intro-active footer,
+html.intro-active #chat-widget,
+html.intro-active #scroll-to-top,
+html.intro-active .scroll-progress {
+  visibility: hidden;
+}
+
+/* ==========================================================================
+   Intro Overlay Container
+   ========================================================================== */
+
+#cinematic-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background-color: #0a0b10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  will-change: transform, opacity;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle noise/grain texture overlay for cinematic depth */
+#cinematic-intro::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.025;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Ambient warm glow — very subtle */
+#cinematic-intro::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120vmax;
+  height: 120vmax;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(225, 212, 194, 0.04) 0%,
+    rgba(33, 40, 66, 0.02) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Scene Container (centered content area)
+   ========================================================================== */
+
+.intro-scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  max-width: 100%;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   The Horizon Line — the foundational motif
+   ========================================================================== */
+
+.intro-line {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(225, 212, 194, 0.5) 20%,
+    rgba(225, 212, 194, 0.8) 50%,
+    rgba(225, 212, 194, 0.5) 80%,
+    transparent 100%
+  );
+  will-change: width;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   Thematic text fragments
+   ========================================================================== */
+
+.intro-fragment {
+  position: absolute;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-weight: 300;
+  font-size: clamp(0.75rem, 1.2vw, 1rem);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(225, 212, 194, 0.6);
+  opacity: 0;
+  white-space: nowrap;
+  will-change: opacity, transform;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   Grid structure motif — subtle line grid that appears mid-sequence
+   ========================================================================== */
+
+.intro-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  will-change: opacity;
+  overflow: hidden;
+}
+
+.intro-grid-line {
+  position: absolute;
+  background: rgba(225, 212, 194, 0.04);
+}
+
+.intro-grid-line.h {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+
+.intro-grid-line.v {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+
+/* ==========================================================================
+   Name reveal
+   ========================================================================== */
+
+.intro-name {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: #ffffff;
+  opacity: 0;
+  will-change: opacity, transform;
+  z-index: 3;
+  margin-bottom: 0.5em;
+}
+
+/* ==========================================================================
+   Tagline reveal
+   ========================================================================== */
+
+.intro-tagline {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  font-size: clamp(0.875rem, 1.8vw, 1.25rem);
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+  color: rgba(225, 212, 194, 0.7);
+  opacity: 0;
+  max-width: 36ch;
+  will-change: opacity, transform;
+  z-index: 3;
+}
+
+/* ==========================================================================
+   Logo mark — small EA logo that resolves before name
+   ========================================================================== */
+
+.intro-logo {
+  width: clamp(44px, 7vw, 64px);
+  height: auto;
+  opacity: 0;
+  will-change: opacity, transform;
+  z-index: 3;
+  margin-bottom: 1.5rem;
+}
+
+/* ==========================================================================
+   Skip button
+   ========================================================================== */
+
+.intro-skip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid rgba(225, 212, 194, 0.15);
+  border-radius: 9999px;
+  background: rgba(10, 11, 16, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: rgba(225, 212, 194, 0.6);
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              background 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* Reset button styles */
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  white-space: nowrap;
+}
+
+.intro-skip:hover {
+  color: rgba(225, 212, 194, 0.9);
+  border-color: rgba(225, 212, 194, 0.3);
+  background: rgba(10, 11, 16, 0.8);
+}
+
+.intro-skip:focus-visible {
+  outline: 2px solid rgba(225, 212, 194, 0.5);
+  outline-offset: 2px;
+}
+
+.intro-skip svg {
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
+}
+
+/* Mobile skip adjustments */
+@media (max-width: 640px) {
+  .intro-skip {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* ==========================================================================
+   Reveal curtain — the transition layer
+   ========================================================================== */
+
+.intro-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background-color: #0a0b10;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   Reduced Motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  #cinematic-intro,
+  .intro-curtain {
+    transition: opacity 0.3s ease !important;
+    animation: none !important;
+  }
+  
+  #cinematic-intro *,
+  .intro-curtain * {
+    animation: none !important;
+    transition-duration: 0.1s !important;
+  }
+}
+
+/* ==========================================================================
+   Post-intro cleanup: ensure no visual leftovers
+   ========================================================================== */
+
+#cinematic-intro[data-state="done"],
+.intro-curtain[data-state="done"] {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Controls container (bottom bar: sound toggle + skip)
+   ========================================================================== */
+
+.intro-controls {
+  position: fixed;
+  bottom: 2.5rem;
+  left: 0;
+  right: 0;
+  z-index: 100001;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0 2.5rem;
+  pointer-events: none;
+  opacity: 0;
+  will-change: opacity;
+}
+
+.intro-controls > * {
+  pointer-events: auto;
+}
+
+/* Mobile controls */
+@media (max-width: 640px) {
+  .intro-controls {
+    bottom: 1.5rem;
+    padding: 0 1.5rem;
+    gap: 0.5rem;
+  }
+}
+
+/* ==========================================================================
+   Sound toggle button
+   ========================================================================== */
+
+.intro-sound-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.625rem 1rem;
+  border: 1px solid rgba(225, 212, 194, 0.15);
+  border-radius: 9999px;
+  background: rgba(10, 11, 16, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: rgba(225, 212, 194, 0.6);
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              background 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  white-space: nowrap;
+}
+
+.intro-sound-toggle:hover {
+  color: rgba(225, 212, 194, 0.9);
+  border-color: rgba(225, 212, 194, 0.3);
+  background: rgba(10, 11, 16, 0.8);
+}
+
+.intro-sound-toggle:focus-visible {
+  outline: 2px solid rgba(225, 212, 194, 0.5);
+  outline-offset: 2px;
+}
+
+.intro-sound-toggle .sound-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.intro-sound-toggle .sound-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.intro-sound-toggle .sound-label {
+  font-size: 0.8125rem;
+}
+
+/* Mobile sound toggle */
+@media (max-width: 640px) {
+  .intro-sound-toggle {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    gap: 0.35rem;
+  }
+
+  .intro-sound-toggle .sound-icon,
+  .intro-sound-toggle .sound-icon svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .intro-sound-toggle .sound-label {
+    font-size: 0.75rem;
+  }
+}
+
+/* ==========================================================================
+   Skip button (now lives inside .intro-controls)
+   ========================================================================== */
+
+/* Replay button in footer (subtle) */
+.intro-replay-link {
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.intro-replay-link:hover {
+  opacity: 0.8;
+}
