@@ -8,7 +8,7 @@
   var STORAGE_KEY = 'ea_intro_seen';
   var VO_SRC = '/assets/audio/intro-voiceover.mp3';
   var CAPTIONS_SRC = '/assets/js/intro-captions.json';
-  var DURATION = 76;
+  var DURATION = 77;
   var SCREENSHOTS = '/assets/img/trailer/';
 
   // State
@@ -115,25 +115,65 @@
 
   // ── Scene backgrounds (screenshots) ───────────────────────────────────
   var SCENE_MAP = [
-    // {start, end, bg (screenshot path or null for solid), solid (CSS bg)}
-    {s:0,e:10,bg:null,solid:'#0a0b10'},
-    {s:10,e:15,bg:null,solid:'#0a0b10'}, // identity: dark + text
-    {s:15,e:17,bg:'homepage.jpg',solid:null},
-    {s:17,e:20,bg:null,solid:'#0a0b10'},
-    {s:20,e:24,bg:'background.jpg',solid:null},
-    {s:24,e:29,bg:'about.jpg',solid:null},
-    {s:29,e:33,bg:null,solid:'#e1d4c2'}, // system words on beige
-    {s:33,e:36,bg:'overview.jpg',solid:null},
-    {s:36,e:39,bg:'deep-dive.jpg',solid:null},
-    {s:39,e:42,bg:'projects.jpg',solid:null},
-    {s:42,e:44,bg:'project-portfolio.jpg',solid:null},
-    {s:44,e:46,bg:'project-loreal.jpg',solid:null},
-    {s:46,e:50,bg:'dashboard.jpg',solid:null},
-    {s:50,e:57,bg:'games.jpg',solid:null},
-    {s:57,e:63,bg:null,solid:'#0a0b10'}, // savonie
-    {s:63,e:66,bg:'contact.jpg',solid:null},
-    {s:66,e:72,bg:null,solid:'#0a0b10'}, // values
-    {s:72,e:76,bg:null,solid:'#e1d4c2'} // reveal
+    // Every bg lasts 2-5s max. Visual changes every few seconds.
+    // [0-2s] Dark open
+    {s:0,e:2,bg:null,solid:'#0a0b10'},
+    // [2-4s] "went to school, worked" — generic resume feel
+    {s:2,e:4.5,bg:null,solid:'#111218'},
+    // [4.5-8s] "skills I claim" — still generic
+    {s:4.5,e:8.5,bg:null,solid:'#0e0f15'},
+    // [8.5-10.5s] "different" — first site glimpse: nav bar
+    {s:8.5,e:10.5,bg:'homepage.jpg',solid:null},
+    // [10.5-13.5s] "My name is Estivan Ayramia" — hero headline close-up
+    {s:10.5,e:13.5,bg:'hero-headline.jpg',solid:null},
+    // [13.5-15.5s] "I am Chaldean, born in Baghdad" — headshot
+    {s:13.5,e:15.5,bg:'hero-headshot.jpg',solid:null},
+    // [15.5-18.5s] "raised in El Cajon" — hero card
+    {s:15.5,e:18.5,bg:'hero-card.jpg',solid:null},
+    // [18.5-20.5s] "built from ground up" — homepage full
+    {s:18.5,e:20.5,bg:'homepage-mid.jpg',solid:null},
+    // [20.5-24s] "crossed borders" — background story page
+    {s:20.5,e:24,bg:'background-story.jpg',solid:null},
+    // [24-27s] "not fragile" — about page
+    {s:24,e:27,bg:'about.jpg',solid:null},
+    // [27-29.5s] "resourceful" — values cards
+    {s:27,e:29.5,bg:'values-cards.jpg',solid:null},
+    // [29.5-32s] "not a resume / system" — overview top
+    {s:29.5,e:32,bg:'overview-top.jpg',solid:null},
+    // [32-34s] "structure" — systems section
+    {s:32,e:34,bg:'systems-section.jpg',solid:null},
+    // [34-36s] "proof" — deep dive
+    {s:34,e:36,bg:'deep-dive.jpg',solid:null},
+    // [36-38.5s] "real work you can check" — overview full
+    {s:36,e:38.5,bg:'overview.jpg',solid:null},
+    // [38.5-41s] "built to be examined" — projects cards
+    {s:38.5,e:41,bg:'projects-cards.jpg',solid:null},
+    // [41-43s] "not admired from distance" — portfolio detail
+    {s:41,e:43,bg:'portfolio-detail.jpg',solid:null},
+    // [43-46s] "pulled apart up close" — loreal detail
+    {s:43,e:46,bg:'loreal-detail.jpg',solid:null},
+    // [46-49s] "carousel" — dashboard with carousel
+    {s:46,e:49,bg:'dashboard.jpg',solid:null},
+    // [49-52s] "roulette" — projects page
+    {s:49,e:52,bg:'projects.jpg',solid:null},
+    // [52-55s] "arcade games" — games page
+    {s:52,e:55,bg:'games.jpg',solid:null},
+    // [55-58s] "well crafted" — games cards close-up
+    {s:55,e:58,bg:'games-cards.jpg',solid:null},
+    // [58-61s] "AI has a name" — dark for Savonie
+    {s:58,e:61,bg:null,solid:'#0a0b10'},
+    // [61-64s] "He is called Savonie" — contact info
+    {s:61,e:64,bg:'contact-info.jpg',solid:null},
+    // [64-67s] "try him" — contact form
+    {s:64,e:67,bg:'contact-form.jpg',solid:null},
+    // [67-70s] "people, process" — working with me
+    {s:67,e:70,bg:'working-detail.jpg',solid:null},
+    // [70-73s] "doing the work right" — homepage lower
+    {s:70,e:73,bg:'homepage-lower.jpg',solid:null},
+    // [73-75s] "see all of it" — homepage full
+    {s:73,e:75,bg:'homepage.jpg',solid:null},
+    // [75-77s] "welcome in" — beige reveal
+    {s:75,e:77,bg:null,solid:'#e1d4c2'}
   ];
 
   function buildBGs() {
@@ -432,63 +472,62 @@
       onComplete: function() { completeTrailer(); }
     });
 
-    // Scene 1: fragments [0-9s]
+    // Scene 1: resume fragments [0-8.5s]
     var s1 = scenes[0];
-    t.to(s1.el, {opacity:1, duration:0.5}, 0);
+    t.to(s1.el, {opacity:1, duration:0.3}, 0);
     Array.from(s1.frags).forEach(function(f,i) {
-      t.to(f, {opacity:0.4+Math.random()*0.3, duration:1.5, ease:'power2.out'}, 0.3+i*0.3);
+      t.to(f, {opacity:0.35+Math.random()*0.25, duration:1, ease:'power2.out'}, 0.2+i*0.25);
     });
-    // Scatter at "different" ~9s
-    t.to(s1.el, {opacity:0, duration:0.5, ease:'power2.in'}, 9);
+    t.to(s1.el, {opacity:0, duration:0.4, ease:'power2.in'}, 8);
 
-    // Show player at 1.5s
-    t.add(function() { playerEl.classList.add('visible'); }, 1.5);
+    // Show player at 1s
+    t.add(function() { playerEl.classList.add('visible'); }, 1);
 
-    // Scene 2: identity [10-19s]
+    // Scene 2: identity [10.5-18.5s] — over hero screenshot backgrounds
     var s2 = scenes[1];
-    t.to(s2.el, {opacity:1, duration:0.6}, 10);
-    t.fromTo(s2.mono, {opacity:0,y:10}, {opacity:1,y:0, duration:0.8, ease:'power3.out'}, 10.5);
-    t.fromTo(s2.name, {opacity:0,y:20}, {opacity:1,y:0, duration:1, ease:'power3.out'}, 11);
-    t.fromTo(s2.origin, {opacity:0}, {opacity:1, duration:0.8}, 14.5);
-    t.to(s2.el, {opacity:0, duration:0.6}, 19);
+    t.to(s2.el, {opacity:1, duration:0.5}, 10.5);
+    t.fromTo(s2.mono, {opacity:0,y:8}, {opacity:1,y:0, duration:0.6, ease:'power3.out'}, 11);
+    t.fromTo(s2.name, {opacity:0,y:15}, {opacity:1,y:0, duration:0.8, ease:'power3.out'}, 11.5);
+    t.fromTo(s2.origin, {opacity:0}, {opacity:1, duration:0.6}, 15);
+    t.to(s2.el, {opacity:0, duration:0.5}, 18);
 
-    // Scene 4: system words [29-38s]
+    // Scene 4: system words [29.5-36s] — over overview/systems screenshots
     var s4 = scenes[2];
-    t.to(s4.el, {opacity:1, duration:0.5}, 29);
+    t.to(s4.el, {opacity:1, duration:0.4}, 29.5);
     s4.words.forEach(function(w,i) {
-      t.fromTo(w, {opacity:0,y:15}, {opacity:1,y:0, duration:0.5, ease:'power3.out'}, 30+i*1.2);
+      t.fromTo(w, {opacity:0,y:12}, {opacity:1,y:0, duration:0.4, ease:'power3.out'}, 30+i*1.3);
     });
-    t.fromTo(s4.sub, {opacity:0}, {opacity:1, duration:0.6}, 35);
-    t.to(s4.el, {opacity:0, duration:0.5}, 38);
+    t.fromTo(s4.sub, {opacity:0}, {opacity:1, duration:0.5}, 35);
+    t.to(s4.el, {opacity:0, duration:0.4}, 36);
 
-    // Scene 6: arcade [50-57s]
+    // Scene 6: arcade [52-58s] — over games screenshots
     var s6 = scenes[3];
-    t.to(s6.el, {opacity:1, duration:0.5}, 50);
+    t.to(s6.el, {opacity:1, duration:0.4}, 52.5);
     Array.from(s6.icons).forEach(function(ic,i) {
-      t.fromTo(ic, {opacity:0,scale:0.5}, {opacity:1,scale:1, duration:0.4, ease:'back.out(2)'}, 51+i*0.3);
+      t.fromTo(ic, {opacity:0,scale:0.5}, {opacity:1,scale:1, duration:0.35, ease:'back.out(2)'}, 53+i*0.25);
     });
-    t.fromTo(s6.label, {opacity:0}, {opacity:1, duration:0.5}, 53);
-    t.to(s6.el, {opacity:0, duration:0.5}, 56.5);
+    t.fromTo(s6.label, {opacity:0}, {opacity:1, duration:0.4}, 54.5);
+    t.to(s6.el, {opacity:0, duration:0.4}, 57);
 
-    // Scene 7: savonie [57-65s]
+    // Scene 7: savonie [58-64s] — avatar on dark, then contact pages
     var s7 = scenes[4];
-    t.to(s7.el, {opacity:1, duration:0.5}, 57.5);
-    t.fromTo(s7.avatar, {opacity:0,scale:0.8}, {opacity:1,scale:1, duration:0.8, ease:'power3.out'}, 58);
-    t.fromTo(s7.bubble, {opacity:0,y:10}, {opacity:1,y:0, duration:0.6}, 59.5);
-    t.fromTo(s7.savName, {opacity:0}, {opacity:1, duration:0.5}, 60.5);
-    t.to(s7.el, {opacity:0, duration:0.5}, 64.5);
+    t.to(s7.el, {opacity:1, duration:0.4}, 58.5);
+    t.fromTo(s7.avatar, {opacity:0,scale:0.85}, {opacity:1,scale:1, duration:0.6, ease:'power3.out'}, 59);
+    t.fromTo(s7.bubble, {opacity:0,y:8}, {opacity:1,y:0, duration:0.5}, 60);
+    t.fromTo(s7.savName, {opacity:0}, {opacity:1, duration:0.4}, 60.5);
+    t.to(s7.el, {opacity:0, duration:0.4}, 63.5);
 
-    // Scene 8: values [66-73s]
+    // Scene 8: values [67-73s] — over working-with-me + homepage
     var s8 = scenes[5];
-    t.to(s8.el, {opacity:1, duration:0.5}, 66.5);
+    t.to(s8.el, {opacity:1, duration:0.4}, 67.5);
     s8.vals.forEach(function(v,i) {
-      t.fromTo(v, {opacity:0,y:8}, {opacity:1,y:0, duration:0.5, ease:'power2.out'}, 67+i*0.4);
+      t.fromTo(v, {opacity:0,y:6}, {opacity:1,y:0, duration:0.4, ease:'power2.out'}, 68+i*0.35);
     });
-    t.to(s8.el, {opacity:0, duration:0.8}, 72);
+    t.to(s8.el, {opacity:0, duration:0.6}, 72);
 
-    // Final fade [73-76s]
-    t.to(introEl, {opacity:0, duration:1.5, ease:'power2.inOut'}, 74);
-    t.add(function() { if(playerEl) playerEl.classList.remove('visible'); }, 73.5);
+    // Final fade [74-77s]
+    t.to(introEl, {opacity:0, duration:1.5, ease:'power2.inOut'}, 75);
+    t.add(function() { if(playerEl) playerEl.classList.remove('visible'); }, 74.5);
 
     // Total duration pad
     t.to({}, {duration:0.1}, DURATION);
