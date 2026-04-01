@@ -1,408 +1,668 @@
 /**
- * CINEMATIC SITE TRAILER V4 — Video-Based Controller
- * Real captured site footage with voiceover, captions, and premium player controls.
- * The video element is the primary visual driver. No screenshot scene maps.
- * @version 5.0.0
+ * ============================================================================
+ * CINEMATIC FIRST-VISIT INTRO — CONTROLLER
+ * ============================================================================
+ *
+ * Orchestrates a premium motion-driven intro for first-time visitors.
+ * Uses GSAP (already bundled in site.min.js) for timeline animation.
+ * Uses cinematic-audio.js for procedural Web Audio synthesis.
+ *
+ * Features:
+ * - First-visit only (localStorage persistence)
+ * - Skippable at any point
+ * - Reduced-motion aware (instant fade fallback)
+ * - Keyboard accessible (Escape / Enter / Space to skip)
+ * - Clean body scroll lock/unlock
+ * - Seamless reveal transition into live homepage
+ * - Replay affordance via footer link
+ * - Integrated audio with mute toggle
+ * - Autoplay-safe: audio starts on first user interaction
+ *
+ * Storage key: 'ea_intro_seen' (value: '1')
+ *
+ * @version 2.0.0
  */
+
 (function () {
   'use strict';
+
+  // ── Constants ──────────────────────────────────────────────────────────
   var STORAGE_KEY = 'ea_intro_seen';
-  var VIDEO_SRC = '/assets/video/site-trailer.mp4';
-  var CAPTIONS_SRC = '/assets/js/intro-captions.json';
+  var INTRO_ID = 'cinematic-intro';
+  var CURTAIN_CLASS = 'intro-curtain';
 
-  // State
-  var videoEl = null, overlayEl = null, curtainEl = null, playerEl = null;
-  var captionWrap = null, captionText = null, promptEl = null;
-  var captions = [], capIdx = -1;
-  var isSkipping = false, isComplete = false, captionsVisible = true;
-  var isMuted = false, audioUnlocked = false;
+  // ── State ──────────────────────────────────────────────────────────────
+  var timeline = null;
+  var isSkipping = false;
+  var isComplete = false;
+  var introEl = null;
+  var curtainEl = null;
+  var skipBtn = null;
+  var soundBtn = null;
+  var startTime = 0;       // Performance.now() when intro began
+  var audioAttempted = false;
 
-  function hasSeen() { try { return localStorage.getItem(STORAGE_KEY)==='1'; } catch(e) { return false; } }
-  function markSeen() { try { localStorage.setItem(STORAGE_KEY,'1'); } catch(e) {} }
-  function reducedMotion() { try { return matchMedia('(prefers-reduced-motion:reduce)').matches; } catch(e) { return false; } }
-  function isHome() { var p=location.pathname; return p==='/'||p==='/EN/'||p==='/EN/index.html'||p==='/index.html'||p===''; }
-  function fmt(s) { if(isNaN(s)||s<0) s=0; var m=Math.floor(s/60); var sec=Math.floor(s%60); return m+':'+(sec<10?'0':'')+sec; }
-
-  // Icons
-  var IC = {
-    play: '<svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>',
-    pause: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>',
-    rw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/><text x="12" y="16" fill="currentColor" stroke="none" font-size="8" text-anchor="middle" font-family="sans-serif">10</text></svg>',
-    fw: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/><text x="12" y="16" fill="currentColor" stroke="none" font-size="8" text-anchor="middle" font-family="sans-serif">10</text></svg>',
-    volOn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5" fill="currentColor"/><path d="M19 4.9a10 10 0 0 1 0 14.1"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>',
-    volOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5" fill="currentColor"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>',
-    cc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><text x="12" y="15" fill="currentColor" stroke="none" font-size="9" font-weight="bold" text-anchor="middle" font-family="sans-serif">CC</text></svg>',
-    close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
-  };
-
-  // ── Video Element ─────────────────────────────────────────────────────
-  function createVideo() {
-    videoEl = document.createElement('video');
-    videoEl.preload = 'auto';
-    videoEl.playsInline = true;
-    videoEl.setAttribute('playsinline','');
-    videoEl.setAttribute('webkit-playsinline','');
-    videoEl.muted = true; // Start muted for autoplay compliance
-    videoEl.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;';
-    var src = document.createElement('source');
-    src.src = VIDEO_SRC;
-    src.type = 'video/mp4';
-    videoEl.appendChild(src);
-    try { videoEl.load(); } catch(e) {}
-
-    // Time update: drive captions + player
-    videoEl.addEventListener('timeupdate', function() {
-      var t = videoEl.currentTime;
-      updateCaptions(t);
-      updatePlayer(t);
-    });
-
-    videoEl.addEventListener('ended', function() {
-      completeTrailer();
-    });
+  // ── Audio handle (loaded from cinematic-audio.js) ─────────────────────
+  function audio() {
+    return window.__introAudio || null;
   }
 
-  function probeAutoplay() {
-    return new Promise(function(res) {
-      if (!videoEl) { res(false); return; }
-      // Try autoplay muted (should work everywhere)
-      videoEl.muted = true;
-      var p = videoEl.play();
-      if (p && typeof p.then === 'function') {
-        p.then(function() { res(true); }).catch(function() { res(false); });
-      } else { res(false); }
-    });
+  // ── Utility ────────────────────────────────────────────────────────────
+
+  function hasSeenIntro() {
+    try {
+      return localStorage.getItem(STORAGE_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
   }
 
-  function unlockAudio() {
-    if (audioUnlocked || isComplete || isSkipping) return;
-    audioUnlocked = true;
-    isMuted = false;
-    if (videoEl) {
-      videoEl.muted = false;
-      videoEl.volume = 1.0;
-      // If video isn't playing yet, play it
-      if (videoEl.paused) {
-        try { videoEl.play().catch(function(){}); } catch(e) {}
+  function markIntroSeen() {
+    try {
+      localStorage.setItem(STORAGE_KEY, '1');
+    } catch (e) {}
+  }
+
+  function prefersReducedMotion() {
+    try {
+      return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isHomepage() {
+    var path = window.location.pathname;
+    return path === '/' ||
+           path === '/EN/' ||
+           path === '/EN/index.html' ||
+           path === '/index.html' ||
+           path === '';
+  }
+
+  function getElapsedSeconds() {
+    return startTime ? (performance.now() - startTime) / 1000 : 0;
+  }
+
+  // ── Audio Initialization (on user gesture) ────────────────────────────
+
+  function tryStartAudio() {
+    if (audioAttempted || isComplete || isSkipping) return;
+    var a = audio();
+    if (!a || !a.isAvailable()) return;
+    audioAttempted = true;
+    var elapsed = getElapsedSeconds();
+    a.start(elapsed).then(function (ok) {
+      if (ok && soundBtn) {
+        updateSoundButtonState();
       }
+    });
+  }
+
+  function updateSoundButtonState() {
+    if (!soundBtn) return;
+    var a = audio();
+    var muted = a && a.isMuted();
+    var icon = soundBtn.querySelector('.sound-icon');
+    if (icon) {
+      icon.innerHTML = muted ? ICON_MUTED : ICON_UNMUTED;
     }
-    removePrompt();
-    updateMuteBtn();
+    soundBtn.setAttribute('aria-label', muted ? 'Turn sound on' : 'Turn sound off');
   }
 
-  function removePrompt() {
-    if (promptEl && promptEl.parentNode) {
-      promptEl.style.opacity = '0';
-      setTimeout(function() { if(promptEl&&promptEl.parentNode) promptEl.parentNode.removeChild(promptEl); promptEl=null; }, 300);
+  // SVG icons for sound toggle
+  var ICON_UNMUTED = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
+
+  var ICON_MUTED = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>';
+
+  // ── DOM Construction ──────────────────────────────────────────────────
+
+  function buildIntroDOM() {
+    // Main overlay
+    introEl = document.createElement('div');
+    introEl.id = INTRO_ID;
+    introEl.setAttribute('role', 'dialog');
+    introEl.setAttribute('aria-modal', 'true');
+    introEl.setAttribute('aria-label', 'Welcome intro sequence');
+
+    // Scene container
+    var scene = document.createElement('div');
+    scene.className = 'intro-scene';
+
+    // Horizon line
+    var line = document.createElement('div');
+    line.className = 'intro-line';
+    line.setAttribute('aria-hidden', 'true');
+
+    // Grid structure (background motif)
+    var grid = document.createElement('div');
+    grid.className = 'intro-grid';
+    grid.setAttribute('aria-hidden', 'true');
+    var gridPositions = [20, 35, 50, 65, 80];
+    gridPositions.forEach(function (pos) {
+      var hLine = document.createElement('div');
+      hLine.className = 'intro-grid-line h';
+      hLine.style.top = pos + '%';
+      grid.appendChild(hLine);
+      var vLine = document.createElement('div');
+      vLine.className = 'intro-grid-line v';
+      vLine.style.left = pos + '%';
+      grid.appendChild(vLine);
+    });
+
+    // Thematic text fragments
+    var fragments = [
+      { text: 'curiosity', x: '-8vw', y: '-6vh' },
+      { text: 'structure', x: '6vw', y: '2vh' },
+      { text: 'execution', x: '-3vw', y: '8vh' }
+    ];
+    var fragmentEls = fragments.map(function (f) {
+      var el = document.createElement('span');
+      el.className = 'intro-fragment';
+      el.textContent = f.text;
+      el.style.left = 'calc(50% + ' + f.x + ')';
+      el.style.top = 'calc(50% + ' + f.y + ')';
+      el.style.transform = 'translate(-50%, -50%)';
+      el.setAttribute('aria-hidden', 'true');
+      return el;
+    });
+
+    // Logo mark
+    var logo = document.createElement('img');
+    logo.className = 'intro-logo';
+    logo.src = '/assets/img/logo-ea-monogram.webp';
+    logo.alt = '';
+    logo.setAttribute('aria-hidden', 'true');
+    logo.width = 64;
+    logo.height = 62;
+
+    // Name
+    var name = document.createElement('div');
+    name.className = 'intro-name';
+    name.textContent = 'Estivan Ayramia';
+
+    // Tagline
+    var tagline = document.createElement('div');
+    tagline.className = 'intro-tagline';
+    tagline.textContent = 'Built to show what a resume can\u2019t.';
+
+    // Assemble scene
+    scene.appendChild(logo);
+    scene.appendChild(name);
+    scene.appendChild(tagline);
+
+    // Assemble overlay
+    introEl.appendChild(grid);
+    introEl.appendChild(line);
+    fragmentEls.forEach(function (el) { introEl.appendChild(el); });
+    introEl.appendChild(scene);
+
+    // ── Controls container (bottom row: sound + skip) ────────────────
+    var controls = document.createElement('div');
+    controls.className = 'intro-controls';
+
+    // Sound toggle button (only if Web Audio is available)
+    var a = audio();
+    if (a && a.isAvailable()) {
+      soundBtn = document.createElement('button');
+      soundBtn.className = 'intro-sound-toggle';
+      soundBtn.setAttribute('type', 'button');
+      soundBtn.setAttribute('aria-label', 'Turn sound on');
+      soundBtn.innerHTML = '<span class="sound-icon">' + ICON_MUTED + '</span><span class="sound-label">Sound</span>';
+      controls.appendChild(soundBtn);
     }
-  }
 
-  function setMuted(m) {
-    isMuted = m;
-    if (videoEl) { videoEl.muted = m; if(!m) videoEl.volume = 1.0; }
-    updateMuteBtn();
-  }
+    // Skip button
+    skipBtn = document.createElement('button');
+    skipBtn.className = 'intro-skip';
+    skipBtn.setAttribute('type', 'button');
+    skipBtn.setAttribute('aria-label', 'Skip intro');
+    skipBtn.innerHTML = 'Skip <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 4 15 12 5 20"></polyline><line x1="19" y1="4" x2="19" y2="20"></line></svg>';
+    controls.appendChild(skipBtn);
 
-  // ── Captions ──────────────────────────────────────────────────────────
-  function loadCaptions(cb) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', CAPTIONS_SRC, true); xhr.responseType = 'json';
-    xhr.onload = function() { if(xhr.status===200&&xhr.response) captions=xhr.response; cb(); };
-    xhr.onerror = function() { cb(); };
-    xhr.send();
-  }
-  function updateCaptions(t) {
-    if (!captionText || !captions.length || !captionsVisible) return;
-    var found = -1;
-    for (var i=0;i<captions.length;i++) {
-      if (t >= captions[i].start && t <= captions[i].end + 0.3) { found=i; break; }
-    }
-    if (found !== capIdx) {
-      capIdx = found;
-      if (found>=0) { captionText.textContent=captions[found].text; captionText.classList.add('visible'); }
-      else { captionText.classList.remove('visible'); }
-    }
-  }
-
-  // ── Build DOM ─────────────────────────────────────────────────────────
-  function buildDOM() {
-    overlayEl = document.createElement('div');
-    overlayEl.id = 'cinematic-intro';
-    overlayEl.setAttribute('role','dialog');
-    overlayEl.setAttribute('aria-modal','true');
-    overlayEl.setAttribute('aria-label','Site trailer');
-    overlayEl.appendChild(videoEl);
-
-    // Captions
-    captionWrap = document.createElement('div');
-    captionWrap.className = 'trailer-captions';
-    captionWrap.setAttribute('aria-live','polite');
-    captionText = document.createElement('span');
-    captionText.className = 'trailer-caption-text';
-    captionWrap.appendChild(captionText);
-
-    // Player
-    playerEl = buildPlayer();
-
-    // Curtain
+    // Curtain (for reveal transition)
     curtainEl = document.createElement('div');
-    curtainEl.className = 'intro-curtain';
+    curtainEl.className = CURTAIN_CLASS;
 
+    // Insert into DOM
     document.body.insertBefore(curtainEl, document.body.firstChild);
-    document.body.insertBefore(overlayEl, document.body.firstChild);
-    document.body.appendChild(captionWrap);
-    document.body.appendChild(playerEl);
+    document.body.insertBefore(introEl, document.body.firstChild);
+    document.body.appendChild(controls);
+
+    return {
+      scene: scene,
+      line: line,
+      grid: grid,
+      fragments: fragmentEls,
+      logo: logo,
+      name: name,
+      tagline: tagline,
+      controls: controls
+    };
   }
 
-  // ── Player Bar ────────────────────────────────────────────────────────
-  var progressFill, progressDot, timeDisplay, playBtn, muteBtn, ccBtn;
+  // ── Animation Timeline ────────────────────────────────────────────────
 
-  function buildPlayer() {
-    var bar = document.createElement('div');
-    bar.className = 'trailer-player';
-
-    var rw = mkBtn('trailer-btn-rw', IC.rw, 'Rewind 10s');
-    rw.addEventListener('click', function() { seekBy(-10); });
-
-    playBtn = mkBtn('trailer-btn-pp', IC.pause, 'Pause');
-    playBtn.addEventListener('click', function() { togglePlay(); });
-
-    var fw = mkBtn('trailer-btn-fw', IC.fw, 'Forward 10s');
-    fw.addEventListener('click', function() { seekBy(10); });
-
-    var progWrap = document.createElement('div');
-    progWrap.className = 'trailer-progress-wrap';
-    var track = document.createElement('div');
-    track.className = 'trailer-progress-track';
-    progressFill = document.createElement('div');
-    progressFill.className = 'trailer-progress-fill';
-    progressDot = document.createElement('div');
-    progressDot.className = 'trailer-progress-dot';
-    progressFill.appendChild(progressDot);
-    track.appendChild(progressFill);
-    progWrap.appendChild(track);
-    progWrap.addEventListener('click', function(e) {
-      var rect = progWrap.getBoundingClientRect();
-      var pct = Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
-      seekTo(pct * (videoEl ? videoEl.duration || 75 : 75));
-    });
-
-    timeDisplay = document.createElement('span');
-    timeDisplay.className = 'trailer-time';
-    timeDisplay.textContent = '0:00 / 0:00';
-
-    ccBtn = mkBtn('trailer-btn-cc', IC.cc, 'Toggle captions');
-    ccBtn.classList.add('active');
-    ccBtn.addEventListener('click', function() {
-      captionsVisible = !captionsVisible;
-      ccBtn.classList.toggle('active', captionsVisible);
-      captionWrap.classList.toggle('hidden', !captionsVisible);
-    });
-
-    muteBtn = mkBtn('trailer-btn-mute', IC.volOff, 'Unmute');
-    muteBtn.addEventListener('click', function() {
-      if (!audioUnlocked) { unlockAudio(); return; }
-      setMuted(!isMuted);
-    });
-
-    var closeBtn = mkBtn('trailer-btn-close', IC.close, 'Close trailer');
-    closeBtn.addEventListener('click', function() { skipTrailer(); });
-
-    bar.appendChild(rw); bar.appendChild(playBtn); bar.appendChild(fw);
-    bar.appendChild(progWrap); bar.appendChild(timeDisplay);
-    bar.appendChild(ccBtn); bar.appendChild(muteBtn); bar.appendChild(closeBtn);
-    return bar;
-  }
-
-  function mkBtn(cls, svg, label) {
-    var b = document.createElement('button');
-    b.className = cls; b.innerHTML = svg;
-    b.setAttribute('type','button');
-    b.setAttribute('aria-label', label);
-    return b;
-  }
-
-  function updateMuteBtn() {
-    if (!muteBtn) return;
-    muteBtn.innerHTML = isMuted ? IC.volOff : IC.volOn;
-    muteBtn.setAttribute('aria-label', isMuted ? 'Unmute' : 'Mute');
-  }
-
-  function updatePlayer(t) {
-    if (!progressFill||!timeDisplay||!videoEl) return;
-    var dur = videoEl.duration || 75;
-    var pct = Math.min(100,(t/dur)*100);
-    progressFill.style.width = pct+'%';
-    timeDisplay.textContent = fmt(t)+' / '+fmt(dur);
-  }
-
-  function togglePlay() {
-    if (isComplete||isSkipping||!videoEl) return;
-    if (videoEl.paused) {
-      try { videoEl.play().catch(function(){}); } catch(e) {}
-      playBtn.innerHTML = IC.pause;
-      playBtn.setAttribute('aria-label','Pause');
-    } else {
-      videoEl.pause();
-      playBtn.innerHTML = IC.play;
-      playBtn.setAttribute('aria-label','Play');
+  function createTimeline(els) {
+    if (typeof gsap === 'undefined') {
+      completeIntro();
+      return null;
     }
+
+    var tl = gsap.timeline({
+      paused: true,
+      onComplete: function () {
+        completeIntro();
+      }
+    });
+
+    // ── Phase 0: Brief darkness (builds anticipation) ── [0s → 0.6s]
+    tl.set(els.line, { width: 0 });
+    tl.to({}, { duration: 0.6 });
+
+    // ── Phase 1: Horizon line draws across ── [0.6s → 2.2s]
+    tl.to(els.line, {
+      width: 'min(80vw, 600px)',
+      duration: 1.6,
+      ease: 'power2.inOut'
+    });
+
+    // ── Phase 1.5: Show controls ── [1.2s]
+    tl.to(els.controls, {
+      opacity: 1,
+      duration: 0.6,
+      ease: 'power2.out'
+    }, 1.2);
+
+    // ── Phase 2: Text fragments appear ── [2.2s → 5.0s]
+    els.fragments.forEach(function (frag, i) {
+      var fragStart = 2.2 + (i * 0.8);
+      tl.to(frag, {
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.out'
+      }, fragStart);
+      tl.to(frag, {
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power2.in'
+      }, fragStart + 1.6);
+    });
+
+    // ── Phase 3: Grid structure fades in ── [3.8s → 5.5s]
+    tl.to(els.grid, {
+      opacity: 1,
+      duration: 1.7,
+      ease: 'power1.inOut'
+    }, 3.8);
+
+    // ── Phase 4: Line fades, grid fades ── [5.5s → 7.0s]
+    tl.to(els.line, {
+      opacity: 0,
+      duration: 1.0,
+      ease: 'power2.in'
+    }, 5.5);
+    tl.to(els.grid, {
+      opacity: 0,
+      duration: 1.0,
+      ease: 'power2.in'
+    }, 6.0);
+
+    // ── Phase 5: Logo appears ── [6.8s → 7.8s]
+    tl.fromTo(els.logo, {
+      opacity: 0,
+      y: 12,
+      scale: 0.9
+    }, {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      duration: 1.0,
+      ease: 'power3.out'
+    }, 6.8);
+
+    // ── Phase 6: Name reveals ── [7.8s → 9.0s]
+    tl.fromTo(els.name, {
+      opacity: 0,
+      y: 20
+    }, {
+      opacity: 1,
+      y: 0,
+      duration: 1.2,
+      ease: 'power3.out'
+    }, 7.8);
+
+    // ── Phase 7: Tagline reveals ── [9.0s → 10.2s]
+    tl.fromTo(els.tagline, {
+      opacity: 0,
+      y: 14
+    }, {
+      opacity: 1,
+      y: 0,
+      duration: 1.0,
+      ease: 'power3.out'
+    }, 9.0);
+
+    // ── Phase 8: Hold final composition ── [10.2s → 12.5s]
+    tl.to({}, { duration: 2.3 });
+
+    // ── Phase 9: Everything fades, reveal ── [12.5s → 14.0s]
+    tl.to([els.logo, els.name, els.tagline], {
+      opacity: 0,
+      y: -10,
+      duration: 0.8,
+      ease: 'power2.in',
+      stagger: 0.1
+    }, 12.5);
+
+    // Fade overlay
+    tl.to(introEl, {
+      opacity: 0,
+      duration: 1.0,
+      ease: 'power2.inOut'
+    }, 13.0);
+
+    // Fade controls
+    tl.to(els.controls, {
+      opacity: 0,
+      duration: 0.4,
+      ease: 'power2.in'
+    }, 12.5);
+
+    return tl;
   }
 
-  function seekTo(t) {
-    if (!videoEl) return;
-    var dur = videoEl.duration || 75;
-    t = Math.max(0, Math.min(dur-0.5, t));
-    videoEl.currentTime = t;
-    updatePlayer(t);
-    updateCaptions(t);
-  }
+  // ── Complete / Exit ───────────────────────────────────────────────────
 
-  function seekBy(delta) {
-    seekTo((videoEl ? videoEl.currentTime : 0) + delta);
-  }
-
-  // ── Sound Prompt ──────────────────────────────────────────────────────
-  function buildPrompt() {
-    promptEl = document.createElement('div');
-    promptEl.className = 'trailer-sound-prompt';
-    promptEl.setAttribute('role','button');
-    promptEl.setAttribute('aria-label','Tap for sound');
-    var pill = document.createElement('div');
-    pill.className = 'trailer-sound-pill';
-    pill.innerHTML = IC.volOn + ' Tap for sound';
-    promptEl.appendChild(pill);
-    promptEl.addEventListener('click', function() { unlockAudio(); });
-    promptEl.addEventListener('touchend', function(e) { e.preventDefault(); unlockAudio(); });
-    document.body.appendChild(promptEl);
-  }
-
-  // ── Complete / Skip ───────────────────────────────────────────────────
-  function completeTrailer() {
+  function completeIntro() {
     if (isComplete) return;
     isComplete = true;
-    markSeen();
-    if (videoEl) { try { videoEl.pause(); } catch(e) {} }
-    removePrompt();
-    if (captionWrap&&captionWrap.parentNode) captionWrap.parentNode.removeChild(captionWrap);
-    if (playerEl&&playerEl.parentNode) playerEl.parentNode.removeChild(playerEl);
+    markIntroSeen();
+
+    // Stop audio gracefully
+    var a = audio();
+    if (a && a.isActive()) {
+      a.fadeOut(0.8);
+    } else if (a) {
+      a.destroy();
+    }
+
+    // Unlock body
     document.documentElement.classList.remove('intro-active');
-    ['#main-content','header','footer','#chat-widget','#scroll-to-top','.scroll-progress'].forEach(function(sel) {
-      var el = document.querySelector(sel); if(el) el.style.visibility='';
+
+    // Make site visible
+    var mainContent = document.getElementById('main-content');
+    var header = document.querySelector('header');
+    var footer = document.querySelector('footer');
+    var chatWidget = document.getElementById('chat-widget');
+    var scrollTop = document.getElementById('scroll-to-top');
+    var scrollProgress = document.querySelector('.scroll-progress');
+
+    [mainContent, header, footer, chatWidget, scrollTop, scrollProgress].forEach(function (el) {
+      if (el) el.style.visibility = '';
     });
-    // Fade overlay
-    if (overlayEl) {
-      overlayEl.style.transition = 'opacity 0.8s ease';
-      overlayEl.style.opacity = '0';
+
+    // Animate site elements in
+    if (typeof gsap !== 'undefined') {
+      if (header) {
+        gsap.fromTo(header, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.1 });
+      }
+      if (mainContent) {
+        gsap.fromTo(mainContent, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: 'power2.out', delay: 0.15 });
+      }
     }
-    setTimeout(function() {
-      if(overlayEl&&overlayEl.parentNode) { overlayEl.setAttribute('data-state','done'); overlayEl.parentNode.removeChild(overlayEl); }
-      if(curtainEl&&curtainEl.parentNode) { curtainEl.setAttribute('data-state','done'); curtainEl.parentNode.removeChild(curtainEl); }
-      videoEl = null;
-    }, 900);
-    if(typeof ScrollTrigger!=='undefined'&&ScrollTrigger.refresh) setTimeout(function(){ScrollTrigger.refresh();},1000);
+
+    // Clean up DOM
+    requestAnimationFrame(function () {
+      setTimeout(function () {
+        if (introEl && introEl.parentNode) {
+          introEl.setAttribute('data-state', 'done');
+          introEl.parentNode.removeChild(introEl);
+        }
+        if (curtainEl && curtainEl.parentNode) {
+          curtainEl.setAttribute('data-state', 'done');
+          curtainEl.parentNode.removeChild(curtainEl);
+        }
+        // Remove controls container
+        var controls = document.querySelector('.intro-controls');
+        if (controls && controls.parentNode) {
+          controls.parentNode.removeChild(controls);
+        }
+        skipBtn = null;
+        soundBtn = null;
+        if (timeline) {
+          timeline.kill();
+          timeline = null;
+        }
+      }, 500);
+    });
+
+    // Re-trigger ScrollTrigger refresh
+    if (typeof ScrollTrigger !== 'undefined' && ScrollTrigger.refresh) {
+      setTimeout(function () { ScrollTrigger.refresh(); }, 600);
+    }
+
     addReplayLink();
-    showWatchBtn();
   }
 
-  function skipTrailer() {
-    if (isSkipping||isComplete) return;
+  function skipIntro() {
+    if (isSkipping || isComplete) return;
     isSkipping = true;
-    // Fade video volume
-    if (videoEl && !videoEl.muted) {
-      var step=0, steps=8, orig=videoEl.volume;
-      var iv = setInterval(function() { step++; if(step>=steps){clearInterval(iv);return;} videoEl.volume=Math.max(0,orig*(1-step/steps)); }, 50);
+
+    // Fade audio quickly
+    var a = audio();
+    if (a && a.isActive()) {
+      a.fadeOut(0.4);
     }
-    if (videoEl) setTimeout(function() { try{videoEl.pause();}catch(e){} }, 400);
-    if (overlayEl) {
-      overlayEl.style.transition = 'opacity 0.6s ease';
-      overlayEl.style.opacity = '0';
+
+    if (timeline) {
+      timeline.pause();
     }
-    if (playerEl) { playerEl.style.transition='opacity 0.3s ease'; playerEl.style.opacity='0'; }
-    if (captionWrap) { captionWrap.style.transition='opacity 0.3s ease'; captionWrap.style.opacity='0'; }
-    setTimeout(completeTrailer, 700);
+
+    if (typeof gsap !== 'undefined') {
+      gsap.to(introEl, {
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power2.inOut',
+        onComplete: completeIntro
+      });
+      var controls = document.querySelector('.intro-controls');
+      if (controls) {
+        gsap.to(controls, {
+          opacity: 0,
+          duration: 0.3,
+          ease: 'power2.in'
+        });
+      }
+    } else {
+      if (introEl) introEl.style.opacity = '0';
+      setTimeout(completeIntro, 400);
+    }
   }
 
-  // ── Replay ────────────────────────────────────────────────────────────
+  // ── Replay affordance ─────────────────────────────────────────────────
+
   function addReplayLink() {
     var footer = document.querySelector('footer .border-t');
-    if (!footer||footer.querySelector('.intro-replay-link')) return;
+    if (!footer || footer.querySelector('.intro-replay-link')) return;
+
     var link = document.createElement('button');
-    link.type='button'; link.className='intro-replay-link';
-    link.style.cssText='display:block;margin:1rem auto 0;font-size:0.75rem;color:inherit;background:none;border:none;font-family:inherit;padding:0.25rem 0.5rem;';
-    link.textContent='Replay trailer';
-    link.addEventListener('click', function() { try{localStorage.removeItem(STORAGE_KEY);}catch(e){} location.reload(); });
+    link.type = 'button';
+    link.className = 'intro-replay-link';
+    link.style.cssText = 'display:block;margin:1rem auto 0;font-size:0.75rem;color:inherit;background:none;border:none;font-family:inherit;padding:0.25rem 0.5rem;';
+    link.textContent = 'Replay intro';
+    link.setAttribute('aria-label', 'Replay the site intro sequence');
+    link.addEventListener('click', function () {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      window.location.reload();
+    });
     footer.appendChild(link);
   }
-  function showWatchBtn() {
-    document.querySelectorAll('.watch-trailer-btn').forEach(function(b) {
-      b.style.display='';
-      b.addEventListener('click', function() { try{localStorage.removeItem(STORAGE_KEY);}catch(e){} location.reload(); });
-    });
-  }
 
-  // ── Reduced Motion ────────────────────────────────────────────────────
-  function runReduced() {
-    overlayEl = document.createElement('div');
-    overlayEl.id='cinematic-intro';
-    overlayEl.style.cssText='position:fixed;inset:0;z-index:100000;background:#0a0b10;display:flex;align-items:center;justify-content:center;';
-    var nm = document.createElement('div');
-    nm.style.cssText='font-family:Inter,sans-serif;font-weight:600;font-size:clamp(1.5rem,4vw,2.5rem);color:#fff;letter-spacing:-0.02em;text-align:center;padding:2rem;';
-    nm.textContent='Estivan Ayramia';
-    overlayEl.appendChild(nm);
-    document.body.insertBefore(overlayEl, document.body.firstChild);
+  // ── Reduced-motion path ───────────────────────────────────────────────
+
+  function runReducedMotion() {
+    introEl = document.createElement('div');
+    introEl.id = INTRO_ID;
+    introEl.style.cssText = 'position:fixed;inset:0;z-index:100000;background:#0a0b10;display:flex;align-items:center;justify-content:center;flex-direction:column;';
+
+    var name = document.createElement('div');
+    name.style.cssText = 'font-family:Inter,Helvetica,Arial,sans-serif;font-weight:600;font-size:clamp(1.5rem,4vw,2.5rem);color:#fff;letter-spacing:-0.02em;text-align:center;padding:2rem;';
+    name.textContent = 'Estivan Ayramia';
+    introEl.appendChild(name);
+
+    document.body.insertBefore(introEl, document.body.firstChild);
     document.documentElement.classList.add('intro-active');
-    setTimeout(function() { overlayEl.style.transition='opacity 0.4s ease'; overlayEl.style.opacity='0'; setTimeout(completeTrailer, 450); }, 1500);
+
+    setTimeout(function () {
+      introEl.style.transition = 'opacity 0.4s ease';
+      introEl.style.opacity = '0';
+      setTimeout(function () {
+        completeIntro();
+      }, 450);
+    }, 1500);
   }
 
-  // ── Events ────────────────────────────────────────────────────────────
+  // ── Event Bindings ────────────────────────────────────────────────────
+
   function bindEvents() {
-    overlayEl.addEventListener('click', function() { if(!audioUnlocked) unlockAudio(); });
-    overlayEl.addEventListener('touchend', function() { if(!audioUnlocked) unlockAudio(); });
-    function onKey(e) {
-      if(isComplete) { document.removeEventListener('keydown',onKey); return; }
-      if(!audioUnlocked) unlockAudio();
-      if(e.key==='Escape') { e.preventDefault(); skipTrailer(); }
-      else if(e.key===' ') { e.preventDefault(); togglePlay(); }
-      else if(e.key==='ArrowLeft') { e.preventDefault(); seekBy(-5); }
-      else if(e.key==='ArrowRight') { e.preventDefault(); seekBy(5); }
-      else if(e.key==='m'||e.key==='M') { if(audioUnlocked) setMuted(!isMuted); }
-      else if(e.key==='c'||e.key==='C') { ccBtn&&ccBtn.click(); }
+    // Skip button
+    if (skipBtn) {
+      skipBtn.addEventListener('click', function () {
+        tryStartAudio(); // User gesture — try audio
+        skipIntro();
+      });
     }
-    document.addEventListener('keydown', onKey);
+
+    // Sound toggle
+    if (soundBtn) {
+      soundBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var a = audio();
+        if (!a) return;
+        // First click: start audio if not started
+        if (!audioAttempted) {
+          tryStartAudio();
+          // Don't toggle mute on first click — first click unmutes
+          return;
+        }
+        a.toggleMute();
+        updateSoundButtonState();
+      });
+    }
+
+    // Click anywhere on overlay = try to start audio (user gesture)
+    introEl.addEventListener('click', function () {
+      tryStartAudio();
+    });
+
+    // Keyboard: Escape, Enter, or Space to skip
+    function onKeyDown(e) {
+      if (isComplete) {
+        document.removeEventListener('keydown', onKeyDown);
+        return;
+      }
+      // Any keypress counts as user gesture for audio
+      tryStartAudio();
+      if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        skipIntro();
+      }
+    }
+    document.addEventListener('keydown', onKeyDown);
   }
 
   // ── Init ──────────────────────────────────────────────────────────────
+
   function init() {
-    if (!isHome()) { addReplayLink(); showWatchBtn(); return; }
-    if (hasSeen()) { addReplayLink(); showWatchBtn(); return; }
-    if (reducedMotion()) { markSeen(); runReduced(); return; }
+    // Gate: only show on homepage
+    if (!isHomepage()) {
+      addReplayLink();
+      return;
+    }
 
+    // Gate: already seen
+    if (hasSeenIntro()) {
+      addReplayLink();
+      return;
+    }
+
+    // Reduced motion path (no audio)
+    if (prefersReducedMotion()) {
+      markIntroSeen();
+      runReducedMotion();
+      return;
+    }
+
+    // Lock the body
     document.documentElement.classList.add('intro-active');
-    document.querySelectorAll('.watch-trailer-btn').forEach(function(b){b.style.display='none';});
 
-    createVideo();
-    loadCaptions(function(){});
-    buildDOM();
+    // Record start time
+    startTime = performance.now();
+
+    // Build DOM
+    var els = buildIntroDOM();
+
+    // Bind events
     bindEvents();
 
-    // Show player
-    setTimeout(function() { playerEl.classList.add('visible'); }, 500);
+    // Wait for GSAP, then start (load from CDN if mobile deferred it)
+    var gsapRetries = 0;
+    var MAX_GSAP_RETRIES = 40; // ~2s of polling
 
-    // Try autoplay (muted for compliance)
-    probeAutoplay().then(function(ok) {
-      if (ok) {
-        // Video autoplaying muted. Show prompt for sound.
-        buildPrompt();
+    function loadGsapCDN(cb) {
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+      s.onload = function () { cb(); };
+      s.onerror = function () { completeIntro(); }; // Can't load GSAP — reveal site
+      document.head.appendChild(s);
+    }
+
+    function tryStart() {
+      if (typeof gsap !== 'undefined') {
+        timeline = createTimeline(els);
+        if (timeline) {
+          timeline.play();
+        }
       } else {
-        // Can't autoplay at all. Show prompt.
-        buildPrompt();
+        gsapRetries++;
+        if (gsapRetries < MAX_GSAP_RETRIES) {
+          setTimeout(tryStart, 50);
+        } else {
+          // GSAP not loaded (mobile deferred load) — load from CDN
+          loadGsapCDN(function () {
+            if (typeof gsap !== 'undefined') {
+              timeline = createTimeline(els);
+              if (timeline) {
+                // Adjust start position to account for wait time
+                var waited = gsapRetries * 0.05;
+                timeline.play();
+                timeline.time(Math.min(waited, 0.6)); // Skip past darkness phase
+              }
+            } else {
+              completeIntro(); // Fallback: reveal site
+            }
+          });
+        }
       }
+    }
+
+    requestAnimationFrame(function () {
+      setTimeout(tryStart, 80);
     });
   }
 
-  if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', init, {once:true});
-  else init();
+  // ── Boot ──────────────────────────────────────────────────────────────
 
-  window.__replayIntro = function() { try{localStorage.removeItem(STORAGE_KEY);}catch(e){} location.reload(); };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+
+  window.__replayIntro = function () {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    window.location.reload();
+  };
+
 })();

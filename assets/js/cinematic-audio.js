@@ -36,7 +36,7 @@
   var isStarted = false;
   var isDestroyed = false;
   var scheduledNodes = [];  // Track all active nodes for cleanup
-  var targetVolume = 0.15;  // Master volume — quiet, voiceover dominates
+  var targetVolume = 0.35;  // Master volume (0–1), tuned for tasteful presence
 
   // ── AudioContext Creation ──────────────────────────────────────────────
 
@@ -422,22 +422,6 @@
      */
     isActive: function () {
       return isStarted && !isDestroyed;
-    },
-
-    /**
-     * Set muted state directly (for player integration)
-     */
-    setMuted: function (muted) {
-      isMuted = muted;
-      if (masterGain && ctx && ctx.state === 'running') {
-        try {
-          var now = ctx.currentTime;
-          masterGain.gain.cancelScheduledValues(now);
-          masterGain.gain.setValueAtTime(masterGain.gain.value, now);
-          if (muted) masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
-          else masterGain.gain.linearRampToValueAtTime(targetVolume, now + 0.15);
-        } catch (e) {}
-      }
     }
   };
 
