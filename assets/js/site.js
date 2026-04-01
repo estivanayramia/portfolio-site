@@ -406,6 +406,40 @@ const __initCarouselAndLightbox = () => {
             galleryRoot.dataset.luxuryMiniInit = '1';
             galleryRoot.dataset.galleryCoverflowInit = 'true';
             galleryRoot.dataset.coverflowReady = 'true';
+
+            // Add visible counter beneath carousel
+            const counterEl = document.createElement('div');
+            counterEl.className = 'gallery-carousel-counter';
+            counterEl.style.cssText = 'text-align:center;margin-top:0.75rem;font-size:0.8rem;color:rgba(54,32,23,0.55);font-variant-numeric:tabular-nums;letter-spacing:0.04em;';
+            counterEl.textContent = `1 / ${slides.length}`;
+            galleryRoot.parentNode.insertBefore(counterEl, galleryRoot.nextSibling);
+
+            // Update counter on slide change
+            const origCallback = instance.config?.callbacks?.onSlideChange;
+            if (instance.config && instance.config.callbacks) {
+                const prevOnChange = instance.config.callbacks.onSlideChange;
+                instance.config.callbacks.onSlideChange = (index) => {
+                    counterEl.textContent = `${index + 1} / ${slides.length}`;
+                    if (prevOnChange) prevOnChange(index);
+                };
+            }
+            // Also hook into goToSlide for more reliable updates
+            const origGoToSlide = instance.goToSlide?.bind(instance);
+            if (origGoToSlide) {
+                const origRender = instance.renderPosition?.bind(instance);
+                // Update counter whenever currentIndex changes
+                const updateCounter = () => {
+                    const idx = instance.currentIndex ?? 0;
+                    counterEl.textContent = `${idx + 1} / ${slides.length}`;
+                };
+                // Poll briefly to catch initial render
+                let counterPollCount = 0;
+                const counterPoll = setInterval(() => {
+                    updateCounter();
+                    if (++counterPollCount > 5) clearInterval(counterPoll);
+                }, 500);
+            }
+
             return true;
         };
 
