@@ -627,6 +627,22 @@ html.intro-active .scroll-progress {
   height: 10px;
 }
 
+/* Dark mode */
+[data-theme="dark"] .watch-trailer-btn {
+  color: rgba(225, 212, 194, 0.6);
+  border-color: rgba(225, 212, 194, 0.15);
+  background: rgba(225, 212, 194, 0.04);
+}
+
+[data-theme="dark"] .watch-trailer-btn:hover {
+  color: rgba(225, 212, 194, 0.85);
+  border-color: rgba(225, 212, 194, 0.3);
+}
+
+[data-theme="dark"] .watch-trailer-btn:focus-visible {
+  outline-color: rgba(225, 212, 194, 0.4);
+}
+
 /* Replay button in footer (subtle) */
 .intro-replay-link {
   cursor: pointer;
