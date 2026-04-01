@@ -543,16 +543,20 @@ body {
    ========================================================================== */
 
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #e1d4c2;
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #362017;
-    border-radius: 6px;
+    background: rgba(54, 32, 23, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: rgba(54, 32, 23, 0.5);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -561,15 +565,15 @@ body {
 
 /* Dark Mode Scrollbar */
 [data-theme="dark"] ::-webkit-scrollbar-track {
-    background: #212842;
+    background: transparent;
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
-    background: #e1d4c2;
+    background: rgba(225, 212, 194, 0.3);
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-    background: #ffffff;
+    background: rgba(225, 212, 194, 0.5);
 }
 
 /* ==========================================================================
@@ -2528,7 +2532,8 @@ footer, .section-below-fold {
     top: 0;
     left: 0;
     right: 0;
-    width: 100%;
+    /* width: 100% removed — left:0 + right:0 already spans full width.
+       Adding width:100% on top can cause overflow past scrollbar. */
     height: 3px;
     background: transparent;
     z-index: 9998;
@@ -2858,13 +2863,10 @@ footer {
     z-index: 40;
 }
 
-/* Desktop: ensure chat widget clears footer */
+/* Chat widget: keep above footer. The footer is ~200px tall.
+   On desktop the widget sits at bottom-right. 28px is the base position
+   which works fine mid-page. The overlap only matters at the very bottom
+   of the page which is an acceptable tradeoff vs floating too high. */
 #chat-widget {
     bottom: 28px;
-}
-/* When scrolled near bottom, lift chat higher to avoid footer overlap */
-@media (min-width: 641px) {
-    #chat-widget {
-        bottom: 28px;
-    }
 }
