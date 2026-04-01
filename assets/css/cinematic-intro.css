@@ -1,6 +1,6 @@
 /**
- * CINEMATIC SITE TRAILER V3
- * 75s scene-based trailer with voiceover, captions, player controls
+ * CINEMATIC SITE TRAILER V4 — Video-Based
+ * Styles for video player, captions, controls, watch button
  */
 
 /* === Body Lock === */
@@ -15,119 +15,9 @@ html.intro-active #chat-widget, html.intro-active #scroll-to-top, html.intro-act
 /* === Trailer Overlay === */
 #cinematic-intro {
   position: fixed; inset: 0; z-index: 100000;
-  background: #0a0b10;
-  overflow: hidden;
+  background: #0a0b10; overflow: hidden;
   -webkit-font-smoothing: antialiased;
   font-family: 'Inter', Helvetica, Arial, sans-serif;
-}
-/* Grain texture */
-#cinematic-intro::before {
-  content: ''; position: absolute; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 200px; opacity: 0.02; pointer-events: none; mix-blend-mode: overlay; z-index: 1;
-}
-
-/* === Scene Layers === */
-.trailer-scene {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; padding: 2rem;
-  opacity: 0; will-change: opacity, transform;
-  pointer-events: none; z-index: 2;
-}
-
-/* Scene background images */
-.trailer-bg {
-  position: absolute; inset: 0;
-  background-size: cover; background-position: center;
-  opacity: 0; will-change: opacity, transform;
-  z-index: 0;
-}
-.trailer-bg::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(to bottom, rgba(10,11,16,0.5) 0%, rgba(10,11,16,0.3) 50%, rgba(10,11,16,0.6) 100%);
-}
-
-/* === Scene 1: Resume Fragments === */
-.trailer-frag {
-  position: absolute;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-weight: 300;
-  color: rgba(120, 130, 155, 0.3);
-  white-space: nowrap; opacity: 0;
-  user-select: none;
-}
-
-/* === Scene 2: Identity === */
-.trailer-name {
-  font-weight: 700; font-size: clamp(2rem, 5.5vw, 4rem);
-  letter-spacing: -0.03em; line-height: 1.05; color: #fff; opacity: 0;
-}
-.trailer-monogram {
-  width: clamp(48px, 8vw, 72px); height: auto;
-  opacity: 0; margin-bottom: 1.25rem;
-}
-.trailer-origin {
-  font-weight: 400; font-size: clamp(0.7rem, 1.2vw, 0.875rem);
-  letter-spacing: 0.2em; text-transform: uppercase;
-  color: rgba(225, 212, 194, 0.5);
-  margin-top: 1rem; opacity: 0;
-}
-
-/* === Scene 4: System Words === */
-.trailer-word {
-  font-weight: 700; font-size: clamp(2rem, 6vw, 4.5rem);
-  letter-spacing: -0.02em; line-height: 1.2;
-  opacity: 0; margin: 0.1em 0;
-}
-.trailer-word.on-dark { color: #ffffff; }
-.trailer-word.on-light { color: #212842; }
-.trailer-subtitle {
-  font-weight: 400; font-size: clamp(0.875rem, 1.5vw, 1.125rem);
-  color: rgba(225,212,194,0.7); margin-top: 1rem; opacity: 0;
-}
-
-/* === Scene 6: Arcade === */
-.trailer-arcade-icons {
-  display: flex; gap: 1.25rem; flex-wrap: wrap; justify-content: center;
-}
-.trailer-arcade-icon {
-  font-size: 1.75rem; opacity: 0;
-}
-.trailer-arcade-label {
-  font-weight: 600; font-size: clamp(1rem, 2vw, 1.5rem);
-  color: #fff; letter-spacing: 0.02em; margin-top: 1rem; opacity: 0;
-}
-
-/* === Scene 7: Savonie === */
-.trailer-savonie-avatar {
-  width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
-  opacity: 0; box-shadow: 0 0 30px rgba(225,212,194,0.15);
-}
-.trailer-savonie-bubble {
-  background: rgba(255,255,255,0.08); backdrop-filter: blur(12px);
-  border-radius: 16px 16px 16px 4px; padding: 0.75rem 1.25rem;
-  margin-top: 1rem; color: rgba(225,212,194,0.85);
-  font-size: clamp(0.8125rem, 1.2vw, 0.9375rem); opacity: 0;
-  max-width: 280px;
-}
-.trailer-savonie-name {
-  font-weight: 600; font-size: 0.75rem; letter-spacing: 0.06em;
-  color: rgba(225,212,194,0.5); margin-top: 0.5rem; opacity: 0;
-}
-
-/* === Scene 8: Values === */
-.trailer-values-row {
-  display: flex; gap: clamp(1.5rem, 4vw, 3rem); align-items: center;
-}
-.trailer-value {
-  font-weight: 600; font-size: clamp(1.25rem, 3vw, 2rem);
-  letter-spacing: 0.06em; text-transform: uppercase;
-  color: rgba(225,212,194,0.8); opacity: 0;
-}
-.trailer-value-dot {
-  width: 4px; height: 4px; border-radius: 50%;
-  background: rgba(225,212,194,0.3); opacity: 0;
 }
 
 /* === Captions === */
@@ -138,12 +28,12 @@ html.intro-active #chat-widget, html.intro-active #scroll-to-top, html.intro-act
 }
 .trailer-caption-text {
   display: inline-block;
-  background: rgba(0,0,0,0.45); backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
   border-radius: 8px; padding: 0.5rem 1rem;
-  color: rgba(255,255,255,0.92);
+  color: rgba(255,255,255,0.95);
   font-family: 'Inter', sans-serif; font-size: clamp(0.8125rem, 1.3vw, 1rem);
   font-weight: 400; line-height: 1.6; letter-spacing: 0.005em;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
   opacity: 0; transition: opacity 200ms ease;
 }
 .trailer-caption-text.visible { opacity: 1; }
@@ -154,18 +44,15 @@ html.intro-active #chat-widget, html.intro-active #scroll-to-top, html.intro-act
   position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
   z-index: 100003;
   display: flex; align-items: center; gap: 0.5rem;
-  max-width: min(700px, calc(100vw - 2rem));
-  width: 100%;
+  max-width: min(700px, calc(100vw - 2rem)); width: 100%;
   padding: 0.5rem 0.875rem;
-  background: rgba(0,0,0,0.5); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  background: rgba(0,0,0,0.55); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 14px;
-  opacity: 0; will-change: opacity;
-  pointer-events: none;
+  opacity: 0; will-change: opacity; pointer-events: none;
 }
 .trailer-player.visible { opacity: 1; pointer-events: auto; }
 
-/* Player buttons */
 .trailer-player button {
   display: flex; align-items: center; justify-content: center;
   width: 32px; height: 32px; border: none; background: none;
@@ -177,6 +64,7 @@ html.intro-active #chat-widget, html.intro-active #scroll-to-top, html.intro-act
 .trailer-player button:hover { background: rgba(255,255,255,0.1); color: #fff; }
 .trailer-player button:focus-visible { outline: 2px solid rgba(225,212,194,0.5); outline-offset: 2px; }
 .trailer-player button svg { width: 16px; height: 16px; }
+.trailer-player button.active { color: rgba(225,212,194,0.9); }
 
 /* Progress bar */
 .trailer-progress-wrap {
@@ -201,15 +89,11 @@ html.intro-active #chat-widget, html.intro-active #scroll-to-top, html.intro-act
 }
 .trailer-progress-wrap:hover .trailer-progress-dot { opacity: 1; }
 
-/* Time display */
 .trailer-time {
   font-size: 0.6875rem; color: rgba(255,255,255,0.5);
   white-space: nowrap; min-width: 70px; text-align: center;
   font-variant-numeric: tabular-nums; letter-spacing: 0.02em;
 }
-
-/* CC toggle active state */
-.trailer-player button.active { color: rgba(225,212,194,0.9); }
 
 /* Mobile */
 @media (max-width: 640px) {
@@ -228,7 +112,7 @@ html.intro-active #chat-widget, html.intro-active #scroll-to-top, html.intro-act
 .trailer-sound-prompt {
   position: fixed; inset: 0; z-index: 100004;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
+  cursor: pointer; transition: opacity 0.3s ease;
 }
 .trailer-sound-pill {
   display: flex; align-items: center; gap: 0.5rem;
@@ -237,7 +121,6 @@ html.intro-active #chat-widget, html.intro-active #scroll-to-top, html.intro-act
   border: 1px solid rgba(225,212,194,0.15);
   color: rgba(225,212,194,0.8); font-family: 'Inter', sans-serif;
   font-size: 0.875rem; font-weight: 400; letter-spacing: 0.02em;
-  transition: transform 0.4s ease;
 }
 
 /* === Curtain === */
@@ -253,11 +136,10 @@ html.intro-active #chat-widget, html.intro-active #scroll-to-top, html.intro-act
 
 /* === Reduced Motion === */
 @media (prefers-reduced-motion: reduce) {
-  #cinematic-intro, .intro-curtain { transition: opacity 0.3s ease !important; animation: none !important; }
-  #cinematic-intro *, .intro-curtain * { animation: none !important; transition-duration: 0.1s !important; }
+  #cinematic-intro, .intro-curtain { transition: opacity 0.3s ease !important; }
 }
 
-/* === Watch Trailer Button (homepage) === */
+/* === Watch Trailer Button === */
 .watch-trailer-btn {
   display: inline-flex; align-items: center; gap: 0.375rem;
   padding: 0.375rem 0.75rem;
@@ -270,15 +152,11 @@ html.intro-active #chat-widget, html.intro-active #scroll-to-top, html.intro-act
   -webkit-appearance: none; appearance: none; outline: none;
   margin-top: 1rem;
 }
-.watch-trailer-btn:hover {
-  color: rgba(54,32,23,0.8); border-color: rgba(54,32,23,0.3);
-}
-.watch-trailer-btn:focus-visible {
-  outline: 2px solid rgba(33,40,66,0.4); outline-offset: 2px;
-}
+.watch-trailer-btn:hover { color: rgba(54,32,23,0.8); border-color: rgba(54,32,23,0.3); }
+.watch-trailer-btn:focus-visible { outline: 2px solid rgba(33,40,66,0.4); outline-offset: 2px; }
 .watch-trailer-btn svg { width: 12px; height: 12px; }
 
-/* Replay link in footer */
+/* Replay link */
 .intro-replay-link {
   cursor: pointer; opacity: 0.5; transition: opacity 180ms ease;
 }
