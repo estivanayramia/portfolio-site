@@ -1200,6 +1200,18 @@ export function isRedirectOnlyReply(reply) {
 // - Source attribution instruction
 // - ICE-structured rules replace scattered rules
 // ═══════════════════════════════════════════════════════════════════════
+function computeCurrentAge() {
+  const birthDate = new Date(PERSONAL_KNOWLEDGE.identity.birthday);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const hasHadBirthdayThisYear = (
+    today.getMonth() > birthDate.getMonth()
+    || (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate())
+  );
+  if (!hasHadBirthdayThisYear) age -= 1;
+  return age;
+}
+
 export function buildModelContext({
   message,
   language,
@@ -1299,6 +1311,7 @@ SECTION 3 — CONSTRAINTS (what NOT to do)
 ANTI-HALLUCINATION — CORE RULE (read this now and again before answering):
 Only use facts from the verified knowledge base below and the retrieved pages.
 Do NOT invent ANY detail that is not present in the knowledge base.
+When asked about age, use ONLY the pre-computed age provided in the IDENTITY section. Do NOT attempt to calculate age yourself — LLMs are unreliable at date arithmetic.
 
 BANNED LANGUAGE — Never use these phrases: ${BANNED_LANGUAGE.map((p) => '"' + p + '"').join(", ")}
 
@@ -1328,7 +1341,7 @@ Everything below is confirmed fact from the site. Use it freely and thoroughly.
 IDENTITY:
 - Full name: ${pk.identity.fullName}
 - Heritage: ${pk.identity.heritage}
-- Born: ${pk.identity.birthplace} on ${pk.identity.birthday}
+- Born: ${pk.identity.birthplace} on ${pk.identity.birthday} (he is currently ${computeCurrentAge()} years old)
 - Path: ${pk.identity.refugeeHistory}
 - Based in: ${pk.identity.hometown}
 - Height: ${pk.identity.height}
@@ -1422,6 +1435,9 @@ SECTION 7 — CONVERSATION CONTEXT
 
 RECENT CONVERSATION:
 ${conversationSummary}
+
+FOLLOW-UP HANDLING:
+If the user says something short like "tell me more", "okay tell me about it", "what about that", or "go on", look at the RECENT CONVERSATION above to determine what topic they are referring to. Stay on that topic. Do not switch to a random page or generic overview.
 
 CURRENT PAGE THE USER IS VIEWING:
 - Route: ${pageContext.route || "/"}

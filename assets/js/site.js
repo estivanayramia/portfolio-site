@@ -802,8 +802,8 @@ const initAnimations = () => {
 
     // Fade Up Animations
     const fadeElements = document.querySelectorAll('[data-gsap="fade-up"]');
-    const fadeDistance = isMobile ? 20 : 28;
-    const fadeDuration = isMobile ? 0.72 : 0.86;
+    const fadeDistance = isMobile ? 16 : 22;
+    const fadeDuration = isMobile ? 1.0 : 1.2;
     const fadeStart = isMobile ? 'top 93%' : 'top 90%';
     const viewportThreshold = (typeof window !== 'undefined' && window.innerHeight)
         ? window.innerHeight * (isMobile ? 0.92 : 0.88)
@@ -886,10 +886,10 @@ const initAnimations = () => {
     const cards = document.querySelectorAll('.card-hover');
     cards.forEach(card => {
         card.addEventListener('mouseenter', () => {
-            gsap.to(card, { y: -8, duration: 0.3, ease: 'power2.out' });
+            gsap.to(card, { y: -6, duration: 0.45, ease: 'power2.out' });
         });
         card.addEventListener('mouseleave', () => {
-            gsap.to(card, { y: 0, duration: 0.3, ease: 'power2.out' });
+            gsap.to(card, { y: 0, duration: 0.45, ease: 'power2.out' });
         });
     });
 };
