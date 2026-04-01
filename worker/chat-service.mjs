@@ -219,7 +219,7 @@ const SURFACE_FACT_PATTERNS = [
   { key: "favorite_team", pattern: /\bbarcelona|fc barcelona|favorite team|sports team\b/i },
   { key: "favorite_sport", pattern: /\b(favo[u]?rite|best).*(sport|sports)|what.*sport.*(favorite|play)\b/i },
   { key: "languages", pattern: /\blanguages?|speak|write in|english|arabic|chaldean|spanish\b/i },
-  { key: "education", pattern: /\b(graduat(e|ed|ion)|degree|college|university|school|sdsu|major)\b/i },
+  { key: "education", pattern: /\b(education|graduat(e|ed|ion)|degree|college|university|school|sdsu|major|studied)\b/i },
   { key: "birthday", pattern: /\bbirthday\b|\bborn on\b|\bwhen.*born\b|\bage\b|\bhow old\b|\bold is\b/i },
   { key: "hometown", pattern: /\bwhere.*from|hometown|grew up|el cajon|baghdad|born in\b/i },
   { key: "height", pattern: /\bheight|how tall|tall\b/i },
@@ -751,7 +751,7 @@ function classifyQuestion(message) {
   if (/\b(resume|cv|download)\b/.test(lower)) {
     return QUESTION_CLASSES.RESUME;
   }
-  if (/\b(why hire|more experience|hire you|hire him|worth interviewing)\b/.test(lower)) {
+  if (/\b(why hire|more experience|hire you|hire him|worth interviewing|recruiter|quick pitch|elevator pitch|sell me on|convince me|pitch me)\b/.test(lower)) {
     return QUESTION_CLASSES.HIRE_CASE;
   }
   if (/\b(mostly ai|just ai|is this ai|real skill|actually skilled)\b/.test(lower)) {
