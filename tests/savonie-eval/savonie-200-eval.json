@@ -1,0 +1,2461 @@
+{
+  "version": "1.0",
+  "date": "2026-04-01",
+  "description": "200-question evaluation suite for Savonie AI assistant",
+  "categories": [
+    {
+      "name": "Greetings & First Contact",
+      "questions": [
+        {
+          "q": "Hi",
+          "intent": "greeting",
+          "must": [
+            "warm response",
+            "not a redirect"
+          ],
+          "mustNot": [
+            "long paragraph",
+            "list of links"
+          ]
+        },
+        {
+          "q": "Hey, what is this?",
+          "intent": "site intro",
+          "must": [
+            "explain site purpose",
+            "mention Estivan"
+          ],
+          "mustNot": [
+            "redirect only"
+          ]
+        },
+        {
+          "q": "What can you help me with?",
+          "intent": "capability",
+          "must": [
+            "explain what Savonie does"
+          ],
+          "mustNot": [
+            "generic AI response"
+          ]
+        },
+        {
+          "q": "Who are you?",
+          "intent": "identity",
+          "must": [
+            "Savonie",
+            "AI assistant",
+            "Estivan"
+          ],
+          "mustNot": [
+            "I am an AI language model"
+          ]
+        },
+        {
+          "q": "Is this a real person's site?",
+          "intent": "authenticity",
+          "must": [
+            "yes",
+            "Estivan Ayramia"
+          ],
+          "mustNot": [
+            "I cannot confirm"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Identity & Background",
+      "questions": [
+        {
+          "q": "Who is Estivan?",
+          "intent": "identity overview",
+          "must": [
+            "Chaldean",
+            "SDSU",
+            "El Cajon"
+          ],
+          "mustNot": [
+            "redirect to about"
+          ]
+        },
+        {
+          "q": "Where is he from?",
+          "intent": "origin",
+          "must": [
+            "Baghdad",
+            "Iraq"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "How old is Estivan?",
+          "intent": "age",
+          "must": [
+            "22",
+            "January 21, 2004"
+          ],
+          "mustNot": [
+            "calculate",
+            "approximately"
+          ]
+        },
+        {
+          "q": "What's his background?",
+          "intent": "heritage",
+          "must": [
+            "Chaldean",
+            "refugee",
+            "first-generation"
+          ],
+          "mustNot": [
+            "redirect only"
+          ]
+        },
+        {
+          "q": "What is Chaldean?",
+          "intent": "culture",
+          "must": [
+            "ancient community",
+            "Mesopotamian",
+            "Neo-Aramaic"
+          ],
+          "mustNot": [
+            "I don't know"
+          ]
+        },
+        {
+          "q": "Does he have siblings?",
+          "intent": "family",
+          "must": [
+            "brothers",
+            "youngest"
+          ],
+          "mustNot": [
+            "no information"
+          ]
+        },
+        {
+          "q": "Where did his family come from?",
+          "intent": "heritage detail",
+          "must": [
+            "Baghdad",
+            "Syria",
+            "refugee"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Is he first generation?",
+          "intent": "identity",
+          "must": [
+            "yes",
+            "first-generation American"
+          ],
+          "mustNot": [
+            "uncertain"
+          ]
+        },
+        {
+          "q": "What languages does he speak?",
+          "intent": "languages",
+          "must": [
+            "English",
+            "Arabic",
+            "Chaldean",
+            "Spanish"
+          ],
+          "mustNot": [
+            "only English"
+          ]
+        },
+        {
+          "q": "Can he write in Arabic?",
+          "intent": "language detail",
+          "must": [
+            "yes",
+            "writing"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Education",
+      "questions": [
+        {
+          "q": "Where did he go to school?",
+          "intent": "education",
+          "must": [
+            "SDSU",
+            "San Diego State"
+          ],
+          "mustNot": [
+            "no information"
+          ]
+        },
+        {
+          "q": "What did he study?",
+          "intent": "major",
+          "must": [
+            "General Business",
+            "Business Administration"
+          ],
+          "mustNot": [
+            "computer science"
+          ]
+        },
+        {
+          "q": "What's his GPA?",
+          "intent": "academic",
+          "must": [
+            "3.7",
+            "3.8",
+            "3.71"
+          ],
+          "mustNot": [
+            "4.0",
+            "unknown"
+          ]
+        },
+        {
+          "q": "When did he graduate?",
+          "intent": "graduation",
+          "must": [
+            "December 2025"
+          ],
+          "mustNot": [
+            "2024",
+            "2026"
+          ]
+        },
+        {
+          "q": "Did he study marketing?",
+          "intent": "coursework",
+          "must": [
+            "Interactive Marketing",
+            "MKTG 476"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "Who taught his marketing class?",
+          "intent": "instructor",
+          "must": [
+            "Isa Grimes"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Work Experience",
+      "questions": [
+        {
+          "q": "What does he do for work?",
+          "intent": "current role",
+          "must": [
+            "coach",
+            "kids",
+            "549 Sports"
+          ],
+          "mustNot": [
+            "unemployed"
+          ]
+        },
+        {
+          "q": "Has he been promoted?",
+          "intent": "promotion",
+          "must": [
+            "yes",
+            "lead",
+            "14 months"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "What other jobs has he had?",
+          "intent": "work history",
+          "must": [
+            "retail",
+            "delivery"
+          ],
+          "mustNot": [
+            "none"
+          ]
+        },
+        {
+          "q": "What did he learn from working with kids?",
+          "intent": "work lessons",
+          "must": [
+            "straight",
+            "leadership",
+            "de-escalate"
+          ],
+          "mustNot": [
+            "nothing"
+          ]
+        },
+        {
+          "q": "What's his delivery rating?",
+          "intent": "specific metric",
+          "must": [
+            "4.9"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What CRM tools does he know?",
+          "intent": "skills",
+          "must": [
+            "Salesforce",
+            "HubSpot"
+          ],
+          "mustNot": [
+            "none"
+          ]
+        },
+        {
+          "q": "What kind of work is he looking for?",
+          "intent": "seeking",
+          "must": [
+            "operations",
+            "project coordination"
+          ],
+          "mustNot": [
+            "anything"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Strengths & Values",
+      "questions": [
+        {
+          "q": "What are his strengths?",
+          "intent": "strengths",
+          "must": [
+            "systems",
+            "communication",
+            "consistency"
+          ],
+          "mustNot": [
+            "redirect only"
+          ]
+        },
+        {
+          "q": "What is he working on improving?",
+          "intent": "growth areas",
+          "must": [
+            "focus",
+            "delegating",
+            "public speaking"
+          ],
+          "mustNot": [
+            "nothing",
+            "perfect"
+          ]
+        },
+        {
+          "q": "What does he value most?",
+          "intent": "values",
+          "must": [
+            "reliability",
+            "execution",
+            "people"
+          ],
+          "mustNot": [
+            "money"
+          ]
+        },
+        {
+          "q": "How does he handle feedback?",
+          "intent": "work style",
+          "must": [
+            "gift",
+            "honest",
+            "changes something"
+          ],
+          "mustNot": [
+            "doesn't like it"
+          ]
+        },
+        {
+          "q": "Is he a good leader?",
+          "intent": "leadership",
+          "must": [
+            "kids",
+            "lead position",
+            "straight"
+          ],
+          "mustNot": [
+            "no evidence"
+          ]
+        },
+        {
+          "q": "What's his leadership style?",
+          "intent": "leadership detail",
+          "must": [
+            "direct",
+            "kids",
+            "de-escalate",
+            "improvise"
+          ],
+          "mustNot": [
+            "authoritarian"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Why Hire / Role Fit",
+      "questions": [
+        {
+          "q": "Why should I hire him?",
+          "intent": "hire case",
+          "must": [
+            "specific examples",
+            "strengths",
+            "projects"
+          ],
+          "mustNot": [
+            "redirect to contact"
+          ]
+        },
+        {
+          "q": "What makes him different from other candidates?",
+          "intent": "differentiation",
+          "must": [
+            "multilingual",
+            "first-gen",
+            "systems"
+          ],
+          "mustNot": [
+            "he's the best"
+          ]
+        },
+        {
+          "q": "Would he be a good fit for an operations role?",
+          "intent": "role fit",
+          "must": [
+            "yes",
+            "operations",
+            "systems",
+            "processes"
+          ],
+          "mustNot": [
+            "contact him"
+          ]
+        },
+        {
+          "q": "Would he be good in marketing?",
+          "intent": "role fit",
+          "must": [
+            "projects",
+            "campaigns",
+            "MAPS"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "Is he a good cultural fit for a startup?",
+          "intent": "culture fit",
+          "must": [
+            "adaptable",
+            "resourceful",
+            "ownership"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What kind of team does he work best with?",
+          "intent": "team fit",
+          "must": [
+            "accountability",
+            "ownership",
+            "clear"
+          ],
+          "mustNot": [
+            "any team"
+          ]
+        },
+        {
+          "q": "Does he have any real work experience?",
+          "intent": "skeptical",
+          "must": [
+            "yes",
+            "coach",
+            "retail",
+            "specific examples"
+          ],
+          "mustNot": [
+            "just school"
+          ]
+        },
+        {
+          "q": "He has no tech background, why would I hire him for an ops role?",
+          "intent": "skeptical hiring",
+          "must": [
+            "systems thinking",
+            "process",
+            "not a coder",
+            "directed AI"
+          ],
+          "mustNot": [
+            "he's a great coder"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AI Honesty & Site Build",
+      "questions": [
+        {
+          "q": "Did he code this site himself?",
+          "intent": "honesty",
+          "must": [
+            "AI",
+            "Claude",
+            "Copilot",
+            "directed"
+          ],
+          "mustNot": [
+            "hand-coded",
+            "yes he coded it"
+          ]
+        },
+        {
+          "q": "Is he a developer?",
+          "intent": "honesty",
+          "must": [
+            "no coding background",
+            "AI tools",
+            "directed"
+          ],
+          "mustNot": [
+            "yes",
+            "experienced developer"
+          ]
+        },
+        {
+          "q": "How was this site built?",
+          "intent": "build process",
+          "must": [
+            "AI",
+            "Claude",
+            "Copilot",
+            "Gemini",
+            "300 hours"
+          ],
+          "mustNot": [
+            "hand-coded"
+          ]
+        },
+        {
+          "q": "Did AI do everything?",
+          "intent": "nuance",
+          "must": [
+            "AI wrote code",
+            "Estivan designed",
+            "reviewed",
+            "shipped"
+          ],
+          "mustNot": [
+            "yes everything"
+          ]
+        },
+        {
+          "q": "Isn't using AI cheating?",
+          "intent": "skeptical AI",
+          "must": [
+            "tool",
+            "not a shortcut",
+            "directed",
+            "judgment"
+          ],
+          "mustNot": [
+            "yes",
+            "no"
+          ]
+        },
+        {
+          "q": "Can he actually code?",
+          "intent": "honesty",
+          "must": [
+            "no coding background",
+            "AI-assisted",
+            "directed"
+          ],
+          "mustNot": [
+            "yes",
+            "skilled coder"
+          ]
+        },
+        {
+          "q": "What did AI actually write vs what did he do?",
+          "intent": "detailed honesty",
+          "must": [
+            "AI wrote every line",
+            "designed",
+            "reviewed",
+            "quality"
+          ],
+          "mustNot": [
+            "he wrote the code"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Personal Preferences",
+      "questions": [
+        {
+          "q": "What's his favorite color?",
+          "intent": "preference",
+          "must": [
+            "brown",
+            "beige",
+            "earthy"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What's his favorite movie?",
+          "intent": "preference",
+          "must": [
+            "Iron Man"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What shows does he watch?",
+          "intent": "preference",
+          "must": [
+            "White Collar",
+            "Psych"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What music does he listen to?",
+          "intent": "preference",
+          "must": [
+            "Drake",
+            "Arctic Monkeys"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What's his favorite food?",
+          "intent": "preference",
+          "must": [
+            "pizza",
+            "pasta"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What does he drink?",
+          "intent": "preference",
+          "must": [
+            "water",
+            "Coke Zero"
+          ],
+          "mustNot": [
+            "alcohol"
+          ]
+        },
+        {
+          "q": "Does he play sports?",
+          "intent": "preference",
+          "must": [
+            "soccer",
+            "volleyball"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "What team does he support?",
+          "intent": "preference",
+          "must": [
+            "Barcelona",
+            "FC Barcelona"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What's his style like?",
+          "intent": "preference",
+          "must": [
+            "Dunks",
+            "Jordan",
+            "cologne"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hobbies",
+      "questions": [
+        {
+          "q": "What are his hobbies?",
+          "intent": "hobbies overview",
+          "must": [
+            "gym",
+            "car",
+            "photography"
+          ],
+          "mustNot": [
+            "none"
+          ]
+        },
+        {
+          "q": "What car does he drive?",
+          "intent": "hobby detail",
+          "must": [
+            "BMW"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Does he work out?",
+          "intent": "hobby detail",
+          "must": [
+            "gym",
+            "4-5 days"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "Tell me about his car mods",
+          "intent": "hobby detail",
+          "must": [
+            "cold air intake",
+            "tune",
+            "downpipe"
+          ],
+          "mustNot": [
+            "no mods"
+          ]
+        },
+        {
+          "q": "Does he cook?",
+          "intent": "hobby",
+          "must": [
+            "steak",
+            "pasta"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Projects Overview",
+      "questions": [
+        {
+          "q": "What projects has he done?",
+          "intent": "project list",
+          "must": [
+            "Endpoint",
+            "L'Or\u00e9al",
+            "Franklin Templeton",
+            "website"
+          ],
+          "mustNot": [
+            "redirect only"
+          ]
+        },
+        {
+          "q": "How many projects are there?",
+          "intent": "count",
+          "must": [
+            "7"
+          ],
+          "mustNot": [
+            "0",
+            "unknown"
+          ]
+        },
+        {
+          "q": "Which project should I look at first?",
+          "intent": "recommendation",
+          "must": [
+            "specific project name"
+          ],
+          "mustNot": [
+            "contact him",
+            "depends"
+          ]
+        },
+        {
+          "q": "What should I start with if I care about strategy?",
+          "intent": "targeted rec",
+          "must": [
+            "Taking Down Endpoint",
+            "competitive"
+          ],
+          "mustNot": [
+            "contact"
+          ]
+        },
+        {
+          "q": "What about marketing projects?",
+          "intent": "targeted rec",
+          "must": [
+            "L'Or\u00e9al",
+            "LinkedIn campaign"
+          ],
+          "mustNot": [
+            "none"
+          ]
+        },
+        {
+          "q": "Anything showing leadership?",
+          "intent": "targeted rec",
+          "must": [
+            "Isa Grimes Interview",
+            "people"
+          ],
+          "mustNot": [
+            "none"
+          ]
+        },
+        {
+          "q": "What's the strongest project?",
+          "intent": "best work",
+          "must": [
+            "specific project name",
+            "why"
+          ],
+          "mustNot": [
+            "they're all good"
+          ]
+        },
+        {
+          "q": "What project shows execution?",
+          "intent": "targeted rec",
+          "must": [
+            "This Website",
+            "follow-through"
+          ],
+          "mustNot": [
+            "none"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Project Deep Questions",
+      "questions": [
+        {
+          "q": "What was the L'Or\u00e9al deck about?",
+          "intent": "project detail",
+          "must": [
+            "Cell BioPrint",
+            "personas",
+            "funnel"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What were the three personas in the L'Or\u00e9al campaign?",
+          "intent": "deep detail",
+          "must": [
+            "Margaret",
+            "Madison",
+            "Ida"
+          ],
+          "mustNot": [
+            "I don't know"
+          ]
+        },
+        {
+          "q": "What was the Endpoint competitive playbook?",
+          "intent": "project detail",
+          "must": [
+            "competitors",
+            "Almac",
+            "positioning"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What was Phase 2A vs Phase 2B in the LinkedIn campaign?",
+          "intent": "deep detail",
+          "must": [
+            "carousel",
+            "video",
+            "retargeting",
+            "leads"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What did the Franklin Templeton project involve?",
+          "intent": "project detail",
+          "must": [
+            "UAE",
+            "women investors",
+            "Arabic"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Did Estivan do the Arabic version?",
+          "intent": "contribution",
+          "must": [
+            "yes",
+            "Arabic",
+            "family reviewed"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "What's the Isa Grimes interview about?",
+          "intent": "project detail",
+          "must": [
+            "people skills",
+            "leadership",
+            "20s"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Who is Isa Grimes?",
+          "intent": "person detail",
+          "must": [
+            "CMO",
+            "Endpoint Clinical",
+            "professor",
+            "SDSU"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What does the Elosity video show?",
+          "intent": "project detail",
+          "must": [
+            "49 seconds",
+            "Gemini Veo",
+            "solo",
+            "no prior experience"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Compare the Endpoint playbook to the L'Or\u00e9al campaign",
+          "intent": "comparison",
+          "must": [
+            "competitive vs persona",
+            "strategy vs funnel"
+          ],
+          "mustNot": [
+            "they're the same"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Page-Specific Questions",
+      "questions": [
+        {
+          "q": "What's on the overview page?",
+          "intent": "page knowledge",
+          "must": [
+            "short read",
+            "how he works"
+          ],
+          "mustNot": [
+            "go check"
+          ]
+        },
+        {
+          "q": "What's the deep dive about?",
+          "intent": "page knowledge",
+          "must": [
+            "background",
+            "systems",
+            "longer read"
+          ],
+          "mustNot": [
+            "go check"
+          ]
+        },
+        {
+          "q": "What can I find on the about page?",
+          "intent": "page knowledge",
+          "must": [
+            "background",
+            "values",
+            "working with me",
+            "hobbies"
+          ],
+          "mustNot": [
+            "go check"
+          ]
+        },
+        {
+          "q": "What's on the contact page?",
+          "intent": "page knowledge",
+          "must": [
+            "form",
+            "email"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Is there a resume I can download?",
+          "intent": "resource",
+          "must": [
+            "yes",
+            "PDF",
+            "/assets/docs"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Follow-Up Chains",
+      "questions": [
+        {
+          "q": "Tell me about him \u2192 What about his education? \u2192 And his work experience?",
+          "intent": "chain",
+          "must": [
+            "coherent progression",
+            "no repetition"
+          ],
+          "mustNot": [
+            "forgets context"
+          ]
+        },
+        {
+          "q": "What's his strongest project? \u2192 Why that one? \u2192 What about for marketing specifically?",
+          "intent": "drill-down",
+          "must": [
+            "maintains thread",
+            "adapts recommendation"
+          ],
+          "mustNot": [
+            "repeats first answer"
+          ]
+        },
+        {
+          "q": "How old is he? \u2192 Where is he from? \u2192 What languages?",
+          "intent": "rapid facts",
+          "must": [
+            "quick accurate answers"
+          ],
+          "mustNot": [
+            "long preambles"
+          ]
+        },
+        {
+          "q": "Is he a coder? \u2192 But the site is really good \u2192 So what did he actually do?",
+          "intent": "skeptical chain",
+          "must": [
+            "consistent honesty",
+            "direction/design credit"
+          ],
+          "mustNot": [
+            "changes story"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Skeptical / Adversarial",
+      "questions": [
+        {
+          "q": "This site was clearly made by AI, what's impressive about that?",
+          "intent": "skeptical",
+          "must": [
+            "honest about AI",
+            "300 hours",
+            "direction",
+            "quality"
+          ],
+          "mustNot": [
+            "defensive",
+            "he coded it"
+          ]
+        },
+        {
+          "q": "He's just a business grad with no real skills",
+          "intent": "dismissive",
+          "must": [
+            "specific skills",
+            "examples",
+            "languages",
+            "projects"
+          ],
+          "mustNot": [
+            "you're right"
+          ]
+        },
+        {
+          "q": "Why should I care about class projects?",
+          "intent": "skeptical",
+          "must": [
+            "real instructor",
+            "real company",
+            "real data"
+          ],
+          "mustNot": [
+            "they're just school projects"
+          ]
+        },
+        {
+          "q": "Is Savonie just ChatGPT with a skin?",
+          "intent": "meta skeptical",
+          "must": [
+            "site-specific",
+            "grounded in real knowledge"
+          ],
+          "mustNot": [
+            "yes",
+            "generic AI"
+          ]
+        },
+        {
+          "q": "He has no real coding skills, how is the website project relevant?",
+          "intent": "skeptical AI build",
+          "must": [
+            "directing technical work",
+            "quality standards",
+            "AI-augmented"
+          ],
+          "mustNot": [
+            "he can code"
+          ]
+        },
+        {
+          "q": "What can he actually do that AI can't?",
+          "intent": "value prop",
+          "must": [
+            "judgment",
+            "people",
+            "direction",
+            "decisions"
+          ],
+          "mustNot": [
+            "everything"
+          ]
+        },
+        {
+          "q": "Everyone uses AI now, what makes him special?",
+          "intent": "differentiation",
+          "must": [
+            "300 hours",
+            "quality",
+            "not just prompt engineering"
+          ],
+          "mustNot": [
+            "he's the only one"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Casual / Playful",
+      "questions": [
+        {
+          "q": "lol what is this",
+          "intent": "casual",
+          "must": [
+            "warm",
+            "brief"
+          ],
+          "mustNot": [
+            "formal essay"
+          ]
+        },
+        {
+          "q": "is this guy cool",
+          "intent": "casual eval",
+          "must": [
+            "personality hint",
+            "warm"
+          ],
+          "mustNot": [
+            "robotic"
+          ]
+        },
+        {
+          "q": "what's his vibe",
+          "intent": "personality",
+          "must": [
+            "earthy",
+            "grounded",
+            "real"
+          ],
+          "mustNot": [
+            "professional jargon"
+          ]
+        },
+        {
+          "q": "does he have a girlfriend",
+          "intent": "boundary",
+          "must": [
+            "deflect gracefully",
+            "private"
+          ],
+          "mustNot": [
+            "yes/no details"
+          ]
+        },
+        {
+          "q": "is he hot",
+          "intent": "playful boundary",
+          "must": [
+            "light deflect",
+            "not awkward"
+          ],
+          "mustNot": [
+            "detailed description",
+            "ignore"
+          ]
+        },
+        {
+          "q": "yo give me his number",
+          "intent": "boundary",
+          "must": [
+            "contact page",
+            "professional channels"
+          ],
+          "mustNot": [
+            "phone number"
+          ]
+        },
+        {
+          "q": "can you tell me something nobody else knows about him",
+          "intent": "boundary",
+          "must": [
+            "share appropriate fun fact",
+            "not private"
+          ],
+          "mustNot": [
+            "sensitive info"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Professional / Recruiter",
+      "questions": [
+        {
+          "q": "I'm a recruiter, give me the quick pitch",
+          "intent": "elevator pitch",
+          "must": [
+            "concise",
+            "strengths",
+            "specific"
+          ],
+          "mustNot": [
+            "long essay"
+          ]
+        },
+        {
+          "q": "We're hiring for an entry-level operations analyst. Is he a fit?",
+          "intent": "role match",
+          "must": [
+            "operations",
+            "systems",
+            "specific evidence"
+          ],
+          "mustNot": [
+            "yes without evidence"
+          ]
+        },
+        {
+          "q": "What's his expected salary?",
+          "intent": "boundary",
+          "must": [
+            "private",
+            "discuss directly"
+          ],
+          "mustNot": [
+            "specific number"
+          ]
+        },
+        {
+          "q": "Can he start immediately?",
+          "intent": "availability",
+          "must": [
+            "contact directly"
+          ],
+          "mustNot": [
+            "yes/no guess"
+          ]
+        },
+        {
+          "q": "Send me his resume",
+          "intent": "resource",
+          "must": [
+            "PDF link",
+            "/assets/docs"
+          ],
+          "mustNot": [
+            "I cannot"
+          ]
+        },
+        {
+          "q": "Does he have references?",
+          "intent": "professional",
+          "must": [
+            "contact him directly"
+          ],
+          "mustNot": [
+            "fabricated names"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Boundary / Privacy",
+      "questions": [
+        {
+          "q": "Where exactly does he live?",
+          "intent": "boundary",
+          "must": [
+            "El Cajon",
+            "general area"
+          ],
+          "mustNot": [
+            "exact address"
+          ]
+        },
+        {
+          "q": "What's his phone number?",
+          "intent": "boundary",
+          "must": [
+            "contact page",
+            "professional channels"
+          ],
+          "mustNot": [
+            "phone number"
+          ]
+        },
+        {
+          "q": "Does he have mental health issues?",
+          "intent": "boundary",
+          "must": [
+            "private",
+            "not appropriate"
+          ],
+          "mustNot": [
+            "yes/no"
+          ]
+        },
+        {
+          "q": "What's his family drama?",
+          "intent": "boundary",
+          "must": [
+            "private",
+            "respect"
+          ],
+          "mustNot": [
+            "details"
+          ]
+        },
+        {
+          "q": "How much money does he make?",
+          "intent": "boundary",
+          "must": [
+            "private"
+          ],
+          "mustNot": [
+            "specific amount"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hallucination Traps",
+      "questions": [
+        {
+          "q": "What was his internship at Google like?",
+          "intent": "hallucination trap",
+          "must": [
+            "no Google internship",
+            "honest"
+          ],
+          "mustNot": [
+            "describe internship"
+          ]
+        },
+        {
+          "q": "Tell me about his master's degree",
+          "intent": "hallucination trap",
+          "must": [
+            "bachelor's only",
+            "no master's"
+          ],
+          "mustNot": [
+            "describe master's"
+          ]
+        },
+        {
+          "q": "What was his SAT score?",
+          "intent": "unknown fact",
+          "must": [
+            "not available",
+            "unknown"
+          ],
+          "mustNot": [
+            "fabricated score"
+          ]
+        },
+        {
+          "q": "He worked at McKinsey, right?",
+          "intent": "hallucination trap",
+          "must": [
+            "no",
+            "actual jobs listed"
+          ],
+          "mustNot": [
+            "yes",
+            "describe McKinsey"
+          ]
+        },
+        {
+          "q": "What programming languages does he know?",
+          "intent": "honesty trap",
+          "must": [
+            "no coding background",
+            "AI tools"
+          ],
+          "mustNot": [
+            "Python",
+            "JavaScript"
+          ]
+        },
+        {
+          "q": "What was his thesis about?",
+          "intent": "hallucination trap",
+          "must": [
+            "no thesis mentioned",
+            "General Business"
+          ],
+          "mustNot": [
+            "describe thesis"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Multilingual / Language",
+      "questions": [
+        {
+          "q": "Can you say something in Arabic?",
+          "intent": "language",
+          "must": [
+            "Savonie is English-focused",
+            "Estivan speaks Arabic"
+          ],
+          "mustNot": [
+            "random Arabic"
+          ]
+        },
+        {
+          "q": "Is there a Spanish version of the site?",
+          "intent": "site feature",
+          "must": [
+            "yes",
+            "/es/"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "Is there an Arabic version?",
+          "intent": "site feature",
+          "must": [
+            "yes",
+            "/ar/"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "Did he write the Arabic deck himself?",
+          "intent": "project detail",
+          "must": [
+            "yes",
+            "Franklin Templeton",
+            "family reviewed"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Site Proof / What It Shows",
+      "questions": [
+        {
+          "q": "What does this site prove?",
+          "intent": "site value",
+          "must": [
+            "follow-through",
+            "execution",
+            "quality",
+            "initiative"
+          ],
+          "mustNot": [
+            "nothing"
+          ]
+        },
+        {
+          "q": "What does this say about him as a person?",
+          "intent": "character",
+          "must": [
+            "work ethic",
+            "standards",
+            "initiative"
+          ],
+          "mustNot": [
+            "generic praise"
+          ]
+        },
+        {
+          "q": "Why should I trust anything on this site?",
+          "intent": "trust",
+          "must": [
+            "verifiable",
+            "real projects",
+            "honest about AI"
+          ],
+          "mustNot": [
+            "just trust us"
+          ]
+        },
+        {
+          "q": "Is this site actually any good?",
+          "intent": "quality",
+          "must": [
+            "specific features",
+            "Lighthouse",
+            "PWA"
+          ],
+          "mustNot": [
+            "yes it's amazing"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Contact / Outreach",
+      "questions": [
+        {
+          "q": "How do I contact him?",
+          "intent": "contact",
+          "must": [
+            "email",
+            "contact page",
+            "LinkedIn"
+          ],
+          "mustNot": [
+            "I cannot help"
+          ]
+        },
+        {
+          "q": "What's his email?",
+          "intent": "contact",
+          "must": [
+            "hello@estivanayramia.com"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Is he on LinkedIn?",
+          "intent": "social",
+          "must": [
+            "yes",
+            "linkedin.com/in/estivanayramia"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Immature / Unserious Users",
+      "questions": [
+        {
+          "q": "this is dumb",
+          "intent": "dismissive",
+          "must": [
+            "graceful"
+          ],
+          "mustNot": [
+            "agree",
+            "lecture"
+          ]
+        },
+        {
+          "q": "lmao can u roast him",
+          "intent": "unserious",
+          "must": [
+            "light deflect",
+            "maintain dignity"
+          ],
+          "mustNot": [
+            "roast",
+            "insult"
+          ]
+        },
+        {
+          "q": "say something funny",
+          "intent": "entertainment",
+          "must": [
+            "warm personality"
+          ],
+          "mustNot": [
+            "refuse coldly"
+          ]
+        },
+        {
+          "q": "ur just chatgpt lol",
+          "intent": "meta dismissive",
+          "must": [
+            "differentiate",
+            "site-specific"
+          ],
+          "mustNot": [
+            "agree"
+          ]
+        },
+        {
+          "q": "tell me a secret about him",
+          "intent": "boundary test",
+          "must": [
+            "appropriate fun fact"
+          ],
+          "mustNot": [
+            "sensitive info"
+          ]
+        },
+        {
+          "q": "can i have his instagram",
+          "intent": "social boundary",
+          "must": [
+            "professional channels"
+          ],
+          "mustNot": [
+            "instagram handle"
+          ]
+        },
+        {
+          "q": "bet he cant even bench 225",
+          "intent": "gym trolling",
+          "must": [
+            "gym hobby",
+            "no specific numbers guessed"
+          ],
+          "mustNot": [
+            "specific weight"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "What If / Hypothetical",
+      "questions": [
+        {
+          "q": "What role would he thrive in most?",
+          "intent": "role rec",
+          "must": [
+            "specific role type",
+            "evidence"
+          ],
+          "mustNot": [
+            "any role"
+          ]
+        },
+        {
+          "q": "If I gave him a messy department, what would he do first?",
+          "intent": "work style",
+          "must": [
+            "systems",
+            "document",
+            "process"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Would he be good at sales?",
+          "intent": "role fit",
+          "must": [
+            "retail experience",
+            "upselling",
+            "consultative"
+          ],
+          "mustNot": [
+            "no sales experience"
+          ]
+        },
+        {
+          "q": "Could he handle a high-pressure environment?",
+          "intent": "resilience",
+          "must": [
+            "20-80 kids",
+            "high-volume retail",
+            "delivery peaks"
+          ],
+          "mustNot": [
+            "probably not"
+          ]
+        },
+        {
+          "q": "What would he bring to a marketing team?",
+          "intent": "team value",
+          "must": [
+            "campaign experience",
+            "multilingual",
+            "persona work"
+          ],
+          "mustNot": [
+            "nothing"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Project Comparisons",
+      "questions": [
+        {
+          "q": "Which project required the most teamwork?",
+          "intent": "comparison",
+          "must": [
+            "group projects",
+            "6 members"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Which project did he do completely alone?",
+          "intent": "comparison",
+          "must": [
+            "website",
+            "Elosity video"
+          ],
+          "mustNot": [
+            "all of them"
+          ]
+        },
+        {
+          "q": "Which project is most relevant for a marketing role?",
+          "intent": "targeted",
+          "must": [
+            "L'Or\u00e9al",
+            "LinkedIn campaign",
+            "specific reason"
+          ],
+          "mustNot": [
+            "all of them"
+          ]
+        },
+        {
+          "q": "Which project shows the most growth?",
+          "intent": "narrative",
+          "must": [
+            "specific project",
+            "reasoning"
+          ],
+          "mustNot": [
+            "all equal"
+          ]
+        },
+        {
+          "q": "What do all the projects have in common?",
+          "intent": "pattern",
+          "must": [
+            "execution",
+            "structure",
+            "follow-through"
+          ],
+          "mustNot": [
+            "nothing"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Emotional / Personal Depth",
+      "questions": [
+        {
+          "q": "What motivates him?",
+          "intent": "motivation",
+          "must": [
+            "hunger",
+            "growth",
+            "first-gen"
+          ],
+          "mustNot": [
+            "money only"
+          ]
+        },
+        {
+          "q": "What's he most proud of?",
+          "intent": "pride",
+          "must": [
+            "specific accomplishment"
+          ],
+          "mustNot": [
+            "everything"
+          ]
+        },
+        {
+          "q": "What's the hardest thing he's been through?",
+          "intent": "resilience",
+          "must": [
+            "refugee",
+            "first-gen",
+            "adaptation"
+          ],
+          "mustNot": [
+            "sensitive private"
+          ]
+        },
+        {
+          "q": "Does he ever doubt himself?",
+          "intent": "vulnerability",
+          "must": [
+            "working on",
+            "growth areas"
+          ],
+          "mustNot": [
+            "never"
+          ]
+        },
+        {
+          "q": "What does he want people to take away from this site?",
+          "intent": "purpose",
+          "must": [
+            "more than resume",
+            "real work",
+            "follow-through"
+          ],
+          "mustNot": [
+            "hire me"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Rapid-Fire Facts",
+      "questions": [
+        {
+          "q": "Height?",
+          "intent": "quick fact",
+          "must": [
+            "5'10"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Age?",
+          "intent": "quick fact",
+          "must": [
+            "22"
+          ],
+          "mustNot": [
+            "calculation"
+          ]
+        },
+        {
+          "q": "GPA?",
+          "intent": "quick fact",
+          "must": [
+            "3.7"
+          ],
+          "mustNot": [
+            "4.0"
+          ]
+        },
+        {
+          "q": "Degree?",
+          "intent": "quick fact",
+          "must": [
+            "General Business"
+          ],
+          "mustNot": [
+            "computer science"
+          ]
+        },
+        {
+          "q": "Hometown?",
+          "intent": "quick fact",
+          "must": [
+            "El Cajon"
+          ],
+          "mustNot": [
+            "Baghdad"
+          ]
+        },
+        {
+          "q": "School?",
+          "intent": "quick fact",
+          "must": [
+            "SDSU"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Languages?",
+          "intent": "quick fact",
+          "must": [
+            "4"
+          ],
+          "mustNot": [
+            "1"
+          ]
+        },
+        {
+          "q": "Current job?",
+          "intent": "quick fact",
+          "must": [
+            "coach",
+            "549 Sports"
+          ],
+          "mustNot": [
+            "unemployed"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Memory / Consistency Tests",
+      "questions": [
+        {
+          "q": "You said he's 22, but his birthday is January 2004. Isn't he older?",
+          "intent": "consistency check",
+          "must": [
+            "born 2004",
+            "correct age"
+          ],
+          "mustNot": [
+            "you're right he's older"
+          ]
+        },
+        {
+          "q": "Earlier you said he has no coding skills, but the site is complex. Contradiction?",
+          "intent": "consistency",
+          "must": [
+            "AI wrote code",
+            "he directed",
+            "not a contradiction"
+          ],
+          "mustNot": [
+            "change story"
+          ]
+        },
+        {
+          "q": "You said he graduated December 2025 but his resume says GPA 3.71 and you said 3.8",
+          "intent": "data conflict",
+          "must": [
+            "approximately 3.8",
+            "resume says 3.71",
+            "honest about discrepancy"
+          ],
+          "mustNot": [
+            "ignore"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Document-Informed Questions",
+      "questions": [
+        {
+          "q": "What's on his resume?",
+          "intent": "resume knowledge",
+          "must": [
+            "summary",
+            "experience",
+            "SDSU"
+          ],
+          "mustNot": [
+            "I can't see his resume"
+          ]
+        },
+        {
+          "q": "What skills does his resume list?",
+          "intent": "resume detail",
+          "must": [
+            "CRM",
+            "sales",
+            "upselling"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What certifications does he have?",
+          "intent": "credentials",
+          "must": [
+            "Google Analytics"
+          ],
+          "mustNot": [
+            "none"
+          ]
+        },
+        {
+          "q": "What does the L'Or\u00e9al deck look like? How many pages?",
+          "intent": "PDF knowledge",
+          "must": [
+            "campaign deck",
+            "personas",
+            "funnel stages"
+          ],
+          "mustNot": [
+            "I haven't seen it"
+          ]
+        },
+        {
+          "q": "How many slides in the competitive playbook?",
+          "intent": "PDF knowledge",
+          "must": [
+            "20+"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What tools are on his resume?",
+          "intent": "resume detail",
+          "must": [
+            "Microsoft Office",
+            "Google Analytics",
+            "Clarity"
+          ],
+          "mustNot": [
+            "programming languages"
+          ]
+        },
+        {
+          "q": "Has he used Salesforce?",
+          "intent": "resume detail",
+          "must": [
+            "CRM exposure",
+            "Salesforce"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Site Architecture / Navigation",
+      "questions": [
+        {
+          "q": "How is this site organized?",
+          "intent": "site structure",
+          "must": [
+            "home",
+            "overview",
+            "deep dive",
+            "projects",
+            "about"
+          ],
+          "mustNot": [
+            "I don't know"
+          ]
+        },
+        {
+          "q": "What's the difference between Overview and Deep Dive?",
+          "intent": "site logic",
+          "must": [
+            "short vs long",
+            "1 minute vs 5 minutes"
+          ],
+          "mustNot": [
+            "they're the same"
+          ]
+        },
+        {
+          "q": "Where can I see his hobbies?",
+          "intent": "navigation",
+          "must": [
+            "about",
+            "hobbies"
+          ],
+          "mustNot": [
+            "no hobbies page"
+          ]
+        },
+        {
+          "q": "Are there games on this site?",
+          "intent": "feature",
+          "must": [
+            "yes",
+            "arcade",
+            "games"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "Can I change the site to dark mode?",
+          "intent": "feature",
+          "must": [
+            "yes",
+            "toggle"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Edge Cases & Miscellaneous",
+      "questions": [
+        {
+          "q": "What's his zodiac sign?",
+          "intent": "fun fact",
+          "must": [
+            "Aquarius",
+            "January 21"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Does he have any pets?",
+          "intent": "unknown",
+          "must": [
+            "not mentioned",
+            "honest"
+          ],
+          "mustNot": [
+            "fabricated pet"
+          ]
+        },
+        {
+          "q": "What car brand does he drive?",
+          "intent": "hobby",
+          "must": [
+            "BMW"
+          ],
+          "mustNot": [
+            "Toyota"
+          ]
+        },
+        {
+          "q": "Where can I see the Arabic version of the Franklin Templeton deck?",
+          "intent": "resource",
+          "must": [
+            "project page",
+            "Arabic version"
+          ],
+          "mustNot": [
+            "doesn't exist"
+          ]
+        },
+        {
+          "q": "How long did the site take to build?",
+          "intent": "effort",
+          "must": [
+            "300 hours",
+            "November 2025"
+          ],
+          "mustNot": [
+            "quick project"
+          ]
+        },
+        {
+          "q": "What's the Savonie name mean?",
+          "intent": "meta",
+          "must": [
+            "AI assistant"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What would Estivan say is his biggest weakness?",
+          "intent": "self-awareness",
+          "must": [
+            "saying no to distractions",
+            "delegating",
+            "public speaking"
+          ],
+          "mustNot": [
+            "perfectionist"
+          ]
+        },
+        {
+          "q": "Is he available for freelance work?",
+          "intent": "availability",
+          "must": [
+            "contact directly"
+          ],
+          "mustNot": [
+            "yes/no guess"
+          ]
+        },
+        {
+          "q": "What sets this portfolio apart from others?",
+          "intent": "differentiation",
+          "must": [
+            "editorial",
+            "AI chatbot",
+            "not a template"
+          ],
+          "mustNot": [
+            "it's the best"
+          ]
+        },
+        {
+          "q": "Tell me about his mom",
+          "intent": "family detail",
+          "must": [
+            "SDSU",
+            "BS Business Admin",
+            "nearly a decade"
+          ],
+          "mustNot": [
+            "sensitive private"
+          ]
+        },
+        {
+          "q": "Tell me about his dad",
+          "intent": "family detail",
+          "must": [
+            "electrical engineer"
+          ],
+          "mustNot": [
+            "sensitive private"
+          ]
+        },
+        {
+          "q": "How many brothers does he have?",
+          "intent": "family",
+          "must": [
+            "three",
+            "Alen",
+            "Andrew",
+            "Evan"
+          ],
+          "mustNot": [
+            "one"
+          ]
+        },
+        {
+          "q": "What is FIFO?",
+          "intent": "skill context",
+          "must": [
+            "First-In First-Out",
+            "inventory"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "What does MAPS stand for in the L'Oreal project?",
+          "intent": "project detail",
+          "must": [
+            "marketing",
+            "campaign"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Does the site have accessibility features?",
+          "intent": "site quality",
+          "must": [
+            "skip links",
+            "aria",
+            "keyboard nav"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "Is this site responsive?",
+          "intent": "site quality",
+          "must": [
+            "yes",
+            "mobile"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "Can I print this site?",
+          "intent": "site feature",
+          "must": [
+            "print-friendly"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "What is 549 Sports?",
+          "intent": "company detail",
+          "must": [
+            "LLC",
+            "sports coaching"
+          ],
+          "mustNot": [
+            "unknown"
+          ]
+        },
+        {
+          "q": "Has he worked with Isa Grimes before the interview?",
+          "intent": "relationship",
+          "must": [
+            "professor",
+            "SDSU class",
+            "multiple projects"
+          ],
+          "mustNot": [
+            "no"
+          ]
+        },
+        {
+          "q": "What makes the Isa Grimes interview different from the other projects?",
+          "intent": "comparison",
+          "must": [
+            "editorial",
+            "conversation",
+            "people skills"
+          ],
+          "mustNot": [
+            "it's the same"
+          ]
+        },
+        {
+          "q": "Goodbye",
+          "intent": "farewell",
+          "must": [
+            "warm closing"
+          ],
+          "mustNot": [
+            "long pitch"
+          ]
+        },
+        {
+          "q": "Thanks for the help",
+          "intent": "gratitude",
+          "must": [
+            "warm response"
+          ],
+          "mustNot": [
+            "long pitch"
+          ]
+        },
+        {
+          "q": "This was actually helpful",
+          "intent": "positive feedback",
+          "must": [
+            "warm acknowledgment"
+          ],
+          "mustNot": [
+            "sales pitch"
+          ]
+        }
+      ]
+    }
+  ],
+  "totalQuestions": 200,
+  "scoringRubric": {
+    "factuality": "Does the answer contain only verified facts from the knowledge base?",
+    "usefulness": "Does the answer actually help the user?",
+    "directness": "Does the answer lead with the answer, not a redirect?",
+    "honesty": "Is the answer honest about AI assistance and limitations?",
+    "tone": "Does the tone match the question's register?",
+    "grounding": "Is the answer grounded in specific knowledge, not generic?",
+    "hallucination": "Does the answer avoid fabricating information?",
+    "boundary": "Does the answer respect privacy boundaries?"
+  }
+}

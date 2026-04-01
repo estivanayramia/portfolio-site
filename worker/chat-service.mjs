@@ -316,7 +316,88 @@ function getMinimalProfileFallback() {
 function getMinimalFactsFallback() {
   return {
     version: "fallback-facts",
-    projects: [],
+    projects: [
+      {
+        id: "taking-down-endpoint",
+        title: "Taking Down Endpoint (Competitive Playbook)",
+        class: "MKTG 476 Interactive Marketing, SDSU",
+        instructor: "Isa Grimes (CMO at Endpoint Clinical)",
+        estivanRole: "Strategy, Website & 3rd Party",
+        format: "20+ page competitive strategy deck",
+        summary: "Competitive playbook analyzing Almac, 4G Clinical, and other competitors to Endpoint Clinical. Includes SWOT analysis, positioning strategy, SEO/SEM/LLM optimization, marketing automation workflows, and analytics framework.",
+        keyInsights: ["Competitor positioning gaps", "SEO and LLM optimization strategy", "Marketing automation flows", "Analytics integration"],
+        whatItProves: "Strategic thinking, competitive analysis, synthesizing complex market data into actionable positioning",
+        url: "/projects/endpoint-competitive-playbook"
+      },
+      {
+        id: "endpoint-linkedin-campaign",
+        title: "Endpoint LinkedIn Campaign",
+        class: "MKTG 476 Interactive Marketing, SDSU",
+        instructor: "Isa Grimes (CMO at Endpoint Clinical)",
+        format: "15-page LinkedIn campaign plan deck",
+        summary: "Phase 2A and 2B retargeting strategy. Phase 2A: qualified leads via carousel retargeting. Phase 2B: deeper interest via video retargeting. Includes KPI targets, kill/scale rules, and experiment hypotheses.",
+        keyInsights: ["Phase-based campaign architecture", "Retargeting from awareness to conversion", "KPI targets per phase", "Kill/scale rules for budget optimization"],
+        whatItProves: "Campaign planning discipline, metrics-driven marketing, structured phased execution",
+        url: "/projects/endpoint-linkedin-campaign"
+      },
+      {
+        id: "franklin-templeton",
+        title: "Franklin Templeton x Mashable ME Partnership",
+        class: "MKTG 476 Interactive Marketing, SDSU",
+        instructor: "Isa Grimes",
+        format: "17-page concept deck (English + Arabic version)",
+        summary: "Campaign concept targeting women investors in the UAE. Estivan built the Arabic version of the deck, reviewed by his family for accuracy. Women make up ~8% of UAE ETF investors, growing 18% in 5 years.",
+        keyInsights: ["Dual-language content creation", "Community-driven engagement", "Social media pivot for traditional brand", "UAE women investor market opportunity"],
+        whatItProves: "Multilingual content creation, cultural sensitivity, market research, bilingual campaign execution",
+        url: "/projects/franklin-templeton-concept"
+      },
+      {
+        id: "loreal-cell-bioprint",
+        title: "L'Oréal Cell BioPrint MAPS Campaign",
+        class: "MKTG 476 Interactive Marketing, SDSU",
+        instructor: "Isa Grimes",
+        format: "Full MAPS campaign deck",
+        summary: "Campaign mapping three personas (Margaret the consumer, Madison the medspa, Ida the influencer) across the marketing funnel. Touchpoints by stage: ads, landing pages, website triggers, email, and retention.",
+        keyInsights: ["Three distinct persona profiles", "Touchpoints by funnel stage", "One funnel across all personas", "Positioning and target market segmentation"],
+        whatItProves: "Persona-driven marketing, funnel architecture, touchpoint mapping, audience segmentation",
+        url: "/projects/loreal-maps-campaign"
+      },
+      {
+        id: "isa-grimes-interview",
+        title: "Isa Grimes Interview",
+        format: "Editorial interview feature",
+        summary: "A real conversation with Isa Grimes (CMO at Endpoint Clinical, SDSU professor) about your 20s, people skills, leadership, favoritism, support systems, and why the fastest route is not always the right one.",
+        keyInsights: ["People judgment matters more than titles", "Leadership is reading situations and adapting", "Mentorship and support systems", "Patience over quick wins"],
+        whatItProves: "Interview ability, people skills, editorial thinking, relationship building",
+        url: "/projects/isa-grimes-interview"
+      },
+      {
+        id: "endpoint-elosity-video",
+        title: "Endpoint Elosity Video Concept",
+        format: "49-second video concept (unlisted YouTube)",
+        summary: "Solo video for Endpoint's Elosity platform. Made with no prior video production experience using Google Gemini Veo 3.0, CapCut Pro, and audio tools.",
+        whatItProves: "Willingness to learn new tools, creative problem-solving, self-directed execution",
+        url: "/projects/endpoint-elosity-video"
+      },
+      {
+        id: "this-website",
+        title: "This Website (Portfolio)",
+        format: "Full-stack portfolio site",
+        summary: "Started late November 2025 with no coding background. Over 300 hours of directing, reviewing, and shipping. AI wrote every line of code (Claude, Copilot, Gemini). Estivan designed, reviewed, and shipped.",
+        whatItProves: "Initiative, follow-through, quality standards, ability to direct complex technical work",
+        url: "/projects/portfolio"
+      }
+    ],
+    resume: {
+      coreSkills: ["Consultative recommendations", "Upselling", "Objection handling", "Service recovery", "CRM exposure (Salesforce, HubSpot, Pardot)", "Google Analytics Certification", "Microsoft Clarity", "Multilingual communication"],
+      experience: [
+        { role: "Sports Coach", company: "549 Sports LLC", dates: "Sep 2024 – Present", key: "Supervise 20-80 children per session, multilingual communication, incident reports" },
+        { role: "Retail Sales Associate", company: "Convenience Retail and Fuel", dates: "Sept 2023 – Aug 2024", key: "Upper-four-digit daily sales, 8-12 customers at peak, inventory reorganization" },
+        { role: "Store Associate", company: "Del Sol Market", dates: "May – Aug 2023", key: "30-100 transactions per shift, alternative suggestions increasing basket size" },
+        { role: "Independent Contractor", company: "Delivery Services", dates: "2021 – 2022", key: "40-70 deliveries/week, ~4.9/5 rating" }
+      ],
+      education: { school: "SDSU", degree: "BS Business Administration (General Business)", graduation: "Dec 18, 2025", gpa: "3.71" }
+    },
     hobbies: [],
     meta: {
       projectCount: 0,
@@ -680,7 +761,7 @@ function classifyQuestion(message) {
   if (/\b(what does this site prove|what does the site prove|what does the website prove)\b/.test(lower)) {
     return QUESTION_CLASSES.SITE_PROOF;
   }
-  if (/\b(projects|work samples|what have you done|what projects)\b/.test(lower)) {
+  if (/\b(projects|work samples|what have you done|what projects|which project|recommend|start with|look at first|best project|top project|strongest|most impressive|what should I (see|look|check|open))\b/i.test(lower)) {
     return QUESTION_CLASSES.PROJECT_LIST;
   }
   if (/\b(languages|speak|write in|english|arabic|chaldean|spanish)\b/.test(lower)) {
@@ -1293,6 +1374,8 @@ RESPONSE QUALITY:
 - When asked evaluative questions (why hire, what makes him different), build a real case with specific examples. 4–8 sentences minimum.
 - When asked about projects, describe what each project actually involved and what skill it demonstrates. Do not just list titles.
 - When asked "which project should I start with" or for a recommendation, pick ONE specific project and explain WHY it matches what the user cares about. Use project names from the knowledge base: Taking Down Endpoint (strategy/competitive), L'Oréal Cell BioPrint (marketing/campaign), Franklin Templeton (multilingual/content), This Website (execution/technical), Isa Grimes Interview (people/leadership).
+- CRITICAL: When asked for a project recommendation, you MUST name a specific project. Do NOT deflect to "contact him" or "that depends." If you cannot determine the user's interest, default to the Isa Grimes Interview (people skills and thinking) or This Website (follow-through and execution). Always name a project. Always explain why.
+- PROJECT DETAIL: When asked about specific project content (e.g., "what was in the L'Oréal deck?", "what did the Endpoint playbook cover?"), use the detailed project knowledge from the IDENTITY section below. Each project includes class context, instructor, format, key insights, and what it proves.
 - When asked complex multi-part questions, address EVERY part. Do not skip sub-questions.
 - For page-specific questions, answer the question first using page content, then link. Do not reduce to "the best place for that is…"
 

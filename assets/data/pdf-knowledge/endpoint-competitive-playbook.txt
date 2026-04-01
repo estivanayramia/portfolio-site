@@ -1,0 +1,855 @@
+Taking Down
+
+ENDPOINT
+By: Group 1
+Tess Amel, Estivan Ayramia, Kailey
+Fusca, Evan O’Donnell, Rachel Son,
+Isabelle Vanderby
+
+MARKETING CONSULTANTS TEAM
+We bridge the gap between creative brand strategy and deep technical execution. By combining
+a d v a n c e d a n a l y t i c s , L L M t e c h n o l o g y, a n d h u m a n i n s i g h t . W e e n g i n e e r s m a r t e r m a r k e t i n g t h a t
+drives measurable growth.
+
+CREATIVE & BRAND STRATEGY
+
+SOCIAL & DISPLAY ADVERTISING
+
+STRATEGY, WEBSITE & 3RD PARTY
+
+TESS AMEL
+
+ESTIVAN AYRAMIA
+
+KAILEY FUSCA
+
+MARKETING AUTOMATION & EMAIL
+
+SEO, SEM & LLM OPTIMIZATION
+
+ANALYTICS & DATA SCIENCE (DS)
+
+ISABELLE VANDERBY
+
+EVAN O'DONNELL
+
+RACHEL SON
+
+Table of
+
+CONTENTS
+4
+
+5-8
+
+9-19
+
+20-22
+
+Introduction
+
+Strategy
+
+Customer Journey
+
+Creative/Brand
+
+23-26
+
+27-34
+
+35-36
+
+SEO/SEM/LLM
+
+Analytics
+
+Why We Win
+
+ALMAC GROUP
+
+4G CLINICAL
+
+Who are they?
+
+Who are they?
+
+Global clinical trial solutions company (IRT,
+packaging, labeling, distribution)
+Known for end-to-end clinical supply chain
+management
+Originally founded in 1968; officially established as
+Almac Group in 2002 following the merge other
+healthcare groups
+
+Where are they in the IRT space?
+Long-standing, reliable partner; not positioned as
+the most modern tech leader
+
+What are they doing?
+Industry events - services and distribution capabilies
+Though leadership – supply chain effciency
+
+Specialized RTSM/IRT company focused on
+complex trials
+Known for modern, predictive RTSM powered by
+NLP tech, and flexible trial solutions
+Founded in 2015; no major public acquisitions
+reported
+
+Where are they in the IRT space?
+Newer, tech-forward competitor with 1,000+ trials
+tested and supported, but they lack awareness
+
+What are they doing?
+Podcasts + thought leadership
+Global expansion backed by acquisition
+Regular presence at industry events
+
+Strategy
+
+Endpoint’s Pain Point
+
+Strategy:
+ALMAC GROUP
+
+Endpoint is a RTSM vendor with no integrated supply chain, forcing
+sponsors to manage multiple vendors and increasing complexity.
+
+The Strategy
+We plan to partner with 4G Clinical to combine Almac’s global supply
+expertise with modern RTSM and NLP technology. This positions
+Almac as the single-vendor alternative to Endpoint, reducing risk,
+handoffs, and delays for sponsors.
+
+How Will Almac Achieve Success?
+Almac succeeds by showing they’re the full-service “one vendor” endto-end solution, strengthened by 4G’s niche RTSM. They’ll use AI for
+smarter supply planning, keywords like “end-to-end,” and promote
+these capabilities at Clinical Trial Forum Europe, Pharma IQ, and JP
+Morgan.
+
+Endpoint’s Pain Point
+
+Strategy:
+4G CLINICAL
+
+Endpoint relies on slow, complex internal workflows and untested AI
+processes, which lead to more money spent and longer timelines for
+sponsors.
+
+The Strategy
+Our strategy is to reposition 4G Clinical as the NLP-driven RTSM
+specialist that simplifies trials with fewer steps, fewer failures, and
+faster execution.
+
+How Will 4G Achieve Success?
+4G succeeds by showing how its preventative NLP tech cuts setup
+time and prevents errors. They’ll promote these wins at DIA, OCT
+SoCal, and ASCO with demos and real trial examples that compare
+directly against Endpoint’s reactive model. Additionally use keywords
+like “NLP.”
+
+Why Does Our Strategy Stand Out?
+Our strategy outperforms Endpoint because it gives sponsors what they
+actually need:
+Speed from 4G’s preventative NLP technology
+Simplicity from Almac’s unified supply + RTSM model
+Reliability with fewer steps and fewer failures
+Clarity through smoother communication and faster changes
+
+Together, these save sponsors time, money, and stress ...
+making our approach the clear choice.
+
+Consumer Journey:
+
+Almac Group Email #1 - Awareness
+This awareness email introduces
+Almac as a modern clinical supply
+partner, and uses the 4G
+partnership to improve brand
+perception.
+It positions Almac as a low-risk
+alternative to multi-vendor
+approaches with tech credibility.
+The goal is to reset perceptions of
+Almac as a modern rather than
+traditional partner.
+
+4G Clinical Email #1 - Awareness
+4G Clinical is introduced through
+this awareness email as a techdriven partner.
+They are differentiated as a smarter
+and simpler alternative compared to
+competitors.
+The goal is to present 4G Clinical as
+the category leader in speed and
+efficiency.
+
+CRUSHING ENDPOINT: ALMAC’S ONE-VENDOR OFFENSIVE
+(INTEREST SOCIAL POST)
+CONTENT FOCUS
+
+TALKING POINTS
+
+Target Persona
+
+Head of Clinical Operations / Supply Chain
+Leads (Focus: Risk Reduction & Reliability)
+
+Competitive Visual
+
+MULTI-VENDOR RISK: ENDPOINT CLINICAL
+TRIALS + OTHERS
+
+Core Insight
+
+ENDPOINT’S PAIN POINT: Juggling multiple
+vendors creates friction
+
+Strategic Goal
+
+SHIFT ALMAC’S POSITIONING from a
+traditional provider to a modern end-toend partner
+
+Almac Email #3 - Success Story (Consideration)
+Email will be sent out to people who
+signed up to learn more at Almac’s
+events.
+Success story highlights Almac’s ability
+to resolve the pain points that clinical
+teams are facing.
+The merge between Almac and 4G
+Clinical is showcased through modern
+RTSM and streamlined processes.
+This email can move prospects from the
+awareness to consideration stage as
+credibility is proven through measurable
+results rather than marketing claims.
+
+4G Clinical Strategy: The Agility Offensive
+(Consideration Post)
+CONTENT FOCUS
+
+TALKING POINTS
+
+Positioning
+
+Reposition 4G Clinical as the specialist
+that delivers fewer steps, fewer
+failures, and faster outcomes.
+
+Competitive
+Attack
+
+Directly attack Endpoint’s dual-platform
+and AI-heavy process which creates
+risk, slowdowns, and concerns for
+sponsors
+
+Visual
+Message
+
+“Traditional IRT: Dual Platforms + AI
+Dependence → Higher Costs &
+Compliance Risk” vs a clean “Modern
+Unified IRT → Lower Costs, Less Risk,
+Faster to Market.”
+
+Core Goal
+
+Present 4G Clinical as the category
+leader in speed and efficiency
+
+4G Clinical Email #3 - Competitive Replacement (Consideration)
+
+It will be sent out to people who signed
+up to learn more at 4G’s events.
+4G Clinical is directly compared to
+competitors, such as Endpoint, which
+allows emphasis of specific
+differentiators that make it a category
+leader.
+Assuming readers are familiar with
+RTSM, it pushes the audience to
+evaluate their provider options.
+By outlining solutions to the given pain
+points, this email paints 4G Clinical to be
+better than current or potential options.
+
+THE ONE-VENDOR ADVANTAGE: SEAMLESS END-TO-END EXECUTION
+(CONVERSION SOCIAL POST)
+CONTENT FOCUS
+
+TALKING POINTS
+
+Visual Focus
+
+THE ONE-VENDOR ADVANTAGE: ALMAC &
+4G CLINICAL STRATEGIC ALLIANCE
+
+Channel Strategy
+
+LinkedIn Sponsored Content & Retargeting
+Display
+
+Core Asset
+Messaging
+
+Message: Stop Juggling Vendors. CTA:
+Download the Integrated IRT Case Study.
+
+Key Performance
+Metrics (KPIs)
+
+We prioritize metrics that measure
+content relevance: CTOR.
+MQL→SQL→Opportunities. ROI & ROAS
+
+4G Clinical Execution & Measurement
+(CONVERSION POST)
+CONTENT FOCUS
+
+TALKING POINTS
+
+LinkedIn Sponsored
+Content
+
+Focus on 4G being "Built for
+Constant Change" rather than
+legacy systems that slow down
+protocol amendments
+
+High-Fidelity
+UI/Display Visual
+
+Prove Rapid Protocol Adaptation
+and seamless mid-study
+changes.
+
+Display Retargeting
+Banner
+
+Drive immediate action by
+reinforcing the agility claim to
+interested prospects
+
+KPIs
+
+MQLs (Qualified Leads) → SQLs
+(Sales Acceptance) →
+Opportunities (Revenue
+Conversion)
+
+Almac Group Email #3 - Retention Campaign (Loyalty)
+Following a conversion, it is
+necessary to nurture the
+relationship for future business, so
+this email offers a CTA for
+exclusive perks for those who have
+decided to partner with Almac.
+A free demo and membership to a
+partnership program are included,
+which reinforces value and
+encourages retention and deeper
+partnership.
+
+4G Clinical Email #3 - Retention Campaign (Loyalty)
+Offering VIP access to a feature
+demo is a huge perk coming from a
+category leader, and 4G Clinical is
+happy to invite their partners to
+join as that can increase retention
+rate.
+This can stimulate positive wordof-mouth from current trial groups
+as this exclusive access reinforces
+4G’s ability to nurture ongoing
+relationships.
+
+Creative/Brand
+
+We’ll be there from end to end.
+
+LANDING PAGES
+
+Positioning: modern end-to-end solution provider
+.
+
+Initial message: partnership with 4G Clinical will
+streamline workflow
+
+One narrative: integration reduces risk
+
+LANDING PAGES
+
+Positioning: 4G is a tech forward specialist
+Initial message: technology that allows unmatched speed
+and cohesivity
+Message reinforcements: predictable speed, sponsor
+control, and fewer failures
+
+Landing Page Alt Text
+NEW AND IMPROVED ALT TEXT
+
+SEO/SEM/LLM
+
+SEO KEYWORDS WE WANT TO RUN
+4G Clinical
+Keyword
+
+Overview
+
+Natural
+Language
+Processing
+(NLP)
+
+WE CHOSE NLP AS THE
+KEYWORD BECAUSE IT
+REPRESENTS A CORE
+FEATURE OF 4G
+CLINICAL’S
+TECHNOLOGY, YET
+THEY CURRENTLY HAVE
+NO SEO VISIBILITY FOR
+IT, MAKING IT A MAJOR
+OPPORTUNITY FOR
+IMPROVEMENT.
+
+Problem
+4G HAS NO SEO
+VISIBILITY FOR NLP
+BECAUSE THEIR
+WEBSITE BARELY
+MENTIONS NLP, HAS
+NO NLP-FOCUSED
+PAGES OR CONTENT,
+AND DOESN’T TARGET
+ANY NLP-RELATED
+SEARCH TERMS THAT
+GOOGLE CAN RANK
+
+Solution
+4G CAN FIX THIS BY
+ADDING NLPFOCUSED PAGES AND
+CONTENT SO GOOGLE
+CAN FINALLY
+RECOGNIZE AND
+RANK THEM FOR NLPRELATED SEARCHES.
+
+Analytics
+
+DATA REFLECTS THE MONTH OF SEPT 2025
+
+SEMRUSH
+
+ALMAC
+TRAFFIC OVERVIEW
+
+ENGAGEMENT METRICS
+
+Endpoint
+
+Almac
+
+Organic
+
+735
+
+12,100
+
+Direct
+
+73,400
+
+44,900
+
+Referral
+
+1,300
+
+7,300
+
+SEM
+
+0
+
+1,300
+
+Social
+
+0
+
+249
+
+Monthly traffic
+
+76,300
+
+72,900
+
+Unique visitors
+
+10,400
+
+48,900
+
+Monthly growth
+
+42.04%
+
+5.92%
+
+Greatest traffic source is direct
+Lowest traffic source is paid social
+Greater organic and referral traffic than Endpoint
+Good, comparable traffic
+Lots of interest but poor growth
+
+Endpoint
+
+Almac
+
+visit duration
+
+00:04:32
+
+00:06:33
+
+pages/visit
+
+29.18
+
+3.31
+
+bounce rate
+
+3.38%
+
+48.94%
+
+Our engagement metrics show that we have a solid visit
+duration that outperforms Endpoint, however we have low
+pages/visit and a very high bounce rate.
+This could be a result of:
+poor landing page
+slow site performance
+lack of CTA, hero image, video...
+content does not resonate
+confusing content
+
+SEPT 2025
+
+Traffic cost: $567
+Trafffic: 505
+Top paid keywords
+“almac”
+one for clinical and one for analytical landing page
+brought in 26.93% of traffic with volume of 2,900 and CPC
+of $1.39
+“almac group”
+one for clinical and one for analytical landing page
+brought in 9.3% traffic with volume of 1,000 and lower CPC
+of $0.34 and $1.23
+“almac clinical service”
+highest CPC, brought in volume of 320 with only 0.79% of
+traffic
+
+CURRENT
+
+Traffic cost: $84
+Traffic: 31
+Top paid keywords
+“pharmaceutical companies near me”
+bringing in the most amount of volume of 4,400 and but
+low traffic conversion of only 22 traffic for CPC of $2.09
+popular search but too broad
+“curascript sd specialty distribution”
+second largest traffic (but it is low) and low volume with the
+second highest cost of $6.54; may be worth discarding or
+tweak wording
+“ivd assay development”
+second largest volume, low traffic, highest cost
+discard or tweak wording
+
+DATA REFLECTS THE MONTH OF SEPT 2025
+
+SEMRUSH
+
+4G
+
+ENGAGEMENT METRICS
+
+TRAFFIC OVERVIEW
+Endpoint
+
+4G
+
+Organic
+
+735
+
+1
+
+Direct
+
+73,400
+
+10,000
+
+Referral
+
+1,300
+
+1,900
+
+SEM
+
+0
+
+0
+
+Social
+
+0
+
+0
+
+Monthly traffic
+
+76,300
+
+13,500
+
+Unique visitors
+
+10,400
+
+5,300
+
+Monthly growth
+
+42.04%
+
+8.45%
+
+Greatest traffic source is direct
+Lowest traffic source is organic
+SEM and Social not detected
+Greater referral traffic than Endpoint
+Very poor organic traffic
+Poor overall traffic and growth
+Not much interest
+
+Endpoint
+
+4G
+
+visit duration
+
+00:04:32
+
+00:08:39
+
+pages/visit
+
+29.18
+
+4.06
+
+bounce rate
+
+3.38%
+
+42.27%
+
+Our engagement metrics show that we have a great visit
+duration that outperforms Endpoint, however we have
+low pages/visit and a very high bounce rate.
+This could be a result of:
+poor landing page
+slow site performance
+lack of CTA, hero image, video...
+content does not resonate
+confusing content
+
+SEPT 2025
+
+CURRENT
+
+Could not find any SEM data on 4g because
+low-volume
+minimal paid-search activity
+Traffic cost: $567
+
+Traffic cost: $84
+
+Top paid keywords
+
+Top paid keywords
+
+“almac”
+one for clinical and one for analytical landing page
+brought in 26.93% of traffic with volume of 2,900 and CPC
+of $1.39
+“almac group”
+one for clinical and one for analytical landing page
+brought in 9.3% traffic with volume of 1,000 and lower CPC
+of $0.34 and $1.23
+“almac clinical service”
+highest CPC, brought in volume of 320 with only 0.79% of
+traffic
+
+“pharmaceutical companies near me”
+bringing in the most amount of volume of 4,400 and 70.96%
+traffic for lower CPC of $2.09
+positioning at 5, invest more of budget on this keyword
+“curascript sd specialty distribution”
+second largest traffic (but it is low) and low volume with the
+second highest cost of $6.54; may be worth discarding or
+tweak wording
+“ivd assay development”
+second largest volume, low traffic, highest cost
+discard or tweak wording
+
+ALMAC
+STRENGTHS
+
+Best for full-service
+pharma requiring
+integrated supply chain
+Strong legacy trust
+global reach
+strong LinkedIn following
+(75k, compared to EP
+25k)
+
+4G
+WEAKNESS
+
+thousands of indexed
+pages due to global
+operations - lots of
+content
+limited visibility in
+IRT/RTSM SEM
+
+STRENGTHS
+
+innovative/modern
+messaging
+Strong value for agile
+sponsors and biotech
+clear value propositions
+
+fragmented branding
+across divisions.
+
+Recommedations:
+Build unified social identity
+Create long-form insights integrating full supply
+chain + IRT capabilities.
+Promote end-to-end value proposition + tech: one
+partner for everything (supply, randomization,
+logistics)
+
+WEAKNESS
+
+smaller reach
+niche-focused
+poor SEO and SEM
+weak LinkedIn following
+(12k, compared to EP
+25k)
+
+Recommedations:
+Strengthen digital authority with data
+visualizations, socials, focus on awareness
+Expand SEM into specific sponsor-relevant queries
+Amplify niche expertise in NLP and strength in
+agility with thought leadership
+
+How AI is
+Currently Used
+
+Overview: Almac uses AI in both
+enzyme discovery and clinical-trial
+operations to help make their drug
+development and trial-management
+processes faster and more efficient
+Pro: Their use of AI can speed up
+things like enzyme optimization and
+trial setup, giving them a more
+streamlined and end-to-end workflow
+Con: Almac talks about using AI in
+R&D and clinical-data tools, but they
+don’t clearly show that it’s being
+used to improve their supply-chain
+operations, which makes their
+approach seem less advanced in that
+area.
+
+Overview: 4G Clinical uses NLP and
+machine learning to interpret clinical
+protocols, making them wellpositioned to expand into full LLMdriven automation for RTSM setup
+and supply optimization.
+Pro: 4G Clinical already uses NLP to
+automatically interpret written clinical
+trial specifications and convert them
+into a functional RTSM setup,
+significantly speeding up and
+simplifying the study-build process
+Con: Because NLP accuracy depends
+on how clearly and consistently a
+protocol is written, 4G Clinical’s
+system may still misinterpret unclear
+sections and require human review.
+
+Upgraded Almac & 4G LLM
+Strategy to Outperform
+Endpoint
+Why Endpoints is Currently Better:
+Endpoint is better because it has a wide, builtin multi-agent AI system that handles
+everything from study design to supply chain,
+compliance, and monitoring. It’s also fully
+integrated into their RTSM platform and
+clearly marketed as advanced AI, making it
+feel more modern and capable than
+competitors.
+
+Why Endpoints is Currently Better:
+Endpoint is better because it has a wide, builtin multi-agent AI system that handles
+everything from study design to supply chain,
+compliance, and monitoring. It’s also fully
+integrated into their RTSM platform and
+clearly marketed as advanced AI, making it
+feel more modern and capable than
+competitors.
+
+How to Improve:
+Almac could beat Endpoint by expanding its AI
+beyond R&D and using it directly in their
+clinical supply-chain operations like adding AI
+tools for forecasting, resupply, and real-time
+logistics monitoring since that’s where
+Endpoint is strongest and Almac already has
+the infrastructure but not the AI behind it.
+
+How to Improve:
+4G Clinical could surpass Endpoint by
+upgrading their NLP into a full LLM-powered
+system and building agent-like tools that
+automate more than just study setup—such as
+AI-driven supply management, compliance
+checks, or trial monitoring—essentially turning
+their strong protocol-reading technology into
+an end-to-end automation platform.
+
+Why We Win
+
+ENDPOINT’S
+END.POINT.
+
+THANK YOU
+QUESTIONS?
+
+

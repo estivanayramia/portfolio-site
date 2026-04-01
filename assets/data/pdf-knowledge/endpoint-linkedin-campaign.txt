@@ -1,0 +1,207 @@
+By: Group 1
+
+EndPoint LinkedIn
+Campaign
+
+Goals per Phase
+Stage
+
+Phase 2A
+
+Retargeting via carousel ad
+
+Primary Goal
+Generate qualiﬁed leads
+from users who engaged in
+phase 1
+
+Supporting KPI’s
+
+Increased: CTR,
+Engagement Rate
+
+Help turn MQL’s into qualiﬁed
+leads
+
+Drive deeper interest +
+education via CTA
+Phase 2B
+
+Retargeting via video
+Help turn leads into
+opportunities
+
+Increased: Conversions,
+ROAS
+Decreased: CPC
+
+Creative Format
+
+Quick, emphasizes key pain
+points solved by Endpoint
+Clinical via statics
+
+Storytelling-based that
+shows the client we are their
+efficient and only solution
+with CTA in the caption to
+learn more
+
+Audience Strategy
+●
+●
+●
+
+Retarget with people who interacted with Phase 1 ads (clicked + engaged)
+Segments by job function and seniority
+○ Clinical operations, pharma execs, decision makers
+Potential audiences:
+○ Retargeting website visitors or engagement list
+■ Such as contacts or accounts from events
+○ “Lookalikes”
+○ ABM segment of target companies
+○ VIP Lists
+
+Why? → we want to target a smaller and relevant retargeting pool so that our CTR
+and engagement rates perform well
+
+Overview of Plan
+For Phases 2A and 2B, our objective is to retarget and convert the engaged audience from Phase 1 awareness efforts into
+qualiﬁed leads and help them down the pipeline. We want to increase CTR above the .40% marker, achieve an engagement
+rate of at least 1.10%, and lower CPC while gaining conversions. Our target audience included decision makers in clinical
+operations, pharmaceutical executives, and decision makers located in North America. We will focus ﬁrst on retargeting users
+who previously interacted with the ads, and later expand to lookalike segments and VIP lists.
+For creative strategy, we will use a carousel ad in Phase 2A to efficiently communicate Endpoint Clinical’s impressive
+statistics to show value and push users to a lead generation form. In Phase 2B, we will introduce a short-form video to tell a
+visual story to entertain our audience so they will convert. Our key KPI’s of CTR, engagement rate, CPC, cost per conversion,
+and ROAS will help us track performance across the funnel. CTR and engagement rate will measure interest and ﬁt, CPC will
+reﬂect cost efficiency, and conversions and ROAS will show the campaign’s actual business impact.
+
+Phase 1 Metrics
+Spend:
+Impressions:
+Clicks:
+Engagement:
+Conversions:
+CTR:
+Engagement Rate:
+CPC:
+CP Conversion:
+
+$6,924.90
+1,400,000
+3,527
+3,004
+2,963
+0.25%
+0.21%
+$1.96
+$2.34
+
+Phase 2A Metrics
+Spend:
+Impressions:
+Clicks:
+Engagement:
+Conversions:
+CTR:
+Engagement Rate:
+CPC:
+CP Conversion:
+
+$3,000
+500,000
+8,000
+6,000
+4,000
+1.6%
+1.2%
+$0.38
+$0.75
+
+Phase 2B Metrics
+Spend:
+Impressions:
+Clicks:
+Engagement:
+Conversions:
+CTR:
+Engagement Rate:
+CPC:
+CP Conversion:
+
+$3,000
+350,000
+4,025
+3,200
+2,000
+1.2%
+0.91%
+$0.74
+$1.50
+
+Ad 1: Carousel Statistics
+
+Focusing on conversion in phase 2
+and retargeting to customers who
+are already interested.
+
+Ad 2: Elosity: The Bottleneck Breaker
+
+Excel Workbook
+
+Phase 1 Kill/Scale Rules
+-
+
+Kill if spend exceeds budget by 10% with CTR > 0.30%
+Scale if CTR ≥ 0.45% for 3 consecutive days
+Kill if CTR decreases ≥ 0.20% a week after optimization
+Kill if engagement rate ≤ 0.5% after 5,000 impressions
+Scale if CPC ≤ $1.50 with CTR ≥ 0.40%
+
+Phase 2A + 2B Kill/Scale Rules
+-
+
+Kill if Spend > $6,000 with Engagement < 4,000 in the ﬁrst week
+Scale if Engagement rate ≥ 0.4%
+Kill if CTR rate declines ≥ 20% week over week
+Scale if CPC ≤ $1.00 with 4,000 conversions per week
+Scale if CPC ≤ $0.70 with CTR
+
+Audience Experiment
+Hypothesis:
+Targeted ads aimed at specific industry segments (e.g., biotech firms, CROs, and pharmaceutical
+companies) will generate higher engagement and conversion rates than broader, untargeted audiences.
+By testing segmented audience groups through social channels and geographic locations, we can
+identify which audience is most responsive to our product offerings.
+Success Metric (KPI):
+●
+
+Primary: Click-Through Rate (CTR) — measures which audience finds the ad most relevant and
+engaging.
+
+●
+
+Secondary: Return on Ad Spend (ROAS) — to determine which audience delivers the best return on
+ad spend.
+
+Creative/Format Experiment
+Hypothesis:
+A longer, visually engaging video that clearly explains what Elosity does will drive higher
+engagement and conversions than a quicker carousel or GIF format. While GIFs may capture attention
+faster, our target audience in the medical field tends to value clarity and informational depth,
+making longer, well-designed video content more effective.
+Success Metric (KPI):
+●
+
+Primary: Conversion Rate (CVR) — percentage of users who take the desired action (e.g., demo
+request, site visit).
+
+●
+
+Secondary: Engagement Rate (likes, shares, comments, or completion rate), to measure how well
+each creative holds attention.
+
+Thank you!
+
+
