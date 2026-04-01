@@ -35,12 +35,19 @@
   var timeline = null;
   var isSkipping = false;
   var isComplete = false;
+  var isPaused = false;
   var introEl = null;
   var curtainEl = null;
   var skipBtn = null;
   var soundBtn = null;
+  var playerBarEl = null;
+  var progressFill = null;
+  var progressDot = null;
+  var timeDisplay = null;
+  var playPauseBtn = null;
   var startTime = 0;       // Performance.now() when intro began
   var audioAttempted = false;
+  var TOTAL_DURATION = 14;  // intro duration in seconds
 
   // ── Audio handle (loaded from cinematic-audio.js) ─────────────────────
   function audio() {
@@ -110,10 +117,63 @@
     soundBtn.setAttribute('aria-label', muted ? 'Turn sound on' : 'Turn sound off');
   }
 
-  // SVG icons for sound toggle
+  // SVG icons
+  var ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="5,3 19,12 5,21"/></svg>';
+  var ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>';
+
   var ICON_UNMUTED = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
 
   var ICON_MUTED = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>';
+
+  // ── Player helpers ──────────────────────────────────────────────────
+
+  function fmt(s) {
+    if (isNaN(s) || s < 0) s = 0;
+    var m = Math.floor(s / 60);
+    var sec = Math.floor(s % 60);
+    return m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function updatePlayerBar() {
+    if (!timeline || !progressFill || !timeDisplay) return;
+    var t = timeline.time();
+    var dur = timeline.duration();
+    var pct = Math.min(100, (t / dur) * 100);
+    progressFill.style.width = pct + '%';
+    timeDisplay.textContent = fmt(t) + ' / ' + fmt(dur);
+  }
+
+  function togglePlayPause() {
+    if (isComplete || isSkipping || !timeline) return;
+    if (isPaused) {
+      isPaused = false;
+      timeline.play();
+      if (playPauseBtn) {
+        playPauseBtn.innerHTML = ICON_PAUSE;
+        playPauseBtn.setAttribute('aria-label', 'Pause');
+      }
+    } else {
+      isPaused = true;
+      timeline.pause();
+      if (playPauseBtn) {
+        playPauseBtn.innerHTML = ICON_PLAY;
+        playPauseBtn.setAttribute('aria-label', 'Play');
+      }
+    }
+  }
+
+  function seekTo(t) {
+    if (!timeline) return;
+    var dur = timeline.duration();
+    t = Math.max(0, Math.min(dur - 0.1, t));
+    timeline.time(t);
+    updatePlayerBar();
+  }
+
+  function seekBy(delta) {
+    if (!timeline) return;
+    seekTo(timeline.time() + delta);
+  }
 
   // ── DOM Construction ──────────────────────────────────────────────────
 
@@ -197,28 +257,81 @@
     fragmentEls.forEach(function (el) { introEl.appendChild(el); });
     introEl.appendChild(scene);
 
-    // ── Controls container (bottom row: sound + skip) ────────────────
-    var controls = document.createElement('div');
-    controls.className = 'intro-controls';
+    // ── Player bar (bottom center) ────────────────────────────────────
+    playerBarEl = document.createElement('div');
+    playerBarEl.className = 'intro-player';
+    playerBarEl.setAttribute('aria-label', 'Playback controls');
 
-    // Sound toggle button (only if Web Audio is available)
+    // Rewind button
+    var rwBtn = document.createElement('button');
+    rwBtn.className = 'intro-player-btn intro-btn-rw';
+    rwBtn.setAttribute('type', 'button');
+    rwBtn.setAttribute('aria-label', 'Rewind 5 seconds');
+    rwBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+    rwBtn.addEventListener('click', function () { seekBy(-5); });
+    playerBarEl.appendChild(rwBtn);
+
+    // Play/Pause button
+    playPauseBtn = document.createElement('button');
+    playPauseBtn.className = 'intro-player-btn intro-btn-pp';
+    playPauseBtn.setAttribute('type', 'button');
+    playPauseBtn.setAttribute('aria-label', 'Pause');
+    playPauseBtn.innerHTML = ICON_PAUSE;
+    playPauseBtn.addEventListener('click', function () { togglePlayPause(); });
+    playerBarEl.appendChild(playPauseBtn);
+
+    // Forward button
+    var fwBtn = document.createElement('button');
+    fwBtn.className = 'intro-player-btn intro-btn-fw';
+    fwBtn.setAttribute('type', 'button');
+    fwBtn.setAttribute('aria-label', 'Forward 5 seconds');
+    fwBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="23,4 23,10 17,10"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg>';
+    fwBtn.addEventListener('click', function () { seekBy(5); });
+    playerBarEl.appendChild(fwBtn);
+
+    // Progress bar
+    var progWrap = document.createElement('div');
+    progWrap.className = 'intro-progress-wrap';
+    var progTrack = document.createElement('div');
+    progTrack.className = 'intro-progress-track';
+    progressFill = document.createElement('div');
+    progressFill.className = 'intro-progress-fill';
+    progressDot = document.createElement('div');
+    progressDot.className = 'intro-progress-dot';
+    progressFill.appendChild(progressDot);
+    progTrack.appendChild(progressFill);
+    progWrap.appendChild(progTrack);
+    progWrap.addEventListener('click', function (e) {
+      var rect = progWrap.getBoundingClientRect();
+      var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      seekTo(pct * TOTAL_DURATION);
+    });
+    playerBarEl.appendChild(progWrap);
+
+    // Time display
+    timeDisplay = document.createElement('span');
+    timeDisplay.className = 'intro-time-display';
+    timeDisplay.textContent = '0:00 / 0:14';
+    playerBarEl.appendChild(timeDisplay);
+
+    // Sound toggle
     var a = audio();
     if (a && a.isAvailable()) {
       soundBtn = document.createElement('button');
-      soundBtn.className = 'intro-sound-toggle';
+      soundBtn.className = 'intro-player-btn intro-btn-sound';
       soundBtn.setAttribute('type', 'button');
       soundBtn.setAttribute('aria-label', 'Turn sound on');
-      soundBtn.innerHTML = '<span class="sound-icon">' + ICON_MUTED + '</span><span class="sound-label">Sound</span>';
-      controls.appendChild(soundBtn);
+      soundBtn.innerHTML = '<span class="sound-icon">' + ICON_MUTED + '</span>';
+      playerBarEl.appendChild(soundBtn);
     }
 
-    // Skip button
+    // Skip/Close button
     skipBtn = document.createElement('button');
-    skipBtn.className = 'intro-skip';
+    skipBtn.className = 'intro-player-btn intro-btn-skip';
     skipBtn.setAttribute('type', 'button');
     skipBtn.setAttribute('aria-label', 'Skip intro');
-    skipBtn.innerHTML = 'Skip <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 4 15 12 5 20"></polyline><line x1="19" y1="4" x2="19" y2="20"></line></svg>';
-    controls.appendChild(skipBtn);
+    skipBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    playerBarEl.appendChild(skipBtn);
 
     // Curtain (for reveal transition)
     curtainEl = document.createElement('div');
@@ -227,7 +340,7 @@
     // Insert into DOM
     document.body.insertBefore(curtainEl, document.body.firstChild);
     document.body.insertBefore(introEl, document.body.firstChild);
-    document.body.appendChild(controls);
+    document.body.appendChild(playerBarEl);
 
     return {
       scene: scene,
@@ -237,7 +350,7 @@
       logo: logo,
       name: name,
       tagline: tagline,
-      controls: controls
+      controls: playerBarEl
     };
   }
 
@@ -251,6 +364,9 @@
 
     var tl = gsap.timeline({
       paused: true,
+      onUpdate: function () {
+        updatePlayerBar();
+      },
       onComplete: function () {
         completeIntro();
       }
@@ -423,11 +539,11 @@
           curtainEl.setAttribute('data-state', 'done');
           curtainEl.parentNode.removeChild(curtainEl);
         }
-        // Remove controls container
-        var controls = document.querySelector('.intro-controls');
-        if (controls && controls.parentNode) {
-          controls.parentNode.removeChild(controls);
+        // Remove player bar
+        if (playerBarEl && playerBarEl.parentNode) {
+          playerBarEl.parentNode.removeChild(playerBarEl);
         }
+        playerBarEl = null;
         skipBtn = null;
         soundBtn = null;
         if (timeline) {
@@ -443,6 +559,18 @@
     }
 
     addReplayLink();
+    showWatchBtn();
+  }
+
+  function showWatchBtn() {
+    var btns = document.querySelectorAll('.watch-trailer-btn');
+    btns.forEach(function (b) {
+      b.style.display = '';
+      b.addEventListener('click', function () {
+        try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+        window.location.reload();
+      });
+    });
   }
 
   function skipIntro() {
@@ -466,9 +594,8 @@
         ease: 'power2.inOut',
         onComplete: completeIntro
       });
-      var controls = document.querySelector('.intro-controls');
-      if (controls) {
-        gsap.to(controls, {
+      if (playerBarEl) {
+        gsap.to(playerBarEl, {
           opacity: 0,
           duration: 0.3,
           ease: 'power2.in'
@@ -556,17 +683,25 @@
       tryStartAudio();
     });
 
-    // Keyboard: Escape, Enter, or Space to skip
+    // Keyboard shortcuts
     function onKeyDown(e) {
       if (isComplete) {
         document.removeEventListener('keydown', onKeyDown);
         return;
       }
-      // Any keypress counts as user gesture for audio
       tryStartAudio();
-      if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+      if (e.key === 'Escape') {
         e.preventDefault();
         skipIntro();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        togglePlayPause();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        seekBy(-5);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        seekBy(5);
       }
     }
     document.addEventListener('keydown', onKeyDown);
@@ -584,6 +719,7 @@
     // Gate: already seen
     if (hasSeenIntro()) {
       addReplayLink();
+      showWatchBtn();
       return;
     }
 
