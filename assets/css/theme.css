@@ -2836,3 +2836,24 @@ footer {
   margin-top: 5rem !important;
 }
 
+
+/* Mobile chat chips: allow wrapping instead of horizontal scroll */
+@media (max-width: 640px) {
+    #chat-chips {
+        flex-wrap: wrap !important;
+        white-space: normal !important;
+        overflow-x: visible !important;
+    }
+    #chat-chips .chip-btn {
+        white-space: nowrap;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Ensure mobile menu is above all content */
+#mobile-menu {
+    position: relative;
+    z-index: 40;
+}
