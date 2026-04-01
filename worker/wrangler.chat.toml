@@ -2,6 +2,7 @@ name = "portfolio-chat"
 main = "chat-worker.js"
 compatibility_date = "2024-01-01"
 workers_dev = true
+# Deploy trigger note: no behavior change.
 
 # Chat worker owns ONLY the chat endpoints.
 # IMPORTANT: do not add broad patterns like /api/* here.
