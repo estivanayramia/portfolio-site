@@ -1242,3 +1242,11 @@
         text-overflow: ellipsis;
     }
 }
+
+/* Games carousel: extra bottom padding to prevent arrow overlap with cards */
+#arcade-featured-carousel .coverflow-container {
+    padding-bottom: 8rem;
+}
+#arcade-featured-carousel .coverflow-controls {
+    bottom: 1rem;
+}
