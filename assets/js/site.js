@@ -1018,16 +1018,18 @@ const __findContactForm = () => {
 const initFormValidation = () => {
     const form = __findContactForm();
     if (!form) return;
+    if (form.dataset.contactSubmitBound === 'true') return;
+    form.dataset.contactSubmitBound = 'true';
 
     const endpointFromData = (form.getAttribute('data-form-endpoint') || '').trim();
     const endpointFromAction = (form.getAttribute('action') || '').trim();
     const submitEndpoint = endpointFromData || endpointFromAction;
-    const isRemoteEndpoint = /^https?:\/\//i.test(submitEndpoint);
 
     // Keep native fallback aligned with configured endpoint.
     if (endpointFromData && endpointFromAction !== endpointFromData) {
         form.setAttribute('action', endpointFromData);
     }
+    form.noValidate = true;
 
     const inputs = form.querySelectorAll('input, textarea, select');
     const fileInput = form.querySelector('input[type="file"][name="file"]');
@@ -1067,46 +1069,68 @@ const initFormValidation = () => {
     // Helper to show inline error
     const showError = (input, message) => {
         input.classList.add('border-red-500');
+        input.setAttribute('aria-invalid', 'true');
         let errorEl = input.parentElement.querySelector('.inline-error');
         if (!errorEl) {
             errorEl = document.createElement('p');
             errorEl.className = 'inline-error text-xs text-red-600 mt-1';
             input.parentElement.appendChild(errorEl);
         }
+        if (!errorEl.id) {
+            const inputKey = input.id || input.name || 'field';
+            errorEl.id = `inline-error-${inputKey.replace(/[^a-z0-9_-]+/gi, '-')}`;
+        }
+        input.setAttribute('aria-describedby', errorEl.id);
         errorEl.textContent = message;
     };
 
     // Helper to clear inline error
     const clearError = (input) => {
         input.classList.remove('border-red-500');
+        input.removeAttribute('aria-invalid');
+        input.removeAttribute('aria-describedby');
         const errorEl = input.parentElement.querySelector('.inline-error');
         if (errorEl) errorEl.remove();
+    };
+
+    const validateInput = (input) => {
+        const value = typeof input.value === 'string' ? input.value.trim() : '';
+
+        if (input.hasAttribute('required') && !value) {
+            showError(input, 'This field is required');
+            return false;
+        }
+
+        if (input.type === 'email' && input.value && !input.checkValidity()) {
+            showError(input, 'Please enter a valid email address');
+            return false;
+        }
+
+        if (input.type === 'url' && input.value && !isSafeUrl(input.value)) {
+            showError(input, 'Please enter a valid URL');
+            return false;
+        }
+
+        if (!input.checkValidity()) {
+            showError(input, input.validationMessage || 'Invalid input');
+            return false;
+        }
+
+        clearError(input);
+        return true;
     };
 
     // Real-time validation for each input
     inputs.forEach(input => {
         // Validate on blur
         input.addEventListener('blur', () => {
-            if (input.hasAttribute('required') && !input.value.trim()) {
-                showError(input, 'This field is required');
-            } else if (input.type === 'email' && input.value && !input.checkValidity()) {
-                showError(input, 'Please enter a valid email address');
-            } else if (input.type === 'url' && input.value && !isSafeUrl(input.value)) {
-                showError(input, 'Please enter a valid URL');
-            } else if (!input.checkValidity()) {
-                showError(input, input.validationMessage || 'Invalid input');
-            } else {
-                clearError(input);
-            }
+            validateInput(input);
         });
 
         // Clear error as user types
         input.addEventListener('input', () => {
             if (input.classList.contains('border-red-500')) {
-                // Re-validate on input to clear error when fixed
-                if (input.checkValidity() && input.value.trim()) {
-                    clearError(input);
-                }
+                validateInput(input);
             }
         });
     });
@@ -1122,6 +1146,9 @@ const initFormValidation = () => {
 
     const isContactStatus = status.id === 'contact-status';
     const setStatus = (message, type) => {
+        status.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
+        status.setAttribute('role', type === 'error' ? 'alert' : 'status');
+
         if (isContactStatus) {
             const base = 'min-h-[3rem] text-sm font-medium';
             status.dataset.status = type || 'idle';
@@ -1146,6 +1173,10 @@ const initFormValidation = () => {
             btn.disabled = submitting;
             btn.classList.toggle('loading', submitting);
         }
+        if (clearBtn) {
+            clearBtn.disabled = submitting;
+        }
+        form.setAttribute('aria-busy', submitting ? 'true' : 'false');
     };
 
     const clearBtn = document.getElementById('clear-form-btn');
@@ -1157,12 +1188,15 @@ const initFormValidation = () => {
         });
     }
 
+    let isSubmitting = false;
     const submitForm = async () => {
         if (!submitEndpoint) {
             setStatus('Contact form endpoint is missing. Please use the email link below.', 'error');
             return;
         }
+        if (isSubmitting) return;
 
+        isSubmitting = true;
         setSubmitting(true);
         setStatus('Sending your message...', 'pending');
         try {
@@ -1195,7 +1229,21 @@ const initFormValidation = () => {
                 mode: 'cors',
                 credentials: 'omit'
             });
-            if (res.ok) {
+            let responseData = null;
+            const contentType = (res.headers.get('content-type') || '').toLowerCase();
+            if (contentType.includes('application/json')) {
+                try {
+                    responseData = await res.json();
+                } catch (_) {
+                    responseData = null;
+                }
+            }
+
+            const responseErrors = Array.isArray(responseData && responseData.errors)
+                ? responseData.errors.map((error) => error && error.message).filter(Boolean)
+                : [];
+
+            if (res.ok && responseErrors.length === 0) {
                 form.reset();
                 inputs.forEach((input) => clearError(input));
 
@@ -1214,51 +1262,38 @@ const initFormValidation = () => {
                     }
                 }
             } else {
-                setStatus('Sorry, something went wrong. Trying fallback...', 'error');
-                // Fallback to normal submission (opens in new tab)
-                try {
-                    form.setAttribute('action', submitEndpoint);
-                    form.setAttribute('target', '_blank');
-                    form.submit();
-                } catch (_) {
-                    // keep error visible
-                    setStatus('Sorry, something went wrong. Please try again or email hello@estivanayramia.com.', 'error');
-                }
+                const responseErrorMessage = responseErrors.join(' ');
+                setStatus(
+                    responseErrorMessage || 'Sorry, something went wrong. Please try again or email hello@estivanayramia.com.',
+                    'error'
+                );
             }
-        } catch (err) {
-            setStatus('Network error detected. Opening fallback submit...', 'error');
-            // Fallback to normal submission (opens in new tab)
-            try {
-                form.setAttribute('action', submitEndpoint);
-                form.setAttribute('target', '_blank');
-                if (isRemoteEndpoint) form.submit();
-                else throw new Error('Non-remote endpoint');
-            } catch (_) {
-                setStatus('Network error. Please check your connection or email hello@estivanayramia.com.', 'error');
-            }
+        } catch (_) {
+            setStatus('Network error. Please check your connection or email hello@estivanayramia.com.', 'error');
         } finally {
+            isSubmitting = false;
             setSubmitting(false);
         }
     };
 
     // Form submission handling
     form.addEventListener('submit', (e) => {
-        let isValid = true;
+        e.preventDefault();
+        if (isSubmitting) return;
 
-        inputs.forEach(input => {
-            if (!input.checkValidity()) {
-                isValid = false;
-                input.classList.add('border-red-500');
-            }
+        let firstInvalid = null;
+        let isValid = true;
+        Array.from(inputs).forEach((input) => {
+            const fieldValid = validateInput(input);
+            if (!fieldValid && !firstInvalid) firstInvalid = input;
+            if (!fieldValid) isValid = false;
         });
 
-        e.preventDefault();
         if (!isValid) {
-                    // Focus on first invalid field (prevent scrolling the viewport)
-                    const firstInvalid = form.querySelector('.border-red-500');
-                    if (firstInvalid) {
-                        try { firstInvalid.focus({ preventScroll: true }); } catch (e) { try { __logCollect && __logCollect('focus-fallback', { selector: firstInvalid.tagName + (firstInvalid.id ? '#'+firstInvalid.id : '' ) }); } catch(_){} firstInvalid.focus(); }
-                    }
+            // Focus on first invalid field (prevent scrolling the viewport)
+            if (firstInvalid) {
+                try { firstInvalid.focus({ preventScroll: true }); } catch (err) { try { __logCollect && __logCollect('focus-fallback', { selector: firstInvalid.tagName + (firstInvalid.id ? '#'+firstInvalid.id : '' ) }); } catch(_){} firstInvalid.focus(); }
+            }
             setStatus('Please complete required fields highlighted in red.', 'error');
             return;
         }
