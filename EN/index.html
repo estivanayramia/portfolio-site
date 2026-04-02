@@ -4,22 +4,22 @@
   <head>
     <meta charset="UTF-8" />
     <script>
-      document.documentElement.classList.add("js");
+      document.documentElement.classList.add('js');
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <meta name="description" content="I built this site to show how I think, learn, adapt, and execute so you can see more than a resume can hold.">
+                <meta name="description" content="A direct look at my work, how I think, and what I follow through on.">
                 <link rel="canonical" href="https://www.estivanayramia.com/">
                 <title>Estivan Ayramia | Built to Show More Than a Resume</title>
 
     <!-- Open Graph / Social Media -->
                 <meta property="og:type" content="website">
                 <meta property="og:title" content="Estivan Ayramia | Built to Show More Than a Resume">
-                <meta property="og:description" content="I built this site to show how I think, learn, adapt, and execute so you can see more than a resume can hold.">
+                <meta property="og:description" content="A direct look at my work, how I think, and what I follow through on.">
                 <meta property="og:url" content="https://www.estivanayramia.com/">
     <meta property="og:site_name" content="Estivan Ayramia" />
                 <meta name="twitter:card" content="summary_large_image">
                 <meta name="twitter:title" content="Estivan Ayramia | Built to Show More Than a Resume">
-                <meta name="twitter:description" content="I built this site to show how I think, learn, adapt, and execute so you can see more than a resume can hold.">
+                <meta name="twitter:description" content="A direct look at my work, how I think, and what I follow through on.">
 
     <!-- Inter (self-hosted to avoid render-blocking Google Fonts CSS) -->
     <link
@@ -899,13 +899,16 @@
         --tw-ring-color: rgb(225 212 194/var(--tw-ring-opacity, 1));
       }
     </style>
-    <link rel="stylesheet" href="/assets/css/style.css?v=23626563" />
+    <link rel="stylesheet" href="/assets/css/style.css?v=012bbc00" />
+    <link rel="stylesheet" href="/assets/css/cinematic-intro.css?v=012bbc00" />
 
     <!-- Theme CSS (load as stylesheet to avoid CLS from late layout-affecting rules) -->
-    <link rel="preload" as="style" href="/theme.css?v=23626563" />
-    <link rel="stylesheet" href="/theme.css?v=23626563" />
+    <link rel="preload" as="style" href="/theme.css?v=012bbc00" />
+    <link rel="stylesheet" href="/theme.css?v=012bbc00" />
 
-    <script src="/assets/js/site.min.js?v=23626563" defer></script>
+    <script src="/assets/js/site.min.js?v=012bbc00" defer></script>
+    <script src="/assets/js/cinematic-audio.js?v=012bbc00" defer></script>
+    <script src="/assets/js/cinematic-intro.js?v=012bbc00" defer></script>
 
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
@@ -953,7 +956,7 @@
     <!-- Markdown Parser loaded via lazy-loader.js -->
 
     <!-- Auto Cache Refresh Script -->
-    <meta name="build-version" content="20260319-23626563" />
+    <meta name="build-version" content="20260402-ee5d4a13" />
     <script src="/assets/js/cache-refresh.js" defer></script>
               <meta property="og:image" content="https://www.estivanayramia.com/assets/img/logo-ea.webp">
             <meta name="twitter:image" content="https://www.estivanayramia.com/assets/img/logo-ea.webp">
@@ -1131,112 +1134,134 @@
     </header>
 
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 spine-page">
       <!-- Hero Section -->
-      <section class="max-w-5xl mx-auto px-6 lg:px-12 py-20 lg:py-32">
-        <div class="text-center space-y-8">
-          <!-- EA Logo -->
-          <div class="flex justify-center mb-8">
-            <img
-              src="/assets/img/logo-ea.webp"
-              alt="Estivan Ayramia Logo"
-              class="h-32 w-32 lg:h-40 lg:w-40 object-contain drop-shadow-2xl"
-              width="300"
-              height="264"
-              fetchpriority="high"
-            />
+      <section
+        class="page-hero max-w-6xl mx-auto px-6 lg:px-12 py-12 lg:py-20"
+        data-hero-parallax="true"
+      >
+        <div class="spine-hero-grid">
+          <div class="space-y-8">
+            <div class="spine-hero-mark">
+              <img
+                src="/assets/img/headshot.webp"
+                alt="Portrait of Estivan Ayramia"
+                class="h-24 w-24 lg:h-28 lg:w-28 rounded-full object-cover object-center drop-shadow-2xl"
+                width="600"
+                height="800"
+                fetchpriority="high"
+              />
+              <div class="space-y-3">
+                <p class="spine-kicker">Start here</p>
+                <p class="text-sm text-chocolate/70 max-w-sm">
+                  A fast read, real work, and direct contact if you need it.
+                </p>
+              </div>
+            </div>
+
+            <div class="space-y-5">
+              <p class="spine-eyebrow">More than a resume</p>
+              <h1
+                class="text-5xl lg:text-7xl font-bold text-indigodeep leading-tight tracking-tight"
+              >
+                Built to show what a resume can't.
+              </h1>
+              <p class="text-lg lg:text-xl text-chocolate leading-relaxed">
+                I made this because a resume can show the outline, not the
+                range. This is the work, the thinking behind it, and whether I
+                actually follow through.
+              </p>
+            </div>
+
+            <div class="spine-cta-actions">
+              <a
+                href="/contact"
+                class="inline-block text-base font-medium text-indigodeep bg-transparent border-2 border-indigodeep px-8 py-4 rounded-full hover:scale-105 dark:text-beige dark:border-indigodeep transition-all focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-4 focus:ring-offset-transparent dark:focus:ring-beige"
+              >
+                Start a Conversation
+              </a>
+              <a
+                href="#proof-strip"
+                class="inline-block text-base font-medium text-indigodeep bg-white/40 border border-chocolate/10 px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-4 focus:ring-offset-transparent"
+              >
+                Jump to Proof
+              </a>
+            </div>
+            <button type="button" class="watch-trailer-btn" aria-label="Watch trailer" style="display:none;">
+              <svg viewBox="0 0 16 16" fill="currentColor" width="10" height="10"><polygon points="3,1 13,8 3,15"/></svg>
+              Watch trailer
+            </button>
           </div>
 
-          <h1
-            class="text-5xl lg:text-7xl font-bold text-indigodeep leading-tight tracking-tight"
+          <aside
+            class="spine-hero-rail opacity-0"
+            data-gsap="fade-up"
+            data-gsap-delay="0.1"
           >
-            Built to show what a resume can't.
-          </h1>
-          <p
-            class="text-lg lg:text-xl text-chocolate max-w-2xl mx-auto leading-relaxed"
-          >
-            I am an SDSU General Business graduate, and I built this site to
-            show more than a list of bullet points. This is where I make the
-            case with real work, clear thinking, and follow-through.
-          </p>
-          <div>
-            <a
-              href="/contact"
-              class="inline-block text-base font-medium text-indigodeep bg-transparent border-2 border-indigodeep px-8 py-4 rounded-full hover:scale-105 dark:text-beige dark:border-indigodeep transition-all focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-4 focus:ring-offset-transparent dark:focus:ring-beige"
-            >
-              Start a Conversation
-            </a>
-          </div>
+            <p class="spine-eyebrow">Quick read</p>
+            <div class="spine-note-list text-sm text-chocolate">
+              <div class="spine-note-item">
+                The short version of who I am and how I work.
+              </div>
+              <div class="spine-note-item">
+                Real work you can check instead of a polished pitch.
+              </div>
+              <div class="spine-note-item">
+                If you want specifics, ask directly.
+              </div>
+            </div>
+          </aside>
         </div>
       </section>
 
-      <!-- Where to Start Strip -->
-      <section class="max-w-5xl mx-auto px-6 lg:px-12 pb-12">
+      <!-- Quick Route Strip -->
+      <section class="proof-band max-w-5xl mx-auto px-6 lg:px-12 pb-12">
         <div
-          class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-6 opacity-0"
+          class="spine-band opacity-0"
           data-gsap="fade-up"
         >
-          <p class="text-sm font-medium text-chocolate/80 text-center mb-4">
-            I built this site because a resume can show the outline, not the
-            real range. Pick the path that fits your time.
-          </p>
-          <div class="grid md:grid-cols-3 gap-4 text-center">
+          <div class="spine-section-head is-split mb-0">
+            <div>
+              <p class="spine-eyebrow">If you already know what you want</p>
+              <h2 class="text-2xl lg:text-3xl font-bold text-indigodeep">
+                Go straight there.
+              </h2>
+            </div>
+            <p class="text-sm text-chocolate/80 leading-relaxed">
+              Overview is the short read. Projects is the proof. Contact is the direct route.
+            </p>
+          </div>
+          <div class="grid md:grid-cols-3 gap-4">
             <a
               href="/overview"
-              class="flex items-center justify-center gap-2 text-sm text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2"
+              class="spine-route-card"
             >
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                ></path>
-              </svg>
-              <span class="font-medium">Quick Overview</span>
+              <span class="spine-route-meta">Overview</span>
+              <span class="text-lg font-semibold text-indigodeep">Read the clean summary</span>
+              <span class="text-sm text-chocolate/70 leading-relaxed">
+                Go straight to the shortest page that explains how I work and
+                what keeps showing up.
+              </span>
             </a>
             <a
               href="/projects/"
-              class="flex items-center justify-center gap-2 text-sm text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2"
+              class="spine-route-card"
             >
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                ></path>
-              </svg>
-              <span class="font-medium">See My Work</span>
+              <span class="spine-route-meta">Projects</span>
+              <span class="text-lg font-semibold text-indigodeep">Go straight to the work</span>
+              <span class="text-sm text-chocolate/70 leading-relaxed">
+                Skip the extra context and open the work directly.
+              </span>
             </a>
             <a
               href="/contact"
-              class="flex items-center justify-center gap-2 text-sm text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2"
+              class="spine-route-card"
             >
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                ></path>
-              </svg>
-              <span class="font-medium">Get in Touch</span>
+              <span class="spine-route-meta">Direct conversation</span>
+              <span class="text-lg font-semibold text-indigodeep">Reach out now</span>
+              <span class="text-sm text-chocolate/70 leading-relaxed">
+                If talking directly is the right move, message me.
+              </span>
             </a>
           </div>
         </div>
@@ -1244,127 +1269,88 @@
 
       <!-- Time Budget Choices Section -->
       <section class="max-w-6xl mx-auto px-6 lg:px-12 py-20 lg:py-32">
-        <div class="text-center mb-16">
-          <h2 class="text-3xl lg:text-4xl font-bold text-indigodeep mb-4">
-            Pick the version that fits your time.
-          </h2>
-          <p class="text-base text-chocolate max-w-xl mx-auto">
-            Same site. Different depth. Start where it makes sense.
+        <div class="spine-section-head is-split">
+          <div>
+            <p class="spine-eyebrow">Time-budget paths</p>
+            <h2 class="text-3xl lg:text-4xl font-bold text-indigodeep mb-4">
+              Pick the version that fits your time.
+            </h2>
+          </div>
+          <p class="spine-lead">
+            Same site. Different depth. Start where it makes sense, then keep
+            going only if the signal holds up.
           </p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8">
+        <div class="spine-route-grid">
           <!-- 30 Seconds Option -->
           <div
-            class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-8 opacity-0"
+            class="spine-route-card opacity-0"
             data-gsap="fade-up"
             data-gsap-delay="0.1"
           >
-            <div class="text-center space-y-4">
-              <div
-                class="inline-flex items-center justify-center w-16 h-16 bg-indigodeep/10 rounded-full"
-              >
-                <svg
-                  class="w-8 h-8 text-indigodeep"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  ></path>
-                </svg>
-              </div>
-              <h3 class="text-2xl font-semibold text-indigodeep">30 Seconds</h3>
-              <p class="text-sm text-chocolate leading-relaxed">
-                Fast proof and the short case for why I am worth a closer look.
-              </p>
-              <a
-                href="#proof-strip"
-                class="inline-block text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded"
-              >
-                Jump to Proof
-              </a>
-            </div>
+            <div class="spine-route-meta">Fast signal</div>
+            <h3 class="spine-route-title">30 Seconds</h3>
+            <p class="spine-route-copy">
+              Start with proof and the short case for why I am worth a closer
+              look.
+            </p>
+            <p class="text-sm text-chocolate/70 leading-relaxed">
+              Best if you want the signal before anything else.
+            </p>
+            <a
+              href="#proof-strip"
+              class="spine-route-link focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded"
+            >
+              Jump to Proof
+            </a>
           </div>
 
           <!-- 1 Minute Option -->
           <div
-            class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-8 opacity-0"
+            class="spine-route-card is-primary opacity-0"
             data-gsap="fade-up"
             data-gsap-delay="0.2"
           >
-            <div class="text-center space-y-4">
-              <div
-                class="inline-flex items-center justify-center w-16 h-16 bg-indigodeep/10 rounded-full"
-              >
-                <svg
-                  class="w-8 h-8 text-indigodeep"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  ></path>
-                </svg>
-              </div>
-              <h3 class="text-2xl font-semibold text-indigodeep">1 Minute</h3>
-              <p class="text-sm text-chocolate leading-relaxed">
-                The clearest read on how I work, what I value, and what I can
-                already do.
-              </p>
-              <a
-                href="/overview"
-                class="inline-block text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded"
-              >
-                View Overview
-              </a>
-            </div>
+            <div class="spine-route-meta">Overview</div>
+            <h3 class="spine-route-title">1 Minute</h3>
+            <p class="spine-route-copy">
+              The clearest read on how I work, what I value, and what I can
+              already do.
+            </p>
+            <p class="text-sm text-chocolate/70 leading-relaxed">
+              Best if you want the strongest bridge from Home into the rest of
+              the site.
+            </p>
+            <a
+              href="/overview"
+              class="spine-route-link focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded"
+            >
+              View Overview
+            </a>
           </div>
 
           <!-- 5 Minutes Option -->
           <div
-            class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-8 opacity-0"
+            class="spine-route-card opacity-0"
             data-gsap="fade-up"
             data-gsap-delay="0.3"
           >
-            <div class="text-center space-y-4">
-              <div
-                class="inline-flex items-center justify-center w-16 h-16 bg-indigodeep/10 rounded-full"
-              >
-                <svg
-                  class="w-8 h-8 text-indigodeep"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                  ></path>
-                </svg>
-              </div>
-              <h3 class="text-2xl font-semibold text-indigodeep">5 Minutes</h3>
-              <p class="text-sm text-chocolate leading-relaxed">
-                The longer version: background, build process, and the thinking
-                behind the work.
-              </p>
-              <a
-                href="/deep-dive"
-                class="inline-block text-sm font-medium text-indigodeep hover:text-chocolate transition-colors underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded"
-              >
-                Explore Deep Dive
-              </a>
-            </div>
+            <div class="spine-route-meta">Full story</div>
+            <h3 class="spine-route-title">5 Minutes</h3>
+            <p class="spine-route-copy">
+              Background, build process, and the thinking
+              behind the work.
+            </p>
+            <p class="text-sm text-chocolate/70 leading-relaxed">
+              Best if you want the systems, context, and next direction.
+            </p>
+            <a
+              href="/deep-dive"
+              class="spine-route-link focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded"
+            >
+              Explore Deep Dive
+            </a>
           </div>
         </div>
       </section>
@@ -1375,57 +1361,73 @@
         class="bg-white/30 backdrop-blur-sm border-y border-chocolate/10 py-20 lg:py-32"
       >
         <div class="max-w-6xl mx-auto px-6 lg:px-12">
-          <div class="text-center mb-16">
-            <h2 class="text-3xl lg:text-4xl font-bold text-indigodeep mb-4">
-              What this site proves fast
-            </h2>
-            <p class="text-base text-chocolate max-w-xl mx-auto">
-              I built it to show how I think, learn, and execute, not just say
-              I do.
-            </p>
+          <div class="spine-section-head is-split">
+            <div>
+              <p class="spine-eyebrow">Fast proof</p>
+              <h2 class="text-3xl lg:text-4xl font-bold text-indigodeep mb-4">
+                What you can check fast
+              </h2>
+            </div>
+            <div class="space-y-4">
+              <p class="spine-lead">
+                I made this because a resume leaves too much out. The short
+                version is simple: there is real work here, range, and enough
+                detail to check the claims for yourself.
+              </p>
+              <a
+                href="/projects/"
+                class="spine-route-link focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded"
+              >
+                Go straight to Projects
+              </a>
+            </div>
           </div>
 
-          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
+          <div class="spine-proof-grid">
             <!-- Proof Card 1 -->
             <div
-              class="text-center space-y-3 opacity-0"
+              class="spine-proof-stat opacity-0"
               data-gsap="fade-up"
               data-gsap-delay="0.1"
             >
-              <div class="text-5xl font-bold text-indigodeep">5</div>
-              <div class="text-sm font-medium text-chocolate">
-                Project Pages
+              <div class="spine-stat-number" data-home-proof-project-count>7</div>
+              <div class="text-base font-semibold text-indigodeep">
+                Selected Work Pages
               </div>
-              <div class="text-xs text-ink/60">
-                Strategy, operations, and practical problem-solving
+              <div class="text-sm text-chocolate/80 leading-relaxed">
+                Seven current project write-ups covering strategy, operations,
+                and practical problem-solving you can inspect instead of taking
+                the pitch on faith.
               </div>
             </div>
 
             <!-- Proof Card 2 -->
             <div
-              class="text-center space-y-3 opacity-0"
+              class="spine-proof-stat opacity-0"
               data-gsap="fade-up"
               data-gsap-delay="0.2"
             >
-              <div class="text-5xl font-bold text-indigodeep">4</div>
-              <div class="text-sm font-medium text-chocolate">Languages</div>
-              <div class="text-xs text-ink/60">
-                English, Chaldean, Spanish, Arabic
+              <div class="spine-stat-number">4</div>
+              <div class="text-base font-semibold text-indigodeep">Languages</div>
+              <div class="text-sm text-chocolate/80 leading-relaxed">
+                English, Chaldean, Spanish, and Arabic. Useful range, not just a
+                line on a resume.
               </div>
             </div>
 
             <!-- Proof Card 3 -->
             <div
-              class="text-center space-y-3 opacity-0"
+              class="spine-proof-stat opacity-0"
               data-gsap="fade-up"
               data-gsap-delay="0.3"
             >
-              <div class="text-5xl font-bold text-indigodeep">1</div>
-              <div class="text-sm font-medium text-chocolate">
+              <div class="spine-stat-number">1</div>
+              <div class="text-base font-semibold text-indigodeep">
                 Site Built From Scratch
               </div>
-              <div class="text-xs text-ink/60">
-                AI, analytics, and iteration in the loop
+              <div class="text-sm text-chocolate/80 leading-relaxed">
+                Built with AI, analytics, and iteration in the loop so the site
+                is useful, not just decorative.
               </div>
             </div>
           </div>
@@ -1434,141 +1436,99 @@
 
       <!-- Differentiation Section -->
       <section class="max-w-6xl mx-auto px-6 lg:px-12 py-20 lg:py-32">
-        <div class="text-center mb-16">
-          <h2 class="text-3xl lg:text-4xl font-bold text-indigodeep mb-4">
-            Why this is easier to use than a normal portfolio
-          </h2>
-          <p class="text-base text-chocolate max-w-xl mx-auto">
-            The structure is deliberate. It is built to help you get the signal
-            fast.
+        <div class="spine-section-head is-split">
+          <div>
+            <p class="spine-eyebrow">Why the structure works</p>
+            <h2 class="text-3xl lg:text-4xl font-bold text-indigodeep mb-4">
+              Laid out so the point is easy to find
+            </h2>
+          </div>
+          <p class="spine-lead">
+            If you want the short version, it is easy to get. If you want the
+            details, they are there too.
           </p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8">
+        <div class="spine-divider-list">
           <!-- Differentiator 1 -->
-          <div
-            class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-8 opacity-0"
+          <article
+            class="spine-divider-item opacity-0"
             data-gsap="fade-up"
             data-gsap-delay="0.1"
           >
-            <div class="space-y-4">
-              <div
-                class="inline-flex items-center justify-center w-12 h-12 bg-indigodeep/10 rounded-full"
-              >
-                <svg
-                  class="w-6 h-6 text-indigodeep"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  ></path>
-                </svg>
-              </div>
+            <div>
+              <p class="spine-label">01</p>
               <h3 class="text-xl font-semibold text-indigodeep">
                 Time-budget paths
               </h3>
-              <p class="text-sm text-chocolate leading-relaxed">
-                You should not have to dig for the point. The time paths let
-                you get the short version or the full version without wasting
-                clicks.
-              </p>
             </div>
-          </div>
+            <p class="text-base text-chocolate leading-relaxed">
+              You should not have to dig for the point. The time paths let you
+              get the short version or the full version without wasting clicks.
+            </p>
+          </article>
 
           <!-- Differentiator 2 -->
-          <div
-            class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-8 opacity-0"
+          <article
+            class="spine-divider-item opacity-0"
             data-gsap="fade-up"
             data-gsap-delay="0.2"
           >
-            <div class="space-y-4">
-              <div
-                class="inline-flex items-center justify-center w-12 h-12 bg-indigodeep/10 rounded-full"
-              >
-                <svg
-                  class="w-6 h-6 text-indigodeep"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
-                  ></path>
-                </svg>
-              </div>
+            <div>
+              <p class="spine-label">02</p>
               <h3 class="text-xl font-semibold text-indigodeep">
-                Multilingual by design
+                Clear next steps
               </h3>
-              <p class="text-sm text-chocolate leading-relaxed">
-                If another language gets you closer to the point, switching
-                should be simple. That matters more than a flashy toggle.
-              </p>
             </div>
-          </div>
+            <p class="text-base text-chocolate leading-relaxed">
+              If you want proof, context, or a direct conversation, the next
+              move should be obvious.
+            </p>
+          </article>
 
           <!-- Differentiator 3 -->
-          <div
-            class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-8 opacity-0"
+          <article
+            class="spine-divider-item opacity-0"
             data-gsap="fade-up"
             data-gsap-delay="0.3"
           >
-            <div class="space-y-4">
-              <div
-                class="inline-flex items-center justify-center w-12 h-12 bg-indigodeep/10 rounded-full"
-              >
-                <svg
-                  class="w-6 h-6 text-indigodeep"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                  ></path>
-                </svg>
-              </div>
+            <div>
+              <p class="spine-label">03</p>
               <h3 class="text-xl font-semibold text-indigodeep">
                 Ask instead of hunt
               </h3>
-              <p class="text-sm text-chocolate leading-relaxed">
-                If you have a specific question, the chat gives you a direct
-                answer instead of making you guess where it is buried.
-              </p>
             </div>
-          </div>
+            <p class="text-base text-chocolate leading-relaxed">
+              If you have a specific question, the chat gives you a direct
+              answer instead of making you guess where it is buried.
+            </p>
+          </article>
         </div>
       </section>
 
       <!-- AI Teammate Section -->
       <section class="bg-indigodeep py-20 lg:py-32">
         <div class="max-w-6xl mx-auto px-6 lg:px-12">
-          <div class="text-center mb-16">
-            <h2 class="text-3xl lg:text-4xl font-bold text-white mb-4">
-              How I used AI to make this real
-            </h2>
-            <p
-              class="text-base text-white/90 md:text-beige/80 max-w-xl mx-auto"
-            >
-              AI helped me learn faster, build faster, and improve faster. It
-              was a tool, not a shortcut around judgment.
-            </p>
-          </div>
+          <div class="grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] gap-10 items-start">
+            <div class="space-y-6">
+              <p class="spine-eyebrow text-beige/70">AI, used on purpose</p>
+              <h2 class="text-3xl lg:text-4xl font-bold text-white">
+                How AI helps the site stay useful
+              </h2>
+              <p class="text-base text-white/90 md:text-beige/80 leading-relaxed">
+                AI helped me learn faster, build faster, and improve faster. It
+                was a tool, not a shortcut around judgment.
+              </p>
+              <p class="text-sm text-white/75 md:text-beige/70 leading-relaxed">
+                Savonie is here for the moments when browsing is slower than
+                asking directly.
+              </p>
+            </div>
 
-          <div class="grid md:grid-cols-3 gap-8">
+            <div class="spine-stack">
             <!-- AI Tool 1 -->
             <div
-              class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 opacity-0"
+              class="spine-utility-card opacity-0"
               data-gsap="fade-up"
               data-gsap-delay="0.1"
             >
@@ -1605,7 +1565,7 @@
 
             <!-- AI Tool 2 -->
             <div
-              class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 opacity-0"
+              class="spine-utility-card opacity-0"
               data-gsap="fade-up"
               data-gsap-delay="0.2"
             >
@@ -1642,7 +1602,7 @@
 
             <!-- AI Tool 3 -->
             <div
-              class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 opacity-0"
+              class="spine-utility-card opacity-0"
               data-gsap="fade-up"
               data-gsap-delay="0.3"
             >
@@ -1674,32 +1634,53 @@
                   the site useful and makes it feel more like a conversation
                   than a dead archive.
                 </p>
+                <div class="spine-chip-row">
+                  <span class="spine-chip">Projects</span>
+                  <span class="spine-chip">Background</span>
+                  <span class="spine-chip">Languages</span>
+                </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </section>
 
       <!-- CTA Section -->
-      <section class="max-w-4xl mx-auto px-6 lg:px-12 py-20 lg:py-32">
+      <section class="page-close max-w-5xl mx-auto px-6 lg:px-12 py-20 lg:py-32">
         <div
-          class="bg-indigodeep rounded-3xl p-12 lg:p-16 text-center space-y-6"
+          class="bg-indigodeep rounded-3xl p-12 lg:p-16 spine-cta-card"
         >
-          <h2 class="text-3xl lg:text-4xl font-bold text-white">
-            If you want the longer version, keep going.
-          </h2>
-          <p
-            class="text-base text-white/90 md:text-beige max-w-xl mx-auto leading-relaxed"
-          >
-            I built this site because I wanted a better way to be seen than a
-            PDF allows. If you want to talk directly, I am here.
-          </p>
-          <a
-            href="/contact"
-            class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep"
-          >
-            Get in Touch
-          </a>
+          <div class="spine-cta-copy">
+            <p class="spine-eyebrow text-beige/70">Keep going</p>
+            <h2 class="text-3xl lg:text-4xl font-bold text-white">
+              If you want the longer version, keep going.
+            </h2>
+            <p class="text-base text-white/90 md:text-beige leading-relaxed">
+              Overview is the short read. Deep Dive is the full story.
+              If you already know enough, contact me directly.
+            </p>
+          </div>
+          <div class="spine-cta-actions">
+            <a
+              href="/overview"
+              class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep"
+            >
+              Read Overview
+            </a>
+            <a
+              href="/deep-dive"
+              class="inline-block text-base font-medium text-beige bg-transparent border-2 border-beige px-8 py-4 rounded-full hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep"
+            >
+              Open Deep Dive
+            </a>
+            <a
+              href="/contact"
+              class="inline-flex items-center text-base font-medium text-beige underline underline-offset-4 focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-4 focus:ring-offset-indigodeep rounded"
+            >
+              Prefer to talk directly? Contact me.
+            </a>
+          </div>
         </div>
       </section>
     </main>
@@ -1821,7 +1802,7 @@
         </div>
 
         <div class="border-t border-beige/20 pt-8 text-center">
-          <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+          <p class="text-sm text-beige/80">© <span id="copyright-year">2026</span> Estivan Ayramia. All rights reserved.</p>
         </div>
       </div>
     </footer>
@@ -1906,26 +1887,22 @@
       >
         <div
           id="chat-header"
-          class="p-4 flex justify-between items-center shrink-0 cursor-move select-none"
-          style="background: linear-gradient(135deg, #212842 0%, #2d3456 50%, #362017 100%)"
+          class="bg-[#212842] p-4 flex justify-between items-center shrink-0 cursor-move select-none"
         >
           <h3
             id="chat-title"
-            class="text-white font-medium text-sm flex items-center gap-2.5 pointer-events-none"
+            class="text-white font-medium text-sm flex items-center gap-2 pointer-events-none"
           >
             <img
               src="/assets/img/savonie-thumb.webp"
               alt="Savonie chatbot avatar"
-              class="w-7 h-7 rounded-full border-2 border-[#c9a76d]/40 object-cover shadow-sm"
+              class="w-6 h-6 rounded-full border border-white/20 object-cover"
               width="64"
               height="64"
               loading="lazy"
               decoding="async"
             />
-            <span class="flex flex-col leading-tight">
-              <span class="text-sm font-semibold tracking-wide">Savonie</span>
-              <span class="text-[10px] text-[#c9a76d]/90 font-normal tracking-wider uppercase">Estivan's AI Guide</span>
-            </span>
+            Savonie AI
           </h3>
           <button
             type="button"
@@ -2012,8 +1989,7 @@
       <button
         type="button"
         id="chat-toggle"
-        class="absolute bottom-0 right-0 w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-110 hover:shadow-2xl transition-all duration-500 ease-out group overflow-hidden"
-        style="background: linear-gradient(135deg, #212842, #362017); border: 2px solid rgba(201,167,109,0.3); box-shadow: 0 8px 32px rgba(33,40,66,0.4), 0 0 0 0 rgba(201,167,109,0)"
+        class="absolute bottom-0 right-0 bg-[#212842] w-16 h-16 rounded-full shadow-xl flex items-center justify-center hover:scale-105 hover:rotate-3 transition-all duration-300 group border-2 border-white/10 overflow-hidden"
         aria-label="Open Chat"
       >
         <img
@@ -2029,5 +2005,38 @@
     </div>
 
     <script src="/assets/js/lazy-loader.min.js" defer></script>
+    <script>
+      (() => {
+        const initProofAnchor = () => {
+          const proofSection = document.getElementById('proof-strip');
+          if (!proofSection) return;
+
+          const scrollToProof = (behavior) => {
+            const top = proofSection.getBoundingClientRect().top + window.pageYOffset - 100;
+            window.scrollTo({ top, behavior });
+          };
+
+          document.querySelectorAll('a[href="#proof-strip"]').forEach((link) => {
+            link.addEventListener('click', (event) => {
+              event.preventDefault();
+              window.history.replaceState(null, '', '#proof-strip');
+              scrollToProof('smooth');
+            });
+          });
+
+          if (window.location.hash === '#proof-strip') {
+            requestAnimationFrame(() => {
+              setTimeout(() => scrollToProof('auto'), 0);
+            });
+          }
+        };
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initProofAnchor, { once: true });
+        } else {
+          initProofAnchor();
+        }
+      })();
+    </script>
   </body>
 </html>

@@ -24,15 +24,15 @@ const ROOT_TIER_CLASSES = [
 const MOTION_PROFILES = {
   premium: {
     tierClass: 'premium',
-    slideMs: 560,
-    settleMs: 320,
-    introMs: 340,
-    spinMs: 5200,
-    dialogMs: 320,
-    scrollSensitivity: 0.0035,
+    slideMs: 420,
+    settleMs: 240,
+    introMs: 260,
+    spinMs: 4400,
+    dialogMs: 260,
+    scrollSensitivity: 0.0038,
     scrollThreshold: 34,
     dragPixelsPerSlide: 255,
-    staggerDelay: 0.02,
+    staggerDelay: 0.016,
     reflectionOpacity: 0.22,
     glowStrength: 1,
     rouletteMode: 'premium',
@@ -41,15 +41,15 @@ const MOTION_PROFILES = {
   },
   enhanced: {
     tierClass: 'enhanced',
-    slideMs: 500,
-    settleMs: 280,
-    introMs: 280,
-    spinMs: 4600,
-    dialogMs: 280,
-    scrollSensitivity: 0.0032,
+    slideMs: 400,
+    settleMs: 220,
+    introMs: 220,
+    spinMs: 3900,
+    dialogMs: 240,
+    scrollSensitivity: 0.0034,
     scrollThreshold: 32,
     dragPixelsPerSlide: 245,
-    staggerDelay: 0.015,
+    staggerDelay: 0.012,
     reflectionOpacity: 0.16,
     glowStrength: 0.82,
     rouletteMode: 'full',
@@ -58,15 +58,15 @@ const MOTION_PROFILES = {
   },
   baseline: {
     tierClass: 'baseline',
-    slideMs: 420,
-    settleMs: 220,
-    introMs: 220,
-    spinMs: 3400,
-    dialogMs: 220,
+    slideMs: 340,
+    settleMs: 180,
+    introMs: 180,
+    spinMs: 2900,
+    dialogMs: 200,
     scrollSensitivity: 0.0028,
     scrollThreshold: 28,
     dragPixelsPerSlide: 228,
-    staggerDelay: 0.006,
+    staggerDelay: 0.004,
     reflectionOpacity: 0,
     glowStrength: 0.3,
     rouletteMode: 'lite',
@@ -75,11 +75,11 @@ const MOTION_PROFILES = {
   },
   reduced: {
     tierClass: 'reduced',
-    slideMs: 200,
-    settleMs: 140,
-    introMs: 160,
-    spinMs: 1400,
-    dialogMs: 160,
+    slideMs: 180,
+    settleMs: 120,
+    introMs: 140,
+    spinMs: 1200,
+    dialogMs: 140,
     scrollSensitivity: 0.0024,
     scrollThreshold: 24,
     dragPixelsPerSlide: 210,
@@ -95,51 +95,51 @@ const MOTION_PROFILES = {
 const MOBILE_POSITIONS = {
   center: {
     rotateY: 0,
-    translateZ: 0,
+    translateZ: 46,
     translateX: 0,
-    scale: 1,
+    scale: 1.01,
     opacity: 1,
     zIndex: 100,
     blur: 0,
-    brightness: 1.04,
-    saturate: 1.04
+    brightness: 1.08,
+    saturate: 1.06
   },
   adjacent1: {
-    rotateY: 14,
-    translateZ: -42,
-    translateX: 220,
-    scale: 0.9,
-    opacity: 0.82,
+    rotateY: 22,
+    translateZ: -120,
+    translateX: 188,
+    scale: 0.82,
+    opacity: 0.66,
     zIndex: 90,
-    blur: 0,
-    brightness: 0.92,
-    saturate: 1
+    blur: 0.6,
+    brightness: 0.86,
+    saturate: 0.95
   },
   adjacent2: {
     rotateY: 34,
-    translateZ: -190,
-    translateX: 430,
-    scale: 0.7,
-    opacity: 0.34,
+    translateZ: -280,
+    translateX: 300,
+    scale: 0.66,
+    opacity: 0.32,
     zIndex: 80,
-    blur: 1,
-    brightness: 0.84,
-    saturate: 0.95
+    blur: 1.4,
+    brightness: 0.72,
+    saturate: 0.9
   },
   adjacent3: {
     rotateY: 44,
-    translateZ: -300,
-    translateX: 560,
+    translateZ: -420,
+    translateX: 390,
     scale: 0.52,
-    opacity: 0.1,
+    opacity: 0.12,
     zIndex: 70,
     blur: 2,
-    brightness: 0.68,
-    saturate: 0.9
+    brightness: 0.62,
+    saturate: 0.82
   },
   far: {
     rotateY: 50,
-    translateZ: -380,
+    translateZ: -560,
     translateX: 660,
     scale: 0.4,
     opacity: 0,
@@ -238,6 +238,42 @@ function buildStableMixedOrder(items) {
     }))
     .sort((left, right) => left.weight - right.weight || left.index - right.index)
     .map((entry) => entry.index);
+}
+
+function buildPreviewBackground(previewImage, fallbackBackground) {
+  if (!previewImage) return fallbackBackground;
+  const safeUrl = encodeURI(previewImage).replace(/'/g, '%27');
+  return `linear-gradient(160deg, rgba(8, 10, 17, 0.14), rgba(8, 10, 17, 0.46)), url('${safeUrl}')`;
+}
+
+function resolveLocalPreviewLink(link) {
+  const raw = String(link || '').trim();
+  if (!raw) return raw;
+
+  try {
+    const locationUrl = new URL(window.location.href);
+    const isLocal = /^(localhost|127\.0\.0\.1)$/i.test(locationUrl.hostname);
+    if (!isLocal || !raw.startsWith('/')) return raw;
+
+    const isEnglishPage = locationUrl.pathname.startsWith('/EN/');
+    if (!isEnglishPage) return raw;
+
+    if (raw === '/projects/') return '/EN/projects/index.html';
+    if (raw === '/about') return '/EN/about.html';
+    if (raw === '/overview') return '/EN/overview.html';
+    if (raw === '/deep-dive') return '/EN/deep-dive.html';
+    if (raw === '/contact') return '/EN/contact.html';
+    if (raw === '/privacy') return '/EN/privacy.html';
+    if (raw === '/hobbies-games') return '/EN/hobbies-games.html';
+
+    if (raw.startsWith('/projects/')) return `/EN${raw}.html`;
+    if (raw.startsWith('/about/')) return `/EN${raw}.html`;
+    if (raw.startsWith('/hobbies/')) return `/EN${raw}.html`;
+
+    return raw;
+  } catch {
+    return raw;
+  }
 }
 
 function isCoarsePointerDevice() {
@@ -629,15 +665,21 @@ class RouletteOverlayController {
     }
 
     this.previewCache = this.carousel.items.map((item) => {
+      const previewImageNode = item.querySelector('.card-bg img.card-image, .card-image-container img.card-image, img.card-image');
+      const previewImage = item.dataset.previewImage
+        || previewImageNode?.getAttribute('src')
+        || '';
+
       const backgroundNode = item.querySelector('.card-bg');
       const backgroundStyle = backgroundNode ? window.getComputedStyle(backgroundNode) : null;
-      const background = backgroundStyle
+      const fallbackBackground = backgroundStyle
         ? (backgroundStyle.backgroundImage !== 'none' ? backgroundStyle.backgroundImage : backgroundStyle.background)
         : 'linear-gradient(135deg, #212842, #3d4666)';
+      const background = buildPreviewBackground(previewImage, fallbackBackground);
       const title = item.dataset.title || item.querySelector('.card-title')?.textContent?.trim() || 'Project';
       const category = item.querySelector('.card-category')?.textContent?.trim() || 'Selected Work';
       const link = item.querySelector('.card-link, a[href]')?.getAttribute('href') || '';
-      return { background, title, category, link };
+      return { background, previewImage, title, category, link };
     });
 
     return this.previewCache;
@@ -663,7 +705,7 @@ class RouletteOverlayController {
   navigateToResultLink(link) {
     if (!link) return;
     this.clearAutoNavigateTimer();
-    window.location.href = link;
+    window.location.href = resolveLocalPreviewLink(link);
   }
 
   prepareSpinResult() {
@@ -744,6 +786,10 @@ class RouletteOverlayController {
   resetWheelVisuals() {
     gsap.killTweensOf([this.elements.stage, this.elements.wheel, this.elements.ball, this.elements.ballShadow, this.elements.ballHighlight, this.elements.dialog]);
     gsap.killTweensOf(this.pockets.map((pocket) => pocket.root));
+    if (this._spinFrame) {
+      gsap.killTweensOf(this._spinFrame);
+      this._spinFrame = null;
+    }
 
     gsap.set(this.elements.wheel, { rotation: 0 });
     gsap.set(this.elements.ball, { x: 0, y: 0, opacity: 1, scale: 1 });
@@ -791,6 +837,9 @@ class RouletteOverlayController {
     this.clearAutoNavigateTimer();
     this.isActive = false;
     this.isSpinning = false;
+    this.resources.clearTimeout(this.interactionsUnlockTimer);
+    this.interactionsUnlockTimer = null;
+    this.interactionsLocked = false;
     this.overlay.classList.remove('is-active');
     this.overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('roulette-overlay-open');
@@ -829,29 +878,60 @@ class RouletteOverlayController {
   }
 
   renderSpinFrame(frame) {
-    const radius = frame.radius;
+    // --- pocket-bounce radial modulation ---
+    // The ball rattles over pocket dividers: a sinusoidal radial
+    // perturbation whose amplitude fades as the spin decelerates.
+    const bounceOffset = this.wheelEngine.getPocketBounceOffset(
+      frame.ballAngle,
+      frame.progress,
+      frame.bounceAmplitude ?? 6
+    );
+    const effectiveRadius = frame.radius + bounceOffset;
+
     const angleInRadians = (frame.ballAngle * Math.PI) / 180;
-    const x = Math.cos(angleInRadians) * radius;
-    const y = Math.sin(angleInRadians) * radius;
+    const x = Math.cos(angleInRadians) * effectiveRadius;
+    // Vertical lift: during bounces the ball lifts slightly above the
+    // track plane.  The lift is proportional to the bounce offset.
+    const liftY = -bounceOffset * 0.45;
+    const y = Math.sin(angleInRadians) * effectiveRadius + liftY;
+
+    const depthRatio = (Math.sin(angleInRadians - Math.PI / 2) + 1) / 2;
+    const ballScale = 0.84 + (depthRatio * 0.34);
 
     gsap.set(this.elements.wheel, { rotation: frame.wheelRotation });
-    gsap.set(this.elements.ball, { x, y });
-    gsap.set(this.elements.ballHighlight, { x: x - 5, y: y - 5, opacity: 0.75 });
-    gsap.set(this.elements.ballShadow, {
-      x,
-      y: y + 18,
-      opacity: 0.45,
-      scale: 0.82 + frame.progress * 0.18
+    gsap.set(this.elements.ball, {
+      x, y,
+      scale: ballScale,
+      zIndex: 1000 + Math.round(depthRatio * 100)
+    });
+    gsap.set(this.elements.ballHighlight, {
+      x: x - (5 * ballScale),
+      y: y - (5 * ballScale),
+      opacity: 0.52 + (depthRatio * 0.34),
+      scale: ballScale
     });
 
+    // Shadow stretches away when the ball lifts off the surface
+    const shadowStretch = 1 + (bounceOffset / 30);
+    gsap.set(this.elements.ballShadow, {
+      x,
+      y: y + (20 - (depthRatio * 8)) + bounceOffset * 0.6,
+      opacity: Math.max(0.12, (0.32 + ((1 - depthRatio) * 0.26)) - bounceOffset * 0.015),
+      scale: (0.72 + ((1 - depthRatio) * 0.44)) * shadowStretch
+    });
+
+    // Status announcements (accessibility)
     let phase = 'final';
     let message = 'Picking the final pocket';
-    if (frame.progress < 0.25) {
+    if (frame.progress < 0.20) {
       phase = 'fast';
       message = 'Wheel at full speed';
-    } else if (frame.progress < 0.65) {
+    } else if (frame.progress < 0.55) {
       phase = 'settling';
       message = 'Settling into position';
+    } else if (frame.progress < 0.85) {
+      phase = 'approaching';
+      message = 'Approaching final pocket';
     }
 
     if (phase !== this.lastStatusPhase) {
@@ -965,6 +1045,7 @@ class RouletteOverlayController {
     gsap.set(activeItem, { clearProps: 'opacity,scale,filter' });
     gsap.set(overlayBackground, { clearProps: 'backgroundColor,backdropFilter' });
     gsap.set(overlayWheelTargets, { clearProps: 'opacity' });
+    this.closeOverlay({ restoreFocus: false });
   }
 
   async waitForCarouselSettle() {
@@ -1008,7 +1089,19 @@ class RouletteOverlayController {
     }
 
     await new Promise((resolve) => {
+      let resolved = false;
+      const finish = () => {
+        if (resolved) return;
+        resolved = true;
+        resolve();
+      };
+
       const stagger = this.carousel.motion.staggerDelay;
+      const fallbackMs = Math.max(220, this.carousel.motion.introMs + (this.pockets.length * stagger * 1000) + 180);
+      const fallbackTimeout = this.resources.timeout(() => {
+        finish();
+      }, fallbackMs);
+
       gsap.fromTo(
         this.pockets.map((pocket) => pocket.root),
         { opacity: 0, scale: 0.9 },
@@ -1018,121 +1111,216 @@ class RouletteOverlayController {
           duration: this.carousel.motion.introMs / 1000,
           stagger,
           ease: 'power2.out',
-          onComplete: resolve
+          onComplete: () => {
+            this.resources.clearTimeout(fallbackTimeout);
+            finish();
+          }
         }
       );
     });
   }
 
   async runSpinAnimation() {
-    const wheelSpin = this.wheelEngine.calculateWheelSpin(this.result.winnerPocketIndex);
-    // Slow the spin down for a more cinematic, premium feel
-    const durationSeconds = Math.max(this.carousel.motion.spinMs / 1000, 5.2);
+    const wheelSpin = this.wheelEngine.calculateWheelSpin(this.result.winnerPocketIndex, {
+      landingAngle: -92
+    });
+    const durationSeconds = this.carousel.motion.spinMs / 1000;
     const wheelRadius = parseFloat(getComputedStyle(this.overlay).getPropertyValue('--roulette-wheel-radius')) || 220;
+    const totalBallRotation = wheelSpin.spins * 360 + 280 + Math.random() * 90;
+    const initialBallAngle = wheelSpin.landingAngle + totalBallRotation;
+
+    // Bounce amplitude starts high and the frame-renderer fades it with progress
     const frame = {
       wheelRotation: 0,
-      ballAngle: 180,
-      radius: wheelRadius * 1.16,
+      ballAngle: initialBallAngle,
+      radius: wheelRadius * 1.13,
       progress: 0,
-      wobble: 0
+      bounceAmplitude: 7
     };
+    // Expose frame so cancelSpin can kill in-flight tweens on it
+    this._spinFrame = frame;
 
     const renderFrame = () => {
       frame.progress = this.spinTween ? this.spinTween.progress() : frame.progress;
-      // Add realistic ball wobble during deceleration phase
-      const wobbleAmount = Math.sin(frame.ballAngle * 0.15) * frame.wobble;
-      const adjustedRadius = frame.radius + wobbleAmount;
-      this.renderSpinFrame({ ...frame, radius: adjustedRadius });
+      this.renderSpinFrame(frame);
     };
 
+    // --- Phase 1: main spin with exponential deceleration ----------------
     await new Promise((resolve) => {
       this.isSpinning = true;
-      const totalBallRotation = wheelSpin.spins * 360 + 340;
-      const firstLeg = durationSeconds * 0.45;
-      const secondLeg = durationSeconds * 0.28;
-      const thirdLeg = durationSeconds * 0.15;
-      const finalLeg = Math.max(0.5, durationSeconds - firstLeg - secondLeg - thirdLeg);
+
+      // 6-leg timeline for richer momentum feel
+      //   Leg 1 – explosive launch (power build)
+      //   Leg 2 – sustained high speed on outer rail
+      //   Leg 3 – primary exponential deceleration
+      //   Leg 4 – ball drops inward, big slowdown
+      //   Leg 5 – "hanging" moment — near-stop, tease pocket
+      //   Leg 6 – final creep into the winning pocket
+
+      const leg1Dur = durationSeconds * 0.18;
+      const leg2Dur = durationSeconds * 0.22;
+      const leg3Dur = durationSeconds * 0.22;
+      const leg4Dur = durationSeconds * 0.16;
+      const leg5Dur = durationSeconds * 0.12;         // hanging tease
+      const leg6Dur = Math.max(0.36, durationSeconds - leg1Dur - leg2Dur - leg3Dur - leg4Dur - leg5Dur);
+
+      // Wheel rotation keyframes (cumulative, negative = counter-clockwise)
+      const wR1 = wheelSpin.finalRotation * 0.30;
+      const wR2 = wheelSpin.finalRotation * 0.58;
+      const wR3 = wheelSpin.finalRotation * 0.78;
+      const wR4 = wheelSpin.finalRotation * 0.91;
+      const wR5 = wheelSpin.finalRotation * 0.975;
+      const wRFinal = wheelSpin.finalRotation;
+
+      // Ball angle keyframes
+      const bA1 = initialBallAngle - (totalBallRotation * 0.36);
+      const bA2 = initialBallAngle - (totalBallRotation * 0.64);
+      const bA3 = initialBallAngle - (totalBallRotation * 0.84);
+      const bA4 = initialBallAngle - (totalBallRotation * 0.94);
+      const bA5 = initialBallAngle - (totalBallRotation * 0.982);
+      const bAFinal = wheelSpin.landingAngle;
 
       this.spinTween = gsap.timeline({
         onComplete: () => {
           this.spinTween = null;
-          this.isSpinning = false;
           resolve();
         }
       });
 
-      // Leg 1: Smooth, powerful acceleration — the croupier's launch
+      // Leg 1: explosive launch — ball flings outward
       this.spinTween.to(frame, {
-        wheelRotation: -(wheelSpin.finalRotation * 0.62),
-        ballAngle: frame.ballAngle - (totalBallRotation * 0.68),
-        radius: wheelRadius * 1.08,
-        wobble: 0,
-        duration: firstLeg,
-        ease: 'power2.in',
+        wheelRotation: wR1,
+        ballAngle: bA1,
+        radius: wheelRadius * 1.18,
+        bounceAmplitude: 8,
+        duration: leg1Dur,
+        ease: 'power3.in',
         onUpdate: renderFrame
       });
 
-      // Leg 2: Graceful deceleration — the ball begins to spiral inward
+      // Leg 2: sustained full speed on the outer rim
       this.spinTween.to(frame, {
-        wheelRotation: -(wheelSpin.finalRotation * 0.88),
-        ballAngle: frame.ballAngle - (totalBallRotation * 0.22),
-        radius: wheelRadius * 0.92,
-        wobble: 4,
-        duration: secondLeg,
+        wheelRotation: wR2,
+        ballAngle: bA2,
+        radius: wheelRadius * 1.14,
+        bounceAmplitude: 7,
+        duration: leg2Dur,
+        ease: 'none',               // linear at top speed
+        onUpdate: renderFrame
+      });
+
+      // Leg 3: primary exponential deceleration — visible slowdown
+      this.spinTween.to(frame, {
+        wheelRotation: wR3,
+        ballAngle: bA3,
+        radius: wheelRadius * 1.02,
+        bounceAmplitude: 5,
+        duration: leg3Dur,
+        ease: 'expo.out',
+        onUpdate: renderFrame
+      });
+
+      // Leg 4: ball drops inward toward the pocket ring
+      this.spinTween.to(frame, {
+        wheelRotation: wR4,
+        ballAngle: bA4,
+        radius: wheelRadius * 0.88,
+        bounceAmplitude: 3,
+        duration: leg4Dur,
         ease: 'power3.out',
         onUpdate: renderFrame
       });
 
-      // Leg 3: Tension — the ball skips across pockets (realistic bouncing phase)
+      // Leg 5: "hanging" moment — ball almost stops, teasing a pocket
       this.spinTween.to(frame, {
-        wheelRotation: -wheelSpin.finalRotation + 18,
-        ballAngle: frame.ballAngle - (totalBallRotation * 0.07),
-        radius: wheelRadius * 0.84,
-        wobble: 6,
-        duration: thirdLeg,
-        ease: 'power2.out',
+        wheelRotation: wR5,
+        ballAngle: bA5,
+        radius: wheelRadius * 0.82,
+        bounceAmplitude: 1.5,
+        duration: leg5Dur,
+        ease: 'sine.inOut',          // butter-smooth near-stop
         onUpdate: renderFrame
       });
 
-      // Leg 4: Final settle — ball drops into pocket with satisfying weight
+      // Leg 6: final creep — slow glide into the winning pocket
       this.spinTween.to(frame, {
-        wheelRotation: -wheelSpin.finalRotation,
-        ballAngle: frame.ballAngle - (totalBallRotation * 0.03),
-        radius: wheelRadius * 0.80,
-        wobble: 0,
-        duration: finalLeg,
-        ease: 'elastic.out(1.1, 0.35)',
+        wheelRotation: wRFinal,
+        ballAngle: bAFinal,
+        radius: wheelRadius * 0.78,
+        bounceAmplitude: 0,
+        duration: leg6Dur,
+        ease: 'power4.out',
         onUpdate: renderFrame
       });
     });
+
+    // --- Phase 2: dampened settle bounces --------------------------------
+    // The ball has reached the winning pocket's neighbourhood.  Now it
+    // bounces 3-4 times with decreasing height before coming to rest —
+    // like a real ball rattling between the frets.
+    const bounces = this.wheelEngine.getBounceSequence();
+    const settleBaseRadius = wheelRadius * 0.78;
+    let currentAngle = wheelSpin.landingAngle;
+    const currentWheelRotation = wheelSpin.finalRotation;
+
+    for (const bounce of bounces) {
+      // Each bounce: lift outward then drop back in, advancing the angle
+      // slightly as if the ball skips forward across a pocket or two.
+      const peakRadius = settleBaseRadius + bounce.height;
+      const halfDur = bounce.duration / 2;
+      const angleAdvance = bounce.angularTravel;
+
+      // Upward arc (ball lifts)
+      await new Promise((resolve) => {
+        gsap.to(frame, {
+          radius: peakRadius,
+          ballAngle: currentAngle - angleAdvance * 0.6,
+          bounceAmplitude: 0,
+          duration: halfDur,
+          ease: bounce.ease,
+          onUpdate: () => {
+            frame.wheelRotation = currentWheelRotation;
+            this.renderSpinFrame(frame);
+          },
+          onComplete: resolve
+        });
+      });
+
+      // Downward arc (ball drops back)
+      currentAngle -= angleAdvance;
+      await new Promise((resolve) => {
+        gsap.to(frame, {
+          radius: settleBaseRadius,
+          ballAngle: currentAngle,
+          bounceAmplitude: 0,
+          duration: halfDur,
+          ease: bounce.ease.replace('.out', '.in'),
+          onUpdate: () => {
+            frame.wheelRotation = currentWheelRotation;
+            this.renderSpinFrame(frame);
+          },
+          onComplete: resolve
+        });
+      });
+    }
+
+    this.isSpinning = false;
+    this._spinFrame = null;
   }
 
   async presentResult() {
     const winningPocket = this.pockets[this.result.winnerPocketIndex]?.root;
     if (winningPocket) {
-      // Step 1: Winner pocket scales up with a dramatic golden glow reveal
+      // Step 1: Winner pocket scales up with a glow
       gsap.fromTo(
         winningPocket,
         { scale: 1, boxShadow: '0 0 0px rgba(201,167,109,0)' },
         {
-          scale: 1.2,
-          boxShadow: '0 0 48px rgba(201,167,109,0.75), 0 0 96px rgba(201,167,109,0.3)',
-          duration: 0.5,
+          scale: 1.15,
+          boxShadow: '0 0 28px rgba(201,167,109,0.6)',
+          duration: 0.3,
           repeat: 1,
           yoyo: true,
-          ease: 'power2.inOut'
-        }
-      );
-
-      // Flash highlight on the stage for cinematic reveal feel
-      gsap.fromTo(
-        this.elements.stage,
-        { boxShadow: '0 0 0 0 rgba(201,167,109,0)' },
-        {
-          boxShadow: '0 0 80px 20px rgba(201,167,109,0.15)',
-          duration: 0.6,
-          yoyo: true,
-          repeat: 1,
           ease: 'power2.out'
         }
       );
@@ -1151,14 +1339,11 @@ class RouletteOverlayController {
       this.carousel.items[this.result.winnerCardIndex]?.focus?.({ preventScroll: true });
 
       if (preview.link && this.carousel.config.rouletteAutoNavigate !== false) {
-        const delayMs = Number.isFinite(this.carousel.config.rouletteAutoNavigateDelay)
-          ? this.carousel.config.rouletteAutoNavigateDelay
-          : 1200;
-
+        const delayMs = 220;
+        this.closeOverlay({ restoreFocus: false });
         this.autoNavigateTimer = this.resources.timeout(() => {
-          if (!this.isActive || this.isSpinning) return;
           this.navigateToResultLink(preview.link);
-        }, Math.max(400, delayMs));
+        }, delayMs);
       }
       return;
     }
@@ -1193,6 +1378,11 @@ class RouletteOverlayController {
     this.clearAutoNavigateTimer();
     gsap.killTweensOf([this.elements.wheel, this.elements.ball, this.elements.ballShadow, this.elements.ballHighlight, this.elements.dialog]);
     gsap.killTweensOf(this.pockets.map((pocket) => pocket.root));
+    // Kill settle-bounce tweens that target the frame object directly
+    if (this._spinFrame) {
+      gsap.killTweensOf(this._spinFrame);
+      this._spinFrame = null;
+    }
     this.isSpinning = false;
     this.spinTween = null;
     this.setStatus(message, 'assertive');
@@ -1364,12 +1554,12 @@ export class LuxuryCoverflow {
   }
 
   getEngineConfig() {
-    const isMobile = window.innerWidth < 640;
+    const isCompactViewport = window.innerWidth < 960;
     const config = {
       infiniteLoop: this.config.infiniteLoop
     };
 
-    if (isMobile) {
+    if (isCompactViewport) {
       config.positions = MOBILE_POSITIONS;
     }
 
@@ -1419,10 +1609,11 @@ export class LuxuryCoverflow {
     this.announce(`Now showing ${title}`);
   }
 
-  updatePagination() {
+  updatePagination(position = this.currentIndex) {
     const current = this.selectors.paginationCurrent ? this.container.querySelector(this.selectors.paginationCurrent) : null;
     const total = this.selectors.paginationTotal ? this.container.querySelector(this.selectors.paginationTotal) : null;
-    if (current) current.textContent = String(this.currentIndex + 1);
+    const activeIndex = this.getNearestIndex(position);
+    if (current) current.textContent = String(activeIndex + 1);
     if (total) total.textContent = String(this.items.length);
   }
 
@@ -1563,7 +1754,7 @@ export class LuxuryCoverflow {
       this.previewIndex = centerIndex;
       this.wheelState.previewPosition = centerIndex;
       applyTransforms(centerIndex);
-      this.updatePagination();
+      this.updatePagination(centerIndex);
       this.finishAnimation();
       return;
     }
@@ -1571,7 +1762,7 @@ export class LuxuryCoverflow {
     const startPosition = Number.isFinite(this.previewIndex) ? this.previewIndex : this.currentIndex;
     const tweenState = { position: startPosition };
     this.isAnimating = true;
-    this.updatePagination();
+    this.updatePagination(centerIndex);
 
     this.positionTween = gsap.to(tweenState, {
       position: centerIndex,
@@ -1581,12 +1772,14 @@ export class LuxuryCoverflow {
         this.previewIndex = tweenState.position;
         this.wheelState.previewPosition = tweenState.position;
         applyTransforms(tweenState.position);
+        this.updatePagination(tweenState.position);
       },
       onComplete: () => {
         this.positionTween = null;
         this.previewIndex = centerIndex;
         this.wheelState.previewPosition = centerIndex;
         applyTransforms(centerIndex);
+        this.updatePagination(centerIndex);
         this.finishAnimation();
       }
     });
@@ -1611,6 +1804,7 @@ export class LuxuryCoverflow {
       });
     });
     this.updateDots();
+    this.updatePagination(position);
   }
 
   setAnimating(durationMs) {
@@ -1640,6 +1834,7 @@ export class LuxuryCoverflow {
       return;
     }
 
+    this.pendingTarget = null;
     this.currentIndex = normalizedTarget;
     this.updateAllItems(continuousTarget, durationMs);
     this.resetAutoplay();
@@ -1653,10 +1848,18 @@ export class LuxuryCoverflow {
   }
 
   next() {
+    if (this.isAnimating) {
+      this.pendingTarget = (typeof this.pendingTarget === 'number' ? this.pendingTarget : this.currentIndex) + 1;
+      return;
+    }
     this.goToSlide(this.currentIndex + 1, { durationMs: this.getDiscreteNavigationDuration() });
   }
 
   prev() {
+    if (this.isAnimating) {
+      this.pendingTarget = (typeof this.pendingTarget === 'number' ? this.pendingTarget : this.currentIndex) - 1;
+      return;
+    }
     this.goToSlide(this.currentIndex - 1, { durationMs: this.getDiscreteNavigationDuration() });
   }
 
@@ -1797,25 +2000,15 @@ export class LuxuryCoverflow {
   setupWheelNavigation() {
     if (!this.config.enableScroll) return;
 
-    // Prevent browser back/forward swipe gestures from leaking through the carousel
-    this.container.style.overscrollBehaviorX = 'contain';
-    this.container.style.touchAction = 'pan-y';
-
-    this.resources.listen(this.container, 'wheel', (event) => {
+    const handleWheel = (event) => {
       if (this.roulette?.isActive) return;
 
       const absX = Math.abs(event.deltaX);
       const absY = Math.abs(event.deltaY);
+      if (absX < 10 || absX <= absY * 1.2) return;
 
-      // Prevent any horizontal wheel event on the carousel from becoming a browser
-      // back/forward navigation gesture. Even small deltaX values can trigger it.
-      if (absX > 1 && absX > absY * 0.5) {
-        event.preventDefault();
-      }
-
-      // Only drive the carousel for significant horizontal intent
-      if (absX < 6 || absX <= absY) return;
-
+      event.preventDefault();
+      event.stopPropagation();
       this.stopAutoplay();
       this.wheelState.accumulator += event.deltaX;
 
@@ -1829,16 +2022,22 @@ export class LuxuryCoverflow {
 
       this.resources.clearTimeout(this.wheelState.settleTimeout);
       this.wheelState.settleTimeout = this.resources.timeout(() => {
-        let targetIndex = this.currentIndex;
-        if (Math.abs(this.wheelState.accumulator) >= this.motion.scrollThreshold) {
-          targetIndex = this.currentIndex + (this.wheelState.accumulator > 0 ? 1 : -1);
+        let targetIndex = this.motion.enableSmoothTracking
+          ? this.getNearestIndex(this.previewIndex)
+          : this.currentIndex;
+
+        if (!this.motion.enableSmoothTracking && Math.abs(this.wheelState.accumulator) >= this.motion.scrollThreshold) {
+          targetIndex += this.wheelState.accumulator > 0 ? 1 : -1;
         }
 
         this.wheelState.accumulator = 0;
-        this.previewIndex = normalizeIndex(targetIndex, this.items.length, this.config.infiniteLoop);
         this.goToSlide(targetIndex, { durationMs: this.motion.settleMs });
       }, 110);
-    }, { passive: false });
+    };
+
+    [this.container, this.track, this.container.closest('.coverflow-section')].filter(Boolean).forEach((node) => {
+      this.resources.listen(node, 'wheel', handleWheel, { passive: false });
+    });
   }
 
   startDrag(clientX, clientY, target) {
@@ -1908,9 +2107,10 @@ export class LuxuryCoverflow {
     const velocity = this.physics.velocity;
     const hasMeaningfulMovement = Math.abs(deltaX) >= 24 || Math.abs(velocity) > 0.2;
     const direction = deltaX < 0 ? 1 : -1;
+    const settledIndex = this.getNearestIndex(this.previewIndex);
     const targetIndex = hasMeaningfulMovement
-      ? this.currentIndex + direction
-      : this.currentIndex;
+      ? settledIndex + direction
+      : settledIndex;
 
     this.dragState.isDragging = false;
     this.dragState.axisLocked = null;

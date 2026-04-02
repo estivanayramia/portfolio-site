@@ -26,9 +26,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" data-media="(min-width: 769px)">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=23626563">
-    <link rel="preload" href="/assets/css/style.css?v=23626563" as="style">
-    <script src="/assets/js/site.min.js?v=23626563" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=012bbc00">
+    <link rel="preload" href="/assets/css/style.css?v=012bbc00" as="style">
+    <script src="/assets/js/site.min.js?v=012bbc00" defer></script>
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -139,11 +139,11 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 project-page project-systems">
         
         <!-- Breadcrumb -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
-            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+            <nav aria-label="Breadcrumb" class="project-breadcrumb-shell opacity-0 translate-y-4" data-gsap="fade-up">
                 <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
                     <li><span class="text-chocolate/40">/</span></li>
                     <li><a href="/projects/" class="hover:text-indigodeep transition-colors">Projects</a></li>
@@ -154,8 +154,9 @@
         </section>
         
         <!-- Project Header -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+        <section class="page-hero project-hero-shell max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
             <div class="space-y-6">
+                <p class="project-kicker opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.05">Systems / strategy page</p>
                 <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
                     <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Strategy</span>
                     <span class="text-xs bg-chocolate/10 text-chocolate px-3 py-1 rounded-full">Market Analysis</span>
@@ -168,18 +169,28 @@
                 </p>
             </div>
         </section>
-        
-        <!-- Project Visual -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8 space-y-4">
-            <div class="aspect-video bg-gradient-to-br from-[#0f172a] via-[#1f2937] to-[#f97316] rounded-2xl flex items-center justify-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
-                <svg class="w-24 h-24 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7h18M3 12h18M3 17h18" />
-                </svg>
+
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 pb-8">
+            <div class="project-proof-grid">
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.35">
+                    <p class="project-fact-label">Strategic frame</p>
+                    <p class="text-base text-chocolate leading-relaxed">The core move was not a slide trick. It was the alliance logic: Almac plus 4G as a more unified alternative to Endpoint.</p>
+                </article>
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                    <p class="project-fact-label">What I owned</p>
+                    <p class="text-base text-chocolate leading-relaxed">I led the social and display section, helped shape the overall strategy, and created the Tekier team identity used across the deck.</p>
+                </article>
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.45">
+                    <p class="project-fact-label">Why it matters</p>
+                    <p class="text-base text-chocolate leading-relaxed">The page works best when the reader can see the context, the strategic move, and the evidence structure separately instead of all at once.</p>
+                </article>
             </div>
         </section>
+        
+        <!-- Project Visual removed: was generic placeholder -->
 
         <!-- PDF Preview Section -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-4 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-4 opacity-0 project-preview-shell" data-gsap="fade-up" data-gsap-delay="0.5">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-sm font-semibold tracking-wide text-chocolate/80">Case study preview</h2>
                 <button type="button" class="preview-toggle inline-flex items-center gap-1 rounded-full border border-chocolate/30 px-3 py-1 text-xs text-chocolate/70 hover:bg-chocolate/5 transition-colors">
@@ -223,10 +234,10 @@
         
         <!-- Project Details -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
-            <div class="grid lg:grid-cols-3 gap-12">
+            <div class="project-body-grid">
                 
                 <!-- Main Content -->
-                <div class="lg:col-span-2 space-y-12">
+                <div class="project-narrative">
 
                     <!-- What I Did -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.45">
@@ -303,10 +314,10 @@
                 </div>
                 
                 <!-- Sidebar -->
-                <div class="space-y-8">
+                <div class="project-side-stack">
                     
                     <!-- Project Info -->
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                    <div class="project-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h3 class="text-lg font-semibold text-indigodeep mb-4">Project Info</h3>
                         <dl class="space-y-4 text-sm">
                             <div>
@@ -333,7 +344,7 @@
                     </div>
                     
                     <!-- Skills Applied -->
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                    <div class="project-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
                         <h3 class="text-lg font-semibold text-indigodeep mb-4">Skills Applied</h3>
                         <div class="flex flex-wrap gap-2">
                             <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Strategy</span>
@@ -345,7 +356,7 @@
                     </div>
                     
                     <!-- CTA -->
-                    <div class="bg-indigodeep text-beige rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                    <div class="project-callout bg-indigodeep text-beige opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
                         <h3 class="text-lg font-semibold mb-3">Want to talk about this?</h3>
                         <p class="text-sm text-beige/80 mb-4">Reach out if you want to talk about a project or role.</p>
                         <a href="/contact" class="inline-block text-sm font-medium bg-beige text-indigodeep px-5 py-2 rounded-full hover:bg-chocolate hover:text-beige transition-colors focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-2 focus:ring-offset-indigodeep">
@@ -359,18 +370,18 @@
         </section>
         
         <!-- Related Projects -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10">
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10 project-divider">
             <h2 class="text-2xl font-bold text-indigodeep mb-8 opacity-0" data-gsap="fade-up">Related Projects</h2>
             <div class="grid md:grid-cols-3 gap-6">
                 <a href="/projects/loreal-maps-campaign" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
                     <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Go-to-Market</span>
-                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">L'Oréal Cell BioPrint MAPS Campaign</h3>
-                    <p class="text-sm text-chocolate">Class concept campaign deck for L'Oréal Cell BioPrint personas.</p>
+                    <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">L'Or&eacute;al Cell BioPrint MAPS Campaign</h3>
+                    <p class="text-sm text-chocolate">Class concept campaign deck for L'Or&eacute;al Cell BioPrint personas.</p>
                 </a>
                 <a href="/projects/portfolio" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
                     <span class="text-xs bg-indigodeep/10 text-indigodeep px-2 py-1 rounded-full">Development</span>
                     <h3 class="text-lg font-semibold text-indigodeep mt-3 mb-2">This Website</h3>
-                    <p class="text-sm text-chocolate">120+ hours of hand-coded work. Built from scratch.</p>
+                    <p class="text-sm text-chocolate">Over 300 hours of AI-assisted design, direction, and polish.</p>
                 </a>
                 <a href="/projects/" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
                     <div class="text-center py-8">
@@ -421,7 +432,7 @@
             </div>
             
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2026</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
     </footer>

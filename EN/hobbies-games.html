@@ -21,12 +21,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/assets/css/style.css?v=23626563">
+    <link rel="stylesheet" href="/assets/css/style.css?v=012bbc00">
     <link rel="stylesheet" href="/theme.css?v=v20260119-5">
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=23626563-v4">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=012bbc00-v4">
     
     <!-- Main Site Logic (Chat, Theme, etc.) -->
-    <script src="/assets/js/site.min.js?v=23626563" defer></script>
+    <script src="/assets/js/site.min.js?v=012bbc00" defer></script>
     <script type="module" src="/assets/js/arcade/arcade-core.js"></script>
     <script type="module" src="/assets/js/arcade/achievements-ui.js"></script>
     
@@ -854,8 +854,8 @@
     <div class="scroll-progress" aria-hidden="true"></div>
     
     <!-- Fixed Header -->
-    <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
-        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between">
+    <header class="fixed top-0 left-0 right-0 z-50 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-4 flex items-center justify-between">
             <a href="/" class="text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center" aria-label="Go to Portfolio home page">
                 <picture>
   <source srcset="/assets/img/logo-ea.webp" type="image/webp">
@@ -866,11 +866,10 @@
             
             <!-- Main Navigation -->
             <ul class="hidden md:flex items-center space-x-8">
-                <li><a href="/" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Home</a></li>
-                <li><a href="/projects/" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
                 <li><a href="/overview" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Overview</a></li>
                 <li><a href="/deep-dive" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Deep Dive</a></li>
                 <li><a href="/about" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">About</a></li>
+                <li><a href="/projects/" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">Projects</a></li>
                 <li><a href="/contact" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
 <!-- Dark Mode Toggle -->
@@ -887,11 +886,10 @@
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
             <ul class="px-6 py-4 space-y-3">
-                <li><a href="/" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Home</a></li>
-                <li><a href="/projects/" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Projects</a></li>
                 <li><a href="/overview" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Overview</a></li>
                 <li><a href="/deep-dive" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Deep Dive</a></li>
                 <li><a href="/about" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">About</a></li>
+                <li><a href="/projects/" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2">Projects</a></li>
                 <li><a href="/contact" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full text-center hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige">Contact</a></li>
             </ul>
         </div>
@@ -927,7 +925,7 @@
                 </div>
                 <h2 class="sr-only">Featured games</h2>
                 
-                <section id="arcade-featured-carousel" class="coverflow-section" data-luxury-coverflow aria-label="Featured arcade games" role="region" style="min-height:auto; background:transparent; padding:0.5rem 0 1rem;">
+                <section id="arcade-featured-carousel" class="coverflow-section" data-luxury-coverflow aria-label="Featured arcade games" role="region" style="min-height:auto; background:transparent; padding:2.5rem 0 1rem;">
                     <div class="coverflow-header mb-6">
                         <h2 class="coverflow-title">
                             <span class="title-main">Featured Games</span>
@@ -1009,25 +1007,89 @@
                                         </div>
                                     </div>
                                 </article>
+
+                                <article class="coverflow-card" role="listitem" data-index="4" data-title="Flappy Face">
+                                    <div class="card-inner">
+                                        <div class="card-image-container">
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #1e1b4b, #7c3aed); font-size: 4rem;">😄</div>
+                                            <div class="card-image-overlay"></div>
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="card-category">Reflex</div>
+                                            <h3 class="card-title">Flappy Face</h3>
+                                            <p class="card-description">Tap to fly a cartoon face through golden pipes. Parallax sky, particle trails, and escalating difficulty.</p>
+                                            <div class="card-actions">
+                                                <a href="/hobbies-games/flappy-face" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <article class="coverflow-card" role="listitem" data-index="5" data-title="Color Match">
+                                    <div class="card-inner">
+                                        <div class="card-image-container">
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #0c4a6e, #06b6d4); font-size: 4rem;">🎨</div>
+                                            <div class="card-image-overlay"></div>
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="card-category">Speed</div>
+                                            <h3 class="card-title">Color Match</h3>
+                                            <p class="card-description">Stroop-effect reaction game. Match the ink color, not the word. Combos, fire effects, and 60-second rounds.</p>
+                                            <div class="card-actions">
+                                                <a href="/hobbies-games/color-match" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <article class="coverflow-card" role="listitem" data-index="6" data-title="Gravity Runner">
+                                    <div class="card-inner">
+                                        <div class="card-image-container">
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #064e3b, #10b981); font-size: 4rem;">🏃</div>
+                                            <div class="card-image-overlay"></div>
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="card-category">Endless Runner</div>
+                                            <h3 class="card-title">Gravity Runner</h3>
+                                            <p class="card-description">Flip gravity to dodge obstacles on floor and ceiling. Cyberpunk visuals, power-ups, and rising speed.</p>
+                                            <div class="card-actions">
+                                                <a href="/hobbies-games/gravity-runner" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
+
+                                <article class="coverflow-card" role="listitem" data-index="7" data-title="Hex Memory">
+                                    <div class="card-inner">
+                                        <div class="card-image-container">
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #312e81, #8b5cf6); font-size: 4rem;">⬡</div>
+                                            <div class="card-image-overlay"></div>
+                                        </div>
+                                        <div class="card-content">
+                                            <div class="card-category">Memory</div>
+                                            <h3 class="card-title">Hex Memory</h3>
+                                            <p class="card-description">Simon-says on a hexagonal grid. Watch the sequence glow, then repeat it. Grid grows with each level.</p>
+                                            <div class="card-actions">
+                                                <a href="/hobbies-games/hex-memory" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </article>
                             </div>
                         </div>
 
                         <div class="coverflow-controls" role="group" aria-label="Featured games navigation">
                             <button class="coverflow-btn coverflow-btn-prev" type="button" aria-label="Previous featured game">←</button>
-                            <div class="coverflow-pagination"><span class="pagination-current">1</span><span class="pagination-separator">/</span><span class="pagination-total">4</span></div>
+                            <div class="coverflow-pagination"><span class="pagination-current">1</span><span class="pagination-separator">/</span><span class="pagination-total">8</span></div>
                             <button class="coverflow-btn coverflow-btn-next" type="button" aria-label="Next featured game">→</button>
                         </div>
                     </div>
                 </section>
                 
                 <div class="text-center">
-                    <button onclick="toggleSound()" id="sound-toggle-secondary" class="mb-4 px-6 py-2 bg-indigodeep text-white rounded-lg font-medium hover:opacity-90 transition-all" title="Toggle Sound Effects" aria-label="Toggle game sound effects">
-                        🔊
-                    </button>
-                    <br>
-                    <a href="/hobbies/" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigodeep to-[#362017] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
-                        <span>Continue to Hobbies</span>
-                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                    <a href="/about" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigodeep to-[#362017] text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                        <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                        <span>Back to About</span>
                     </a>
                 </div>
 
@@ -1298,7 +1360,7 @@
             </div>
             
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2026</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -1394,7 +1456,7 @@
             }
             const icon = soundsEnabled ? '🔊' : '🔇';
             // Update all sound toggle buttons
-            ['sound-toggle', 'sound-toggle-secondary', 'sound-toggle-snake', 'sound-toggle-breaker', 'sound-toggle-invaders'].forEach(id => {
+            ['sound-toggle', 'sound-toggle-snake', 'sound-toggle-breaker', 'sound-toggle-invaders'].forEach(id => {
                 const btn = document.getElementById(id);
                 if (btn) btn.textContent = icon;
             });

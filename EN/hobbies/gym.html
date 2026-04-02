@@ -27,9 +27,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=23626563">
-    <link rel="preload" href="/assets/css/style.css?v=23626563" as="style">
-    <script src="/assets/js/site.min.js?v=23626563" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=012bbc00">
+    <link rel="preload" href="/assets/css/style.css?v=012bbc00" as="style">
+    <script src="/assets/js/site.min.js?v=012bbc00" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
@@ -202,7 +202,7 @@
               "@type": "ListItem",
               "position": 2,
               "name": "Hobbies",
-              "item": "https://www.estivanayramia.com/hobbies/"
+              "item": "https://www.estivanayramia.com/about"
             },
             {
               "@type": "ListItem",
@@ -228,10 +228,11 @@
     
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
+    <div class="scroll-progress" aria-hidden="true"></div>
     
     <!-- Navigation Header -->
     <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
-        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between gap-2">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-8 flex items-center justify-between gap-2">
             <a href="/" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
                 <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
                 <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
@@ -269,14 +270,14 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 hobby-page">
         
         <!-- Breadcrumb -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
-            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+            <nav aria-label="Breadcrumb" class="hobby-crumbs opacity-0 translate-y-4" data-gsap="fade-up">
                 <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
                     <li><span class="text-chocolate/40">/</span></li>
-                    <li><a href="/hobbies/" class="hover:text-indigodeep transition-colors">Hobbies</a></li>
+                    <li><a href="/about" class="hover:text-indigodeep transition-colors">About</a></li>
                     <li><span class="text-chocolate/40">/</span></li>
                     <li class="text-indigodeep font-medium">Gym</li>
                 </ol>
@@ -284,8 +285,9 @@
         </section>
         
         <!-- Hero Section -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+        <section class="page-hero max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
             <div class="space-y-6">
+                <p class="hobby-kicker opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.05">Hobby chapter / discipline</p>
                 <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
                     <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Physical</span>
                     <span class="text-xs text-ink/60">Daily Practice</span>
@@ -301,7 +303,7 @@
         
         <!-- Stats Banner -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8">
-            <div class="bg-indigodeep/5 border border-indigodeep/10 rounded-2xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+            <div class="hobby-panel opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                     <div>
                         <div class="text-2xl font-bold text-indigodeep">5'10"</div>
@@ -310,9 +312,14 @@
                     <div>
                         <div class="text-2xl font-bold text-indigodeep">170 lbs</div>
                         <div class="text-sm text-chocolate">Target Weight</div>
-                    </div>`r`n<div>
+                    </div>
+                    <div>
                         <div class="text-2xl font-bold text-indigodeep">3-6 Days</div>
                         <div class="text-sm text-chocolate">Training Frequency</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-indigodeep">Consistency</div>
+                        <div class="text-sm text-chocolate">Main Metric</div>
                     </div>
                 </div>
             </div>
@@ -320,10 +327,10 @@
         
         <!-- Content Grid -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
-            <div class="grid lg:grid-cols-3 gap-12">
+            <div class="hobby-body-grid">
                 
                 <!-- Main Content -->
-                <div class="lg:col-span-2 min-w-0 space-y-12">
+                <div class="hobby-narrative min-w-0">
                     
                     <!-- Why I Train -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
@@ -339,7 +346,8 @@
                     <div>
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">How I Structure My Training</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p>The idea is simple. Do a little more than last time. One more rep, five more pounds, cleaner form. That is it. It sounds boring but small things add up fast when you stay consistent.</p>`r`n<p>I am not on a strict diet and I am not going to pretend otherwise. I still enjoy food. But there is a voice in the back of my head that reminds me I want a body that actually looks like I go to the gym. So I pay attention without being obsessive. Enough protein, not too much junk, and I still eat the things I like.</p>
+                            <p>The idea is simple. Do a little more than last time. One more rep, five more pounds, cleaner form. That is it. It sounds boring but small things add up fast when you stay consistent.</p>
+                            <p>I am not on a strict diet and I am not going to pretend otherwise. I still enjoy food. But there is a voice in the back of my head that reminds me I want a body that actually looks like I go to the gym. So I pay attention without being obsessive. Enough protein, not too much junk, and I still eat the things I like.</p>
                         </div>
                     </div>
                     
@@ -357,7 +365,7 @@
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.75">
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">In Action</h2>
                         <div class="aspect-video rounded-xl overflow-hidden shadow-lg border border-chocolate/10 bg-black">
-                            <video controls class="w-full h-full object-contain" preload="metadata">
+                            <video controls class="w-full h-full object-contain" preload="none">
                                 <source src="/assets/img/Portolio-Media/Portfolio-Media/gym-/muscle_up_attempt.mp4" type="video/mp4">
                                 Your browser does not support the video tag.
                             </video>
@@ -392,27 +400,28 @@
                 </div>
                 
                 <!-- Sidebar -->
-                <div class="space-y-8">
+                <div class="hobby-side-stack">
                     
                     <!-- Quick Facts -->
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                    <div class="hobby-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h3 class="text-lg font-semibold text-indigodeep mb-4">Quick Facts</h3>
                         <dl class="space-y-4 text-sm">
                             <div>
                                 <dt class="text-chocolate/60 mb-1">Training Style</dt>
                                 <dd class="text-indigodeep font-medium">Progressive Overload</dd>
-                            </div>`r`n`r`n<div>
+                            </div>
+                            <div>
                                 <dt class="text-chocolate/60 mb-1">Primary Goal</dt>
                                 <dd class="text-indigodeep font-medium">Discipline & Consistency</dd>
                             </div>
                         </dl>
                     </div>
                     
-                    <!-- Back to Hobbies -->
-                    <div class="bg-indigodeep rounded-xl p-6 text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                    <!-- Back to About -->
+                    <div class="hobby-side-card bg-indigodeep text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
                         <p class="text-beige/90 text-sm mb-4">Explore more hobbies</p>
-                        <a href="/hobbies/#hobby-gym-card" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
-                            &larr; Back to All Hobbies
+                        <a href="/about" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
+                            &larr; Back to About
                         </a>
                     </div>
                     
@@ -460,7 +469,7 @@
             </div>
             
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">&copy; <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">&copy; <span id="copyright-year">2026</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -493,9 +502,7 @@
             <div id="chat-chips" data-chat-suggestions="container" class="p-2 bg-white/80 border-t border-[#362017]/5 flex gap-2 overflow-x-auto whitespace-nowrap" role="group" aria-label="Suggested questions"></div>
 
             <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white dark:bg-[#362017] border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
-                <button type="button" id="suggestions-btn" data-chat-suggestions-toggle="button" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors">
-                    ?
-                </button>
+                <button type="button" id="suggestions-btn" data-chat-suggestions-toggle="button" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors"><svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-2v-4h2m-1-7a4 4 0 0 0-4 4c0 1.6.7 2.8 1.8 3.7.8.6 1.2 1.3 1.2 2.3h2c0-1 .4-1.7 1.2-2.3C15.3 11.8 16 10.6 16 9a4 4 0 0 0-4-4zm-2 14h4m-5 2h6"></path></svg></button>
                 <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] dark:text-[#e1d4c2] dark:placeholder-[#e1d4c2]/60 focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
                 <button type="button" id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>

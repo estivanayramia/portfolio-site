@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <script>document.documentElement.classList.add('js')</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <meta name="description" content="Explore Estivan Ayramia's photography hobby and visual storytelling approach, from composition choices to everyday moments captured with intentional framing.">
+                    <meta name="description" content="Photos Estivan Ayramia has taken and the kind of frames he likes to catch.">
                     <link rel="canonical" href="https://www.estivanayramia.com/hobbies/photography">
                     <title>Photography | Estivan Ayramia</title>
     
     <!-- Open Graph / Social Media -->
                     <meta property="og:type" content="website">
                     <meta property="og:title" content="Photography | Estivan Ayramia">
-                    <meta property="og:description" content="Explore Estivan Ayramia's photography hobby and visual storytelling approach, from composition choices to everyday moments captured with intentional framing.">
+                    <meta property="og:description" content="Photos Estivan Ayramia has taken and the kind of frames he likes to catch.">
                     <meta property="og:url" content="https://www.estivanayramia.com/hobbies/photography">
                     <meta name="twitter:card" content="summary_large_image">
                     <meta name="twitter:title" content="Photography | Estivan Ayramia">
-                    <meta name="twitter:description" content="Explore Estivan Ayramia's photography hobby and visual storytelling approach, from composition choices to everyday moments captured with intentional framing.">
+                    <meta name="twitter:description" content="Photos Estivan Ayramia has taken and the kind of frames he likes to catch.">
     
     <!-- Google Fonts: Inter (non-render-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,14 +27,14 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=23626563">
-    <link rel="preload" href="/assets/css/style.css?v=23626563" as="style">
-    <script src="/assets/js/site.min.js?v=23626563" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=012bbc00">
+    <link rel="preload" href="/assets/css/style.css?v=012bbc00" as="style">
+    <script src="/assets/js/site.min.js?v=012bbc00" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
     <!-- Theme CSS - loads reliably for all viewports -->
-    <link rel="stylesheet" href="/theme.css?v=v20260119-5">
+    <link rel="stylesheet" href="/theme.css?v=012bbc00">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -182,7 +182,7 @@
           "@id": "https://www.estivanayramia.com/hobbies/photography#webpage",
           "url": "https://www.estivanayramia.com/hobbies/photography",
           "name": "Photography | Estivan Ayramia",
-          "description": "Explore Estivan Ayramia's photography hobby and visual storytelling approach, from composition choices to everyday moments captured with intentional framing.",
+          "description": "Photos Estivan Ayramia has taken and the kind of frames he likes to catch.",
           "isPartOf": "https://www.estivanayramia.com/",
           "about": "https://www.estivanayramia.com/#person",
           "inLanguage": "en"
@@ -200,8 +200,8 @@
             {
               "@type": "ListItem",
               "position": 2,
-              "name": "Hobbies",
-              "item": "https://www.estivanayramia.com/hobbies/"
+              "name": "About",
+              "item": "https://www.estivanayramia.com/about"
             },
             {
               "@type": "ListItem",
@@ -220,17 +220,18 @@
     <!-- Lightbox Modal -->
     <div id="lightbox" class="lightbox-overlay" aria-hidden="true">
         <button class="lightbox-close" aria-label="Close lightbox">&times;</button>
-        <button class="lightbox-nav lightbox-prev" aria-label="Previous image">←</button>
+        <button class="lightbox-nav lightbox-prev" aria-label="Previous image">&larr;</button>
         <img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="" class="lightbox-content" id="lightbox-image">
-        <button class="lightbox-nav lightbox-next" aria-label="Next image">→</button>
+        <button class="lightbox-nav lightbox-next" aria-label="Next image">&rarr;</button>
     </div>
     
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
+    <div class="scroll-progress" aria-hidden="true"></div>
     
     <!-- Navigation Header -->
     <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
-        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between gap-2">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-8 flex items-center justify-between gap-2">
             <a href="/" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
                 <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
                 <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
@@ -268,14 +269,14 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 hobby-page">
         
         <!-- Breadcrumb -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
-            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+            <nav aria-label="Breadcrumb" class="hobby-crumbs opacity-0 translate-y-4" data-gsap="fade-up">
                 <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
                     <li><span class="text-chocolate/40">/</span></li>
-                    <li><a href="/hobbies/" class="hover:text-indigodeep transition-colors">Hobbies</a></li>
+                    <li><a href="/about" class="hover:text-indigodeep transition-colors">About</a></li>
                     <li><span class="text-chocolate/40">/</span></li>
                     <li class="text-indigodeep font-medium">Photography</li>
                 </ol>
@@ -283,8 +284,9 @@
         </section>
         
         <!-- Hero Section -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+        <section class="page-hero max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
             <div class="space-y-6">
+                <p class="hobby-kicker opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.05">Hobby chapter / visual attention</p>
                 <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
                     <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Creative</span>
                     <span class="text-xs text-ink/60">Visual</span>
@@ -293,17 +295,17 @@
                     Photography
                 </h1>
                 <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
-                    Not about documenting everything. It's about seeing patterns and systems in motion, then capturing the moment where everything aligns.
+                    I like catching a frame that actually feels like something. Good light, strong lines, and the right moment are enough.
                 </p>
             </div>
         </section>
         
         <!-- Content Grid -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
-            <div class="grid lg:grid-cols-3 gap-12">
+            <div class="hobby-body-grid">
                 
                 <!-- Main Content -->
-                <div class="lg:col-span-2 min-w-0 space-y-12">
+                <div class="hobby-narrative min-w-0">
                     
                     <!-- What I Like to Shoot -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
@@ -328,8 +330,8 @@
                         <p class="text-chocolate mb-6 text-sm">This gallery shows how I see things, and you get to look through my eyes for a few minutes. These photos highlight the everyday details that catch my attention. It is a fun way to introduce myself.</p>
                         
                         <div class="gallery-carousel" id="galleryCarousel" data-mini-carousel="true">
-                            <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">←</button>
-                            <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">→</button>
+                            <button class="carousel-btn carousel-btn-prev" id="carouselPrev" aria-label="Previous images">&larr;</button>
+                            <button class="carousel-btn carousel-btn-next" id="carouselNext" aria-label="Next images">&rarr;</button>
                             
                             <div class="carousel-track" id="carouselTrack">
                                 <figure class="carousel-slide gallery-card rounded-xl overflow-hidden bg-chocolate/10">
@@ -401,13 +403,15 @@
                 </div>
                 
                 <!-- Sidebar -->
-                <div class="space-y-8">
+                <div class="hobby-side-stack">
                     
-                    <!-- Back to Hobbies -->
-                    <div class="bg-indigodeep rounded-xl p-6 text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
-                        <p class="text-beige/90 text-sm mb-4">Explore more hobbies</p>
-                        <a href="/hobbies/#hobby-photography-card" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
-                            ← Back to All Hobbies
+                    <!-- Back to About -->
+                    <div class="hobby-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                        <p class="hobby-label">Navigate back</p>
+                        <h2 class="text-lg font-semibold text-indigodeep">Return to the personal side</h2>
+                        <p class="text-sm text-chocolate leading-relaxed">Photography still lives inside the About carousel. That is the cleanest place to keep the rest of the personal pages together.</p>
+                        <a href="/about#about-carousel-section" class="inline-flex items-center justify-center text-sm font-medium text-indigodeep border border-indigodeep/25 px-6 py-3 rounded-full hover:bg-indigodeep hover:text-beige transition-colors">
+                            Back to About
                         </a>
                     </div>
                     
@@ -445,8 +449,8 @@
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Connect</h3>
                     <ul class="space-y-2">
-                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
-                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
+                        <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn &nearr;</a></li>
+                        <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub &nearr;</a></li>
                         <li><a href="/contact" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
                         <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
                         <li><a href="/privacy" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
@@ -455,7 +459,7 @@
             </div>
             
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">&copy; <span id="copyright-year">2026</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -489,7 +493,7 @@
 
             <div id="chat-input-area" class="pl-2 pr-4 py-4 bg-white dark:bg-[#362017] border-t border-[#362017]/10 shrink-0 flex gap-1 sm:gap-2 items-center">
                 <button type="button" id="suggestions-btn" data-chat-suggestions-toggle="button" aria-label="Toggle suggestions" title="Toggle suggestions" class="shrink-0 px-1 sm:px-2 py-1 flex justify-center items-center text-[#362017]/60 hover:text-[#362017] dark:text-[#e1d4c2]/60 dark:hover:text-[#e1d4c2] transition-colors">
-                    💡
+                    &#x1F4A1;
                 </button>
                 <input type="text" id="chat-input" placeholder="Ask a question..." class="flex-1 bg-[#e1d4c2]/30 border-none rounded-lg px-2 sm:px-3 py-1 text-xs sm:text-sm text-[#362017] dark:text-[#e1d4c2] dark:placeholder-[#e1d4c2]/60 focus:ring-2 focus:ring-[#212842]/20 outline-none min-w-0">
                 <button type="button" id="send-btn" class="bg-[#212842] text-white px-1 sm:px-2 py-1 rounded-lg hover:bg-[#362017] transition-colors shrink-0 flex justify-center items-center" aria-label="Send Message">
@@ -500,7 +504,7 @@
 
         <!-- Welcome Bubble (anchored above toggle button) -->
         <div id="welcome-bubble" class="fixed bg-white px-4 py-2 rounded-xl rounded-br-none shadow-lg border border-[#362017]/5 transform transition-all duration-500 opacity-0 translate-y-4 pointer-events-none" style="bottom: 5.625rem;">
-            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? 👋</p>
+            <p class="text-sm font-medium text-[#362017]">Hi, maybe I can help? &#x1F44B;</p>
         </div>
 
         <!-- Toggle Button (always stays in bottom-right corner) -->

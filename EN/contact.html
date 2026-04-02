@@ -34,16 +34,16 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp" fetchpriority="high">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=23626563">
+    <link rel="stylesheet" href="/assets/css/style.css?v=012bbc00">
     
-    <script src="/assets/js/site.min.js?v=23626563" defer></script>
+    <script src="/assets/js/site.min.js?v=012bbc00" defer></script>
     <!-- Theme CSS -->
     <noscript></noscript>
     
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
     <!-- Theme CSS - loads reliably for all viewports -->
-    <link rel="stylesheet" href="/theme.css?v=v20260119-5">
+    <link rel="stylesheet" href="/theme.css?v=012bbc00">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -144,27 +144,84 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 spine-page">
         
         <!-- Hero Section -->
-        <section class="max-w-4xl mx-auto px-6 lg:px-12 py-20 lg:py-28">
-            <div class="text-center space-y-6">
-                <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up">
-                    Let's Talk
-                </h1>
-                <p class="text-lg text-chocolate leading-relaxed max-w-2xl mx-auto opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
-                    Whether it's a role, a project, or a conversation about systems and operations; reach out. Responses typically within 24 hours.
-                </p>
+        <section class="page-hero max-w-6xl mx-auto px-6 lg:px-12 py-20 lg:py-28">
+            <div class="spine-hero-grid">
+                <div class="space-y-6">
+                    <p class="spine-kicker">Contact / direct</p>
+                    <h1 class="text-4xl lg:text-6xl font-bold text-indigodeep leading-tight tracking-tight opacity-0 translate-y-8" data-gsap="fade-up">
+                        Let's Talk
+                    </h1>
+                    <p class="text-lg text-chocolate leading-relaxed opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.2">
+                        If it is a role, a project, or you just want to talk, reach out.
+                    </p>
+                    <p class="text-base text-chocolate/80 leading-relaxed opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
+                        If you already know what you need, send it. If you do not, a direct note works too.
+                    </p>
+                </div>
+
+                <aside class="spine-hero-rail opacity-0" data-gsap="fade-up" data-gsap-delay="0.15">
+                    <p class="spine-eyebrow">What to expect</p>
+                    <div class="spine-note-list text-sm text-chocolate">
+                        <div class="spine-note-item">The form is the fastest route if you want to send context in one place.</div>
+                        <div class="spine-note-item">Direct email is still here if that feels simpler.</div>
+                        <div class="spine-note-item">Responses typically come within 24 hours.</div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section class="proof-band max-w-5xl mx-auto px-6 lg:px-12 pb-12">
+            <div class="spine-band opacity-0" data-gsap="fade-up">
+                <div class="spine-section-head is-split mb-0">
+                    <div>
+                        <p class="spine-eyebrow">Why people reach out</p>
+                        <h2 class="text-3xl font-bold text-indigodeep">The page works for roles, projects, or direct questions.</h2>
+                    </div>
+                    <p class="text-sm text-chocolate/80 leading-relaxed">
+                        The point is clarity, not pressure. Pick the lane that
+                        matches what you are trying to start.
+                    </p>
+                </div>
+                <div class="spine-mini-route-grid">
+                    <div class="spine-route-card">
+                        <div class="spine-route-meta">Roles</div>
+                        <div class="text-lg font-semibold text-indigodeep">Job and internship conversations</div>
+                        <div class="text-sm text-chocolate/70">Use the form if you want to include context, links, or an attachment.</div>
+                    </div>
+                    <div class="spine-route-card">
+                        <div class="spine-route-meta">Projects</div>
+                        <div class="text-lg font-semibold text-indigodeep">Collaboration or consulting</div>
+                        <div class="text-sm text-chocolate/70">A short brief is enough to start if the fit looks promising.</div>
+                    </div>
+                    <div class="spine-route-card">
+                        <div class="spine-route-meta">Direct</div>
+                        <div class="text-lg font-semibold text-indigodeep">General questions or a quick note</div>
+                        <div class="text-sm text-chocolate/70">If you do not need a formal brief, a direct message works too.</div>
+                    </div>
+                </div>
             </div>
         </section>
         
         <!-- Contact Form & Info Section -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
-            <div class="grid lg:grid-cols-5 gap-12">
+        <section class="page-close max-w-6xl mx-auto px-6 lg:px-12 py-16">
+            <div class="spine-section-head is-split">
+                <div>
+                    <p class="spine-eyebrow">Send the message</p>
+                    <h2 class="text-3xl font-bold text-indigodeep">Keep it simple and send the useful context.</h2>
+                </div>
+                <p class="spine-lead">
+                    The form stays front and center. The sidebar is only there to
+                    make direct options and availability easier to scan.
+                </p>
+            </div>
+            <div class="spine-form-layout">
                 
                 <!-- Contact Form -->
-                <div class="lg:col-span-3">
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl p-8 opacity-0" data-gsap="fade-up">
+                <div>
+                    <div class="spine-form-shell opacity-0" data-gsap="fade-up">
                         <h2 class="text-2xl font-bold text-indigodeep mb-6">Send a Message</h2>
                         
                         <!-- Formspree Form -->
@@ -307,13 +364,13 @@
                 </div>
                 
                 <!-- Contact Information -->
-                <div class="lg:col-span-2 space-y-8">
+                <div class="spine-side-stack">
                     
                     <!-- Direct Contact -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
+                    <div class="spine-sidebar-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
                         <h3 class="text-xl font-semibold text-indigodeep mb-4">Direct Contact</h3>
                         <div class="space-y-4">
-                            <div class="flex items-start space-x-3">
+                            <div class="spine-link-row">
                                 <svg class="w-5 h-5 text-indigodeep mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                                 </svg>
@@ -328,7 +385,7 @@
                     </div>
                     
                     <!-- Social Links -->
-                    <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
+                    <div class="spine-sidebar-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
                         <h3 class="text-xl font-semibold text-indigodeep mb-4">Connect</h3>
                         <div class="space-y-3">
                             <a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="flex items-center space-x-3 text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep rounded p-2 -ml-2">
@@ -348,7 +405,7 @@
                     
                     <!-- Response Time -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
-                        <div class="bg-indigodeep/5 border border-indigodeep/10 rounded-xl p-6">
+                        <div class="spine-sidebar-card">
                             <h3 class="text-base font-semibold text-indigodeep mb-2">Response Time</h3>
                             <p class="text-sm text-chocolate leading-relaxed">
                                 Typically respond within 24 hours during weekdays. For urgent inquiries, please mention it in your message.
@@ -358,13 +415,13 @@
                     
                     <!-- Availability -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
-                        <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6">
+                        <div class="spine-sidebar-card">
                             <h3 class="text-base font-semibold text-indigodeep mb-2">Current Status</h3>
                             <p class="text-sm text-chocolate leading-relaxed mb-3">
-                                Actively seeking internships and entry-level operations roles for 2025. Open to project collaborations and consulting opportunities.
+                                Actively seeking internships and entry-level operations roles. Open to project collaborations and consulting opportunities.
                             </p>
                             <div class="flex items-center space-x-2">
-                                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                <div class="spine-status-dot"></div>
                                 <span class="text-xs font-medium text-indigodeep">Available for opportunities</span>
                             </div>
                         </div>
@@ -414,7 +471,7 @@
             </div>
             
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2026</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
     </footer>

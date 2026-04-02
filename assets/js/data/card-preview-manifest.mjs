@@ -1,0 +1,322 @@
+export const CARD_PREVIEW_VERSION = '2026-03-30-v6';
+export const CARD_PREVIEW_OUTPUT_DIR = '/assets/img/generated/card-previews';
+
+export const PROJECT_CARD_PREVIEWS = [
+  {
+    id: 'project-portfolio',
+    category: 'Web Development',
+    title: 'This Website',
+    description: 'Hand-coded with PWA support, service workers, Lighthouse 90+ scores.',
+    link: '/projects/portfolio',
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/home-portrait-native-v3.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 20%'
+    },
+    generation: {
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/home-portrait-native-v3.jpg'
+    }
+  },
+  {
+    id: 'project-isa-grimes',
+    category: 'Interview Project',
+    title: 'Isa Grimes Interview',
+    description: 'A real conversation about your 20s, people skills, leadership, favoritism, support systems, and why the fastest route is not always the right one.',
+    link: '/projects/isa-grimes-interview',
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/isa_grimes.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 18%'
+    },
+    generation: {
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/isa_grimes.jpg'
+    }
+  },
+  {
+    id: 'project-loreal-maps',
+    category: 'Campaign Strategy',
+    title: "L'Oréal Cell BioPrint",
+    description: 'MAPS campaign deck mapping personas across the funnel.',
+    link: '/projects/loreal-maps-campaign',
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/06-project-loreal-maps.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 14%'
+    },
+    generation: {
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/06-project-loreal-maps.jpg'
+    }
+  },
+  {
+    id: 'project-franklin-templeton',
+    category: 'Content Strategy',
+    title: 'Franklin Templeton',
+    description: 'Dual-language investment content strategy for English and Arabic audiences.',
+    link: '/projects/franklin-templeton-concept',
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/05-project-franklin-templeton.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 12%'
+    },
+    generation: {
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/05-project-franklin-templeton.jpg'
+    }
+  },
+  {
+    id: 'project-endpoint-linkedin',
+    category: 'Retargeting',
+    title: 'EndPoint LinkedIn Campaign',
+    description: '15-page deck outlining Phase 2A and 2B retargeting strategy.',
+    link: '/projects/endpoint-linkedin-campaign',
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/04-project-endpoint-linkedin.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 12%'
+    },
+    generation: {
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/04-project-endpoint-linkedin.jpg'
+    }
+  },
+  {
+    id: 'project-elosity-video',
+    category: 'Video Concept',
+    title: 'Endpoint Elosity Launch',
+    description: 'Motion storyboard and voiceover script for LinkedIn autoplay.',
+    link: '/projects/endpoint-elosity-video',
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/03-project-elosity-video.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 20%'
+    },
+    generation: {
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/03-project-elosity-video.jpg'
+    }
+  },
+  {
+    id: 'project-endpoint-competitive',
+    category: 'Strategy',
+    title: 'Taking Down Endpoint',
+    description: 'Almac + 4G Clinical positioning strategy against Endpoint.',
+    link: '/projects/endpoint-competitive-playbook',
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/02-project-competitive-playbook.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 10%'
+    },
+    generation: {
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/02-project-competitive-playbook.jpg'
+    }
+  }
+];
+
+export const ABOUT_CARD_PREVIEWS = [
+  {
+    id: 'about-values',
+    category: 'Philosophy',
+    title: 'Core Values',
+    description: 'Curiosity, execution, growth through discomfort. The principles that shape how I approach problems.',
+    link: '/about/values',
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/values-portrait-native-v3.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 16%'
+    },
+    generation: {
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/values-portrait-native-v3.jpg'
+    }
+  },
+  {
+    id: 'about-background',
+    category: 'Identity',
+    title: 'Background',
+    description: 'Chaldean heritage, four languages, family history, and the context I come from.',
+    link: '/about/background',
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/01-about-background.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 30%'
+    },
+    generation: {
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/01-about-background.jpg'
+    }
+  },
+  {
+    id: 'about-working-with-me',
+    category: 'Professional',
+    title: 'Working With Me',
+    description: 'Clear communication, follow-through, and what people can expect if we work together.',
+    link: '/about/working-with-me',
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/working-portrait-native-v3.jpg',
+    presentation: {
+      fit: 'cover',
+      position: '50% 18%'
+    },
+    generation: {
+      type: 'image',
+      treatment: 'single-image-editorial',
+      source: '/assets/img/Portolio-Media/Portfolio-Media/projects-/working-portrait-native-v3.jpg'
+    }
+  },
+  {
+    id: 'about-gym',
+    category: 'Physical',
+    title: 'Gym & Strength Training',
+    description: 'Building discipline through progressive overload. Tracking PRs, optimizing recovery.',
+    link: '/hobbies/gym',
+    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-gym-collage.webp`,
+    generation: {
+      type: 'collage',
+      treatment: 'hero-detail-triptych',
+      sources: [
+        '/assets/img/Portolio-Media/Portfolio-Media/gym-/beach_in_pb.jpg',
+        '/assets/img/Portolio-Media/Portfolio-Media/gym-/hip_thrust_pr.jpg',
+        '/assets/img/Portolio-Media/Portfolio-Media/gym-/sitting_on_curling_bench.png'
+      ]
+    }
+  },
+  {
+    id: 'about-photography',
+    category: 'Creative',
+    title: 'Photography',
+    description: 'iPhone shots that tell stories. No DSLR needed, just good lighting and better timing.',
+    link: '/hobbies/photography',
+    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-photography-collage.webp`,
+    generation: {
+      type: 'collage',
+      treatment: 'photography-contact-sheet',
+      sources: [
+        '/assets/img/Portolio-Media/Portfolio-Media/photography-/IMG_0799.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/photography-/IMG_2957.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/photography-/IMG_3473.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/photography-/IMG_3402.webp'
+      ]
+    }
+  },
+  {
+    id: 'about-car',
+    category: 'Mechanical',
+    title: 'Car Enthusiasm',
+    description: 'First car, first freedom. About ownership, maintenance, pride of keeping something running clean.',
+    link: '/hobbies/car',
+    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-car-collage.webp`,
+    generation: {
+      type: 'collage',
+      treatment: 'hero-detail-triptych',
+      sources: [
+        '/assets/img/Portolio-Media/Portfolio-Media/car-/car_by_ocean.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/car-/me_and_car.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/car-/car_front.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/car-/car_by_sunset.webp'
+      ]
+    }
+  },
+  {
+    id: 'about-cooking',
+    category: 'Culinary',
+    title: 'Cooking',
+    description: 'Steak, pasta, everything in between. Not a chef; just someone who refuses to eat mediocre food.',
+    link: '/hobbies/cooking',
+    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-cooking-collage.webp`,
+    generation: {
+      type: 'collage',
+      treatment: 'hero-detail-triptych',
+      sources: [
+        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/avocado_steak_eggs_smoothie.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/steaks.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/chicken_alfredo_pasta.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/cooking-/vodka_pasta.webp'
+      ]
+    }
+  },
+  {
+    id: 'about-whispers',
+    category: 'Reflective',
+    title: 'Whispers (Sticky Notes)',
+    description: 'Random thoughts on sticky notes. Ideas, observations, reminders. Mental clutter organized.',
+    link: '/hobbies/whispers',
+    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-whispers-collage.webp`,
+    generation: {
+      type: 'collage',
+      treatment: 'reflective-note-cover',
+      sources: [
+        '/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 10.jpg',
+        '/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 24.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 38.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/whispers-/Note 41.webp'
+      ]
+    }
+  },
+  {
+    id: 'about-reading',
+    category: 'Intellectual',
+    title: 'Reading',
+    description: 'Books are compressed experience. Cheapest way to access decades of wisdom.',
+    link: '/hobbies/reading',
+    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-reading-collage.webp`,
+    generation: {
+      type: 'collage',
+      treatment: 'reading-editorial',
+      sources: [
+        '/assets/img/Portolio-Media/Portfolio-Media/reading-/reading_by_beach.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/reading-/dead_kindle_3.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/reading-/Advice_From_Aristotle.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/reading-/How_To_Win_Friends_and_Influence_People_Dale_Carnegie.webp'
+      ]
+    }
+  },
+  {
+    id: 'about-me',
+    category: 'Personal',
+    title: 'Me',
+    description: 'Personal snapshots that capture identity, growth, and the moments behind the work.',
+    link: '/hobbies/me',
+    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-me-collage.webp`,
+    generation: {
+      type: 'collage',
+      treatment: 'hero-detail-triptych',
+      sources: [
+        '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_0551.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_1411.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_4675.webp',
+        '/assets/img/Portolio-Media/Portfolio-Media/me-/IMG_8895.webp'
+      ]
+    }
+  },
+  {
+    id: 'about-games',
+    category: 'Strategy',
+    title: 'Games',
+    description: 'Chess, strategy games, competitive thinking. Because even hobbies teach systems.',
+    link: '/hobbies-games',
+    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-games-cover.webp`,
+    generation: {
+      type: 'synthetic',
+      treatment: 'arcade-cover-art-v2'
+    }
+  }
+];
+
+export const CARD_PREVIEW_MANIFEST = {
+  version: CARD_PREVIEW_VERSION,
+  outputDir: CARD_PREVIEW_OUTPUT_DIR,
+  projectCards: PROJECT_CARD_PREVIEWS,
+  aboutCards: ABOUT_CARD_PREVIEWS
+};

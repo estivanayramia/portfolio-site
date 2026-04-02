@@ -90,18 +90,18 @@ if (badLocaleRewriteRe.test(redirects)) {
   );
 }
 
-// Check directory routes rewrite to directory paths (not index.html)
-// This prevents Cloudflare Pages rewrite failures
-const hobbiesRewriteRe = /^\/hobbies\/\s+\/EN\/hobbies\/\s+200\s*$/m;
+// Check route behavior for protected directory routes.
+// /hobbies/ is intentionally not a public hub anymore and must redirect to /about.
+const hobbiesRedirectToAboutRe = /^\/hobbies\/\s+\/about\s+301\s*$/m;
 const projectsRewriteRe = /^\/projects\/\s+\/EN\/projects\/\s+200\s*$/m;
 
-if (!hobbiesRewriteRe.test(redirects)) {
+if (!hobbiesRedirectToAboutRe.test(redirects)) {
   if (DEBUG) {
     const candidates = findMatchingLines(redirects, /^\/hobbies\//m);
     dbg(`/hobbies/ candidates: ${candidates.slice(0, 10).join(' | ')}`);
   }
   fail(
-    "_redirects does not include '/hobbies/  /EN/hobbies/  200' (must rewrite to directory, not index.html).",
+    "_redirects must include '/hobbies/  /about  301' because /hobbies/ is not a public hub.",
   );
 }
 

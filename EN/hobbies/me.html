@@ -27,9 +27,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=23626563">
-    <link rel="preload" href="/assets/css/style.css?v=23626563" as="style">
-    <script src="/assets/js/site.min.js?v=23626563" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=012bbc00">
+    <link rel="preload" href="/assets/css/style.css?v=012bbc00" as="style">
+    <script src="/assets/js/site.min.js?v=012bbc00" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
@@ -201,7 +201,7 @@
               "@type": "ListItem",
               "position": 2,
               "name": "Hobbies",
-              "item": "https://www.estivanayramia.com/hobbies/"
+              "item": "https://www.estivanayramia.com/about"
             },
             {
               "@type": "ListItem",
@@ -227,10 +227,11 @@
     
     <!-- Skip to main content for accessibility -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigodeep focus:text-beige focus:rounded">Skip to main content</a>
+    <div class="scroll-progress" aria-hidden="true"></div>
     
     <!-- Navigation Header -->
     <header class="fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10">
-        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between gap-2">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-8 flex items-center justify-between gap-2">
             <a href="/" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
                 <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
                 <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
@@ -268,14 +269,14 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 hobby-page">
         
         <!-- Breadcrumb -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
-            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+            <nav aria-label="Breadcrumb" class="hobby-crumbs opacity-0 translate-y-4" data-gsap="fade-up">
                 <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
                     <li><span class="text-chocolate/40">/</span></li>
-                    <li><a href="/hobbies/" class="hover:text-indigodeep transition-colors">Hobbies</a></li>
+                    <li><a href="/about" class="hover:text-indigodeep transition-colors">About</a></li>
                     <li><span class="text-chocolate/40">/</span></li>
                     <li class="text-indigodeep font-medium">Me</li>
                 </ol>
@@ -283,8 +284,9 @@
         </section>
         
         <!-- Hero Section -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+        <section class="page-hero max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
             <div class="space-y-6">
+                <p class="hobby-kicker opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.05">Hobby chapter / personal</p>
                 <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
                     <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Personal</span>
                     <span class="text-xs text-ink/60">Identity</span>
@@ -300,10 +302,10 @@
         
         <!-- Content Grid -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
-            <div class="grid lg:grid-cols-3 gap-12">
+            <div class="hobby-body-grid">
                 
                 <!-- Main Content -->
-                <div class="lg:col-span-2 min-w-0 space-y-12">
+                <div class="hobby-narrative min-w-0">
                     
                     <!-- What This Section Captures -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
@@ -396,10 +398,10 @@
                 </div>
                 
                 <!-- Sidebar -->
-                <div class="space-y-8">
+                <div class="hobby-side-stack">
                     
                     <!-- Section Focus -->
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                    <div class="hobby-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
                         <h3 class="text-lg font-semibold text-indigodeep mb-4">Section Focus</h3>
                         <ul class="space-y-3 text-sm text-chocolate">
                             <li class="flex items-start">
@@ -425,11 +427,11 @@
                         </ul>
                     </div>
                     
-                    <!-- Back to Hobbies -->
-                    <div class="bg-indigodeep rounded-xl p-6 text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                    <!-- Back to About -->
+                    <div class="hobby-side-card bg-indigodeep text-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <p class="text-beige/90 text-sm mb-4">Explore more hobbies</p>
-                        <a href="/hobbies/#hobby-me-card" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
-                            ← Back to All Hobbies
+                        <a href="/about" class="inline-block text-sm font-medium text-beige border border-beige/30 px-6 py-3 rounded-full hover:bg-beige/10 transition-colors">
+                            ← Back to About
                         </a>
                     </div>
                     
@@ -477,7 +479,7 @@
             </div>
             
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2026</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
     </footer>

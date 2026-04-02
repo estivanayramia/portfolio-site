@@ -4,18 +4,18 @@
     <meta charset="UTF-8">
     <script>document.documentElement.classList.add('js')</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <meta name="description" content="See how this portfolio was designed and built by Estivan Ayramia, from information architecture and performance tuning to accessibility and maintainable systems.">
+                    <meta name="description" content="How Estivan built this site, what changed along the way, and what was worth figuring out to make it work.">
                     <title>Portfolio Build | Estivan Ayramia</title>
                     <link rel="canonical" href="https://www.estivanayramia.com/projects/portfolio">
     
     <!-- Open Graph / Social Media -->
                     <meta property="og:type" content="article">
                     <meta property="og:title" content="Portfolio Build | Estivan Ayramia">
-                    <meta property="og:description" content="See how this portfolio was designed and built by Estivan Ayramia, from information architecture and performance tuning to accessibility and maintainable systems.">
+                    <meta property="og:description" content="How Estivan built this site, what changed along the way, and what was worth figuring out to make it work.">
                     <meta property="og:url" content="https://www.estivanayramia.com/projects/portfolio">
                     <meta name="twitter:card" content="summary_large_image">
                     <meta name="twitter:title" content="Portfolio Build | Estivan Ayramia">
-                    <meta name="twitter:description" content="See how this portfolio was designed and built by Estivan Ayramia, from information architecture and performance tuning to accessibility and maintainable systems.">
+                    <meta name="twitter:description" content="How Estivan built this site, what changed along the way, and what was worth figuring out to make it work.">
     
     <!-- Google Fonts: Inter (non-render-blocking) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,9 +27,9 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=23626563">
-    <link rel="preload" href="/assets/css/style.css?v=23626563" as="style">
-    <script src="/assets/js/site.min.js?v=23626563" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=012bbc00">
+    <link rel="preload" href="/assets/css/style.css?v=012bbc00" as="style">
+    <script src="/assets/js/site.min.js?v=012bbc00" defer></script>
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -44,7 +44,7 @@
     
     <!-- Schema.org CreativeWork Markup -->
 <!-- Theme CSS - loads reliably for all viewports -->
-    <link rel="stylesheet" href="/theme.css?v=v20260119-5">
+    <link rel="stylesheet" href="/theme.css?v=012bbc00">
                 <meta property="og:image" content="https://www.estivanayramia.com/assets/img/logo-ea.webp">
                 <meta name="twitter:image" content="https://www.estivanayramia.com/assets/img/logo-ea.webp">
 
@@ -57,7 +57,7 @@
           "@id": "https://www.estivanayramia.com/projects/portfolio#webpage",
           "url": "https://www.estivanayramia.com/projects/portfolio",
           "name": "Portfolio Build | Estivan Ayramia",
-          "description": "See how this portfolio was designed and built by Estivan Ayramia, from information architecture and performance tuning to accessibility and maintainable systems.",
+          "description": "How Estivan built this site, what changed along the way, and what was worth figuring out to make it work.",
           "isPartOf": "https://www.estivanayramia.com/",
           "about": "https://www.estivanayramia.com/#person",
           "inLanguage": "en"
@@ -138,11 +138,11 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 project-page project-systems">
         
         <!-- Breadcrumb -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-6">
-            <nav aria-label="Breadcrumb" class="opacity-0 translate-y-4" data-gsap="fade-up">
+            <nav aria-label="Breadcrumb" class="project-breadcrumb-shell opacity-0 translate-y-4" data-gsap="fade-up">
                 <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
                     <li><span class="text-chocolate/40">/</span></li>
                     <li><a href="/projects/" class="hover:text-indigodeep transition-colors">Projects</a></li>
@@ -153,8 +153,9 @@
         </section>
         
         <!-- Project Header -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+        <section class="page-hero project-hero-shell max-w-5xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
             <div class="space-y-6">
+                <p class="project-kicker opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.05">Project page / this website</p>
                 <div class="flex flex-wrap items-center gap-3 opacity-0 translate-y-4" data-gsap="fade-up" data-gsap-delay="0.1">
                     <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">Development</span>
                     <span class="text-xs text-ink/60">2025</span>
@@ -163,33 +164,43 @@
                     This Website
                 </h1>
                 <p class="text-xl text-chocolate leading-relaxed max-w-3xl opacity-0 translate-y-8" data-gsap="fade-up" data-gsap-delay="0.3">
-                    Started in late November 2025 with no coding background. 120+ hours of directing, reviewing, and shipping. No templates. No page builders. Talk is cheap, and this website was expensive.
+                    Started in late November 2025 with no coding background. Over 300 hours of directing, reviewing, and shipping. No templates. No page builders. Talk is cheap, and this website was expensive.
                 </p>
             </div>
         </section>
-        
-        <!-- Project Visual -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-8">
-            <div class="aspect-video bg-gradient-to-br from-chocolate/80 to-indigodeep/60 rounded-2xl flex items-center justify-center opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
-                <svg class="w-24 h-24 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
-                </svg>
+
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 pb-8">
+            <div class="project-proof-grid">
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.35">
+                    <p class="project-fact-label">What this proves</p>
+                    <p class="text-base text-chocolate leading-relaxed">I can define a standard, direct a technical build, review it critically, and keep pushing until the result is publishable.</p>
+                </article>
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                    <p class="project-fact-label">AI role</p>
+                    <p class="text-base text-chocolate leading-relaxed">AI wrote the code. I directed the work, tested it, found problems, and decided what was good enough to ship.</p>
+                </article>
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.45">
+                    <p class="project-fact-label">Fast proof</p>
+                    <p class="text-base text-chocolate leading-relaxed">Live site, repo, accessibility work, PWA support, and performance checks all exist as direct evidence, not just claims.</p>
+                </article>
             </div>
         </section>
         
+        <!-- Project Visual removed: was generic placeholder -->
+        
         <!-- Project Details -->
         <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16">
-            <div class="grid lg:grid-cols-3 gap-12">
+            <div class="project-body-grid">
                 
                 <!-- Main Content -->
-                <div class="lg:col-span-2 space-y-12">
+                <div class="project-narrative">
                     
                     <!-- Overview -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h2 class="text-2xl font-bold text-indigodeep mb-4">Overview</h2>
                         <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
                             <p>You are looking at it. This site was built with AI writing every line of code. I had no coding background before this project. Not a tutorial. Not a class. Zero.</p>
-                            <p>My job was to direct the build: decide what to make, how it should look and work, review every change, find every problem, and hold the bar on quality. That took 120+ hours starting in late November 2025.</p>
+                            <p>My job was to direct the build: decide what to make, how it should look and work, review every change, find every problem, and hold the bar on quality. That took over 300 hours starting in late November 2025.</p>
                         </div>
                     </div>
                     
@@ -208,27 +219,40 @@
                         </div>
                     </div>
                     
-                    <!-- What I Built -->
+                    <!-- What I Directed -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
-                        <h2 class="text-2xl font-bold text-indigodeep mb-4">What I Built</h2>
-                        <div class="prose prose-lg text-chocolate leading-relaxed space-y-4">
-                            <p><strong>1. Static HTML, Tailwind CSS, Vanilla JavaScript</strong></p>
-                            <p>No React. No Next.js. No build step dependencies that break in six months. Just files that work in any browser, forever.</p>
-                            
-                            <p><strong>2. GSAP Animations with ScrollTrigger</strong></p>
-                            <p>Every animation was spec'd to serve the content. They do not distract from it.</p>
-                            
-                            <p><strong>3. PWA with Offline Support</strong></p>
-                            <p>Service worker, manifest.json, installable on mobile. Works without internet after the first visit.</p>
-                            
-                            <p><strong>4. WCAG (Web Content Accessibility Guidelines) 2.1 Accessibility</strong></p>
-                            <p>Semantic HTML, ARIA (Accessible Rich Internet Applications) labels, keyboard navigation, screen reader tested, dark mode toggle with system preference detection.</p>
-                            
-                            <p><strong>5. AI Chat Integration</strong></p>
-                            <p>Savonie lets visitors ask questions about my work directly on the page.</p>
-
-                            <p><strong>6. Achievement System</strong></p>
-                            <p>Eight unlockable achievements and three easter eggs, including a Konami code and a mini-game.</p>
+                        <h2 class="text-2xl font-bold text-indigodeep mb-4">What I Directed</h2>
+                        <div class="project-proof-grid">
+                            <article class="project-summary-card">
+                                <p class="project-fact-label">01 / Stack</p>
+                                <h3 class="text-lg font-semibold text-indigodeep mb-2">Static HTML, Tailwind CSS, vanilla JavaScript</h3>
+                                <p class="text-sm text-chocolate leading-relaxed">No React. No Next.js. No build-step pile that breaks in six months. Just files that work in any browser.</p>
+                            </article>
+                            <article class="project-summary-card">
+                                <p class="project-fact-label">02 / Motion</p>
+                                <h3 class="text-lg font-semibold text-indigodeep mb-2">GSAP with ScrollTrigger</h3>
+                                <p class="text-sm text-chocolate leading-relaxed">Animations were spec'd to support the page rhythm, not pull attention away from the content.</p>
+                            </article>
+                            <article class="project-summary-card">
+                                <p class="project-fact-label">03 / PWA</p>
+                                <h3 class="text-lg font-semibold text-indigodeep mb-2">Offline-ready build</h3>
+                                <p class="text-sm text-chocolate leading-relaxed">Service worker, manifest, install prompt support, and a setup that still works after the first visit.</p>
+                            </article>
+                            <article class="project-summary-card">
+                                <p class="project-fact-label">04 / Accessibility</p>
+                                <h3 class="text-lg font-semibold text-indigodeep mb-2">WCAG-minded foundation</h3>
+                                <p class="text-sm text-chocolate leading-relaxed">Semantic HTML, ARIA labels, keyboard handling, screen reader checks, and theme support that holds up.</p>
+                            </article>
+                            <article class="project-summary-card">
+                                <p class="project-fact-label">05 / AI</p>
+                                <h3 class="text-lg font-semibold text-indigodeep mb-2">Savonie on-site chat</h3>
+                                <p class="text-sm text-chocolate leading-relaxed">Visitors can ask direct questions about the work instead of hunting through the site for a specific detail.</p>
+                            </article>
+                            <article class="project-summary-card">
+                                <p class="project-fact-label">06 / Extras</p>
+                                <h3 class="text-lg font-semibold text-indigodeep mb-2">Achievement system and hidden details</h3>
+                                <p class="text-sm text-chocolate leading-relaxed">Eight unlockable achievements, easter eggs, and small systems that reward curiosity without turning gimmicky.</p>
+                            </article>
                         </div>
                     </div>
                     
@@ -238,7 +262,7 @@
                         <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 space-y-4">
                             <div class="grid md:grid-cols-2 gap-6">
                                 <div>
-                                    <div class="text-3xl font-bold text-indigodeep mb-2">120+</div>
+                                    <div class="text-3xl font-bold text-indigodeep mb-2">300+</div>
                                     <p class="text-sm text-chocolate">Hours directing, reviewing, and shipping</p>
                                 </div>
                                 <div>
@@ -296,7 +320,7 @@
                                 <li><strong>Spec first:</strong> Every feature started with a clear brief - what it does, how it behaves, what done looks like</li>
                                 <li><strong>Active review:</strong> I tested every change on desktop and mobile. I ran Lighthouse and PageSpeed on every major update. I caught regressions and sent them back.</li>
                                 <li><strong>Quality control:</strong> When AI produced code that looked wrong, scored badly, or broke something, I found it and flagged it. AI diagnosed and fixed it.</li>
-                                <li><strong>No autopilot:</strong> 120+ hours of concentrated work went into this site. The code is AI's. The decisions, the standards, and the outcome are mine.</li>
+                                <li><strong>No autopilot:</strong> Over 300 hours of concentrated work went into this site. The code is AI's. The decisions, the standards, and the outcome are mine.</li>
                             </ul>
                             <p class="text-sm text-chocolate font-medium mt-4">Talk is cheap, and this website was expensive.</p>
                         </div>
@@ -304,10 +328,10 @@
                 </div>
                 
                 <!-- Sidebar -->
-                <div class="space-y-8">
+                <div class="project-side-stack">
                     
                     <!-- Project Info -->
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
+                    <div class="project-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h3 class="text-lg font-semibold text-indigodeep mb-4">Project Info</h3>
                         <dl class="space-y-4 text-sm">
                             <div>
@@ -320,7 +344,7 @@
                             </div>
                             <div>
                                 <dt class="text-chocolate/60 dark:text-[#e1d4c2] mb-1">Time Invested</dt>
-                                <dd class="text-indigodeep font-medium">120+ Hours</dd>
+                                <dd class="text-indigodeep font-medium">Over 300 Hours</dd>
                             </div>
                             <div>
                                 <dt class="text-chocolate/60 mb-1">Year</dt>
@@ -334,7 +358,7 @@
                     </div>
                     
                     <!-- Skills Applied -->
-                    <div class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
+                    <div class="project-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
                         <h3 class="text-lg font-semibold text-indigodeep mb-4">Skills Applied</h3>
                         <div class="flex flex-wrap gap-2">
                             <span class="text-xs bg-indigodeep/10 text-indigodeep px-3 py-1 rounded-full">HTML5</span>
@@ -350,7 +374,7 @@
                     </div>
                     
                     <!-- CTA -->
-                    <div class="bg-indigodeep text-beige rounded-xl p-6 opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                    <div class="project-callout bg-indigodeep text-beige opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
                         <h3 class="text-lg font-semibold mb-3">Like what you see?</h3>
                         <p class="text-sm text-beige/80 mb-4">Reach out if you want to talk about a project or role.</p>
                         <a href="/contact" class="inline-block text-sm font-medium bg-beige text-indigodeep px-5 py-2 rounded-full hover:bg-chocolate hover:text-beige transition-colors focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-2 focus:ring-offset-indigodeep">
@@ -364,7 +388,7 @@
         </section>
         
         <!-- Related Projects -->
-        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10">
+        <section class="max-w-5xl mx-auto px-6 lg:px-12 py-16 border-t border-chocolate/10 project-divider">
             <h2 class="text-2xl font-bold text-indigodeep mb-8 opacity-0" data-gsap="fade-up">Related Projects</h2>
             <div class="grid md:grid-cols-3 gap-6">
                 <a href="/projects/endpoint-competitive-playbook" class="block bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-xl p-6 hover:border-indigodeep/30 transition-colors opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
@@ -426,7 +450,7 @@
             </div>
             
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2026</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
     </footer>

@@ -170,17 +170,19 @@ export class RouletteWheelEngine {
   /**
    * Calculate wheel spin parameters
    */
-  calculateWheelSpin(winnerPocketIndex) {
-    const pocketAngle = (360 / this.pocketCount) * winnerPocketIndex;
-    const spins = this.config.minSpins + Math.random() * 
-                  (this.config.maxSpins - this.config.minSpins);
-    
-    const finalRotation = (spins * 360) + (360 - pocketAngle);
-    
-    const duration = this.config.spinDuration.min + 
+  calculateWheelSpin(winnerPocketIndex, options = {}) {
+    const pocketAngle = ((360 / this.pocketCount) * winnerPocketIndex) - 90;
+    const landingAngle = Number.isFinite(options.landingAngle) ? options.landingAngle : -92;
+    const spinRange = Math.max(1, this.config.maxSpins - this.config.minSpins + 1);
+    const spins = this.config.minSpins + Math.floor(Math.random() * spinRange);
+
+    // Align selected pocket to a deterministic landing angle after full turns.
+    const finalRotation = (landingAngle - pocketAngle) - (spins * 360);
+
+    const duration = this.config.spinDuration.min +
                      Math.random() * (this.config.spinDuration.max - this.config.spinDuration.min);
-    
-    return { finalRotation, duration, spins: Math.round(spins) };
+
+    return { finalRotation, duration, spins, landingAngle, pocketAngle };
   }
   
   /**
@@ -197,13 +199,69 @@ export class RouletteWheelEngine {
   }
   
   /**
-   * Ball bounce sequence
+   * Ball bounce sequence for the final settle phase.
+   * Each bounce lifts the ball outward (radially) and advances it by a
+   * fraction of a pocket before it drops back down.
+   *
+   * height: radial lift in px (outward from wheel centre)
+   * angularTravel: degrees the ball travels during this bounce
+   * duration: seconds for the full up-and-down arc
+   * ease: GSAP ease for the upward half; downward mirrors with .in
    */
   getBounceSequence() {
     return [
-      { height: 50, duration: 0.35, ease: 'power2.out' },
-      { height: 25, duration: 0.25, ease: 'power2.out' },
-      { height: 8, duration: 0.15, ease: 'power1.out' }
+      { height: 38,  angularTravel: 22,  duration: 0.38, ease: 'power2.out' },
+      { height: 20,  angularTravel: 12,  duration: 0.30, ease: 'power2.out' },
+      { height: 9,   angularTravel: 5,   duration: 0.22, ease: 'power1.out' },
+      { height: 3.5, angularTravel: 1.8, duration: 0.14, ease: 'sine.out'   }
     ];
+  }
+
+  /**
+   * Pocket-boundary bounce modulation.
+   *
+   * Given the current ball angle, returns a radial offset that simulates
+   * the ball rattling over the metal frets (pocket dividers) on the wheel.
+   *
+   * The amplitude envelope decays as `progress` approaches 1 so the
+   * rattling fades away naturally during deceleration.
+   *
+   * @param {number} ballAngle  Current ball angle in degrees
+   * @param {number} progress   Normalised spin progress 0..1
+   * @param {number} amplitude  Max radial perturbation in px (default 6)
+   * @returns {number} Radial offset (positive = outward)
+   */
+  getPocketBounceOffset(ballAngle, progress, amplitude = 6) {
+    const pocketArc = 360 / this.pocketCount;           // ~9.73 deg per pocket
+    const positionInPocket = ((ballAngle % pocketArc) + pocketArc) % pocketArc;
+    const normPos = positionInPocket / pocketArc;        // 0..1 within pocket
+
+    // Half-sine pulse: peaks at the boundary (normPos near 0 or 1),
+    // zero in the middle of the pocket.
+    const bounceWave = Math.abs(Math.sin(normPos * Math.PI));
+
+    // Envelope: strongest early on, fades with exponential decay
+    const envelope = Math.pow(1 - progress, 2.2);
+
+    return bounceWave * amplitude * envelope;
+  }
+
+  /**
+   * Compute an exponential-decay velocity factor for a given progress.
+   *
+   * At progress=0 the factor is 1 (full speed). At progress=1 the factor
+   * approaches `floor` (near-zero but not exactly zero, to keep a slow
+   * creep at the end). The `sharpness` parameter controls how quickly
+   * velocity drops off:
+   *   sharpness=3 → moderate (good for premium tier)
+   *   sharpness=5 → very fast initial drop-off
+   *
+   * @param {number} progress   0..1
+   * @param {number} sharpness  Exponential rate (default 3.2)
+   * @param {number} floor      Minimum velocity fraction (default 0.04)
+   * @returns {number} velocity multiplier 0..1
+   */
+  getDecelerationFactor(progress, sharpness = 3.2, floor = 0.04) {
+    return floor + (1 - floor) * Math.exp(-sharpness * progress);
   }
 }

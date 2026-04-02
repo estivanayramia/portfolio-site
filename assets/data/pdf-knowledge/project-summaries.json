@@ -1,0 +1,78 @@
+{
+  "projects": [
+    {
+      "id": "taking-down-endpoint",
+      "title": "Taking Down Endpoint (Competitive Playbook)",
+      "class": "MKTG 476 Interactive Marketing, SDSU",
+      "instructor": "Isa Grimes (CMO at Endpoint Clinical)",
+      "groupMembers": ["Tess Amel", "Estivan Ayramia", "Kailey Fusca", "Evan O'Donnell", "Rachel Son", "Isabelle Vanderby"],
+      "estivanRole": "Strategy, Website & 3rd Party (his area within the group)",
+      "format": "Competitive strategy deck",
+      "summary": "20+ page competitive playbook analyzing Almac, 4G Clinical, and other competitors to Endpoint Clinical. Includes SWOT analysis, positioning strategy, SEO/SEM/LLM optimization recommendations, marketing automation workflows, and analytics framework.",
+      "keyInsights": ["Competitor positioning gaps identified", "SEO and LLM optimization strategy", "Marketing automation and email nurture flows", "Data science and analytics integration"],
+      "whatItProves": "Strategic thinking, competitive analysis, ability to synthesize complex market data into actionable positioning"
+    },
+    {
+      "id": "endpoint-linkedin-campaign",
+      "title": "Endpoint LinkedIn Campaign",
+      "class": "MKTG 476 Interactive Marketing, SDSU",
+      "instructor": "Isa Grimes (CMO at Endpoint Clinical)",
+      "format": "15-page LinkedIn campaign plan deck",
+      "summary": "Phase 2A and 2B retargeting strategy for Endpoint Clinical's LinkedIn presence. Phase 2A focused on generating qualified leads through carousel retargeting. Phase 2B drove deeper interest through video retargeting with CTA.",
+      "keyInsights": ["Phase-based campaign architecture", "Retargeting from awareness to conversion", "KPI targets per phase: CTR, engagement rate, conversions, ROAS", "Kill/scale rules for budget optimization", "Two experiment hypotheses for audience and creative testing"],
+      "whatItProves": "Campaign planning discipline, metrics-driven marketing, structured phased execution"
+    },
+    {
+      "id": "franklin-templeton",
+      "title": "Franklin Templeton x Mashable ME Partnership",
+      "class": "MKTG 476 Interactive Marketing, SDSU",
+      "instructor": "Isa Grimes",
+      "format": "17-page concept deck (English + Arabic version)",
+      "summary": "Campaign concept targeting women investors in the UAE through a Franklin Templeton x Mashable ME partnership. Estivan built the Arabic version of the deck, reviewed by his family for accuracy.",
+      "keyInsights": ["Women make up ~8% of ETF investors in UAE, growing 18% in 5 years", "Community-driven engagement strategy", "Dual-language content (English + Arabic)", "Social media pivot for traditionally non-social brand"],
+      "whatItProves": "Multilingual content creation, cultural sensitivity, market research, ability to build bilingual campaigns"
+    },
+    {
+      "id": "loreal-cell-bioprint",
+      "title": "L'Oréal Cell BioPrint MAPS Campaign",
+      "class": "MKTG 476 Interactive Marketing, SDSU",
+      "instructor": "Isa Grimes",
+      "format": "Full MAPS campaign deck",
+      "summary": "Campaign deck mapping three personas (Margaret the consumer, Madison the medspa, Ida the influencer) across the marketing funnel with touchpoints by stage: ads, landing pages, website triggers, email, and retention.",
+      "keyInsights": ["Three distinct persona profiles with pain points and triggers", "Touchpoints by funnel stage for each persona", "One funnel across all three personas with tactics adjusted by audience", "Positioning and target market segmentation"],
+      "whatItProves": "Persona-driven marketing, funnel architecture, touchpoint mapping, audience segmentation"
+    },
+    {
+      "id": "isa-grimes-interview",
+      "title": "Isa Grimes Interview",
+      "format": "Editorial interview feature",
+      "summary": "A real conversation with Isa Grimes (CMO at Endpoint Clinical, SDSU professor) about your 20s, people skills, leadership, favoritism, support systems, and why the fastest route is not always the right one.",
+      "keyInsights": ["People judgment and perspective matter more than titles", "Leadership is about reading situations and adapting", "The value of mentorship and support systems", "Patience and long-term thinking over quick wins"],
+      "whatItProves": "Ability to conduct meaningful interviews, people skills, editorial thinking, relationship building"
+    },
+    {
+      "id": "endpoint-elosity-video",
+      "title": "Endpoint Elosity Video Concept",
+      "format": "49-second video concept (unlisted YouTube)",
+      "summary": "Solo video concept for Endpoint's Elosity platform. Made with no prior video production experience using Google Gemini Veo 3.0, CapCut Pro, and audio tools. Never run as a paid ad.",
+      "whatItProves": "Willingness to learn new tools, creative problem-solving, self-directed project execution"
+    },
+    {
+      "id": "this-website",
+      "title": "This Website (Portfolio)",
+      "summary": "Started in late November 2025 with no coding background. Over 300 hours of directing, reviewing, and shipping. AI wrote every line of code (Claude, Copilot, Gemini). Estivan designed, reviewed, and shipped. No templates, no page builders.",
+      "features": "PWA, service workers, Lighthouse 90+, AI chatbot (Savonie), coverflow carousel with roulette, dark/light theme, multi-language support, editorial design system",
+      "whatItProves": "Initiative, follow-through, quality standards, ability to direct complex technical work without being a coder"
+    }
+  ],
+  "resumeHighlights": {
+    "coreSkills": ["Consultative recommendations", "Upselling", "Objection handling", "Service recovery", "High-volume transactions", "Queue management", "Cash control", "CRM exposure (Salesforce, HubSpot, Pardot)", "Microsoft Office Suite", "Google Analytics Certification", "Microsoft Clarity", "Multilingual communication", "FIFO inventory management"],
+    "experience": [
+      {"role": "Sports Coach", "company": "549 Sports LLC", "location": "San Diego, CA", "dates": "Sep 2024 – Present", "highlights": ["Supervise 20-80 children per session", "Multilingual parent/staff communication", "Incident reports and records"]},
+      {"role": "Retail Sales Associate", "company": "Convenience Retail and Fuel", "location": "San Diego, CA", "dates": "Sept 2023 – Aug 2024", "highlights": ["Upper-four-digit daily sales", "8-12 customers at peak", "Reorganized inventory layout"]},
+      {"role": "Store Associate", "company": "Del Sol Market", "location": "San Diego, CA", "dates": "May 2023 – Aug 2023", "highlights": ["30-100 customer transactions per shift", "Alternative suggestions increasing basket size"]},
+      {"role": "Independent Contractor", "company": "Delivery Services (Uber Eats, DoorDash, Instacart)", "location": "San Diego, CA", "dates": "2021 – 2022", "highlights": ["40-70 deliveries per week", "~4.9/5 customer rating"]}
+    ],
+    "education": {"school": "San Diego State University", "degree": "BS Business Administration (General Business)", "graduation": "Dec 18, 2025", "gpa": "3.71"}
+  }
+}

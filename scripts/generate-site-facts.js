@@ -205,39 +205,34 @@ function parseProjectsIndex(indexPath) {
   return projects;
 }
 
-// Parse hobbies from index page
-function parseHobbiesIndex(indexPath) {
-  const html = fs.readFileSync(indexPath, 'utf-8');
+// Parse hobbies from the About page carousel/cards
+function parseHobbiesFromAboutPage(aboutPath) {
+  const html = fs.readFileSync(aboutPath, 'utf-8');
   const hobbies = [];
-  
-  // Split by article tags
-  const articles = html.split(/<article[^>]*>/);
-  
-  for (let i = 1; i < articles.length; i++) {
-    const article = articles[i];
-    const endIdx = article.indexOf('</article>');
-    if (endIdx === -1) continue;
-    
-    const cardHtml = article.substring(0, endIdx);
+
+  const coverflowCards = Array.from(
+    html.matchAll(/<article[^>]*class="[^"]*coverflow-card[^"]*"[^>]*>([\s\S]*?)<\/article>/g)
+  ).map((match) => match[1]);
+
+  for (const cardHtml of coverflowCards) {
     const title = extractCardTitle(cardHtml);
     const summary = extractCardSummary(cardHtml);
     const link = extractCardLink(cardHtml);
-    
-    if (title && link) {
-      // Use clean URL path
-      let canonicalPath = toCanonicalPath(link);
-      
-      hobbies.push({
-        id: generateId(title),
-        title,
-        summary: summary || title,
-        url: canonicalPath,
-        fullUrl: `${BASE_URL}${canonicalPath}`,
-        filePath: toContentFilePath(canonicalPath),
-      });
-    }
+
+    if (!title || !link) continue;
+    if (!/^\/hobbies(?:\/|$)|^\/hobbies-games$/i.test(link)) continue;
+
+    const canonicalPath = toCanonicalPath(link);
+    hobbies.push({
+      id: generateId(title),
+      title,
+      summary: summary || title,
+      url: canonicalPath,
+      fullUrl: `${BASE_URL}${canonicalPath}`,
+      filePath: toContentFilePath(canonicalPath),
+    });
   }
-  
+
   return hobbies;
 }
 
@@ -311,8 +306,8 @@ function generateSiteFacts() {
   
   // Parse hobbies
   console.log('🎨 Parsing hobbies...');
-  const hobbiesIndexPath = getContentPath(path.join('hobbies', 'index.html'));
-  const hobbies = parseHobbiesIndex(hobbiesIndexPath);
+  const aboutPath = getContentPath('about.html');
+  const hobbies = parseHobbiesFromAboutPage(aboutPath);
   hobbies.forEach(h => console.log(`   → ${h.title}`));
   console.log(`✅ Found ${hobbies.length} hobbies\n`);
   

@@ -543,16 +543,20 @@ body {
    ========================================================================== */
 
 ::-webkit-scrollbar {
-    width: 12px;
+    width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #e1d4c2;
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #362017;
-    border-radius: 6px;
+    background: rgba(54, 32, 23, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:active {
+    background: rgba(54, 32, 23, 0.5);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -561,15 +565,15 @@ body {
 
 /* Dark Mode Scrollbar */
 [data-theme="dark"] ::-webkit-scrollbar-track {
-    background: #212842;
+    background: transparent;
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
-    background: #e1d4c2;
+    background: rgba(225, 212, 194, 0.3);
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-    background: #ffffff;
+    background: rgba(225, 212, 194, 0.5);
 }
 
 /* ==========================================================================
@@ -1873,7 +1877,7 @@ select.border-red-500 {
 /* Mobile chat widget adjustments */
 @media (max-width: 640px) {
     #chat-widget {
-        bottom: 1rem !important;
+        bottom: 80px !important;
     }
 
     :lang(ar) #chat-widget {
@@ -2496,10 +2500,25 @@ footer, .section-below-fold {
     }
 }
 
+/* Small screens - reduce brand font to prevent truncation */
+@media (max-width: 480px) {
+    #brand-logo {
+        font-size: 0.95rem !important;
+        letter-spacing: -0.01em;
+    }
+    #brand-logo .truncate {
+        font-size: 0.85rem;
+        letter-spacing: -0.01em;
+    }
+}
+
 /* Extra small screens - further reduce brand logo font */
 @media (max-width: 360px) {
     #brand-logo {
-        font-size: 1rem !important; /* text-base */
+        font-size: 0.85rem !important;
+    }
+    #brand-logo .truncate {
+        font-size: 0.8rem;
     }
 }
 
@@ -2512,11 +2531,14 @@ footer, .section-below-fold {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    right: 0;
+    /* width: 100% removed — left:0 + right:0 already spans full width.
+       Adding width:100% on top can cause overflow past scrollbar. */
     height: 3px;
     background: transparent;
     z-index: 9998;
     pointer-events: none;
+    overflow: hidden;
 }
 
 /* Dark-theme override: Beige color */
@@ -2819,3 +2841,32 @@ footer {
   margin-top: 5rem !important;
 }
 
+
+/* Mobile chat chips: allow wrapping instead of horizontal scroll */
+@media (max-width: 640px) {
+    #chat-chips {
+        flex-wrap: wrap !important;
+        white-space: normal !important;
+        overflow-x: visible !important;
+    }
+    #chat-chips .chip-btn {
+        white-space: nowrap;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Ensure mobile menu is above all content */
+#mobile-menu {
+    position: relative;
+    z-index: 40;
+}
+
+/* Chat widget: keep above footer. The footer is ~200px tall.
+   On desktop the widget sits at bottom-right. 28px is the base position
+   which works fine mid-page. The overlap only matters at the very bottom
+   of the page which is an acceptable tradeoff vs floating too high. */
+#chat-widget {
+    bottom: 28px;
+}

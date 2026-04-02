@@ -1,0 +1,28 @@
+name: Deploy Chat Worker
+
+on:
+  push:
+    branches: [main, perfecting-site-content]
+    paths:
+      - 'worker/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Deploy chat worker
+        working-directory: worker
+        run: npx wrangler deploy --config wrangler.chat.toml
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

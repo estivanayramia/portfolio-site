@@ -83,7 +83,7 @@ function ensureToastContainer() {
     'display:flex',
     'flex-direction:column-reverse', // Stack upward from bottom
     'gap:8px',
-    'max-width:min(280px, calc(100vw - 32px))',
+    'max-width:min(240px, calc(100vw - 32px))',
     'pointer-events:none'
   ].join(';');
 
@@ -128,15 +128,15 @@ function showToast(achievement) {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     background: #212842;
     color: #e1d4c2;
-    padding: 12px 16px;
+    padding: 8px 12px;
     border-radius: 10px;
     border: 2px solid rgba(225, 212, 194, 0.1);
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    min-width: 240px;
-    max-width: min(280px, calc(100vw - 50px));
+    min-width: 200px;
+    max-width: min(240px, calc(100vw - 50px));
     overflow: hidden;
     transform: translateX(120%);
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -145,11 +145,11 @@ function showToast(achievement) {
   `;
 
   toast.innerHTML = `
-    <div class="achievement-icon" style="font-size: 2rem;">${icon}</div>
+    <div class="achievement-icon" style="font-size: 1.5rem;">${icon}</div>
     <div class="achievement-content" style="flex: 1; min-width: 0;">
         <div class="achievement-title" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; margin-bottom: 2px;">Achievement Unlocked!</div>
-        <div class="achievement-name" style="font-weight: 700; font-size: 1rem; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(title)}</div>
-        <div class="achievement-desc" style="font-size: 0.8rem; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(description)}</div>
+        <div class="achievement-name" style="font-weight: 700; font-size: 0.85rem; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(title)}</div>
+        <div class="achievement-desc" style="font-size: 0.7rem; opacity: 0.75; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(description)}</div>
     </div>
     <button class="achievement-close" style="background: transparent; border: none; color: inherit; font-size: 1.3rem; cursor: pointer; opacity: 0.5; padding: 0 4px; line-height: 1;">×</button>
   `;

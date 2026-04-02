@@ -16,8 +16,8 @@
     { "source": "/projects/", "destination": "/EN/projects/" },
     { "source": "/projects/:slug", "destination": "/EN/projects/:slug.html" },
 
-    { "source": "/hobbies", "destination": "/EN/hobbies/" },
-    { "source": "/hobbies/", "destination": "/EN/hobbies/" },
+    { "source": "/hobbies", "destination": "/EN/about.html" },
+    { "source": "/hobbies/", "destination": "/EN/about.html" },
     { "source": "/hobbies/:slug", "destination": "/EN/hobbies/:slug.html" },
 
     { "source": "/hobbies-games/:slug", "destination": "/EN/hobbies-games/:slug.html" }

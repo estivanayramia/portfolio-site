@@ -26,9 +26,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" data-media="(min-width: 769px)">
     <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=23626563">
-    <link rel="preload" href="/assets/css/style.css?v=23626563" as="style">
-    <script src="/assets/js/site.min.js?v=23626563" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=012bbc00">
+    <link rel="preload" href="/assets/css/style.css?v=012bbc00" as="style">
+    <script src="/assets/js/site.min.js?v=012bbc00" defer></script>
     <!-- Custom Theme CSS -->
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -137,11 +137,11 @@
     </header>
     
     <!-- Main Content -->
-    <main id="main-content" class="pt-24">
+    <main id="main-content" class="pt-24 project-page project-campaign">
         
         <!-- Breadcrumb -->
         <section class="max-w-5xl px-6 py-6 mx-auto lg:px-12">
-            <nav aria-label="Breadcrumb" class="translate-y-4 opacity-0" data-gsap="fade-up">
+            <nav aria-label="Breadcrumb" class="project-breadcrumb-shell translate-y-4 opacity-0" data-gsap="fade-up">
                 <ol class="flex items-center space-x-2 text-sm text-chocolate/60">
                     <li><span class="text-chocolate/40">/</span></li>
                     <li><a href="/projects/" class="transition-colors hover:text-indigodeep">Projects</a></li>
@@ -152,8 +152,9 @@
         </section>
         
         <!-- Project Header -->
-        <section class="max-w-5xl px-6 py-12 mx-auto lg:px-12 lg:py-16">
+        <section class="page-hero project-hero-shell max-w-5xl px-6 py-12 mx-auto lg:px-12 lg:py-16">
             <div class="space-y-6">
+                <p class="project-kicker translate-y-4 opacity-0" data-gsap="fade-up" data-gsap-delay="0.05">Campaign / concept page</p>
                 <div class="flex flex-wrap items-center gap-3 translate-y-4 opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
                     <span class="px-3 py-1 text-xs rounded-full bg-indigodeep/10 text-indigodeep">A team-built concept campaign deck from Interactive Marketing at SDSU. Three personas. One funnel. Built in Canva over two weeks with no prior knowledge of the product.</span>
                 </div>
@@ -165,18 +166,28 @@
                 </p>
             </div>
         </section>
-        
-        <!-- Project Visual -->
-        <section class="max-w-5xl px-6 py-8 mx-auto lg:px-12">
-            <div class="flex items-center justify-center opacity-0 aspect-video bg-gradient-to-br from-indigodeep to-chocolate rounded-2xl" data-gsap="fade-up" data-gsap-delay="0.4">
-                <svg class="w-24 h-24 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                </svg>
+
+        <section class="max-w-5xl px-6 pb-8 mx-auto lg:px-12">
+            <div class="project-meta-grid">
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.35">
+                    <p class="project-fact-label">What it was</p>
+                    <p class="text-base text-chocolate leading-relaxed">A class concept deck built around three personas, one funnel, and a campaign system the team had to build from zero product familiarity.</p>
+                </article>
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.4">
+                    <p class="project-fact-label">Why it matters</p>
+                    <p class="text-base text-chocolate leading-relaxed">The useful part is the audience logic, touchpoint sequencing, and retention structure, not pretending the campaign ran live.</p>
+                </article>
+                <article class="project-summary-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.45">
+                    <p class="project-fact-label">Contribution</p>
+                    <p class="text-base text-chocolate leading-relaxed">I contributed to persona development, visual consistency, and slide layout inside a team campaign build.</p>
+                </article>
             </div>
         </section>
+        
+        <!-- Project Visual removed: was generic placeholder -->
 
         <!-- PDF Preview Section -->
-        <section class="max-w-5xl px-6 py-4 mx-auto opacity-0 lg:px-12" data-gsap="fade-up" data-gsap-delay="0.45">
+        <section class="max-w-5xl px-6 py-4 mx-auto opacity-0 lg:px-12 project-preview-shell" data-gsap="fade-up" data-gsap-delay="0.45">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-sm font-semibold tracking-wide text-chocolate/80">Case study preview</h2>
                 <button type="button" class="inline-flex items-center gap-1 px-3 py-1 text-xs transition-colors border rounded-full preview-toggle border-chocolate/30 text-chocolate/70 hover:bg-chocolate/5">
@@ -220,10 +231,10 @@
         
         <!-- Project Details -->
         <section class="max-w-5xl px-6 py-16 mx-auto lg:px-12">
-            <div class="grid gap-12 lg:grid-cols-3">
+            <div class="project-body-grid">
                 
                 <!-- Main Content -->
-                <div class="space-y-12 lg:col-span-2">
+                <div class="project-narrative">
                     
                     <!-- Overview -->
                     <div class="opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
@@ -335,10 +346,10 @@
                 </div>
                 
                 <!-- Sidebar -->
-                <div class="space-y-8">
+                <div class="project-side-stack">
                     
                     <!-- Project Info -->
-                    <div class="p-6 border opacity-0 bg-white/50 backdrop-blur-sm border-chocolate/10 rounded-xl" data-gsap="fade-up" data-gsap-delay="0.5">
+                    <div class="project-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.5">
                         <h3 class="mb-4 text-lg font-semibold text-indigodeep">Project Info</h3>
                         <dl class="space-y-4 text-sm">
                             <div>
@@ -357,7 +368,7 @@
                     </div>
                     
                     <!-- Skills Applied -->
-                    <div class="p-6 border opacity-0 bg-white/50 backdrop-blur-sm border-chocolate/10 rounded-xl" data-gsap="fade-up" data-gsap-delay="0.6">
+                    <div class="project-side-card opacity-0" data-gsap="fade-up" data-gsap-delay="0.6">
                         <h3 class="mb-4 text-lg font-semibold text-indigodeep">Skills Applied</h3>
                         <div class="flex flex-wrap gap-2">
                             <span class="px-3 py-1 text-xs rounded-full bg-indigodeep/10 text-indigodeep">Campaign Strategy</span>
@@ -369,9 +380,9 @@
                     </div>
                     
                     <!-- CTA -->
-                    <div class="p-6 opacity-0 bg-indigodeep text-beige rounded-xl" data-gsap="fade-up" data-gsap-delay="0.7">
-                        <h3 class="mb-3 text-lg font-semibold">Want the concept deck?</h3>
-                        <p class="mb-4 text-sm text-beige/80">Happy to share how the persona funnels and touchpoints are structured.</p>
+                    <div class="project-callout bg-indigodeep text-beige opacity-0" data-gsap="fade-up" data-gsap-delay="0.7">
+                        <h3 class="mb-3 text-lg font-semibold">Questions about this project?</h3>
+                        <p class="mb-4 text-sm text-beige/80">Happy to walk through the deck or talk about the thinking behind it.</p>
                         <a href="/contact" class="inline-block px-5 py-2 text-sm font-medium transition-colors rounded-full bg-beige text-indigodeep hover:bg-chocolate hover:text-beige focus:outline-none focus:ring-2 focus:ring-beige focus:ring-offset-2 focus:ring-offset-indigodeep">
                             Get in Touch
                         </a>
@@ -383,7 +394,7 @@
         </section>
         
         <!-- Related Projects -->
-        <section class="max-w-5xl px-6 py-16 mx-auto border-t lg:px-12 border-chocolate/10">
+        <section class="max-w-5xl px-6 py-16 mx-auto border-t lg:px-12 border-chocolate/10 project-divider">
             <h2 class="mb-8 text-2xl font-bold opacity-0 text-indigodeep" data-gsap="fade-up">Related Projects</h2>
             <div class="grid gap-6 md:grid-cols-3">
                 <a href="/projects/endpoint-linkedin-campaign" class="block p-6 transition-colors border opacity-0 bg-white/50 backdrop-blur-sm border-chocolate/10 rounded-xl hover:border-indigodeep/30" data-gsap="fade-up" data-gsap-delay="0.1">
@@ -440,7 +451,7 @@
             </div>
             
             <div class="pt-8 text-center border-t border-beige/20">
-                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">© <span id="copyright-year">2026</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
     </footer>

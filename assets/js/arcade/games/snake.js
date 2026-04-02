@@ -315,21 +315,75 @@ function step() {
   }
 }
 
+// ── Trail particles for snake movement ──
+let trailParticles = [];
+
+function emitTrailParticle(x, y, color) {
+  trailParticles.push({
+    x: x + (Math.random() - 0.5) * 4,
+    y: y + (Math.random() - 0.5) * 4,
+    r: 1.5 + Math.random() * 2,
+    life: 1,
+    decay: 0.04 + Math.random() * 0.03,
+    color,
+  });
+  if (trailParticles.length > 60) trailParticles.splice(0, trailParticles.length - 60);
+}
+
 function draw() {
   if (!ctx) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Background
-  ctx.fillStyle = "rgba(0,0,0,0.25)";
+  // Gradient background
+  const bg = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  bg.addColorStop(0, 'rgba(10, 15, 30, 0.95)');
+  bg.addColorStop(0.5, 'rgba(15, 25, 45, 0.95)');
+  bg.addColorStop(1, 'rgba(8, 18, 35, 0.95)');
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  // Subtle grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+  ctx.lineWidth = 0.5;
   const px = cellPx();
+  const size = gridSize();
+  for (let i = 1; i < size; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * px, 0);
+    ctx.lineTo(i * px, canvas.height);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, i * px);
+    ctx.lineTo(canvas.width, i * px);
+    ctx.stroke();
+  }
 
-  // Obstacles
+  // Update & draw trail particles
+  for (let i = trailParticles.length - 1; i >= 0; i--) {
+    const p = trailParticles[i];
+    p.life -= p.decay;
+    if (p.life <= 0) { trailParticles.splice(i, 1); continue; }
+    ctx.save();
+    ctx.globalAlpha = p.life * 0.6;
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 4;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Obstacles with glow
   obstacles.forEach(o => {
-    ctx.fillStyle = o.moving ? 'rgba(239, 68, 68, 0.7)' : 'rgba(107, 114, 128, 0.8)';
+    const oColor = o.moving ? 'rgba(239, 68, 68, 0.8)' : 'rgba(107, 114, 128, 0.85)';
+    ctx.save();
+    ctx.shadowColor = o.moving ? 'rgba(239, 68, 68, 0.6)' : 'rgba(107, 114, 128, 0.4)';
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = oColor;
     ctx.fillRect(o.x * px + 1, o.y * px + 1, px - 2, px - 2);
+    ctx.restore();
     // Draw X pattern
     ctx.strokeStyle = 'rgba(255,255,255,0.4)';
     ctx.lineWidth = 1.5;
@@ -341,18 +395,26 @@ function draw() {
     ctx.stroke();
   });
 
-  // Power-Up
+  // Power-Up with enhanced glow
   if (powerUp) {
+    ctx.save();
+    ctx.shadowColor = powerUp.color;
+    ctx.shadowBlur = 14;
     ctx.fillStyle = powerUp.color;
     ctx.beginPath();
     ctx.arc(powerUp.x * px + px / 2, powerUp.y * px + px / 2, px * 0.38, 0, Math.PI * 2);
     ctx.fill();
-    // Pulsing glow
+    ctx.restore();
+    // Pulsing glow ring
     ctx.save();
     ctx.globalAlpha = 0.3 + 0.2 * Math.sin(Date.now() / 200);
+    ctx.strokeStyle = powerUp.color;
+    ctx.lineWidth = 2;
+    ctx.shadowColor = powerUp.color;
+    ctx.shadowBlur = 10;
     ctx.beginPath();
     ctx.arc(powerUp.x * px + px / 2, powerUp.y * px + px / 2, px * 0.5, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.stroke();
     ctx.restore();
     // Icon
     ctx.font = `${Math.floor(px * 0.6)}px sans-serif`;
@@ -361,24 +423,83 @@ function draw() {
     ctx.fillText(powerUp.icon, powerUp.x * px + px / 2, powerUp.y * px + px / 2);
   }
 
-  // Food
-  ctx.fillStyle = "rgba(239, 68, 68, 0.95)";
+  // Food with glow and pulse
+  const foodPulse = 0.33 + 0.04 * Math.sin(Date.now() / 150);
+  const fx = food.x * px + px / 2;
+  const fy = food.y * px + px / 2;
+  ctx.save();
+  ctx.shadowColor = 'rgba(239, 68, 68, 0.9)';
+  ctx.shadowBlur = 12;
+  const foodGrad = ctx.createRadialGradient(fx, fy, 0, fx, fy, px * foodPulse);
+  foodGrad.addColorStop(0, 'rgba(255, 120, 100, 1)');
+  foodGrad.addColorStop(0.6, 'rgba(239, 68, 68, 0.95)');
+  foodGrad.addColorStop(1, 'rgba(200, 40, 40, 0.8)');
+  ctx.fillStyle = foodGrad;
   ctx.beginPath();
-  ctx.arc(food.x * px + px / 2, food.y * px + px / 2, px * 0.33, 0, Math.PI * 2);
+  ctx.arc(fx, fy, px * foodPulse, 0, Math.PI * 2);
   ctx.fill();
+  ctx.restore();
 
-  // Snake
+  // Snake with gradient body segments
   const isInvincible = hasPowerUp('invincible');
   const isSpeed = hasPowerUp('speed');
+  const snakeLen = snake.length;
   snake.forEach((s, i) => {
+    const cx = s.x * px + px / 2;
+    const cy = s.y * px + px / 2;
+    const halfPx = (px - 2) / 2;
+    const t = i / Math.max(snakeLen - 1, 1); // 0 at head, 1 at tail
+
+    let baseR, baseG, baseB, glowColor;
     if (isInvincible) {
-      ctx.fillStyle = i === 0 ? 'rgba(245, 158, 11, 1)' : `rgba(245, 158, 11, ${0.9 - i * 0.01})`;
+      baseR = 245; baseG = 158; baseB = 11;
+      glowColor = 'rgba(245, 158, 11, 0.7)';
     } else if (isSpeed) {
-      ctx.fillStyle = i === 0 ? 'rgba(168, 85, 247, 1)' : `rgba(168, 85, 247, ${0.9 - i * 0.01})`;
+      baseR = 168; baseG = 85; baseB = 247;
+      glowColor = 'rgba(168, 85, 247, 0.7)';
     } else {
-      ctx.fillStyle = i === 0 ? "rgba(34,197,94,1)" : "rgba(34,197,94,0.85)";
+      baseR = 34; baseG = 197; baseB = 94;
+      glowColor = 'rgba(34, 197, 94, 0.5)';
     }
-    ctx.fillRect(s.x * px + 1, s.y * px + 1, px - 2, px - 2);
+
+    const alpha = 1 - t * 0.35;
+    const segGrad = ctx.createRadialGradient(cx - 2, cy - 2, 0, cx, cy, halfPx * 1.4);
+    const lighter = `rgba(${Math.min(255, baseR + 60)}, ${Math.min(255, baseG + 60)}, ${Math.min(255, baseB + 60)}, ${alpha})`;
+    const base = `rgba(${baseR}, ${baseG}, ${baseB}, ${alpha})`;
+    const darker = `rgba(${Math.max(0, baseR - 40)}, ${Math.max(0, baseG - 40)}, ${Math.max(0, baseB - 40)}, ${alpha * 0.8})`;
+    segGrad.addColorStop(0, lighter);
+    segGrad.addColorStop(0.5, base);
+    segGrad.addColorStop(1, darker);
+
+    ctx.save();
+    if (i === 0) {
+      ctx.shadowColor = glowColor;
+      ctx.shadowBlur = 10;
+    }
+    ctx.fillStyle = segGrad;
+    const radius = i === 0 ? 4 : 3;
+    const sx = s.x * px + 1;
+    const sy = s.y * px + 1;
+    const sw = px - 2;
+    const sh = px - 2;
+    ctx.beginPath();
+    ctx.moveTo(sx + radius, sy);
+    ctx.lineTo(sx + sw - radius, sy);
+    ctx.quadraticCurveTo(sx + sw, sy, sx + sw, sy + radius);
+    ctx.lineTo(sx + sw, sy + sh - radius);
+    ctx.quadraticCurveTo(sx + sw, sy + sh, sx + sw - radius, sy + sh);
+    ctx.lineTo(sx + radius, sy + sh);
+    ctx.quadraticCurveTo(sx, sy + sh, sx, sy + sh - radius);
+    ctx.lineTo(sx, sy + radius);
+    ctx.quadraticCurveTo(sx, sy, sx + radius, sy);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // Emit trail particle from tail segment
+    if (i === snakeLen - 1 && (dir.x !== 0 || dir.y !== 0)) {
+      emitTrailParticle(cx, cy, `rgba(${baseR}, ${baseG}, ${baseB}, 0.6)`);
+    }
   });
 
   // HUD: Active Power-Ups (top-right)
@@ -400,7 +521,7 @@ function draw() {
     ctx.font = 'bold 12px Inter, system-ui, sans-serif';
     ctx.fillStyle = 'rgba(234, 179, 8, 0.9)';
     ctx.textAlign = 'left';
-    ctx.fillText('2× SCORE', 8, 14);
+    ctx.fillText('2x SCORE', 8, 14);
     ctx.restore();
   }
 

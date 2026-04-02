@@ -46,8 +46,38 @@ function spawn() {
   });
 }
 
+// ── Merge sparkle effect ──
+function spawnMergeSparkle(x, y) {
+  if (!container) return;
+  try {
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  } catch (e) { /* proceed */ }
+  const sparkle = document.createElement('div');
+  sparkle.style.cssText = `
+    position: absolute;
+    left: ${x}px; top: ${y}px;
+    width: 70px; height: 70px;
+    pointer-events: none; z-index: 30;
+    background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 70%);
+    border-radius: 50%;
+    animation: merge-sparkle-fade 0.4s ease-out forwards;
+    transform: scale(0.5);
+  `;
+  container.style.position = 'relative';
+  container.appendChild(sparkle);
+  setTimeout(() => sparkle.remove(), 450);
+}
+
 function render() {
   if (!layer) return;
+
+  // Inject merge sparkle animation if not present
+  if (!document.getElementById('merge-sparkle-anim')) {
+    const style = document.createElement('style');
+    style.id = 'merge-sparkle-anim';
+    style.textContent = `@keyframes merge-sparkle-fade { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.8); opacity: 0; } }`;
+    document.head.appendChild(style);
+  }
 
   const existing = new Map();
   Array.from(layer.children).forEach((el) => {
@@ -82,6 +112,11 @@ function render() {
     el.className = classes.join(" ");
 
     existing.delete(String(t.id));
+
+    // Emit sparkle on merge
+    if (t.merged) {
+      spawnMergeSparkle(x + 12, y + 12);
+    }
 
     if (t.new || t.merged) {
       setTimeout(() => {
