@@ -230,7 +230,7 @@ const SURFACE_FACT_PATTERNS = [
   { key: "weaknesses", pattern: /\bweakness(es)?|working on|improving|growth area\b/i },
   { key: "hobbies", pattern: /\bhobb(y|ies)|free time|fun|do for fun|outside work\b/i },
   { key: "car", pattern: /\b(bmw|540i|mods|modification)\b|\bhis car\b|\bcar mods\b|\bwhat car\b/i },
-  { key: "skills", pattern: /\b(crm|salesforce|hubspot|pardot|certif)\b|\bhis skills\b|\bwhat skills\b|\btools does he\b/i },
+  { key: "skills", pattern: /\b(crm|salesforce|hubspot|pardot|certif)\b|\bhis skills\b|\bwhat skills\b|\btools does he\b|\bcrm tools\b|\bwhat tools\b|\btechnical skills\b/i },
   { key: "heritage", pattern: /\b(chaldean|refugee|iraqi?)\b|\bhis (heritage|background)\b/i },
   { key: "family", pattern: /\b(brother|sibling|parent)s?\b|\bhis (mom|dad|father|mother|family)\b|\bdoes he have (brothers|siblings|family)\b/i },
   { key: "values", pattern: /\bhis values\b|\bwhat does he value\b|\bwhat.*believe\b|\bwork ethic\b|\bphilosophy\b/i },
@@ -742,7 +742,7 @@ function classifyQuestion(message) {
   const lower = normalizeComparableText(message);
 
   if (!lower) return QUESTION_CLASSES.UNKNOWN;
-  if (/^(hi|hello|hey|yo|what's up|whats up|good morning|good afternoon|good evening)\b/.test(lower)) {
+  if (/^(hi|hello|hey|yo|sup|what's up|whats up|good morning|good afternoon|good evening|lol|lmao|haha|bruh|ayy|what is this|what even is this)\b/.test(lower) || /^(who are you|what can you do|help|what is this)$/i.test(lower)) {
     return QUESTION_CLASSES.GREETING;
   }
   if (/\b(contact|email|reach out|reach him|reach you|linkedin)\b/.test(lower)) {
@@ -754,7 +754,10 @@ function classifyQuestion(message) {
   if (/\b(why hire|more experience|hire you|hire him|worth interviewing|recruiter|quick pitch|elevator pitch|sell me on|convince me|pitch me)\b/.test(lower)) {
     return QUESTION_CLASSES.HIRE_CASE;
   }
-  if (/\b(mostly ai|just ai|is this ai|real skill|actually skilled)\b/.test(lower)) {
+  if (/\b(mostly ai|just ai|is this ai|real skill|actually skilled|just chatgpt|just gpt|chatgpt with|gpt wrapper|ai wrapper|is savonie|savonie just)\b/.test(lower)) {
+    return QUESTION_CLASSES.SKEPTICAL_AI;
+  }
+  if (/\b(code|coded|built|build|develop|hand.?code|program)\b/.test(lower) && /\b(this site|himself|herself|alone|scratch|from scratch|by hand)\b/.test(lower)) {
     return QUESTION_CLASSES.SKEPTICAL_AI;
   }
   if (SURFACE_FACT_PATTERNS.some((entry) => entry.pattern.test(lower))) {
@@ -781,7 +784,7 @@ function classifyQuestion(message) {
   if (/\b(sat|act|gpa|gmat|lsat|class rank|iq)\b/.test(lower)) {
     return QUESTION_CLASSES.UNKNOWN;
   }
-  if (/\b(relationship|dating|girlfriend|boyfriend|ex|family drama|mental health|diagnosed|address|where exactly do you live|salary you make)\b/.test(lower)) {
+  if (/\b(relationship|dating|girlfriend|boyfriend|ex|family drama|mental health|diagnosed|address|where exactly do you live|salary you make|phone number|ssn|social security|income|how much.*make|how much.*earn)\b/.test(lower)) {
     return QUESTION_CLASSES.BOUNDARY;
   }
   if (/\b(what's he about|whats he about|what is estivan about|what are you about|who are you|tell me about yourself|tell me about estivan|what does estivan do|what does he do|what do you do)\b/.test(lower)) {
@@ -1023,7 +1026,7 @@ function formatSurfaceFactReply(key) {
 }
 
 function buildBoundaryReply() {
-  return "Some things stay off the public version on purpose. The site can still help with the work, the site, how he thinks, or anything already on the portfolio.";
+  return `That is not something shared publicly through the site. For direct contact, the best route is ${PERSONAL_KNOWLEDGE.contact.email} or the [Contact page](/contact). The site covers the work, thinking, and background openly — ask about any of that.`;
 }
 
 function buildUnknownReply() {
@@ -1173,8 +1176,11 @@ function buildDeterministicReply({ message, questionClass, surfaceFactKey, profi
       return `The [resume PDF](${PERSONAL_KNOWLEDGE.contact.resumePdf}) is the quickest source for that.`;
     case QUESTION_CLASSES.HIRE_CASE:
       return `${(seeds.hireOverExperience || []).join(" ")} ${formatProjectList(siteFacts)}`;
-    case QUESTION_CLASSES.SKEPTICAL_AI:
-      return `${(seeds.aiSkeptical || []).join(" ")} ${formatInternalLink("The portfolio build page", "/projects/portfolio")} is the cleanest proof.`;
+    case QUESTION_CLASSES.SKEPTICAL_AI: {
+      const aiHonestyBase = "AI wrote every line of code. Estivan directed the vision, designed the site, reviewed every change, and shipped the final product. He used Claude, Copilot, and Gemini as tools. He had no coding background before starting. What the site proves is not coding skill, it is initiative, judgment, quality standards, and the ability to direct complex technical work to a high standard over 300+ hours.";
+      const seedExtra = (seeds.aiSkeptical || []).join(" ");
+      return `${aiHonestyBase} ${seedExtra} ${formatInternalLink("The portfolio build page", "/projects/portfolio")} covers the full story.`;
+    }
     case QUESTION_CLASSES.TEAM:
       return [
         ...(seeds.team || []),
@@ -1214,8 +1220,10 @@ function buildDeterministicReply({ message, questionClass, surfaceFactKey, profi
       return buildUnknownReply();
     case QUESTION_CLASSES.COMPLEX_OPEN:
       return "";
+    case QUESTION_CLASSES.OPEN:
+      return "";
     default:
-      return retrieval.pages.length > 0 ? buildPageSpecificReply(retrieval, message) : "";
+      return "";
   }
 }
 
@@ -1230,7 +1238,8 @@ function shouldUseDeterministicOnly(questionClass, retrieval) {
     QUESTION_CLASSES.RESUME,
     QUESTION_CLASSES.BOUNDARY,
     QUESTION_CLASSES.SURFACE_FACT,
-    QUESTION_CLASSES.LANGUAGES
+    QUESTION_CLASSES.LANGUAGES,
+    QUESTION_CLASSES.SKEPTICAL_AI
   ];
   return deterministicClasses.includes(questionClass);
 }
