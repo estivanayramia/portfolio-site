@@ -92,6 +92,145 @@ const MOTION_PROFILES = {
   }
 };
 
+<<<<<<< HEAD
+=======
+const CANONICAL_PREMIUM_POSITIONS = {
+  center: {
+    rotateY: 0,
+    rotateX: 0,
+    translateZ: 0,
+    translateX: 0,
+    translateY: -6,
+    scale: 1.28,
+    opacity: 1,
+    zIndex: 100,
+    blur: 0,
+    brightness: 1.12,
+    saturate: 1.08
+  },
+  adjacent1: {
+    rotateY: 54,
+    rotateX: 1.4,
+    translateZ: -340,
+    translateX: 430,
+    translateY: 4,
+    scale: 0.84,
+    opacity: 0.84,
+    zIndex: 90,
+    blur: 0.5,
+    brightness: 0.9,
+    saturate: 0.96
+  },
+  adjacent2: {
+    rotateY: 66,
+    rotateX: 2.2,
+    translateZ: -640,
+    translateX: 700,
+    translateY: 12,
+    scale: 0.68,
+    opacity: 0.62,
+    zIndex: 80,
+    blur: 1.2,
+    brightness: 0.78,
+    saturate: 0.9
+  },
+  adjacent3: {
+    rotateY: 72,
+    rotateX: 3,
+    translateZ: -880,
+    translateX: 920,
+    translateY: 20,
+    scale: 0.54,
+    opacity: 0.4,
+    zIndex: 70,
+    blur: 2,
+    brightness: 0.64,
+    saturate: 0.84
+  },
+  far: {
+    rotateY: 78,
+    rotateX: 3.4,
+    translateZ: -1120,
+    translateX: 1080,
+    translateY: 28,
+    scale: 0.42,
+    opacity: 0.12,
+    zIndex: 60,
+    blur: 2.8,
+    brightness: 0.5,
+    saturate: 0.8
+  }
+};
+
+const GALLERY_STANDARD_POSITIONS = {
+  center: {
+    rotateY: 0,
+    rotateX: 0,
+    translateZ: 46,
+    translateX: 0,
+    translateY: 0,
+    scale: 1.01,
+    opacity: 1,
+    zIndex: 100,
+    blur: 0,
+    brightness: 1.08,
+    saturate: 1.04
+  },
+  adjacent1: {
+    rotateY: 22,
+    rotateX: 0,
+    translateZ: -120,
+    translateX: 188,
+    translateY: 0,
+    scale: 0.82,
+    opacity: 0.84,
+    zIndex: 90,
+    blur: 0.35,
+    brightness: 0.93,
+    saturate: 0.98
+  },
+  adjacent2: {
+    rotateY: 34,
+    rotateX: 0,
+    translateZ: -280,
+    translateX: 300,
+    translateY: 0,
+    scale: 0.66,
+    opacity: 0.62,
+    zIndex: 80,
+    blur: 0.9,
+    brightness: 0.82,
+    saturate: 0.92
+  },
+  adjacent3: {
+    rotateY: 44,
+    rotateX: 0,
+    translateZ: -420,
+    translateX: 390,
+    translateY: 0,
+    scale: 0.52,
+    opacity: 0.4,
+    zIndex: 70,
+    blur: 1.5,
+    brightness: 0.68,
+    saturate: 0.86
+  },
+  far: {
+    rotateY: 50,
+    rotateX: 0,
+    translateZ: -560,
+    translateX: 660,
+    translateY: 0,
+    scale: 0.4,
+    opacity: 0.16,
+    zIndex: 60,
+    blur: 2.1,
+    brightness: 0.56,
+    saturate: 0.82
+  }
+};
+
+>>>>>>> d3209cc7 (fix(carousel): harden shared interaction settling)
 const MOBILE_POSITIONS = {
   center: {
     rotateY: 0,
@@ -1431,6 +1570,7 @@ export class LuxuryCoverflow {
 
     this.callbacks = {
       onActiveItemSelect: null,
+      onSlideChange: null,
       resolveItemTitle: null,
       ...options.callbacks
     };
@@ -1439,7 +1579,18 @@ export class LuxuryCoverflow {
     this.items = Array.from(this.container.querySelectorAll(this.selectors.items));
     if (!this.track || this.items.length === 0) return;
 
+    this.isLuxurySectionSurface = this.container.hasAttribute('data-luxury-coverflow');
+    this.isGalleryMiniSurface = options.surface === 'luxury-coverflow'
+      || isGalleryMediaSurface(this.container)
+      || this.container.dataset?.miniCarousel === 'true';
+
     const profile = computePerformanceProfile();
+<<<<<<< HEAD
+=======
+    const defaultTier = this.isLuxurySectionSurface
+      ? 'premium'
+      : (this.isGalleryMiniSurface ? 'enhanced' : profile.tier);
+>>>>>>> d3209cc7 (fix(carousel): harden shared interaction settling)
     const resolvedTier = getReducedMotionPreference()
       ? 'reduced'
       : normalizeTier(options.performanceTier) || profile.tier;
@@ -1463,6 +1614,14 @@ export class LuxuryCoverflow {
       performanceTier: resolvedTier,
       animationEase: 'power3.inOut',
       surface: 'default',
+<<<<<<< HEAD
+=======
+      geometryProfile: this.isLuxurySectionSurface
+        ? 'about-premium'
+        : (this.isGalleryMiniSurface ? 'gallery-standard' : 'adaptive'),
+      rememberLastCard: this.isGalleryMiniSurface || this.isLuxurySectionSurface,
+      memoryKey: null,
+>>>>>>> d3209cc7 (fix(carousel): harden shared interaction settling)
       activeStateClass: 'coverflow-card--active',
       maxVisibleDots: 7,
       itemRoleDescription: 'slide',
@@ -1480,10 +1639,15 @@ export class LuxuryCoverflow {
       this.config.animationEase = 'power2.inOut';
     }
 
-    this.currentIndex = normalizeIndex(this.config.initialIndex, this.items.length, this.config.infiniteLoop);
+    this.memoryKey = this.resolveMemoryKey();
+    const restoredIndex = this.restoreRememberedIndex();
+    const initialIndex = Number.isFinite(restoredIndex) ? restoredIndex : this.config.initialIndex;
+
+    this.currentIndex = normalizeIndex(initialIndex, this.items.length, this.config.infiniteLoop);
     this.previewIndex = this.currentIndex;
     this.pendingTarget = null;
     this.isAnimating = false;
+    this.animationCycle = 0;
     this.animationTimeout = null;
     this.positionTween = null;
     this.autoplayInterval = null;
@@ -1499,6 +1663,7 @@ export class LuxuryCoverflow {
       currentX: 0,
       currentY: 0,
       axisLocked: null,
+      startIndex: this.currentIndex,
       previewPosition: this.currentIndex,
       rafPending: false,
       sourceTarget: null
@@ -1523,6 +1688,71 @@ export class LuxuryCoverflow {
 
     this.liveRegion = this.ensureLiveRegion();
     this.init();
+  }
+
+  sanitizeMemoryFragment(value) {
+    return String(value || '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-zA-Z0-9:_\/-]/g, '')
+      .slice(0, 80);
+  }
+
+  buildFallbackMemoryId() {
+    const candidates = Array.from(document.querySelectorAll('.gallery-carousel[data-mini-carousel="true"], .gallery-carousel'));
+    const index = candidates.indexOf(this.container);
+    return index >= 0 ? `gallery-${index + 1}` : 'gallery-unknown';
+  }
+
+  resolveMemoryKey() {
+    if (!this.config.rememberLastCard) return null;
+
+    const explicit = this.config.memoryKey || this.container.dataset?.coverflowMemoryKey;
+    if (explicit) {
+      return `ea.gallery.coverflow:${this.sanitizeMemoryFragment(explicit)}`;
+    }
+
+    const route = this.sanitizeMemoryFragment(window.location.pathname || '/');
+    const identity = this.sanitizeMemoryFragment(
+      this.container.id
+      || this.container.dataset?.galleryId
+      || this.container.getAttribute('aria-label')
+      || this.buildFallbackMemoryId()
+    );
+
+    return `ea.gallery.coverflow:${route}:${identity}`;
+  }
+
+  restoreRememberedIndex() {
+    if (!this.memoryKey) return null;
+
+    try {
+      const raw = window.localStorage.getItem(this.memoryKey);
+      if (!raw) return null;
+
+      const parsed = JSON.parse(raw);
+      const rawIndex = typeof parsed === 'number' ? parsed : parsed?.index;
+      if (!Number.isFinite(rawIndex)) return null;
+
+      return normalizeIndex(Math.trunc(rawIndex), this.items.length, this.config.infiniteLoop);
+    } catch {
+      return null;
+    }
+  }
+
+  persistRememberedIndex(index = this.currentIndex) {
+    if (!this.memoryKey) return;
+
+    try {
+      const payload = JSON.stringify({
+        index: normalizeIndex(index, this.items.length, this.config.infiniteLoop),
+        totalItems: this.items.length,
+        savedAt: Date.now()
+      });
+      window.localStorage.setItem(this.memoryKey, payload);
+    } catch {
+      // Ignore storage failures in private browsing or restricted environments.
+    }
   }
 
   init() {
@@ -1556,6 +1786,8 @@ export class LuxuryCoverflow {
     this.setupRouletteButton();
     this.setupResizeHandling();
 
+    this.persistRememberedIndex(this.currentIndex);
+
     if (this.config.autoplay && this.profile.tier !== 'reduced') {
       this.startAutoplay();
     }
@@ -1565,10 +1797,29 @@ export class LuxuryCoverflow {
 
   getEngineConfig() {
     const isCompactViewport = window.innerWidth < 960;
+<<<<<<< HEAD
+=======
+    const isCanonicalGeometry = this.config.geometryProfile === 'about-premium'
+      || this.config.geometryProfile === 'canonical-premium';
+    const isGalleryStandardGeometry = this.config.geometryProfile === 'gallery-standard';
+>>>>>>> d3209cc7 (fix(carousel): harden shared interaction settling)
     const config = {
       infiniteLoop: this.config.infiniteLoop
     };
 
+<<<<<<< HEAD
+=======
+    if (isCanonicalGeometry) {
+      config.positions = CANONICAL_PREMIUM_POSITIONS;
+      return config;
+    }
+
+    if (isGalleryStandardGeometry) {
+      config.positions = GALLERY_STANDARD_POSITIONS;
+      return config;
+    }
+
+>>>>>>> d3209cc7 (fix(carousel): harden shared interaction settling)
     if (isCompactViewport) {
       config.positions = MOBILE_POSITIONS;
     }
@@ -1619,6 +1870,11 @@ export class LuxuryCoverflow {
     this.announce(`Now showing ${title}`);
   }
 
+  emitSlideChange(index = this.currentIndex) {
+    if (typeof this.callbacks.onSlideChange !== 'function') return;
+    this.callbacks.onSlideChange(index, this);
+  }
+
   updatePagination(position = this.currentIndex) {
     const current = this.selectors.paginationCurrent ? this.container.querySelector(this.selectors.paginationCurrent) : null;
     const total = this.selectors.paginationTotal ? this.container.querySelector(this.selectors.paginationTotal) : null;
@@ -1658,11 +1914,42 @@ export class LuxuryCoverflow {
     this.positionTween = null;
   }
 
-  finishAnimation() {
+  beginAnimation(durationMs) {
+    this.animationCycle += 1;
+    const cycleId = this.animationCycle;
+
+    this.resources.clearTimeout(this.animationTimeout);
+    this.animationTimeout = null;
+    this.isAnimating = durationMs > 0;
+
+    if (durationMs > 0) {
+      const timeoutMs = Math.max(180, durationMs + this.motion.settleMs + 96);
+      this.animationTimeout = this.resources.timeout(() => {
+        this.finishAnimation(cycleId);
+      }, timeoutMs);
+    }
+
+    return cycleId;
+  }
+
+  finishAnimation(cycleId = this.animationCycle) {
+    if (cycleId !== this.animationCycle) return;
+
+    this.resources.clearTimeout(this.animationTimeout);
+    this.animationTimeout = null;
+    this.positionTween = null;
     this.isAnimating = false;
     this.items.forEach((item) => {
       item.style.willChange = 'auto';
     });
+
+    if (typeof this.pendingTarget === 'number') {
+      const queuedTarget = this.pendingTarget;
+      this.pendingTarget = null;
+      this.resources.raf(() => {
+        this.goToSlide(queuedTarget, { durationMs: this.getDiscreteNavigationDuration() });
+      });
+    }
   }
 
   buildDots() {
@@ -1734,6 +2021,7 @@ export class LuxuryCoverflow {
 
   updateAllItems(centerIndex, durationMs = this.motion.slideMs) {
     const durationSeconds = durationMs / 1000;
+    const cycleId = this.beginAnimation(durationMs);
 
     this.clearPositionTween();
     gsap.killTweensOf(this.items);
@@ -1765,7 +2053,8 @@ export class LuxuryCoverflow {
       this.wheelState.previewPosition = centerIndex;
       applyTransforms(centerIndex);
       this.updatePagination(centerIndex);
-      this.finishAnimation();
+      this.emitSlideChange(this.getNearestIndex(centerIndex));
+      this.finishAnimation(cycleId);
       return;
     }
 
@@ -1785,12 +2074,15 @@ export class LuxuryCoverflow {
         this.updatePagination(tweenState.position);
       },
       onComplete: () => {
-        this.positionTween = null;
         this.previewIndex = centerIndex;
         this.wheelState.previewPosition = centerIndex;
         applyTransforms(centerIndex);
         this.updatePagination(centerIndex);
-        this.finishAnimation();
+        this.emitSlideChange(this.currentIndex);
+        this.finishAnimation(cycleId);
+      },
+      onInterrupt: () => {
+        this.finishAnimation(cycleId);
       }
     });
   }
@@ -1846,6 +2138,7 @@ export class LuxuryCoverflow {
 
     this.pendingTarget = null;
     this.currentIndex = normalizedTarget;
+    this.persistRememberedIndex(this.currentIndex);
     this.updateAllItems(continuousTarget, durationMs);
     this.resetAutoplay();
     if (announce) this.announceCurrentSlide();
@@ -1858,19 +2151,15 @@ export class LuxuryCoverflow {
   }
 
   next() {
-    if (this.isAnimating) {
-      this.pendingTarget = (typeof this.pendingTarget === 'number' ? this.pendingTarget : this.currentIndex) + 1;
-      return;
-    }
-    this.goToSlide(this.currentIndex + 1, { durationMs: this.getDiscreteNavigationDuration() });
+    const baseIndex = typeof this.pendingTarget === 'number' ? this.pendingTarget : this.currentIndex;
+    this.pendingTarget = null;
+    this.goToSlide(baseIndex + 1, { durationMs: this.getDiscreteNavigationDuration() });
   }
 
   prev() {
-    if (this.isAnimating) {
-      this.pendingTarget = (typeof this.pendingTarget === 'number' ? this.pendingTarget : this.currentIndex) - 1;
-      return;
-    }
-    this.goToSlide(this.currentIndex - 1, { durationMs: this.getDiscreteNavigationDuration() });
+    const baseIndex = typeof this.pendingTarget === 'number' ? this.pendingTarget : this.currentIndex;
+    this.pendingTarget = null;
+    this.goToSlide(baseIndex - 1, { durationMs: this.getDiscreteNavigationDuration() });
   }
 
   pulseCurrentCard() {
@@ -2062,6 +2351,7 @@ export class LuxuryCoverflow {
       currentX: clientX,
       currentY: clientY,
       axisLocked: null,
+      startIndex: this.currentIndex,
       previewPosition: this.currentIndex,
       sequence: this.dragSequence,
       rafPending: false,
@@ -2117,15 +2407,19 @@ export class LuxuryCoverflow {
     const velocity = this.physics.velocity;
     const hasMeaningfulMovement = Math.abs(deltaX) >= 24 || Math.abs(velocity) > 0.2;
     const direction = deltaX < 0 ? 1 : -1;
+    const startIndex = Number.isFinite(this.dragState.startIndex)
+      ? this.dragState.startIndex
+      : this.currentIndex;
     const settledIndex = this.getNearestIndex(this.previewIndex);
     const targetIndex = hasMeaningfulMovement
-      ? settledIndex + direction
+      ? (settledIndex !== startIndex ? settledIndex : startIndex + direction)
       : settledIndex;
 
     this.dragState.isDragging = false;
     this.dragState.axisLocked = null;
-  this.dragState.sequence = null;
-  this.dragState.rafPending = false;
+    this.dragState.sequence = null;
+    this.dragState.rafPending = false;
+    this.dragState.startIndex = this.currentIndex;
     this.container.classList.remove('is-dragging');
     if (hasMeaningfulMovement) {
       // Touch browsers may emit a trailing click after a drag; suppress it briefly.
