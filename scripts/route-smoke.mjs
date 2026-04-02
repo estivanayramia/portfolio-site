@@ -13,8 +13,8 @@ const TESTS = [
   { path: '/projects/isa-grimes-interview', status: 200, marker: '<title>' },
   { path: '/projects/grimes-interview', status: 301, location: '/projects/isa-grimes-interview' },
   { path: '/projects/conflict', status: 301, location: '/projects/isa-grimes-interview' },
-  { path: '/hobbies', status: 301, location: '/hobbies/' },
-  { path: '/hobbies/', status: 200, marker: '<title>' },
+  { path: '/hobbies', status: 301, location: ['/hobbies/', '/about'] },
+  { path: '/hobbies/', status: 301, location: '/about' },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -118,7 +118,10 @@ async function main() {
 
           const statusMatch = res.status === test.status;
           const location = res.headers.get('location');
-          const locMatch = !test.location || location === test.location;
+          const locMatch = !test.location
+            || (Array.isArray(test.location)
+              ? test.location.includes(location)
+              : location === test.location);
           const markerMatch = !test.marker || content.includes(test.marker);
 
           const statusStr = String(res.status).padEnd(6);
@@ -131,7 +134,10 @@ async function main() {
           console.log(`${test.path.padEnd(10)} | ${statusStr} | ${locStr} | ${markStr}    | ${pass ? 'PASS' : 'FAIL'}`);
           
           if (!pass && !statusMatch) console.error(`  Expected status ${test.status}, got ${res.status}`);
-          if (!pass && !locMatch) console.error(`  Expected location ${test.location}, got ${location}`);
+          if (!pass && !locMatch) {
+            const expectedLocation = Array.isArray(test.location) ? test.location.join(' or ') : test.location;
+            console.error(`  Expected location ${expectedLocation}, got ${location}`);
+          }
           if (!pass && !markerMatch) console.error(`  Marker '${test.marker}' not found`);
       }
   } finally {
