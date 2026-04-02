@@ -2,7 +2,7 @@
   "version": "page-grounding-v1",
   "source": "repo-crawl",
   "baseUrl": "https://www.estivanayramia.com",
-  "buildVersion": "20260402-f2ee2c1a",
+  "buildVersion": "20260402-aec5d88e",
   "pageCount": 26,
   "pages": [
     {
@@ -13,7 +13,7 @@
       "pageType": "home",
       "title": "Estivan Ayramia | Built to Show More Than a Resume",
       "description": "A direct look at my work, how I think, and what I follow through on.",
-      "buildVersion": "20260402-f2ee2c1a",
+      "buildVersion": "20260402-aec5d88e",
       "summary": "A direct look at my work, how I think, and what I follow through on.",
       "headings": [
         "Estivan Ayramia | Built to Show More Than a Resume",
@@ -536,7 +536,7 @@
         "/overview",
         "/contact"
       ],
-      "checksum": "fnv1a-4c77547f",
+      "checksum": "fnv1a-380fae57",
       "keywords": [
         "/about",
         "estivan",
@@ -575,7 +575,7 @@
         {
           "heading": "About | Estivan Ayramia",
           "level": 1,
-          "text": "Estivan Ayramia – San Diego State University Alumni with a bachelors in Business Administration. . Aspiring to achieve the best version of me, always.\nAbout / more than the work",
+          "text": "Estivan Ayramia – San Diego State University alumnus with a bachelor’s degree in Business Administration. Always aspiring to become the best version of myself.\nAbout / more than the work",
           "keywords": [
             "estivan",
             "ayramia",
@@ -583,15 +583,17 @@
             "diego",
             "state",
             "university",
-            "alumni",
-            "bachelors",
+            "alumnus",
+            "bachelor",
+            "degree",
             "business",
             "administration",
+            "always",
             "aspiring",
-            "achieve",
+            "become",
             "best",
             "version",
-            "always",
+            "myself",
             "more",
             "than",
             "work"
