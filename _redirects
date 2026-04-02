@@ -55,6 +55,10 @@ https://estivanayramia.com/*    https://www.estivanayramia.com/:splat    301
 /hobbies-games/1024-moves/    /hobbies-games/1024-moves    301
 /hobbies-games/2048/    /hobbies-games/2048    301
 /hobbies-games/block-breaker/    /hobbies-games/block-breaker    301
+/hobbies-games/color-match/    /hobbies-games/color-match    301
+/hobbies-games/flappy-face/    /hobbies-games/flappy-face    301
+/hobbies-games/gravity-runner/    /hobbies-games/gravity-runner    301
+/hobbies-games/hex-memory/    /hobbies-games/hex-memory    301
 /hobbies-games/nano-wirebot/    /hobbies-games/nano-wirebot    301
 /hobbies-games/off-the-line/    /hobbies-games/off-the-line    301
 /hobbies-games/oh-flip/    /hobbies-games/oh-flip    301
@@ -97,6 +101,10 @@ https://estivanayramia.com/*    https://www.estivanayramia.com/:splat    301
 /hobbies-games/1024-moves    /EN/hobbies-games/1024-moves    200
 /hobbies-games/2048    /EN/hobbies-games/2048    200
 /hobbies-games/block-breaker    /EN/hobbies-games/block-breaker    200
+/hobbies-games/color-match    /EN/hobbies-games/color-match    200
+/hobbies-games/flappy-face    /EN/hobbies-games/flappy-face    200
+/hobbies-games/gravity-runner    /EN/hobbies-games/gravity-runner    200
+/hobbies-games/hex-memory    /EN/hobbies-games/hex-memory    200
 /hobbies-games/nano-wirebot    /EN/hobbies-games/nano-wirebot    200
 /hobbies-games/off-the-line    /EN/hobbies-games/off-the-line    200
 /hobbies-games/oh-flip    /EN/hobbies-games/oh-flip    200
@@ -150,6 +158,14 @@ https://estivanayramia.com/*    https://www.estivanayramia.com/:splat    301
 /EN/hobbies-games/2048    /hobbies-games/2048    301
 /EN/hobbies-games/block-breaker.html    /hobbies-games/block-breaker    301
 /EN/hobbies-games/block-breaker    /hobbies-games/block-breaker    301
+/EN/hobbies-games/color-match.html    /hobbies-games/color-match    301
+/EN/hobbies-games/color-match    /hobbies-games/color-match    301
+/EN/hobbies-games/flappy-face.html    /hobbies-games/flappy-face    301
+/EN/hobbies-games/flappy-face    /hobbies-games/flappy-face    301
+/EN/hobbies-games/gravity-runner.html    /hobbies-games/gravity-runner    301
+/EN/hobbies-games/gravity-runner    /hobbies-games/gravity-runner    301
+/EN/hobbies-games/hex-memory.html    /hobbies-games/hex-memory    301
+/EN/hobbies-games/hex-memory    /hobbies-games/hex-memory    301
 /EN/hobbies-games/nano-wirebot.html    /hobbies-games/nano-wirebot    301
 /EN/hobbies-games/nano-wirebot    /hobbies-games/nano-wirebot    301
 /EN/hobbies-games/off-the-line.html    /hobbies-games/off-the-line    301
