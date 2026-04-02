@@ -999,25 +999,35 @@ function formatSurfaceFactReply(key) {
     case "style":
       return `${pk.preferences.style.summary}. Favorite shoes are ${pk.preferences.style.shoes}. ${pk.preferences.style.note}`;
     case "work":
-      return `${pk.work.current} ${pk.work.workLessons} He is looking for: ${pk.work.seeking}`;
+      return pk.work?.current
+        ? `${pk.work.current} ${pk.work.workLessons || ""} He is looking for: ${pk.work.seeking || "operations, coordination, or project support roles."}`
+        : "Currently a Sports Coach at 549 Sports LLC, supervising 20-80 children per session. Previously worked in retail and delivery services. Looking for operations, coordination, or project support roles.";
     case "gpa":
-      return `His GPA is ${pk.identity.education.gpa}. He graduated from ${pk.identity.education.school} in ${pk.identity.education.graduationDate} with a ${pk.identity.education.degree} degree.`;
+      return `His GPA is ${pk.identity?.education?.gpa || "approximately 3.8"}. He graduated from ${pk.identity?.education?.school || "SDSU"} in ${pk.identity?.education?.graduationDate || "December 2025"} with a ${pk.identity?.education?.degree || "General Business"} degree.`;
     case "strengths":
-      return `His main strengths: ${pk.strengths.slice(0, 4).join("; ")}. The pattern across the site is systems thinking, clear communication, and consistent execution.`;
+      return pk.strengths?.length
+        ? `His main strengths: ${pk.strengths.slice(0, 4).join("; ")}. The pattern across the site is systems thinking, clear communication, and consistent execution.`
+        : "His main strengths: systems thinking, clear communication, consistency, and people judgment. The pattern across the site is figuring things out, structuring them, and following through.";
     case "weaknesses":
-      return `What he is working on: ${pk.workingOn.slice(0, 3).join("; ")}. He is honest about growth areas, which is itself a strength.`;
+      return pk.workingOn?.length
+        ? `What he is working on: ${pk.workingOn.slice(0, 3).join("; ")}. He is honest about growth areas, which is itself a strength.`
+        : "He is working on: saying no to distractions, delegating instead of doing everything himself, and public speaking comfort. He is honest about growth areas, which is itself a strength.";
     case "hobbies":
       return `His hobbies include gym and strength training (4-5 days/week), photography, car enthusiasm (BMW with mods), cooking, and reading. He also has an [arcade games section](/hobbies-games) on the site.`;
     case "car":
       return `He drives a BMW that he has modified: MHD Stage 2 tune, cold air intake, upgraded CTS charge pipe, MAD turbo inlet, catless downpipe, muffler delete, front lip, side skirts, rear diffuser, and hubcentric spacers. The full story is on the [Car page](/hobbies/car).`;
     case "skills":
-      return `Key skills from his resume: ${pk.resume.coreSkills.slice(0, 6).join(", ")}. He has Google Analytics Certification and exposure to Salesforce, HubSpot, and Pardot.`;
+      return pk.resume?.coreSkills
+        ? `Key skills from his resume: ${pk.resume.coreSkills.slice(0, 6).join(", ")}. He has Google Analytics Certification and exposure to Salesforce, HubSpot, and Pardot.`
+        : "From his resume: consultative recommendations, upselling, objection handling, service recovery, CRM exposure (Salesforce, HubSpot, Pardot), Google Analytics Certification, Microsoft Clarity, and multilingual communication.";
     case "heritage":
-      return `${pk.identity.heritage}. Born in ${pk.identity.birthplace}. ${pk.identity.refugeeHistory}. ${pk.identity.chaldeanContext.split(".").slice(0, 2).join(".")}.`;
+      return `${pk.identity?.heritage || "Chaldean, Iraqi-American"}. Born in ${pk.identity?.birthplace || "Baghdad, Iraq"}. ${pk.identity?.refugeeHistory || "Lived in Syria as a refugee, moved to El Cajon, California in 2008 at age 4"}. ${(pk.identity?.chaldeanContext || "Part of an ancient community tracing back to Mesopotamian times").split(".").slice(0, 2).join(".")}.`;
     case "family":
-      return `He is the youngest of four brothers: Alen, Andrew, Evan, and Estivan. His dad was an electrical engineer. His mom earned a BS in Business Administration from SDSU after nearly a decade of classes. The family story is covered in detail on the [Background page](/about/background).`;
+      return `He is the youngest of four brothers: Alen, Andrew, Evan, and Estivan. His dad was an electrical engineer. His mom earned a BS in Business Administration from SDSU after nearly a decade of classes. The family story is on the [Background page](/about/background).`;
     case "values":
-      return `His core values: ${Object.keys(pk.values).slice(0, 4).map(k => pk.values[k].split(".")[0]).join(". ")}. The full picture is on the [Values page](/about/values).`;
+      return pk.values && Object.keys(pk.values).length
+        ? `His core values: ${Object.keys(pk.values).slice(0, 4).map(k => pk.values[k]?.split(".")[0] || k).join(". ")}. The full picture is on the [Values page](/about/values).`
+        : "His core values center on reliability, execution, honest communication, and continuous improvement. The full picture is on the [Values page](/about/values).";
     case "zodiac":
       return `Aquarius. Born January 21, 2004.`;
     default:
