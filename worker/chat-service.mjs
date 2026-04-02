@@ -155,7 +155,6 @@ const PERSONAL_KNOWLEDGE = {
     "Four languages enabling cross-cultural communication in professional settings"
   ],
   workingOn: [
-    "Saying no to distractions and staying focused on high-impact work",
     "Being more direct in communication rather than overexplaining",
     "Delegating tasks instead of trying to do everything himself",
     "Building patience for long-term projects that take months to see results",
@@ -1014,7 +1013,7 @@ function formatSurfaceFactReply(key) {
     case "weaknesses":
       return pk.workingOn?.length
         ? `What he is working on: ${pk.workingOn.slice(0, 3).join("; ")}. He is honest about growth areas, which is itself a strength.`
-        : "He is working on: saying no to distractions, delegating instead of doing everything himself, and public speaking comfort. He is honest about growth areas, which is itself a strength.";
+        : "He is working on: being more direct in communication, delegating instead of doing everything himself, and public speaking comfort. He is honest about growth areas, which is itself a strength.";
     case "hobbies":
       return `His hobbies include gym and strength training (4-5 days/week), photography, car enthusiasm (BMW with mods), cooking, and reading. He also has an [arcade games section](/hobbies-games) on the site.`;
     case "car":
@@ -1043,7 +1042,7 @@ function buildBoundaryReply() {
 }
 
 function buildUnknownReply() {
-  return `That is a fair question. Here is what the site does cover: Estivan is a ${PERSONAL_KNOWLEDGE.identity.education.degree} graduate from ${PERSONAL_KNOWLEDGE.identity.education.school} (GPA ${PERSONAL_KNOWLEDGE.identity.education.gpa}), Chaldean from El Cajon. He has 7 projects spanning strategy, marketing campaigns, and an editorial interview. For anything more specific, the best route is ${PERSONAL_KNOWLEDGE.contact.email} or [Contact](${PERSONAL_KNOWLEDGE.contact.contactPage}).`;
+  return `That is a fair question. Here is what the site does cover: Estivan is a ${PERSONAL_KNOWLEDGE.identity.education.degree} graduate from ${PERSONAL_KNOWLEDGE.identity.education.school} (GPA ${PERSONAL_KNOWLEDGE.identity.education.gpa}). He is a San Diego State University Alumni with a bachelors in Business Administration and has 7 projects spanning strategy, marketing campaigns, and an editorial interview. For anything more specific, the best route is ${PERSONAL_KNOWLEDGE.contact.email} or [Contact](${PERSONAL_KNOWLEDGE.contact.contactPage}).`;
 }
 
 function buildGroundedSectionLines(topPage, retrieval) {

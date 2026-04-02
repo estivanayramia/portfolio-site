@@ -53,7 +53,14 @@
 }
 
 #arcade-featured-carousel.coverflow-section {
+  min-height: auto;
+  background: transparent;
+  padding: 4.5rem 0 1rem;
   overflow: visible;
+}
+
+#arcade-featured-carousel .coverflow-container {
+  height: clamp(40rem, 82vh, 56rem);
 }
 
 .coverflow-header {
@@ -525,12 +532,12 @@
 
 .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
-  padding: 0.5rem clamp(3rem, 6vw, 4.75rem) 0;
-  --gallery-card-width: clamp(11.5rem, 28vw, 19rem);
-  --gallery-card-height: clamp(14rem, 36vw, 25rem);
-  --gallery-track-height: calc(var(--gallery-card-height) + clamp(3rem, 8vw, 5rem));
+  padding: 0.5rem clamp(2.4rem, 5vw, 4rem) 0;
+  --gallery-card-width: clamp(14rem, 32vw, 22rem);
+  --gallery-card-height: clamp(18rem, 46vw, 30rem);
+  --gallery-track-height: calc(var(--gallery-card-height) + clamp(3.5rem, 8vw, 5.5rem));
 }
 
 .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-track {
@@ -598,11 +605,11 @@
 }
 
 .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-btn-prev {
-  left: clamp(-2.5rem, -4vw, -1rem);
+  left: clamp(0.5rem, 1.6vw, 1.25rem);
 }
 
 .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-btn-next {
-  right: clamp(-2.5rem, -4vw, -1rem);
+  right: clamp(0.5rem, 1.6vw, 1.25rem);
 }
 
 @media (max-width: 640px) {

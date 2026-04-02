@@ -1025,9 +1025,23 @@ const initSmoothScroll = () => {
 // Form Validation
 // ==========================================================================
 
+const __findContactForm = () => {
+    return document.querySelector('#contact-form, form[data-form-endpoint], form[action*="formspree.io"], form[action*="formspree"]');
+};
+
 const initFormValidation = () => {
-    const form = document.querySelector('form[action*="formspree.io"]');
+    const form = __findContactForm();
     if (!form) return;
+
+    const endpointFromData = (form.getAttribute('data-form-endpoint') || '').trim();
+    const endpointFromAction = (form.getAttribute('action') || '').trim();
+    const submitEndpoint = endpointFromData || endpointFromAction;
+    const isRemoteEndpoint = /^https?:\/\//i.test(submitEndpoint);
+
+    // Keep native fallback aligned with configured endpoint.
+    if (endpointFromData && endpointFromAction !== endpointFromData) {
+        form.setAttribute('action', endpointFromData);
+    }
 
     const inputs = form.querySelectorAll('input, textarea, select');
     const fileInput = form.querySelector('input[type="file"][name="file"]');
@@ -1112,13 +1126,33 @@ const initFormValidation = () => {
     });
 
     // Ensure a status container exists
-    let status = form.querySelector('#form-status');
+    let status = form.querySelector('#contact-status, #form-status');
     if (!status) {
         status = document.createElement('div');
         status.id = 'form-status';
         status.className = 'text-sm mt-3';
         form.appendChild(status);
     }
+
+    const isContactStatus = status.id === 'contact-status';
+    const setStatus = (message, type) => {
+        if (isContactStatus) {
+            const base = 'min-h-[3rem] text-sm font-medium';
+            status.dataset.status = type || 'idle';
+            if (type === 'success') status.className = `${base} text-green-700`;
+            else if (type === 'error') status.className = `${base} text-red-700`;
+            else if (type === 'pending') status.className = `${base} text-indigodeep`;
+            else status.className = base;
+            status.textContent = message || '\u00a0';
+            return;
+        }
+
+        if (type === 'success') status.className = 'text-sm mt-3 text-green-700';
+        else if (type === 'error') status.className = 'text-sm mt-3 text-red-700';
+        else if (type === 'pending') status.className = 'text-sm mt-3 text-indigodeep';
+        else status.className = 'text-sm mt-3';
+        status.textContent = message || '';
+    };
 
     const setSubmitting = (submitting) => {
         const btn = form.querySelector('button[type="submit"]');
@@ -1128,9 +1162,23 @@ const initFormValidation = () => {
         }
     };
 
+    const clearBtn = document.getElementById('clear-form-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            form.reset();
+            inputs.forEach((input) => clearError(input));
+            setStatus('Form cleared.', 'idle');
+        });
+    }
+
     const submitForm = async () => {
+        if (!submitEndpoint) {
+            setStatus('Contact form endpoint is missing. Please use the email link below.', 'error');
+            return;
+        }
+
         setSubmitting(true);
-        status.textContent = '';
+        setStatus('Sending your message...', 'pending');
         try {
             const formData = new FormData(form);
             // Validate file if present
@@ -1138,26 +1186,23 @@ const initFormValidation = () => {
                 const f = fileInput.files[0];
                 const ext = (f.name.split('.').pop() || '').toLowerCase();
                 if (!ACCEPT_EXT.includes(ext)) {
-                    status.className = 'text-sm mt-3 text-red-700';
-                    status.textContent = 'Unsupported file type. Please upload one of: CSV, DOC, DOCX, PDF, TXT, XLS, XLSX, JPG, JPEG, PNG, GIF, SVG, WEBP.';
+                    setStatus('Unsupported file type. Please upload one of: CSV, DOC, DOCX, PDF, TXT, XLS, XLSX, JPG, JPEG, PNG, GIF, SVG, WEBP.', 'error');
                     setSubmitting(false);
                     return;
                 }
                 if (f.size > MAX_FILE_BYTES) {
-                    status.className = 'text-sm mt-3 text-red-700';
-                    status.textContent = 'File too large (max 5MB). Please upload a smaller file.';
+                    setStatus('File too large (max 5MB). Please upload a smaller file.', 'error');
                     setSubmitting(false);
                     return;
                 }
             }
             // Validate link if present
             if (linkInput && linkInput.value && !isSafeUrl(linkInput.value)) {
-                status.className = 'text-sm mt-3 text-red-700';
-                status.textContent = 'Please enter a valid link starting with https:// or http://';
+                setStatus('Please enter a valid link starting with https:// or http://', 'error');
                 setSubmitting(false);
                 return;
             }
-            const res = await fetch(form.action, {
+            const res = await fetch(submitEndpoint, {
                 method: 'POST',
                 body: formData,
                 headers: { 'Accept': 'application/json' },
@@ -1166,37 +1211,44 @@ const initFormValidation = () => {
             });
             if (res.ok) {
                 form.reset();
-                // Replace form with mini-game easter egg
-                const card = form.parentElement;
-                if (card) {
-                    card.innerHTML = `
-                        <h2 class="text-2xl font-bold text-indigodeep mb-2">Thanks - message sent!</h2>
-                        <p class="text-sm text-chocolate mb-4">Enjoy a quick game while you're here.</p>
-                        <div id="mini-game-root" class="w-full bg-white border border-chocolate/10 rounded-xl p-4"></div>
-                    `;
-                    initMiniGame('mini-game-root');
+                inputs.forEach((input) => clearError(input));
+
+                if (isContactStatus) {
+                    setStatus('Message sent successfully. Thanks for reaching out.', 'success');
+                } else {
+                    // Preserve the easter egg behavior for legacy forms.
+                    const card = form.parentElement;
+                    if (card) {
+                        card.innerHTML = `
+                            <h2 class="text-2xl font-bold text-indigodeep mb-2">Thanks - message sent!</h2>
+                            <p class="text-sm text-chocolate mb-4">Enjoy a quick game while you're here.</p>
+                            <div id="mini-game-root" class="w-full bg-white border border-chocolate/10 rounded-xl p-4"></div>
+                        `;
+                        initMiniGame('mini-game-root');
+                    }
                 }
             } else {
-                status.className = 'text-sm mt-3 text-red-700';
-                status.textContent = 'Sorry, something went wrong. Trying fallback...';
+                setStatus('Sorry, something went wrong. Trying fallback...', 'error');
                 // Fallback to normal submission (opens in new tab)
                 try {
+                    form.setAttribute('action', submitEndpoint);
                     form.setAttribute('target', '_blank');
                     form.submit();
                 } catch (_) {
                     // keep error visible
-                    status.textContent = 'Sorry, something went wrong. Please try again or email hello@estivanayramia.com.';
+                    setStatus('Sorry, something went wrong. Please try again or email hello@estivanayramia.com.', 'error');
                 }
             }
         } catch (err) {
-            status.className = 'text-sm mt-3 text-red-700';
-            status.textContent = 'Network error detected. Opening fallback submit...';
+            setStatus('Network error detected. Opening fallback submit...', 'error');
             // Fallback to normal submission (opens in new tab)
             try {
+                form.setAttribute('action', submitEndpoint);
                 form.setAttribute('target', '_blank');
-                form.submit();
+                if (isRemoteEndpoint) form.submit();
+                else throw new Error('Non-remote endpoint');
             } catch (_) {
-                status.textContent = 'Network error. Please check your connection or email hello@estivanayramia.com.';
+                setStatus('Network error. Please check your connection or email hello@estivanayramia.com.', 'error');
             }
         } finally {
             setSubmitting(false);
@@ -1206,7 +1258,7 @@ const initFormValidation = () => {
     // Form submission handling
     form.addEventListener('submit', (e) => {
         let isValid = true;
-        
+
         inputs.forEach(input => {
             if (!input.checkValidity()) {
                 isValid = false;
@@ -1221,14 +1273,12 @@ const initFormValidation = () => {
                     if (firstInvalid) {
                         try { firstInvalid.focus({ preventScroll: true }); } catch (e) { try { __logCollect && __logCollect('focus-fallback', { selector: firstInvalid.tagName + (firstInvalid.id ? '#'+firstInvalid.id : '' ) }); } catch(_){} firstInvalid.focus(); }
                     }
-            status.className = 'text-sm mt-3 text-red-700';
-            status.textContent = 'Please complete required fields highlighted in red.';
+            setStatus('Please complete required fields highlighted in red.', 'error');
             return;
         }
         submitForm();
     });
 };
-
 // ==========================================================================
 // Mini Game: Catch the Orbs
 // ==========================================================================
@@ -2476,7 +2526,7 @@ const initAnalytics = () => {
     });
 
     // Track form submissions
-    const form = document.querySelector('form[action*="formspree.io"]');
+    const form = __findContactForm();
     if (form) {
         form.addEventListener('submit', () => {
             trackEventDebug('form_submission');
@@ -2674,9 +2724,9 @@ const initPerformanceMonitoring = () => {
 // ==========================================================================
 
 const initPhase2 = () => {
-    // A. Email Interceptor - Use Event Delegation
+    // A. Optional Email Interceptor - only on explicitly opted-in links
     document.body.addEventListener('click', (e) => {
-        const link = e.target.closest('a[href^="mailto:"]');
+        const link = e.target.closest('a[data-copy-mailto="true"][href^="mailto:"]');
         if (!link) return;
         
         e.preventDefault();
@@ -2690,7 +2740,7 @@ const initPhase2 = () => {
                 // Visual feedback: change text if link has inner text
                 if (link.innerText || link.textContent) {
                     const originalText = link.innerText || link.textContent;
-                    link.innerText = 'Copied! ✅';
+                    link.innerText = 'Copied!';
                     
                     // Revert after 2 seconds
                     setTimeout(() => {
@@ -2723,7 +2773,7 @@ const initPhase2 = () => {
     } catch (e) {}
     
     // C. Honeypot Check on Contact Form
-    const contactForm = document.querySelector('form[action*="formspree"]');
+    const contactForm = __findContactForm();
     if (contactForm) {
         contactForm.addEventListener('submit', (e) => {
             const honeypot = contactForm.querySelector('input[name="website_url"]');
@@ -2754,79 +2804,132 @@ const __isEnglishChromePage = () => {
 const __ensureStandardEnglishChrome = () => {
     if (!__isEnglishChromePage()) return;
 
-    // Header: inject only if missing (avoid clobbering per-page scripts)
-    try {
-        const hasStandardHeader = !!document.querySelector('header #brand-logo, header #mobile-menu-toggle');
-        if (!hasStandardHeader) {
-            const header = document.createElement('header');
-            header.className = 'fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10';
-            header.innerHTML = `
+    const normalizeRoute = (rawPath) => {
+        try {
+            let p = String(rawPath || '/').split('#')[0].split('?')[0];
+            p = p.replace(/^\/EN(?=\/|$)/i, '');
+            if (p.endsWith('.html')) p = p.slice(0, -5);
+            if (p === '/index') p = '/';
+            if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1);
+            return p || '/';
+        } catch (e) {
+            return '/';
+        }
+    };
+
+    const currentPath = normalizeRoute(window.location && window.location.pathname);
+    const activeNavKey = (() => {
+        if (currentPath === '/') return 'home';
+        if (currentPath.startsWith('/projects')) return 'projects';
+        if (currentPath === '/overview') return 'overview';
+        if (currentPath === '/deep-dive') return 'deep-dive';
+        if (currentPath.startsWith('/about')) return 'about';
+        if (currentPath === '/contact') return 'contact';
+        return null;
+    })();
+
+    const desktopInactive = 'text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded';
+    const desktopActive = 'text-sm text-indigodeep font-medium underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded';
+    const desktopContact = 'text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige';
+    const mobileInactive = 'block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2';
+    const mobileActive = 'block text-sm text-indigodeep font-medium focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2';
+    const mobileContact = 'block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full text-center hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige';
+
+    const buildHeaderMarkup = () => `
         <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between gap-2">
-            <a href="/index.html" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to Portfolio home page">
-                <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
-                <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
-            </a>
-            
-            <!-- Main Navigation -->
-            <ul class="hidden md:flex items-center space-x-8">
-                <li><a href="/index.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="home">Home</a></li>
-                <li><a href="/projects.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="projects">Projects</a></li>
-                <li><a href="/overview.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="overview">Overview</a></li>
-                <li><a href="/deep-dive.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="deep-dive">Deep Dive</a></li>
-                <li><a href="/about.html" class="text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-nav-key="about">About</a></li>
-                <li><a href="/contact.html" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
-            </ul>
-            
-            <!-- Language Switcher -->
-            <div id="lang-switcher" class="flex items-center space-x-3 shrink-0" style="z-index: 20;">
-                <a href="#" class="text-xs font-semibold text-indigodeep underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded" data-lang-key="en">EN</a>
-                <a href="/es/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">ES</a>
-                <a href="/ar/index.html" class="text-xs text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded">AR</a>
-            </div>
-            
-            <!-- Dark Mode Toggle -->
-            <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">☀️</span></button>
-            
-            <!-- Mobile Menu Toggle -->
-            <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
+          <a href="/" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to home page">
+            <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
+            <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
+          </a>
+
+          <!-- Main Navigation -->
+          <ul class="hidden md:flex items-center space-x-8">
+            <li>
+              <a href="/" data-nav-key="home" class="${desktopActive}" aria-current="page">Home</a>
+            </li>
+            <li>
+              <a href="/projects/" data-nav-key="projects" class="${desktopInactive}">Projects</a>
+            </li>
+            <li>
+              <a href="/overview" data-nav-key="overview" class="${desktopInactive}">Overview</a>
+            </li>
+            <li>
+              <a href="/deep-dive" data-nav-key="deep-dive" class="${desktopInactive}">Deep Dive</a>
+            </li>
+            <li>
+              <a href="/about" data-nav-key="about" class="${desktopInactive}">About</a>
+            </li>
+            <li>
+              <a href="/contact" data-nav-key="contact" class="${desktopContact}">Contact</a>
+            </li>
+          </ul>
+
+          <!-- Dark Mode Toggle -->
+          <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">&#x2600;&#xFE0F;</span></button>
+
+          <!-- Mobile Menu Toggle -->
+          <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
         </nav>
-        
+
         <!-- Mobile Menu -->
         <div id="mobile-menu" class="hidden md:hidden border-t border-chocolate/10 bg-beige">
-            <ul class="px-6 py-4 space-y-3">
-                <li><a href="/index.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="home">Home</a></li>
-                <li><a href="/projects.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="projects">Projects</a></li>
-                <li><a href="/overview.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="overview">Overview</a></li>
-                <li><a href="/deep-dive.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="deep-dive">Deep Dive</a></li>
-                <li><a href="/about.html" class="block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2" data-nav-key="about">About</a></li>
-                <li><a href="/contact.html" class="block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors text-center dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" data-nav-key="contact">Contact</a></li>
-            </ul>
+          <ul class="px-6 py-4 space-y-3">
+            <li><a href="/" data-nav-key="home" class="${mobileActive}" aria-current="page">Home</a></li>
+            <li><a href="/projects/" data-nav-key="projects" class="${mobileInactive}">Projects</a></li>
+            <li><a href="/overview" data-nav-key="overview" class="${mobileInactive}">Overview</a></li>
+            <li><a href="/deep-dive" data-nav-key="deep-dive" class="${mobileInactive}">Deep Dive</a></li>
+            <li><a href="/about" data-nav-key="about" class="${mobileInactive}">About</a></li>
+            <li><a href="/contact" data-nav-key="contact" class="${mobileContact}">Contact</a></li>
+          </ul>
         </div>
-            `;
+    `;
 
-            if (document.body) {
-                document.body.insertBefore(header, document.body.firstChild);
-            }
-
-            // Ensure content isn't hidden under fixed header
-            const hasMainPad = !!document.querySelector('main.pt-24');
-            if (!hasMainPad) {
-                document.body && document.body.classList && document.body.classList.add('pt-24');
-            }
-
-            // Set EN link to current English path
-            try {
-                const enLink = header.querySelector('[data-lang-key="en"]');
-                if (enLink) {
-                    const p = window.location.pathname || '/';
-                    enLink.href = (p === '/' ? '/index.html' : p);
-                }
-            } catch (e) {}
+    const applyHeaderState = (header) => {
+        const brand = header.querySelector('#brand-logo');
+        if (brand) {
+            if (activeNavKey === 'home') brand.setAttribute('aria-current', 'page');
+            else brand.removeAttribute('aria-current');
         }
+
+        header.querySelectorAll('[data-nav-key]').forEach((link) => {
+            const key = link.getAttribute('data-nav-key');
+            const inMobileMenu = !!link.closest('#mobile-menu');
+            const isContact = key === 'contact';
+            const isActive = key && activeNavKey === key;
+
+            if (isContact) {
+                link.className = inMobileMenu ? mobileContact : desktopContact;
+            } else {
+                link.className = isActive
+                    ? (inMobileMenu ? mobileActive : desktopActive)
+                    : (inMobileMenu ? mobileInactive : desktopInactive);
+            }
+
+            if (isActive) link.setAttribute('aria-current', 'page');
+            else link.removeAttribute('aria-current');
+        });
+    };
+
+    // Header: always normalize to canonical markup for English pages.
+    try {
+        let header = document.querySelector('body > header') || document.querySelector('header');
+        if (!header) {
+            header = document.createElement('header');
+            const firstEl = document.body && document.body.firstElementChild;
+            if (document.body && firstEl) document.body.insertBefore(header, firstEl);
+            else if (document.body) document.body.appendChild(header);
+        }
+
+        header.className = 'fixed top-0 left-0 right-0 z-40 bg-beige/95 backdrop-blur-sm border-b border-chocolate/10';
+        header.innerHTML = buildHeaderMarkup();
+        applyHeaderState(header);
+
+        const main = document.querySelector('main');
+        if (main && !main.classList.contains('pt-24')) main.classList.add('pt-24');
     } catch (e) {}
 
     // Footer: inject only if missing
@@ -2843,15 +2946,15 @@ const __ensureStandardEnglishChrome = () => {
                         <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
-                    <p class="text-sm text-beige/80 leading-relaxed">Chaldean from El Cajon. General Business graduate from SDSU. Building systems, working with people, and turning chaos into clean execution.</p>
+                    <p class="text-sm text-beige/80 leading-relaxed">San Diego State University Alumni with a bachelors in Business Administration. . Aspiring to achieve the best version of me, always.</p>
                 </div>
                 <div class="space-y-4">
                     <h3 class="text-sm font-semibold text-white uppercase tracking-wider">Quick Links</h3>
                     <ul class="space-y-2">
-                        <li><a href="/overview.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
-                        <li><a href="/deep-dive.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
+                        <li><a href="/overview" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Overview</a></li>
+                        <li><a href="/deep-dive" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Deep Dive</a></li>
                         <li><a href="/projects/" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Projects</a></li>
-                        <li><a href="/about.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
+                        <li><a href="/about" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">About</a></li>
                     </ul>
                 </div>
                 <div class="space-y-4">
@@ -2859,14 +2962,14 @@ const __ensureStandardEnglishChrome = () => {
                     <ul class="space-y-2">
                         <li><a href="https://www.linkedin.com/in/estivanayramia" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">LinkedIn ↗</a></li>
                         <li><a href="https://github.com/estivanayramia/" target="_blank" rel="noopener noreferrer" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">GitHub ↗</a></li>
-                        <li><a href="/contact.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
+                        <li><a href="/contact" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Contact</a></li>
                         <li><a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download="" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Resume (PDF)</a></li>
-                        <li><a href="/privacy.html" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
+                        <li><a href="/privacy" class="text-sm text-beige/80 hover:text-white inline-block transition-all hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigodeep rounded">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
             <div class="border-t border-beige/20 pt-8 text-center">
-                <p class="text-sm text-beige/80">© <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
+                <p class="text-sm text-beige/80">&copy; <span id="copyright-year">2025</span> Estivan Ayramia. All rights reserved.</p>
             </div>
         </div>
             `;

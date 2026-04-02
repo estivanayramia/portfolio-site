@@ -2,7 +2,7 @@
   "version": "page-grounding-v1",
   "source": "repo-crawl",
   "baseUrl": "https://www.estivanayramia.com",
-  "buildVersion": "20260329-d93872f",
+  "buildVersion": "20260402-f2ee2c1a",
   "pageCount": 26,
   "pages": [
     {
@@ -13,7 +13,7 @@
       "pageType": "home",
       "title": "Estivan Ayramia | Built to Show More Than a Resume",
       "description": "A direct look at my work, how I think, and what I follow through on.",
-      "buildVersion": "20260329-d93872f",
+      "buildVersion": "20260402-f2ee2c1a",
       "summary": "A direct look at my work, how I think, and what I follow through on.",
       "headings": [
         "Estivan Ayramia | Built to Show More Than a Resume",
@@ -536,7 +536,7 @@
         "/overview",
         "/contact"
       ],
-      "checksum": "fnv1a-4f53c040",
+      "checksum": "fnv1a-4c77547f",
       "keywords": [
         "/about",
         "estivan",
@@ -575,25 +575,26 @@
         {
           "heading": "About | Estivan Ayramia",
           "level": 1,
-          "text": "Estivan Ayramia – Chaldean from El Cajon, General Business graduate from SDSU, and someone who likes work that actually gets finished.\nAbout / more than the work",
+          "text": "Estivan Ayramia – San Diego State University Alumni with a bachelors in Business Administration. . Aspiring to achieve the best version of me, always.\nAbout / more than the work",
           "keywords": [
             "estivan",
             "ayramia",
-            "chaldean",
-            "el",
-            "cajon",
-            "general",
+            "san",
+            "diego",
+            "state",
+            "university",
+            "alumni",
+            "bachelors",
             "business",
-            "graduate",
-            "sdsu",
-            "someone",
-            "likes",
-            "work",
-            "actually",
-            "gets",
-            "finished",
+            "administration",
+            "aspiring",
+            "achieve",
+            "best",
+            "version",
+            "always",
             "more",
-            "than"
+            "than",
+            "work"
           ]
         },
         {
@@ -2182,7 +2183,7 @@
         "/contact",
         "/about"
       ],
-      "checksum": "fnv1a-8df2767f",
+      "checksum": "fnv1a-cafa44bd",
       "keywords": [
         "/deep-dive",
         "think",
@@ -2621,17 +2622,10 @@
         {
           "heading": "What I Am Working On",
           "level": 2,
-          "text": "• \n Saying no to distractions and staying focused on high-impact work\n• \n Being more direct in communication rather than overexplaining\n• \n Delegating tasks instead of trying to do everything myself\n• \n Building patience for long-term projects that take months to see results\n• \n Getting better at public speaking and presenting in front of groups\nHow we got here",
+          "text": "• \n Being more direct in communication rather than overexplaining\n• \n Delegating tasks instead of trying to do everything myself\n• \n Building patience for long-term projects that take months to see results\n• \n Getting better at public speaking and presenting in front of groups\nHow we got here",
           "keywords": [
             "am",
             "working",
-            "saying",
-            "no",
-            "distractions",
-            "staying",
-            "focused",
-            "high-impact",
-            "work",
             "being",
             "more",
             "direct",
@@ -2646,7 +2640,14 @@
             "everything",
             "myself",
             "building",
-            "patience"
+            "patience",
+            "long-term",
+            "projects",
+            "take",
+            "months",
+            "see",
+            "results",
+            "getting"
           ]
         },
         {
@@ -3247,7 +3248,7 @@
       "links": [
         "/about"
       ],
-      "checksum": "fnv1a-8684a37f",
+      "checksum": "fnv1a-18b41cf5",
       "keywords": [
         "/hobbies/car",
         "car",
@@ -3389,20 +3390,32 @@
         {
           "heading": "Mod List",
           "level": 3,
-          "text": "• \n MHD Stage 2 Tune\n• \n Catless Downpipe\n• \n Muffler Delete\nExplore more hobbies",
+          "text": "• \n MHD Stage 2 Tune\n• \n Cold Air Intake\n• \n Upgraded CTS Charge Pipe\n• \n Upgraded MAD Turbo Inlet\n• \n Catless Downpipe\n• \n Muffler Delete\n• \n Front Lip\n• \n Side Skirts\n• \n Rear Diffuser\n• \n 20mm Rear Hubcentric Spacers\n• \n 15mm Front Hubcentric Spacers\nExplore more hobbies",
           "keywords": [
             "mod",
             "list",
             "mhd",
             "stage",
             "tune",
+            "cold",
+            "air",
+            "intake",
+            "upgraded",
+            "cts",
+            "charge",
+            "pipe",
+            "mad",
+            "turbo",
+            "inlet",
             "catless",
             "downpipe",
             "muffler",
             "delete",
-            "explore",
-            "more",
-            "hobbies"
+            "front",
+            "lip",
+            "side",
+            "skirts",
+            "rear"
           ]
         }
       ]
@@ -5327,7 +5340,6 @@
       "summary": "Selected work: what it was, what I made, and why it mattered.",
       "headings": [
         "Projects | Estivan Ayramia",
-        "Selected Work",
         "Not everything I have done. The pages that matter most.",
         "This Website",
         "Isa Grimes Interview",
@@ -5356,7 +5368,7 @@
         "/contact",
         "/deep-dive"
       ],
-      "checksum": "fnv1a-a034db1f",
+      "checksum": "fnv1a-871f72f0",
       "keywords": [
         "/projects/",
         "projects",
@@ -5403,24 +5415,15 @@
         {
           "heading": "Projects | Estivan Ayramia",
           "level": 1,
-          "text": "Selected work",
+          "text": "Portfolio\nDifferent kinds of work, same pattern: figure it out, structure it, finish it.\nHow to browse\nWhat ties these together",
           "keywords": [
             "projects",
             "estivan",
             "ayramia",
-            "selected",
-            "work"
-          ]
-        },
-        {
-          "heading": "Selected Work",
-          "level": 1,
-          "text": "Different kinds of work, same pattern: figure it out, structure it, finish it.\nHow to browse\nWhat ties these together",
-          "keywords": [
-            "selected",
-            "work",
+            "portfolio",
             "different",
             "kinds",
+            "work",
             "same",
             "pattern",
             "figure",
@@ -5436,7 +5439,7 @@
         {
           "heading": "Not everything I have done. The pages that matter most.",
           "level": 2,
-          "text": "Taken together, these pages tell you how I think faster\n than a resume does.\nCurrent set\n7 projects\nThe strongest projects to open first, not every old file in one pile.\nBrowse your way\nCoverflow + roulette\nThe page supports browsing, direct picks, and a quick random entry point.\nWhat connects them\nThe Isa Grimes interview reinforced that people judgment and perspective matter more than titles and theater. The Endpoint playbook showed how structure and positioning can shift a market story. Building this website proved the same mindset works in code too.",
+          "text": "Taken together, these pages tell you how I think faster\n than a resume does.\nCurrent set\n7 projects\nThe strongest projects to open first, not every old file in one pile.\nBrowse your way\nCoverflow + roulette\nThe page supports browsing, direct picks, and a quick random entry point.\nWhat connects them\nThe Isa Grimes interview reinforced that people judgment and perspective matter more than titles and theater. The Endpoint playbook showed how structure and positioning can shift a market story. Building this website with AI proved the same mindset works in product direction too.",
           "keywords": [
             "not",
             "everything",
@@ -5793,7 +5796,7 @@
         "/projects/loreal-maps-campaign",
         "/projects/portfolio"
       ],
-      "checksum": "fnv1a-a17a8b37",
+      "checksum": "fnv1a-51768099",
       "keywords": [
         "/projects/endpoint-competitive-playbook",
         "endpoint",
@@ -6106,16 +6109,16 @@
         {
           "heading": "This Website",
           "level": 3,
-          "text": "Over 300 hours of hand-coded work. Built from scratch.\nView all projects",
+          "text": "Over 300 hours of AI-assisted design, direction, and polish.\nView all projects",
           "keywords": [
             "website",
             "over",
             "300",
             "hours",
-            "hand-coded",
-            "work",
-            "built",
-            "scratch",
+            "ai-assisted",
+            "design",
+            "direction",
+            "polish",
             "view",
             "all",
             "projects"
@@ -6458,7 +6461,7 @@
         "What I Did",
         "Goals per Phase",
         "Campaign Structure",
-        "Want the full Phase 2 retargeting plan?",
+        "Interested in the thinking behind this?",
         "L'Oréal Cell BioPrint Campaign",
         "Franklin Templeton Class Concept"
       ],
@@ -6469,7 +6472,7 @@
         "/projects/loreal-maps-campaign",
         "/projects/franklin-templeton-concept"
       ],
-      "checksum": "fnv1a-ad94e728",
+      "checksum": "fnv1a-f535d9aa",
       "keywords": [
         "/projects/endpoint-linkedin-campaign",
         "endpoint",
@@ -6496,10 +6499,9 @@
         "goals",
         "per",
         "phase",
-        "want",
-        "full",
-        "retargeting",
-        "plan",
+        "interested",
+        "thinking",
+        "behind",
         "al",
         "cell",
         "bioprint",
@@ -6679,20 +6681,19 @@
           ]
         },
         {
-          "heading": "Want the full Phase 2 retargeting plan?",
+          "heading": "Interested in the thinking behind this?",
           "level": 3,
-          "text": "Reach out if you want to talk about a project or role.",
+          "text": "Happy to walk through the strategy or talk about a project.",
           "keywords": [
-            "want",
-            "full",
-            "phase",
-            "retargeting",
-            "plan",
-            "reach",
-            "out",
+            "interested",
+            "thinking",
+            "behind",
+            "happy",
+            "walk",
+            "through",
+            "strategy",
             "talk",
-            "project",
-            "role"
+            "project"
           ]
         },
         {
@@ -7127,7 +7128,7 @@
         "/",
         "/projects/"
       ],
-      "checksum": "fnv1a-e6e975f1",
+      "checksum": "fnv1a-839261f7",
       "keywords": [
         "/projects/isa-grimes-interview",
         "isa",
@@ -7241,7 +7242,7 @@
         {
           "heading": "What Actually Hit",
           "level": 2,
-          "text": "Your 20s are for exposure, not certainty\nWhen I asked him what he would tell a person uncertain about the future, he did not give me some polished five-step plan. He said the first five years after graduation should be full of different roles, industries, and people.\nIt kills the lie that you are supposed to know everything at 22.\nHis point was clear: most people in their 20s do not know yet, so stop pretending certainty is the goal. Get exposure instead. Put yourself in different rooms. Learn different industries. Learn different communication styles. Figure out what actually fits you by living more of life, not less of it.\n&ldquo;The first 5 years of graduation, you have to be in as many different roles and industries and around people as possible.&rdquo;\nDo not rush the route just because you are scared of falling behind\nWhen I pushed him on what advice he would give his younger self to become who he is now, but quicker, I expected some answer about efficiency.\nThat is not what he gave me.\nHe said he would not change the route just to get there faster. He talked about enjoying his 20s, living through things, making mistakes, and becoming the kind of person who could actually carry the role later.\nThat was one of the strongest answers in the whole interview for me, because it rejected the fake obsession with speed. He did not talk like someone desperate to erase the years that formed him. He talked like someone who understood that the route mattered because it made him ready.\n&ldquo;During your 20s, have fun. That&rsquo;s what it&rsquo;s for. But at the same time, expose yourself to different opportunities that are out there.&rdquo;\nPeople beat process\nWhen I asked him what mattered more in his growth &mdash; understanding the organization or knowing how to manage people &mdash; he answered quickly: people.\nThat answer carried the whole page.\nHe made it clear that a lot of organizational knowledge can be learned. What is harder to fake is knowing how to deal with people well. Knowing what makes someone tick. Knowing how to read strengths, weaknesses, timing, ego, confidence, communication style, and what someone actually needs from you.\nThat is what separates a title from actual leadership.\n&ldquo;People, right. Most people don&rsquo;t know how to manage people.&rdquo;\nFavoritism ruins leadership\nOne of the cleanest answers in the interview came when I asked what he learned from people by watching how not to be.\nHe did not dodge. He said favoritism.\nI liked that because it was concrete. Not some vague answer about &ldquo;poor leadership.&rdquo; Favoritism. Giving people room, credit, or movement because you like them, not because they are right for the moment. Once you do that, you poison the room. You make trust thinner. You make standards weaker. You make people feel the hierarchy before they feel the purpose.\n&ldquo;I see a lot of people have favoritism.&rdquo;\nBuild a round table, not a throne\nThe best leadership image he gave me was not corporate at all. It was a round table.\nHe talked about leadership like King Arthur, the Justice League, a room where everybody brings a different angle and different value. The leader still has to make the final call, but the room is not supposed to revolve around one ego.\nIt matched the way he talked the whole time. He did not sound like someone obsessed with status. He sounded like someone who actually believes that people matter, no matter where they sit.\n&ldquo;Everyone is equal. I don&rsquo;t care if you&rsquo;re the garbage man. I don&rsquo;t care if you&rsquo;re a CMO.&rdquo;\nThe most human answer had nothing to do with work\nWhen I asked him what experience taught him something real about leadership, he did not go straight to a job. He went to marriage, growing up, and realizing life was not just about him.\nThat was probably the most human answer in the interview.\nLeadership is shallow if it only exists at work. If you still move through life like your choices only affect you, then the title does not mean much. The real shift came when he started asking a harder question: not &ldquo;am I technically wrong?&rdquo; but &ldquo;what does this do to the other person?&rdquo;\nThat answer had more leadership in it than most leadership answers do.\nLeadership starts before the title does\nI also liked what he said about who he used to be as an employee.\nHe admitted that earlier in his career he was more of a blind doer. He was getting tasks done without really understanding the bigger meaning behind them. Then he started changing the way he carried himself. He started dressing like he wanted to lead. Looking for stretch work. Shadowing other functions. Reading more. Asking bigger questions. Acting like the next role before he had it.\nThat answer mattered because too many people talk about leadership like it begins the day they get authority. It does not. It starts way earlier than that &mdash; in how you learn, how you carry yourself, what extra weight you take on, and whether people can trust you before you are in charge of anything.\nRoots. Trees. Forest.\n&ldquo;There&rsquo;s three levels in life: roots, trees, and forest.&rdquo;\nThis was one of the best frameworks in the entire conversation.\nHe said life has three levels: roots, trees, and forest.\nSometimes you are down in the roots doing the immediate work. Sometimes you are in the trees looking at the next level up. Sometimes you are in the forest asking where all of this is going. What I liked is that he did not present those like fixed ranks. He treated them like positions you move through depending on the situation.\nThat made the idea useful instead of decorative.\nNo one is omnipresent\nThe introspection part of the interview was strong because it was honest about trade-offs.\nHe said you cannot be everywhere for everyone. You are going to give time to one thing and take time from another. You are going to disappoint somebody. You are going to make choices that help one responsibility and cost another one.\nThat is real life.\nWhat mattered was not pretending balance is easy. What mattered was knowing that trade-offs are unavoidable and still trying to make the right call for the people and responsibilities that matter most in that moment.\n&ldquo;No one is omnipresent.&rdquo;\n&ldquo;Spend time with the ones you love.&rdquo;",
+          "text": "Your 20s are for exposure, not certainty\nWhen I asked him what he would tell a person uncertain about the future, he did not give me some polished five-step plan. He said the first five years after graduation should be full of different roles, industries, and people.\nIt kills the lie that you are supposed to know everything at 22.\nHis point was clear: most people in their 20s do not know yet, so stop pretending certainty is the goal. Get exposure instead. Put yourself in different rooms. Learn different industries. Learn different communication styles. Figure out what actually fits you by living more of life, not less of it.\n&ldquo;The first 5 years of graduation, you have to be in as many different roles and industries and around people as possible.&rdquo;\nDo not rush the route just because you are scared of falling behind\nWhen I pushed him on what advice he would give his younger self to become who he is now, but quicker, I expected some answer about efficiency.\nThat is not what he gave me.\nHe said he would not change the route just to get there faster. He talked about enjoying his 20s, living through things, making mistakes, and becoming the kind of person who could actually carry the role later.\nThat was one of the strongest answers in the whole interview for me, because it rejected the fake obsession with speed. He did not talk like someone desperate to erase the years that formed him. He talked like someone who understood that the route mattered because it made him ready.\n&ldquo;During your 20s, have fun. That&rsquo;s what it&rsquo;s for. But at the same time, expose yourself to different opportunities that are out there.&rdquo;\nPeople beat process\nWhen I asked him what mattered more in his growth &mdash; understanding the organization or knowing how to manage people &mdash; he answered quickly: people.\nThat answer carried the whole page.\nHe made it clear that a lot of organizational knowledge can be learned. What is harder to fake is knowing how to deal with people well. Knowing what makes someone tick. Knowing how to read strengths, weaknesses, timing, ego, confidence, communication style, and what someone actually needs from you.\nThat is what separates a title from actual leadership.\n&ldquo;Most people don&rsquo;t know how to manage people.&rdquo;\nFavoritism ruins leadership\nOne of the cleanest answers in the interview came when I asked what he learned from people by watching how not to be.\nHe did not dodge. He said favoritism.\nI liked that because it was concrete. Not some vague answer about &ldquo;poor leadership.&rdquo; Favoritism. Giving people room, credit, or movement because you like them, not because they are right for the moment. Once you do that, you poison the room. You make trust thinner. You make standards weaker. You make people feel the hierarchy before they feel the purpose.\n&ldquo;I see a lot of people have favoritism.&rdquo;\nBuild a round table, not a throne\nThe best leadership image he gave me was not corporate at all. It was a round table.\nHe talked about leadership like King Arthur, the Justice League, a room where everybody brings a different angle and different value. The leader still has to make the final call, but the room is not supposed to revolve around one ego.\nIt matched the way he talked the whole time. He did not sound like someone obsessed with status. He sounded like someone who actually believes that people matter, no matter where they sit.\n&ldquo;Everyone is equal. I don&rsquo;t care if you&rsquo;re the garbage man. I don&rsquo;t care if you&rsquo;re a CMO.&rdquo;\nThe most human answer had nothing to do with work\nWhen I asked him what experience taught him something real about leadership, he did not go straight to a job. He went to marriage, growing up, and realizing life was not just about him.\nThat was probably the most human answer in the interview.\nLeadership is shallow if it only exists at work. If you still move through life like your choices only affect you, then the title does not mean much. The real shift came when he started asking a harder question: not &ldquo;am I technically wrong?&rdquo; but &ldquo;what does this do to the other person?&rdquo;\nThat answer had more leadership in it than most leadership answers do.\nLeadership starts before the title does\nI also liked what he said about who he used to be as an employee.\nHe admitted that earlier in his career he was more of a blind doer. He was getting tasks done without really understanding the bigger meaning behind them. Then he started changing the way he carried himself. He started dressing like he wanted to lead. Looking for stretch work. Shadowing other functions. Reading more. Asking bigger questions. Acting like the next role before he had it.\nThat answer mattered because too many people talk about leadership like it begins the day they get authority. It does not. It starts way earlier than that &mdash; in how you learn, how you carry yourself, what extra weight you take on, and whether people can trust you before you are in charge of anything.\nRoots. Trees. Forest.\n&ldquo;There&rsquo;s three levels in life: roots, trees, and forest.&rdquo;\nThis was one of the best frameworks in the entire conversation.\nHe said life has three levels: roots, trees, and forest.\nSometimes you are down in the roots doing the immediate work. Sometimes you are in the trees looking at the next level up. Sometimes you are in the forest asking where all of this is going. What I liked is that he did not present those like fixed ranks. He treated them like positions you move through depending on the situation.\nThat made the idea useful instead of decorative.\nNo one is omnipresent\nThe introspection part of the interview was strong because it was honest about trade-offs.\nHe said you cannot be everywhere for everyone. You are going to give time to one thing and take time from another. You are going to disappoint somebody. You are going to make choices that help one responsibility and cost another one.\nThat is real life.\nWhat mattered was not pretending balance is easy. What mattered was knowing that trade-offs are unavoidable and still trying to make the right call for the people and responsibilities that matter most in that moment.\n&ldquo;No one is omnipresent.&rdquo;\n&ldquo;Spend time with the ones you love.&rdquo;",
           "keywords": [
             "actually",
             "hit",
@@ -7303,7 +7304,7 @@
         {
           "heading": "Selected Lines",
           "level": 2,
-          "text": "These are the lines I would keep even if the rest of the page disappeared.\n&ldquo;The first 5 years of graduation, you have to be in as many different roles and industries and around people as possible.&rdquo;\n&ldquo;During your 20s, have fun. That&rsquo;s what it&rsquo;s for. But at the same time, expose yourself to different opportunities that are out there.&rdquo;\n&ldquo;People, right. Most people don&rsquo;t know how to manage people.&rdquo;\n&ldquo;I see a lot of people have favoritism.&rdquo;\n&ldquo;Everyone is equal. I don&rsquo;t care if you&rsquo;re the garbage man. I don&rsquo;t care if you&rsquo;re a CMO.&rdquo;\n&ldquo;There&rsquo;s three levels in life: roots, trees, and forest.&rdquo;\n&ldquo;Spend time with the ones you love.&rdquo;",
+          "text": "These are the lines I would keep even if the rest of the page disappeared.\n&ldquo;The first 5 years of graduation, you have to be in as many different roles and industries and around people as possible.&rdquo;\n&ldquo;During your 20s, have fun. That&rsquo;s what it&rsquo;s for. But at the same time, expose yourself to different opportunities that are out there.&rdquo;\n&ldquo;Most people don&rsquo;t know how to manage people.&rdquo;\n&ldquo;I see a lot of people have favoritism.&rdquo;\n&ldquo;Everyone is equal. I don&rsquo;t care if you&rsquo;re the garbage man. I don&rsquo;t care if you&rsquo;re a CMO.&rdquo;\n&ldquo;There&rsquo;s three levels in life: roots, trees, and forest.&rdquo;\n&ldquo;Spend time with the ones you love.&rdquo;",
           "keywords": [
             "selected",
             "lines",
@@ -7383,7 +7384,7 @@
         "Objectives (Conceptual)",
         "Campaign Assets (Concepts)",
         "Business Case Insights",
-        "Want the concept deck?",
+        "Questions about this project?",
         "Taking Down Endpoint"
       ],
       "links": [
@@ -7391,7 +7392,7 @@
         "/contact",
         "/projects/endpoint-linkedin-campaign"
       ],
-      "checksum": "fnv1a-4d2b6ccf",
+      "checksum": "fnv1a-e6cae835",
       "keywords": [
         "/projects/loreal-maps-campaign",
         "loreal",
@@ -7424,8 +7425,8 @@
         "assets",
         "concepts",
         "insights",
-        "want",
-        "concept",
+        "questions",
+        "project",
         "taking",
         "down",
         "endpoint"
@@ -7666,19 +7667,19 @@
           ]
         },
         {
-          "heading": "Want the concept deck?",
+          "heading": "Questions about this project?",
           "level": 3,
-          "text": "Happy to share how the persona funnels and touchpoints are structured.",
+          "text": "Happy to walk through the deck or talk about the thinking behind it.",
           "keywords": [
-            "want",
-            "concept",
-            "deck",
+            "questions",
+            "project",
             "happy",
-            "share",
-            "persona",
-            "funnels",
-            "touchpoints",
-            "structured"
+            "walk",
+            "through",
+            "deck",
+            "talk",
+            "thinking",
+            "behind"
           ]
         },
         {
@@ -7714,7 +7715,7 @@
         "Portfolio Build | Estivan Ayramia",
         "This Website",
         "Why This Way",
-        "What I Built",
+        "What I Directed",
         "Static HTML, Tailwind CSS, vanilla JavaScript",
         "GSAP with ScrollTrigger",
         "Offline-ready build",
@@ -7736,7 +7737,7 @@
         "/projects/endpoint-competitive-playbook",
         "/projects/loreal-maps-campaign"
       ],
-      "checksum": "fnv1a-e5035990",
+      "checksum": "fnv1a-dcb58c98",
       "keywords": [
         "/projects/portfolio",
         "portfolio",
@@ -7754,6 +7755,7 @@
         "make",
         "work",
         "website",
+        "directed",
         "static",
         "html",
         "tailwind",
@@ -7776,8 +7778,7 @@
         "tech",
         "stack",
         "learned",
-        "like",
-        "see"
+        "like"
       ],
       "sections": [
         {
@@ -7857,11 +7858,11 @@
           ]
         },
         {
-          "heading": "What I Built",
+          "heading": "What I Directed",
           "level": 2,
           "text": "01 / Stack",
           "keywords": [
-            "built",
+            "directed",
             "01",
             "stack"
           ]
