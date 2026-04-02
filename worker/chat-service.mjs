@@ -210,8 +210,8 @@ const PERSONAL_KNOWLEDGE = {
 
 const SURFACE_FACT_PATTERNS = [
   { key: "favorite_color", pattern: /\b(favo[u]?rite|like).*(color|colour)|what.*(color|colour).*(like|favorite)\b/i },
-  { key: "favorite_movie", pattern: /\b(favo[u]?rite|best).*movie|what.*movie.*(favorite|like)\b/i },
-  { key: "favorite_show", pattern: /\b(favo[u]?rite|best).*(show|shows|series)|what.*(tv|show|series).*(favorite|watch)\b/i },
+  { key: "favorite_movie", pattern: /\b(favo[u]?rite).*movie\b|\bwhat.*movie.*(favorite|like)\b|\bbest movie\b/i },
+  { key: "favorite_show", pattern: /\b(favo[u]?rite).*(show|shows|series|tv)\b|\bwhat.*(tv|series).*(watch|like)\b|\bwhat shows? does he watch\b/i },
   { key: "favorite_book", pattern: /\b(favo[u]?rite|best).*book|what.*book.*(favorite|like)\b/i },
   { key: "favorite_music", pattern: /\b(favo[u]?rite|best).*(music|artist|artists|band|bands)|what.*(listen to|music|artist|band)\b/i },
   { key: "favorite_food", pattern: /\b(favo[u]?rite|best).*(food|foods|meal)|what.*(eat|food|meal|dessert|pizza|pasta)\b/i },
@@ -775,7 +775,7 @@ function classifyQuestion(message) {
   if (/\b(what does this site prove|what does the site prove|what does the website prove)\b/.test(lower)) {
     return QUESTION_CLASSES.SITE_PROOF;
   }
-  if (/\b(projects|work samples|what have you done|what projects|which project|recommend|start with|look at first|best project|top project|strongest|most impressive|what should I (see|look|check|open))\b/i.test(lower)) {
+  if (/\b(projects|work samples|what have you done|what projects|which project|recommend|start with|look at first|best project|top project|strongest|most impressive|what should I (see|look|check|open))\b/i.test(lower) || /\bproject.*(best|show|demonstrat|prov)\b/i.test(lower) || /\bbest (show|demonstrat|prov).*(project|work|execution|initiative|skill)\b/i.test(lower)) {
     return QUESTION_CLASSES.PROJECT_LIST;
   }
   if (/\b(languages|speak|write in|english|arabic|chaldean|spanish)\b/.test(lower)) {
