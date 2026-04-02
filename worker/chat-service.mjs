@@ -229,11 +229,11 @@ const SURFACE_FACT_PATTERNS = [
   { key: "strengths", pattern: /\bstrengths?|good at|best at|strongest\b/i },
   { key: "weaknesses", pattern: /\bweakness(es)?|working on|improving|growth area\b/i },
   { key: "hobbies", pattern: /\bhobb(y|ies)|free time|fun|do for fun|outside work\b/i },
-  { key: "car", pattern: /\bcar|bmw|540i|drive|vehicle|mods|modification\b/i },
-  { key: "skills", pattern: /\bskills?|crm|salesforce|hubspot|tools|certif\b/i },
-  { key: "heritage", pattern: /\bchaldean|heritage|background|refugee|iraq\b/i },
-  { key: "family", pattern: /\bbrother|sibling|parent|mom|dad|father|mother|family\b/i },
-  { key: "values", pattern: /\bvalues?|believe|principl|philosophy|work ethic\b/i },
+  { key: "car", pattern: /\b(bmw|540i|mods|modification)\b|\bhis car\b|\bcar mods\b|\bwhat car\b/i },
+  { key: "skills", pattern: /\b(crm|salesforce|hubspot|pardot|certif)\b|\bhis skills\b|\bwhat skills\b|\btools does he\b/i },
+  { key: "heritage", pattern: /\b(chaldean|refugee|iraqi?)\b|\bhis (heritage|background)\b/i },
+  { key: "family", pattern: /\b(brother|sibling|parent)s?\b|\bhis (mom|dad|father|mother|family)\b|\bdoes he have (brothers|siblings|family)\b/i },
+  { key: "values", pattern: /\bhis values\b|\bwhat does he value\b|\bwhat.*believe\b|\bwork ethic\b|\bphilosophy\b/i },
   { key: "zodiac", pattern: /\bzodiac|star sign|astrolog|aquarius\b/i }
 ];
 
