@@ -92,8 +92,6 @@ const MOTION_PROFILES = {
   }
 };
 
-<<<<<<< HEAD
-=======
 const CANONICAL_PREMIUM_POSITIONS = {
   center: {
     rotateY: 0,
@@ -230,7 +228,6 @@ const GALLERY_STANDARD_POSITIONS = {
   }
 };
 
->>>>>>> d3209cc7 (fix(carousel): harden shared interaction settling)
 const MOBILE_POSITIONS = {
   center: {
     rotateY: 0,
@@ -1585,15 +1582,12 @@ export class LuxuryCoverflow {
       || this.container.dataset?.miniCarousel === 'true';
 
     const profile = computePerformanceProfile();
-<<<<<<< HEAD
-=======
     const defaultTier = this.isLuxurySectionSurface
       ? 'premium'
       : (this.isGalleryMiniSurface ? 'enhanced' : profile.tier);
->>>>>>> d3209cc7 (fix(carousel): harden shared interaction settling)
     const resolvedTier = getReducedMotionPreference()
       ? 'reduced'
-      : normalizeTier(options.performanceTier) || profile.tier;
+      : normalizeTier(options.performanceTier) || defaultTier;
 
     this.motion = MOTION_PROFILES[resolvedTier] || MOTION_PROFILES.enhanced;
     this.profile = {
@@ -1614,14 +1608,11 @@ export class LuxuryCoverflow {
       performanceTier: resolvedTier,
       animationEase: 'power3.inOut',
       surface: 'default',
-<<<<<<< HEAD
-=======
       geometryProfile: this.isLuxurySectionSurface
         ? 'about-premium'
         : (this.isGalleryMiniSurface ? 'gallery-standard' : 'adaptive'),
       rememberLastCard: this.isGalleryMiniSurface || this.isLuxurySectionSurface,
       memoryKey: null,
->>>>>>> d3209cc7 (fix(carousel): harden shared interaction settling)
       activeStateClass: 'coverflow-card--active',
       maxVisibleDots: 7,
       itemRoleDescription: 'slide',
@@ -1759,6 +1750,7 @@ export class LuxuryCoverflow {
     this.container.dataset.coverflowReady = 'true';
     this.container.dataset.coverflowTier = this.profile.tier;
     this.container.dataset.coverflowSurface = this.config.surface;
+    this.container.dataset.coverflowGeometry = this.config.geometryProfile;
     this.container.style.setProperty('--luxury-glow-strength', String(this.motion.glowStrength));
     this.container.style.setProperty('--luxury-reflection-opacity', String(this.motion.reflectionOpacity));
 
@@ -1797,18 +1789,13 @@ export class LuxuryCoverflow {
 
   getEngineConfig() {
     const isCompactViewport = window.innerWidth < 960;
-<<<<<<< HEAD
-=======
     const isCanonicalGeometry = this.config.geometryProfile === 'about-premium'
       || this.config.geometryProfile === 'canonical-premium';
     const isGalleryStandardGeometry = this.config.geometryProfile === 'gallery-standard';
->>>>>>> d3209cc7 (fix(carousel): harden shared interaction settling)
     const config = {
       infiniteLoop: this.config.infiniteLoop
     };
 
-<<<<<<< HEAD
-=======
     if (isCanonicalGeometry) {
       config.positions = CANONICAL_PREMIUM_POSITIONS;
       return config;
@@ -1819,7 +1806,6 @@ export class LuxuryCoverflow {
       return config;
     }
 
->>>>>>> d3209cc7 (fix(carousel): harden shared interaction settling)
     if (isCompactViewport) {
       config.positions = MOBILE_POSITIONS;
     }

@@ -1094,31 +1094,37 @@
 
 @media (max-width: 640px) {
   :root {
-    --card-width: 80vw;
-    --card-height: min(calc(var(--card-width) * 1.5), calc(55vh - 20px));
+    --card-width: clamp(240px, 72vw, 300px);
+    --card-height: min(calc(var(--card-width) * 1.5), 450px);
   }
   
   .coverflow-section {
-    padding: 3rem 1rem;
+    padding: 3rem 1rem 2.25rem;
     clip-path: inset(0);
+    overflow: visible;
   }
   
   .coverflow-container {
-    height: calc(60vh + 4rem);
-    min-height: 400px;
-    padding-bottom: 7rem;
-    padding-top: 4rem;
+    height: clamp(620px, 74vh, 720px);
+    min-height: 620px;
+    padding-bottom: 8.75rem;
+    padding-top: 3.5rem;
   }
 
   .coverflow-section--no-header .coverflow-container {
-    padding-top: 2.5rem;
+    padding-top: 3rem;
+  }
+
+  .coverflow-section--no-header .coverflow-track {
+    top: calc(50% + 0.25rem);
   }
 
   .coverflow-controls {
     position: static;
     transform: none;
     justify-content: center;
-    margin-top: 1rem;
+    margin-top: 2.75rem;
+    padding-bottom: 0.25rem;
   }
   
   .coverflow-perspective {
@@ -1278,14 +1284,3 @@
         text-overflow: ellipsis;
     }
 }
-<<<<<<< HEAD
-
-/* Games carousel: extra bottom padding to prevent arrow overlap with cards */
-#arcade-featured-carousel .coverflow-container {
-    padding-bottom: 8rem;
-}
-#arcade-featured-carousel .coverflow-controls {
-    bottom: 1rem;
-}
-=======
->>>>>>> d3209cc7 (fix(carousel): harden shared interaction settling)
