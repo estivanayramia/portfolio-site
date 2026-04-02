@@ -531,21 +531,71 @@ function draw() {
     ctx.fillText('BOSS', boss.x + boss.w / 2, barY - 4);
   }
 
-  // Aliens with gradient and slight glow
-  aliens.forEach((a) => {
+  // Aliens — pixel-art style creatures with glow and animation
+  const alienFrame = Math.floor(Date.now() / 400) % 2; // subtle animation toggle
+  aliens.forEach((a, idx) => {
     if (!a.alive) return;
     ctx.save();
-    const alienGrad = ctx.createLinearGradient(a.x, a.y, a.x + a.w, a.y + a.h);
-    alienGrad.addColorStop(0, 'rgba(255,80,80,0.95)');
-    alienGrad.addColorStop(1, 'rgba(200,40,60,0.9)');
-    ctx.shadowColor = 'rgba(255,80,80,0.3)';
-    ctx.shadowBlur = 6;
-    ctx.fillStyle = alienGrad;
-    ctx.fillRect(a.x, a.y, a.w, a.h);
-    // Inner detail: eyes
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    ctx.fillRect(a.x + 4, a.y + 5, 4, 4);
-    ctx.fillRect(a.x + 12, a.y + 5, 4, 4);
+    // Row-based color palette: each row gets a different hue
+    const row = Math.floor(idx / 11) || 0;
+    const palettes = [
+      { body: '#ff6b6b', glow: 'rgba(255,107,107,0.4)', accent: '#c0392b' },
+      { body: '#a29bfe', glow: 'rgba(162,155,254,0.4)', accent: '#6c5ce7' },
+      { body: '#55efc4', glow: 'rgba(85,239,196,0.4)', accent: '#00b894' },
+      { body: '#ffeaa7', glow: 'rgba(255,234,167,0.4)', accent: '#fdcb6e' },
+      { body: '#fd79a8', glow: 'rgba(253,121,168,0.4)', accent: '#e84393' },
+    ];
+    const pal = palettes[row % palettes.length];
+    const cx = a.x + a.w / 2;
+    const cy = a.y + a.h / 2;
+    // Glow
+    ctx.shadowColor = pal.glow;
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = pal.body;
+    // Body — rounded with notched bottom (pixel invader silhouette)
+    ctx.beginPath();
+    ctx.roundRect(a.x + 2, a.y + 2, a.w - 4, a.h - 6, 4);
+    ctx.fill();
+    // Antenna / horns
+    ctx.fillStyle = pal.accent;
+    if (alienFrame === 0) {
+      ctx.fillRect(a.x + 3, a.y - 2, 3, 4);
+      ctx.fillRect(a.x + a.w - 6, a.y - 2, 3, 4);
+    } else {
+      ctx.fillRect(a.x + 2, a.y - 3, 3, 5);
+      ctx.fillRect(a.x + a.w - 5, a.y - 3, 3, 5);
+    }
+    // Eyes — glowing dots
+    ctx.shadowColor = '#fff';
+    ctx.shadowBlur = 4;
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(a.x + 6, a.y + 8, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(a.x + a.w - 6, a.y + 8, 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    // Pupils — look toward player
+    ctx.fillStyle = pal.accent;
+    const lookX = player ? Math.sign(player.x - cx) * 0.8 : 0;
+    ctx.beginPath();
+    ctx.arc(a.x + 6 + lookX, a.y + 8.5, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(a.x + a.w - 6 + lookX, a.y + 8.5, 1.2, 0, Math.PI * 2);
+    ctx.fill();
+    // Legs — animated
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = pal.body;
+    if (alienFrame === 0) {
+      ctx.fillRect(a.x + 3, a.y + a.h - 5, 3, 5);
+      ctx.fillRect(a.x + a.w - 6, a.y + a.h - 5, 3, 5);
+      ctx.fillRect(a.x + a.w / 2 - 1, a.y + a.h - 4, 3, 4);
+    } else {
+      ctx.fillRect(a.x + 1, a.y + a.h - 4, 3, 4);
+      ctx.fillRect(a.x + a.w - 4, a.y + a.h - 4, 3, 4);
+      ctx.fillRect(a.x + a.w / 2 - 2, a.y + a.h - 5, 4, 5);
+    }
     ctx.restore();
   });
 

@@ -210,8 +210,8 @@ const PERSONAL_KNOWLEDGE = {
 
 const SURFACE_FACT_PATTERNS = [
   { key: "favorite_color", pattern: /\b(favo[u]?rite|like).*(color|colour)|what.*(color|colour).*(like|favorite)\b/i },
-  { key: "favorite_movie", pattern: /\b(favo[u]?rite|best).*movie|what.*movie.*(favorite|like)\b/i },
-  { key: "favorite_show", pattern: /\b(favo[u]?rite|best).*(show|shows|series)|what.*(tv|show|series).*(favorite|watch)\b/i },
+  { key: "favorite_movie", pattern: /\b(favo[u]?rite).*movie\b|\bwhat.*movie.*(favorite|like)\b|\bbest movie\b/i },
+  { key: "favorite_show", pattern: /\b(favo[u]?rite).*(show|shows|series|tv)\b|\bwhat.*(tv|series).*(watch|like)\b|\bwhat shows? does he watch\b/i },
   { key: "favorite_book", pattern: /\b(favo[u]?rite|best).*book|what.*book.*(favorite|like)\b/i },
   { key: "favorite_music", pattern: /\b(favo[u]?rite|best).*(music|artist|artists|band|bands)|what.*(listen to|music|artist|band)\b/i },
   { key: "favorite_food", pattern: /\b(favo[u]?rite|best).*(food|foods|meal)|what.*(eat|food|meal|dessert|pizza|pasta)\b/i },
@@ -752,6 +752,9 @@ function classifyQuestion(message) {
     return QUESTION_CLASSES.RESUME;
   }
   if (/\b(why hire|more experience|hire you|hire him|worth interviewing|recruiter|quick pitch|elevator pitch|sell me on|convince me|pitch me)\b/.test(lower)) {
+    if (/\b(project|projects|which project|one project|start with|look at first|open first|read first|best project|top project)\b/.test(lower)) {
+      return QUESTION_CLASSES.PROJECT_LIST;
+    }
     return QUESTION_CLASSES.HIRE_CASE;
   }
   if (/\b(mostly ai|just ai|is this ai|real skill|actually skilled|just chatgpt|just gpt|chatgpt with|gpt wrapper|ai wrapper|is savonie|savonie just)\b/.test(lower)) {
@@ -775,7 +778,7 @@ function classifyQuestion(message) {
   if (/\b(what does this site prove|what does the site prove|what does the website prove)\b/.test(lower)) {
     return QUESTION_CLASSES.SITE_PROOF;
   }
-  if (/\b(projects|work samples|what have you done|what projects|which project|recommend|start with|look at first|best project|top project|strongest|most impressive|what should I (see|look|check|open))\b/i.test(lower)) {
+  if (/\b(projects|work samples|what have you done|what projects|which project|recommend|start with|look at first|best project|top project|strongest|most impressive|what should i (see|look|check|open|read)|read first)\b/i.test(lower) || /\bproject.*(best|show|demonstrat|prov)\b/i.test(lower) || /\bbest (show|demonstrat|prov).*(project|work|execution|initiative|skill)\b/i.test(lower)) {
     return QUESTION_CLASSES.PROJECT_LIST;
   }
   if (/\b(languages|speak|write in|english|arabic|chaldean|spanish)\b/.test(lower)) {
@@ -1214,8 +1217,50 @@ function buildDeterministicReply({ message, questionClass, surfaceFactKey, profi
         "The strongest proof is not just that he launched a site. It is that the site, the projects, and the About material all show the same pattern: structure, judgment, iteration, and follow-through.",
         `${formatInternalLink("The site build page", "/projects/portfolio")} is the clearest single example.`
       ].join(" ");
-    case QUESTION_CLASSES.PROJECT_LIST:
+    case QUESTION_CLASSES.PROJECT_LIST: {
+      // Smart single-project recommendation based on user intent.
+      // Use grounded facts first, then fall back to static knowledge if needed.
+      const ml = String(message || "").toLowerCase();
+      const projects = Array.isArray(siteFacts?.projects) && siteFacts.projects.length
+        ? siteFacts.projects
+        : (Array.isArray(PERSONAL_KNOWLEDGE.projects) ? PERSONAL_KNOWLEDGE.projects : []);
+      const findProject = (...candidates) => {
+        for (const candidate of candidates) {
+          const found = projects.find((p) => p?.id === candidate || p?.url === candidate);
+          if (found) return found;
+        }
+        return null;
+      };
+      let pick = null;
+      let why = '';
+      if (/marketing|campaign|funnel|persona|ads|retarget/.test(ml)) {
+        pick = findProject('loreal-cell-bioprint', '/projects/loreal-maps-campaign') || findProject('endpoint-linkedin-campaign', '/projects/endpoint-linkedin-campaign');
+        why = 'It maps three personas across a full marketing funnel with touchpoints by stage.';
+      } else if (/strateg|competitive|analys|position|swot|market(?!ing)/.test(ml)) {
+        pick = findProject('taking-down-endpoint', '/projects/endpoint-competitive-playbook');
+        why = 'It is a competitive strategy playbook that shows structured analysis, SWOT work, and market positioning.';
+      } else if (/multilingual|arabic|language|cultur|international|bilingual/.test(ml)) {
+        pick = findProject('franklin-templeton', '/projects/franklin-templeton-concept');
+        why = 'He built the Arabic version of a campaign deck targeting UAE investors, reviewed by his family for accuracy.';
+      } else if (/people|leadership|interview|judgment|team|soft skill|emotional/.test(ml)) {
+        pick = findProject('isa-grimes-interview', '/projects/isa-grimes-interview');
+        why = 'It is a real conversation with a CMO about people skills, leadership, and why perspective matters more than titles.';
+      } else if (/execut|initiative|follow.?through|built|ship|technical|website|proof/.test(ml)) {
+        pick = findProject('this-website', '/projects/portfolio');
+        why = 'Over 300 hours of directing AI tools to build this site from scratch with no coding background. That is initiative and follow-through.';
+      } else if (/recruiter|hiring|quick|fast|30 sec|impress|strongest|best/.test(ml)) {
+        pick = findProject('isa-grimes-interview', '/projects/isa-grimes-interview');
+        why = 'It shows how he thinks about people, which is the hardest thing to prove on paper. Then check This Website for execution proof.';
+      } else {
+        // Default: Isa Grimes Interview — shows depth, people, real conversation
+        pick = findProject('isa-grimes-interview', '/projects/isa-grimes-interview');
+        why = 'It shows real thinking about people and leadership, which is the hardest thing to put on a resume. Start there, then explore based on what you care about.';
+      }
+      if (pick) {
+        return `Start with [${pick.title}](${pick.url}). ${why}`;
+      }
       return formatProjectList(siteFacts);
+    }
     case QUESTION_CLASSES.PAGE_SPECIFIC:
       return buildPageSpecificReply(retrieval, message);
     case QUESTION_CLASSES.BOUNDARY:

@@ -52,6 +52,10 @@
   overflow: hidden;
 }
 
+#arcade-featured-carousel.coverflow-section {
+  overflow: visible;
+}
+
 .coverflow-header {
   text-align: center;
   margin-bottom: clamp(2rem, 5vw, 4rem);

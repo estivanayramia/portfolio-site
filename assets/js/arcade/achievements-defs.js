@@ -255,6 +255,38 @@ export const ACHIEVEMENTS = {
         icon: '🚀'
     },
 
+    // Flappy Face Achievements
+    flappy_first_pipe: { id: 'flappy_first_pipe', game: 'flappy', title: 'Through the Gap', description: 'Pass your first pipe', difficulty: 'Easy', icon: '🎯' },
+    flappy_score_10: { id: 'flappy_score_10', game: 'flappy', title: 'Double Digits', description: 'Score 10 points', difficulty: 'Easy', icon: '🔟' },
+    flappy_score_25: { id: 'flappy_score_25', game: 'flappy', title: 'Quarter Century', description: 'Score 25 points', difficulty: 'Medium', icon: '⭐' },
+    flappy_score_50: { id: 'flappy_score_50', game: 'flappy', title: 'Fifty Fly', description: 'Score 50 points', difficulty: 'Hard', icon: '🏅' },
+    flappy_score_100: { id: 'flappy_score_100', game: 'flappy', title: 'Centurion', description: 'Score 100 points', difficulty: 'Legendary', icon: '👑' },
+    flappy_best_5: { id: 'flappy_best_5', game: 'flappy', title: 'Getting the Hang', description: 'Set a best score of 5+', difficulty: 'Easy', icon: '📈' },
+
+    // Color Match Achievements
+    colormatch_first: { id: 'colormatch_first', game: 'colormatch', title: 'True Colors', description: 'Get your first correct match', difficulty: 'Easy', icon: '🎨' },
+    colormatch_streak_5: { id: 'colormatch_streak_5', game: 'colormatch', title: 'Hot Streak', description: 'Get 5 correct in a row', difficulty: 'Easy', icon: '🔥' },
+    colormatch_streak_10: { id: 'colormatch_streak_10', game: 'colormatch', title: 'On Fire', description: 'Get 10 correct in a row', difficulty: 'Medium', icon: '💥' },
+    colormatch_score_20: { id: 'colormatch_score_20', game: 'colormatch', title: 'Sharp Eye', description: 'Score 20+ in one round', difficulty: 'Medium', icon: '👁️' },
+    colormatch_score_40: { id: 'colormatch_score_40', game: 'colormatch', title: 'Color Master', description: 'Score 40+ in one round', difficulty: 'Hard', icon: '🏆' },
+    colormatch_combo_3: { id: 'colormatch_combo_3', game: 'colormatch', title: 'Combo King', description: 'Reach 3x combo multiplier', difficulty: 'Medium', icon: '⚡' },
+
+    // Gravity Runner Achievements
+    gravrunner_first_dodge: { id: 'gravrunner_first_dodge', game: 'gravrunner', title: 'First Flip', description: 'Dodge your first obstacle', difficulty: 'Easy', icon: '🔄' },
+    gravrunner_score_500: { id: 'gravrunner_score_500', game: 'gravrunner', title: 'Runner Up', description: 'Score 500 distance', difficulty: 'Easy', icon: '🏃' },
+    gravrunner_score_2000: { id: 'gravrunner_score_2000', game: 'gravrunner', title: 'Marathon', description: 'Score 2000 distance', difficulty: 'Medium', icon: '🏅' },
+    gravrunner_score_5000: { id: 'gravrunner_score_5000', game: 'gravrunner', title: 'Ultramarathon', description: 'Score 5000 distance', difficulty: 'Hard', icon: '🌟' },
+    gravrunner_obstacles_10: { id: 'gravrunner_obstacles_10', game: 'gravrunner', title: 'Weaver', description: 'Dodge 10 obstacles in one run', difficulty: 'Easy', icon: '🕸️' },
+    gravrunner_obstacles_50: { id: 'gravrunner_obstacles_50', game: 'gravrunner', title: 'Untouchable', description: 'Dodge 50 obstacles in one run', difficulty: 'Hard', icon: '💎' },
+
+    // Hex Memory Achievements
+    hexmemory_level_1: { id: 'hexmemory_level_1', game: 'hexmemory', title: 'Hex Starter', description: 'Complete Level 1', difficulty: 'Easy', icon: '⬡' },
+    hexmemory_level_3: { id: 'hexmemory_level_3', game: 'hexmemory', title: 'Pattern Reader', description: 'Reach Level 3', difficulty: 'Easy', icon: '🧠' },
+    hexmemory_level_5: { id: 'hexmemory_level_5', game: 'hexmemory', title: 'Memory Palace', description: 'Reach Level 5', difficulty: 'Medium', icon: '🏰' },
+    hexmemory_level_8: { id: 'hexmemory_level_8', game: 'hexmemory', title: 'Total Recall', description: 'Reach Level 8', difficulty: 'Hard', icon: '🌟' },
+    hexmemory_level_10: { id: 'hexmemory_level_10', game: 'hexmemory', title: 'Hex Master', description: 'Reach Level 10', difficulty: 'Legendary', icon: '👑' },
+    hexmemory_perfect_3: { id: 'hexmemory_perfect_3', game: 'hexmemory', title: 'Clean Sequence', description: 'Complete 3 levels without mistakes', difficulty: 'Medium', icon: '✨' },
+
     // Site Achievements (mirrors ids used by assets/js/site.js)
     explorer: {
         id: 'explorer',
@@ -751,13 +783,17 @@ export const ACHIEVEMENTS = {
 // These exports are required by achievements.js (used by the game routes).
 // Failure mode (prod): ESM import aborts with "does not provide an export named ..."
 // which prevents the game modules from running at all.
-export const GAME_ORDER = ['snake', 'breaker', 'merge', 'invaders', 'site'];
+export const GAME_ORDER = ['snake', 'breaker', 'merge', 'invaders', 'flappy', 'colormatch', 'gravrunner', 'hexmemory', 'site'];
 
 export const GAME_LABELS = {
   snake: 'Snake',
   breaker: 'Block Breaker',
   merge: '2048',
   invaders: 'Space Invaders',
+  flappy: 'Flappy Face',
+  colormatch: 'Color Match',
+  gravrunner: 'Gravity Runner',
+  hexmemory: 'Hex Memory',
   site: 'Website'
 };
 
