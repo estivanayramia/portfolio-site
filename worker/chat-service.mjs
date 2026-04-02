@@ -1214,8 +1214,40 @@ function buildDeterministicReply({ message, questionClass, surfaceFactKey, profi
         "The strongest proof is not just that he launched a site. It is that the site, the projects, and the About material all show the same pattern: structure, judgment, iteration, and follow-through.",
         `${formatInternalLink("The site build page", "/projects/portfolio")} is the clearest single example.`
       ].join(" ");
-    case QUESTION_CLASSES.PROJECT_LIST:
+    case QUESTION_CLASSES.PROJECT_LIST: {
+      // Smart single-project recommendation based on user intent
+      const ml = message.toLowerCase();
+      const projects = PERSONAL_KNOWLEDGE.projects || [];
+      let pick = null;
+      let why = '';
+      if (/strateg|competitive|analys|position|swot|market/.test(ml)) {
+        pick = projects.find(p => p.id === 'taking-down-endpoint');
+        why = 'It is a competitive strategy playbook that shows structured analysis, SWOT work, and market positioning.';
+      } else if (/marketing|campaign|funnel|persona|ads|retarget/.test(ml)) {
+        pick = projects.find(p => p.id === 'loreal-cell-bioprint') || projects.find(p => p.id === 'endpoint-linkedin-campaign');
+        why = 'It maps three personas across a full marketing funnel with touchpoints by stage.';
+      } else if (/multilingual|arabic|language|cultur|international|bilingual/.test(ml)) {
+        pick = projects.find(p => p.id === 'franklin-templeton');
+        why = 'He built the Arabic version of a campaign deck targeting UAE investors, reviewed by his family for accuracy.';
+      } else if (/people|leadership|interview|judgment|team|soft skill|emotional/.test(ml)) {
+        pick = projects.find(p => p.id === 'isa-grimes-interview');
+        why = 'It is a real conversation with a CMO about people skills, leadership, and why perspective matters more than titles.';
+      } else if (/execut|initiative|follow.?through|built|ship|technical|website|proof/.test(ml)) {
+        pick = projects.find(p => p.id === 'this-website');
+        why = 'Over 300 hours of directing AI tools to build this site from scratch with no coding background. That is initiative and follow-through.';
+      } else if (/recruiter|hiring|quick|fast|30 sec|impress|strongest|best/.test(ml)) {
+        pick = projects.find(p => p.id === 'isa-grimes-interview');
+        why = 'It shows how he thinks about people, which is the hardest thing to prove on paper. Then check This Website for execution proof.';
+      } else {
+        // Default: Isa Grimes Interview — shows depth, people, real conversation
+        pick = projects.find(p => p.id === 'isa-grimes-interview');
+        why = 'It shows real thinking about people and leadership, which is the hardest thing to put on a resume. Start there, then explore based on what you care about.';
+      }
+      if (pick) {
+        return `Start with [${pick.title}](${pick.url}). ${why}`;
+      }
       return formatProjectList(siteFacts);
+    }
     case QUESTION_CLASSES.PAGE_SPECIFIC:
       return buildPageSpecificReply(retrieval, message);
     case QUESTION_CLASSES.BOUNDARY:
