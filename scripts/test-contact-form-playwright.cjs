@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-/* eslint-disable no-console */
 const { chromium } = require('playwright');
 
 const DEFAULT_CONTACT_URL = `https://www.estivanayramia.com/contact?cb=${Date.now()}`;
@@ -15,17 +14,14 @@ function fail(msg) {
 
 (async () => {
   const browser = await chromium.launch({ headless: true });
-
-  // Block SW (Service Worker) so stale caches cannot “help” you
   const context = await browser.newContext({
     serviceWorkers: 'block',
   });
-
   const page = await context.newPage();
 
   const consoleErrors = [];
   const requestFailures = [];
-  let formspreeRequestSeen = false;
+  const formspreePosts = [];
   let formspreeResponse = null;
 
   page.on('console', (msg) => {
@@ -44,7 +40,12 @@ function fail(msg) {
     });
   });
 
-  // CI mode: mock Formspree so you do not spam yourself
+  page.on('request', (req) => {
+    if (req.method() === 'POST' && req.url().includes(FORMSPREE_URL_PART)) {
+      formspreePosts.push(req.url());
+    }
+  });
+
   if (MOCK_FORMSPREE) {
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
@@ -56,18 +57,9 @@ function fail(msg) {
     await page.route('https://formspree.io/**', async (route) => {
       const req = route.request();
 
-      if (req.url().includes('formspree.io')) {
-        console.log(`MOCK Formspree: ${req.method()} ${req.url()}`);
-      }
-
-      // Preflight support (in case any header changes trigger it)
       if (req.method() === 'OPTIONS') {
         await route.fulfill({ status: 204, headers: corsHeaders, body: '' });
         return;
-      }
-
-      if (req.url().includes(FORMSPREE_URL_PART) && req.method() === 'POST') {
-        formspreeRequestSeen = true;
       }
 
       await route.fulfill({
@@ -77,7 +69,6 @@ function fail(msg) {
       });
     });
 
-    // Optional coverage if Formspree ever uses api.formspree.io
     await page.route('https://api.formspree.io/**', async (route) => {
       const req = route.request();
       if (req.method() === 'OPTIONS') {
@@ -93,29 +84,26 @@ function fail(msg) {
   }
 
   page.on('response', async (res) => {
-    const url = res.url();
-    if (url.includes(FORMSPREE_URL_PART)) {
-      formspreeResponse = { url, status: res.status(), ok: res.ok() };
+    if (res.url().includes(FORMSPREE_URL_PART)) {
+      formspreeResponse = { url: res.url(), status: res.status(), ok: res.ok() };
     }
   });
 
   try {
     console.log(`Visiting: ${CONTACT_URL}`);
     await page.goto(CONTACT_URL, { waitUntil: 'domcontentloaded' });
-
     await page.waitForSelector('#contact-form', { state: 'visible', timeout: 15000 });
 
-    // Anti-bot: wait it out
     await page.waitForTimeout(2700);
 
     const stamp = Date.now();
+    await page.locator('#name').scrollIntoViewIfNeeded();
     await page.fill('#name', 'Automated Test');
     await page.fill('#email', `test+${stamp}@example.com`);
     await page.fill('#message', `Automated submission test at ${new Date(stamp).toISOString()}`);
 
     await page.click('#contact-form button[type="submit"]');
 
-    // Ensure the submit handler actually ran (it will set data-status quickly)
     await page.waitForFunction(() => {
       const el = document.querySelector('#contact-status');
       if (!el) return false;
@@ -129,8 +117,10 @@ function fail(msg) {
       console.log(`contact-status(after-submit): [${statusType}] ${statusText && statusText.trim()}`);
     }
 
-    // Success path opens the modal; status text may be overwritten by cooldown timer.
-    await page.waitForSelector('#contact-success-modal:not(.hidden)', { timeout: 30000 });
+    await page.waitForFunction(() => {
+      const el = document.querySelector('#contact-status');
+      return !!el && /message sent successfully/i.test(el.textContent || '');
+    }, { timeout: 30000 });
 
     {
       const statusText = await page.textContent('#contact-status');
@@ -138,39 +128,47 @@ function fail(msg) {
       console.log(`contact-status: [${statusType}] ${statusText && statusText.trim()}`);
     }
 
-    if (MOCK_FORMSPREE) {
-      if (!formspreeRequestSeen) fail('MOCK_FORMSPREE=1 but no POST to Formspree endpoint was observed.');
-    } else {
-      if (!formspreeResponse) fail('No network response observed to Formspree endpoint.');
-      else if (!formspreeResponse.ok) fail(`Formspree response not ok (status=${formspreeResponse.status}).`);
-      else console.log(`Formspree response: ${formspreeResponse.status} ok=${formspreeResponse.ok}`);
+    const currentUrl = page.url();
+    if (/formspree\.io\/thanks/i.test(currentUrl)) {
+      fail(`Unexpected redirect to Formspree thanks page: ${currentUrl}`);
     }
+
+    const modalHidden = await page.evaluate(() => {
+      const modal = document.querySelector('#contact-success-modal');
+      return !modal || modal.classList.contains('hidden');
+    });
+    if (!modalHidden) fail('Contact success modal should remain hidden after inline success.');
+
+    if (formspreePosts.length !== 1) {
+      fail(`Expected exactly 1 Formspree POST, saw ${formspreePosts.length}.`);
+    }
+
+    if (!formspreeResponse) fail('No network response observed to Formspree endpoint.');
+    else if (!formspreeResponse.ok) fail(`Formspree response not ok (status=${formspreeResponse.status}).`);
+    else console.log(`Formspree response: ${formspreeResponse.status} ok=${formspreeResponse.ok}`);
   } catch (e) {
     try {
       const statusText = await page.textContent('#contact-status');
       const statusType = await page.getAttribute('#contact-status', 'data-status');
       console.log(`contact-status(at-fail): [${statusType}] ${statusText && statusText.trim()}`);
-    } catch (e2) {
+    } catch (_) {
       // ignore
     }
-    if (MOCK_FORMSPREE) {
-      console.log(`MOCK_FORMSPREE=1 formspreeRequestSeen=${formspreeRequestSeen}`);
-      if (formspreeResponse) {
-        console.log(`Formspree response(at-fail): ${formspreeResponse.status} ok=${formspreeResponse.ok}`);
-      }
-    } else if (formspreeResponse) {
+
+    if (formspreeResponse) {
       console.log(`Formspree response(at-fail): ${formspreeResponse.status} ok=${formspreeResponse.ok}`);
     }
+
     fail(String(e));
   } finally {
     if (requestFailures.length) {
       console.log('Request failures:');
-      for (const f of requestFailures) console.log(JSON.stringify(f));
+      for (const failure of requestFailures) console.log(JSON.stringify(failure));
     }
 
     if (consoleErrors.length) {
       console.log('Console errors:');
-      for (const c of consoleErrors) console.log(c);
+      for (const error of consoleErrors) console.log(error);
     }
 
     await context.close();

@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v20260402-69a1f361-dashboard-bypass';
+const CACHE_VERSION = 'v20260402-d201061a-contact-csp-harden';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -24,8 +24,8 @@ const ASSETS_TO_CACHE = [
     '/assets/js/site.js',
     '/assets/js/site.min.js',
     '/assets/js/lazy-loader.js',
+    '/assets/js/lazy-loader.min.js',
     '/assets/js/cache-refresh.js',
-    '/assets/js/contact-form.js',
     '/assets/img/headshot.webp',
     '/assets/img/savonie-thumb.webp'
 ];
@@ -33,6 +33,7 @@ const ASSETS_TO_CACHE = [
 // Install event - cache assets
 self.addEventListener('install', (event) => {
     console.log('Service Worker: Installing...');
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
@@ -55,6 +56,7 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             ))
+            .then(() => self.clients.claim())
     );
 });
 
