@@ -457,14 +457,14 @@
 
 .coverflow-controls {
   position: absolute;
-  bottom: clamp(2rem, 5vw, 3.5rem);
+  bottom: clamp(0.75rem, 2vw, 1.5rem);
   left: 50%;
   transform: translateX(-50%);
-  
+
   display: flex;
   align-items: center;
   gap: clamp(1.5rem, 4vw, 2.5rem);
-  
+
   z-index: 20;
 }
 
@@ -817,6 +817,8 @@
   place-items: center;
   min-height: min(66vh, 36rem);
   padding-block: 3.5rem 1rem;
+  perspective: 1200px;
+  perspective-origin: center 40%;
 }
 
 .luxury-roulette-wheel {
@@ -825,6 +827,9 @@
   height: var(--roulette-diameter);
   border-radius: 50%;
   will-change: transform;
+  transform-style: preserve-3d;
+  /* Tilt the wheel into perspective for a convincing 3D casino feel */
+  transform: rotateX(18deg);
 }
 
 .luxury-roulette-rim {
@@ -835,9 +840,10 @@
     radial-gradient(circle at center, rgba(33, 40, 66, 0.2) 0 25%, transparent 25% 28%, rgba(201, 167, 109, 0.16) 28% 64%, rgba(29, 22, 12, 0.92) 64% 100%),
     conic-gradient(from 0deg, #b7904f, #f1ddb8, #8c6b32, #d2b37a, #b7904f);
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.08),
-    inset 0 0 48px rgba(0, 0, 0, 0.38),
-    0 18px 60px rgba(0, 0, 0, 0.45);
+    inset 0 0 0 3px rgba(255, 255, 255, 0.12),
+    inset 0 0 64px rgba(0, 0, 0, 0.5),
+    0 24px 80px rgba(0, 0, 0, 0.55),
+    0 0 120px rgba(201, 167, 109, 0.08);
 }
 
 .luxury-roulette-pocket-ring {
@@ -944,26 +950,31 @@
 }
 
 .luxury-roulette-ball {
-  width: 18px;
-  height: 18px;
-  background: radial-gradient(circle at 30% 30%, #fff, #efe2c7 58%, #c9a76d);
-  box-shadow: 0 0 16px rgba(201, 167, 109, 0.6), 0 8px 20px rgba(0, 0, 0, 0.26);
+  width: 20px;
+  height: 20px;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.95) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, #efe2c7, #c9a76d 60%, #8c6b32);
+  box-shadow:
+    0 0 20px rgba(201, 167, 109, 0.7),
+    0 0 6px rgba(255, 255, 255, 0.3),
+    0 10px 24px rgba(0, 0, 0, 0.35);
   will-change: transform;
 }
 
 .luxury-roulette-ball-highlight {
-  width: 8px;
-  height: 8px;
-  background: rgba(255, 255, 255, 0.85);
-  filter: blur(1px);
+  width: 10px;
+  height: 10px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9), transparent 70%);
+  filter: blur(1.5px);
   will-change: transform, opacity;
 }
 
 .luxury-roulette-ball-shadow {
-  width: 16px;
-  height: 8px;
-  background: rgba(0, 0, 0, 0.32);
-  filter: blur(6px);
+  width: 20px;
+  height: 10px;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.45), transparent 70%);
+  filter: blur(8px);
   will-change: transform, opacity;
 }
 
