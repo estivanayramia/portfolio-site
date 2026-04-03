@@ -122,6 +122,11 @@ function fail(msg) {
       return !!el && /message sent successfully/i.test(el.textContent || '');
     }, { timeout: 30000 });
 
+    await page.waitForFunction(() => {
+      const modal = document.querySelector('#contact-success-modal');
+      return !!modal && !modal.classList.contains('hidden');
+    }, { timeout: 10000 });
+
     {
       const statusText = await page.textContent('#contact-status');
       const statusType = await page.getAttribute('#contact-status', 'data-status');
@@ -133,11 +138,11 @@ function fail(msg) {
       fail(`Unexpected redirect to Formspree thanks page: ${currentUrl}`);
     }
 
-    const modalHidden = await page.evaluate(() => {
+    const modalVisible = await page.evaluate(() => {
       const modal = document.querySelector('#contact-success-modal');
-      return !modal || modal.classList.contains('hidden');
+      return !!modal && !modal.classList.contains('hidden');
     });
-    if (!modalHidden) fail('Contact success modal should remain hidden after inline success.');
+    if (!modalVisible) fail('Contact success modal should open after inline success.');
 
     if (formspreePosts.length !== 1) {
       fail(`Expected exactly 1 Formspree POST, saw ${formspreePosts.length}.`);
