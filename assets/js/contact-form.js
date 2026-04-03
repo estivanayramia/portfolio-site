@@ -7,6 +7,7 @@
     const form = document.getElementById('contact-form');
     const modal = document.getElementById('contact-success-modal');
     const closeBtn = document.getElementById('close-success-modal');
+    const restartSuccessBtn = document.getElementById('restart-success-game');
     const canvas = document.getElementById('success-game-canvas');
     const scoreDisplay = document.getElementById('score-display');
     
@@ -21,6 +22,7 @@
     if (!form || !modal) return;
 
     const isModalOpen = () => !modal.classList.contains('hidden');
+    let successStateObserved = false;
 
     // State
     let scrollY = 0;
@@ -59,6 +61,80 @@
     const WAVE_BANNER_MS = 1200;
     const BETWEEN_WAVE_PAUSE_MS = 800;
     const SLOW_EFFECT_MS = 4500;
+
+    const syncSuccessModalToStatus = () => {
+        const nextState = statusArea ? String(statusArea.getAttribute('data-status') || '').toLowerCase() : '';
+
+        if (nextState === 'success') {
+            if (!successStateObserved) {
+                successStateObserved = true;
+                openModal();
+            }
+            return;
+        }
+
+        successStateObserved = false;
+    };
+
+    if (statusArea) {
+        syncSuccessModalToStatus();
+        const successObserver = new MutationObserver(syncSuccessModalToStatus);
+        successObserver.observe(statusArea, {
+            attributes: true,
+            attributeFilter: ['data-status'],
+            childList: true,
+            characterData: true,
+            subtree: true
+        });
+    }
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            successStateObserved = false;
+            if (isModalOpen()) closeModal();
+        });
+    }
+
+    closeBtn.addEventListener('click', closeModal);
+    if (restartSuccessBtn) {
+        restartSuccessBtn.addEventListener('click', () => {
+            if (!isModalOpen()) return;
+            initGame();
+            try { canvas.focus({ preventScroll: true }); } catch (e) {}
+            showToast('success', 'Restarted');
+        });
+    }
+
+    modal.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab' && isModalOpen()) {
+            const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+
+            if (e.shiftKey) {
+                if (document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                }
+            } else if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            if (gameActive) {
+                if (animationFrameId) cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+        } else if (gameActive && isModalOpen() && !animationFrameId) {
+            loop();
+        }
+    });
+
+    return;
 
     // ==========================================
     // INITIALIZATION

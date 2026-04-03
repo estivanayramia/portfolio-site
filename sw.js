@@ -7,7 +7,7 @@
 //
 // Cache Version: Bump this whenever you deploy changes that affect cached files
 // ==========================================================================
-const CACHE_VERSION = 'v20260402-d201061a-contact-csp-harden';
+const CACHE_VERSION = 'v20260403-78691f86-contact-success-restored';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 const ASSETS_TO_CACHE = [
     '/',
@@ -23,6 +23,7 @@ const ASSETS_TO_CACHE = [
     '/assets/css/style.css',
     '/assets/js/site.js',
     '/assets/js/site.min.js',
+    '/assets/js/contact-form.js',
     '/assets/js/lazy-loader.js',
     '/assets/js/lazy-loader.min.js',
     '/assets/js/cache-refresh.js',
