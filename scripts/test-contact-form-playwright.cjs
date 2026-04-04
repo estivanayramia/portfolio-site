@@ -4,6 +4,7 @@ const { chromium } = require('playwright');
 const DEFAULT_CONTACT_URL = `https://www.estivanayramia.com/contact?cb=${Date.now()}`;
 const CONTACT_URL = process.env.CONTACT_URL || DEFAULT_CONTACT_URL;
 
+const CONTACT_API_PATH = '/api/contact';
 const FORMSPREE_URL_PART = 'formspree.io/f/mblbnwoy';
 const MOCK_FORMSPREE = process.env.MOCK_FORMSPREE === '1';
 
@@ -21,8 +22,8 @@ function fail(msg) {
 
   const consoleErrors = [];
   const requestFailures = [];
-  const formspreePosts = [];
-  let formspreeResponse = null;
+  const contactApiPosts = [];
+  let contactApiResponse = null;
 
   page.on('console', (msg) => {
     if (msg.type() === 'error') consoleErrors.push(msg.text());
@@ -41,8 +42,8 @@ function fail(msg) {
   });
 
   page.on('request', (req) => {
-    if (req.method() === 'POST' && req.url().includes(FORMSPREE_URL_PART)) {
-      formspreePosts.push(req.url());
+    if (req.method() === 'POST' && req.url().includes(CONTACT_API_PATH)) {
+      contactApiPosts.push(req.url());
     }
   });
 
@@ -54,9 +55,8 @@ function fail(msg) {
       'Access-Control-Max-Age': '86400',
     };
 
-    await page.route('https://formspree.io/**', async (route) => {
+    await page.route(`**${CONTACT_API_PATH}`, async (route) => {
       const req = route.request();
-
       if (req.method() === 'OPTIONS') {
         await route.fulfill({ status: 204, headers: corsHeaders, body: '' });
         return;
@@ -65,34 +65,39 @@ function fail(msg) {
       await route.fulfill({
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ok: true }),
-      });
-    });
-
-    await page.route('https://api.formspree.io/**', async (route) => {
-      const req = route.request();
-      if (req.method() === 'OPTIONS') {
-        await route.fulfill({ status: 204, headers: corsHeaders, body: '' });
-        return;
-      }
-      await route.fulfill({
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ok: true }),
+        body: JSON.stringify({
+          success: true,
+          recorded: true,
+          receiptId: `mock-receipt-${Date.now()}`,
+          upstream: {
+            endpoint: `https://${FORMSPREE_URL_PART}`,
+            status: 200,
+            ok: true,
+            next: '/thanks'
+          }
+        }),
       });
     });
   }
 
   page.on('response', async (res) => {
-    if (res.url().includes(FORMSPREE_URL_PART)) {
-      formspreeResponse = { url: res.url(), status: res.status(), ok: res.ok() };
+    if (res.url().includes(CONTACT_API_PATH)) {
+      let body = null;
+      try {
+        body = await res.json();
+      } catch (_) {
+        body = null;
+      }
+      contactApiResponse = { url: res.url(), status: res.status(), ok: res.ok(), body };
     }
   });
 
   try {
     console.log(`Visiting: ${CONTACT_URL}`);
     await page.goto(CONTACT_URL, { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('#contact-form', { state: 'visible', timeout: 15000 });
+    await page.waitForSelector('#contact-form', { state: 'attached', timeout: 15000 });
+    await page.locator('#contact-form').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(400);
 
     await page.waitForTimeout(2700);
 
@@ -119,7 +124,8 @@ function fail(msg) {
 
     await page.waitForFunction(() => {
       const el = document.querySelector('#contact-status');
-      return !!el && /message sent successfully/i.test(el.textContent || '');
+      const text = el ? String(el.textContent || '') : '';
+      return !!el && /message (sent successfully|received and recorded)/i.test(text);
     }, { timeout: 30000 });
 
     await page.waitForFunction(() => {
@@ -144,13 +150,19 @@ function fail(msg) {
     });
     if (!modalVisible) fail('Contact success modal should open after inline success.');
 
-    if (formspreePosts.length !== 1) {
-      fail(`Expected exactly 1 Formspree POST, saw ${formspreePosts.length}.`);
+    if (contactApiPosts.length !== 1) {
+      fail(`Expected exactly 1 contact API POST, saw ${contactApiPosts.length}.`);
     }
 
-    if (!formspreeResponse) fail('No network response observed to Formspree endpoint.');
-    else if (!formspreeResponse.ok) fail(`Formspree response not ok (status=${formspreeResponse.status}).`);
-    else console.log(`Formspree response: ${formspreeResponse.status} ok=${formspreeResponse.ok}`);
+    if (!contactApiResponse) fail('No network response observed to contact API endpoint.');
+    else if (!contactApiResponse.ok) fail(`Contact API response not ok (status=${contactApiResponse.status}).`);
+    else if (!contactApiResponse.body || contactApiResponse.body.success !== true || contactApiResponse.body.recorded !== true || !contactApiResponse.body.receiptId) {
+      fail(`Contact API did not confirm a recorded receipt: ${JSON.stringify(contactApiResponse.body)}`);
+    } else if (!contactApiResponse.body.upstream || contactApiResponse.body.upstream.ok !== true || !String(contactApiResponse.body.upstream.endpoint || '').includes(FORMSPREE_URL_PART)) {
+      fail(`Contact API did not confirm the intended Formspree upstream: ${JSON.stringify(contactApiResponse.body)}`);
+    } else {
+      console.log(`Contact API response: ${contactApiResponse.status} ok=${contactApiResponse.ok} receipt=${contactApiResponse.body.receiptId}`);
+    }
   } catch (e) {
     try {
       const statusText = await page.textContent('#contact-status');
@@ -160,8 +172,9 @@ function fail(msg) {
       // ignore
     }
 
-    if (formspreeResponse) {
-      console.log(`Formspree response(at-fail): ${formspreeResponse.status} ok=${formspreeResponse.ok}`);
+    if (contactApiResponse) {
+      console.log(`Contact API response(at-fail): ${contactApiResponse.status} ok=${contactApiResponse.ok}`);
+      console.log(JSON.stringify(contactApiResponse.body));
     }
 
     fail(String(e));
