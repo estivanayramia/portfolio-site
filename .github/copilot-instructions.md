@@ -1,55 +1,90 @@
-You are my local repo agent for `portfolio-site` in VS Code (Visual Studio Code).
+# Copilot instructions for this repository
 
-PRIMARY GOAL
-Keep the repo clean, consistent, and verifiable. Every response must include a full self-audit so I can trust changes without seeing your filesystem.
+## Goal
+Help improve this portfolio site with small, correct, maintainable changes that are safe to ship.
 
-ABSOLUTE RULE
-After EVERY response you produce, append exactly one section titled `WORKSPACE REPORT`.
-- Do not skip it.
-- Put all diagnostics inside it.
-- If a command fails, include the command and full raw error output.
-- Do not paraphrase command outputs.
-- If a check has no output, explicitly print `PASS (empty)` as the script output.
+Priorities:
+- correctness
+- minimal diffs
+- low regression risk
+- clean UX
+- accessibility
+- performance
+- accurate verification
 
-PERSISTENCE
-This exact instruction text must live at `.github/copilot-instructions.md` and be committed.
-It is an allowed exception to any “no Markdown outside docs” rule because it is tool configuration and must remain in `.github/` to load.
+## Default behavior
+- Be concise by default.
+- Prefer the smallest change that fully solves the task.
+- Read the relevant files before editing.
+- Preserve existing conventions unless there is a strong reason to improve them.
+- Keep unrelated edits out of the diff.
+- Do not invent repo facts, command results, logs, or verification.
 
-DOCS POLICY (ENFORCED)
-- All documentation Markdown belongs under `./docs/**`.
-- No `.md` files in repo root.
-- No root directories ending with `.md`.
-- Allowed exception outside docs: `.github/copilot-instructions.md` only.
-- Never put copies of copilot instructions under `docs/`. Delete duplicates immediately.
+## How to work
+- Diagnose before changing code.
+- Fix root causes, not just symptoms.
+- State assumptions briefly when they affect the solution.
+- When a request is underspecified, make the safest reasonable interpretation from the repo context.
+- Update obvious references when renaming or moving files.
+- Avoid broad refactors unless they are necessary to solve the task.
 
-PATH RULES
-- Docs filenames: lowercase-kebab-case.md
-- Docs folders: lowercase-kebab-case/
-- Use `git mv` for renames/moves.
+## Verification
+Use the lightest relevant verification for the change.
+- Run relevant checks when practical.
+- Do not paste raw command output unless the user asks for it or it is the key evidence for a blocker.
+- Summarize validation in a few lines:
+  - what was checked,
+  - what passed,
+  - what could not be verified.
 
-REALISTIC “SPACES IN PATHS” RULE
-Spaces in paths are only allowed in these prefixes (allowlist):
-- `assets/img/Portolio-Media/`
-- `.github/agents/`
-Flag any other tracked path containing spaces.
+Examples of relevant repo checks include:
+- `npm run build`
+- `npm run audit`
+- `npm run test:redirects` for routing, redirects, or worker route changes
+- targeted CSS / service worker / secret audits when related to the change
 
-NOISE CONTROL
-Never recursively scan the filesystem for repo policy (node_modules noise). Use git-based commands.
-If any command output exceeds 200 lines:
-- Save full output to `.reports/workspace-report-latest.txt`
-- Print first 50 and last 50 lines
-- Print the saved path as a final line
+Never claim success without checking the behavior that changed.
 
-FINISHING BEHAVIOR
-If the user says “perfect this”, “finish”, or “make it good”:
-1) Remove duplicates (example: delete docs copies of instructions).
-2) Ensure `.github/copilot-instructions.md` exists and is tracked (not ignored).
-3) `git add -A`
-4) Run the full WORKSPACE REPORT
-5) If clean and staged, commit once with a clear message
-6) If branch is ahead, remind to `git push` (do not push automatically)
+## Response style
+Lead with the outcome, then summarize:
+- what changed,
+- which files were touched,
+- how it was verified,
+- any risks, follow-ups, or blockers.
 
-WORKSPACE REPORT GENERATION
-Always generate the WORKSPACE REPORT by running this one command and pasting its entire stdout:
+Do not append a mandatory report block to every response.
+Do not dump stdout/stderr by default.
 
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/workspace-report.ps1
+## Repository-specific guardrails
+
+### Routing and Workers
+- Keep Worker routes narrow. Do not bind Workers to apex or `www` catch-all routes unless the task explicitly requires it.
+- Be careful with `_redirects`. Preserve the site’s static Pages behavior and avoid redirect/404 loop regressions.
+- Treat `wrangler` config names and deploy targets as sensitive; avoid accidental cross-worker overwrites.
+- Prefer repo deploy scripts over ad hoc deploy commands.
+
+### Secrets and config
+- Never hardcode secrets in source, docs, tests, or config.
+- Use environment variables and the repository’s secret-management flow.
+- If a secret appears in existing content, treat it as a security issue and remove/redact it safely.
+
+### CSS and assets
+- Prefer the repo’s CSS source/build flow instead of editing generated output directly.
+- Be careful with asset paths, filename casing, and content references.
+- Avoid inline styles unless clearly justified.
+
+### Build, cache, and service worker
+- Respect versioning/build steps that keep asset references and cache keys in sync.
+- Be careful with service worker changes; avoid stale-cache regressions.
+- Do not bypass the repo’s atomic ship/deploy workflow.
+
+### File hygiene
+- Keep debug files, reports, and one-off diagnostics out of the repo root unless the task explicitly targets them.
+- Do not commit `node_modules`, generated clutter, or temporary artifacts.
+
+### Encoding
+- Preserve UTF-8 without BOM and avoid double-encoding issues.
+
+## Scope
+This file is for repo-wide behavior only.
+Put narrower rules in `.github/instructions/*.instructions.md` when they apply only to specific paths, workflows, or tools.

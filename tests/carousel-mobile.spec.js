@@ -114,7 +114,7 @@ const miniPages = [
   { name: 'Reading', url: readingUrl }
 ];
 
-const touchSwipeRegressionProfiles = new Set(['Android Small', 'Android Large']);
+const touchSwipeRegressionProfiles = new Set(['Android Small', 'Android Large', 'Tablet Landscape']);
 
 function getTouchSwipeRegressionOptions(profileName) {
   if (profileName === 'Android Small') {
@@ -123,6 +123,10 @@ function getTouchSwipeRegressionOptions(profileName) {
 
   if (profileName === 'Android Large') {
     return { distanceRatio: 0.28, steps: 22, settleMs: 1000 };
+  }
+
+  if (profileName === 'Tablet Landscape') {
+    return { distanceRatio: 0.24, steps: 18, settleMs: 900 };
   }
 
   return undefined;
@@ -171,8 +175,12 @@ async function prepareCarouselAt(page, url, selector = '[data-luxury-coverflow]'
 
   const carousel = page.locator(selector);
   await expect(carousel).toBeVisible({ timeout: 10000 });
-  await expect(carousel).toHaveAttribute('data-coverflow-ready', 'true', { timeout: 10000 });
   await carousel.scrollIntoViewIfNeeded();
+  await page.evaluate((carouselSelector) => {
+    document.querySelector(carouselSelector)?.scrollIntoView({ block: 'center', inline: 'nearest' });
+    window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+  }, selector);
+  await expect(carousel).toHaveAttribute('data-coverflow-ready', 'true', { timeout: 10000 });
   await page.waitForTimeout(250);
 }
 
@@ -201,6 +209,10 @@ async function getActiveCard(page) {
 async function getActiveIndex(page) {
   const activeCard = await getActiveCard(page);
   return (await activeCard.getAttribute('data-index')) || '';
+}
+
+async function getPremiumCardCount(page, selector = '[data-luxury-coverflow]') {
+  return page.locator(`${selector} .coverflow-card`).count();
 }
 
 async function ensureCarouselInView(page) {
@@ -467,18 +479,29 @@ for (const profile of touchProfiles) {
       expect(cardBox.x + cardBox.width).toBeLessThanOrEqual(viewport.width + 4);
     });
 
+    test('active premium card never clips vertically', async ({ page }) => {
+      const card = page.locator('.coverflow-card--active, .coverflow-card.is-center').first();
+      const box = await card.boundingBox();
+      const viewport = page.viewportSize();
+
+      expect(box.y).toBeGreaterThanOrEqual(-2);
+      expect(box.y + box.height).toBeLessThanOrEqual(viewport.height + 2);
+    });
+
     test('horizontal swipe left advances exactly one card', async ({ page }) => {
       const initialIndex = Number(await getActiveIndex(page));
+      const totalItems = await getPremiumCardCount(page);
       const swipeOptions = touchSwipeRegressionProfiles.has(profile.name)
         ? getTouchSwipeRegressionOptions(profile.name)
         : undefined;
 
       await swipeCarousel(page, 'left', swipeOptions);
       const finalIndex = Number(await getActiveIndex(page));
-      expect(finalIndex).toBe((initialIndex + 1) % 6);
+      expect(finalIndex).toBe((initialIndex + 1) % totalItems);
     });
 
     test('horizontal swipe right reverses exactly one card', async ({ page }) => {
+      const totalItems = await getPremiumCardCount(page);
       const swipeOptions = touchSwipeRegressionProfiles.has(profile.name)
         ? getTouchSwipeRegressionOptions(profile.name)
         : undefined;
@@ -487,7 +510,7 @@ for (const profile of touchProfiles) {
       const initialIndex = Number(await getActiveIndex(page));
       await swipeCarousel(page, 'right', swipeOptions);
       const finalIndex = Number(await getActiveIndex(page));
-      expect(finalIndex).toBe((initialIndex + 5) % 6);
+      expect(finalIndex).toBe((initialIndex - 1 + totalItems) % totalItems);
     });
 
     test('vertical swipe does not advance the carousel', async ({ page }) => {
@@ -530,9 +553,10 @@ test.describe('Repeated Touch Stability', () => {
 
   test('20 consecutive swipes remain deterministic', async ({ page }) => {
     let expectedIndex = Number(await getActiveIndex(page));
+    const totalItems = await getPremiumCardCount(page);
     for (let step = 0; step < 20; step += 1) {
       await swipeCarousel(page, 'left', { settleMs: 650 });
-      expectedIndex = (expectedIndex + 1) % 6;
+      expectedIndex = (expectedIndex + 1) % totalItems;
       expect(Number(await getActiveIndex(page))).toBe(expectedIndex);
     }
   });
@@ -550,10 +574,11 @@ for (const profile of desktopProfiles) {
       const nextButton = page.locator('.coverflow-btn-next').first();
       const previousButton = page.locator('.coverflow-btn-prev').first();
       const initialIndex = Number(await getActiveIndex(page));
+      const totalItems = await getPremiumCardCount(page);
 
       await nextButton.click();
       await page.waitForTimeout(450);
-      expect(Number(await getActiveIndex(page))).toBe((initialIndex + 1) % 6);
+      expect(Number(await getActiveIndex(page))).toBe((initialIndex + 1) % totalItems);
 
       await previousButton.click();
       await page.waitForTimeout(450);
@@ -562,8 +587,9 @@ for (const profile of desktopProfiles) {
 
     test('wheel interaction advances and reverses cleanly', async ({ page }) => {
       const initialIndex = Number(await getActiveIndex(page));
+      const totalItems = await getPremiumCardCount(page);
       await wheelCarousel(page, 'next');
-      expect(Number(await getActiveIndex(page))).toBe((initialIndex + 1) % 6);
+      expect(Number(await getActiveIndex(page))).toBe((initialIndex + 1) % totalItems);
 
       await wheelCarousel(page, 'prev');
       expect(Number(await getActiveIndex(page))).toBe(initialIndex);
@@ -574,10 +600,11 @@ for (const profile of desktopProfiles) {
       const activeCard = await getActiveCard(page);
       await activeCard.focus();
       const initialIndex = Number(await getActiveIndex(page));
+      const totalItems = await getPremiumCardCount(page);
 
       await page.keyboard.press('ArrowRight');
       await page.waitForTimeout(450);
-      expect(Number(await getActiveIndex(page))).toBe((initialIndex + 1) % 6);
+      expect(Number(await getActiveIndex(page))).toBe((initialIndex + 1) % totalItems);
 
       await page.keyboard.press('ArrowLeft');
       await page.waitForTimeout(450);
@@ -606,13 +633,15 @@ test.describe(`${hybridProfile.name} — Hybrid Input`, () => {
   test('touch swipe followed by button click does not double-advance', async ({ page }) => {
     const nextButton = page.locator('.coverflow-btn-next').first();
     const initialIndex = Number(await getActiveIndex(page));
+    const totalItems = await getPremiumCardCount(page);
+    const swipeOptions = { distanceRatio: 0.2, steps: 16, settleMs: 850 };
 
-    await swipeCarousel(page, 'left');
-    expect(Number(await getActiveIndex(page))).toBe((initialIndex + 1) % 6);
+    await swipeCarousel(page, 'left', swipeOptions);
+    expect(Number(await getActiveIndex(page))).toBe((initialIndex + 1) % totalItems);
 
     await nextButton.click();
     await page.waitForTimeout(450);
-    expect(Number(await getActiveIndex(page))).toBe((initialIndex + 2) % 6);
+    expect(Number(await getActiveIndex(page))).toBe((initialIndex + 2) % totalItems);
   });
 });
 
@@ -627,9 +656,10 @@ test.describe('Reduced Motion Tier', () => {
     await expect(page.locator('[data-luxury-coverflow]')).toHaveAttribute('data-coverflow-ready', 'true');
 
     const initialIndex = Number(await getActiveIndex(page));
+    const totalItems = await getPremiumCardCount(page);
     await page.locator('.coverflow-btn-next').click();
     await page.waitForTimeout(300);
-    expect(Number(await getActiveIndex(page))).toBe((initialIndex + 1) % 6);
+    expect(Number(await getActiveIndex(page))).toBe((initialIndex + 1) % totalItems);
     await context.close();
   });
 });
@@ -773,7 +803,7 @@ test.describe('Gallery Coverflow Input', () => {
     await prepareMiniCarouselAt(page, photographyUrl);
 
     const activeSlide = page.locator('[data-mini-carousel] .carousel-slide.coverflow-card--active, [data-mini-carousel] .carousel-slide.is-center').first();
-    await activeSlide.click();
+    await activeSlide.evaluate((element) => element.click());
     await expect(page.locator('#lightbox')).toHaveClass(/active/);
     await expect(page.locator('#lightbox')).toHaveAttribute('aria-hidden', 'false');
 

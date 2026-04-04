@@ -1769,6 +1769,7 @@ export class LuxuryCoverflow {
 
     this.buildDots();
     this.updateAllItems(this.currentIndex, 0);
+    this.resources.raf(() => this.syncStageBounds());
     this.setupKeyboardNavigation();
     this.setupPointerInteractions();
     this.setupTouchInteractions();
@@ -2040,6 +2041,7 @@ export class LuxuryCoverflow {
       applyTransforms(centerIndex);
       this.updatePagination(centerIndex);
       this.emitSlideChange(this.getNearestIndex(centerIndex));
+      this.syncStageBounds();
       this.finishAnimation(cycleId);
       return;
     }
@@ -2065,9 +2067,11 @@ export class LuxuryCoverflow {
         applyTransforms(centerIndex);
         this.updatePagination(centerIndex);
         this.emitSlideChange(this.currentIndex);
+        this.syncStageBounds();
         this.finishAnimation(cycleId);
       },
       onInterrupt: () => {
+        this.syncStageBounds();
         this.finishAnimation(cycleId);
       }
     });
@@ -2538,6 +2542,7 @@ export class LuxuryCoverflow {
       this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
       this.updateAllItems(this.currentIndex, 0);
       this.roulette.refreshLayout();
+      this.syncStageBounds();
     };
 
     let resizeTimeout = null;
@@ -2565,6 +2570,27 @@ export class LuxuryCoverflow {
     }
   }
 
+  syncStageBounds() {
+    const stage = this.container.querySelector('.coverflow-container');
+    const active = this.items[this.currentIndex];
+    if (!stage || !active) return;
+
+    const safePadding = 16;
+    stage.style.setProperty('--coverflow-dynamic-height', '0px');
+    stage.style.setProperty('--coverflow-dynamic-top', '0px');
+    stage.style.setProperty('--coverflow-dynamic-bottom', '0px');
+
+    const stageRect = stage.getBoundingClientRect();
+    const activeRect = active.getBoundingClientRect();
+    const topOverflow = Math.max(0, stageRect.top + safePadding - activeRect.top);
+    const bottomOverflow = Math.max(0, activeRect.bottom - (stageRect.bottom - safePadding));
+    const neededHeight = Math.ceil(stageRect.height + topOverflow + bottomOverflow);
+
+    stage.style.setProperty('--coverflow-dynamic-top', `${Math.ceil(topOverflow)}px`);
+    stage.style.setProperty('--coverflow-dynamic-bottom', `${Math.ceil(bottomOverflow)}px`);
+    stage.style.setProperty('--coverflow-dynamic-height', `${neededHeight}px`);
+  }
+
   startAutoplay() {
     if (!this.config.autoplay || this.autoplayInterval) return;
     this.autoplayInterval = this.resources.interval(() => this.next(), this.config.autoplayDelay);
@@ -2590,6 +2616,7 @@ export class LuxuryCoverflow {
     this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
     this.updateAllItems(this.currentIndex, 0);
     this.roulette.refreshLayout();
+    this.syncStageBounds();
   }
 
   destroy() {
