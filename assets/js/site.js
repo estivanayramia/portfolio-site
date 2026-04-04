@@ -43,6 +43,17 @@
  * @license MIT
  */
 
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+try {
+    gsap.registerPlugin(ScrollTrigger);
+    if (typeof window !== 'undefined') {
+        window.gsap = gsap;
+        window.ScrollTrigger = ScrollTrigger;
+    }
+} catch (e) {}
+
 // ============================================================================
 // CORE UTILITIES - User Interaction Tracking
 // ============================================================================
@@ -774,7 +785,95 @@ const initAriaCurrent = () => {
  * @requires gsap.js
  * @requires ScrollTrigger plugin
  */
+const __animationRuntime = (typeof window !== 'undefined')
+    ? (window.__EAAnimationRuntime = window.__EAAnimationRuntime || {
+        initialized: false,
+        hoverBound: false,
+        refreshSignalsBound: false,
+        refreshTimer: null
+    })
+    : {
+        initialized: false,
+        hoverBound: false,
+        refreshSignalsBound: false,
+        refreshTimer: null
+    };
+
+const getAnimatedElements = () => Array.from(document.querySelectorAll('[data-gsap]'));
+
+const revealAnimatedElement = (element, state = 'fallback-visible') => {
+    if (!element) return;
+    element.classList.remove('opacity-0', 'translate-y-8', 'translate-y-6', 'translate-y-4');
+    element.style.opacity = '1';
+    element.style.visibility = 'visible';
+    element.style.transform = 'none';
+    element.style.willChange = 'auto';
+    element.dataset.gsapState = state;
+};
+
+const revealGsapElementsImmediately = () => {
+    getAnimatedElements().forEach((element) => {
+        revealAnimatedElement(element);
+    });
+};
+
+const scheduleAnimationRefresh = () => {
+    if (!__animationRuntime.initialized || typeof window === 'undefined') return;
+    if (typeof ScrollTrigger === 'undefined' || typeof ScrollTrigger.refresh !== 'function') return;
+
+    if (__animationRuntime.refreshTimer != null) {
+        window.clearTimeout(__animationRuntime.refreshTimer);
+    }
+
+    __animationRuntime.refreshTimer = window.setTimeout(() => {
+        __animationRuntime.refreshTimer = null;
+        try {
+            ScrollTrigger.refresh();
+        } catch (e) {}
+    }, 150);
+};
+
+const bindAnimationRefreshSignals = () => {
+    if (__animationRuntime.refreshSignalsBound || typeof window === 'undefined') return;
+    __animationRuntime.refreshSignalsBound = true;
+
+    window.addEventListener('load', scheduleAnimationRefresh, { once: true });
+    window.addEventListener('resize', scheduleAnimationRefresh, { passive: true });
+    window.addEventListener('orientationchange', scheduleAnimationRefresh, { passive: true });
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            const animated = getAnimatedElements();
+            try {
+                gsap.killTweensOf(animated);
+            } catch (e) {}
+            animated.forEach((element) => revealAnimatedElement(element, 'restored'));
+        }
+        scheduleAnimationRefresh();
+    }, { passive: true });
+
+    if (document.fonts?.ready && typeof document.fonts.ready.then === 'function') {
+        document.fonts.ready.then(scheduleAnimationRefresh).catch(() => {});
+    }
+};
+
+const bindCardHoverAnimations = () => {
+    if (__animationRuntime.hoverBound) return;
+    __animationRuntime.hoverBound = true;
+
+    document.querySelectorAll('.card-hover').forEach((card) => {
+        card.addEventListener('mouseenter', () => {
+            gsap.to(card, { y: -6, duration: 0.45, ease: 'power2.out', overwrite: 'auto' });
+        });
+        card.addEventListener('mouseleave', () => {
+            gsap.to(card, { y: 0, duration: 0.45, ease: 'power2.out', overwrite: 'auto' });
+        });
+    });
+};
+
 const initAnimations = () => {
+    const animatedElements = getAnimatedElements();
+    if (!animatedElements.length) return;
+
     const isMobile = (typeof window !== 'undefined')
         && (typeof window.matchMedia === 'function')
         && window.matchMedia('(max-width: 768px)').matches;
@@ -783,55 +882,44 @@ const initAnimations = () => {
         && (typeof window.matchMedia === 'function')
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const allAnimated = document.querySelectorAll('[data-gsap]');
-    const revealWithoutAnimation = () => {
-        allAnimated.forEach(el => {
-            el.classList.remove('opacity-0', 'translate-y-8', 'translate-y-6', 'translate-y-4');
-            el.dataset.gsapState = 'fallback-visible';
-            el.style.opacity = '1';
-            el.style.visibility = 'visible';
-            el.style.transform = 'none';
-        });
-    };
+    bindAnimationRefreshSignals();
 
-    // If GSAP unavailable, keep content visible and exit
-    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
-        console.warn('GSAP or ScrollTrigger not loaded; revealing content without animations.');
-        revealWithoutAnimation();
+    if (__animationRuntime.initialized) {
+        scheduleAnimationRefresh();
         return;
     }
 
-    // Reduced motion: keep layout stable (no transform-based entrance/scroll animations)
     if (prefersReducedMotion) {
-        revealWithoutAnimation();
+        revealGsapElementsImmediately();
+        __animationRuntime.initialized = true;
         return;
     }
 
-    allAnimated.forEach((el) => {
-        el.classList.remove('opacity-0', 'translate-y-8', 'translate-y-6', 'translate-y-4');
-        el.style.removeProperty('opacity');
-        el.style.removeProperty('visibility');
-        el.style.removeProperty('transform');
-    });
-
-    // Register ScrollTrigger
-    gsap.registerPlugin(ScrollTrigger);
     if (typeof ScrollTrigger.getAll === 'function') {
         ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     }
 
-    // Fade Up Animations
     const fadeElements = document.querySelectorAll('[data-gsap="fade-up"]');
-    const fadeDistance = isMobile ? 16 : 22;
-    const fadeDuration = isMobile ? 1.0 : 1.2;
-    const fadeStart = isMobile ? 'top 93%' : 'top 90%';
+    const fadeDistance = isMobile ? 14 : 22;
+    const fadeDuration = isMobile ? 0.82 : 1.02;
+    const fadeStart = isMobile ? 'top 94%' : 'top 90%';
     const viewportThreshold = (typeof window !== 'undefined' && window.innerHeight)
-        ? window.innerHeight * (isMobile ? 0.92 : 0.88)
+        ? window.innerHeight * (isMobile ? 0.95 : 0.9)
         : 0;
+
     gsap.killTweensOf(fadeElements);
+
+    animatedElements.forEach((element) => {
+        element.classList.remove('opacity-0', 'translate-y-8', 'translate-y-6', 'translate-y-4');
+        element.style.removeProperty('opacity');
+        element.style.removeProperty('visibility');
+        element.style.removeProperty('transform');
+        element.style.willChange = 'auto';
+        element.removeAttribute('data-gsap-state');
+    });
+
     fadeElements.forEach((element) => {
         const delay = Number.parseFloat(element.dataset.gsapDelay || '0');
-        element.removeAttribute('data-gsap-state');
         const delaySeconds = Number.isFinite(delay) ? delay : 0;
         const isInitiallyInView = element.getBoundingClientRect().top <= viewportThreshold;
 
@@ -848,7 +936,7 @@ const initAnimations = () => {
                     delay: delaySeconds,
                     ease: 'power3.out',
                     overwrite: 'auto',
-                    clearProps: 'opacity,visibility,transform',
+                    clearProps: 'opacity,visibility,transform,willChange',
                     onStart: () => {
                         element.dataset.gsapState = 'animating';
                     },
@@ -859,9 +947,12 @@ const initAnimations = () => {
             return;
         }
 
-        element.style.opacity = '0';
-        element.style.visibility = 'hidden';
-        element.style.transform = `translate3d(0, ${fadeDistance}px, 0)`;
+        gsap.set(element, {
+            autoAlpha: 0,
+            y: fadeDistance,
+            force3D: true,
+            willChange: 'opacity, transform'
+        });
 
         gsap.to(element, {
             autoAlpha: 1,
@@ -870,7 +961,7 @@ const initAnimations = () => {
             delay: delaySeconds,
             ease: 'power3.out',
             overwrite: 'auto',
-            clearProps: 'opacity,visibility,transform',
+            clearProps: 'opacity,visibility,transform,willChange',
             onStart: () => {
                 element.dataset.gsapState = 'animating';
             },
@@ -887,7 +978,6 @@ const initAnimations = () => {
         });
     });
 
-    // Parallax effect for hero section (if exists)
     const heroSection = document.querySelector('section:first-of-type[data-hero-parallax="true"]');
     if (heroSection && !isMobile && !heroSection.classList.contains('no-parallax')) {
         gsap.to(heroSection, {
@@ -902,70 +992,14 @@ const initAnimations = () => {
         });
     }
 
-    // Card hover animations
-    const cards = document.querySelectorAll('.card-hover');
-    cards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            gsap.to(card, { y: -6, duration: 0.45, ease: 'power2.out' });
-        });
-        card.addEventListener('mouseleave', () => {
-            gsap.to(card, { y: 0, duration: 0.45, ease: 'power2.out' });
-        });
-    });
-};
-
-const revealGsapElementsImmediately = () => {
-    document.querySelectorAll('[data-gsap]').forEach((el) => {
-        el.classList.remove('opacity-0', 'translate-y-8', 'translate-y-6', 'translate-y-4');
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
-        el.style.transform = 'none';
-        el.dataset.gsapState = 'fallback-visible';
-    });
+    bindCardHoverAnimations();
+    __animationRuntime.initialized = true;
+    scheduleAnimationRefresh();
 };
 
 const loadGSAPAndInit = () => {
-    const isMobile = (typeof window !== 'undefined') && (typeof window.matchMedia === 'function') && window.matchMedia('(max-width: 768px)').matches;
-    revealGsapElementsImmediately();
-    
-    const loadScripts = () => {
-        if (window.gsap && window.ScrollTrigger) {
-            initAnimations();
-            return;
-        }
-        const gsapScript = document.createElement('script');
-        gsapScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
-        gsapScript.onerror = () => {
-            revealGsapElementsImmediately();
-        };
-        gsapScript.onload = () => {
-            const stScript = document.createElement('script');
-            stScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js';
-            stScript.onload = () => {
-                initAnimations();
-            };
-            stScript.onerror = () => {
-                revealGsapElementsImmediately();
-            };
-            document.body.appendChild(stScript);
-        };
-        document.body.appendChild(gsapScript);
-    };
-
-    if (isMobile) {
-        // Mobile: Reveal content immediately (static)
-        initAnimations();
-        
-        // Load GSAP on interaction
-        const onInteraction = () => {
-            ['scroll', 'touchstart', 'mousemove'].forEach(ev => window.removeEventListener(ev, onInteraction));
-            loadScripts();
-        };
-        ['scroll', 'touchstart', 'mousemove'].forEach(ev => window.addEventListener(ev, onInteraction, { once: true, passive: true }));
-    } else {
-        // Desktop: Load GSAP immediately (content stays hidden until loaded)
-        loadScripts();
-    }
+    bindAnimationRefreshSignals();
+    initAnimations();
 };
 
 // ==========================================================================
@@ -3182,6 +3216,11 @@ const __initDynamicGameSuggestions = () => {
 };
 
 const init = () => {
+    if (typeof window !== 'undefined') {
+        if (window.__EA_SITE_INIT_DONE) return;
+        window.__EA_SITE_INIT_DONE = true;
+    }
+
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
@@ -3266,6 +3305,9 @@ init();
  * @requires DOM elements: chat-widget, chat-window, chat-messages, etc.
  */
 document.addEventListener('DOMContentLoaded', () => {
+    if (document.documentElement.dataset.savonieInit === '1') return;
+    document.documentElement.dataset.savonieInit = '1';
+
     // ======================================================================
     // Configuration
     // ======================================================================
@@ -3392,34 +3434,41 @@ document.addEventListener('DOMContentLoaded', () => {
     function positionWelcomeBubble() {
         if (!els.bubble || !els.toggleBtn) return;
 
+        const viewport = window.visualViewport || {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            offsetLeft: 0,
+            offsetTop: 0
+        };
         const toggleRect = els.toggleBtn.getBoundingClientRect();
         const bubbleRect = els.bubble.getBoundingClientRect();
-        if (!toggleRect.width || !bubbleRect.width) {
+        if (!toggleRect.width || !bubbleRect.width || !bubbleRect.height) {
             els.bubble.removeAttribute('data-positioned');
             return;
         }
 
-        const minViewportLeft = 12;
-        const maxViewportLeft = window.innerWidth - bubbleRect.width - 12;
+        const viewportPadding = window.innerWidth <= 640 ? 16 : 12;
+        const viewportLeft = viewport.offsetLeft || 0;
+        const viewportTop = viewport.offsetTop || 0;
+        const viewportWidth = viewport.width || window.innerWidth;
+        const viewportHeight = viewport.height || window.innerHeight;
+        const minViewportLeft = viewportLeft + viewportPadding;
+        const maxViewportLeft = viewportLeft + viewportWidth - bubbleRect.width - viewportPadding;
         const desiredLeft = toggleRect.left + (toggleRect.width / 2) - (bubbleRect.width / 2);
-        let resolvedLeft = desiredLeft;
-
-        if (resolvedLeft + bubbleRect.width > window.innerWidth - 12) {
-            resolvedLeft = toggleRect.right - bubbleRect.width;
-        }
-
-        if (resolvedLeft < minViewportLeft) {
-            resolvedLeft = toggleRect.left;
-        }
-
-        const clampedLeft = Math.max(minViewportLeft, Math.min(resolvedLeft, maxViewportLeft));
-        const top = Math.max(12, toggleRect.top - bubbleRect.height - 12);
+        const clampedLeft = Math.max(minViewportLeft, Math.min(desiredLeft, maxViewportLeft));
+        const preferredTop = toggleRect.top - bubbleRect.height - 12;
+        const fallbackTop = toggleRect.bottom + 12;
+        const minViewportTop = viewportTop + viewportPadding;
+        const maxViewportTop = viewportTop + viewportHeight - bubbleRect.height - viewportPadding;
+        const resolvedTop = preferredTop >= minViewportTop
+            ? preferredTop
+            : Math.min(maxViewportTop, Math.max(minViewportTop, fallbackTop));
 
         els.bubble.setAttribute('data-positioned', 'true');
-        els.bubble.style.left = `${Math.round(clampedLeft)}px`;
-        els.bubble.style.right = 'auto';
-        els.bubble.style.top = `${Math.round(top)}px`;
-        els.bubble.style.bottom = 'auto';
+        els.bubble.style.setProperty('left', `${Math.round(clampedLeft)}px`, 'important');
+        els.bubble.style.setProperty('right', 'auto', 'important');
+        els.bubble.style.setProperty('top', `${Math.round(resolvedTop)}px`, 'important');
+        els.bubble.style.setProperty('bottom', 'auto', 'important');
     }
 
     function positionWelcomeBubbleDeferred() {
@@ -3442,6 +3491,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         window.addEventListener('load', positionWelcomeBubbleDeferred, { once: true });
+        window.addEventListener('orientationchange', positionWelcomeBubbleDeferred, { passive: true });
+
+        if (window.visualViewport?.addEventListener) {
+            window.visualViewport.addEventListener('resize', positionWelcomeBubbleDeferred, { passive: true });
+            window.visualViewport.addEventListener('scroll', positionWelcomeBubbleDeferred, { passive: true });
+        }
     }
 
     // State
@@ -4025,7 +4080,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.style.setProperty('--floating-ui-lift', '0px');
         document.body.classList.remove('page-close-ui-guard');
         if (els.bubble) {
-            els.bubble.classList.remove('opacity-0', 'translate-y-4');
+            positionWelcomeBubbleDeferred();
         }
     }
 

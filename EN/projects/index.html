@@ -28,17 +28,17 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=78691f86">
-    <link rel="preload" href="/assets/css/style.css?v=78691f86" as="style">
-    <script src="/assets/js/site.min.js?v=78691f86inal-gallery-pass" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=84f62a0d">
+    <link rel="preload" href="/assets/css/style.css?v=84f62a0d" as="style">
+    <script src="/assets/js/site.min.js?v=84f62a0dinal-gallery-pass" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
     <!-- Theme CSS - loads reliably for all viewports -->
-    <link rel="stylesheet" href="/theme.css?v=78691f86">
+    <link rel="stylesheet" href="/theme.css?v=84f62a0d">
     
     <!-- Luxury Coverflow Carousel V4 -->
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=78691f86-v8">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=84f62a0d-v8">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -631,7 +631,7 @@
     
     <!-- Luxury Coverflow Carousel V4 (GSAP-powered, Roulette-enabled) -->
     <script type="module">
-        import { LuxuryCoverflow } from '/assets/js/carousel/luxury-coverflow.min.js?v=78691f86-v8';
+        import { LuxuryCoverflow } from '/assets/js/carousel/luxury-coverflow.min.js?v=84f62a0d-v8';
         import { PROJECT_CARD_PREVIEWS } from '/assets/js/data/card-preview-manifest.mjs';
         import { hydrateDocumentCardPreviews } from '/assets/js/carousel/card-preview-sync.mjs';
 
@@ -711,7 +711,11 @@
             window.addEventListener('touchstart', fastStart, { once: true, passive: true });
             window.addEventListener('keydown', fastStart, { once: true });
             window.addEventListener('wheel', fastStart, { once: true, passive: true });
-            window.addEventListener('pageshow', () => {
+            window.addEventListener('pageshow', (event) => {
+                if (event.persisted && !window.luxuryCoverflow && !initDone) {
+                    scheduleInit();
+                    return;
+                }
                 if (!window.luxuryCoverflow?.refreshLayout) return;
                 requestAnimationFrame(() => window.luxuryCoverflow.refreshLayout());
             });
@@ -723,7 +727,7 @@
                 }
                 window.luxuryCoverflow?.refreshLayout?.();
             });
-            window.addEventListener('pagehide', () => {
+            window.addEventListener('pagehide', (event) => {
                 if (idleHandle != null) {
                     if ('cancelIdleCallback' in window) {
                         window.cancelIdleCallback(idleHandle);
@@ -732,6 +736,7 @@
                     }
                     idleHandle = null;
                 }
+                if (event.persisted) return;
                 destroyExisting();
             });
         }

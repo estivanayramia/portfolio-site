@@ -2870,3 +2870,81 @@ footer {
 #chat-widget {
     bottom: 28px;
 }
+
+/* Shared chat widget anchoring */
+:root {
+    --chat-widget-edge: 1rem;
+    --chat-widget-offset-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+    --chat-widget-offset-bottom-mobile: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+
+#chat-widget {
+    position: fixed;
+    right: max(var(--chat-widget-edge), env(safe-area-inset-right, 0px)) !important;
+    left: auto !important;
+    bottom: calc(var(--chat-widget-offset-bottom) + var(--floating-ui-lift, 0px)) !important;
+    pointer-events: none;
+    z-index: 9999 !important;
+}
+
+:lang(ar) #chat-widget {
+    left: max(var(--chat-widget-edge), env(safe-area-inset-left, 0px)) !important;
+    right: auto !important;
+}
+
+#chat-widget > * {
+    pointer-events: auto;
+}
+
+#chat-toggle {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 64px !important;
+    height: 64px !important;
+}
+
+:lang(ar) #chat-toggle {
+    left: 0;
+    right: auto;
+}
+
+#welcome-bubble {
+    position: fixed;
+    width: fit-content;
+    max-width: min(18rem, calc(100vw - 2rem));
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    pointer-events: none;
+    white-space: normal;
+    transform-origin: bottom right;
+}
+
+:lang(ar) #welcome-bubble {
+    transform-origin: bottom left;
+}
+
+@media (max-width: 640px) {
+    #chat-widget {
+        right: 1rem !important;
+        left: auto !important;
+        bottom: calc(var(--chat-widget-offset-bottom-mobile) + var(--floating-ui-lift, 0px)) !important;
+    }
+
+    :lang(ar) #chat-widget {
+        left: 1rem !important;
+        right: auto !important;
+    }
+
+    #chat-toggle {
+        width: 56px !important;
+        height: 56px !important;
+    }
+
+    #welcome-bubble {
+        max-width: min(15rem, calc(100vw - 2rem));
+        font-size: 0.875rem;
+    }
+}

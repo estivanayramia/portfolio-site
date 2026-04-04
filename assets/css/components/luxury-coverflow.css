@@ -50,6 +50,7 @@
     linear-gradient(180deg, #24304c 0%, #1c253b 42%, #2f241b 100%);
   isolation: isolate;
   overflow: hidden;
+  overscroll-behavior-x: none;
 }
 
 #arcade-featured-carousel.coverflow-section {
@@ -105,7 +106,7 @@
   height: clamp(620px, 82vh, 920px);
   padding-bottom: 6.5rem;
   overflow: visible;
-  overscroll-behavior-x: contain;
+  overscroll-behavior-x: none;
   overscroll-behavior-y: contain;
   contain: paint;
 }
@@ -130,7 +131,7 @@
   perspective-origin: 50% 50%;
   transform-style: preserve-3d;
   touch-action: pan-y pinch-zoom;
-  overscroll-behavior-x: contain;
+  overscroll-behavior-x: none;
 }
 
 /* V4: Floor horizon line */
@@ -164,6 +165,7 @@
   height: 100%;
   transform-style: preserve-3d;
   overscroll-behavior: contain;
+  overscroll-behavior-x: none;
   touch-action: pan-y pinch-zoom;
 }
 
@@ -537,6 +539,7 @@
   position: relative;
   overflow: visible;
   isolation: isolate;
+  overscroll-behavior-x: none;
   padding: 0.5rem clamp(2.4rem, 5vw, 4rem) 0;
   --gallery-card-width: clamp(14rem, 32vw, 22rem);
   --gallery-card-height: clamp(18rem, 46vw, 30rem);
@@ -553,6 +556,7 @@
   transform-style: preserve-3d;
   perspective: 2200px;
   perspective-origin: 50% 50%;
+  overscroll-behavior-x: none;
   touch-action: pan-y pinch-zoom;
 }
 
@@ -679,7 +683,7 @@
   position: absolute;
   top: clamp(1rem, 2.5vw, 2rem);
   right: clamp(1rem, 2.5vw, 2rem);
-  z-index: 50;
+  z-index: 260;
   
   display: flex;
   flex-direction: column;
@@ -710,6 +714,7 @@
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   isolation: isolate;
+  pointer-events: auto;
 }
 
 .roulette-trigger-btn:hover {
@@ -1108,7 +1113,7 @@
     height: clamp(620px, 74vh, 720px);
     min-height: 620px;
     padding-bottom: 8.75rem;
-    padding-top: 3.5rem;
+    padding-top: 4.25rem;
   }
 
   .coverflow-section--no-header .coverflow-container {
@@ -1150,14 +1155,22 @@
   .roulette-trigger-btn {
     top: 0.75rem;
     right: 0.75rem;
-    width: 3rem;
-    height: 3rem;
-    padding: 0;
+    width: auto;
+    min-height: 2.875rem;
+    height: auto;
+    padding: 0.65rem 0.9rem;
     border-radius: 999px;
     justify-content: center;
+    flex-direction: row;
+    gap: 0.45rem;
   }
 
-  .roulette-trigger-btn .roulette-text,
+  .roulette-trigger-btn .roulette-text {
+    display: inline;
+    font-size: 0.78rem;
+    line-height: 1;
+  }
+
   .roulette-trigger-btn .roulette-subtext {
     display: none;
   }
@@ -1231,21 +1244,27 @@
 /* Mobile fix: reposition roulette button below carousel to prevent overlap */
 @media (max-width: 767px) {
   .roulette-trigger-btn {
-    position: static !important;
+    position: absolute !important;
+    top: 0.875rem;
+    right: 0.875rem;
     display: flex;
-    margin: 1rem auto 0;
+    margin: 0;
     float: none;
     width: auto;
     height: auto;
-    padding: 0.75rem 1.25rem;
-    border-radius: clamp(12px, 1.5vw, 16px);
+    min-height: 2.875rem;
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
     flex-direction: row;
     gap: 0.5rem;
   }
 
-  .roulette-trigger-btn .roulette-text,
-  .roulette-trigger-btn .roulette-subtext {
+  .roulette-trigger-btn .roulette-text {
     display: inline !important;
+  }
+
+  .roulette-trigger-btn .roulette-subtext {
+    display: none !important;
   }
 
   .roulette-icon {

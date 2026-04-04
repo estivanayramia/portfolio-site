@@ -2159,6 +2159,31 @@ export class LuxuryCoverflow {
     );
   }
 
+  getGestureSurfaceNodes() {
+    return Array.from(new Set([
+      this.container,
+      this.track,
+      this.container.querySelector('.coverflow-perspective'),
+      this.container.closest('.coverflow-section')
+    ].filter(Boolean)));
+  }
+
+  resetInteractionState() {
+    this.clearPositionTween();
+    this.resources.clearTimeout(this.wheelState.settleTimeout);
+    this.wheelState.accumulator = 0;
+    this.wheelState.previewPosition = this.currentIndex;
+    this.previewIndex = this.currentIndex;
+    this.pendingTarget = null;
+    this.isAnimating = false;
+    this.dragState.isDragging = false;
+    this.dragState.axisLocked = null;
+    this.dragState.sequence = null;
+    this.dragState.rafPending = false;
+    this.activePointerId = null;
+    this.container.classList.remove('is-dragging');
+  }
+
   setupKeyboardNavigation() {
     if (!this.config.enableKeyboard) return;
 
@@ -2209,6 +2234,9 @@ export class LuxuryCoverflow {
         if (event.target.closest('button, a, [data-no-drag]')) return;
 
         this.activePointerId = event.pointerId;
+        try {
+          event.currentTarget?.setPointerCapture?.(event.pointerId);
+        } catch (error) {}
         if (isTouchPointer) {
           this.lastPointerTouchAt = performance.now();
           event.preventDefault();
@@ -2229,6 +2257,9 @@ export class LuxuryCoverflow {
 
       const finishPointerDrag = (event) => {
         if (this.activePointerId != null && event.pointerId !== this.activePointerId) return;
+        try {
+          this.track.releasePointerCapture?.(event.pointerId);
+        } catch (error) {}
         this.activePointerId = null;
         if (this.dragState.isDragging) this.endDrag();
       };
@@ -2290,7 +2321,8 @@ export class LuxuryCoverflow {
 
       const absX = Math.abs(event.deltaX);
       const absY = Math.abs(event.deltaY);
-      if (absX < 10 || absX <= absY * 1.2) return;
+      const isHorizontalIntent = absX >= 6 && absX > absY * 1.15;
+      if (!isHorizontalIntent || !event.cancelable) return;
 
       event.preventDefault();
       event.stopPropagation();
@@ -2320,8 +2352,8 @@ export class LuxuryCoverflow {
       }, 110);
     };
 
-    [this.container, this.track, this.container.closest('.coverflow-section')].filter(Boolean).forEach((node) => {
-      this.resources.listen(node, 'wheel', handleWheel, { passive: false });
+    this.getGestureSurfaceNodes().forEach((node) => {
+      this.resources.listen(node, 'wheel', handleWheel, { passive: false, capture: true });
     });
   }
 
@@ -2516,6 +2548,16 @@ export class LuxuryCoverflow {
 
     this.resources.listen(window, 'resize', handleResize, { passive: true });
     this.resources.listen(window, 'orientationchange', handleResize, { passive: true });
+    this.resources.listen(window, 'pageshow', (event) => {
+      if (!event.persisted) return;
+      this.resetInteractionState();
+      gsap.killTweensOf(this.items);
+      this.resources.raf(() => refresh());
+    }, { passive: true });
+    this.resources.listen(document, 'visibilitychange', () => {
+      if (document.visibilityState !== 'visible') return;
+      this.resources.raf(() => refresh());
+    });
 
     if ('ResizeObserver' in window) {
       const observer = this.resources.observe(new ResizeObserver(handleResize));
