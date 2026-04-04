@@ -6,7 +6,7 @@ import {
   tokenizeText
 } from "./chat-grounding-utils.mjs";
 
-export const CHAT_VERSION = "v2026.03.30-savonie-v3";
+export const CHAT_VERSION = "v2026.03.30-savonie-v2";
 
 const FACTS_KEY = "site-facts:v1";
 const PROFILE_KEY = "profile:public:v1";
@@ -34,6 +34,7 @@ const DEFAULT_START_ROUTES = [
   "/about",
   "/projects/",
   "/contact",
+  "/hobbies/",
   "/es/",
   "/ar/"
 ];
@@ -70,11 +71,6 @@ const BANNED_LANGUAGE = [
   "family culture"
 ];
 
-// ═══════════════════════════════════════════════════════════════════════
-// PERSONAL_KNOWLEDGE — Single source of truth for ALL personal facts.
-// Every entry is verified from site content. Nothing is fabricated.
-// Gemini receives this in every prompt so it NEVER has to guess.
-// ═══════════════════════════════════════════════════════════════════════
 const PERSONAL_KNOWLEDGE = {
   identity: {
     fullName: "Estivan Ayramia",
@@ -89,9 +85,9 @@ const PERSONAL_KNOWLEDGE = {
       degree: "General Business",
       graduationDate: "December 2025",
       gpa: "approximately 3.8",
-      focus: "Practical execution — taking messy situations and making them clearer and more manageable"
+      focus: "Practical execution: taking messy situations and making them clearer and more manageable"
     },
-    chaldeanContext: "Part of an ancient community tracing back to Mesopotamian times. Chaldean is a dialect related to the language Jesus spoke. First-generation American. Parents had an arranged marriage. Dad was an electrical engineer. Mom restarted her education from scratch in the USA and earned a BS in Business Administration from SDSU after nearly a decade of classes.",
+    chaldeanContext: "Part of an ancient community tracing back to Mesopotamian times. Chaldean is a dialect related to the language Jesus spoke. First-generation American. Parents had an arranged marriage. Dad was an electrical engineer. Mom restarted her education from scratch in the USA and earned a BS in Business Administration from SDSU after nearly a decade.",
     firstGenContext: "Being first-generation means figuring out systems not built with you in mind. No family connections in corporate America, no inherited safety net. What that builds is resourcefulness and a deep appreciation for every inch of progress."
   },
   languages: {
@@ -101,7 +97,7 @@ const PERSONAL_KNOWLEDGE = {
   },
   work: {
     current: "Coach and chaperone role working with kids. Moved into a lead position within 14 months with a promotion and significantly more responsibility.",
-    workLessons: "Kids call out anything that does not add up, so you learn to be straight with them. Being able to hold attention, de-escalate, and improvise in real time is like a crash course in leadership.",
+    workLessons: "Kids call out anything that doesn't add up, so you learn to be straight with them. Being able to hold attention, de-escalate, and improvise in real time is like a crash course in leadership.",
     seeking: "Operations and project coordination work. Open to new opportunities, remote or San Diego hybrid. Looking for respectful accountability, clear ownership, and real intellectual challenge. Not looking to be babysat."
   },
   preferences: {
@@ -115,11 +111,11 @@ const PERSONAL_KNOWLEDGE = {
     },
     favoriteShows: {
       answer: "White Collar, Burn Notice, Prison Break, and Psych",
-      why: "Psych stands out because of how closely it notices details. There is a pattern across all of them: shows about people who are resourceful, observant, and solve problems using what they have."
+      why: "Psych stands out because of how closely it notices details. There's a pattern: shows about people who are resourceful, observant, and solve problems using what they have."
     },
     favoriteBook: {
       answer: "How to Win Friends and Influence People",
-      why: "The useful part is the genuine-interest side of it, not the cheesy version. It is about actually listening and caring about what the other person needs."
+      why: "The useful part is the genuine-interest side of it, not the cheesy version. It's about actually listening and caring about what the other person needs."
     },
     favoriteMusic: {
       answer: "Drake, Arctic Monkeys, The Marias, and The Neighbourhood",
@@ -140,7 +136,7 @@ const PERSONAL_KNOWLEDGE = {
       favoriteTeam: "FC Barcelona"
     },
     style: {
-      summary: "His style depends on the outing",
+      summary: "Style depends on the outing",
       shoes: "Nike Dunks, Jordan 1s, and Air Forces",
       note: "He cares about cologne more than most people probably should."
     }
@@ -151,53 +147,54 @@ const PERSONAL_KNOWLEDGE = {
     "Showing up consistently and delivering on commitments",
     "Translating complex ideas into clear, actionable steps",
     "Self-directed learning and quickly picking up new tools",
-    "Pattern recognition — noticing where things break down before they become real problems",
-    "Four languages enabling cross-cultural communication in professional settings"
+    "Pattern recognition",
+    "Four languages enabling cross-cultural communication"
   ],
   workingOn: [
+    "Saying no to distractions and staying focused on high-impact work",
     "Being more direct in communication rather than overexplaining",
-    "Delegating tasks instead of trying to do everything himself",
+    "Delegating tasks instead of trying to do everything myself",
     "Building patience for long-term projects that take months to see results",
     "Getting better at public speaking and presenting in front of groups"
   ],
   systems: {
     proofOfWorkLoop: "Build something real, document it clearly, iterate until it is good enough, then move on. A recruiter can evaluate actual work instead of reading inflated bullet points.",
-    learningSystem: "Learns by asking questions repeatedly and cycling material until it sticks. Almost never takes notes because it does not help much. Matches how his brain works — and it is consistent with finishing General Business on track with a strong GPA.",
-    focusDiscipline: "Deleted short-form social media because it is too easy to waste hours. Phone time down to about 3-5 hours/day (used to be way higher). Eliminated most notifications because constant buzzing hijacks attention. Daily reminder he actually uses: 'Do not say anything negative today.' Trains 4-5 days/week at the gym — it is where his mind quiets down and focus locks in."
+    learningSystem: "Learns by asking questions repeatedly and cycling material until it sticks. Almost never takes notes because it does not help much. Matches how his brain works.",
+    focusDiscipline: "Deleted short-form social media. Phone time down to 3-5 hours/day (used to be way higher). Eliminated most notifications. Daily reminder: 'Do not say anything negative today.' Trains 4-5 days/week at the gym."
   },
   values: {
-    reliabilityOverFlash: "Consistency is what actually moves things forward. Showing up on time, doing what you said you would, and having a backup plan when things go sideways. It is not exciting, but it is what makes people trust you.",
-    peopleAreTheSystem: "The best process in the world falls apart if the people running it are not on board. Understanding where someone is coming from, communicating clearly, and knowing how to work through friction matters more than most job descriptions let on.",
-    executionIsEverything: "A great idea with no follow-through is just a conversation. Checklists, time blocks, and honest review loops are what separate things that actually ship from things that live forever in a Notes app.",
-    growthThroughDiscomfort: "The best learning happens right at the edge of what you can actually do. Seek out challenges that feel just a bit out of reach, write down what goes wrong, adjust, and keep going.",
-    documentationMatters: "If it only exists in someone's head, it does not really exist. Written records become reference material that compounds over time.",
-    systemsBeatWillpower: "Motivation is great when it shows up. It does not always show up. What actually keeps things moving is having a setup that makes it easier to do the right thing than to skip it.",
-    feedbackIsAGift: "Feedback that is actually honest is rare and worth a lot. The kind that stings a little is usually the kind that changes something."
+    reliabilityOverFlash: "Consistency moves things forward. Showing up on time, doing what you said you would, having a backup plan.",
+    peopleAreTheSystem: "Best process falls apart if people running it are not on board. Understanding where someone is coming from matters more than most job descriptions let on.",
+    executionIsEverything: "A great idea with no follow-through is just a conversation. Checklists, time blocks, honest review loops.",
+    growthThroughDiscomfort: "Best learning happens at the edge of what you can do. Seek challenges just out of reach.",
+    documentationMatters: "If it only exists in someone's head, it does not really exist.",
+    systemsBeatWillpower: "Having a setup that makes it easier to do the right thing than to skip it.",
+    feedbackIsAGift: "Honest feedback is rare and worth a lot. The kind that stings is usually the kind that changes something."
   },
   workingWithMe: {
-    reliabilityOverHeroics: "Would rather be the person who shows up every day and does what they said than the person who pulls off something spectacular once and disappears. If something is slipping, will tell you before it becomes a problem. No surprises.",
-    continuousImprovement: "Good enough to ship beats perfect and stuck. Put things out, see what actually happens, and fix what needs fixing. The first version is mostly just a question — the next version is where the real answer shows up.",
-    ownershipNotExcuses: "If something is his responsibility and it goes wrong, that is on him. Fix it, understand what happened, and make sure it does not happen the same way again.",
-    leadershipStyle: "Learned from working with kids: be straight, hold attention, de-escalate, and improvise in real time. You cannot fake it with kids — they know when you are being real."
+    reliabilityOverHeroics: "Would rather show up every day and do what they said than pull off something spectacular once and disappear. If something is slipping, will tell you before it becomes a problem.",
+    continuousImprovement: "Good enough to ship beats perfect and stuck. Put things out, see what happens, fix what needs fixing.",
+    ownershipNotExcuses: "If something is my responsibility and it goes wrong, that is on me.",
+    leadershipStyle: "Learned from working with kids: be straight, hold attention, de-escalate, improvise in real time."
   },
   threeDecisions: {
-    systemsOverShortcuts: "Early on, he realized that quick fixes create debt. Every time he chose to build a repeatable process instead of just solving the immediate problem, it compounded. Now he spends less time firefighting because the systems handle the predictable stuff.",
-    leaningIntoDiscomfort: "Taking on projects that felt too big, having conversations that felt too hard, and putting himself in situations where failure was possible. The growth only happened at the edges of what he could handle. Staying comfortable meant staying stuck.",
-    writingThingsDown: "Documenting processes, lessons learned, and reflections. Most people skip this step because it feels like extra work. But written records become reference material that compounds. This portfolio exists because he decided to document rather than just experience."
+    systemsOverShortcuts: "Quick fixes create debt. Building repeatable processes compounds over time.",
+    leaningIntoDiscomfort: "Taking on projects that felt too big, having conversations that felt too hard. Growth only happened at the edges.",
+    writingThingsDown: "Documenting processes, lessons learned, and reflections. This portfolio exists because he decided to document rather than just experience."
   },
   timeline: [
-    "Born in Baghdad, Iraq",
+    "Born in Baghdad",
     "Lived in Syria as a refugee",
-    "Moved to El Cajon, California in 2008 at age 4",
-    "General Business at SDSU, graduated December 2025, GPA approximately 3.8",
-    "Coaching/chaperone work with kids — promoted to lead within 14 months",
-    "Directed this portfolio site using AI development tools (Claude, Copilot, Gemini) with PWA support, service workers, Lighthouse 90+ scores, and an AI assistant (Savonie)"
+    "Moved to El Cajon in 2008 at age 4",
+    "General Business at SDSU, graduated December 2025, GPA ~3.8",
+    "Coaching/chaperone work with kids, promoted to lead within 14 months",
+    "Built this portfolio site from scratch with PWA support, service workers, Lighthouse 90+ scores, and an AI assistant"
   ],
   siteInfo: {
     url: "https://www.estivanayramia.com",
-    builtBy: "Estivan directing AI tools — AI wrote every line of code, Estivan designed, reviewed, and shipped",
-    features: "PWA support, service workers, Lighthouse 90+ scores, AI chatbot (Savonie), scroll progress, coverflow carousel, multi-language support (English, Spanish, Arabic), dark/light theme",
-    purpose: "A resume leaves too much out. This site exists so people can see the actual work, thinking, and personality — not just bullet points."
+    builtBy: "Estivan, hand-coded",
+    features: "PWA support, service workers, Lighthouse 90+ scores, AI assistant (Savonie), scroll progress, coverflow carousel, multi-language (English, Spanish, Arabic)",
+    purpose: "A resume leaves too much out. This site exists so people can see the actual work, thinking, and personality."
   },
   contact: {
     email: "hello@estivanayramia.com",
@@ -208,32 +205,20 @@ const PERSONAL_KNOWLEDGE = {
 };
 
 const SURFACE_FACT_PATTERNS = [
-  { key: "favorite_color", pattern: /\b(favo[u]?rite|like).*(color|colour)|what.*(color|colour).*(like|favorite)\b/i },
-  { key: "favorite_movie", pattern: /\b(favo[u]?rite).*movie\b|\bwhat.*movie.*(favorite|like)\b|\bbest movie\b/i },
-  { key: "favorite_show", pattern: /\b(favo[u]?rite).*(show|shows|series|tv)\b|\bwhat.*(tv|series).*(watch|like)\b|\bwhat shows? does he watch\b/i },
-  { key: "favorite_book", pattern: /\b(favo[u]?rite|best).*book|what.*book.*(favorite|like)\b/i },
-  { key: "favorite_music", pattern: /\b(favo[u]?rite|best).*(music|artist|artists|band|bands)|what.*(listen to|music|artist|band)\b/i },
-  { key: "favorite_food", pattern: /\b(favo[u]?rite|best).*(food|foods|meal)|what.*(eat|food|meal|dessert|pizza|pasta)\b/i },
-  { key: "favorite_drink", pattern: /\b(favo[u]?rite|best).*(drink|drinks)|what.*(drink|coffee|caffeine|coke zero|water)\b/i },
+  { key: "favorite_color", pattern: /\b(favo[u]?rite|what color).*color|\bcolor\b/i },
+  { key: "favorite_movie", pattern: /\b(favo[u]?rite|best).*movie|\bmovie\b/i },
+  { key: "favorite_show", pattern: /\b(favo[u]?rite|best).*(show|shows|series)|\b(show|series)\b/i },
+  { key: "favorite_book", pattern: /\b(favo[u]?rite|best).*book|\bbook\b/i },
+  { key: "favorite_music", pattern: /\bmusic|artist|artists|band|bands|listen to\b/i },
+  { key: "favorite_food", pattern: /\bfood|foods|eat|eating|meal|pizza|pasta|dessert\b/i },
+  { key: "favorite_drink", pattern: /\bdrink|drinks|coffee|caffeine|coke zero|water\b/i },
   { key: "favorite_team", pattern: /\bbarcelona|fc barcelona|favorite team|sports team\b/i },
-  { key: "favorite_sport", pattern: /\b(favo[u]?rite|best).*(sport|sports)|what.*sport.*(favorite|play)\b/i },
+  { key: "favorite_sport", pattern: /\bsport|sports|soccer|football|volleyball|pickleball\b/i },
   { key: "languages", pattern: /\blanguages?|speak|write in|english|arabic|chaldean|spanish\b/i },
-  { key: "education", pattern: /\b(education|graduat(e|ed|ion)|degree|college|university|school|sdsu|major|studied)\b/i },
-  { key: "birthday", pattern: /\bbirthday\b|\bborn on\b|\bwhen.*born\b|\bage\b|\bhow old\b|\bold is\b/i },
-  { key: "hometown", pattern: /\bwhere.*from|hometown|grew up|el cajon|baghdad|born in\b/i },
+  { key: "hometown", pattern: /\bwhere.*from|hometown|grew up|el cajon|baghdad|born\b/i },
+  { key: "birthday", pattern: /\bbirthday\b|\bborn on\b|\bwhen.*born\b|\bage\b/i },
   { key: "height", pattern: /\bheight|how tall|tall\b/i },
-  { key: "style", pattern: /\bstyle|dress|clothes|fashion|shoes|cologne|jewelry\b/i },
-  { key: "work", pattern: /\bcurrent (job|role|work)|what does he do for (work|a living)|where does he work|coach|549 sports\b/i },
-  { key: "gpa", pattern: /\bgpa|grade point|grades\b/i },
-  { key: "strengths", pattern: /\bstrengths?|good at|best at|strongest\b/i },
-  { key: "weaknesses", pattern: /\bweakness(es)?|working on|improving|growth area\b/i },
-  { key: "hobbies", pattern: /\bhobb(y|ies)|free time|fun|do for fun|outside work\b/i },
-  { key: "car", pattern: /\b(bmw|540i|mods|modification)\b|\bhis car\b|\bcar mods\b|\bwhat car\b/i },
-  { key: "skills", pattern: /\b(crm|salesforce|hubspot|pardot|certif)\b|\bhis skills\b|\bwhat skills\b|\btools does he\b|\bcrm tools\b|\bwhat tools\b|\btechnical skills\b/i },
-  { key: "heritage", pattern: /\b(chaldean|refugee|iraqi?)\b|\bhis (heritage|background)\b/i },
-  { key: "family", pattern: /\b(brother|sibling|parent)s?\b|\bhis (mom|dad|father|mother|family)\b|\bdoes he have (brothers|siblings|family)\b/i },
-  { key: "values", pattern: /\bhis values\b|\bwhat does he value\b|\bwhat.*believe\b|\bwork ethic\b|\bphilosophy\b/i },
-  { key: "zodiac", pattern: /\bzodiac|star sign|astrolog|aquarius\b/i }
+  { key: "style", pattern: /\bstyle|dress|clothes|fashion|shoes|cologne|jewelry\b/i }
 ];
 
 function now() {
@@ -242,18 +227,6 @@ function now() {
 
 function withTrailingSlash(baseUrl) {
   return String(baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, "");
-}
-
-function normalizeComparableText(value) {
-  return String(value || "")
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[''`']/g, "")
-    .replace(/[^a-z0-9\s/'-]+/gi, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase()
-    .replace(/\bloral\b/g, "loreal");
 }
 
 function getCacheEntry(name) {
@@ -299,9 +272,6 @@ function getMinimalProfileFallback() {
     },
     identity: {
       hometown: "El Cajon, California",
-      birthday: "January 21, 2004",
-      birthplace: "Baghdad, Iraq",
-      height: "5'10\" barefoot",
       education: {
         school: "San Diego State University",
         degree: "General Business"
@@ -326,88 +296,7 @@ function getMinimalProfileFallback() {
 function getMinimalFactsFallback() {
   return {
     version: "fallback-facts",
-    projects: [
-      {
-        id: "taking-down-endpoint",
-        title: "Taking Down Endpoint (Competitive Playbook)",
-        class: "MKTG 476 Interactive Marketing, SDSU",
-        instructor: "Isa Grimes (CMO at Endpoint Clinical)",
-        estivanRole: "Strategy, Website & 3rd Party",
-        format: "20+ page competitive strategy deck",
-        summary: "Competitive playbook analyzing Almac, 4G Clinical, and other competitors to Endpoint Clinical. Includes SWOT analysis, positioning strategy, SEO/SEM/LLM optimization, marketing automation workflows, and analytics framework.",
-        keyInsights: ["Competitor positioning gaps", "SEO and LLM optimization strategy", "Marketing automation flows", "Analytics integration"],
-        whatItProves: "Strategic thinking, competitive analysis, synthesizing complex market data into actionable positioning",
-        url: "/projects/endpoint-competitive-playbook"
-      },
-      {
-        id: "endpoint-linkedin-campaign",
-        title: "Endpoint LinkedIn Campaign",
-        class: "MKTG 476 Interactive Marketing, SDSU",
-        instructor: "Isa Grimes (CMO at Endpoint Clinical)",
-        format: "15-page LinkedIn campaign plan deck",
-        summary: "Phase 2A and 2B retargeting strategy. Phase 2A: qualified leads via carousel retargeting. Phase 2B: deeper interest via video retargeting. Includes KPI targets, kill/scale rules, and experiment hypotheses.",
-        keyInsights: ["Phase-based campaign architecture", "Retargeting from awareness to conversion", "KPI targets per phase", "Kill/scale rules for budget optimization"],
-        whatItProves: "Campaign planning discipline, metrics-driven marketing, structured phased execution",
-        url: "/projects/endpoint-linkedin-campaign"
-      },
-      {
-        id: "franklin-templeton",
-        title: "Franklin Templeton x Mashable ME Partnership",
-        class: "MKTG 476 Interactive Marketing, SDSU",
-        instructor: "Isa Grimes",
-        format: "17-page concept deck (English + Arabic version)",
-        summary: "Campaign concept targeting women investors in the UAE. Estivan built the Arabic version of the deck, reviewed by his family for accuracy. Women make up ~8% of UAE ETF investors, growing 18% in 5 years.",
-        keyInsights: ["Dual-language content creation", "Community-driven engagement", "Social media pivot for traditional brand", "UAE women investor market opportunity"],
-        whatItProves: "Multilingual content creation, cultural sensitivity, market research, bilingual campaign execution",
-        url: "/projects/franklin-templeton-concept"
-      },
-      {
-        id: "loreal-cell-bioprint",
-        title: "L'Oréal Cell BioPrint MAPS Campaign",
-        class: "MKTG 476 Interactive Marketing, SDSU",
-        instructor: "Isa Grimes",
-        format: "Full MAPS campaign deck",
-        summary: "Campaign mapping three personas (Margaret the consumer, Madison the medspa, Ida the influencer) across the marketing funnel. Touchpoints by stage: ads, landing pages, website triggers, email, and retention.",
-        keyInsights: ["Three distinct persona profiles", "Touchpoints by funnel stage", "One funnel across all personas", "Positioning and target market segmentation"],
-        whatItProves: "Persona-driven marketing, funnel architecture, touchpoint mapping, audience segmentation",
-        url: "/projects/loreal-maps-campaign"
-      },
-      {
-        id: "isa-grimes-interview",
-        title: "Isa Grimes Interview",
-        format: "Editorial interview feature",
-        summary: "A real conversation with Isa Grimes (CMO at Endpoint Clinical, SDSU professor) about your 20s, people skills, leadership, favoritism, support systems, and why the fastest route is not always the right one.",
-        keyInsights: ["People judgment matters more than titles", "Leadership is reading situations and adapting", "Mentorship and support systems", "Patience over quick wins"],
-        whatItProves: "Interview ability, people skills, editorial thinking, relationship building",
-        url: "/projects/isa-grimes-interview"
-      },
-      {
-        id: "endpoint-elosity-video",
-        title: "Endpoint Elosity Video Concept",
-        format: "49-second video concept (unlisted YouTube)",
-        summary: "Solo video for Endpoint's Elosity platform. Made with no prior video production experience using Google Gemini Veo 3.0, CapCut Pro, and audio tools.",
-        whatItProves: "Willingness to learn new tools, creative problem-solving, self-directed execution",
-        url: "/projects/endpoint-elosity-video"
-      },
-      {
-        id: "this-website",
-        title: "This Website (Portfolio)",
-        format: "Full-stack portfolio site",
-        summary: "Started late November 2025 with no coding background. Over 300 hours of directing, reviewing, and shipping. AI wrote every line of code (Claude, Copilot, Gemini). Estivan designed, reviewed, and shipped.",
-        whatItProves: "Initiative, follow-through, quality standards, ability to direct complex technical work",
-        url: "/projects/portfolio"
-      }
-    ],
-    resume: {
-      coreSkills: ["Consultative recommendations", "Upselling", "Objection handling", "Service recovery", "CRM exposure (Salesforce, HubSpot, Pardot)", "Google Analytics Certification", "Microsoft Clarity", "Multilingual communication"],
-      experience: [
-        { role: "Sports Coach", company: "549 Sports LLC", dates: "Sep 2024 – Present", key: "Supervise 20-80 children per session, multilingual communication, incident reports" },
-        { role: "Retail Sales Associate", company: "Convenience Retail and Fuel", dates: "Sept 2023 – Aug 2024", key: "Upper-four-digit daily sales, 8-12 customers at peak, inventory reorganization" },
-        { role: "Store Associate", company: "Del Sol Market", dates: "May – Aug 2023", key: "30-100 transactions per shift, alternative suggestions increasing basket size" },
-        { role: "Independent Contractor", company: "Delivery Services", dates: "2021 – 2022", key: "40-70 deliveries/week, ~4.9/5 rating" }
-      ],
-      education: { school: "SDSU", degree: "BS Business Administration (General Business)", graduation: "Dec 18, 2025", gpa: "3.71" }
-    },
+    projects: [],
     hobbies: [],
     meta: {
       projectCount: 0,
@@ -415,59 +304,6 @@ function getMinimalFactsFallback() {
       source: "Minimal fallback"
     }
   };
-}
-
-function sanitizeConversationHistory(rawHistory) {
-  if (!Array.isArray(rawHistory)) return [];
-
-  return rawHistory
-    .slice(-8)
-    .map((entry) => {
-      if (!entry || typeof entry !== "object") return null;
-
-      if (entry.kind === "card" && entry.cardId) {
-        return {
-          kind: "card",
-          cardId: cleanTextFragment(entry.cardId).slice(0, 120)
-        };
-      }
-
-      if (entry.kind === "text" && entry.sender && entry.text) {
-        return {
-          kind: "text",
-          sender: cleanTextFragment(entry.sender).slice(0, 16),
-          text: cleanTextFragment(entry.text).slice(0, 500)
-        };
-      }
-
-      return null;
-    })
-    .filter(Boolean);
-}
-
-function isAmbiguousFollowUp(message) {
-  const lower = String(message || "").toLowerCase().trim();
-  if (!lower) return false;
-  if (lower.length <= 72 && /\b(it|that|this|those|them|he|his|him|more|deeper|why|how so|what about that|and that|tell me more)\b/i.test(lower)) {
-    return true;
-  }
-  return /^(and|also|more|why|how|what about that|tell me more)/i.test(lower);
-}
-
-function buildHistoryAwareQuery(message, history) {
-  const current = cleanTextFragment(message || "");
-  if (!history.length) return current;
-  if (!isAmbiguousFollowUp(current)) return current;
-
-  const previousUser = [...history]
-    .reverse()
-    .find((entry) => entry.kind === "text" && entry.sender === "user" && cleanTextFragment(entry.text) !== current);
-  const parts = [current];
-  if (previousUser?.text) {
-    parts.push(`Previous user question: ${previousUser.text}`);
-  }
-
-  return cleanTextFragment(parts.join(" "));
 }
 
 function parsePageContext(rawPageContext, legacyPageContent) {
@@ -539,7 +375,7 @@ function normalizeManifest(manifest) {
           : tokenizeText(`${section.heading || ""} ${section.text || ""}`).slice(0, 24)
       })).filter((section) => section.heading || section.text) : []
     }))
-    .filter((page) => page.route && isRelevantInternalRoute(page.route));
+    .filter((page) => page.route);
 
   return {
     ...manifest,
@@ -569,37 +405,6 @@ async function loadPageManifest(env) {
 
   const kvManifest = env?.__PAGE_MANIFEST || await loadJsonFromKv(env, PAGE_MANIFEST_KEY);
   return setCacheEntry("manifest", normalizeManifest(kvManifest));
-}
-
-async function loadJsonFromUrl(url) {
-  if (!url) return null;
-  try {
-    const response = await fetch(url, {
-      headers: {
-        Accept: "application/json"
-      }
-    });
-    if (!response?.ok) return null;
-    return await response.json();
-  } catch {
-    return null;
-  }
-}
-
-async function primeFallbackGrounding(env, baseUrl) {
-  if (!env) return;
-
-  if (!env.__SITE_FACTS) {
-    env.__SITE_FACTS = await loadJsonFromUrl(`${withTrailingSlash(baseUrl)}/assets/data/site-facts.json`);
-  }
-
-  if (!env.__PAGE_MANIFEST) {
-    env.__PAGE_MANIFEST = await loadJsonFromUrl(`${withTrailingSlash(baseUrl)}/assets/data/chat-page-manifest.json`);
-  }
-
-  if (!env.__CHAT_PROFILE) {
-    env.__CHAT_PROFILE = await loadJsonFromUrl(`${withTrailingSlash(baseUrl)}/data/chat/estivan-profile.public.json`);
-  }
 }
 
 function chooseManifestBuildVersion(pages) {
@@ -716,7 +521,7 @@ async function refreshManifestIfNeeded(env, request, requestedBuildVersion, mani
 }
 
 function detectRegister(message) {
-  const lower = normalizeComparableText(message);
+  const lower = String(message || "").toLowerCase();
 
   if (/(actually|be honest|seriously|mostly ai|just ai|real skill|why should|convince me)/i.test(lower)) {
     return "skeptical";
@@ -738,10 +543,10 @@ function detectRegister(message) {
 }
 
 function classifyQuestion(message) {
-  const lower = normalizeComparableText(message);
+  const lower = String(message || "").toLowerCase().trim();
 
   if (!lower) return QUESTION_CLASSES.UNKNOWN;
-  if (/^(hi|hello|hey|yo|sup|what's up|whats up|good morning|good afternoon|good evening|lol|lmao|haha|bruh|ayy|what is this|what even is this)\b/.test(lower) || /^(who are you|what can you do|help|what is this)$/i.test(lower)) {
+  if (/^(hi|hello|hey|yo|what's up|whats up|good morning|good afternoon|good evening)\b/.test(lower)) {
     return QUESTION_CLASSES.GREETING;
   }
   if (/\b(contact|email|reach out|reach him|reach you|linkedin)\b/.test(lower)) {
@@ -750,16 +555,10 @@ function classifyQuestion(message) {
   if (/\b(resume|cv|download)\b/.test(lower)) {
     return QUESTION_CLASSES.RESUME;
   }
-  if (/\b(why hire|more experience|hire you|hire him|worth interviewing|recruiter|quick pitch|elevator pitch|sell me on|convince me|pitch me)\b/.test(lower)) {
-    if (/\b(project|projects|which project|one project|start with|look at first|open first|read first|best project|top project)\b/.test(lower)) {
-      return QUESTION_CLASSES.PROJECT_LIST;
-    }
+  if (/\b(why hire|more experience|hire you|hire him|worth interviewing)\b/.test(lower)) {
     return QUESTION_CLASSES.HIRE_CASE;
   }
-  if (/\b(mostly ai|just ai|is this ai|real skill|actually skilled|just chatgpt|just gpt|chatgpt with|gpt wrapper|ai wrapper|is savonie|savonie just)\b/.test(lower)) {
-    return QUESTION_CLASSES.SKEPTICAL_AI;
-  }
-  if (/\b(code|coded|built|build|develop|hand.?code|program)\b/.test(lower) && /\b(this site|himself|herself|alone|scratch|from scratch|by hand)\b/.test(lower)) {
+  if (/\b(mostly ai|just ai|is this ai|real skill|actually skilled)\b/.test(lower)) {
     return QUESTION_CLASSES.SKEPTICAL_AI;
   }
   if (SURFACE_FACT_PATTERNS.some((entry) => entry.pattern.test(lower))) {
@@ -777,7 +576,7 @@ function classifyQuestion(message) {
   if (/\b(what does this site prove|what does the site prove|what does the website prove)\b/.test(lower)) {
     return QUESTION_CLASSES.SITE_PROOF;
   }
-  if (/\b(projects|work samples|what have you done|what projects|which project|recommend|start with|look at first|best project|top project|strongest|most impressive|what should i (see|look|check|open|read)|read first)\b/i.test(lower) || /\bproject.*(best|show|demonstrat|prov)\b/i.test(lower) || /\bbest (show|demonstrat|prov).*(project|work|execution|initiative|skill)\b/i.test(lower)) {
+  if (/\b(projects|work samples|what have you done|what projects)\b/.test(lower)) {
     return QUESTION_CLASSES.PROJECT_LIST;
   }
   if (/\b(languages|speak|write in|english|arabic|chaldean|spanish)\b/.test(lower)) {
@@ -786,13 +585,13 @@ function classifyQuestion(message) {
   if (/\b(sat|act|gpa|gmat|lsat|class rank|iq)\b/.test(lower)) {
     return QUESTION_CLASSES.UNKNOWN;
   }
-  if (/\b(relationship|dating|girlfriend|boyfriend|ex|family drama|mental health|diagnosed|address|where exactly do you live|salary you make|phone number|ssn|social security|income|how much.*make|how much.*earn)\b/.test(lower)) {
+  if (/\b(relationship|dating|girlfriend|boyfriend|ex|family drama|mental health|diagnosed|address|where exactly do you live|salary you make)\b/.test(lower)) {
     return QUESTION_CLASSES.BOUNDARY;
   }
-  if (/\b(what's he about|whats he about|what is estivan about|what are you about|who are you|tell me about yourself|tell me about estivan|what does estivan do|what does he do|what do you do)\b/.test(lower)) {
+  if (/\b(what's he about|whats he about|what are you about|who are you|tell me about yourself|tell me about estivan)\b/.test(lower)) {
     return QUESTION_CLASSES.ABOUT_GENERAL;
   }
-  if (/\b(page|site|homepage|overview|deep dive|about|project page|hobbies|whispers|portfolio build|l[' ]?oreal|loreal|endpoint|franklin|cooking|reading|photography|me page)\b/.test(lower)) {
+  if (/\b(page|site|homepage|overview|deep dive|about|project page|hobbies|whispers|portfolio build|loreal|endpoint|franklin|cooking|reading|photography|me page)\b/.test(lower)) {
     return QUESTION_CLASSES.PAGE_SPECIFIC;
   }
   // Detect complex multi-part or analytical questions
@@ -800,77 +599,56 @@ function classifyQuestion(message) {
   if (wordCount > 12 || /\b(and also|as well as|in addition|furthermore|compare|contrast|relationship between|how does.*relate|what.*connection|walk me through|break down|strengths? and weaknesses?|tell me about.*and)\b/.test(lower)) {
     return QUESTION_CLASSES.COMPLEX_OPEN;
   }
+
   return QUESTION_CLASSES.OPEN;
 }
 
 function detectSurfaceFactKey(message) {
-  const lower = normalizeComparableText(message);
+  const lower = String(message || "").toLowerCase();
   const match = SURFACE_FACT_PATTERNS.find((entry) => entry.pattern.test(lower));
   return match ? match.key : "";
 }
 
 function scorePage(page, queryTokens, message, questionClass) {
-  const lower = normalizeComparableText(message);
+  const lower = String(message || "").toLowerCase();
   let score = 0;
   const route = String(page.route || "");
-  const title = normalizeComparableText(page.title || "");
-  const summary = normalizeComparableText(page.summary || "");
-  const description = normalizeComparableText(page.description || "");
-  const headings = normalizeComparableText((page.headings || []).join(" "));
+  const title = String(page.title || "").toLowerCase();
+  const summary = String(page.summary || "").toLowerCase();
+  const description = String(page.description || "").toLowerCase();
+  const headings = (page.headings || []).join(" ").toLowerCase();
 
   if (lower.includes(route.replace(/\/$/, "")) && route !== "/") score += 30;
   if (title && lower.includes(title)) score += 24;
 
   for (const token of queryTokens) {
-    const normalizedToken = normalizeComparableText(token);
-    if (!normalizedToken) continue;
-    if (route.includes(normalizedToken)) score += 7;
-    if (title.includes(normalizedToken)) score += 9;
-    if (headings.includes(normalizedToken)) score += 6;
-    if (summary.includes(normalizedToken)) score += 5;
-    if (description.includes(normalizedToken)) score += 4;
-    if ((page.keywords || []).map((keyword) => normalizeComparableText(keyword)).includes(normalizedToken)) score += 3;
+    if (route.includes(token)) score += 7;
+    if (title.includes(token)) score += 9;
+    if (headings.includes(token)) score += 6;
+    if (summary.includes(token)) score += 5;
+    if (description.includes(token)) score += 4;
+    if ((page.keywords || []).includes(token)) score += 3;
   }
 
   if (questionClass === QUESTION_CLASSES.PAGE_SPECIFIC) {
     if (page.pageType === "project_detail" || page.pageType === "hobby_detail" || page.pageType === "about_detail") {
       score += 10;
     }
-    if (/\bhobbies?\b/.test(lower) && /\b(hub|gateway|overview|main)\b/.test(lower)) {
-      if (route === "/about") score += 30;
-      if (route.startsWith("/about/") && route !== "/about") score += 8;
-      if (page.pageType === "hobby_detail") score -= 18;
-    }
-    if (/\bprojects?\b|\bwork\b/.test(lower) && page.pageType === "projects_index") score += 18;
-    if (/\babout\b/.test(lower) && page.route === "/about") score += 12;
   }
 
   if (questionClass === QUESTION_CLASSES.PROJECT_LIST && page.pageType === "projects_index") score += 12;
   if (questionClass === QUESTION_CLASSES.TEAM && (route === "/overview" || route === "/deep-dive" || route === "/about")) score += 8;
   if (questionClass === QUESTION_CLASSES.LANGUAGES && (route === "/overview" || route === "/about" || route === "/deep-dive" || route === "/es/" || route === "/ar/")) score += 8;
   if (questionClass === QUESTION_CLASSES.SITE_PROOF && (route === "/" || route === "/projects/portfolio")) score += 12;
-  if (/\bl['']?or[ée]al|\bloreal\b/i.test(lower) && route.includes("loreal")) score += 40;
-  if (/\bfranklin\b/i.test(lower) && route.includes("franklin")) score += 30;
-  if (/\bisa\b|\bgrimes\b/i.test(lower) && route.includes("isa-grimes")) score += 30;
-  if (/\bportfolio\b|\bthis website\b|\bsite build\b/i.test(lower) && route.includes("/projects/portfolio")) score += 34;
-  if (/\bbackground\b|\bhis background\b|\btell me about his background\b/i.test(lower) && route === "/about/background") score += 36;
-  if (/\bworking with people\b|\bworking with him\b|\bteam\b|\bcollaborat/i.test(lower) && route === "/about/working-with-me") score += 22;
-  if (/\bl[' ]?oreal\b|\bloreal\b/.test(lower) && route.includes("loreal")) score += 48;
-  if (/previous user question: .*background/.test(lower) && route === "/about/background") score += 56;
-  if (/previous user question: .*working with/.test(lower) && route === "/about/working-with-me") score += 48;
-  if (/previous user question: .*values?/.test(lower) && route === "/about/values") score += 44;
-  if (/(previous user question: .*l[' ]?oreal|previous user question: .*loreal)/.test(lower) && route.includes("loreal")) score += 60;
-  if (/(previous user question: .*portfolio|previous user question: .*this website|previous user question: .*site build)/.test(lower) && route.includes("/projects/portfolio")) score += 54;
-  if (/\bl[' ]?oreal\b|\bloreal\b/.test(lower) && page.pageType === "projects_index") score -= 18;
 
   return score;
 }
 
 function scoreSection(page, section, queryTokens, message) {
-  const lower = normalizeComparableText(message);
+  const lower = String(message || "").toLowerCase();
   let score = 0;
-  const heading = normalizeComparableText(section.heading || "");
-  const text = normalizeComparableText(section.text || "");
+  const heading = String(section.heading || "").toLowerCase();
+  const text = String(section.text || "").toLowerCase();
 
   if (heading && lower.includes(heading)) score += 10;
   for (const token of queryTokens) {
@@ -945,28 +723,7 @@ function formatProjectList(siteFacts) {
   return `Right now the site shows ${list}.`;
 }
 
-function formatBirthdayWithAge() {
-  const birthday = PERSONAL_KNOWLEDGE.identity.birthday;
-  const birthDate = new Date(birthday);
-  if (Number.isNaN(birthDate.getTime())) {
-    return birthday;
-  }
-
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const hasHadBirthdayThisYear = (
-    today.getMonth() > birthDate.getMonth()
-    || (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate())
-  );
-
-  if (!hasHadBirthdayThisYear) {
-    age -= 1;
-  }
-
-  return `He was born on ${birthday}, so he is ${age} right now.`;
-}
-
-function formatSurfaceFactReply(key) {
+function formatSurfaceFactReply(key, profile) {
   const pk = PERSONAL_KNOWLEDGE;
 
   switch (key) {
@@ -990,312 +747,129 @@ function formatSurfaceFactReply(key) {
       return `${pk.preferences.favoriteSport.favoriteTeam}.`;
     case "languages":
       return `Estivan speaks ${pk.languages.spoken.join(", ")}. He writes in ${pk.languages.written.join(", ")}. ${pk.languages.note}`;
-    case "education":
-      return `He graduated from ${pk.identity.education.school} with a ${pk.identity.education.degree} degree in ${pk.identity.education.graduationDate}, with a GPA of ${pk.identity.education.gpa}. ${pk.identity.education.focus}.`;
     case "hometown":
       return `He was born in ${pk.identity.birthplace} and grew up in ${pk.identity.hometown}. ${pk.identity.refugeeHistory}.`;
     case "birthday":
-      return formatBirthdayWithAge();
+      return `${pk.identity.birthday}.`;
     case "height":
       return `${pk.identity.height}.`;
     case "style":
       return `${pk.preferences.style.summary}. Favorite shoes are ${pk.preferences.style.shoes}. ${pk.preferences.style.note}`;
-    case "work":
-      return pk.work?.current
-        ? `${pk.work.current} ${pk.work.workLessons || ""} He is looking for: ${pk.work.seeking || "operations, coordination, or project support roles."}`
-        : "Currently a Sports Coach at 549 Sports LLC, supervising 20-80 children per session. Previously worked in retail and delivery services. Looking for operations, coordination, or project support roles.";
-    case "gpa":
-      return `His GPA is ${pk.identity?.education?.gpa || "approximately 3.8"}. He graduated from ${pk.identity?.education?.school || "SDSU"} in ${pk.identity?.education?.graduationDate || "December 2025"} with a ${pk.identity?.education?.degree || "General Business"} degree.`;
-    case "strengths":
-      return pk.strengths?.length
-        ? `His main strengths: ${pk.strengths.slice(0, 4).join("; ")}. The pattern across the site is systems thinking, clear communication, and consistent execution.`
-        : "His main strengths: systems thinking, clear communication, consistency, and people judgment. The pattern across the site is figuring things out, structuring them, and following through.";
-    case "weaknesses":
-      return pk.workingOn?.length
-        ? `What he is working on: ${pk.workingOn.slice(0, 3).join("; ")}. He is honest about growth areas, which is itself a strength.`
-        : "He is working on: being more direct in communication, delegating instead of doing everything himself, and public speaking comfort. He is honest about growth areas, which is itself a strength.";
-    case "hobbies":
-      return `His hobbies include gym and strength training (4-5 days/week), photography, car enthusiasm (BMW with mods), cooking, and reading. He also has an [arcade games section](/hobbies-games) on the site.`;
-    case "car":
-      return `He drives a BMW that he has modified: MHD Stage 2 tune, cold air intake, upgraded CTS charge pipe, MAD turbo inlet, catless downpipe, muffler delete, front lip, side skirts, rear diffuser, and hubcentric spacers. The full story is on the [Car page](/hobbies/car).`;
-    case "skills":
-      return pk.resume?.coreSkills
-        ? `Key skills from his resume: ${pk.resume.coreSkills.slice(0, 6).join(", ")}. He has Google Analytics Certification and exposure to Salesforce, HubSpot, and Pardot.`
-        : "From his resume: consultative recommendations, upselling, objection handling, service recovery, CRM exposure (Salesforce, HubSpot, Pardot), Google Analytics Certification, Microsoft Clarity, and multilingual communication.";
-    case "heritage":
-      return `${pk.identity?.heritage || "Chaldean, Iraqi-American"}. Born in ${pk.identity?.birthplace || "Baghdad, Iraq"}. ${pk.identity?.refugeeHistory || "Lived in Syria as a refugee, moved to El Cajon, California in 2008 at age 4"}. ${(pk.identity?.chaldeanContext || "Part of an ancient community tracing back to Mesopotamian times").split(".").slice(0, 2).join(".")}.`;
-    case "family":
-      return `He is the youngest of four brothers: Alen, Andrew, Evan, and Estivan. His dad was an electrical engineer. His mom earned a BS in Business Administration from SDSU after nearly a decade of classes. The family story is on the [Background page](/about/background).`;
-    case "values":
-      return pk.values && Object.keys(pk.values).length
-        ? `His core values: ${Object.keys(pk.values).slice(0, 4).map(k => pk.values[k]?.split(".")[0] || k).join(". ")}. The full picture is on the [Values page](/about/values).`
-        : "His core values center on reliability, execution, honest communication, and continuous improvement. The full picture is on the [Values page](/about/values).";
-    case "zodiac":
-      return `Aquarius. Born January 21, 2004.`;
     default:
       return "";
   }
 }
 
 function buildBoundaryReply() {
-  return `That is not something shared publicly through the site. For direct contact, the best route is ${PERSONAL_KNOWLEDGE.contact.email} or the [Contact page](/contact). The site covers the work, thinking, and background openly — ask about any of that.`;
+  return "Some things stay off the public version on purpose. The site can still help with the work, the site, how he thinks, or anything already on the portfolio.";
 }
 
-function buildUnknownReply() {
-  return `That is a fair question. Here is what the site does cover: Estivan is a ${PERSONAL_KNOWLEDGE.identity.education.degree} graduate from ${PERSONAL_KNOWLEDGE.identity.education.school} (GPA ${PERSONAL_KNOWLEDGE.identity.education.gpa}). He is a San Diego State University Alumni with a bachelors in Business Administration and has 7 projects spanning strategy, marketing campaigns, and an editorial interview. For anything more specific, the best route is ${PERSONAL_KNOWLEDGE.contact.email} or [Contact](${PERSONAL_KNOWLEDGE.contact.contactPage}).`;
-}
-
-function buildGroundedSectionLines(topPage, retrieval) {
-  return retrieval.sections
-    .filter((entry) => entry.page.route === topPage.route)
-    .slice(0, 3)
-    .map((entry) => {
-      const heading = cleanTextFragment(entry.section.heading || "")
-        .replace(/\s*\|\s*Estivan Ayramia\s*$/i, "")
-        .trim();
-      const snippet = cleanTextFragment(entry.section.text || "")
-        .replace(/\s+/g, " ")
-        .trim();
-      if (!snippet) return "";
-      if (/view all projects/i.test(snippet)) return "";
-
-      const clipped = snippet.length > 170 ? `${snippet.slice(0, 167).trimEnd()}...` : snippet;
-      if (!heading || heading.toLowerCase() === cleanTextFragment(topPage.title || "").toLowerCase()) {
-        return clipped;
-      }
-      return `${heading}: ${clipped}`;
-    })
-    .filter(Boolean);
-}
-
-function buildGroundedPageAnswer(topPage, retrieval, options = {}) {
-  if (!topPage) return "";
-
-  const displayTitle = getDisplayPageTitle(topPage);
-  const summary = cleanTextFragment(topPage.summary || topPage.description || "");
-  const sectionLines = buildGroundedSectionLines(topPage, retrieval);
-  const intro = options.intro
-    || (summary
-      ? `${displayTitle}: ${summary}`
-      : `${displayTitle} is the relevant page here`);
-
-  if (!sectionLines.length) {
-    return `${intro} ${formatInternalLink(displayTitle, topPage.route)} has the full page.`;
-  }
-
-  return `${intro} ${sectionLines.join(" ")} ${formatInternalLink(displayTitle, topPage.route)} has the full version.`;
+function buildUnknownReply(profile) {
+  return `That is better answered by Estivan directly. The cleanest move is [Contact](/contact) or email ${profile.contact?.email || "hello@estivanayramia.com"}.`;
 }
 
 function containsFirstPerson(text) {
-  return /\b(i|i['\u2019]m|i['\u2019]ve|i['\u2019]d|my|me|mine)\b/i.test(String(text || ""));
+  return /\b(i|i['â€™]m|i['â€™]ve|i['â€™]d|my|me|mine)\b/i.test(String(text || ""));
 }
 
-function buildPageSpecificReply(retrieval, message = "") {
-  let [topPage] = retrieval.pages;
+function buildPageSpecificReply(retrieval) {
+  const [topPage] = retrieval.pages;
   if (!topPage) {
     return "";
   }
 
-  const rawMessage = String(message || "");
-  const lowerMessage = normalizeComparableText(message);
-  const preferredPage = (matcher) => retrieval.pages.find((page) => matcher(page));
+  const displayTitle = getDisplayPageTitle(topPage);
 
-  if (/\bloreal\b/.test(lowerMessage) || /l.?or.?e?al|bio.?print/i.test(rawMessage)) {
-    topPage = preferredPage((page) => page.route.includes("loreal")) || topPage;
-  } else if (/\bfranklin\b/.test(lowerMessage)) {
-    topPage = preferredPage((page) => page.route.includes("franklin")) || topPage;
-  } else if (/\bisa\b|\bgrimes\b/.test(lowerMessage)) {
-    topPage = preferredPage((page) => page.route.includes("isa-grimes")) || topPage;
-  } else if (/\bbackground\b/.test(lowerMessage)) {
-    topPage = preferredPage((page) => page.route === "/about/background") || topPage;
-  } else if (/\bvalues?\b/.test(lowerMessage)) {
-    topPage = preferredPage((page) => page.route === "/about/values") || topPage;
-  } else if (/\bworking with people\b|\bworking with him\b|\bworking with me\b|\bcollaborat/.test(lowerMessage)) {
-    topPage = preferredPage((page) => page.route === "/about/working-with-me") || topPage;
-  } else if (/\bportfolio\b|\bthis website\b|\bsite build\b/.test(lowerMessage)) {
-    topPage = preferredPage((page) => page.route.includes("/projects/portfolio")) || topPage;
-  }
+  const sectionLines = retrieval.sections
+    .filter((entry) => entry.page.route === topPage.route)
+    .slice(0, 2)
+    .map((entry) => {
+      const sectionHeading = cleanTextFragment(entry.section.heading || "")
+        .replace(/\s*\|\s*Estivan Ayramia\s*$/i, "")
+        .trim();
+      const rawSnippet = cleanTextFragment(entry.section.text || "");
+      const dedupedSnippet = sectionHeading && rawSnippet.toLowerCase().startsWith(sectionHeading.toLowerCase())
+        ? rawSnippet.slice(sectionHeading.length).trim().replace(/^[:.\-–—]\s*/, "")
+        : rawSnippet;
+      if (containsFirstPerson(dedupedSnippet)) {
+        return sectionHeading || "";
+      }
+      const snippet = dedupedSnippet.length > 180
+        ? `${dedupedSnippet.slice(0, 177).trimEnd()}...`
+        : dedupedSnippet;
+      if (!snippet) {
+        return sectionHeading || "";
+      }
+      if (!sectionHeading || sectionHeading.toLowerCase() === displayTitle.toLowerCase()) {
+        return snippet;
+      }
+      return `${sectionHeading}: ${snippet}`;
+    })
+    .filter(Boolean);
 
-  const asksHobbiesHub = /\bhobbies?\b/.test(lowerMessage) && /\b(hub|gateway|overview|main)\b/.test(lowerMessage);
-  const asksGames = /\b(game|games|arcade|mini\s*-?\s*games?)\b/.test(lowerMessage);
+  const intro = topPage.summary
+    ? `${formatInternalLink(displayTitle, topPage.route)} is the best place for that. ${topPage.summary}`
+    : `${formatInternalLink(displayTitle, topPage.route)} is the best page for that question.`;
 
-  if (asksHobbiesHub && !asksGames) {
-    return "The hobbies material lives inside the About flow now. That section links out to the personal pages directly instead of hiding them behind a separate hub. [About](/about) is the cleanest starting point.";
-  }
+  if (!sectionLines.length) return intro;
 
-  if (topPage.route === "/hobbies" || topPage.route === "/hobbies/") {
-    return "The hobbies material was folded into the About flow. [About](/about) is the right entry point, then each hobby page branches out from there.";
-  }
-
-  if (topPage.route === "/about") {
-    return buildGroundedPageAnswer(topPage, retrieval, {
-      intro: "The About page is the personal side of the site: background, values, and what it is like to work with him"
-    });
-  }
-
-  if (topPage.route === "/about/background") {
-    return buildGroundedPageAnswer(topPage, retrieval, {
-      intro: "The Background page explains the family and cultural context behind how he works"
-    });
-  }
-
-  if (topPage.route === "/about/values") {
-    return buildGroundedPageAnswer(topPage, retrieval, {
-      intro: "The Values page lays out the standards he actually uses"
-    });
-  }
-
-  if (topPage.route === "/about/working-with-me") {
-    return buildGroundedPageAnswer(topPage, retrieval, {
-      intro: "The Working With Me page shows how he collaborates and what people can usually expect from him in the work"
-    });
-  }
-
-  if (topPage.route === "/overview") {
-    return buildGroundedPageAnswer(topPage, retrieval, {
-      intro: "Overview is the short read on how he works and what people can usually count on from him"
-    });
-  }
-
-  if (topPage.route === "/deep-dive") {
-    return buildGroundedPageAnswer(topPage, retrieval, {
-      intro: "Deep Dive is the longer version of the site"
-    });
-  }
-
-  if (topPage.route === "/contact") {
-    return "The Contact page is straightforward: it is the cleanest route if someone wants to send context, links, or an attachment in one place. [Contact](/contact) is the direct path.";
-  }
-
-  if (topPage.pageType === "projects_index") {
-    return buildGroundedPageAnswer(topPage, retrieval, {
-      intro: "The Projects page is the main scan of the work set"
-    });
-  }
-
-  return buildGroundedPageAnswer(topPage, retrieval);
+  return `${intro} The clearest parts are ${sectionLines.join(" ")}`.trim();
 }
 
-function buildDeterministicReply({ message, questionClass, surfaceFactKey, profile, siteFacts, retrieval }) {
+function buildDeterministicReply({ questionClass, surfaceFactKey, profile, siteFacts, retrieval }) {
   const seeds = profile.answerSeeds || {};
 
   switch (questionClass) {
     case QUESTION_CLASSES.GREETING:
       return "Hey. Savonie can help with questions about Estivan, the work, or the site. What do you actually want to know?";
     case QUESTION_CLASSES.CONTACT:
-      return `Best options are [Contact](/contact), ${PERSONAL_KNOWLEDGE.contact.email}, or LinkedIn if that fits better.`;
+      return `Best options are [Contact](/contact), ${profile.contact?.email || "hello@estivanayramia.com"}, or LinkedIn if that fits better.`;
     case QUESTION_CLASSES.RESUME:
-      return `The [resume PDF](${PERSONAL_KNOWLEDGE.contact.resumePdf}) is the quickest source for that.`;
+      return "The [resume PDF](/assets/docs/Estivan-Ayramia-Resume.pdf) is the quickest source for that.";
     case QUESTION_CLASSES.HIRE_CASE:
       return `${(seeds.hireOverExperience || []).join(" ")} ${formatProjectList(siteFacts)}`;
-    case QUESTION_CLASSES.SKEPTICAL_AI: {
-      const aiHonestyBase = "AI wrote every line of code. Estivan directed the vision, designed the site, reviewed every change, and shipped the final product. He used Claude, Copilot, and Gemini as tools. He had no coding background before starting. What the site proves is not coding skill, it is initiative, judgment, quality standards, and the ability to direct complex technical work to a high standard over 300+ hours.";
-      const seedExtra = (seeds.aiSkeptical || []).join(" ");
-      return `${aiHonestyBase} ${seedExtra} ${formatInternalLink("The portfolio build page", "/projects/portfolio")} covers the full story.`;
-    }
+    case QUESTION_CLASSES.SKEPTICAL_AI:
+      return `${(seeds.aiSkeptical || []).join(" ")} ${formatInternalLink("The portfolio build page", "/projects/portfolio")} is the cleanest proof.`;
     case QUESTION_CLASSES.TEAM:
-      return [
-        ...(seeds.team || []),
-        "The grounded version of that answer is that the site consistently points to clear communication, adaptability, and not making other people's jobs harder."
-      ].join(" ");
+      return (seeds.team || []).join(" ");
     case QUESTION_CLASSES.ROLE_FIT:
-      return [
-        "Based on the site, the strongest fit is in roles that combine operations, coordination, communication, and structured problem-solving.",
-        "The work points toward project coordination, operations support, client-facing execution, growth/marketing support, and similar roles where he can turn messy inputs into a cleaner system.",
-        "That pattern shows up across the portfolio build, the campaign decks, and the About pages."
-      ].join(" ");
+      return (seeds.roles || []).join(" ");
     case QUESTION_CLASSES.WEAKNESS:
       return (seeds.weakness || []).join(" ");
     case QUESTION_CLASSES.LANGUAGES:
-      return formatSurfaceFactReply("languages");
+      return formatSurfaceFactReply("languages", profile);
     case QUESTION_CLASSES.SURFACE_FACT:
-      return formatSurfaceFactReply(surfaceFactKey);
+      return formatSurfaceFactReply(surfaceFactKey, profile);
     case QUESTION_CLASSES.SITE_PROOF:
-      return [
-        ...(seeds.siteProof || []),
-        "The strongest proof is not just that he launched a site. It is that the site, the projects, and the About material all show the same pattern: structure, judgment, iteration, and follow-through.",
-        `${formatInternalLink("The site build page", "/projects/portfolio")} is the clearest single example.`
-      ].join(" ");
-    case QUESTION_CLASSES.PROJECT_LIST: {
-      // Smart single-project recommendation based on user intent.
-      // Use grounded facts first, then fall back to static knowledge if needed.
-      const ml = String(message || "").toLowerCase();
-      const projects = Array.isArray(siteFacts?.projects) && siteFacts.projects.length
-        ? siteFacts.projects
-        : (Array.isArray(PERSONAL_KNOWLEDGE.projects) ? PERSONAL_KNOWLEDGE.projects : []);
-      const findProject = (...candidates) => {
-        for (const candidate of candidates) {
-          const found = projects.find((p) => p?.id === candidate || p?.url === candidate);
-          if (found) return found;
-        }
-        return null;
-      };
-      let pick = null;
-      let why = '';
-      if (/marketing|campaign|funnel|persona|ads|retarget/.test(ml)) {
-        pick = findProject('loreal-cell-bioprint', '/projects/loreal-maps-campaign') || findProject('endpoint-linkedin-campaign', '/projects/endpoint-linkedin-campaign');
-        why = 'It maps three personas across a full marketing funnel with touchpoints by stage.';
-      } else if (/strateg|competitive|analys|position|swot|market(?!ing)/.test(ml)) {
-        pick = findProject('taking-down-endpoint', '/projects/endpoint-competitive-playbook');
-        why = 'It is a competitive strategy playbook that shows structured analysis, SWOT work, and market positioning.';
-      } else if (/multilingual|arabic|language|cultur|international|bilingual/.test(ml)) {
-        pick = findProject('franklin-templeton', '/projects/franklin-templeton-concept');
-        why = 'He built the Arabic version of a campaign deck targeting UAE investors, reviewed by his family for accuracy.';
-      } else if (/people|leadership|interview|judgment|team|soft skill|emotional/.test(ml)) {
-        pick = findProject('isa-grimes-interview', '/projects/isa-grimes-interview');
-        why = 'It is a real conversation with a CMO about people skills, leadership, and why perspective matters more than titles.';
-      } else if (/execut|initiative|follow.?through|built|ship|technical|website|proof/.test(ml)) {
-        pick = findProject('this-website', '/projects/portfolio');
-        why = 'Over 300 hours of directing AI tools to build this site from scratch with no coding background. That is initiative and follow-through.';
-      } else if (/recruiter|hiring|quick|fast|30 sec|impress|strongest|best/.test(ml)) {
-        pick = findProject('isa-grimes-interview', '/projects/isa-grimes-interview');
-        why = 'It shows how he thinks about people, which is the hardest thing to prove on paper. Then check This Website for execution proof.';
-      } else {
-        // Default: Isa Grimes Interview — shows depth, people, real conversation
-        pick = findProject('isa-grimes-interview', '/projects/isa-grimes-interview');
-        why = 'It shows real thinking about people and leadership, which is the hardest thing to put on a resume. Start there, then explore based on what you care about.';
-      }
-      if (pick) {
-        return `Start with [${pick.title}](${pick.url}). ${why}`;
-      }
+      return `${(seeds.siteProof || []).join(" ")} ${formatInternalLink("The site build page", "/projects/portfolio")} goes deeper.`;
+    case QUESTION_CLASSES.PROJECT_LIST:
       return formatProjectList(siteFacts);
-    }
     case QUESTION_CLASSES.PAGE_SPECIFIC:
-      return buildPageSpecificReply(retrieval, message);
+      return buildPageSpecificReply(retrieval);
     case QUESTION_CLASSES.BOUNDARY:
       return buildBoundaryReply();
     case QUESTION_CLASSES.ABOUT_GENERAL:
-      return [
-        `Estivan is an SDSU ${PERSONAL_KNOWLEDGE.identity.education.degree} graduate who leans toward systems, operations, people judgment, and cleaner workflows.`,
-        "Across the site, he comes across as someone who notices where things break down, communicates clearly, and keeps pushing until the work is actually usable.",
-        `${formatInternalLink("Overview", "/overview")} is the short read, ${formatInternalLink("Projects", "/projects/")} is the quickest proof, and ${formatInternalLink("About", "/about")} gives the fuller picture.`
-      ].join(" ");
-    case QUESTION_CLASSES.UNKNOWN:
-      return buildUnknownReply();
+      return `${(seeds.aboutGeneral || []).join(" ")} ${(seeds.outreach || []).slice(1, 2).join(" ")}`.trim();
     case QUESTION_CLASSES.COMPLEX_OPEN:
       return "";
-    case QUESTION_CLASSES.OPEN:
-      return "";
+    case QUESTION_CLASSES.UNKNOWN:
+      return buildUnknownReply(profile);
     default:
       return "";
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// ROUTING DECISION: What goes to Gemini vs. what stays deterministic
-// ═══════════════════════════════════════════════════════════════════════
 function shouldUseDeterministicOnly(questionClass, retrieval) {
-  // These questions have strong enough deterministic answers to skip Gemini
-  const deterministicClasses = [
-    QUESTION_CLASSES.GREETING,
-    QUESTION_CLASSES.CONTACT,
-    QUESTION_CLASSES.RESUME,
-    QUESTION_CLASSES.BOUNDARY,
-    QUESTION_CLASSES.SURFACE_FACT,
-    QUESTION_CLASSES.LANGUAGES,
-    QUESTION_CLASSES.SKEPTICAL_AI
-  ];
-  return deterministicClasses.includes(questionClass);
+  // Only truly static/link responses stay deterministic
+  if (
+    questionClass === QUESTION_CLASSES.GREETING ||
+    questionClass === QUESTION_CLASSES.CONTACT ||
+    questionClass === QUESTION_CLASSES.RESUME ||
+    questionClass === QUESTION_CLASSES.BOUNDARY
+  ) {
+    return true;
+  }
+  return false;
 }
 
 function buildRegisterInstruction(register) {
@@ -1314,81 +888,6 @@ function buildRegisterInstruction(register) {
   return "Use a clean, warm, sharp default register.";
 }
 
-// ── Latent chain-of-thought instruction (only for complex/recruiter questions) ──
-// Encourages Gemini to reason internally before answering, without
-// exposing the reasoning chain to the user.
-function buildLatentCoTInstruction(questionClass) {
-  const needsCoT = (
-    questionClass === QUESTION_CLASSES.COMPLEX_OPEN ||
-    questionClass === QUESTION_CLASSES.HIRE_CASE ||
-    questionClass === QUESTION_CLASSES.ROLE_FIT ||
-    questionClass === QUESTION_CLASSES.SKEPTICAL_AI ||
-    questionClass === QUESTION_CLASSES.TEAM ||
-    questionClass === QUESTION_CLASSES.WEAKNESS ||
-    questionClass === QUESTION_CLASSES.SITE_PROOF ||
-    questionClass === QUESTION_CLASSES.ABOUT_GENERAL
-  );
-
-  if (!needsCoT) return "";
-
-  return `
-REASONING APPROACH: Before answering, silently consider: What is being asked? What facts from the knowledge base are relevant? How do they connect? Then give your answer directly without showing your reasoning process.`.trim();
-}
-
-// ── Subtask decomposition instruction (for complex multi-part questions) ──
-function buildSubtaskDecompositionInstruction(questionClass) {
-  if (questionClass !== QUESTION_CLASSES.COMPLEX_OPEN) return "";
-
-  return `
-MULTI-PART QUESTION HANDLING: For multi-part questions, address each part systematically:
-1. Identify each distinct sub-question in the user's message
-2. Answer each one using specific facts from the knowledge base
-3. Connect the answers into a coherent response rather than a disconnected list`.trim();
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// POST-PROCESSING: isRedirectOnlyReply
-// Exported so worker.mjs can import it to trigger self-healing path C.
-// A redirect-only reply is one that sends the user to a page without
-// actually answering the question — the most common Gemini failure mode.
-// ═══════════════════════════════════════════════════════════════════════
-export function isRedirectOnlyReply(reply) {
-  const lower = String(reply || "").toLowerCase();
-  // Must contain a redirect phrase AND lack substantive content
-  const redirectPhrases = /(the best place for that is|check out|head to|head over to|visit the|go to|see the|look at the)/i;
-  const hasSubstance = reply.length > 150 || /\b(because|since|this shows|this means|for example|specifically|in particular|he has|he built|he learned|he earned|he worked|estivan)\b/i.test(reply);
-  return redirectPhrases.test(lower) && !hasSubstance;
-}
-
-// ═══════════════════════════════════════════════════════════════════════
-// THE SYSTEM PROMPT — V3 structure following Google's recommended order:
-// Persona → Conversational Rules → Knowledge → Context → Task
-//
-// ICE Method applied throughout:
-// INSTRUCTIONS: What to do (persona, how to answer)
-// CONSTRAINTS: What NOT to do (anti-hallucination, banned language)
-// ESCALATION: What to do when unsure (suggest reaching out)
-//
-// Key V3 improvements:
-// - Anti-hallucination rule stated at the START and repeated at the END
-// - Latent CoT for complex questions
-// - Subtask decomposition for multi-part questions
-// - Progressive disclosure instruction
-// - Source attribution instruction
-// - ICE-structured rules replace scattered rules
-// ═══════════════════════════════════════════════════════════════════════
-function computeCurrentAge() {
-  const birthDate = new Date(PERSONAL_KNOWLEDGE.identity.birthday);
-  const today = new Date();
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const hasHadBirthdayThisYear = (
-    today.getMonth() > birthDate.getMonth()
-    || (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate())
-  );
-  if (!hasHadBirthdayThisYear) age -= 1;
-  return age;
-}
-
 export function buildModelContext({
   message,
   language,
@@ -1398,8 +897,7 @@ export function buildModelContext({
   retrieval,
   questionClass,
   register,
-  manifestStatus,
-  conversationHistory = []
+  manifestStatus
 }) {
   const retrievedPages = retrieval.pages
     .map((page) => {
@@ -1426,107 +924,30 @@ export function buildModelContext({
     ? siteFacts.hobbies.map((hobby) => `- ${hobby.title}: ${hobby.summary} (${hobby.url})`).join("\n")
     : "";
 
-  const conversationSummary = conversationHistory.length
-    ? conversationHistory
-      .map((entry) => {
-        if (entry.kind === "card") return `- card_shown: ${entry.cardId}`;
-        return `- ${entry.sender}: ${entry.text}`;
-      })
-      .join("\n")
-    : "No prior conversation context.";
-
   const pk = PERSONAL_KNOWLEDGE;
 
-  // Per-question-class optional additions
-  const latentCoT = buildLatentCoTInstruction(questionClass);
-  const subtaskDecomp = buildSubtaskDecompositionInstruction(questionClass);
-
   return `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 1 — PERSONA
-You are Savonie, the on-site AI assistant for Estivan Ayramia's portfolio.
-You know Estivan deeply and speak about him with warmth, specificity, and honesty.
-You are NOT Estivan. You are a third-person assistant who represents him accurately.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SYSTEM: You are Savonie, the on-site AI for Estivan Ayramia's portfolio. You know Estivan deeply and can speak about him with warmth, specificity, and honesty.
 
+PERSPECTIVE: Always speak about Estivan in THIRD PERSON (he/him/his). Never use first person (I/me/my) for Estivan.
 LANGUAGE: Reply in ${language || "English"}.
 REGISTER: ${buildRegisterInstruction(register)}
 QUESTION CLASS: ${questionClass}
 GROUNDING STATUS: ${manifestStatus}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 2 — INSTRUCTIONS (what to do)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-PERSPECTIVE: Always speak about Estivan in THIRD PERSON (he/him/his). unmistakably never use first person (I/me/my) for Estivan.
-
-RESPONSE LENGTH:
-- Simple factual question → 2–4 sentences with the "why" behind it
-- Medium question → 4–6 sentences with specifics from the knowledge base
-- Complex or recruiter question → 6–12 sentences building a complete case
-
-RESPONSE QUALITY:
-- When asked about a preference (favorite color, movie, etc.), give the answer AND the reason. Do not just list names.
-- When asked evaluative questions (why hire, what makes him different), build a real case with specific examples. 4–8 sentences minimum.
-- When asked about projects, describe what each project actually involved and what skill it demonstrates. Do not just list titles.
-- When asked "which project should I start with" or for a recommendation, pick ONE specific project and explain WHY it matches what the user cares about. Use project names from the knowledge base: Taking Down Endpoint (strategy/competitive), L'Oréal Cell BioPrint (marketing/campaign), Franklin Templeton (multilingual/content), This Website (execution/technical), Isa Grimes Interview (people/leadership).
-- CRITICAL: When asked for a project recommendation, you MUST name a specific project. Do NOT deflect to "contact him" or "that depends." If you cannot determine the user's interest, default to the Isa Grimes Interview (people skills and thinking) or This Website (follow-through and execution). Always name a project. Always explain why.
-- PROJECT DETAIL: When asked about specific project content (e.g., "what was in the L'Oréal deck?", "what did the Endpoint playbook cover?"), use the detailed project knowledge from the IDENTITY section below. Each project includes class context, instructor, format, key insights, and what it proves.
-- When asked complex multi-part questions, address EVERY part. Do not skip sub-questions.
-- For page-specific questions, answer the question first using page content, then link. Do not reduce to "the best place for that is…"
-
-PROGRESSIVE DISCLOSURE: Start with a direct, concise answer. If the question warrants depth, expand naturally. Never front-load links before substance.
-
-SOURCE ATTRIBUTION: When referencing specific project details or page content, naturally mention which project or page the info comes from using markdown links, e.g. [Background](/about/background) or [Portfolio Build](/projects/portfolio).
-
-VOICE: Warm, sharp, grounded, low-ego. The voice is confident without being boastful, honest without being defensive.
-
-FORMATTING: Use markdown links for internal routes: [Page Name](/route). Do not use bullet lists unless the question is explicitly asking for a list.
-
-${latentCoT ? latentCoT + "\n" : ""}${subtaskDecomp ? subtaskDecomp + "\n" : ""}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 3 — CONSTRAINTS (what NOT to do)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-ANTI-HALLUCINATION — CORE RULE (read this now and again before answering):
-Only use facts from the verified knowledge base below and the retrieved pages.
-Do NOT invent ANY detail that is not present in the knowledge base.
-When asked about age, use ONLY the pre-computed age provided in the IDENTITY section. Do NOT attempt to calculate age yourself — LLMs are unreliable at date arithmetic.
-
-BANNED LANGUAGE — Never use these phrases: ${BANNED_LANGUAGE.map((p) => '"' + p + '"').join(", ")}
-
-DO NOT:
-- Invent fake metrics, made-up quotes, fabricated timelines, or imagined project outcomes
-- Guess at: specific job titles he has not held, salary expectations, exact dates not listed, technical skills not mentioned, personal relationships, or health details
-- Hedge with phrases like "based on available information" or "from what I can see" — answer naturally or defer honestly
-- Front-load with a redirect link before giving any substance (e.g., do not open with "The best place for that is [Page](/route)")
-- Use first-person pronouns (I, me, my, mine) when speaking about Estivan — always third person
-
-WHEN BUILDING AN ARGUMENT: Every claim (e.g., "why hire him") must trace back to a specific fact in the knowledge base below.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 4 — ESCALATION (what to do when unsure)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-If a question asks for something not covered in the knowledge base, say so directly and suggest reaching out:
-"That specific detail is not covered on the site. The best way to get that answer is reaching out directly at ${pk.contact.email} or through [Contact](${pk.contact.contactPage})."
-
-Never fabricate an answer to avoid an escalation. An honest deferral is always better than an invented fact.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 5 — VERIFIED KNOWLEDGE BASE
-Everything below is confirmed fact from the site. Use it freely and thoroughly.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+═══════════════════════════════════════════
+COMPLETE VERIFIED KNOWLEDGE BASE
+Everything below is confirmed fact. Use it freely.
+═══════════════════════════════════════════
 
 IDENTITY:
 - Full name: ${pk.identity.fullName}
 - Heritage: ${pk.identity.heritage}
-- Born: ${pk.identity.birthplace} on ${pk.identity.birthday} (he is currently ${computeCurrentAge()} years old)
+- Born: ${pk.identity.birthplace} on ${pk.identity.birthday}
 - Path: ${pk.identity.refugeeHistory}
 - Based in: ${pk.identity.hometown}
 - Height: ${pk.identity.height}
 - Education: ${pk.identity.education.school} — ${pk.identity.education.degree}, graduated ${pk.identity.education.graduationDate}, GPA ${pk.identity.education.gpa}
-- Education focus: ${pk.identity.education.focus}
 - Chaldean context: ${pk.identity.chaldeanContext}
 - First-gen context: ${pk.identity.firstGenContext}
 
@@ -1536,11 +957,11 @@ LANGUAGES:
 - Note: ${pk.languages.note}
 
 WORK:
-- Current role: ${pk.work.current}
-- Lessons from work: ${pk.work.workLessons}
-- What he is seeking: ${pk.work.seeking}
+- Current: ${pk.work.current}
+- Lessons: ${pk.work.workLessons}
+- Seeking: ${pk.work.seeking}
 
-PERSONAL PREFERENCES (always include the "why" when answering about these):
+PERSONAL PREFERENCES (answer AND elaborate with the "why"):
 - Favorite color: ${pk.preferences.favoriteColor.answer}. Why: ${pk.preferences.favoriteColor.why}
 - Favorite movie: ${pk.preferences.favoriteMovie.answer}. Why: ${pk.preferences.favoriteMovie.why}
 - Favorite shows: ${pk.preferences.favoriteShows.answer}. Why: ${pk.preferences.favoriteShows.why}
@@ -1554,7 +975,7 @@ PERSONAL PREFERENCES (always include the "why" when answering about these):
 STRENGTHS:
 ${pk.strengths.map((s) => "- " + s).join("\n")}
 
-HONESTLY WORKING ON (growth areas he has named himself):
+ACTIVELY WORKING ON (honest growth areas):
 ${pk.workingOn.map((s) => "- " + s).join("\n")}
 
 THREE SYSTEMS HE USES:
@@ -1571,7 +992,7 @@ CORE VALUES:
 - Systems beat willpower: ${pk.values.systemsBeatWillpower}
 - Feedback is a gift: ${pk.values.feedbackIsAGift}
 
-WHAT IT IS LIKE WORKING WITH HIM:
+WORKING WITH HIM:
 - ${pk.workingWithMe.reliabilityOverHeroics}
 - ${pk.workingWithMe.continuousImprovement}
 - ${pk.workingWithMe.ownershipNotExcuses}
@@ -1588,8 +1009,8 @@ ${pk.timeline.map((t) => "- " + t).join("\n")}
 CONTACT:
 - Email: ${pk.contact.email}
 - LinkedIn: ${pk.contact.linkedin}
-- Contact page: [Contact](${pk.contact.contactPage})
-- Resume: [Resume PDF](${pk.contact.resumePdf})
+- Contact page: ${pk.contact.contactPage}
+- Resume: ${pk.contact.resumePdf}
 
 SITE INFO:
 - URL: ${pk.siteInfo.url}
@@ -1597,10 +1018,9 @@ SITE INFO:
 - Features: ${pk.siteInfo.features}
 - Purpose: ${pk.siteInfo.purpose}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 6 — RETRIEVED SITE PAGES (live content from the actual site)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
+═══════════════════════════════════════════
+RETRIEVED SITE PAGES (live content)
+═══════════════════════════════════════════
 ${retrievedPages || "No pages retrieved for this query."}
 
 ALL PROJECTS ON SITE:
@@ -1609,58 +1029,55 @@ ${projectList || "No project data available."}
 ALL HOBBIES ON SITE:
 ${hobbyList || "No hobby data available."}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 7 — CONVERSATION CONTEXT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-RECENT CONVERSATION:
-${conversationSummary}
-
-FOLLOW-UP HANDLING (CRITICAL):
-If the user says something short like "tell me more", "okay tell me about it", "what about that", "go on", or "expand on that", you MUST:
-1. Read the RECENT CONVERSATION above to find the last substantive topic discussed
-2. Continue on THAT EXACT topic — do not pivot to a different page or subject
-3. If the user asked about background, keep talking about background. If they asked about projects, keep talking about projects.
-4. Never respond to a follow-up about one topic by switching to a completely different topic.
-This is a common failure mode — be vigilant about it.
-
 CURRENT PAGE THE USER IS VIEWING:
 - Route: ${pageContext.route || "/"}
 - Title: ${pageContext.title || "Unknown"}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SECTION 8 — FINAL REMINDER BEFORE ANSWERING
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+═══════════════════════════════════════════
+ANTI-HALLUCINATION RULES (NON-NEGOTIABLE)
+═══════════════════════════════════════════
+1. ONLY use facts from the knowledge base above and the retrieved pages. Do not invent ANY detail — no fake metrics, no made-up quotes, no fabricated timelines, no imagined project outcomes.
+2. If you are unsure or the knowledge base does not cover something, say so honestly: "That specific detail isn't covered on the site. The best way to get that answer is reaching out directly at ${pk.contact.email} or through [Contact](${pk.contact.contactPage})."
+3. Do not guess at things like: specific job titles, salary expectations, exact dates not listed, technical skills not mentioned, personal relationships, or health details.
+4. Never say "based on available information" or "from what I can see." Just answer naturally or defer.
+5. When you combine facts to build an argument (e.g., "why hire him"), every claim must trace back to a specific fact above. No generic filler.
 
-ANTI-HALLUCINATION REMINDER (repeated because this is the most important rule):
-Only use facts from the verified knowledge base above and the retrieved pages.
-Do NOT invent ANY detail not present in the knowledge base.
-If a detail is not there, defer honestly — do not fabricate.
-Speak about Estivan in unmistakably THIRD PERSON (he/him/his) only.
-Never open with a redirect. Answer the question first, then optionally link for more.
+═══════════════════════════════════════════
+RESPONSE BEHAVIOR RULES
+═══════════════════════════════════════════
+ELABORATION RULES:
+- When someone asks about a preference (favorite color, movie, etc.), give the answer AND the why. Don't just list — explain what it reveals about him.
+- When someone asks "why hire him" or evaluative questions, build a real case: cite specific projects, values, systems, and traits. Aim for 4-8 sentences minimum.
+- When someone asks about projects, don't just list titles. Describe what each project actually involved and what skill it demonstrates.
+- When someone asks complex multi-part questions, address EVERY part. Don't skip sub-questions.
+- For page-specific questions, quote real content from the retrieved sections and link to the page.
+
+TONE RULES:
+- Voice: warm, sharp, grounded, low-ego. Like talking to a friend who respects the person they're describing.
+- Avoid resume cliches and generic buzzword phrasing.
+- No corporate jargon, therapy-speak, fake-deep language, or resume perfume.
+- Keep some mystery. Don't overexpose private details.
+- If the question is shallow, answer it well but you can gently invite a deeper one.
+
+LENGTH RULES:
+- Simple factual question (favorite color, birthday) → 2-4 sentences with the "why"
+- Medium question (tell me about a project, what's he good at) → 4-6 sentences with specifics
+- Complex/recruiter question (why hire, evaluate, compare) → 6-12 sentences building a complete case
+- If the user explicitly asks for depth ("walk me through", "elaborate", "detailed") → go as deep as the knowledge allows
+
+LINKING RULES:
+- Use markdown links for internal routes: [Page Name](/route)
+- When referencing a project, link to it: [Taking Down Endpoint](/projects/endpoint-competitive-playbook)
+- Always link to [Contact](/contact) when suggesting outreach
 
 USER QUESTION:
 ${message}
 `.trim();
 }
 
-export function isLikelyIncompleteReply(reply) {
-  const cleaned = stripUnsafeArtifacts(reply);
-  if (!cleaned) return true;
-
-  if (cleaned.length < 40) {
-    return !/[.!?]"?$/.test(cleaned);
-  }
-
-  if (/[.!?]"?$/.test(cleaned)) return false;
-  if (/[:;,]\s*$/.test(cleaned)) return true;
-
-  return /\b(and|or|but|because|especially|including|while|with|for|to|that|which|who|where|when|how|his|her|their|the)\s*$/i.test(cleaned);
-}
-
 function soundsTooFirstPerson(reply) {
   const lower = String(reply || "").toLowerCase();
-  const firstPersonCount = (lower.match(/\b(i|i['']m|i['']ve|i['']d|my|me|mine)\b/g) || []).length;
+  const firstPersonCount = (lower.match(/\b(i|i['’]m|i['’]ve|i['’]d|my|me|mine)\b/g) || []).length;
   const thirdPersonCount = (lower.match(/\b(estivan|he|his|him)\b/g) || []).length;
   return firstPersonCount > thirdPersonCount;
 }
@@ -1703,7 +1120,7 @@ export function buildChips(questionClass, retrieval) {
   }
   if (questionClass === QUESTION_CLASSES.PAGE_SPECIFIC && retrieval.pages[0]) {
     return [
-      `Tell me more about ${getDisplayPageTitle(retrieval.pages[0])}`,
+      `Tell me more about ${retrieval.pages[0].title}`,
       "What projects has he done?",
       "How can I contact him?"
     ];
@@ -1714,14 +1131,9 @@ export function buildChips(questionClass, retrieval) {
   return ["Projects", "Resume", "Contact"];
 }
 
-export async function prepareChatContext({ env, request, message, language, rawPageContext, legacyPageContent, conversationHistory }) {
+export async function prepareChatContext({ env, request, message, language, rawPageContext, legacyPageContent }) {
   const pageContext = parsePageContext(rawPageContext, legacyPageContent);
   const requestedBuildVersion = pageContext.buildVersion;
-  const baseUrl = inferBaseUrl(request, env);
-  const sanitizedHistory = sanitizeConversationHistory(conversationHistory);
-
-  await primeFallbackGrounding(env, baseUrl);
-
   const [profile, siteFacts, manifestFromKv] = await Promise.all([
     loadProfile(env),
     loadSiteFacts(env),
@@ -1738,17 +1150,15 @@ export async function prepareChatContext({ env, request, message, language, rawP
 
   const questionClass = classifyQuestion(message);
   const register = detectRegister(message);
-  const retrievalQuery = buildHistoryAwareQuery(message, sanitizedHistory);
-  const retrieval = retrieveGrounding(retrievalQuery, manifest, questionClass, pageContext.route);
+  const retrieval = retrieveGrounding(message, manifest, questionClass, pageContext.route);
   const surfaceFactKey = questionClass === QUESTION_CLASSES.SURFACE_FACT ? detectSurfaceFactKey(message) : "";
   const fallbackReply = buildDeterministicReply({
-    message,
     questionClass,
     surfaceFactKey,
     profile,
     siteFacts,
     retrieval
-  }) || buildUnknownReply();
+  }) || buildUnknownReply(profile);
 
   return {
     profile,
@@ -1759,7 +1169,6 @@ export async function prepareChatContext({ env, request, message, language, rawP
     questionClass,
     register,
     retrieval,
-    conversationHistory: sanitizedHistory,
     surfaceFactKey,
     fallbackReply,
     deterministicOnly: shouldUseDeterministicOnly(questionClass, retrieval)
