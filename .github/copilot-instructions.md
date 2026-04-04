@@ -1,90 +1,163 @@
-# Copilot instructions for this repository
+You are my local repo agent for `portfolio-site` in VS Code (Visual Studio Code).
 
-## Goal
-Help improve this portfolio site with small, correct, maintainable changes that are safe to ship.
+PRIMARY GOAL
+Keep the repo clean, consistent, and verifiable.
+Every response must include a full self-audit so I can trust changes without seeing your filesystem.
 
-Priorities:
-- correctness
-- minimal diffs
-- low regression risk
-- clean UX
-- accessibility
-- performance
-- accurate verification
+ABSOLUTE RULE
+After EVERY response you produce, append exactly one section titled `WORKSPACE REPORT`.
+- Do not skip it.
+- Put all diagnostics inside it.
+- If a command fails, include the command and full raw error output.
+- Do not paraphrase command outputs.
+- If a check has no output, explicitly print `PASS (empty)` as the script output.
 
-## Default behavior
-- Be concise by default.
-- Prefer the smallest change that fully solves the task.
-- Read the relevant files before editing.
-- Preserve existing conventions unless there is a strong reason to improve them.
-- Keep unrelated edits out of the diff.
-- Do not invent repo facts, command results, logs, or verification.
+PERSISTENCE
+This exact instruction text must live at `.github/copilot-instructions.md` and be committed.
+It is an allowed exception to any “no Markdown outside docs” rule because it is tool configuration and must remain in `.github/`.
 
-## How to work
-- Diagnose before changing code.
-- Fix root causes, not just symptoms.
-- State assumptions briefly when they affect the solution.
-- When a request is underspecified, make the safest reasonable interpretation from the repo context.
-- Update obvious references when renaming or moving files.
-- Avoid broad refactors unless they are necessary to solve the task.
+DOCS POLICY (ENFORCED)
+- All documentation Markdown belongs under `./docs/**`.
+- No `.md` files in repo root.
+- No root directories ending with `.md`.
+- Allowed exception outside docs: `.github/copilot-instructions.md` only.
+- Never put copies of copilot instructions under `docs/`. Delete duplicates immediately.
 
-## Verification
-Use the lightest relevant verification for the change.
-- Run relevant checks when practical.
-- Do not paste raw command output unless the user asks for it or it is the key evidence for a blocker.
-- Summarize validation in a few lines:
-  - what was checked,
-  - what passed,
-  - what could not be verified.
+PATH RULES
+- Docs filenames: lowercase-kebab-case.md
+- Docs folders: lowercase-kebab-case/
+- Use `git mv` for renames/moves.
 
-Examples of relevant repo checks include:
-- `npm run build`
-- `npm run audit`
-- `npm run test:redirects` for routing, redirects, or worker route changes
-- targeted CSS / service worker / secret audits when related to the change
+REALISTIC “SPACES IN PATHS” RULE
+Spaces in paths are only allowed in these prefixes (allowlist):
+- `assets/img/Portolio-Media/`
+- `.github/agents/`
+Flag any other tracked path containing spaces.
 
-Never claim success without checking the behavior that changed.
+NOISE CONTROL
+Never recursively scan the filesystem for repo policy (node_modules noise). Use git-based commands.
+If any command output exceeds 200 lines:
+- Save full output to `.reports/workspace-report-latest.txt`
+- Print first 50 and last 50 lines
+- Print the saved path as a final line
 
-## Response style
-Lead with the outcome, then summarize:
-- what changed,
-- which files were touched,
-- how it was verified,
-- any risks, follow-ups, or blockers.
+REPO-STATE PREFLIGHT (REQUIRED)
+Before answering any repo question involving pushes, pulls, commits, branches, merges, deploys, regressions, “what changed”, “did this push”, “is this on GitHub”, “what branch is this”, or “what is unmerged”, you must collect live repo state first.
 
-Do not append a mandatory report block to every response.
-Do not dump stdout/stderr by default.
+Run these checks before reasoning:
+1. `git rev-parse --show-toplevel`
+2. `git branch --show-current`
+3. `git status --short --branch`
+4. `git remote -v`
+5. `git fetch --all --prune`
+6. `git rev-parse HEAD`
+7. `git show -s --format=%H%n%ci%n%s HEAD`
+8. `git rev-parse --abbrev-ref --symbolic-full-name @{u}`
+9. `git rev-list --left-right --count @{u}...HEAD`
+10. `git branch -vv`
+11. `git log --oneline --decorate -n 8`
+12. `git show --stat --summary -1 HEAD`
+13. `git diff --name-status @{u}..HEAD`
+14. `git diff --name-status origin/main...HEAD`
 
-## Repository-specific guardrails
+If upstream does not exist, say so explicitly and fall back to the most relevant comparison target, usually `origin/main`.
 
-### Routing and Workers
-- Keep Worker routes narrow. Do not bind Workers to apex or `www` catch-all routes unless the task explicitly requires it.
-- Be careful with `_redirects`. Preserve the site’s static Pages behavior and avoid redirect/404 loop regressions.
-- Treat `wrangler` config names and deploy targets as sensitive; avoid accidental cross-worker overwrites.
-- Prefer repo deploy scripts over ad hoc deploy commands.
+PUSH / REMOTE VERIFICATION RULE
+Never claim something is “pushed”, “on GitHub”, “merged”, “live”, or “included” unless you verified:
+- current branch
+- current HEAD SHA
+- upstream branch or lack of one
+- ahead/behind counts
+- latest upstream commit identity
+- whether HEAD appears on remote refs (for example via `git branch -r --contains HEAD`)
+- whether the relevant commit exists remotely
+- whether the relevant files are present in the pushed diff
 
-### Secrets and config
-- Never hardcode secrets in source, docs, tests, or config.
-- Use environment variables and the repository’s secret-management flow.
-- If a secret appears in existing content, treat it as a security issue and remove/redact it safely.
+For “check the push” style requests, also run:
+- `git diff --name-status @{u}..HEAD`
+- `git diff --name-status origin/main...HEAD`
 
-### CSS and assets
-- Prefer the repo’s CSS source/build flow instead of editing generated output directly.
-- Be careful with asset paths, filename casing, and content references.
-- Avoid inline styles unless clearly justified.
+If the request is about a specific fix, bug, component, file, route, stylesheet, PR, or feature:
+- identify the exact relevant files
+- say whether they appear in the latest local commit
+- say whether they appear in unpushed commits
+- say whether they appear relative to `origin/main`
+- do not guess from memory
 
-### Build, cache, and service worker
-- Respect versioning/build steps that keep asset references and cache keys in sync.
-- Be careful with service worker changes; avoid stale-cache regressions.
-- Do not bypass the repo’s atomic ship/deploy workflow.
+BRANCH / MERGE SAFETY
+Before recommending any merge, deletion, cleanup, or “just use this branch” decision, verify:
+- current branch
+- merge target branch
+- ahead/behind counts
+- changed file set
+- whether the branch contains unique work not in main
+- whether stale history should be avoided with cherry-pick or clean integration
 
-### File hygiene
-- Keep debug files, reports, and one-off diagnostics out of the repo root unless the task explicitly targets them.
-- Do not commit `node_modules`, generated clutter, or temporary artifacts.
+LOCAL-FIRST CONTEXT RULE
+Prefer the local workspace as source of truth for:
+- current branch
+- latest edits
+- staged vs unstaged changes
+- untracked files
+- local-only commits
+- repo scripts and config
+Do not make the user repeat facts that local git can answer.
 
-### Encoding
-- Preserve UTF-8 without BOM and avoid double-encoding issues.
+RELEVANT-FILE RULE
+For debugging or change-verification requests, inspect the specific file(s) actually tied to the issue.
+Examples:
+- CSS layout issue → inspect the actual CSS, component markup, and route/page that loads it
+- form issue → inspect submit handler, endpoint, env usage, and network-facing code
+- push question → inspect git state plus the exact files expected in the push
 
-## Scope
-This file is for repo-wide behavior only.
-Put narrower rules in `.github/instructions/*.instructions.md` when they apply only to specific paths, workflows, or tools.
+FINISHING BEHAVIOR
+If the user says “perfect this”, “finish”, or “make it good”:
+1) Remove duplicates (example: delete docs copies of instructions).
+2) Ensure `.github/copilot-instructions.md` exists and is tracked (not ignored).
+3) `git add -A`
+4) Run the full WORKSPACE REPORT
+5) If clean and staged, commit once with a clear message
+6) If branch is ahead, remind to `git push` (do not push automatically)
+
+WORKSPACE REPORT STRUCTURE
+The single required `WORKSPACE REPORT` section must include these subsections when relevant:
+
+1. `REPO STATE`
+- repo root
+- current branch
+- HEAD SHA
+- HEAD short SHA
+- HEAD commit date
+- HEAD subject
+- remotes
+- upstream branch
+- upstream latest commit (or explicit `NO_UPSTREAM`)
+- ahead/behind counts
+
+2. `CHANGE STATE`
+- staged files
+- unstaged files
+- untracked files
+- latest commit file summary
+- relevant file paths checked for this task
+
+3. `REMOTE / PUSH STATE`
+- whether latest commit is pushed
+- whether branch tracks a remote
+- whether HEAD appears on remote refs
+- diff vs upstream
+- diff vs `origin/main` when relevant
+- unpushed commit/file visibility
+
+4. `SCRIPT OUTPUT`
+- the exact stdout from the workspace report script below
+
+The canonical report script must provide a fast readable summary for repo/push state using live git data, while still preserving raw command output sections.
+
+Do not paraphrase raw command output inside these subsections.
+You may explain above the WORKSPACE REPORT, but the WORKSPACE REPORT itself must stay exact and verifiable.
+
+WORKSPACE REPORT GENERATION
+Always run this command and paste its entire stdout inside the `SCRIPT OUTPUT` subsection of the WORKSPACE REPORT:
+
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/workspace-report.ps1
