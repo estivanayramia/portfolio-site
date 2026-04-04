@@ -133,31 +133,32 @@
 }
 
 .coverflow-section--no-header {
+  min-height: auto;
   padding-top: clamp(1rem, 3vw, 1.5rem);
-  --coverflow-safe-bottom: clamp(4.75rem, 7vw, 6.5rem);
+  padding-bottom: clamp(1.25rem, 2.8vw, 2rem);
+  --coverflow-safe-top: clamp(0.9rem, 2vw, 1.5rem);
+  --coverflow-safe-bottom: clamp(3.5rem, 5.5vw, 4.75rem);
 }
 
 .coverflow-section--no-header .coverflow-container {
   height: max(
-    clamp(620px, 82vh, 920px),
+    clamp(560px, 74vh, 820px),
     calc(
       (var(--card-height) * var(--coverflow-active-scale))
       + var(--coverflow-safe-top)
       + var(--coverflow-safe-bottom)
-      + clamp(1.75rem, 3vw, 2.5rem)
     ),
     var(--coverflow-dynamic-height)
   );
   min-height: max(
-    clamp(620px, 82vh, 920px),
+    clamp(560px, 74vh, 820px),
     calc(
       (var(--card-height) * var(--coverflow-active-scale))
       + var(--coverflow-safe-top)
       + var(--coverflow-safe-bottom)
-      + clamp(1.75rem, 3vw, 2.5rem)
     )
   );
-  padding-top: clamp(3rem, 5.5vw, 4rem);
+  padding-top: clamp(2rem, 4vw, 2.75rem);
 }
 
 .coverflow-section--no-header .coverflow-track {
@@ -165,7 +166,7 @@
 }
 
 .coverflow-section--no-header .coverflow-controls {
-  bottom: clamp(1.75rem, 3.8vw, 3rem);
+  bottom: clamp(1.5rem, 3vw, 2.25rem);
 }
 
 .coverflow-perspective {
@@ -1142,6 +1143,12 @@
   }
 }
 
+@media (max-width: 1024px) and (min-width: 641px) and (orientation: landscape) {
+  .coverflow-section--no-header .coverflow-controls {
+    bottom: 0.875rem;
+  }
+}
+
 @media (max-width: 640px) {
   :root {
     --card-width: clamp(240px, 72vw, 300px);
@@ -1162,8 +1169,8 @@
   }
 
   .coverflow-section--no-header .coverflow-container {
-    padding-top: 2.5rem;
-    padding-bottom: 7.25rem;
+    padding-top: 2rem;
+    padding-bottom: 6.25rem;
   }
 
   .coverflow-section--no-header .coverflow-track {
@@ -1179,7 +1186,7 @@
   }
 
   .coverflow-section--no-header .coverflow-controls {
-    margin-top: 1.5rem;
+    margin-top: 1rem;
   }
   
   .coverflow-perspective {
