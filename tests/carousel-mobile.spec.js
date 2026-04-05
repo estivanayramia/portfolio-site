@@ -681,6 +681,65 @@ test.describe('Shared Premium Pages', () => {
     expect(finalIndex).toBe(initialIndex);
   });
 
+  test('about page cancels horizontal-biased wheel events inside carousel layers', async ({ page }) => {
+    await prepareCarouselAt(page, aboutUrl, '#about-carousel-section');
+
+    const cancellationResults = await page.evaluate(() => {
+      const selectors = [
+        '#about-carousel-section',
+        '#about-carousel-section .coverflow-container',
+        '#about-carousel-section .coverflow-perspective',
+        '#about-carousel-section .coverflow-track',
+        '#about-carousel-section .coverflow-card'
+      ];
+
+      return selectors
+        .map((selector) => document.querySelector(selector))
+        .filter(Boolean)
+        .map((node) => {
+          const wheelEvent = new WheelEvent('wheel', {
+            bubbles: true,
+            cancelable: true,
+            deltaX: 2.2,
+            deltaY: 1.2
+          });
+          const dispatchResult = node.dispatchEvent(wheelEvent);
+          return {
+            target: node.id || node.className || node.tagName,
+            defaultPrevented: wheelEvent.defaultPrevented,
+            dispatchResult
+          };
+        });
+    });
+
+    expect(cancellationResults.length).toBeGreaterThan(0);
+    for (const result of cancellationResults) {
+      expect(result.defaultPrevented).toBeTruthy();
+      expect(result.dispatchResult).toBeFalsy();
+    }
+  });
+
+  test('about page does not cancel vertical-biased wheel events', async ({ page }) => {
+    await prepareCarouselAt(page, aboutUrl, '#about-carousel-section');
+
+    const verticalWasPrevented = await page.evaluate(() => {
+      const track = document.querySelector('#about-carousel-section .coverflow-track');
+      if (!track) return true;
+
+      const wheelEvent = new WheelEvent('wheel', {
+        bubbles: true,
+        cancelable: true,
+        deltaX: 0.4,
+        deltaY: 24
+      });
+
+      track.dispatchEvent(wheelEvent);
+      return wheelEvent.defaultPrevented;
+    });
+
+    expect(verticalWasPrevented).toBeFalsy();
+  });
+
   test('games page mounts premium featured carousel without roulette', async ({ page }) => {
     await prepareCarouselAt(page, gamesUrl, '#arcade-featured-carousel');
 

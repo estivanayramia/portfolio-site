@@ -296,6 +296,28 @@ const MOBILE_POSITIONS = {
   }
 };
 
+function buildCanonicalPositions(centerScale, centerTranslateY) {
+  if (!Number.isFinite(centerScale) && !Number.isFinite(centerTranslateY)) {
+    return CANONICAL_PREMIUM_POSITIONS;
+  }
+
+  const resolvedScale = Number.isFinite(centerScale)
+    ? centerScale
+    : CANONICAL_PREMIUM_POSITIONS.center.scale;
+  const resolvedTranslateY = Number.isFinite(centerTranslateY)
+    ? centerTranslateY
+    : CANONICAL_PREMIUM_POSITIONS.center.translateY;
+
+  return {
+    ...CANONICAL_PREMIUM_POSITIONS,
+    center: {
+      ...CANONICAL_PREMIUM_POSITIONS.center,
+      scale: resolvedScale,
+      translateY: resolvedTranslateY
+    }
+  };
+}
+
 function safeMatchMedia(query) {
   try {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
@@ -1645,7 +1667,9 @@ export class LuxuryCoverflow {
     this.wheelState = {
       accumulator: 0,
       previewPosition: this.currentIndex,
-      settleTimeout: null
+      settleTimeout: null,
+      axisLock: null,
+      lastInputAt: 0
     };
     this.dragState = {
       isDragging: false,
@@ -1670,6 +1694,8 @@ export class LuxuryCoverflow {
       snapThreshold: 0.25,
       velocityMultiplier: 2.2
     });
+    this.viewportTuning = null;
+    this.applyViewportTuning();
     this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
     this.dots = [];
     this.dotTargets = [];
@@ -1788,6 +1814,41 @@ export class LuxuryCoverflow {
     this.announceCurrentSlide();
   }
 
+  resolveViewportTuning() {
+    const isNoHeaderSurface = this.container.classList.contains('coverflow-section--no-header');
+    if (!isNoHeaderSurface) return null;
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    let activeScale = CANONICAL_PREMIUM_POSITIONS.center.scale;
+
+    if (viewportHeight <= 940) activeScale = 1.22;
+    if (viewportHeight <= 860 || (viewportWidth <= 1200 && viewportHeight <= 920)) activeScale = 1.18;
+    if (viewportHeight <= 780 || (viewportWidth <= 1100 && viewportHeight <= 900)) activeScale = 1.14;
+    if (viewportWidth <= 640) activeScale = viewportHeight <= 720 ? 1.1 : 1.14;
+
+    const clampedScale = clamp(activeScale, 1.08, CANONICAL_PREMIUM_POSITIONS.center.scale);
+    const scaleDelta = CANONICAL_PREMIUM_POSITIONS.center.scale - clampedScale;
+    const centerTranslateY = CANONICAL_PREMIUM_POSITIONS.center.translateY - Math.round(scaleDelta * 110);
+
+    return {
+      activeScale: clampedScale,
+      centerTranslateY
+    };
+  }
+
+  applyViewportTuning() {
+    this.viewportTuning = this.resolveViewportTuning();
+
+    if (!this.viewportTuning) {
+      this.container.style.removeProperty('--coverflow-active-scale');
+      return;
+    }
+
+    const roundedScale = Math.round(this.viewportTuning.activeScale * 1000) / 1000;
+    this.container.style.setProperty('--coverflow-active-scale', String(roundedScale));
+  }
+
   getEngineConfig() {
     const isCompactViewport = window.innerWidth < 960;
     const isCanonicalGeometry = this.config.geometryProfile === 'about-premium'
@@ -1798,7 +1859,10 @@ export class LuxuryCoverflow {
     };
 
     if (isCanonicalGeometry) {
-      config.positions = CANONICAL_PREMIUM_POSITIONS;
+      const tuning = this.viewportTuning || this.resolveViewportTuning();
+      config.positions = tuning
+        ? buildCanonicalPositions(tuning.activeScale, tuning.centerTranslateY)
+        : CANONICAL_PREMIUM_POSITIONS;
       return config;
     }
 
@@ -2177,6 +2241,8 @@ export class LuxuryCoverflow {
     this.resources.clearTimeout(this.wheelState.settleTimeout);
     this.wheelState.accumulator = 0;
     this.wheelState.previewPosition = this.currentIndex;
+    this.wheelState.axisLock = null;
+    this.wheelState.lastInputAt = 0;
     this.previewIndex = this.currentIndex;
     this.pendingTarget = null;
     this.isAnimating = false;
@@ -2320,15 +2386,46 @@ export class LuxuryCoverflow {
   setupWheelNavigation() {
     if (!this.config.enableScroll) return;
 
+    const WHEEL_SEQUENCE_GAP_MS = 160;
+    const HORIZONTAL_INTENT_MIN_DELTA = 1;
+    const HORIZONTAL_INTENT_RATIO = 0.65;
+    const STRONG_HORIZONTAL_MIN_DELTA = 6;
+    const VERTICAL_RELEASE_MIN_DELTA = 10;
+    const VERTICAL_RELEASE_RATIO = 1.8;
+
     const handleWheel = (event) => {
       if (this.roulette?.isActive) return;
+      if (event.ctrlKey) return;
+
+      const now = performance.now();
+      if (now - this.wheelState.lastInputAt > WHEEL_SEQUENCE_GAP_MS) {
+        this.wheelState.axisLock = null;
+      }
+      this.wheelState.lastInputAt = now;
 
       const absX = Math.abs(event.deltaX);
       const absY = Math.abs(event.deltaY);
-      const isHorizontalIntent = absX >= 6 && absX > absY * 1.15;
-      if (!isHorizontalIntent || !event.cancelable) return;
 
-      event.preventDefault();
+      if (this.wheelState.axisLock !== 'horizontal') {
+        const hasHorizontalDelta = absX >= HORIZONTAL_INTENT_MIN_DELTA;
+        const horizontalBias = hasHorizontalDelta && absX >= absY * HORIZONTAL_INTENT_RATIO;
+        const strongHorizontalIntent = absX >= STRONG_HORIZONTAL_MIN_DELTA && absX >= absY * 1.05;
+
+        if (!(strongHorizontalIntent || horizontalBias) || !event.cancelable) {
+          return;
+        }
+
+        this.wheelState.axisLock = 'horizontal';
+      }
+
+      if (absY >= VERTICAL_RELEASE_MIN_DELTA && absY > absX * VERTICAL_RELEASE_RATIO) {
+        this.wheelState.axisLock = null;
+        return;
+      }
+
+      if (event.cancelable) {
+        event.preventDefault();
+      }
       event.stopPropagation();
       this.stopAutoplay();
       this.wheelState.accumulator += event.deltaX;
@@ -2352,6 +2449,8 @@ export class LuxuryCoverflow {
         }
 
         this.wheelState.accumulator = 0;
+        this.wheelState.axisLock = null;
+        this.wheelState.lastInputAt = 0;
         this.goToSlide(targetIndex, { durationMs: this.motion.settleMs });
       }, 110);
     };
@@ -2539,6 +2638,7 @@ export class LuxuryCoverflow {
 
   setupResizeHandling() {
     const refresh = () => {
+      this.applyViewportTuning();
       this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
       this.updateAllItems(this.currentIndex, 0);
       this.roulette.refreshLayout();
@@ -2575,7 +2675,7 @@ export class LuxuryCoverflow {
     const active = this.items[this.currentIndex];
     if (!stage || !active) return;
 
-    const safePadding = 16;
+    const safePadding = this.viewportTuning ? 10 : 16;
     stage.style.setProperty('--coverflow-dynamic-height', '0px');
     stage.style.setProperty('--coverflow-dynamic-top', '0px');
     stage.style.setProperty('--coverflow-dynamic-bottom', '0px');
@@ -2613,6 +2713,7 @@ export class LuxuryCoverflow {
   }
 
   refreshLayout() {
+    this.applyViewportTuning();
     this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
     this.updateAllItems(this.currentIndex, 0);
     this.roulette.refreshLayout();
