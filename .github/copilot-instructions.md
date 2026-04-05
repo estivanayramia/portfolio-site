@@ -145,6 +145,8 @@ The single required `WORKSPACE REPORT` section must include these subsections wh
 - whether latest commit is pushed
 - whether branch tracks a remote
 - whether HEAD appears on remote refs
+- unpushed commit list vs upstream
+- upstream-only commit list vs local
 - diff vs upstream
 - diff vs `origin/main` when relevant
 - unpushed commit/file visibility
@@ -153,6 +155,14 @@ The single required `WORKSPACE REPORT` section must include these subsections wh
 - the exact stdout from the workspace report script below
 
 The canonical report script must provide a fast readable summary for repo/push state using live git data, while still preserving raw command output sections.
+
+The fast summary must explicitly surface:
+- branch tracking status
+- upstream latest commit identity (SHA/date/subject)
+- ahead/behind counts
+- latest commit pushed status
+- unpushed file count vs upstream
+- diff file count vs `origin/main`
 
 Do not paraphrase raw command output inside these subsections.
 You may explain above the WORKSPACE REPORT, but the WORKSPACE REPORT itself must stay exact and verifiable.

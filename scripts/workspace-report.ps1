@@ -22,6 +22,15 @@ function Normalize-Lines {
   return @($Value | ForEach-Object { $_.ToString() })
 }
 
+function Filter-GitPathLines {
+  param($Lines)
+  return @(
+    (Normalize-Lines $Lines) |
+      Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+      Where-Object { $_ -notmatch '^warning:' }
+  )
+}
+
 function Invoke-Capture {
   param([Parameter(Mandatory = $true)][scriptblock]$Cmd)
 
@@ -191,6 +200,16 @@ Run-Cmd -Label "repo/push fast summary" -Cmd {
   $up = Get-UpstreamRef
   $ab = Get-AheadBehind -Upstream $up
 
+  $upstreamHeadSha = "NO_UPSTREAM"
+  $upstreamHeadDate = "NO_UPSTREAM"
+  $upstreamHeadSubject = "NO_UPSTREAM"
+  if ($up) {
+    $upstreamHeadMeta = Invoke-Capture -Cmd { git show -s --format=%H`n%ci`n%s "$up" }
+    if ($upstreamHeadMeta.Lines.Count -ge 1) { $upstreamHeadSha = $upstreamHeadMeta.Lines[0] }
+    if ($upstreamHeadMeta.Lines.Count -ge 2) { $upstreamHeadDate = $upstreamHeadMeta.Lines[1] }
+    if ($upstreamHeadMeta.Lines.Count -ge 3) { $upstreamHeadSubject = $upstreamHeadMeta.Lines[2] }
+  }
+
   $remoteContainsHead = (Invoke-Capture -Cmd { git branch -r --contains HEAD }).Lines |
     ForEach-Object { $_.Trim() } |
     Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
@@ -204,20 +223,20 @@ Run-Cmd -Label "repo/push fast summary" -Cmd {
     }
   }
 
-  $staged = (Invoke-Capture -Cmd { git diff --name-only --staged }).Lines
-  $unstaged = (Invoke-Capture -Cmd { git diff --name-only }).Lines
-  $untracked = (Invoke-Capture -Cmd { git ls-files -o --exclude-standard }).Lines
+  $staged = Filter-GitPathLines ((Invoke-Capture -Cmd { git diff --name-only --staged }).Lines)
+  $unstaged = Filter-GitPathLines ((Invoke-Capture -Cmd { git diff --name-only }).Lines)
+  $untracked = Filter-GitPathLines ((Invoke-Capture -Cmd { git ls-files -o --exclude-standard }).Lines)
 
   $unpushedCount = "unknown"
   if ($up) {
-    $unpushed = (Invoke-Capture -Cmd { git diff --name-only "$up..HEAD" }).Lines
+    $unpushed = Filter-GitPathLines ((Invoke-Capture -Cmd { git diff --name-only "$up..HEAD" }).Lines)
     $unpushedCount = [string]$unpushed.Count
   }
 
   $originMainExists = Has-Ref "origin/main"
   $originMainDiffCount = "NO_ORIGIN_MAIN"
   if ($originMainExists) {
-    $originMainDiff = (Invoke-Capture -Cmd { git diff --name-only "origin/main...HEAD" }).Lines
+    $originMainDiff = Filter-GitPathLines ((Invoke-Capture -Cmd { git diff --name-only "origin/main...HEAD" }).Lines)
     $originMainDiffCount = [string]$originMainDiff.Count
   }
 
@@ -227,7 +246,11 @@ Run-Cmd -Label "repo/push fast summary" -Cmd {
   Print-KV "head_short_sha" $(if ([string]::IsNullOrWhiteSpace($headShort)) { "unknown" } else { $headShort })
   Print-KV "head_date" $headDate
   Print-KV "head_subject" $headSubject
+  Print-KV "branch_tracks_remote" $(if ($up) { "YES" } else { "NO" })
   Print-KV "upstream_branch" $(if ($up) { $up } else { "NO_UPSTREAM" })
+  Print-KV "upstream_latest_commit_sha" $upstreamHeadSha
+  Print-KV "upstream_latest_commit_date" $upstreamHeadDate
+  Print-KV "upstream_latest_commit_subject" $upstreamHeadSubject
   Print-KV "ahead_behind_raw" $ab.Raw
   Print-KV "behind_count" $ab.Behind
   Print-KV "ahead_count" $ab.Ahead
@@ -301,6 +324,7 @@ Run-Cmd -Label "push-state summary" -Cmd {
 
   Print-KV "current_branch" $(if ([string]::IsNullOrWhiteSpace($branch)) { "unknown" } else { $branch })
   Print-KV "head_sha" $(if ([string]::IsNullOrWhiteSpace($head)) { "unknown" } else { $head })
+  Print-KV "branch_tracks_remote" $(if ($up) { "YES" } else { "NO" })
   Print-KV "upstream_branch" $(if ($up) { $up } else { "NO_UPSTREAM" })
   Print-KV "behind_count" $ab.Behind
   Print-KV "ahead_count" $ab.Ahead
@@ -316,17 +340,21 @@ Run-Cmd -Label "push-state summary" -Cmd {
     Print-KV "latest_commit_pushed" "NO"
   }
 
-  Write-Output "unpushed_files_vs_upstream:"
-  $unpushed = (Invoke-Capture -Cmd { git diff --name-only "$up..HEAD" }).Lines
-  if ($unpushed.Count -eq 0) { Write-Output "PASS (empty)" } else { $unpushed }
+  Write-Output "unpushed_commits:"
+  $unpushedCommits = (Invoke-Capture -Cmd { git log --oneline "$up..HEAD" }).Lines
+  if ($unpushedCommits.Count -eq 0) { Write-Output "PASS (empty)" } else { $unpushedCommits }
 
-  Write-Output "upstream_only_files_vs_local:"
-  $upstreamOnly = (Invoke-Capture -Cmd { git diff --name-only "HEAD..$up" }).Lines
-  if ($upstreamOnly.Count -eq 0) { Write-Output "PASS (empty)" } else { $upstreamOnly }
+  Write-Output "upstream_only_commits:"
+  $upstreamOnlyCommits = (Invoke-Capture -Cmd { git log --oneline "HEAD..$up" }).Lines
+  if ($upstreamOnlyCommits.Count -eq 0) { Write-Output "PASS (empty)" } else { $upstreamOnlyCommits }
+
+  Write-Output "unpushed_files_vs_upstream:"
+  $unpushed = Filter-GitPathLines ((Invoke-Capture -Cmd { git diff --name-only "$up..HEAD" }).Lines)
+  if ($unpushed.Count -eq 0) { Write-Output "PASS (empty)" } else { $unpushed }
 
   if (Has-Ref "origin/main") {
     Write-Output "files_vs_origin_main:"
-    $mainDiff = (Invoke-Capture -Cmd { git diff --name-only "origin/main...HEAD" }).Lines
+    $mainDiff = Filter-GitPathLines ((Invoke-Capture -Cmd { git diff --name-only "origin/main...HEAD" }).Lines)
     if ($mainDiff.Count -eq 0) { Write-Output "PASS (empty)" } else { $mainDiff }
   } else {
     Print-KV "origin_main_compare" "NO_ORIGIN_MAIN"
