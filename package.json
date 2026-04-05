@@ -42,6 +42,8 @@
     "test:dashboard": "node scripts/test-dashboard-features-playwright.cjs",
     "test:contact-form": "node scripts/test-contact-form-playwright.cjs",
     "test:carousel": "playwright test tests/carousel-mobile.spec.js",
+    "test:about-swipe": "playwright test tests/carousel-mobile.spec.js -g \"About Swipe Snap Mechanics\"",
+    "test:about-swipe:quick": "cross-env CAROUSEL_TEST_FAST=1 playwright test tests/carousel-mobile.spec.js -g \"@quick\" --timeout=6000 --retries=0 --max-failures=1 --workers=1",
     "test:intents": "node tools/test-intents.mjs",
     "check:banned": "node scripts/check-banned-patterns.mjs",
     "apply:versioning": "node tools/apply-versioning.mjs",
