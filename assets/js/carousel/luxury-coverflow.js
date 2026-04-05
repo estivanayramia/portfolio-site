@@ -318,6 +318,86 @@ function buildCanonicalPositions(centerScale, centerTranslateY) {
   };
 }
 
+function roundTo(value, digits = 2) {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+}
+
+function buildAboutNoHeaderBalancedPositions(centerScale, centerTranslateY, viewportWidth) {
+  const base = buildCanonicalPositions(centerScale, centerTranslateY);
+  const widthFactor = clamp((viewportWidth - 360) / 900, 0, 1);
+  const wideScreenFactor = clamp((viewportWidth - 1600) / 420, 0, 1);
+  const spreadFactor = 0.45 + (0.55 * widthFactor);
+  const depthFactor = 0.6 + (0.4 * widthFactor);
+  const angleFactor = 0.76 + (0.24 * widthFactor);
+  const compactScaleBoost = (1 - widthFactor) * 0.06;
+  const wideScaleBoost = 0.02 * wideScreenFactor;
+  const wideRotateFactor = 1 - (0.08 * wideScreenFactor);
+  const wideSpreadFactor = 1 - (0.06 * wideScreenFactor);
+  const wideDepthFactor = 1 - (0.1 * wideScreenFactor);
+
+  const tune = (position, options) => {
+    const {
+      baseScale,
+      scaleWeight = 1,
+      wideScaleWeight = 1,
+      opacity = position.opacity,
+      rotateFactor = 1,
+      spreadFactorWeight = 1,
+      depthFactorWeight = 1
+    } = options;
+
+    return {
+      ...position,
+      scale: roundTo(baseScale + compactScaleBoost * scaleWeight + wideScaleBoost * wideScaleWeight, 4),
+      opacity,
+      rotateY: roundTo(position.rotateY * rotateFactor * angleFactor * wideRotateFactor, 2),
+      translateX: roundTo(position.translateX * spreadFactorWeight * spreadFactor * wideSpreadFactor, 2),
+      translateZ: roundTo(position.translateZ * depthFactorWeight * depthFactor * wideDepthFactor, 2)
+    };
+  };
+
+  return {
+    ...base,
+    adjacent1: tune(base.adjacent1, {
+      baseScale: 0.94,
+      scaleWeight: 1,
+      wideScaleWeight: 1,
+      opacity: 0.9,
+      rotateFactor: 0.88,
+      spreadFactorWeight: 0.92,
+      depthFactorWeight: 0.88
+    }),
+    adjacent2: tune(base.adjacent2, {
+      baseScale: 0.78,
+      scaleWeight: 0.82,
+      wideScaleWeight: 0.72,
+      opacity: 0.68,
+      rotateFactor: 0.88,
+      spreadFactorWeight: 0.88,
+      depthFactorWeight: 0.82
+    }),
+    adjacent3: tune(base.adjacent3, {
+      baseScale: 0.64,
+      scaleWeight: 0.66,
+      wideScaleWeight: 0.54,
+      opacity: 0.45,
+      rotateFactor: 0.88,
+      spreadFactorWeight: 0.86,
+      depthFactorWeight: 0.79
+    }),
+    far: tune(base.far, {
+      baseScale: 0.5,
+      scaleWeight: 0.45,
+      wideScaleWeight: 0.28,
+      opacity: 0.16,
+      rotateFactor: 0.88,
+      spreadFactorWeight: 0.84,
+      depthFactorWeight: 0.76
+    })
+  };
+}
+
 function safeMatchMedia(query) {
   try {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
@@ -1678,6 +1758,7 @@ export class LuxuryCoverflow {
       currentX: 0,
       currentY: 0,
       axisLocked: null,
+      startPosition: this.currentIndex,
       startIndex: this.currentIndex,
       previewPosition: this.currentIndex,
       rafPending: false,
@@ -1822,14 +1903,17 @@ export class LuxuryCoverflow {
     const viewportHeight = window.innerHeight;
     let activeScale = CANONICAL_PREMIUM_POSITIONS.center.scale;
 
-    if (viewportHeight <= 940) activeScale = 1.22;
-    if (viewportHeight <= 860 || (viewportWidth <= 1200 && viewportHeight <= 920)) activeScale = 1.18;
-    if (viewportHeight <= 780 || (viewportWidth <= 1100 && viewportHeight <= 900)) activeScale = 1.14;
-    if (viewportWidth <= 640) activeScale = viewportHeight <= 720 ? 1.1 : 1.14;
+    if (viewportHeight <= 940) activeScale = 1.23;
+    if (viewportHeight <= 860 || (viewportWidth <= 1200 && viewportHeight <= 920)) activeScale = 1.2;
+    if (viewportHeight <= 780 || (viewportWidth <= 1100 && viewportHeight <= 900)) activeScale = 1.16;
+    if (viewportWidth <= 640) activeScale = viewportHeight <= 720 ? 1.12 : 1.15;
 
-    const clampedScale = clamp(activeScale, 1.08, CANONICAL_PREMIUM_POSITIONS.center.scale);
+    const clampedScale = clamp(activeScale, 1.1, CANONICAL_PREMIUM_POSITIONS.center.scale);
     const scaleDelta = CANONICAL_PREMIUM_POSITIONS.center.scale - clampedScale;
-    const centerTranslateY = CANONICAL_PREMIUM_POSITIONS.center.translateY - Math.round(scaleDelta * 110);
+    let centerTranslateY = CANONICAL_PREMIUM_POSITIONS.center.translateY - Math.round(scaleDelta * 68);
+    if (viewportHeight <= 760) centerTranslateY += 2;
+    if (viewportWidth <= 430 && viewportHeight <= 700) centerTranslateY += 6;
+    centerTranslateY = clamp(centerTranslateY, -18, 4);
 
     return {
       activeScale: clampedScale,
@@ -1860,9 +1944,20 @@ export class LuxuryCoverflow {
 
     if (isCanonicalGeometry) {
       const tuning = this.viewportTuning || this.resolveViewportTuning();
-      config.positions = tuning
-        ? buildCanonicalPositions(tuning.activeScale, tuning.centerTranslateY)
-        : CANONICAL_PREMIUM_POSITIONS;
+      const isNoHeaderSurface = this.container.classList.contains('coverflow-section--no-header');
+      if (isNoHeaderSurface) {
+        const resolvedScale = tuning?.activeScale ?? CANONICAL_PREMIUM_POSITIONS.center.scale;
+        const resolvedTranslateY = tuning?.centerTranslateY ?? CANONICAL_PREMIUM_POSITIONS.center.translateY;
+        config.positions = buildAboutNoHeaderBalancedPositions(
+          resolvedScale,
+          resolvedTranslateY,
+          window.innerWidth
+        );
+      } else {
+        config.positions = tuning
+          ? buildCanonicalPositions(tuning.activeScale, tuning.centerTranslateY)
+          : CANONICAL_PREMIUM_POSITIONS;
+      }
       return config;
     }
 
@@ -2100,11 +2195,12 @@ export class LuxuryCoverflow {
     };
 
     if (durationMs === 0) {
-      this.previewIndex = centerIndex;
-      this.wheelState.previewPosition = centerIndex;
-      applyTransforms(centerIndex);
-      this.updatePagination(centerIndex);
-      this.emitSlideChange(this.getNearestIndex(centerIndex));
+      const settledPosition = this.currentIndex;
+      this.previewIndex = settledPosition;
+      this.wheelState.previewPosition = settledPosition;
+      applyTransforms(settledPosition);
+      this.updatePagination(settledPosition);
+      this.emitSlideChange(this.getNearestIndex(settledPosition));
       this.syncStageBounds();
       this.finishAnimation(cycleId);
       return;
@@ -2126,10 +2222,11 @@ export class LuxuryCoverflow {
         this.updatePagination(tweenState.position);
       },
       onComplete: () => {
-        this.previewIndex = centerIndex;
-        this.wheelState.previewPosition = centerIndex;
-        applyTransforms(centerIndex);
-        this.updatePagination(centerIndex);
+        const settledPosition = this.currentIndex;
+        this.previewIndex = settledPosition;
+        this.wheelState.previewPosition = settledPosition;
+        applyTransforms(settledPosition);
+        this.updatePagination(settledPosition);
         this.emitSlideChange(this.currentIndex);
         this.syncStageBounds();
         this.finishAnimation(cycleId);
@@ -2187,6 +2284,8 @@ export class LuxuryCoverflow {
     const currentNearest = this.getNearestIndex();
 
     if (normalizedTarget === currentNearest && durationMs !== 0 && Math.abs(continuousTarget - (this.previewIndex ?? this.currentIndex)) < 0.001) {
+      this.previewIndex = normalizedTarget;
+      this.wheelState.previewPosition = normalizedTarget;
       return;
     }
 
@@ -2464,6 +2563,18 @@ export class LuxuryCoverflow {
     if (target?.closest('button, a, [data-no-drag]')) return;
 
     this.dragSequence += 1;
+    const startPosition = this.currentIndex;
+    const startIndex = this.getNearestIndex(startPosition);
+
+    this.pendingTarget = null;
+    this.clearPositionTween();
+    this.resources.clearTimeout(this.animationTimeout);
+    this.animationTimeout = null;
+    this.isAnimating = false;
+    this.positionTween = null;
+    this.previewIndex = startPosition;
+    this.wheelState.previewPosition = startPosition;
+    this.updateContinuousPosition(startPosition);
 
     this.dragState = {
       isDragging: true,
@@ -2472,8 +2583,9 @@ export class LuxuryCoverflow {
       currentX: clientX,
       currentY: clientY,
       axisLocked: null,
-      startIndex: this.currentIndex,
-      previewPosition: this.currentIndex,
+      startPosition,
+      startIndex,
+      previewPosition: startPosition,
       sequence: this.dragSequence,
       rafPending: false,
       sourceTarget: target
@@ -2484,14 +2596,86 @@ export class LuxuryCoverflow {
     this.container.classList.add('is-dragging');
   }
 
+  resolveDragPreviewPosition(currentX = this.dragState.currentX) {
+    const startPosition = Number.isFinite(this.dragState.startPosition)
+      ? this.dragState.startPosition
+      : (Number.isFinite(this.previewIndex) ? this.previewIndex : this.currentIndex);
+    const deltaSlides = (this.dragState.startX - currentX) / this.motion.dragPixelsPerSlide;
+    const previewPosition = startPosition + deltaSlides;
+    if (this.config.infiniteLoop) return previewPosition;
+    return clamp(previewPosition, 0, this.items.length - 1);
+  }
+
+  resolveDragReleaseTarget() {
+    const DEAD_ZONE_DISTANCE = 0.24;
+    const DEAD_ZONE_VELOCITY = 0.0018;
+    const COMMIT_DISTANCE = 0.45;
+    const COMMIT_VELOCITY = 0.003;
+    const VELOCITY_PROJECTION_MS = 120;
+    const STRONG_DISTANCE_MULTI_SKIP = 2.8;
+    const MAX_SKIP_STEPS = 2;
+
+    const startPosition = Number.isFinite(this.dragState.startPosition)
+      ? this.dragState.startPosition
+      : this.currentIndex;
+    const startIndex = Number.isFinite(this.dragState.startIndex)
+      ? this.dragState.startIndex
+      : this.getNearestIndex(startPosition);
+    const releasePreview = this.resolveDragPreviewPosition(this.dragState.currentX);
+    const dragDeltaSlides = releasePreview - startPosition;
+    const velocitySlides = -(this.physics.velocity / this.motion.dragPixelsPerSlide);
+    const projectedPosition = releasePreview + velocitySlides * VELOCITY_PROJECTION_MS;
+    const projectedDeltaSlides = projectedPosition - startPosition;
+
+    let direction = Math.sign(projectedDeltaSlides);
+    if (direction === 0) direction = Math.sign(dragDeltaSlides);
+    if (direction === 0) direction = Math.sign(velocitySlides);
+
+    if (direction === 0) {
+      return startIndex;
+    }
+
+    const dragDistance = Math.abs(dragDeltaSlides);
+    const dragVelocity = Math.abs(velocitySlides);
+
+    if (dragDistance < DEAD_ZONE_DISTANCE && dragVelocity < DEAD_ZONE_VELOCITY) {
+      return startIndex;
+    }
+
+    const projectedDistance = Math.abs(projectedDeltaSlides);
+    if (projectedDistance < COMMIT_DISTANCE && dragVelocity < COMMIT_VELOCITY) {
+      return startIndex;
+    }
+
+    let stepCount = 1;
+    const allowMultiSkip = dragDistance >= STRONG_DISTANCE_MULTI_SKIP;
+    if (allowMultiSkip) {
+      stepCount = MAX_SKIP_STEPS;
+    }
+
+    const rawTargetIndex = startIndex + direction * stepCount;
+    if (this.config.infiniteLoop) {
+      return normalizeIndex(rawTargetIndex, this.items.length, true);
+    }
+    return clamp(rawTargetIndex, 0, this.items.length - 1);
+  }
+
   updateDrag(clientX, clientY) {
     if (!this.dragState.isDragging) return;
+
+    const AXIS_DECISION_THRESHOLD = 10;
+    const AXIS_LOCK_RATIO = 1.18;
 
     const absX = Math.abs(clientX - this.dragState.startX);
     const absY = Math.abs(clientY - this.dragState.startY);
     if (this.dragState.axisLocked == null) {
-      if (absX < 8 && absY < 8) return;
-      this.dragState.axisLocked = absX >= absY ? 'horizontal' : 'vertical';
+      if (absX < AXIS_DECISION_THRESHOLD && absY < AXIS_DECISION_THRESHOLD) return;
+
+      const horizontalIntent = absX >= AXIS_DECISION_THRESHOLD && absX > absY * AXIS_LOCK_RATIO;
+      const verticalIntent = absY >= AXIS_DECISION_THRESHOLD && absY > absX * AXIS_LOCK_RATIO;
+      if (!horizontalIntent && !verticalIntent) return;
+
+      this.dragState.axisLocked = horizontalIntent ? 'horizontal' : 'vertical';
       if (this.dragState.axisLocked === 'vertical') {
         this.dragState.isDragging = false;
         this.container.classList.remove('is-dragging');
@@ -2514,8 +2698,7 @@ export class LuxuryCoverflow {
         return;
       }
 
-      const delta = (this.dragState.startX - this.dragState.currentX) / this.motion.dragPixelsPerSlide;
-      const previewPosition = normalizeIndex(this.currentIndex + delta, this.items.length, this.config.infiniteLoop);
+      const previewPosition = this.resolveDragPreviewPosition(this.dragState.currentX);
       this.dragState.previewPosition = previewPosition;
       this.previewIndex = previewPosition;
       this.updateContinuousPosition(previewPosition);
@@ -2524,28 +2707,30 @@ export class LuxuryCoverflow {
   }
 
   endDrag() {
-    const deltaX = this.dragState.currentX - this.dragState.startX;
-    const velocity = this.physics.velocity;
-    const hasMeaningfulMovement = Math.abs(deltaX) >= 24 || Math.abs(velocity) > 0.2;
-    const direction = deltaX < 0 ? 1 : -1;
+    const dragDistancePx = Math.abs(this.dragState.currentX - this.dragState.startX);
     const startIndex = Number.isFinite(this.dragState.startIndex)
       ? this.dragState.startIndex
       : this.currentIndex;
-    const settledIndex = this.getNearestIndex(this.previewIndex);
-    const targetIndex = hasMeaningfulMovement
-      ? (settledIndex !== startIndex ? settledIndex : startIndex + direction)
-      : settledIndex;
+    const releasePreview = this.resolveDragPreviewPosition(this.dragState.currentX);
+    this.dragState.previewPosition = releasePreview;
+    this.previewIndex = releasePreview;
+
+    const targetIndex = this.resolveDragReleaseTarget();
+    const didChangeCard = targetIndex !== startIndex;
+
+    if (didChangeCard || dragDistancePx >= 10) {
+      // Touch browsers may emit a trailing click after a drag; suppress it briefly.
+      this.suppressClickUntil = performance.now() + 420;
+    }
 
     this.dragState.isDragging = false;
     this.dragState.axisLocked = null;
     this.dragState.sequence = null;
     this.dragState.rafPending = false;
+    this.dragState.startPosition = this.currentIndex;
     this.dragState.startIndex = this.currentIndex;
+    this.dragState.previewPosition = this.currentIndex;
     this.container.classList.remove('is-dragging');
-    if (hasMeaningfulMovement) {
-      // Touch browsers may emit a trailing click after a drag; suppress it briefly.
-      this.suppressClickUntil = performance.now() + 420;
-    }
     this.goToSlide(targetIndex, { durationMs: this.motion.settleMs });
   }
 
