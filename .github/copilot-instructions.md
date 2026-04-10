@@ -18,9 +18,13 @@ It is an allowed exception to any “no Markdown outside docs” rule because it
 
 DOCS POLICY (ENFORCED)
 - All documentation Markdown belongs under `./docs/**`.
-- No `.md` files in repo root.
+- No ad hoc `.md` files in repo root.
 - No root directories ending with `.md`.
-- Allowed exception outside docs: `.github/copilot-instructions.md` only.
+- Allowed exceptions outside docs:
+  - `.github/copilot-instructions.md`
+  - `.github/agents/*.agent.md`
+  - `AGENTS.md`
+  - `CLAUDE.md`
 - Never put copies of copilot instructions under `docs/`. Delete duplicates immediately.
 
 PATH RULES
