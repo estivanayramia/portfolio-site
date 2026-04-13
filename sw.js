@@ -8,7 +8,7 @@
 // Precache only real clean routes and real asset paths.
 // Do not let one failed precache request abort install.
 // ==========================================================================
-const CACHE_VERSION = 'v20260412-957fa863-carousel-unification';
+const CACHE_VERSION = 'v20260412-e974e2f7-preview-ready';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
