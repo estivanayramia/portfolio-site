@@ -24,14 +24,14 @@ const ROOT_TIER_CLASSES = [
 const MOTION_PROFILES = {
   premium: {
     tierClass: 'premium',
-    slideMs: 420,
-    settleMs: 240,
-    introMs: 260,
+    slideMs: 380,
+    settleMs: 200,
+    introMs: 240,
     spinMs: 4400,
     dialogMs: 260,
     scrollSensitivity: 0.0038,
-    scrollThreshold: 34,
-    dragPixelsPerSlide: 255,
+    scrollThreshold: 28,
+    dragPixelsPerSlide: 240,
     staggerDelay: 0.016,
     reflectionOpacity: 0.22,
     glowStrength: 1,
@@ -41,9 +41,9 @@ const MOTION_PROFILES = {
   },
   enhanced: {
     tierClass: 'enhanced',
-    slideMs: 400,
-    settleMs: 220,
-    introMs: 220,
+    slideMs: 360,
+    settleMs: 180,
+    introMs: 200,
     spinMs: 3900,
     dialogMs: 240,
     scrollSensitivity: 0.0034,
@@ -58,9 +58,9 @@ const MOTION_PROFILES = {
   },
   baseline: {
     tierClass: 'baseline',
-    slideMs: 340,
-    settleMs: 180,
-    introMs: 180,
+    slideMs: 320,
+    settleMs: 160,
+    introMs: 160,
     spinMs: 2900,
     dialogMs: 200,
     scrollSensitivity: 0.0028,
@@ -98,8 +98,8 @@ const CANONICAL_PREMIUM_POSITIONS = {
     rotateX: 0,
     translateZ: 0,
     translateX: 0,
-    translateY: -6,
-    scale: 1.28,
+    translateY: -4,
+    scale: 1.24,
     opacity: 1,
     zIndex: 100,
     blur: 0,
@@ -112,7 +112,7 @@ const CANONICAL_PREMIUM_POSITIONS = {
     translateZ: -340,
     translateX: 430,
     translateY: 4,
-    scale: 0.84,
+    scale: 0.82,
     opacity: 0.84,
     zIndex: 90,
     blur: 0.5,
@@ -125,7 +125,7 @@ const CANONICAL_PREMIUM_POSITIONS = {
     translateZ: -640,
     translateX: 700,
     translateY: 12,
-    scale: 0.68,
+    scale: 0.66,
     opacity: 0.62,
     zIndex: 80,
     blur: 1.2,
@@ -138,7 +138,7 @@ const CANONICAL_PREMIUM_POSITIONS = {
     translateZ: -880,
     translateX: 920,
     translateY: 20,
-    scale: 0.54,
+    scale: 0.52,
     opacity: 0.4,
     zIndex: 70,
     blur: 2,
@@ -151,7 +151,7 @@ const CANONICAL_PREMIUM_POSITIONS = {
     translateZ: -1120,
     translateX: 1080,
     translateY: 28,
-    scale: 0.42,
+    scale: 0.4,
     opacity: 0.12,
     zIndex: 60,
     blur: 2.8,
@@ -234,8 +234,8 @@ const MOBILE_POSITIONS = {
     rotateX: 0,
     translateZ: 0,
     translateX: 0,
-    translateY: -6,
-    scale: 1.28,
+    translateY: -4,
+    scale: 1.2,
     opacity: 1,
     zIndex: 100,
     blur: 0,
@@ -248,7 +248,7 @@ const MOBILE_POSITIONS = {
     translateZ: -280,
     translateX: 280,
     translateY: 4,
-    scale: 0.84,
+    scale: 0.82,
     opacity: 0.84,
     zIndex: 90,
     blur: 0.5,
@@ -261,7 +261,7 @@ const MOBILE_POSITIONS = {
     translateZ: -520,
     translateX: 470,
     translateY: 12,
-    scale: 0.66,
+    scale: 0.64,
     opacity: 0.62,
     zIndex: 80,
     blur: 1.2,
@@ -274,7 +274,7 @@ const MOBILE_POSITIONS = {
     translateZ: -760,
     translateX: 650,
     translateY: 20,
-    scale: 0.52,
+    scale: 0.5,
     opacity: 0.4,
     zIndex: 70,
     blur: 2,
@@ -1708,7 +1708,7 @@ export class LuxuryCoverflow {
       enableScroll: true,
       enableSmoothTracking: this.motion.enableSmoothTracking,
       performanceTier: resolvedTier,
-      animationEase: 'power3.inOut',
+      animationEase: 'power2.inOut',
       surface: 'default',
       geometryProfile: this.isLuxurySectionSurface
         ? 'about-premium'
@@ -1906,14 +1906,20 @@ export class LuxuryCoverflow {
     if (viewportHeight <= 940) activeScale = 1.23;
     if (viewportHeight <= 860 || (viewportWidth <= 1200 && viewportHeight <= 920)) activeScale = 1.2;
     if (viewportHeight <= 780 || (viewportWidth <= 1100 && viewportHeight <= 900)) activeScale = 1.16;
-    if (viewportWidth <= 640) activeScale = viewportHeight <= 720 ? 1.12 : 1.15;
+    if (viewportHeight <= 760 || (viewportWidth <= 1180 && viewportHeight <= 820)) {
+      activeScale = Math.min(activeScale, 1.13);
+    }
+    if (viewportWidth <= 640) activeScale = viewportHeight <= 720 ? 1.11 : 1.14;
+    if (viewportWidth <= 430 && viewportHeight <= 700) {
+      activeScale = Math.min(activeScale, 1.1);
+    }
 
     const clampedScale = clamp(activeScale, 1.1, CANONICAL_PREMIUM_POSITIONS.center.scale);
     const scaleDelta = CANONICAL_PREMIUM_POSITIONS.center.scale - clampedScale;
     let centerTranslateY = CANONICAL_PREMIUM_POSITIONS.center.translateY - Math.round(scaleDelta * 68);
-    if (viewportHeight <= 760) centerTranslateY += 2;
-    if (viewportWidth <= 430 && viewportHeight <= 700) centerTranslateY += 6;
-    centerTranslateY = clamp(centerTranslateY, -18, 4);
+    if (viewportHeight <= 760) centerTranslateY += 4;
+    if (viewportWidth <= 430 && viewportHeight <= 700) centerTranslateY += 8;
+    centerTranslateY = clamp(centerTranslateY, -16, 8);
 
     return {
       activeScale: clampedScale,
@@ -2300,7 +2306,7 @@ export class LuxuryCoverflow {
   getDiscreteNavigationDuration() {
     // Gallery carousels use the full slideMs for smooth cinematic transitions
     if (this.config.surface === 'luxury-coverflow') return this.motion.slideMs;
-    return 180;
+    return Math.min(220, this.motion.slideMs || 220);
   }
 
   next() {

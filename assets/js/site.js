@@ -900,9 +900,9 @@ const initAnimations = () => {
     }
 
     const fadeElements = document.querySelectorAll('[data-gsap="fade-up"]');
-    const fadeDistance = isMobile ? 14 : 22;
-    const fadeDuration = isMobile ? 0.82 : 1.02;
-    const fadeStart = isMobile ? 'top 94%' : 'top 90%';
+    const fadeDistance = isMobile ? 18 : 28;
+    const fadeDuration = isMobile ? 0.92 : 1.16;
+    const fadeStart = isMobile ? 'top 92%' : 'top 86%';
     const viewportThreshold = (typeof window !== 'undefined' && window.innerHeight)
         ? window.innerHeight * (isMobile ? 0.95 : 0.9)
         : 0;
@@ -934,7 +934,7 @@ const initAnimations = () => {
                     y: 0,
                     duration: fadeDuration,
                     delay: delaySeconds,
-                    ease: 'power3.out',
+                    ease: 'power2.out',
                     overwrite: 'auto',
                     clearProps: 'opacity,visibility,transform,willChange',
                     onStart: () => {
@@ -959,7 +959,7 @@ const initAnimations = () => {
             y: 0,
             duration: fadeDuration,
             delay: delaySeconds,
-            ease: 'power3.out',
+            ease: 'power2.out',
             overwrite: 'auto',
             clearProps: 'opacity,visibility,transform,willChange',
             onStart: () => {
@@ -4342,7 +4342,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         continue; // Retry on timeout
                     }
                 } else {
-                    lastError = { type: 'network', message: fetchError.message };
+                    lastError = {
+                        type: 'network',
+                        message: fetchError.message,
+                        offline: (typeof navigator !== 'undefined') ? navigator.onLine === false : false,
+                        endpoint: CHAT_ENDPOINT
+                    };
                     if (attempt < MAX_RETRIES) {
                         await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
                         continue;
@@ -4365,8 +4370,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'server':
                     errorMessage = "The AI service is temporarily unavailable. Please try again in a few seconds.";
                     break;
+                case 'client':
+                    errorMessage = "The request was rejected by the AI service. Please rephrase and try again.";
+                    break;
                 case 'network':
-                    errorMessage = "Connection lost. Please check your internet connection and try again.";
+                    errorMessage = lastError.offline
+                        ? "Connection appears offline. Please check your internet connection and try again."
+                        : "I could not reach the AI service endpoint from this page. Please refresh and try again.";
                     break;
                 default:
                     errorMessage = "Something went wrong. Please try again.";
