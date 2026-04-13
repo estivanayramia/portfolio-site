@@ -53,12 +53,56 @@ function getPreviewPresentation(cardData) {
 
   return {
     fit: explicit.fit || 'cover',
-    position: explicit.position || (treatment === 'single-image-editorial' ? '50% 18%' : 'center center')
+    position: explicit.position || (treatment === 'single-image-editorial' ? '50% 18%' : 'center center'),
+    contentPlacement: explicit.contentPlacement || 'left',
+    contentWidth: explicit.contentWidth || '72%',
+    contentBottom: explicit.contentBottom || '1rem',
+    overlayMid: explicit.overlayMid ?? 0.18,
+    overlayBottom: explicit.overlayBottom ?? 0.8,
+    overlayBottomStrong: explicit.overlayBottomStrong ?? 0.94,
+    descriptionLines: explicit.descriptionLines || 2
   };
 }
 
-function ensurePreviewImageNode(container, cardData) {
-  if (!container) return null;
+function clearProperty(node, propertyName) {
+  node.style.removeProperty(propertyName);
+}
+
+function applyCardComposition(cardNode, cardData, presentation) {
+  if (!cardNode?.style) return;
+
+  const family = String(cardData?.id || '').split('-')[0] || 'generic';
+  cardNode.dataset.cardFamily = family;
+  cardNode.dataset.cardContentPlacement = presentation.contentPlacement || 'left';
+  cardNode.style.setProperty('--card-content-width', String(presentation.contentWidth || '72%'));
+  cardNode.style.setProperty('--card-content-bottom', String(presentation.contentBottom || '1rem'));
+  cardNode.style.setProperty('--card-overlay-mid', String(presentation.overlayMid ?? 0.18));
+  cardNode.style.setProperty('--card-overlay-bottom', String(presentation.overlayBottom ?? 0.8));
+  cardNode.style.setProperty('--card-overlay-bottom-strong', String(presentation.overlayBottomStrong ?? 0.94));
+  cardNode.style.setProperty('--card-description-lines', String(presentation.descriptionLines || 2));
+
+  const isAboutCard = Boolean(cardData?.id?.startsWith('about-'));
+  if (isAboutCard) {
+    cardNode.dataset.aboutContentPlacement = presentation.contentPlacement || 'left';
+    cardNode.style.setProperty('--about-content-width', String(presentation.contentWidth || '72%'));
+    cardNode.style.setProperty('--about-content-bottom', String(presentation.contentBottom || '1rem'));
+    cardNode.style.setProperty('--about-overlay-mid', String(presentation.overlayMid ?? 0.18));
+    cardNode.style.setProperty('--about-overlay-bottom', String(presentation.overlayBottom ?? 0.8));
+    cardNode.style.setProperty('--about-overlay-bottom-strong', String(presentation.overlayBottomStrong ?? 0.94));
+    cardNode.style.setProperty('--about-description-lines', String(presentation.descriptionLines || 2));
+  } else {
+    delete cardNode.dataset.aboutContentPlacement;
+    clearProperty(cardNode, '--about-content-width');
+    clearProperty(cardNode, '--about-content-bottom');
+    clearProperty(cardNode, '--about-overlay-mid');
+    clearProperty(cardNode, '--about-overlay-bottom');
+    clearProperty(cardNode, '--about-overlay-bottom-strong');
+    clearProperty(cardNode, '--about-description-lines');
+  }
+}
+
+function ensurePreviewImageNode(container, cardData, presentation) {
+  if (!container || !cardData?.previewImage) return null;
 
   let image = container.querySelector('img.card-image');
   if (!image) {
@@ -66,7 +110,6 @@ function ensurePreviewImageNode(container, cardData) {
     image.className = 'card-image';
     image.loading = 'lazy';
     image.decoding = 'async';
-
     container.replaceChildren(image);
   }
 
@@ -74,7 +117,6 @@ function ensurePreviewImageNode(container, cardData) {
   image.alt = `${cardData.title} preview`;
   image.style.width = '100%';
   image.style.height = '100%';
-  const presentation = getPreviewPresentation(cardData);
   image.style.objectFit = presentation.fit;
   image.style.objectPosition = presentation.position;
 
@@ -102,10 +144,12 @@ function applyToCoverflowCard(cardNode, cardData) {
     linkNode.setAttribute('href', cardData.link);
   }
 
-  ensurePreviewImageNode(backgroundNode, cardData);
+  const presentation = getPreviewPresentation(cardData);
+  ensurePreviewImageNode(backgroundNode, cardData, presentation);
+  applyCardComposition(cardNode, cardData, presentation);
 
   cardNode.dataset.title = cardData.title;
-  cardNode.dataset.previewImage = cardData.previewImage;
+  if (cardData.previewImage) cardNode.dataset.previewImage = cardData.previewImage;
   cardNode.dataset.previewLink = cardData.link;
   cardNode.dataset.cardId = cardData.id;
 }
@@ -123,7 +167,7 @@ function applyToLegacyGridCard(cardNode, cardData) {
 
   linkNode.setAttribute('href', cardData.link);
 
-  if (mediaNode) {
+  if (mediaNode && cardData.previewImage) {
     mediaNode.style.background = getPreviewSurfaceBackground(cardData);
     mediaNode.style.backgroundImage = 'none';
     mediaNode.style.backgroundPosition = 'center';
@@ -140,19 +184,18 @@ function applyToLegacyGridCard(cardNode, cardData) {
       image.style.height = '100%';
       image.style.objectFit = 'contain';
       image.style.objectPosition = 'center';
-
       mediaNode.replaceChildren(image);
     }
 
+    const presentation = getPreviewPresentation(cardData);
     image.src = cardData.previewImage;
     image.alt = `${cardData.title} preview`;
-    const presentation = getPreviewPresentation(cardData);
     image.style.objectFit = presentation.fit;
     image.style.objectPosition = presentation.position;
   }
 
-  cardNode.dataset.previewImage = cardData.previewImage;
   cardNode.dataset.cardId = cardData.id;
+  if (cardData.previewImage) cardNode.dataset.previewImage = cardData.previewImage;
 }
 
 function findCardDataFromNode(node, previewLookup) {
@@ -160,7 +203,6 @@ function findCardDataFromNode(node, previewLookup) {
   const href = linkNode ? linkNode.getAttribute('href') : node.getAttribute('data-link');
   const key = normalizeLink(href);
   if (!key) return null;
-
   return previewLookup.get(key) || null;
 }
 
