@@ -48,6 +48,7 @@
   var startTime = 0;       // Performance.now() when intro began
   var audioAttempted = false;
   var TOTAL_DURATION = 14;  // intro duration in seconds
+  var TIMELINE_SPEED = 1.4; // Shorten first-visit blocking time without changing composition order.
 
   // ── Audio handle (loaded from cinematic-audio.js) ─────────────────────
   function audio() {
@@ -85,6 +86,15 @@
            path === '/EN/index.html' ||
            path === '/index.html' ||
            path === '';
+  }
+
+  function isVisualCaptureMode() {
+    try {
+      return window.__EA_VISUAL_CAPTURE__ === true ||
+        document.documentElement.getAttribute('data-visual-capture') === '1';
+    } catch (e) {
+      return false;
+    }
   }
 
   function getElapsedSeconds() {
@@ -628,28 +638,6 @@
 
   // ── Reduced-motion path ───────────────────────────────────────────────
 
-  function runReducedMotion() {
-    introEl = document.createElement('div');
-    introEl.id = INTRO_ID;
-    introEl.style.cssText = 'position:fixed;inset:0;z-index:100000;background:#0a0b10;display:flex;align-items:center;justify-content:center;flex-direction:column;';
-
-    var name = document.createElement('div');
-    name.style.cssText = 'font-family:Inter,Helvetica,Arial,sans-serif;font-weight:600;font-size:clamp(1.5rem,4vw,2.5rem);color:#fff;letter-spacing:-0.02em;text-align:center;padding:2rem;';
-    name.textContent = 'Estivan Ayramia';
-    introEl.appendChild(name);
-
-    document.body.insertBefore(introEl, document.body.firstChild);
-    document.documentElement.classList.add('intro-active');
-
-    setTimeout(function () {
-      introEl.style.transition = 'opacity 0.4s ease';
-      introEl.style.opacity = '0';
-      setTimeout(function () {
-        completeIntro();
-      }, 450);
-    }, 1500);
-  }
-
   // ── Event Bindings ────────────────────────────────────────────────────
 
   function bindEvents() {
@@ -723,10 +711,18 @@
       return;
     }
 
+    if (isVisualCaptureMode()) {
+      markIntroSeen();
+      addReplayLink();
+      showWatchBtn();
+      return;
+    }
+
     // Reduced motion path (no audio)
     if (prefersReducedMotion()) {
       markIntroSeen();
-      runReducedMotion();
+      addReplayLink();
+      showWatchBtn();
       return;
     }
 
@@ -758,6 +754,7 @@
       if (typeof gsap !== 'undefined') {
         timeline = createTimeline(els);
         if (timeline) {
+          timeline.timeScale(TIMELINE_SPEED);
           timeline.play();
         }
       } else {
@@ -770,6 +767,7 @@
             if (typeof gsap !== 'undefined') {
               timeline = createTimeline(els);
               if (timeline) {
+                timeline.timeScale(TIMELINE_SPEED);
                 // Adjust start position to account for wait time
                 var waited = gsapRetries * 0.05;
                 timeline.play();

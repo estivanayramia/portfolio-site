@@ -2,12 +2,13 @@
 # Wrangler picks .toml over .jsonc, so this takes priority over wrangler.jsonc
 # (the Pages asset config — left untouched intentionally).
 #
-# Routes intentionally omitted. portfolio-api-debugger
-# (worker/wrangler.debugger.toml) owns all production routes.
+# Routes intentionally omitted. Production dashboard health/auth/error
+# endpoints live in Pages Functions under `functions/`, and chat stays on
+# the dedicated chat worker.
 # portfolio-worker deploys to workers_dev only for CI validation.
 #
 # For chat worker:     npx wrangler deploy --config worker/wrangler.chat.toml
-# For prod debugger:   npx wrangler deploy --config worker/wrangler.debugger.toml
+# For legacy sandbox:  npx wrangler deploy --config worker/wrangler.debugger.toml
 
 name = "portfolio-worker"
 main = "worker/debugger-worker.js"

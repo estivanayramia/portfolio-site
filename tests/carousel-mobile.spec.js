@@ -1,3 +1,5 @@
+const http = require('http');
+const { spawn } = require('child_process');
 const { test, expect, devices } = require('@playwright/test');
 
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5500';
@@ -11,11 +13,106 @@ const cookingUrl = `${baseUrl}/EN/hobbies/cooking.html`;
 const carUrl = `${baseUrl}/EN/hobbies/car.html`;
 const gymUrl = `${baseUrl}/EN/hobbies/gym.html`;
 const readingUrl = `${baseUrl}/EN/hobbies/reading.html`;
+let localServerProc = null;
+
+function isLocalhostUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
+  } catch {
+    return false;
+  }
+}
+
+async function isPortServingHttp(port, timeoutMs = 750) {
+  return await new Promise((resolve) => {
+    const req = http.request(
+      {
+        host: '127.0.0.1',
+        port,
+        method: 'GET',
+        path: '/',
+        timeout: timeoutMs,
+      },
+      (res) => {
+        res.resume();
+        resolve(true);
+      }
+    );
+
+    req.on('timeout', () => {
+      try { req.destroy(); } catch {}
+      resolve(false);
+    });
+    req.on('error', () => resolve(false));
+    req.end();
+  });
+}
+
+async function startLocalServer(port = 5500) {
+  return await new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, ['scripts/local-serve.js'], {
+      cwd: process.cwd(),
+      env: { ...process.env, PORT: String(port) },
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
+    });
+
+    let settled = false;
+    const timeout = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      try { child.kill(); } catch {}
+      reject(new Error(`Local server did not become ready within 10s (port=${port}).`));
+    }, 10000);
+
+    const onData = (buf) => {
+      const text = String(buf || '');
+      if (!text.includes('Serving on http://localhost:')) return;
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve(child);
+    };
+
+    child.stdout.on('data', onData);
+    child.stderr.on('data', onData);
+    child.on('error', (err) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      reject(err);
+    });
+    child.on('exit', (code) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      reject(new Error(`Local server exited early (code=${code}).`));
+    });
+  });
+}
+
+test.beforeAll(async () => {
+  if (!isLocalhostUrl(baseUrl)) return;
+
+  const parsed = new URL(baseUrl);
+  const port = Number(parsed.port || 80);
+  const alreadyServing = await isPortServingHttp(port);
+  if (alreadyServing) return;
+
+  localServerProc = await startLocalServer(port);
+});
+
+test.afterAll(async () => {
+  if (!localServerProc) return;
+  try { localServerProc.kill(); } catch {}
+  localServerProc = null;
+});
 
 const isFastSmokeMode = process.env.CAROUSEL_TEST_FAST === '1';
 const WAIT_BUDGET = {
   readinessMs: isFastSmokeMode ? 6000 : 10000,
-  overlayMs: isFastSmokeMode ? 6000 : 10000,
+  overlayMs: isFastSmokeMode ? 6000 : 15000,
   prepSettleMs: isFastSmokeMode ? 120 : 250,
   inViewSettleMs: isFastSmokeMode ? 80 : 150,
   smallSettleMs: isFastSmokeMode ? 220 : 450,
@@ -155,7 +252,7 @@ const responsiveMiniPages = [
 ];
 
 async function prepareCarousel(page) {
-  await page.goto(projectUrl);
+  await gotoWithRetry(page, projectUrl);
   await page.evaluate(() => {
     const banner = document.querySelector('[role="dialog"][aria-label="Diagnostics consent"]');
     if (banner) {
@@ -180,7 +277,7 @@ async function prepareCarousel(page) {
 }
 
 async function prepareCarouselAt(page, url, selector = '[data-luxury-coverflow]') {
-  await page.goto(url);
+  await gotoWithRetry(page, url);
   await page.evaluate(() => {
     const banner = document.querySelector('[role="dialog"][aria-label="Diagnostics consent"]');
     if (banner) {
@@ -201,7 +298,7 @@ async function prepareCarouselAt(page, url, selector = '[data-luxury-coverflow]'
 }
 
 async function prepareMiniCarouselAt(page, url, selector = '[data-mini-carousel]') {
-  await page.goto(url);
+  await gotoWithRetry(page, url);
   await page.evaluate(() => {
     const banner = document.querySelector('[role="dialog"][aria-label="Diagnostics consent"]');
     if (banner) {
@@ -220,6 +317,26 @@ async function prepareMiniCarouselAt(page, url, selector = '[data-mini-carousel]
 
 async function getActiveCard(page) {
   return page.locator('.coverflow-card--active, .coverflow-card.is-center').first();
+}
+
+async function gotoWithRetry(page, url, attempts = 3) {
+  let lastError = null;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      await page.goto(url, { waitUntil: 'load' });
+      return;
+    } catch (error) {
+      lastError = error;
+      const message = String(error && error.message ? error.message : error);
+      if (!message.includes('ERR_CONNECTION_REFUSED') || attempt === attempts - 1) {
+        throw error;
+      }
+      await page.waitForTimeout(500);
+    }
+  }
+
+  throw lastError;
 }
 
 async function getActiveIndex(page) {

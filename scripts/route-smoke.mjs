@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 
 // Default to localhost:5500 if no arg provided
-const BASE_URL = process.argv[2] ? process.argv[2].replace(/\/$/, '') : 'http://localhost:5500';
+const BASE_URL = process.argv[2] ? process.argv[2].replace(/\/$/, '') : 'http://127.0.0.1:5513';
 
 const TESTS = [
   { path: '/', status: 200, marker: '<title>' }, // Simple existence check
@@ -15,6 +15,7 @@ const TESTS = [
   { path: '/projects/conflict', status: 301, location: '/projects/isa-grimes-interview' },
   { path: '/hobbies', status: 301, location: ['/hobbies/', '/about'] },
   { path: '/hobbies/', status: 301, location: '/about' },
+  { path: '/totally-missing-route', status: 404, marker: 'Page Not Found' },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -69,8 +70,10 @@ async function ensureLocalServer(baseUrl) {
 
   return {
     stop: () => {
-        console.log('Stopping local server...');
-        child.kill();
+        if (child.exitCode === null && !child.killed) {
+          console.log('Stopping local server...');
+          child.kill();
+        }
     } // No-op for now unless we really want to kill shared server? 
       // Actually usually better to kill it if we started it.
       // But for simplicity/safety I'll define stop() to kill it.
@@ -93,8 +96,8 @@ async function main() {
   // The current implementation returns a stop function that kills the child it spawned.
   // If it didn't spawn (already running), stop is no-op. Correct.
 
-  console.log('route      | status | location   | marker | pass/fail');
-  console.log('-----------|--------|------------|--------|----------');
+  console.log('route                       | status | location                             | marker | pass/fail');
+  console.log('----------------------------|--------|--------------------------------------|--------|----------');
 
   let anyFail = false;
 
@@ -107,7 +110,7 @@ async function main() {
           let content = '';
           try {
             res = await fetchWithTimeout(url, opts);
-            if (test.status === 200) {
+            if (test.marker) {
                 content = await res.text();
             }
           } catch (e) {
@@ -125,13 +128,13 @@ async function main() {
           const markerMatch = !test.marker || content.includes(test.marker);
 
           const statusStr = String(res.status).padEnd(6);
-          const locStr = (location || '').slice(0, 10).padEnd(10);
+          const locStr = (location || '').slice(0, 36).padEnd(36);
           const markStr = test.marker ? (markerMatch ? 'YES' : 'NO') : '-';
           const pass = statusMatch && locMatch && markerMatch;
           
           if (!pass) anyFail = true;
 
-          console.log(`${test.path.padEnd(10)} | ${statusStr} | ${locStr} | ${markStr}    | ${pass ? 'PASS' : 'FAIL'}`);
+          console.log(`${test.path.padEnd(28)} | ${statusStr} | ${locStr} | ${markStr}    | ${pass ? 'PASS' : 'FAIL'}`);
           
           if (!pass && !statusMatch) console.error(`  Expected status ${test.status}, got ${res.status}`);
           if (!pass && !locMatch) {

@@ -4,13 +4,11 @@ compatibility_date = "2024-01-01"
 workers_dev = true
 
 # Routes intentionally omitted from this config.
-# portfolio-api-debugger (wrangler.debugger.toml) owns all production
-# routes. This config is used by Workers Builds CI only — it deploys
-# to workers_dev for validation. Do NOT add routes here or they will
-# conflict with portfolio-api-debugger and break the build.
+# Production dashboard health/auth/error endpoints live in Pages Functions
+# under `functions/`. This worker is kept on workers_dev for validation and
+# legacy sandboxing only.
 #
-# Production route owner: portfolio-api-debugger (wrangler.debugger.toml)
-# For chat worker: npx wrangler deploy --config wrangler.chat.toml
+# Production route owner for chat only: wrangler.chat.toml
 
 # D1 Database for error monitoring
 [[d1_databases]]
@@ -41,4 +39,3 @@ persist = true
 enabled = true
 head_sampling_rate = 1
 persist = true
-

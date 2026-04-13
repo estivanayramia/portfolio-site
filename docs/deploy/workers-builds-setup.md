@@ -1,113 +1,55 @@
-# cloudflare workers builds setup
+# Cloudflare Workers Builds Setup
 
-This site deploys workers exclusively via **Cloudflare Workers Builds**
-(the Git integration on the Cloudflare dashboard).
+This repo deploys two different runtime layers:
 
-The previous `deploy-workers.yml` GitHub Actions workflow was removed to
-eliminate duplicate deployment methods and their conflicting check statuses.
+- Cloudflare Pages for the site and Pages Functions under `functions/`
+- Cloudflare Worker Builds for the dedicated Savonie chat worker
 
-## workers in this repository
+The legacy debugger worker configs remain in the repo for sandboxing, but they should not own production dashboard routes while Pages Functions is the selected source of truth.
 
-| Dashboard name       | Wrangler config              | Entry file                  | Routes                                                         |
-|----------------------|------------------------------|-----------------------------|----------------------------------------------------------------|
-| `portfolio-chat`     | `worker/wrangler.chat.toml`  | `worker/chat-worker.js`     | `/api/chat`, `/chat`                                           |
-| `portfolio-worker`   | `worker/wrangler.toml`       | `worker/debugger-worker.js` | `/api/error-report`, `/api/errors*`, `/api/auth`, `/api/health`|
+## Runtime ownership
 
-> The legacy name `portfolio-api-debugger` (`worker/wrangler.debugger.toml`)
-> deploys the same debugger code to a separate worker via manual
-> `npx wrangler deploy --config worker/wrangler.debugger.toml`. If you no
-> longer need the duplicate, delete it from the dashboard.
+| Surface | Owner | Repo entrypoints |
+|---|---|---|
+| `/chat`, `/api/chat` | `portfolio-chat` Worker | `worker/chat-worker.js`, `worker/wrangler.chat.toml` |
+| `/health` | Pages Functions | `functions/health.js` |
+| `/api/health` | Pages Functions | `functions/api/health.js` |
+| `/api/auth` | Pages Functions | `functions/api/auth.js` |
+| `/api/error-report` | Pages Functions | `functions/api/error-report.js` |
+| `/api/errors*` | Pages Functions | `functions/api/errors.js`, `functions/api/errors/[id].js` |
 
-## configure workers builds (one-time)
+## Workers in this repository
 
-Both workers live in the `worker/` directory. The Cloudflare monorepo
-pattern requires setting **Root directory** to `worker` for each.
+| Dashboard name | Wrangler config | Entry file | Production route ownership |
+|---|---|---|---|
+| `portfolio-chat` | `worker/wrangler.chat.toml` | `worker/chat-worker.js` | Yes |
+| `portfolio-worker` | `worker/wrangler.toml` | `worker/debugger-worker.js` | No, workers.dev only |
+| `portfolio-api-debugger` | `worker/wrangler.debugger.toml` | `worker/debugger-worker.js` | No, legacy sandbox only |
 
-### portfolio-worker (debugger / error API)
+## Cloudflare dashboard setup
 
-1. Go to **Workers & Pages** → select **portfolio-worker**.
-2. Select **Settings** → **Builds**.
-3. If not yet connected, select **Connect** and choose the
-   `estivanayramia/portfolio-site` repository, branch `main`.
-4. Set these build settings:
+### Pages project
 
-   | Setting             | Value                            |
-   |---------------------|----------------------------------|
-   | Git branch          | `main`                           |
-   | Build command       | *(leave empty)*                  |
-   | Deploy command      | `npx wrangler deploy`            |
-   | Root directory      | `worker`                         |
+The Pages project that serves this repo must have:
 
-   > `worker/wrangler.toml` has `name = "portfolio-worker"` which matches
-   > the dashboard name, so the default deploy command works.
+- Functions enabled for the `functions/` directory
+- `DB` bound to the production D1 database
+- `SAVONIE_KV` bound for sessions, rate limiting, and shared dashboard/chat data
+- `DASHBOARD_PASSWORD` or `DASHBOARD_PASSWORD_HASH` configured for both Preview and Production
+- optional vars mirrored with the current code contract:
+  - `SERVICE_NAME`
+  - `RATE_LIMIT_MAX`
+  - `RATE_LIMIT_WINDOW`
 
-5. **Save** and select **Retry build** (or push a commit) to verify.
+### Chat worker
 
-### portfolio-chat
+Configure the `portfolio-chat` worker build with:
 
-1. Go to **Workers & Pages** → select **portfolio-chat**.
-2. Select **Settings** → **Builds**.
-3. If not yet connected, select **Connect** and choose the
-   `estivanayramia/portfolio-site` repository, branch `main`.
-4. Set these build settings:
+- Root directory: `worker`
+- Deploy command: `npx wrangler deploy --config wrangler.chat.toml`
+- Secret: `GEMINI_API_KEY`
+- Optional binding: `SAVONIE_KV`
 
-   | Setting             | Value                                             |
-   |---------------------|---------------------------------------------------|
-   | Git branch          | `main`                                            |
-   | Build command       | *(leave empty)*                                   |
-   | Deploy command      | `npx wrangler deploy --config wrangler.chat.toml` |
-   | Root directory      | `worker`                                          |
+### Legacy debugger workers
 
-   > The deploy command must point to `wrangler.chat.toml` because the
-   > default `wrangler.toml` in this directory targets `portfolio-worker`.
-
-5. **Save** and select **Retry build** (or push a commit) to verify.
-
-## why builds were failing
-
-Workers Builds defaults to running `npx wrangler deploy` from the **repo root**.
-The root contains `wrangler.jsonc` (a Cloudflare Pages config with
-`name = "portfolio-site"`), which does not match either worker name.
-Setting `Root directory = worker` tells Workers Builds to look in that
-subdirectory instead, where it finds the correct wrangler configs.
-
-See [Troubleshooting: Workers name requirement](https://developers.cloudflare.com/workers/ci-cd/builds/troubleshoot/#workers-name-requirement)
-and [Advanced setups: Monorepos](https://developers.cloudflare.com/workers/ci-cd/builds/advanced-setups/#monorepos).
-
-## secrets
-
-Worker secrets (not build secrets) are managed in the Cloudflare dashboard or via
-`wrangler secret put`:
-
-| Worker              | Secrets needed                                            |
-|---------------------|-----------------------------------------------------------|
-| `portfolio-chat`    | `GEMINI_API_KEY`                                          |
-| `portfolio-worker`  | `DASHBOARD_PASSWORD` or `DASHBOARD_PASSWORD_HASH`         |
-
-These are runtime secrets, not build-time. Set them in **Workers & Pages** →
-*[worker]* → **Settings** → **Variables and Secrets**.
-
-## local deployment (optional)
-
-For manual deploys outside Workers Builds:
-
-```bash
-# Authenticate locally (one-time)
-npx wrangler login
-
-# Deploy chat worker
-npm run deploy:chat-worker
-
-# Deploy debugger worker
-npm run deploy:debugger-worker
-```
-
-## ci checks after this change
-
-| Check                              | Source              | Expected result                   |
-|------------------------------------|---------------------|-----------------------------------|
-| `ci / smoke`                       | GitHub Actions      | Pass                              |
-| `verify-pages / verify`            | GitHub Actions      | Pass                              |
-| `Workers Builds: portfolio-chat`   | Cloudflare App      | Pass (after dashboard config)     |
-| `Workers Builds: portfolio-worker` | Cloudflare App      | Pass (after dashboard config)     |
-| `Cloudflare Pages`                 | Cloudflare App      | Pass (already passing)            |
+`portfolio-worker` and `portfolio-api-debugger` can remain connected for workers.dev validation, but should stay detached from apex/www routes unless the dashboard API is intentionally migrated away from Pages Functions.

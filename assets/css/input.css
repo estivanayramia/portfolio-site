@@ -103,13 +103,9 @@
         }
     }
 
-    /* Performance: Content Visibility for below-the-fold content */
-    @media (max-width: 768px) {
-        main > section:nth-child(n+2) {
-            content-visibility: auto;
-            contain-intrinsic-size: 1px 800px;
-        }
-    }
+    /* Narrative sections stay fully rendered on mobile.
+       The previous content-visibility optimization made first-scroll states
+       feel incomplete and inflated visual-regression noise. */
 }
 
 /* ==========================================================================

@@ -13,8 +13,10 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // Only allow debugger/ingestion endpoints for this worker.
-    // This prevents accidental exposure if someone hits the workers.dev URL directly.
+    // Sandbox-only worker wrapper.
+    // Production dashboard health/auth/error routes are Pages Functions-owned;
+    // this worker is kept narrow so a workers.dev sandbox does not expose more
+    // than the legacy debugger surface.
     if (!isDebuggerPath(url.pathname)) {
       if (request.method === "OPTIONS") return new Response(null, { status: 204 });
       return new Response("Not found", { status: 404 });

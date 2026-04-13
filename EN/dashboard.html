@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <script>document.documentElement.classList.add('js')</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="20260405-33494927">
+  <meta name="build-version" content="20260410-7063d847">
+  <meta name="description" content="Operational dashboard for diagnostics, issue triage, and runtime verification on estivanayramia.com.">
   <title>Error Dashboard - Estivan Ayramia</title>
-  <link rel="stylesheet" href="/assets/css/dashboard.css?v=33494927">
+  <link rel="stylesheet" href="/assets/css/dashboard.css?v=1a38ecbf">
   <script src="/assets/js/hud-debug-patch.js"></script>
   <style>
     /* Critical CSS for fast initial render */
@@ -28,21 +29,22 @@
   <link rel="canonical" href="https://www.estivanayramia.com/dashboard">
 </head>
 <body>
+  <a href="#dashboard-main" class="sr-only dashboard-skip">Skip to dashboard content</a>
   <div id="loading">Loading dashboard...</div>
   
   <!-- Login Screen -->
   <div id="login-screen" style="display: none;">
     <div class="login-container">
-      <h1>🛡️ Error Dashboard</h1>
+      <h2>Error Dashboard</h2>
       <p>Protected area - Password required</p>
 
       <div class="login-help" style="margin-top: 10px;">
         <strong>Backend status</strong>
         <div style="margin-top: 6px; font-size: 13px; line-height: 1.4; opacity: 0.9;">
-          <div>Health: <span id="login-backend-health">—</span></div>
-          <div>Auth configured: <span id="login-auth-configured">—</span></div>
-          <div>Auth source: <span id="login-auth-source">—</span></div>
-          <div>Worker version: <span id="login-worker-version">—</span></div>
+          <div>Health: <span id="login-backend-health">N/A</span></div>
+          <div>Auth configured: <span id="login-auth-configured">N/A</span></div>
+          <div>Auth source: <span id="login-auth-source">N/A</span></div>
+          <div>Worker version: <span id="login-worker-version">N/A</span></div>
         </div>
       </div>
       <form id="login-form">
@@ -68,27 +70,34 @@
   </div>
   
   <!-- Dashboard -->
-  <div id="dashboard" style="display: none;">
-    <header class="dashboard-header">
-      <h1>🐛 Error Monitoring Dashboard</h1>
-      <div class="header-actions">
-        <button id="refresh-btn" class="icon-btn" title="Refresh">🔄</button>
-        <button id="export-btn" class="icon-btn" title="Export CSV">📥</button>
-        <button id="logout-btn" class="icon-btn" title="Logout">🚪</button>
+  <main id="dashboard" style="display: none;" aria-labelledby="dashboard-title">
+        <header class="dashboard-header">
+      <div class="header-title">
+        <h1 id="dashboard-title">Error Monitoring Dashboard</h1>
+        <p class="header-subtitle">Diagnostics, issue triage, and runtime verification for local and live site behavior.</p>
+      </div>
+      <div class="header-meta">
+        <div id="dashboard-mode-badge" class="mode-badge" aria-live="polite">Mode pending</div>
+        <div class="header-actions">
+          <button id="refresh-btn" class="icon-btn" title="Refresh data">Refresh</button>
+          <button id="export-btn" class="icon-btn" title="Export filtered CSV">Export CSV</button>
+          <button id="logout-btn" class="icon-btn" title="Logout">Logout</button>
+        </div>
       </div>
     </header>
 
     <nav class="dashboard-tabs" aria-label="Dashboard tabs">
-      <button class="tab-btn active" data-tab="errors">🐛 Errors</button>
-      <button class="tab-btn" data-tab="console">📝 Console</button>
-      <button class="tab-btn" data-tab="network">🌐 Network</button>
-      <button class="tab-btn" data-tab="performance">⚡ Performance</button>
-      <button class="tab-btn" data-tab="redirects">🔀 Redirects</button>
-      <button class="tab-btn" data-tab="storage">💾 Storage</button>
-      <button class="tab-btn" data-tab="system">🖥️ System</button>
+      <button class="tab-btn active" data-tab="errors">Errors</button>
+      <button class="tab-btn" data-tab="console">Console</button>
+      <button class="tab-btn" data-tab="network">Network</button>
+      <button class="tab-btn" data-tab="performance">Performance</button>
+      <button class="tab-btn" data-tab="redirects">Redirects</button>
+      <button class="tab-btn" data-tab="storage">Storage</button>
+      <button class="tab-btn" data-tab="system">System</button>
     </nav>
     
-    <div class="dashboard-container">
+    <div id="dashboard-main" class="dashboard-container">
+      <section id="dashboard-mode-banner" class="mode-banner" aria-live="polite" hidden></section>
 
       <!-- TAB 1: Errors (existing UI preserved) -->
       <div class="tab-panel active" id="tab-errors">
@@ -107,7 +116,9 @@
             <option value="code_bug">Code Bug</option>
             <option value="async_bug">Async Bug</option>
             <option value="navigation">Navigation</option>
-            <option value="connectivity">Connectivity</option>
+          <option value="connectivity">Connectivity</option>
+          <option value="telemetry">Telemetry</option>
+          <option value="spam">Spam/Bot</option>
             <option value="uncategorized">Uncategorized</option>
           </select>
 
@@ -117,9 +128,9 @@
             <option value="1">Bots Only</option>
           </select>
 
-          <input type="text" id="message-search" aria-label="Search by message or URL" placeholder="🔍 Search message/url...">
+          <input type="text" id="message-search" aria-label="Search by message or URL" placeholder="Search message or URL...">
 
-          <button id="export-csv-btn" class="icon-btn" title="Export filtered CSV">📥 CSV</button>
+          <button id="export-csv-btn" class="icon-btn" title="Export filtered CSV">Export CSV</button>
           
           <button id="clear-filters">Clear Filters</button>
         </div>
@@ -150,7 +161,7 @@
               <button id="close-diagnostics" class="icon-btn" disabled>Close</button>
             </div>
           </div>
-          <p class="diagnostics-help">Secure diagnostics are available only after login. Use this panel to inspect telemetry, errors, network, and layout issues.</p>
+          <p class="diagnostics-help">Diagnostics load on demand. In demo mode they inspect local synthetic activity; in real mode they reflect configured backend state.</p>
           <div id="diagnostics-status" class="diagnostics-status">Diagnostics not loaded.</div>
           <div id="diagnostics-mount" class="diagnostics-mount"></div>
         </section>
@@ -179,16 +190,16 @@
         
         <!-- Pagination -->
         <div class="pagination">
-          <button id="prev-page" disabled>← Previous</button>
+          <button id="prev-page" disabled>Previous</button>
           <span id="page-info">Page 1 of 1</span>
-          <button id="next-page" disabled>Next →</button>
+          <button id="next-page" disabled>Next</button>
         </div>
       </div>
 
       <!-- TAB 2: Console Logs -->
       <div class="tab-panel" id="tab-console">
         <div class="console-controls">
-          <button id="console-clear">🗑️ Clear</button>
+          <button id="console-clear">Clear</button>
           <input type="text" id="console-filter" placeholder="Filter logs...">
           <select id="console-level">
             <option value="">All Levels</option>
@@ -205,8 +216,8 @@
       <!-- TAB 3: Network Monitor -->
       <div class="tab-panel" id="tab-network">
         <div class="network-controls">
-          <button id="network-clear">🗑️ Clear</button>
-          <button id="network-export-har">📥 Export HAR</button>
+          <button id="network-clear">Clear</button>
+          <button id="network-export-har">Export HAR</button>
           <select id="network-method">
             <option value="">All Methods</option>
             <option value="GET">GET</option>
@@ -241,19 +252,19 @@
         <div class="perf-grid">
           <div class="perf-card">
             <h3>Core Web Vitals</h3>
-            <div class="metric"><span>LCP</span><strong id="perf-lcp">—</strong></div>
-            <div class="metric"><span>FID/INP</span><strong id="perf-inp">—</strong></div>
-            <div class="metric"><span>CLS</span><strong id="perf-cls">—</strong></div>
+            <div class="metric"><span>LCP</span><strong id="perf-lcp">N/A</strong></div>
+            <div class="metric"><span>FID/INP</span><strong id="perf-inp">N/A</strong></div>
+            <div class="metric"><span>CLS</span><strong id="perf-cls">N/A</strong></div>
           </div>
           <div class="perf-card">
             <h3>Timing</h3>
-            <div class="metric"><span>DOM Content Loaded</span><strong id="perf-dcl">—</strong></div>
-            <div class="metric"><span>Load Complete</span><strong id="perf-load">—</strong></div>
-            <div class="metric"><span>First Paint</span><strong id="perf-fp">—</strong></div>
+            <div class="metric"><span>DOM Content Loaded</span><strong id="perf-dcl">N/A</strong></div>
+            <div class="metric"><span>Load Complete</span><strong id="perf-load">N/A</strong></div>
+            <div class="metric"><span>First Paint</span><strong id="perf-fp">N/A</strong></div>
           </div>
           <div class="perf-card">
             <h3>Resources</h3>
-            <div class="metric"><span>JS Heap Used</span><strong id="perf-memory">—</strong></div>
+            <div class="metric"><span>JS Heap Used</span><strong id="perf-memory">N/A</strong></div>
             <div class="metric"><span>Long Tasks</span><strong id="perf-longtasks">0</strong></div>
           </div>
         </div>
@@ -262,11 +273,11 @@
       <!-- TAB 5: Redirect Testing -->
       <div class="tab-panel" id="tab-redirects">
         <div class="redirect-controls">
-          <button id="redirect-run-diagnostics">🔄 Run Full Diagnostics</button>
+          <button id="redirect-run-diagnostics">Run Full Diagnostics</button>
           <button id="redirect-test-root">Test Root (/)</button>
           <button id="redirect-test-en">Test /EN/</button>
-          <button id="redirect-clear">🗑️ Clear</button>
-          <button id="test-all-features" class="test-all-btn">🧪 Test All Features</button>
+          <button id="redirect-clear">Clear</button>
+          <button id="test-all-features" class="test-all-btn">Test All Features</button>
         </div>
         <div class="redirect-log" id="redirect-log"></div>
         <div class="redirect-results" id="redirect-results"></div>
@@ -275,15 +286,15 @@
       <!-- TAB 6: Storage Inspector -->
       <div class="tab-panel" id="tab-storage">
         <div class="storage-section">
-          <h3>LocalStorage <button id="storage-ls-refresh" class="icon-btn" title="Refresh">🔄</button></h3>
+          <h3>LocalStorage <button id="storage-ls-refresh" class="icon-btn" title="Refresh">Clear</button></h3>
           <table id="storage-ls-table" class="storage-table"></table>
         </div>
         <div class="storage-section">
-          <h3>SessionStorage <button id="storage-ss-refresh" class="icon-btn" title="Refresh">🔄</button></h3>
+          <h3>SessionStorage <button id="storage-ss-refresh" class="icon-btn" title="Refresh">Clear</button></h3>
           <table id="storage-ss-table" class="storage-table"></table>
         </div>
         <div class="storage-section">
-          <h3>Cookies <button id="storage-cookies-refresh" class="icon-btn" title="Refresh">🔄</button></h3>
+          <h3>Cookies <button id="storage-cookies-refresh" class="icon-btn" title="Refresh">Clear</button></h3>
           <table id="storage-cookies-table" class="storage-table"></table>
         </div>
         <div class="storage-section">
@@ -296,29 +307,29 @@
       <!-- TAB 7: System Info -->
       <div class="tab-panel" id="tab-system">
         <table class="system-table">
-          <tr><th>Backend Health</th><td id="sys-backend-health">—</td></tr>
-          <tr><th>Auth Configured</th><td id="sys-auth-configured">—</td></tr>
-          <tr><th>Auth Source</th><td id="sys-auth-source">—</td></tr>
-          <tr><th>Worker Version</th><td id="sys-worker-version">—</td></tr>
-          <tr><th>Build Version</th><td id="sys-build">—</td></tr>
-          <tr><th>User Agent</th><td id="sys-ua">—</td></tr>
-          <tr><th>Viewport</th><td id="sys-viewport">—</td></tr>
-          <tr><th>Device Pixel Ratio</th><td id="sys-dpr">—</td></tr>
-          <tr><th>Platform</th><td id="sys-platform">—</td></tr>
-          <tr><th>Language</th><td id="sys-lang">—</td></tr>
-          <tr><th>Connection</th><td id="sys-connection">—</td></tr>
-          <tr><th>Online Status</th><td id="sys-online">—</td></tr>
-          <tr><th>Memory</th><td id="sys-memory">—</td></tr>
+          <tr><th>Backend Health</th><td id="sys-backend-health">N/A</td></tr>
+          <tr><th>Auth Configured</th><td id="sys-auth-configured">N/A</td></tr>
+          <tr><th>Auth Source</th><td id="sys-auth-source">N/A</td></tr>
+          <tr><th>Worker Version</th><td id="sys-worker-version">N/A</td></tr>
+          <tr><th>Build Version</th><td id="sys-build">N/A</td></tr>
+          <tr><th>User Agent</th><td id="sys-ua">N/A</td></tr>
+          <tr><th>Viewport</th><td id="sys-viewport">N/A</td></tr>
+          <tr><th>Device Pixel Ratio</th><td id="sys-dpr">N/A</td></tr>
+          <tr><th>Platform</th><td id="sys-platform">N/A</td></tr>
+          <tr><th>Language</th><td id="sys-lang">N/A</td></tr>
+          <tr><th>Connection</th><td id="sys-connection">N/A</td></tr>
+          <tr><th>Online Status</th><td id="sys-online">N/A</td></tr>
+          <tr><th>Memory</th><td id="sys-memory">N/A</td></tr>
         </table>
         <div class="system-actions">
-          <button id="sys-export-json">📥 Export All Data (JSON)</button>
-          <button id="sys-copy-report">📋 Copy Debug Report</button>
-          <button id="sys-clear-all" class="danger">🗑️ Clear All Data</button>
+          <button id="sys-export-json">Export All Data (JSON)</button>
+          <button id="sys-copy-report">Copy Debug Report</button>
+          <button id="sys-clear-all" class="danger">Clear Local Diagnostics</button>
         </div>
       </div>
     </div>
-  </div>
-  
+  </main>
+
   <!-- Error Detail Modal -->
   <div id="error-modal" class="modal" style="display: none;">
     <div class="modal-content">
@@ -331,13 +342,13 @@
           <option value="async_bug">Async Bug</option>
           <option value="navigation">Navigation</option>
           <option value="connectivity">Connectivity</option>
-          <option value="spam">Spam/Bot</option>
+          <option value="telemetry">Telemetry</option>
           <option value="uncategorized">Uncategorized</option>
         </select>
         <select id="modal-status">
           <option value="new">New</option>
           <option value="investigating">Investigating</option>
-          <option value="resolved">Resolved (Auto-Delete)</option>
+          <option value="resolved">Resolved</option>
           <option value="ignored">Ignored</option>
         </select>
         <button id="save-error">Save Changes</button>
@@ -345,107 +356,9 @@
       </div>
     </div>
   </div>
-
-  <!-- V12 Diagnostics Telemetry (always available on dashboard) -->
-  <script src="/assets/js/telemetry-core.min.js"></script>
-  <script>
-    (function () {
-      try {
-        if (!window.__SavonieDiagnosticsConsent) {
-          const KEYS = {
-            consent: 'site_diagnostics_consent',
-            upload: 'site_diagnostics_upload',
-            asked: 'site_diagnostics_asked'
-          };
-
-          const storage = {
-            type: (function () {
-              try {
-                const k = '__ls_test__';
-                localStorage.setItem(k, '1');
-                localStorage.removeItem(k);
-                return 'localStorage';
-              } catch {
-                return 'cookie';
-              }
-            })(),
-            set: function (k, v) {
-              if (this.type === 'localStorage') {
-                try { localStorage.setItem(k, v); } catch {}
-                return;
-              }
-              try { document.cookie = encodeURIComponent(k) + '=' + encodeURIComponent(v) + '; path=/; SameSite=Lax'; } catch {}
-            },
-            get: function (k) {
-              if (this.type === 'localStorage') {
-                try { return localStorage.getItem(k); } catch { return null; }
-              }
-              try {
-                const m = document.cookie.match(new RegExp('(?:^|; )' + encodeURIComponent(k) + '=([^;]*)'));
-                return m ? decodeURIComponent(m[1]) : null;
-              } catch {
-                return null;
-              }
-            }
-          };
-
-          const getState = function () {
-            return {
-              consent: storage.get(KEYS.consent),
-              upload: storage.get(KEYS.upload) === 'on',
-              asked: storage.get(KEYS.asked) === '1',
-              storage: storage.type
-            };
-          };
-
-          window.__SavonieDiagnosticsConsent = {
-            get: getState,
-            set: function (o) {
-              try {
-                if (o && typeof o.consent === 'string') storage.set(KEYS.consent, o.consent);
-                if (o && typeof o.upload === 'boolean') storage.set(KEYS.upload, o.upload ? 'on' : 'off');
-                storage.set(KEYS.asked, '1');
-              } catch {}
-            },
-            revoke: function () {
-              try {
-                storage.set(KEYS.consent, 'denied');
-                storage.set(KEYS.upload, 'off');
-                storage.set(KEYS.asked, '1');
-                window.__SavonieTelemetry && window.__SavonieTelemetry.disable && window.__SavonieTelemetry.disable();
-              } catch {}
-            },
-            clearData: function () {
-              try { window.__SavonieTelemetry && window.__SavonieTelemetry.clear && window.__SavonieTelemetry.clear(); } catch {}
-            }
-          };
-
-          // Default to granted for authenticated dashboard usage
-          if (!storage.get(KEYS.consent)) {
-            storage.set(KEYS.consent, 'granted');
-            storage.set(KEYS.upload, 'off');
-            storage.set(KEYS.asked, '1');
-          }
-        }
-
-        // Enable telemetry so breadcrumbs/network/perf hooks attach immediately.
-        if (window.__SavonieTelemetry && typeof window.__SavonieTelemetry.enable === 'function') {
-          window.__SavonieTelemetry.enable({ upload: false, mode: 'dev' });
-        }
-      } catch {}
-    })();
-  </script>
-  <script src="/assets/js/debugger-hud.min.js"></script>
-  <script>
-    (function () {
-      try {
-        if (window.__SavonieHUD && !window.Savonie) window.Savonie = window.__SavonieHUD;
-      } catch {}
-    })();
-  </script>
-  
-  <script src="/assets/js/dashboard.js?v=33494927"></script>
+  <script src="/assets/js/dashboard.js?v=1a38ecbf"></script>
 </body>
 </html>
+
 
 

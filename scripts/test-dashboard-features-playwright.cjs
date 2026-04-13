@@ -3,7 +3,7 @@ const { spawn } = require('child_process');
 const http = require('http');
 const { chromium } = require('playwright');
 
-const DEFAULT_DASHBOARD_URL = `http://localhost:5500/dashboard?demo=1&cb=${Date.now()}`;
+const DEFAULT_DASHBOARD_URL = `http://127.0.0.1:5511/dashboard?demo=1&cb=${Date.now()}`;
 const DASHBOARD_URL = process.env.DASHBOARD_URL || DEFAULT_DASHBOARD_URL;
 const DASHBOARD_PASSWORD = process.env.DASHBOARD_PASSWORD || '';
 const AUTO_START_SERVER = process.env.START_SERVER !== '0';
@@ -129,7 +129,8 @@ async function startLocalServer(port = 5500) {
 (async () => {
   let serverProc = null;
   if (AUTO_START_SERVER && isLocalhostUrl(DASHBOARD_URL)) {
-    const port = 5500;
+    const parsed = new URL(DASHBOARD_URL);
+    const port = Number(parsed.port || 80);
     const alreadyServing = await isPortServingHttp(port);
     if (alreadyServing) {
       console.log(`Using existing local server on port ${port}…`);
@@ -184,11 +185,6 @@ async function startLocalServer(port = 5500) {
 
     await ensureDashboardVisible(page);
 
-    // V12 Diagnostics must be available globally on the dashboard page.
-    await page.waitForFunction(() => {
-      return typeof window.__SavonieTelemetry === 'object' && typeof window.__SavonieHUD === 'object';
-    }, null, { timeout: 15000 });
-
     // Buttons/tabs must be clickable
     await clickTab(page, 'errors');
     await clickTab(page, 'console');
@@ -201,6 +197,9 @@ async function startLocalServer(port = 5500) {
     // Ensure diagnostics open button responds (does not guarantee HUD loads, but validates click path)
     await clickTab(page, 'errors');
     await page.click('#open-diagnostics');
+    await page.waitForFunction(() => {
+      return typeof window.__SavonieTelemetry === 'object' && typeof window.__SavonieHUD === 'object';
+    }, null, { timeout: 15000 });
 
     // Validate Savonie HUD is interactive (tabs clickable)
     await page.waitForSelector('button.savonie-tab', { timeout: 15000 });

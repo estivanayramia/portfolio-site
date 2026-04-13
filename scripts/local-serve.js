@@ -15,6 +15,9 @@ const config   = require(path.join(ROOT_DIR, 'serve.json'));
 const REDIRECTS_PATH = path.join(ROOT_DIR, '_redirects');
 
 const PORT = Number(process.env.PORT) || 5500;
+const COMMON_HEADERS = {
+  'X-Portfolio-Server': 'local-serve',
+};
 
 /* ── MIME map ──────────────────────────────────────────────── */
 const MIME = {
@@ -97,6 +100,9 @@ function applyRedirect(pathname) {
 /* ── Helpers ───────────────────────────────────────────────── */
 function redirect(res, location, statusCode = 301) {
   res.statusCode = statusCode;
+  for (const [name, value] of Object.entries(COMMON_HEADERS)) {
+    res.setHeader(name, value);
+  }
   res.setHeader('Location', location);
   res.end();
 }
@@ -106,7 +112,11 @@ function serveFile(res, filePath) {
   const mime = MIME[ext] || 'application/octet-stream';
   try {
     const data = fs.readFileSync(filePath);
-    res.writeHead(200, { 'Content-Type': mime, 'Content-Length': data.length });
+    res.writeHead(200, {
+      ...COMMON_HEADERS,
+      'Content-Type': mime,
+      'Content-Length': data.length,
+    });
     res.end(data);
   } catch {
     return false;
@@ -125,6 +135,9 @@ function tryFile(res, relativePath) {
 function serve404(res) {
   const page = path.join(ROOT_DIR, '404.html');
   res.statusCode = 404;
+  for (const [name, value] of Object.entries(COMMON_HEADERS)) {
+    res.setHeader(name, value);
+  }
   if (fs.existsSync(page)) {
     const data = fs.readFileSync(page);
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -138,6 +151,16 @@ function serve404(res) {
 const server = http.createServer((req, res) => {
   const requestUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   let pathname = requestUrl.pathname;
+  try {
+    pathname = decodeURIComponent(pathname);
+  } catch {
+    // Keep the raw pathname if decoding fails.
+  }
+  try {
+    pathname = decodeURIComponent(pathname);
+  } catch {
+    pathname = requestUrl.pathname;
+  }
 
   // Canonical trailing slash rules (match production expectations)
   if (pathname === '/projects') return redirect(res, '/projects/');

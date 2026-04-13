@@ -48,12 +48,14 @@ function isDashboardDemoMode() {
   const forceReal = __dashboardParams.get('force_real') === '1';
   const host = String(location.hostname || '').toLowerCase();
   if (forceDemo) return true;
+  if (forceReal) return false;
   if (isLocalDevHost(host)) return true;
   if (isPagesPreviewHost(host) && !forceReal) return true;
   return false;
 }
 
 let DEMO_MODE = isDashboardDemoMode();
+const DASHBOARD_TOKEN_KEY = 'dashboard_token';
 
 // API routing
 const PROD_API_ORIGIN = 'https://www.estivanayramia.com';
@@ -66,12 +68,277 @@ function isPagesPreviewHost(hostname) {
 function getApiOrigin() {
   const host = String(location.hostname || '').toLowerCase();
   if (host === 'estivanayramia.com' || host === 'www.estivanayramia.com') return '';
-  if (host === 'localhost' || host === '127.0.0.1') return '';
+  if (host === 'localhost' || host === '127.0.0.1') {
+    return __dashboardParams.get('force_real') === '1' ? PROD_API_ORIGIN : '';
+  }
   if (isPagesPreviewHost(host)) return PROD_API_ORIGIN;
   return '';
 }
 
 const API_ORIGIN = getApiOrigin();
+
+function getStoredAuthToken() {
+  try {
+    const fromSession = sessionStorage.getItem(DASHBOARD_TOKEN_KEY);
+    if (fromSession) return fromSession;
+  } catch {}
+
+  try {
+    const legacy = localStorage.getItem(DASHBOARD_TOKEN_KEY);
+    if (!legacy) return null;
+    try { sessionStorage.setItem(DASHBOARD_TOKEN_KEY, legacy); } catch {}
+    try { localStorage.removeItem(DASHBOARD_TOKEN_KEY); } catch {}
+    return legacy;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredAuthToken(token) {
+  try { sessionStorage.setItem(DASHBOARD_TOKEN_KEY, token); } catch {}
+  try { localStorage.removeItem(DASHBOARD_TOKEN_KEY); } catch {}
+}
+
+function clearStoredAuthToken() {
+  try { sessionStorage.removeItem(DASHBOARD_TOKEN_KEY); } catch {}
+  try { localStorage.removeItem(DASHBOARD_TOKEN_KEY); } catch {}
+}
+
+function getDashboardModeMeta() {
+  if (DEMO_MODE) {
+    return {
+      label: 'Demo mode',
+      tone: 'demo',
+      banner: 'Using synthetic local data. Backend health, auth, and worker ownership are not inferred from demo-mode rows.',
+      diagnostics: 'Diagnostics inspect local browser state and synthetic activity in demo mode.'
+    };
+  }
+
+  if (isLocalDevHost(location.hostname) && API_ORIGIN === PROD_API_ORIGIN) {
+    return {
+      label: 'Real mode (prod API)',
+      tone: 'real',
+      banner: 'Using the live production dashboard API from localhost. This is useful for verifying real backend status without deploying local code.',
+      diagnostics: 'Diagnostics load on demand. Backend status reflects the live production API.'
+    };
+  }
+
+  if (isPagesPreviewHost(location.hostname)) {
+    return {
+      label: 'Preview real mode',
+      tone: 'real',
+      banner: 'Using the production dashboard API from a Pages preview host.',
+      diagnostics: 'Diagnostics load on demand and reflect configured backend state when available.'
+    };
+  }
+
+  return {
+    label: 'Real mode',
+    tone: 'real',
+    banner: 'Using configured backend state. Missing auth, KV, D1, or route ownership will surface as degraded runtime health.',
+    diagnostics: 'Diagnostics load on demand and reflect real backend state when available.'
+  };
+}
+
+function renderDashboardModeUi() {
+  const meta = getDashboardModeMeta();
+  let badge = document.getElementById('dashboard-mode-badge');
+  let banner = document.getElementById('dashboard-mode-banner');
+  const help = document.querySelector('.diagnostics-help');
+  const dashboardRoot = document.getElementById('dashboard');
+  const loginHeading = document.querySelector('#login-screen .login-container h1');
+  const dashboardHeader = document.querySelector('.dashboard-header');
+
+  if (dashboardRoot) dashboardRoot.setAttribute('role', 'main');
+
+  if (loginHeading && !loginHeading.dataset.dashboardNormalized) {
+    const replacement = document.createElement('h2');
+    replacement.textContent = 'Error Dashboard';
+    replacement.dataset.dashboardNormalized = '1';
+    loginHeading.replaceWith(replacement);
+  }
+
+  if (dashboardHeader && !badge) {
+    const title = dashboardHeader.querySelector('h1');
+    if (title) {
+      title.textContent = 'Error Monitoring Dashboard';
+      const wrapper = document.createElement('div');
+      wrapper.className = 'header-title';
+      title.replaceWith(wrapper);
+      wrapper.appendChild(title);
+
+      badge = document.createElement('span');
+      badge.id = 'dashboard-mode-badge';
+      badge.className = 'mode-badge';
+      wrapper.appendChild(badge);
+    }
+  }
+
+  const dashboardContainer = document.querySelector('.dashboard-container');
+  if (dashboardContainer && !banner) {
+    banner = document.createElement('div');
+    banner.id = 'dashboard-mode-banner';
+    banner.className = 'mode-banner';
+    banner.hidden = true;
+    dashboardContainer.insertBefore(banner, dashboardContainer.firstChild);
+  }
+
+  const telemetryTargets = [
+    document.getElementById('category-filter'),
+    document.getElementById('modal-category')
+  ];
+  telemetryTargets.forEach((select) => {
+    if (!select) return;
+    const existing = Array.from(select.options || []).find((option) => option.value === 'telemetry');
+    if (existing) {
+      existing.textContent = 'Telemetry';
+      return;
+    }
+    const option = document.createElement('option');
+    option.value = 'telemetry';
+    option.textContent = 'Telemetry';
+    select.appendChild(option);
+  });
+
+  const resolvedOption = document.querySelector('#modal-status option[value="resolved"]');
+  if (resolvedOption) resolvedOption.textContent = 'Resolved';
+
+  const clearBtn = document.getElementById('sys-clear-all');
+  if (clearBtn) clearBtn.textContent = 'Clear Local Diagnostics';
+
+  const directLabels = {
+    'export-csv-btn': 'Export CSV',
+    'console-clear': 'Clear',
+    'network-clear': 'Clear',
+    'network-export-har': 'Export HAR',
+    'redirect-run-diagnostics': 'Run Full Diagnostics',
+    'redirect-clear': 'Clear',
+    'test-all-features': 'Test All Features',
+    'storage-ls-refresh': 'Refresh',
+    'storage-ss-refresh': 'Refresh',
+    'storage-cookies-refresh': 'Refresh'
+  };
+  Object.entries(directLabels).forEach(([id, label]) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = label;
+  });
+
+  const tabLabels = {
+    errors: 'Errors',
+    console: 'Console',
+    network: 'Network',
+    performance: 'Performance',
+    redirects: 'Redirects',
+    storage: 'Storage',
+    system: 'System'
+  };
+  Object.entries(tabLabels).forEach(([name, label]) => {
+    const tab = document.querySelector(`.tab-btn[data-tab="${name}"]`);
+    if (tab) tab.textContent = label;
+  });
+
+  if (badge) {
+    badge.textContent = meta.label;
+    badge.dataset.tone = meta.tone;
+  }
+
+  if (banner) {
+    banner.hidden = false;
+    banner.textContent = meta.banner;
+    banner.dataset.tone = meta.tone;
+  }
+
+  if (help) {
+    help.textContent = meta.diagnostics;
+  }
+}
+
+function setTextIfPresent(selector, text) {
+  const el = document.querySelector(selector);
+  if (el) el.textContent = text;
+}
+
+function normalizeDashboardStaticText() {
+  const tabLabels = [
+    ['[data-tab="errors"]', 'Errors'],
+    ['[data-tab="console"]', 'Console'],
+    ['[data-tab="network"]', 'Network'],
+    ['[data-tab="performance"]', 'Performance'],
+    ['[data-tab="redirects"]', 'Redirects'],
+    ['[data-tab="storage"]', 'Storage'],
+    ['[data-tab="system"]', 'System']
+  ];
+  tabLabels.forEach(([selector, text]) => setTextIfPresent(selector, text));
+
+  const buttonLabels = [
+    ['#export-csv-btn', 'Export CSV'],
+    ['#console-clear', 'Clear'],
+    ['#network-clear', 'Clear'],
+    ['#network-export-har', 'Export HAR'],
+    ['#redirect-run-diagnostics', 'Run Full Diagnostics'],
+    ['#redirect-clear', 'Clear'],
+    ['#test-all-features', 'Test All Features'],
+    ['#storage-ls-refresh', 'Refresh'],
+    ['#storage-ss-refresh', 'Refresh'],
+    ['#storage-cookies-refresh', 'Refresh'],
+    ['#sys-export-json', 'Export All Data (JSON)'],
+    ['#sys-copy-report', 'Copy Debug Report'],
+    ['#sys-clear-all', 'Clear Local Diagnostics']
+  ];
+  buttonLabels.forEach(([selector, text]) => setTextIfPresent(selector, text));
+
+  const dashTargets = [
+    '#login-backend-health',
+    '#login-auth-configured',
+    '#login-auth-source',
+    '#login-worker-version',
+    '#perf-lcp',
+    '#perf-inp',
+    '#perf-cls',
+    '#perf-dcl',
+    '#perf-load',
+    '#perf-fp',
+    '#sys-backend-health',
+    '#sys-auth-configured',
+    '#sys-auth-source',
+    '#sys-worker-version',
+    '#sys-build',
+    '#sys-ua',
+    '#sys-viewport',
+    '#sys-dpr',
+    '#sys-platform',
+    '#sys-lang',
+    '#sys-connection',
+    '#sys-online',
+    '#sys-memory'
+  ];
+
+  dashTargets.forEach((selector) => {
+    const el = document.querySelector(selector);
+    if (!el) return;
+    if (!el.textContent || /Ã|â€|Å|ð/.test(el.textContent)) {
+      el.textContent = '—';
+    }
+  });
+
+  const modalStatusResolved = document.querySelector('#modal-status option[value="resolved"]');
+  if (modalStatusResolved) modalStatusResolved.textContent = 'Resolved';
+
+  const modalCategory = document.getElementById('modal-category');
+  if (modalCategory) {
+    const spamOptions = Array.from(modalCategory.querySelectorAll('option[value="spam"]'));
+    spamOptions.forEach((option, index) => {
+      option.textContent = 'Spam/Bot';
+      if (index > 0) option.remove();
+    });
+    if (!modalCategory.querySelector('option[value="telemetry"]')) {
+      const telemetry = document.createElement('option');
+      telemetry.value = 'telemetry';
+      telemetry.textContent = 'Telemetry';
+      modalCategory.insertBefore(telemetry, modalCategory.querySelector('option[value="spam"]'));
+    }
+  }
+}
 
 function apiUrl(pathname) {
   const path = pathname.startsWith('/') ? pathname : `/${pathname}`;
@@ -368,12 +635,6 @@ function ensureDashboardConsent() {
     }
   };
 
-  // Default to granted for authenticated dashboard usage
-  if (!storage.get(KEYS.consent)) {
-    storage.set(KEYS.consent, 'granted');
-    storage.set(KEYS.upload, 'off');
-    storage.set(KEYS.asked, '1');
-  }
 }
 
 async function loadDiagnosticsAssets() {
@@ -384,6 +645,9 @@ async function loadDiagnosticsAssets() {
   setDiagnosticsStatus('Loading diagnostics…', 'loading');
   await loadScript('/assets/js/telemetry-core.min.js');
   ensureDashboardConsent();
+  if (!window.__SavonieDiagnosticsConsent?.get?.().consent) {
+    window.__SavonieDiagnosticsConsent?.set?.({ consent: 'granted', upload: false });
+  }
   window.__SavonieTelemetry?.enable?.({ upload: false, mode: 'dev' });
   await loadScript(`/assets/js/debugger-hud.min.js?v=${__DIAGNOSTICS_ASSET_VERSION}`);
   if (!window.__SavonieHUD || typeof window.__SavonieHUD.open !== 'function') {
@@ -444,15 +708,18 @@ function closeDiagnosticsPanel() {
 
 // Check if already logged in
 window.addEventListener('DOMContentLoaded', () => {
+  normalizeDashboardStaticText();
+
   // Demo is fully offline/self-contained: no password prompt, no API calls.
   if (DEMO_MODE) {
     authToken = null;
+    clearStoredAuthToken();
     showDashboard();
     loadErrors();
     return;
   }
 
-  authToken = localStorage.getItem('dashboard_token');
+  authToken = getStoredAuthToken();
 
   if (authToken) {
     showDashboard();
@@ -469,6 +736,7 @@ function showLogin() {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('dashboard').style.display = 'none';
+  renderDashboardModeUi();
 }
 
 // Show dashboard
@@ -476,6 +744,7 @@ function showDashboard() {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('dashboard').style.display = 'block';
+  renderDashboardModeUi();
   initDiagnosticsPanel();
   initDashboardTabs();
 }
@@ -1029,7 +1298,9 @@ async function runComprehensiveFeatureTest(buttonEl) {
     // 2) Network requests (success + fail)
     logRedirect('Test 2/10: Network requests', 'info');
     try { await fetch('/'); } catch {}
-    try { await fetch(apiUrl('/api/health')); } catch {}
+    if (!DEMO_MODE) {
+      try { await fetch(apiUrl('/api/health')); } catch {}
+    }
     try { await fetch('/nonexistent-endpoint-test-404'); } catch {}
     await sleep(250);
 
@@ -1086,13 +1357,15 @@ async function runComprehensiveFeatureTest(buttonEl) {
 
     // 9) Auth endpoint (invalid password)
     logRedirect('Test 9/10: Auth endpoint (invalid password)', 'info');
-    try {
-      await fetch(apiUrl('/api/auth'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: 'invalid-password-for-testing' })
-      });
-    } catch {}
+    if (!DEMO_MODE) {
+      try {
+        await fetch(apiUrl('/api/auth'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: 'invalid-password-for-testing' })
+        });
+      } catch {}
+    }
     await sleep(250);
 
     // 10) Intentional cross-origin request (expected to fail CORS)
@@ -1307,6 +1580,18 @@ function initSystemTab() {
     if (window.__dashboardBackendHealthLoaded) return;
     window.__dashboardBackendHealthLoaded = true;
 
+    if (DEMO_MODE) {
+      set('sys-backend-health', 'Demo mode');
+      set('sys-auth-configured', 'Not used');
+      set('sys-auth-source', 'Synthetic data');
+      set('sys-worker-version', 'Not queried');
+      const badge = document.getElementById('dashboard-mode-badge');
+      const banner = document.getElementById('dashboard-mode-banner');
+      if (badge) badge.dataset.tone = 'demo';
+      if (banner) banner.dataset.tone = 'demo';
+      return;
+    }
+
     set('sys-backend-health', 'Checking…');
     set('sys-auth-configured', '—');
     set('sys-auth-source', '—');
@@ -1321,6 +1606,13 @@ function initSystemTab() {
 
       if (!res.ok || !json) {
         set('sys-backend-health', `Unhealthy (HTTP ${res.status})`);
+        const badge = document.getElementById('dashboard-mode-badge');
+        const banner = document.getElementById('dashboard-mode-banner');
+        if (badge) badge.dataset.tone = 'degraded';
+        if (banner) {
+          banner.dataset.tone = 'degraded';
+          banner.textContent = `Real mode is active, but backend health failed with HTTP ${res.status}.`;
+        }
         return;
       }
 
@@ -1334,14 +1626,31 @@ function initSystemTab() {
       if (typeof json.version === 'string') {
         set('sys-worker-version', json.version);
       }
+      const degraded = !json.ok || json.authConfigured === false;
+      const badge = document.getElementById('dashboard-mode-badge');
+      const banner = document.getElementById('dashboard-mode-banner');
+      if (badge) badge.dataset.tone = degraded ? 'degraded' : 'real';
+      if (banner) {
+        banner.dataset.tone = degraded ? 'degraded' : 'real';
+        banner.textContent = degraded
+          ? `Real mode is active, but backend readiness is degraded (${json.version || 'unknown version'}).`
+          : `Real mode is active and backend readiness checks passed (${json.version || 'unknown version'}).`;
+      }
     } catch {
       set('sys-backend-health', 'Unavailable');
+      const badge = document.getElementById('dashboard-mode-badge');
+      const banner = document.getElementById('dashboard-mode-banner');
+      if (badge) badge.dataset.tone = 'degraded';
+      if (banner) {
+        banner.dataset.tone = 'degraded';
+        banner.textContent = 'Real mode is active, but backend health is unavailable.';
+      }
     }
   })();
 
   set('sys-build', document.querySelector('meta[name="build-version"]')?.content || 'dev');
   set('sys-ua', navigator.userAgent);
-  set('sys-viewport', `${window.innerWidth} × ${window.innerHeight}`);
+  set('sys-viewport', `${window.innerWidth} x ${window.innerHeight}`);
   set('sys-dpr', String(window.devicePixelRatio || 1));
   set('sys-platform', navigator.platform || 'unknown');
   set('sys-lang', navigator.language || 'unknown');
@@ -1390,7 +1699,7 @@ function exportAllDataJSON() {
     networkRequests,
     system: {
       userAgent: navigator.userAgent,
-      viewport: `${window.innerWidth}×${window.innerHeight}`,
+      viewport: `${window.innerWidth}x${window.innerHeight}`,
       platform: navigator.platform,
       language: navigator.language,
       online: navigator.onLine
@@ -1413,7 +1722,7 @@ async function copyDebugReport() {
     '',
     'System Info:',
     `- User Agent: ${navigator.userAgent}`,
-    `- Viewport: ${window.innerWidth}×${window.innerHeight}`,
+    `- Viewport: ${window.innerWidth}x${window.innerHeight}`,
     `- Platform: ${navigator.platform}`,
     `- Language: ${navigator.language}`,
     '',
@@ -1440,13 +1749,13 @@ async function copyDebugReport() {
 }
 
 function clearAllData() {
-  if (!confirm('Clear all diagnostic data? This cannot be undone.')) return;
+  if (!confirm('Clear local diagnostic data from this browser session? This does not delete production records.')) return;
   consoleLogs.length = 0;
   networkRequests.length = 0;
   renderConsoleLogs();
   renderNetworkRequests();
   try { window.__SavonieTelemetry?.clear?.(); } catch {}
-  alert('All diagnostic data cleared.');
+  alert('Local diagnostic data cleared.');
 }
 
 function formatClockTime(ts) {
@@ -1539,7 +1848,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
     if (response.ok && json && json.token) {
       authToken = json.token;
-      localStorage.setItem('dashboard_token', authToken);
+      setStoredAuthToken(authToken);
       showDashboard();
       loadErrors();
     } else {
@@ -1573,7 +1882,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 // Logout
 document.getElementById('logout-btn').addEventListener('click', () => {
   authToken = null;
-  localStorage.removeItem('dashboard_token');
+  clearStoredAuthToken();
   closeDiagnosticsPanel();
   showLogin();
 });
@@ -1588,37 +1897,14 @@ async function loadErrors() {
     const pageErrors = filtered.slice(start, start + pageSize);
     
     renderErrors(pageErrors);
-    updateStats(pageErrors, filtered.length, MOCK_ERRORS.length);
+    updateStats(filtered, filtered.length, MOCK_ERRORS.length);
     updatePagination(filtered.length);
     announceFilterResults(filtered.length, MOCK_ERRORS.length);
     return;
   }
   
   try {
-    const params = new URLSearchParams({
-      limit: '5000',
-      offset: '0'
-    });
-    
-    const response = await fetch(apiUrl(`/api/errors?${params}`), {
-      headers: getAuthHeaders()
-    });
-    
-    if (!response.ok) {
-      if (response.status === 401) {
-        // Token expired
-        authToken = null;
-        localStorage.removeItem('dashboard_token');
-        showLogin();
-        return;
-      }
-      throw new Error('Failed to fetch errors');
-    }
-    
-    const { json } = await readJsonOrText(response);
-    const data = json;
-    if (!data) throw new Error('Non-JSON API response');
-    const allErrors = Array.isArray(data.errors) ? data.errors : [];
+    const allErrors = await fetchAllErrorsForExport();
     const filtered = applyFilters(allErrors);
     latestFilteredErrors = filtered;
 
@@ -1626,7 +1912,7 @@ async function loadErrors() {
     const pageErrors = filtered.slice(start, start + pageSize);
 
     renderErrors(pageErrors);
-    updateStats(pageErrors, filtered.length, allErrors.length);
+    updateStats(filtered, filtered.length, allErrors.length);
     updatePagination(filtered.length);
     announceFilterResults(filtered.length, allErrors.length);
     
@@ -1747,7 +2033,7 @@ function renderErrors(errors) {
 }
 
 // Update stats
-function updateStats(currentPageErrors, filteredTotal, fullTotal) {
+function updateStats(filteredErrors, filteredTotal, fullTotal) {
   const totalEl = document.getElementById('total-errors');
   if (hasActiveFilters()) {
     totalEl.textContent = `Showing ${filteredTotal} of ${fullTotal} errors`;
@@ -1755,9 +2041,8 @@ function updateStats(currentPageErrors, filteredTotal, fullTotal) {
     totalEl.textContent = fullTotal;
   }
   
-  // Count by status (current page only - approximation)
-  const newCount = currentPageErrors.filter(e => e.status === 'new').length;
-  const invCount = currentPageErrors.filter(e => e.status === 'investigating').length;
+  const newCount = filteredErrors.filter(e => e.status === 'new').length;
+  const invCount = filteredErrors.filter(e => e.status === 'investigating').length;
   
   document.getElementById('new-errors').textContent = newCount;
   document.getElementById('investigating-errors').textContent = invCount;
@@ -1765,6 +2050,14 @@ function updateStats(currentPageErrors, filteredTotal, fullTotal) {
 
 // Update pagination
 function updatePagination(total) {
+  if (total <= 0) {
+    currentPage = 0;
+    document.getElementById('page-info').textContent = 'No results';
+    document.getElementById('prev-page').disabled = true;
+    document.getElementById('next-page').disabled = true;
+    return;
+  }
+
   const totalPages = Math.ceil(total / pageSize);
   const currentPageNum = currentPage + 1;
   
@@ -1976,7 +2269,7 @@ function getExportFilename() {
 async function fetchAllErrorsForExport() {
   if (DEMO_MODE) return MOCK_ERRORS.slice();
 
-  const pageLimit = 500;
+  const pageLimit = 200;
   let offset = 0;
   let total = Infinity;
   const all = [];
@@ -1997,7 +2290,7 @@ async function fetchAllErrorsForExport() {
     if (!response.ok) {
       if (response.status === 401) {
         authToken = null;
-        localStorage.removeItem('dashboard_token');
+        clearStoredAuthToken();
         showLogin();
         throw new Error('Unauthorized export request');
       }
@@ -2014,8 +2307,8 @@ async function fetchAllErrorsForExport() {
 
     all.push(...batch);
 
-    if (batch.length < pageLimit) break;
-    offset += pageLimit;
+    if (batch.length < pageLimit || batch.length === 0) break;
+    offset += batch.length;
   }
 
   return all;
