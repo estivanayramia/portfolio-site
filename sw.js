@@ -1,117 +1,128 @@
-﻿// ==========================================================================
+// ==========================================================================
 // Service Worker Configuration
 // ==========================================================================
-// Caching Strategy:
-//   - HTML (navigation): Network-first, fallback to cache, then 404
-//   - Static Assets (CSS/JS/images): Stale-while-revalidate
+// Strategy:
+// - HTML/navigation: network-first, fallback to cache, then 404
+// - Static assets: stale-while-revalidate
 //
-// Cache Version: Bump this whenever you deploy changes that affect cached files
+// Precache only real clean routes and real asset paths.
+// Do not let one failed precache request abort install.
 // ==========================================================================
-const CACHE_VERSION = 'v20260405-33494927-dashboard-bypass';
+const CACHE_VERSION = 'v20260412-957fa863-carousel-unification';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
-const ASSETS_TO_CACHE = [
-    '/',
-    '/index.html',
-    '/about.html',
-    '/overview.html',
-    '/deep-dive.html',
-    '/projects.html',
-    '/contact.html',
-    '/privacy.html',
-    '/404.html',
-    '/assets/css/theme.css',
-    '/assets/css/style.css',
-    '/assets/js/site.js',
-    '/assets/js/site.min.js',
-    '/assets/js/lazy-loader.js',
-    '/assets/js/lazy-loader.min.js',
-    '/assets/js/cache-refresh.js',
-    '/assets/img/headshot.webp',
-    '/assets/img/savonie-thumb.webp'
+
+const PRECACHE_URLS = [
+  '/',
+  '/about',
+  '/overview',
+  '/deep-dive',
+  '/projects/',
+  '/contact',
+  '/privacy',
+  '/es/',
+  '/ar/',
+  '/404.html',
+  '/assets/css/style.css',
+  '/theme.css',
+  '/assets/js/site.min.js',
+  '/assets/js/lazy-loader.min.js',
+  '/assets/img/headshot.webp',
+  '/assets/img/logo-ea.webp',
+  '/assets/img/savonie-thumb.webp'
 ];
 
-// Install event - cache assets
+async function precacheAll() {
+  const cache = await caches.open(CACHE_NAME);
+  const results = await Promise.allSettled(
+    PRECACHE_URLS.map(async (url) => {
+      const request = new Request(url, { cache: 'reload' });
+      const response = await fetch(request);
+      if (!response.ok) {
+        throw new Error(`${url} -> HTTP ${response.status}`);
+      }
+      await cache.put(request, response);
+    })
+  );
+
+  const failures = results
+    .map((result, index) => ({ result, url: PRECACHE_URLS[index] }))
+    .filter(({ result }) => result.status === 'rejected');
+
+  if (failures.length > 0) {
+    console.warn(
+      '[sw] Precache completed with failures:',
+      failures.map(({ url, result }) => `${url}: ${result.reason?.message || result.reason}`)
+    );
+  }
+}
+
 self.addEventListener('install', (event) => {
-    console.log('Service Worker: Installing...');
-    self.skipWaiting();
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                console.log('Service Worker: Caching files');
-                return cache.addAll(ASSETS_TO_CACHE);
-            })
-    );
+  self.skipWaiting();
+  event.waitUntil(precacheAll());
 });
 
-// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-    console.log('Service Worker: Activating...');
-    event.waitUntil(
-        caches.keys()
-            .then((cacheNames) => Promise.all(
-                cacheNames.map((cache) => {
-                    if (cache !== CACHE_NAME) {
-                        console.log('Service Worker: Deleting old cache:', cache);
-                        return caches.delete(cache);
-                    }
-                })
-            ))
-            .then(() => self.clients.claim())
-    );
+  event.waitUntil(
+    caches.keys()
+      .then((cacheNames) => Promise.all(
+        cacheNames.map((cache) => {
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
+          return undefined;
+        })
+      ))
+      .then(() => self.clients.claim())
+  );
 });
 
-// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-    // Skip non-GET requests
-    if (event.request.method !== 'GET') return;
+  if (event.request.method !== 'GET') return;
+  if (!event.request.url.startsWith(self.location.origin)) return;
 
-    // Skip external requests (CDN, APIs, etc.)
-    if (!event.request.url.startsWith(self.location.origin)) return;
+  const request = event.request;
+  const accept = request.headers.get('accept') || '';
+  const isHTML = request.destination === 'document' || accept.includes('text/html');
+  const isStaticAsset =
+    request.destination === 'style'
+    || request.destination === 'script'
+    || request.destination === 'image'
+    || request.destination === 'font';
 
-    const request = event.request;
-    const isHTML = request.destination === 'document' || request.headers.get('accept')?.includes('text/html');
-
-    // Strategy:
-    // - HTML: network-first (ensures latest code after deploy), fallback to cache/404
-    // - Assets (CSS/JS/images): stale-while-revalidate
-    if (isHTML) {
-        event.respondWith(
-            fetch(request)
-                .then((response) => {
-                    // Cache the latest HTML
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-                    return response;
-                })
-                .catch(async () => {
-                    const cached = await caches.match(request);
-                    return cached || caches.match('/404.html');
-                })
-        );
-        return;
-    }
-
-    // Stale-while-revalidate for assets
+  if (isHTML) {
     event.respondWith(
-        caches.match(request)
-            .then((cachedResponse) => {
-                const networkFetch = fetch(request)
-                    .then((response) => {
-                        if (response && response.status === 200) {
-                            const responseClone = response.clone();
-                            caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
-                        }
-                        return response;
-                    })
-                    .catch(() => undefined);
-
-                // If cache exists, return it immediately and update in background
-                if (cachedResponse) {
-                    return cachedResponse;
-                }
-
-                // Otherwise, return network response (or fail)
-                return networkFetch;
-            })
+      fetch(request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          return response;
+        })
+        .catch(async () => {
+          const cached = await caches.match(request, { ignoreSearch: true });
+          return cached || caches.match('/404.html');
+        })
     );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request, { ignoreSearch: isStaticAsset })
+      .then((cachedResponse) => {
+        const networkFetch = fetch(request)
+          .then((response) => {
+            if (response && response.status === 200) {
+              const clone = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            }
+            return response;
+          })
+          .catch(() => undefined);
+
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        return networkFetch;
+      })
+  );
 });
