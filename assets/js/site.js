@@ -900,9 +900,11 @@ const initAnimations = () => {
     }
 
     const fadeElements = document.querySelectorAll('[data-gsap="fade-up"]');
-    const fadeDistance = isMobile ? 18 : 28;
-    const fadeDuration = isMobile ? 0.92 : 1.16;
-    const fadeStart = isMobile ? 'top 92%' : 'top 86%';
+    const fadeDistance = isMobile ? 18 : 34;
+    const fadeDuration = isMobile ? 0.94 : 1.14;
+    const fadeStart = isMobile ? 'top 95%' : 'top 91%';
+    const fadeScale = isMobile ? 0.994 : 0.985;
+    const inViewStagger = isMobile ? 0.045 : 0.07;
     const viewportThreshold = (typeof window !== 'undefined' && window.innerHeight)
         ? window.innerHeight * (isMobile ? 0.95 : 0.9)
         : 0;
@@ -918,26 +920,37 @@ const initAnimations = () => {
         element.removeAttribute('data-gsap-state');
     });
 
+    let inViewIndex = 0;
+
     fadeElements.forEach((element) => {
         const delay = Number.parseFloat(element.dataset.gsapDelay || '0');
         const delaySeconds = Number.isFinite(delay) ? delay : 0;
         const isInitiallyInView = element.getBoundingClientRect().top <= viewportThreshold;
+        const revealDelay = delaySeconds > 0 ? delaySeconds : inViewIndex * inViewStagger;
+
+        gsap.set(element, {
+            transformOrigin: '50% 100%'
+        });
 
         if (isInitiallyInView) {
+            inViewIndex += 1;
             gsap.fromTo(element,
                 {
                     autoAlpha: 0,
-                    y: fadeDistance
+                    y: fadeDistance,
+                    scale: fadeScale
                 },
                 {
                     autoAlpha: 1,
                     y: 0,
+                    scale: 1,
                     duration: fadeDuration,
-                    delay: delaySeconds,
-                    ease: 'power2.out',
+                    delay: revealDelay,
+                    ease: 'expo.out',
                     overwrite: 'auto',
                     clearProps: 'opacity,visibility,transform,willChange',
                     onStart: () => {
+                        element.style.willChange = 'opacity, transform';
                         element.dataset.gsapState = 'animating';
                     },
                     onComplete: () => {
@@ -950,6 +963,7 @@ const initAnimations = () => {
         gsap.set(element, {
             autoAlpha: 0,
             y: fadeDistance,
+            scale: fadeScale,
             force3D: true,
             willChange: 'opacity, transform'
         });
@@ -957,12 +971,14 @@ const initAnimations = () => {
         gsap.to(element, {
             autoAlpha: 1,
             y: 0,
+            scale: 1,
             duration: fadeDuration,
             delay: delaySeconds,
-            ease: 'power2.out',
+            ease: 'expo.out',
             overwrite: 'auto',
             clearProps: 'opacity,visibility,transform,willChange',
             onStart: () => {
+                element.style.willChange = 'opacity, transform';
                 element.dataset.gsapState = 'animating';
             },
             onComplete: () => {
@@ -972,7 +988,7 @@ const initAnimations = () => {
                 trigger: element,
                 start: fadeStart,
                 once: true,
-                fastScrollEnd: true,
+                toggleActions: 'play none none none',
                 invalidateOnRefresh: true
             }
         });

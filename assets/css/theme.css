@@ -591,7 +591,7 @@ body {
 
 .js [data-gsap="fade-up"] {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translate3d(0, 18px, 0) scale(0.992);
 }
 
 /* ==========================================================================
