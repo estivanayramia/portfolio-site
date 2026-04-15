@@ -14,8 +14,8 @@
 
 :root {
   /* Responsive card dimensions */
-  --card-width: clamp(256px, 21vw, 380px);
-  --card-height: clamp(400px, 33vw, 600px);
+  --card-width: clamp(258px, 21vw, 380px);
+  --card-height: clamp(408px, 33.25vw, 596px);
   --coverflow-active-scale: 1.24;
   --coverflow-safe-top: clamp(1.25rem, 3vw, 2.25rem);
   --coverflow-safe-bottom: clamp(6.5rem, 10vw, 8.5rem);
@@ -88,18 +88,19 @@
   background: transparent;
   padding: 4.5rem 0 1rem;
   overflow: visible;
-  --card-width: clamp(252px, 21vw, 360px);
-  --card-height: clamp(380px, 30vw, 540px);
-  --surface-card-content-width: 76%;
+  --card-width: clamp(258px, 21vw, 380px);
+  --card-height: clamp(408px, 33.25vw, 596px);
+  --coverflow-active-scale: 1.24;
+  --surface-card-content-width: 74%;
   --surface-card-content-bottom: 1.05rem;
   --surface-card-overlay-mid: 0.22;
   --surface-card-overlay-bottom: 0.84;
   --surface-card-overlay-bottom-strong: 0.96;
-  --surface-card-description-lines: 2;
+  --surface-card-description-lines: 3;
 }
 
 #arcade-featured-carousel .coverflow-container {
-  height: clamp(42rem, 82vh, 58rem);
+  height: clamp(41rem, 78vh, 56rem);
 }
 
 #arcade-featured-carousel .coverflow-container::before {
@@ -223,23 +224,23 @@
 }
 
 #about-carousel-section {
-  --card-width: clamp(272px, 23vw, 396px);
-  --coverflow-active-scale: 1.18;
+  --card-width: clamp(258px, 21vw, 380px);
+  --coverflow-active-scale: 1.24;
   --coverflow-safe-top: clamp(0.45rem, 1.2vw, 0.95rem);
   --coverflow-safe-bottom: clamp(2rem, 4vw, 3rem);
   --about-controls-bottom: clamp(0.45rem, 1.1vw, 0.95rem);
-  --card-height: clamp(376px, min(33vw, 58vh), 548px);
+  --card-height: clamp(408px, 33.25vw, 596px);
   --surface-card-content-width: 74%;
-  --surface-card-content-bottom: 1.08rem;
+  --surface-card-content-bottom: 1.1rem;
   --surface-card-overlay-mid: 0.16;
   --surface-card-overlay-bottom: 0.78;
   --surface-card-overlay-bottom-strong: 0.92;
-  --surface-card-description-lines: 2;
+  --surface-card-description-lines: 3;
 }
 
 #about-carousel-section .coverflow-container {
   height: max(
-    clamp(500px, 68vh, 760px),
+    clamp(520px, 68vh, 760px),
     calc(
       (var(--card-height) * var(--coverflow-active-scale))
       + var(--coverflow-safe-top)
@@ -248,7 +249,7 @@
     var(--coverflow-dynamic-height)
   );
   min-height: max(
-    clamp(500px, 68vh, 760px),
+    clamp(520px, 68vh, 760px),
     calc(
       (var(--card-height) * var(--coverflow-active-scale))
       + var(--coverflow-safe-top)
@@ -267,12 +268,36 @@
 }
 
 #luxury-portfolio-carousel {
+  --card-width: clamp(258px, 21vw, 380px);
+  --card-height: clamp(408px, 33.25vw, 596px);
+  --coverflow-active-scale: 1.24;
   --surface-card-content-width: 74%;
   --surface-card-content-bottom: 1.1rem;
   --surface-card-overlay-mid: 0.16;
   --surface-card-overlay-bottom: 0.78;
   --surface-card-overlay-bottom-strong: 0.92;
-  --surface-card-description-lines: 2;
+  --surface-card-description-lines: 3;
+}
+
+#luxury-portfolio-carousel .card-title,
+#luxury-portfolio-carousel .card-description {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+#luxury-portfolio-carousel .card-content {
+  gap: clamp(0.4rem, 0.8vw, 0.62rem);
+}
+
+#luxury-portfolio-carousel .card-actions {
+  margin-top: 0;
 }
 
 .coverflow-perspective {
@@ -596,7 +621,7 @@
 }
 
 .card-description {
-  font-size: clamp(0.74rem, 1.02vw, 0.88rem);
+  font-size: clamp(0.72rem, 0.98vw, 0.84rem);
   color: rgba(255, 244, 230, 0.9);
   line-height: 1.38;
   margin-bottom: 0;
@@ -604,8 +629,8 @@
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.28);
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: var(--card-description-lines, var(--surface-card-description-lines, 2));
-  line-clamp: var(--card-description-lines, var(--surface-card-description-lines, 2));
+  -webkit-line-clamp: var(--card-description-lines, var(--surface-card-description-lines, 3));
+  line-clamp: var(--card-description-lines, var(--surface-card-description-lines, 3));
   overflow: hidden;
 }
 
@@ -751,8 +776,8 @@
 }
 
 #about-carousel-section .card-description {
-  -webkit-line-clamp: var(--about-description-lines, var(--card-description-lines, 2));
-  line-clamp: var(--about-description-lines, var(--card-description-lines, 2));
+  -webkit-line-clamp: var(--about-description-lines, var(--card-description-lines, 3));
+  line-clamp: var(--about-description-lines, var(--card-description-lines, 3));
 }
 
 #luxury-portfolio-carousel .card-title {
@@ -1564,9 +1589,9 @@
   }
 
   #about-carousel-section {
-    --card-width: clamp(200px, 64vw, 268px);
-    --card-height: min(calc(var(--card-width) * 1.4), 368px);
-    --coverflow-active-scale: 1.1;
+    --card-width: clamp(208px, 66vw, 272px);
+    --card-height: min(calc(var(--card-width) * 1.42), 386px);
+    --coverflow-active-scale: 1.14;
     --coverflow-safe-top: 0.25rem;
     --coverflow-safe-bottom: 1.15rem;
   }
@@ -1603,9 +1628,9 @@
   }
 
   #luxury-portfolio-carousel {
-    --card-width: clamp(196px, 62vw, 260px);
-    --card-height: min(calc(var(--card-width) * 1.36), 352px);
-    --coverflow-active-scale: 1.1;
+    --card-width: clamp(208px, 66vw, 272px);
+    --card-height: min(calc(var(--card-width) * 1.42), 386px);
+    --coverflow-active-scale: 1.14;
     --coverflow-safe-bottom: clamp(1.8rem, 5.4vw, 2.8rem);
   }
 
@@ -1615,8 +1640,9 @@
   }
 
   #arcade-featured-carousel {
-    --card-width: clamp(228px, 70vw, 302px);
-    --card-height: min(calc(var(--card-width) * 1.42), 398px);
+    --card-width: clamp(208px, 66vw, 272px);
+    --card-height: min(calc(var(--card-width) * 1.42), 386px);
+    --coverflow-active-scale: 1.14;
   }
 }
 
@@ -1873,16 +1899,33 @@
   }
 }
 
-/* Card description text: proper truncation with ellipsis on mobile */
 @media (max-width: 767px) {
+    #about-carousel-section,
+    #luxury-portfolio-carousel,
+    #arcade-featured-carousel {
+        --surface-card-description-lines: 4;
+    }
+
     .coverflow-card .card-description,
     .coverflow-card .card-text,
     .coverflow-card p:not(.card-category) {
         display: -webkit-box;
-        -webkit-line-clamp: 3;
-    line-clamp: 3;
+        -webkit-line-clamp: 4;
+        line-clamp: 4;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        text-overflow: ellipsis;
+    }
+
+    #luxury-portfolio-carousel .card-title,
+    #luxury-portfolio-carousel .card-description {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        padding: 0 !important;
+        margin: -1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+        border: 0 !important;
     }
 }

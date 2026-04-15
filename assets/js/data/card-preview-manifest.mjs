@@ -6,7 +6,7 @@ export const PROJECT_CARD_PREVIEWS = [
     id: 'project-portfolio',
     category: 'Web Development',
     title: 'This Website',
-    description: 'Hand-coded portfolio build with PWA support and Lighthouse 90+ discipline.',
+    description: 'Hand-coded portfolio built for speed, clarity, and proof.',
     link: '/projects/portfolio',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/home-portrait-native-v3.jpg',
     presentation: {
@@ -30,7 +30,7 @@ export const PROJECT_CARD_PREVIEWS = [
     id: 'project-isa-grimes',
     category: 'Interview Project',
     title: 'Isa Grimes Interview',
-    description: 'Interview project on people judgment, leadership, and why the fastest path is not always right.',
+    description: 'Interview on judgment, leadership, and when the fastest path is wrong.',
     link: '/projects/isa-grimes-interview',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/isa_grimes.jpg',
     presentation: {
@@ -53,8 +53,8 @@ export const PROJECT_CARD_PREVIEWS = [
   {
     id: 'project-loreal-maps',
     category: 'Campaign Strategy',
-    title: "L'OrÃ©al Cell BioPrint",
-    description: 'MAPS campaign deck mapping three personas across the funnel.',
+    title: "L'Or?al Cell BioPrint",
+    description: 'MAPS campaign deck mapping three personas through the funnel.',
     link: '/projects/loreal-maps-campaign',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/06-project-loreal-maps.jpg',
     presentation: {
@@ -78,7 +78,7 @@ export const PROJECT_CARD_PREVIEWS = [
     id: 'project-franklin-templeton',
     category: 'Content Strategy',
     title: 'Franklin Templeton',
-    description: 'Dual-language investment content strategy for English and Arabic audiences.',
+    description: 'Dual-language investment strategy for English and Arabic audiences.',
     link: '/projects/franklin-templeton-concept',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/05-project-franklin-templeton.jpg',
     presentation: {
@@ -102,7 +102,7 @@ export const PROJECT_CARD_PREVIEWS = [
     id: 'project-endpoint-linkedin',
     category: 'Retargeting',
     title: 'EndPoint LinkedIn Campaign',
-    description: 'Retargeting deck covering the Phase 2A and 2B campaign structure.',
+    description: 'Retargeting deck for the Phase 2A and 2B campaign.',
     link: '/projects/endpoint-linkedin-campaign',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/04-project-endpoint-linkedin.jpg',
     presentation: {
@@ -126,7 +126,7 @@ export const PROJECT_CARD_PREVIEWS = [
     id: 'project-elosity-video',
     category: 'Video Concept',
     title: 'Endpoint Elosity Launch',
-    description: 'Motion storyboard and voiceover for LinkedIn autoplay launch creative.',
+    description: 'Motion storyboard and voiceover for LinkedIn autoplay launch.',
     link: '/projects/endpoint-elosity-video',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/03-project-elosity-video.jpg',
     presentation: {
@@ -138,7 +138,7 @@ export const PROJECT_CARD_PREVIEWS = [
       overlayMid: 0.16,
       overlayBottom: 0.78,
       overlayBottomStrong: 0.92,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'image',
@@ -162,7 +162,7 @@ export const PROJECT_CARD_PREVIEWS = [
       overlayMid: 0.18,
       overlayBottom: 0.78,
       overlayBottomStrong: 0.92,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'image',
@@ -189,7 +189,7 @@ export const ABOUT_CARD_PREVIEWS = [
       overlayMid: 0.12,
       overlayBottom: 0.68,
       overlayBottomStrong: 0.88,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'image',
@@ -213,7 +213,7 @@ export const ABOUT_CARD_PREVIEWS = [
       overlayMid: 0.14,
       overlayBottom: 0.72,
       overlayBottomStrong: 0.9,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'image',
@@ -237,7 +237,7 @@ export const ABOUT_CARD_PREVIEWS = [
       overlayMid: 0.12,
       overlayBottom: 0.7,
       overlayBottomStrong: 0.88,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'image',
@@ -261,7 +261,7 @@ export const ABOUT_CARD_PREVIEWS = [
       overlayMid: 0.18,
       overlayBottom: 0.8,
       overlayBottomStrong: 0.94,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'collage',
@@ -289,7 +289,7 @@ export const ABOUT_CARD_PREVIEWS = [
       overlayMid: 0.16,
       overlayBottom: 0.78,
       overlayBottomStrong: 0.92,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'collage',
@@ -477,7 +477,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
     id: 'game-snake',
     category: 'Arcade Classic',
     title: 'Snake',
-    description: 'Classic reflex play with escalating speed and clean restart loops.',
+    description: 'Classic reflex play with escalating speed and clean resets.',
     link: '/hobbies-games/snake',
     presentation: {
       contentPlacement: 'left',
@@ -486,7 +486,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
       overlayMid: 0.2,
       overlayBottom: 0.84,
       overlayBottomStrong: 0.96,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'synthetic',
@@ -497,7 +497,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
     id: 'game-block-breaker',
     category: 'Precision',
     title: 'Block Breaker',
-    description: 'Momentum-heavy brick breaking with rebounds and sharp session pacing.',
+    description: 'Momentum-heavy brick breaking with sharp rebounds and quick pacing.',
     link: '/hobbies-games/block-breaker',
     presentation: {
       contentPlacement: 'right',
@@ -506,7 +506,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
       overlayMid: 0.22,
       overlayBottom: 0.86,
       overlayBottomStrong: 0.96,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'synthetic',
@@ -517,7 +517,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
     id: 'game-2048',
     category: 'Strategy',
     title: '2048',
-    description: 'Clean merge logic, smooth board movement, and one-more-run tension.',
+    description: 'Clean merge logic, smooth movement, and one-more-run tension.',
     link: '/hobbies-games/2048',
     presentation: {
       contentPlacement: 'left',
@@ -526,7 +526,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
       overlayMid: 0.2,
       overlayBottom: 0.84,
       overlayBottomStrong: 0.96,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'synthetic',
@@ -537,7 +537,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
     id: 'game-space-invaders',
     category: 'Survival',
     title: 'Space Invaders',
-    description: 'Wave defense under pressure with tighter movement windows and arcade urgency.',
+    description: 'Wave defense under pressure with tighter movement and arcade urgency.',
     link: '/hobbies-games/space-invaders',
     presentation: {
       contentPlacement: 'left',
@@ -546,7 +546,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
       overlayMid: 0.24,
       overlayBottom: 0.88,
       overlayBottomStrong: 0.98,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'synthetic',
@@ -557,7 +557,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
     id: 'game-flappy-face',
     category: 'Reflex',
     title: 'Flappy Face',
-    description: 'Tap to fly through golden pipes with faster pacing and cleaner recoveries.',
+    description: 'Tap through golden pipes with faster pacing and cleaner recoveries.',
     link: '/hobbies-games/flappy-face',
     presentation: {
       contentPlacement: 'right',
@@ -566,7 +566,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
       overlayMid: 0.2,
       overlayBottom: 0.84,
       overlayBottomStrong: 0.96,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'synthetic',
@@ -577,7 +577,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
     id: 'game-color-match',
     category: 'Speed',
     title: 'Color Match',
-    description: 'Stroop-effect reaction play with combos, fire effects, and tight one-minute rounds.',
+    description: 'Stroop-style reaction play with combos and tight one-minute rounds.',
     link: '/hobbies-games/color-match',
     presentation: {
       contentPlacement: 'left',
@@ -586,7 +586,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
       overlayMid: 0.2,
       overlayBottom: 0.84,
       overlayBottomStrong: 0.96,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'synthetic',
@@ -597,7 +597,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
     id: 'game-gravity-runner',
     category: 'Endless Runner',
     title: 'Gravity Runner',
-    description: 'Flip gravity, dodge both planes, and stay ahead of the speed curve.',
+    description: 'Flip gravity, dodge both planes, and outrun the speed curve.',
     link: '/hobbies-games/gravity-runner',
     presentation: {
       contentPlacement: 'left',
@@ -606,7 +606,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
       overlayMid: 0.22,
       overlayBottom: 0.86,
       overlayBottomStrong: 0.96,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'synthetic',
@@ -617,7 +617,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
     id: 'game-hex-memory',
     category: 'Memory',
     title: 'Hex Memory',
-    description: 'Hex-grid sequence memory with cleaner escalation and a calmer rhythm.',
+    description: 'Hex-grid sequence memory with cleaner escalation and calmer rhythm.',
     link: '/hobbies-games/hex-memory',
     presentation: {
       contentPlacement: 'center',
@@ -626,7 +626,7 @@ export const FEATURED_GAME_CARD_PREVIEWS = [
       overlayMid: 0.2,
       overlayBottom: 0.84,
       overlayBottomStrong: 0.96,
-      descriptionLines: 2
+      descriptionLines: 3
     },
     generation: {
       type: 'synthetic',
