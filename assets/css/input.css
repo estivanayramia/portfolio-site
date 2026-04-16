@@ -7,15 +7,15 @@
     html.js .reveal,
     html.js [data-gsap] {
         opacity: 0;
-        transform: translateY(12px);
-        transition: opacity 500ms ease, transform 500ms ease;
+        transform: translate3d(0, 18px, 0) scale(0.992);
+        transition: none;
         will-change: opacity, transform;
     }
 
     html.js .reveal.is-visible,
     html.js [data-gsap].is-visible {
         opacity: 1;
-        transform: translateY(0);
+        transform: translate3d(0, 0, 0) scale(1);
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -103,13 +103,9 @@
         }
     }
 
-    /* Performance: Content Visibility for below-the-fold content */
-    @media (max-width: 768px) {
-        main > section:nth-child(n+2) {
-            content-visibility: auto;
-            contain-intrinsic-size: 1px 800px;
-        }
-    }
+    /* Narrative sections stay fully rendered on mobile.
+       The previous content-visibility optimization made first-scroll states
+       feel incomplete and inflated visual-regression noise. */
 }
 
 /* ==========================================================================

@@ -900,9 +900,11 @@ const initAnimations = () => {
     }
 
     const fadeElements = document.querySelectorAll('[data-gsap="fade-up"]');
-    const fadeDistance = isMobile ? 14 : 22;
-    const fadeDuration = isMobile ? 0.82 : 1.02;
-    const fadeStart = isMobile ? 'top 94%' : 'top 90%';
+    const fadeDistance = isMobile ? 18 : 34;
+    const fadeDuration = isMobile ? 0.94 : 1.14;
+    const fadeStart = isMobile ? 'top 95%' : 'top 91%';
+    const fadeScale = isMobile ? 0.994 : 0.985;
+    const inViewStagger = isMobile ? 0.045 : 0.07;
     const viewportThreshold = (typeof window !== 'undefined' && window.innerHeight)
         ? window.innerHeight * (isMobile ? 0.95 : 0.9)
         : 0;
@@ -918,26 +920,37 @@ const initAnimations = () => {
         element.removeAttribute('data-gsap-state');
     });
 
+    let inViewIndex = 0;
+
     fadeElements.forEach((element) => {
         const delay = Number.parseFloat(element.dataset.gsapDelay || '0');
         const delaySeconds = Number.isFinite(delay) ? delay : 0;
         const isInitiallyInView = element.getBoundingClientRect().top <= viewportThreshold;
+        const revealDelay = delaySeconds > 0 ? delaySeconds : inViewIndex * inViewStagger;
+
+        gsap.set(element, {
+            transformOrigin: '50% 100%'
+        });
 
         if (isInitiallyInView) {
+            inViewIndex += 1;
             gsap.fromTo(element,
                 {
                     autoAlpha: 0,
-                    y: fadeDistance
+                    y: fadeDistance,
+                    scale: fadeScale
                 },
                 {
                     autoAlpha: 1,
                     y: 0,
+                    scale: 1,
                     duration: fadeDuration,
-                    delay: delaySeconds,
-                    ease: 'power3.out',
+                    delay: revealDelay,
+                    ease: 'expo.out',
                     overwrite: 'auto',
                     clearProps: 'opacity,visibility,transform,willChange',
                     onStart: () => {
+                        element.style.willChange = 'opacity, transform';
                         element.dataset.gsapState = 'animating';
                     },
                     onComplete: () => {
@@ -950,6 +963,7 @@ const initAnimations = () => {
         gsap.set(element, {
             autoAlpha: 0,
             y: fadeDistance,
+            scale: fadeScale,
             force3D: true,
             willChange: 'opacity, transform'
         });
@@ -957,12 +971,14 @@ const initAnimations = () => {
         gsap.to(element, {
             autoAlpha: 1,
             y: 0,
+            scale: 1,
             duration: fadeDuration,
             delay: delaySeconds,
-            ease: 'power3.out',
+            ease: 'expo.out',
             overwrite: 'auto',
             clearProps: 'opacity,visibility,transform,willChange',
             onStart: () => {
+                element.style.willChange = 'opacity, transform';
                 element.dataset.gsapState = 'animating';
             },
             onComplete: () => {
@@ -972,7 +988,7 @@ const initAnimations = () => {
                 trigger: element,
                 start: fadeStart,
                 once: true,
-                fastScrollEnd: true,
+                toggleActions: 'play none none none',
                 invalidateOnRefresh: true
             }
         });
@@ -2885,20 +2901,20 @@ const __ensureStandardEnglishChrome = () => {
 
     const desktopInactive = 'text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded';
     const desktopActive = 'text-sm text-indigodeep font-medium underline focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded';
-    const desktopContact = 'text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige';
+    const desktopContact = 'text-sm font-medium text-beige bg-indigodeep border border-white/20 px-4 py-1.5 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige';
     const mobileInactive = 'block text-sm text-chocolate hover:text-indigodeep transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2';
     const mobileActive = 'block text-sm text-indigodeep font-medium focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded py-2';
-    const mobileContact = 'block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full text-center hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige';
+    const mobileContact = 'block text-sm font-medium text-beige bg-indigodeep border border-white/20 px-4 py-2 rounded-full text-center hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige';
 
     const buildHeaderMarkup = () => `
-        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-6 flex items-center justify-between gap-2">
-          <a href="/" id="brand-logo" class="text-lg sm:text-xl font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to home page">
-            <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-8 w-8 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
+        <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-4 md:py-5 flex items-center justify-between gap-2">
+          <a href="/" id="brand-logo" class="text-base sm:text-lg font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to home page">
+            <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-7 w-7 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
             <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
           </a>
 
           <!-- Main Navigation -->
-          <ul class="hidden md:flex items-center space-x-8">
+          <ul class="hidden md:flex items-center space-x-6 xl:space-x-7">
             <li>
               <a href="/" data-nav-key="home" class="${desktopActive}" aria-current="page">Home</a>
             </li>
@@ -2920,7 +2936,7 @@ const __ensureStandardEnglishChrome = () => {
           </ul>
 
           <!-- Dark Mode Toggle -->
-          <button type="button" id="theme-toggle" class="text-base font-medium text-beige bg-indigodeep border border-white/20 px-5 py-2 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">&#x2600;&#xFE0F;</span></button>
+          <button type="button" id="theme-toggle" class="text-sm font-medium text-beige bg-indigodeep border border-white/20 px-4 py-1.5 rounded-full hover:bg-chocolate transition-colors dark:bg-indigodeep dark:text-beige dark:hover:bg-white dark:hover:text-indigodeep dark:border-white/20 focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige" aria-label="Switch to light mode"><span style="color: #e1d4c2">&#x2600;&#xFE0F;</span></button>
 
           <!-- Mobile Menu Toggle -->
           <button type="button" id="mobile-menu-toggle" class="md:hidden text-chocolate focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded p-2" aria-label="Toggle mobile menu" aria-expanded="false">
@@ -3278,15 +3294,15 @@ init();
  * - Context-aware responses about portfolio projects
  * - Dynamic suggestion chips based on page content
  * - Draggable chat window for better UX
- * - Session history with localStorage persistence
+ * - Cross-page chat history persistence
  * - Voice input support (Web Speech API)
  * - Project card rendering with images
  * - Multi-language support (EN, AR, ES)
  * 
  * Architecture:
  * - Frontend: Native JavaScript with DOM manipulation
- * - Backend: Cloudflare Worker at portfolio-chat.eayramia.workers.dev
- * - Storage: localStorage for chat history and preferences
+ * - Backend: production `/chat` on estivanayramia.com (non-production hosts proxy there unless overridden)
+ * - Storage: localStorage for cross-page chat history and preferences
  * 
  * Features:
  * - Contextual chip suggestions that adapt to conversation
@@ -3322,7 +3338,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (/^(?:www\.)?estivanayramia\.com$/i.test(host)) {
             return `${window.location.origin}/chat`;
         }
-        return 'https://portfolio-chat.eayramia.workers.dev/chat';
+        return 'https://www.estivanayramia.com/chat';
     })();
     const RESUME_URL = '/assets/docs/Estivan-Ayramia-Resume.pdf';
     const LINKEDIN_URL = 'https://www.linkedin.com/in/estivanayramia';
@@ -3378,6 +3394,7 @@ document.addEventListener('DOMContentLoaded', () => {
         suggestionsToggle: document.querySelector('[data-chat-suggestions-toggle="button"]'),
         suggestionsClose: null // Will be set dynamically when X button is created
     };
+    const scrollTopButton = document.getElementById('scroll-to-top');
 
     /* Scroll progress fallback: set --scroll-scale on .scroll-progress for browsers
        that do not support scroll-linked animation timelines. */
@@ -3421,6 +3438,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (els.bubble) {
             els.bubble.style.left = '1rem';
             els.bubble.style.right = 'auto';
+        }
+        if (scrollTopButton) {
+            scrollTopButton.style.left = 'auto';
+            scrollTopButton.style.right = '1.5rem';
         }
     } else if (els.widget) {
         els.widget.style.right = '1rem';
@@ -3503,9 +3524,41 @@ document.addEventListener('DOMContentLoaded', () => {
     let chatHistory = [];
     let isSending = false; // Prevent duplicate sends
     let isInitialized = false;
+    let lastChatFocusedEl = null;
 
-    const historyStorageKey = `savonie_history:${pageLang}:${window.location.pathname || '/'}`;
+    const historyStorageKey = `savonie_history:${pageLang}`;
+    const legacySessionHistoryStorageKey = `savonie_history:${pageLang}:${window.location.pathname || '/'}`;
     const MAX_HISTORY_ITEMS = 50;
+    const CHAT_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    function syncChatA11yState(isOpen) {
+        if (els.window) {
+            els.window.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+        }
+        if (els.toggleBtn) {
+            els.toggleBtn.setAttribute('aria-controls', 'chat-window');
+            els.toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        }
+    }
+
+    function handleChatFocusTrap(e) {
+        if (e.key !== 'Tab' || els.window?.classList.contains('hidden')) return;
+
+        const focusable = Array.from(els.window.querySelectorAll(CHAT_FOCUSABLE_SELECTOR))
+            .filter((node) => !node.hasAttribute('hidden') && node.getAttribute('aria-hidden') !== 'true');
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    }
 
     function buildSafePageContext() {
         try {
@@ -3593,9 +3646,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fix: Suggestions Toggle Button Logic - DEPRECATED (handled by main listener below)
     // if (els.suggestionsBtn) { ... }
     
-    // 1. Initialize - restore history from session
+    // 1. Initialize - restore shared session history across pages
     try { 
-        const saved = sessionStorage.getItem(historyStorageKey);
+        let saved = localStorage.getItem(historyStorageKey);
+        if (!saved) {
+            saved = sessionStorage.getItem(historyStorageKey);
+            if (saved) {
+                localStorage.setItem(historyStorageKey, saved);
+                sessionStorage.removeItem(historyStorageKey);
+            }
+        }
+        if (!saved) {
+            saved = sessionStorage.getItem(legacySessionHistoryStorageKey);
+            if (saved) {
+                localStorage.setItem(historyStorageKey, saved);
+                sessionStorage.removeItem(legacySessionHistoryStorageKey);
+            }
+        }
+
         if (saved) {
             chatHistory = JSON.parse(saved);
             chatHistory.forEach((item) => {
@@ -4086,12 +4154,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function toggleChat() {
         const wasHidden = els.window?.classList.contains('hidden');
-        const isRTL = document.documentElement.dir === 'rtl';
         
         if (wasHidden) {
+            lastChatFocusedEl = document.activeElement instanceof HTMLElement ? document.activeElement : els.toggleBtn;
             // Opening: remove hidden, add flex
             els.window?.classList.remove('hidden');
             els.window?.classList.add('flex');
+            syncChatA11yState(true);
+            document.addEventListener('keydown', handleChatFocusTrap, true);
 
             // Track open event
             if (typeof clarity === 'function') clarity('event', 'chat_open');
@@ -4100,10 +4170,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Closing: remove flex, add hidden
             els.window?.classList.remove('flex');
             els.window?.classList.add('hidden');
+            syncChatA11yState(false);
+            document.removeEventListener('keydown', handleChatFocusTrap, true);
 
             // Track close event
             if (typeof clarity === 'function') clarity('event', 'chat_close');
             if (typeof gtag === 'function') gtag('event', 'chat_close', {'event_category': 'Chatbot'});
+
+            if (lastChatFocusedEl && typeof lastChatFocusedEl.focus === 'function') {
+                try { lastChatFocusedEl.focus({ preventScroll: true }); } catch (e) { lastChatFocusedEl.focus(); }
+            }
         }
         
         if (!els.window?.classList.contains('hidden')) {
@@ -4282,7 +4358,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         continue; // Retry on timeout
                     }
                 } else {
-                    lastError = { type: 'network', message: fetchError.message };
+                    lastError = {
+                        type: 'network',
+                        message: fetchError.message,
+                        offline: (typeof navigator !== 'undefined') ? navigator.onLine === false : false,
+                        endpoint: CHAT_ENDPOINT
+                    };
                     if (attempt < MAX_RETRIES) {
                         await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
                         continue;
@@ -4305,8 +4386,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'server':
                     errorMessage = "The AI service is temporarily unavailable. Please try again in a few seconds.";
                     break;
+                case 'client':
+                    errorMessage = "The request was rejected by the AI service. Please rephrase and try again.";
+                    break;
                 case 'network':
-                    errorMessage = "Connection lost. Please check your internet connection and try again.";
+                    errorMessage = lastError.offline
+                        ? "Connection appears offline. Please check your internet connection and try again."
+                        : "I could not reach the AI service endpoint from this page. Please refresh and try again.";
                     break;
                 default:
                     errorMessage = "Something went wrong. Please try again.";
@@ -4443,7 +4529,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (chatHistory.length > MAX_HISTORY_ITEMS) {
                 chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY_ITEMS);
             }
-            sessionStorage.setItem(historyStorageKey, JSON.stringify(chatHistory));
+            localStorage.setItem(historyStorageKey, JSON.stringify(chatHistory));
         }
         
         els.messages.scrollTop = els.messages.scrollHeight;
@@ -4500,7 +4586,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (chatHistory.length > MAX_HISTORY_ITEMS) {
                 chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY_ITEMS);
             }
-            sessionStorage.setItem(historyStorageKey, JSON.stringify(chatHistory));
+            localStorage.setItem(historyStorageKey, JSON.stringify(chatHistory));
         }
     }
 
@@ -4582,7 +4668,9 @@ document.addEventListener('DOMContentLoaded', () => {
             els.header.style.cursor = 'move';
             document.body.style.userSelect = '';
         });
-    }    // 6. Keyboard Shortcuts
+    }
+
+    // 6. Keyboard Shortcuts
     document.addEventListener('keydown', (e) => {
         // Escape to close chat
         if (e.key === 'Escape' && !els.window?.classList.contains('hidden')) {
@@ -4594,6 +4682,8 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleChat();
         }
     });
+
+    syncChatA11yState(false);
 });
 
 // ==========================================================================

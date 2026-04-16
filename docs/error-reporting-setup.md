@@ -1,57 +1,42 @@
 # Error Reporting Endpoint Setup
 
-The error reporting system sends data to `/api/error-report`. You'll need to create a Cloudflare Worker to receive these reports.
+The site sends diagnostics payloads to `/api/error-report`.
 
-## Quick Setup (Cloudflare Workers)
+Current production owner:
 
-1. **Create file**: `workers/error-report.js`
+- Cloudflare Pages Functions
+- Entrypoint: `functions/api/error-report.js`
+- Shared handler logic: `functions/_lib/dashboard-api.js` and `worker/error-api.js`
 
-```javascript
-export default {
-  async fetch(request) {
-    // Only accept POST requests  
-    if (request.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405 });
-    }
-    
-    // Parse error report
-    const report = await request.json();
-    
-    // Log to console (view in Cloudflare dashboard)
-    console.log('[Error Report]', JSON.stringify(report, null, 2));
-    
-    // Option 1: Send to email via EmailJS/SendGrid
-    // Option 2: Store in KV storage
-    // Option 3: Send to Discord webhook
-    // Option 4: Log to external service like Sentry
-    
-    // Example: Send to Discord webhook
-    if (DISCORD_WEBHOOK_URL) {
-      await fetch(DISCORD_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content: `**Error Report**\n\`\`\`json\n${JSON.stringify(report, null, 2)}\n\`\`\``
-        })
-      });
-    }
-    
-    return new Response('OK', { status: 200 });
-  }
-};
+## Required production setup
+
+The Cloudflare Pages project serving this repo must have:
+
+- `DB` bound to the production D1 database
+- `SAVONIE_KV` bound for sessions and rate limiting
+
+If either binding is missing, `/api/error-report` will return `server_not_configured`.
+
+## Local verification
+
+Use a production-like Pages runtime locally:
+
+```bash
+wrangler pages dev . --port 5500
 ```
 
-2. **Deploy**: Add route in `worker/wrangler.debugger.toml` or Cloudflare dashboard:
-   - Route pattern: `www.estivanayramia.com/api/error-report`
-   - Points to worker: `error-report`
+Then verify:
 
-3. **Test**: Visit site with `?debug=1`, cause an error, check logs
+```bash
+curl http://127.0.0.1:5500/api/health
+curl -X POST http://127.0.0.1:5500/api/error-report -H "Content-Type: application/json" -d "{}"
+```
 
-## Alternative: Skip server endpoint
+## If the endpoint is not configured yet
 
-If you don't want to set up a worker right now, the error reporting will fail silently and won't break the site. Users can still opt in, but reports won't be sent anywhere until you add the endpoint.
+The diagnostics system fails closed. The public site still works, but reports are not retained until the Pages bindings are configured.
 
-## What Data Gets Sent
+## What data gets sent
 
 ```json
 {
@@ -63,12 +48,11 @@ If you don't want to set up a worker right now, the error reporting will fail si
   "stack": "Error: ...",
   "timestamp": 1706234567890,
   "url": "https://www.estivanayramia.com/",
-  "userAgent": "Mozilla/5.0...",
   "viewport": "1920x1080",
   "version": "20251125-001"
 }
 ```
 
-✅ **No PII**: No form values, passwords, tokens, or personal data
-✅ **Anonymous**: No cookies, fingerprinting, or user IDs 
-✅ **Opt-in only**: Only runs if user clicks "Sure, help out"
+- No form values, passwords, tokens, or personal data
+- Anonymous by design
+- User-consented diagnostics only

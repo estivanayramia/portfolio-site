@@ -1,3 +1,6 @@
+> Archived legacy draft. This file is not part of the active custom-agent system.
+> Use `AGENTS.md`, `.github/copilot-instructions.md`, `CLAUDE.md`, and `.github/agents/*.agent.md` instead.
+
 name: Beast Mode
 description: Agent instructions. Auto-approve and max-requests are stored in a companion config file: Beast Mode.agent.config.json
 

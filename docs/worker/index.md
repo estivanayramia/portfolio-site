@@ -1,30 +1,32 @@
-# Savonie chatbot backend Worker
+# Savonie and Dashboard Runtime Overview
 
-Cloudflare Worker that powers the Savonie chat widget used on the portfolio site.
+This repo currently uses two runtime layers:
 
-## Configuration
-
-This repo deploys two Workers:
-
-- `portfolio-chat` (chat only)
+- `portfolio-chat`
+  - Production owner for `/chat` and `/api/chat`
+  - Config: `worker/wrangler.chat.toml`
   - Required secret: `GEMINI_API_KEY`
-  - Optional KV (site facts): `SAVONIE_KV`
-- `portfolio-worker` (debugger/error ingestion + dashboard auth + health)
-  - Required secret: `DASHBOARD_PASSWORD` (plain) OR `DASHBOARD_PASSWORD_HASH` (sha256 hex)
-  - Required bindings: `DB` (D1) and `SAVONIE_KV` (sessions/rate limit)
+  - Optional KV: `SAVONIE_KV`
+- Cloudflare Pages Functions
+  - Production owner for `/health`, `/api/health`, `/api/auth`, `/api/error-report`, and `/api/errors*`
+  - Entrypoints live under `functions/`
+  - Required production bindings/secrets: `DB`, `SAVONIE_KV`, and `DASHBOARD_PASSWORD` or `DASHBOARD_PASSWORD_HASH`
 
-Set secrets via Cloudflare dashboard, or via Wrangler (recommended):
+Legacy worker configs still exist for debugger/error-api sandboxing:
 
-- `cd worker && npx wrangler secret put GEMINI_API_KEY --config wrangler.chat.toml`
-- `cd worker && npx wrangler secret put DASHBOARD_PASSWORD --config wrangler.debugger.toml`
+- `worker/wrangler.toml`
+- `worker/wrangler.debugger.toml`
+
+Keep those detached from apex/www routes unless the dashboard API is intentionally migrated back behind a Worker.
 
 ## Local development
 
-- Chat worker: `cd worker && npx wrangler dev --config wrangler.chat.toml`
-- Debugger worker: `cd worker && npx wrangler dev --config wrangler.debugger.toml`
+- Production-like Pages Functions runtime: `wrangler pages dev . --port 5500`
+- Chat worker only: `cd worker && npx wrangler dev --config wrangler.chat.toml`
+- Legacy debugger worker sandbox only: `cd worker && npx wrangler dev --config wrangler.debugger.toml`
 
 ## Deployment
 
 - Chat worker: `cd worker && npx wrangler deploy --config wrangler.chat.toml`
-- Debugger worker: `cd worker && npx wrangler deploy --config wrangler.debugger.toml`
-
+- Pages project: deploy the site that serves `functions/`
+- Legacy debugger worker sandbox only: `cd worker && npx wrangler deploy --config wrangler.debugger.toml`

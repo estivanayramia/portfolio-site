@@ -50,6 +50,8 @@
   @media (max-width: 767px){
     .savonie-panel{left:10px;right:10px;bottom:10px;border-radius:16px}
     .savonie-handle{display:block;margin:8px auto 0 auto;width:56px;height:5px;border-radius:999px;background:rgba(33,40,66,.25)}
+    .savonie-panel.savonie-embedded{max-height:min(56vh, 420px);overflow:hidden}
+    .savonie-panel.savonie-embedded .savonie-body{max-height:calc(min(56vh, 420px) - 132px);overflow:auto}
   }
   @media (min-width: 768px){
     .savonie-panel{right:12px;top:12px;bottom:12px;width:440px;border-radius:16px}
@@ -80,17 +82,6 @@
   }
   `;
   document.head.appendChild(style);
-
-  // GLOBAL SNIFFER: Debug why clicks aren't reaching usage
-  window.addEventListener('click', (e) => {
-    if (e.target.classList?.contains('savonie-tab') || e.target.closest('.savonie-tab')) {
-      console.log('[GLOBAL SNIFFER] Click detected on Tab!', {
-        target: e.target,
-        path: e.composedPath(),
-        event: e
-      });
-    }
-  }, true); // Capture phase!
 
   const backdrop = document.createElement("div");
   backdrop.className = "savonie-backdrop";
@@ -127,6 +118,8 @@
 
   const tabs = document.createElement("div");
   tabs.className = "savonie-tabs";
+  tabs.setAttribute("role", "tablist");
+  tabs.setAttribute("aria-label", "Diagnostics sections");
 
   const body = document.createElement("div");
   body.className = "savonie-body";
@@ -225,7 +218,7 @@
       for (const v of violations || []) {
         const impact = v && v.impact ? String(v.impact) : "minor";
         const nodes = Array.isArray(v && v.nodes) ? v.nodes.length : 1;
-        points -= (weights[impact] || 1) * nodes;
+        points -= (weights[impact] || 1) * Math.min(nodes, 3);
       }
       return Math.max(0, Math.min(100, Math.round(points)));
     } catch {
@@ -235,7 +228,7 @@
 
   async function runA11yAudit() {
     const started = Date.now();
-    const axeSrc = "https://unpkg.com/axe-core@4.10.0/axe.min.js";
+    const axeSrc = "https://cdn.jsdelivr.net/npm/axe-core@4.10.0/axe.min.js";
     await loadScriptOnce(axeSrc, "axe");
     if (!window.axe || typeof window.axe.run !== "function") {
       throw new Error("axe-core did not initialize (window.axe missing)");
@@ -302,10 +295,26 @@
     };
 
     const csp = analyzeCsp(headers["content-security-policy"]);
+    const isLocalEnvironment = /^(localhost|127\.0\.0\.1)$/i.test(String(location.hostname || ""));
 
     const missing = Object.entries(headers)
       .filter(([, v]) => !v)
       .map(([k]) => k);
+
+    if (isLocalEnvironment) {
+      return {
+        scannedAt: Date.now(),
+        durationMs: Date.now() - started,
+        status: res.status,
+        url: res.url,
+        score: null,
+        missing,
+        headers,
+        csp,
+        environment: "local",
+        note: "Local static server headers do not represent production edge policy. Treat this scan as informational only."
+      };
+    }
 
     let score = 100;
     // Missing headers are high signal.
@@ -360,17 +369,9 @@
     // Handle tab clicks
     if (target.classList.contains("savonie-tab")) {
       const tabName = target.textContent.trim();
-      console.log(`[HUD] Tab clicked: "${tabName}"`, {
-        matches: TAB_NAMES.includes(tabName),
-        current: activeTab
-      });
-
       if (TAB_NAMES.includes(tabName)) {
         activeTab = tabName;
-        console.log("[HUD] Setting active tab to:", activeTab);
         render();
-      } else {
-        console.warn("[HUD] Tab name not in whitelist:", tabName);
       }
       return;
     }
@@ -846,7 +847,7 @@
     const wrap = el("div", { class: "savonie-list" });
 
     const actions = el("div", { class: "savonie-card" });
-    actions.appendChild(el("div", { text: "On-demand only. Loads axe-core from unpkg when you click Run." }));
+    actions.appendChild(el("div", { text: "On-demand only. Loads axe-core from jsDelivr when you click Run." }));
     const row = el("div", { class: "savonie-row" });
     const btnRun = el("button", { class: "savonie-btn", type: "button", "data-action": "run-a11y", text: a11yLoading ? "Running..." : "Run audit" });
     if (a11yLoading) btnRun.disabled = true;
@@ -874,6 +875,10 @@
     }
     summary.appendChild(kv);
     wrap.appendChild(summary);
+
+    if (securityResults.note) {
+      wrap.appendChild(el("div", { class: "savonie-card", text: securityResults.note }));
+    }
 
     const detail = el("div", { class: "savonie-card" });
     const pre = el("div", { class: "savonie-mono" });

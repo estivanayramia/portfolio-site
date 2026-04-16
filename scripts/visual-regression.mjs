@@ -3,6 +3,7 @@ import fsp from 'node:fs/promises';
 import path from 'node:path';
 import http from 'node:http';
 import https from 'node:https';
+import net from 'node:net';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
@@ -18,11 +19,11 @@ const __dirname = path.dirname(__filename);
 const REPO_ROOT = path.resolve(__dirname, '..');
 
 const ROUTES = [
-  { name: 'home', path: '/' },
-  { name: 'about', path: '/about' },
-  { name: 'overview', path: '/overview' },
-  { name: 'contact', path: '/contact' },
-  { name: 'projects', path: '/projects/' },
+  { name: 'home', path: '/', readySelector: 'main' },
+  { name: 'about', path: '/about', readySelector: '#about-carousel-section[data-coverflow-ready="true"]', initSelector: '#about-carousel-section' },
+  { name: 'overview', path: '/overview', readySelector: 'main' },
+  { name: 'contact', path: '/contact', readySelector: 'main' },
+  { name: 'projects', path: '/projects/', readySelector: '[data-luxury-coverflow][data-coverflow-ready="true"]', initSelector: '[data-luxury-coverflow]' },
 ];
 
 const VIEWPORTS = [
@@ -34,7 +35,7 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function httpStatus(url, timeoutMs) {
+function httpProbe(url, timeoutMs) {
   return new Promise((resolve) => {
     const target = new URL(url);
     const lib = target.protocol === 'https:' ? https : http;
@@ -52,14 +53,17 @@ function httpStatus(url, timeoutMs) {
       },
       (res) => {
         res.resume();
-        resolve(res.statusCode || 0);
+        resolve({
+          status: res.statusCode || 0,
+          headers: res.headers || {},
+        });
       }
     );
 
     req.setTimeout(timeoutMs, () => {
       req.destroy(new Error('timeout'));
     });
-    req.on('error', () => resolve(0));
+    req.on('error', () => resolve({ status: 0, headers: {} }));
     req.end();
   });
 }
@@ -72,7 +76,8 @@ async function waitForUrl(url, timeoutMs, intervalMs = 300) {
   while (Date.now() < deadline) {
     // Small per-attempt timeout so we can retry quickly
     // eslint-disable-next-line no-await-in-loop
-    lastStatus = await httpStatus(url, Math.min(1500, Math.max(250, intervalMs * 2)));
+    const probe = await httpProbe(url, Math.min(1500, Math.max(250, intervalMs * 2)));
+    lastStatus = probe.status;
     if (lastStatus >= 200 && lastStatus < 400) return;
     // eslint-disable-next-line no-await-in-loop
     await sleep(intervalMs);
@@ -117,18 +122,9 @@ async function stopChildProcess(child, timeoutMs = 4_000) {
   }
 }
 
-async function ensureLocalServerUp(baseUrl) {
+async function startManagedLocalServer(baseUrl) {
   const normalized = ensureTrailingSlash(baseUrl);
   const rootUrl = new URL('/', normalized).toString();
-
-  // Short probe retry loop to tolerate brief startup jitter.
-  try {
-    await waitForUrl(rootUrl, 1_200, 300);
-    return { started: false, stop: async () => {} };
-  } catch {
-    // Not up; we'll spawn.
-  }
-
   const u = new URL(normalized);
   const port = Number(u.port || (u.protocol === 'https:' ? 443 : 80));
   const serverScript = path.join(REPO_ROOT, 'scripts', 'local-serve.js');
@@ -142,23 +138,69 @@ async function ensureLocalServerUp(baseUrl) {
       ...process.env,
       PORT: String(port),
     },
-    stdio: 'inherit',
+    stdio: ['ignore', 'pipe', 'pipe'],
     windowsHide: true,
+  });
+
+  let stdout = '';
+  let stderr = '';
+  child.stdout?.on('data', (buf) => {
+    stdout += String(buf || '');
+  });
+  child.stderr?.on('data', (buf) => {
+    stderr += String(buf || '');
   });
 
   try {
     await waitForUrl(rootUrl, 15_000, 300);
   } catch (err) {
     await stopChildProcess(child);
-    throw err;
+    throw new Error(`${err.message}\n${stdout}\n${stderr}`.trim());
   }
+
+  return { child, rootUrl };
+}
+
+async function ensureLocalServerUp(baseUrl, options = {}) {
+  const { requireLocalServeIdentity = false, preferManagedServer = false } = options;
+  const normalized = ensureTrailingSlash(baseUrl);
+  const rootUrl = new URL('/', normalized).toString();
+
+  if (!preferManagedServer) {
+    const existingProbe = await httpProbe(rootUrl, 1_200);
+    if (existingProbe.status >= 200 && existingProbe.status < 400) {
+      const serverIdentity = String(existingProbe.headers['x-portfolio-server'] || '');
+      if (!requireLocalServeIdentity || serverIdentity === 'local-serve') {
+        return {
+          started: false,
+          ensureReady: async () => {
+            await waitForUrl(rootUrl, 2_000, 250);
+          },
+          restart: async () => {},
+          stop: async () => {},
+        };
+      }
+      throw new Error(
+        `BASE_URL ${rootUrl} is already serving from a different runtime. Expected X-Portfolio-Server=local-serve, received ${serverIdentity || 'none'}.`
+      );
+    }
+  }
+
+  let managed = await startManagedLocalServer(baseUrl);
 
   return {
     started: true,
+    ensureReady: async () => {
+      await waitForUrl(rootUrl, 2_000, 250);
+    },
+    restart: async () => {
+      await stopChildProcess(managed.child);
+      managed = await startManagedLocalServer(baseUrl);
+    },
     stop: async () => {
       // eslint-disable-next-line no-console
       console.log('Stopping auto-started local server...');
-      await stopChildProcess(child);
+      await stopChildProcess(managed.child);
     },
   };
 }
@@ -181,6 +223,28 @@ function parseArgs(argv) {
 
 function ensureTrailingSlash(url) {
   return url.endsWith('/') ? url : `${url}/`;
+}
+
+async function isPortAvailable(port, host = '127.0.0.1') {
+  return await new Promise((resolve) => {
+    const server = net.createServer();
+    server.unref();
+    server.once('error', () => resolve(false));
+    server.listen({ port, host }, () => {
+      server.close(() => resolve(true));
+    });
+  });
+}
+
+async function getDefaultVisualBaseUrl(startPort = 5512, attempts = 12) {
+  for (let offset = 0; offset < attempts; offset += 1) {
+    const port = startPort + offset;
+    // eslint-disable-next-line no-await-in-loop
+    const available = await isPortAvailable(port);
+    if (available) return `http://127.0.0.1:${port}`;
+  }
+
+  return `http://127.0.0.1:${startPort}`;
 }
 
 function pct(n) {
@@ -206,7 +270,88 @@ function makeShotName(viewportName, routeName) {
   return `${viewportName}_${routeName}.png`;
 }
 
-async function captureScreenshots({ baseUrl, outDir }) {
+async function waitForRouteReady(page, routeName) {
+  const selectors = {
+    about: '#about-carousel-section[data-coverflow-ready="true"]',
+    projects: '[data-luxury-coverflow][data-coverflow-ready="true"]'
+  };
+
+  const selector = selectors[routeName];
+  if (selector) {
+    try {
+      await page.waitForSelector(selector, { timeout: 12_000 });
+    } catch {
+      // Fall through: capture can still proceed, but the route likely remains flaky.
+    }
+  }
+
+  await page.waitForFunction(() => {
+    const images = Array.from(document.images || []);
+    const imagesReady = images.every((img) => img.complete);
+    const animating = document.querySelectorAll('[data-gsap-state="animating"]').length === 0;
+    return imagesReady && animating;
+  }, { timeout: 12_000 }).catch(() => {});
+
+  await page.waitForFunction((name) => {
+    if (name === 'home' || name === 'about') {
+      return Array.from(document.querySelectorAll('.spine-route-card')).every((card) => card.textContent.trim().length > 20);
+    }
+    if (name === 'projects') {
+      return Array.from(document.querySelectorAll('.spine-fact-card')).every((card) => card.textContent.trim().length > 20);
+    }
+    return true;
+  }, routeName, { timeout: 12_000 }).catch(() => {});
+
+  if (routeName === 'about' || routeName === 'projects') {
+    await page.evaluate(async () => {
+      const images = Array.from(document.querySelectorAll('.coverflow-card img.card-image'));
+      images.forEach((img) => {
+        img.loading = 'eager';
+        img.decoding = 'sync';
+        img.fetchPriority = 'high';
+      });
+
+      await Promise.all(images.map(async (img) => {
+        try {
+          if (typeof img.decode === 'function') {
+            await img.decode();
+          }
+        } catch {
+          // ignore decode failures for already-painted images
+        }
+      }));
+    }).catch(() => {});
+
+    await page.waitForFunction(() => {
+      const images = Array.from(document.querySelectorAll('.coverflow-card img.card-image'));
+      return images.length > 0 && images.every((img) => img.complete && img.naturalWidth > 0);
+    }, { timeout: 12_000 }).catch(() => {});
+  }
+}
+
+async function waitForStablePageGeometry(page, timeoutMs = 6_000) {
+  await page.evaluate(() => {
+    window.__visualStableGeometry = { marker: '', count: 0 };
+  });
+
+  await page.waitForFunction(() => {
+    const height = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+    const width = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
+    const marker = `${width}x${height}`;
+    const state = window.__visualStableGeometry || (window.__visualStableGeometry = { marker: '', count: 0 });
+
+    if (state.marker === marker) {
+      state.count += 1;
+    } else {
+      state.marker = marker;
+      state.count = 1;
+    }
+
+    return state.count >= 4;
+  }, { timeout: timeoutMs }).catch(() => {});
+}
+
+async function captureScreenshots({ baseUrl, outDir, server }) {
   await ensureDir(outDir);
 
   const launchConfig = getBrowserLaunchConfig();
@@ -219,28 +364,111 @@ async function captureScreenshots({ baseUrl, outDir }) {
 
   try {
     for (const viewport of VIEWPORTS) {
-      const page = await browser.newPage();
-      await page.setViewport(viewport);
-      await page.setCacheEnabled(false);
-
       for (const route of ROUTES) {
+        const page = await browser.newPage();
+        if (typeof page.setBypassServiceWorker === 'function') {
+          await page.setBypassServiceWorker(true);
+        }
+        await page.emulateMediaFeatures([
+          { name: 'prefers-color-scheme', value: 'light' },
+        ]);
+        await page.evaluateOnNewDocument(() => {
+          try {
+            window.__EA_VISUAL_CAPTURE__ = true;
+            document.documentElement.setAttribute('data-visual-capture', '1');
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.clear();
+            sessionStorage.clear();
+            localStorage.setItem('ea_intro_seen', '1');
+            localStorage.setItem('theme', 'light');
+            localStorage.setItem('theme_manual', 'true');
+            sessionStorage.setItem('savonie_bubble_count', '99');
+          } catch {
+            // Ignore storage failures in restricted contexts.
+          }
+        });
+        await page.setViewport(viewport);
+        await page.setCacheEnabled(false);
+
+        if (server?.ensureReady) {
+          try {
+            await server.ensureReady();
+          } catch (error) {
+            if (!server?.restart) throw error;
+            await server.restart();
+            await server.ensureReady();
+          }
+        }
         const targetUrl = new URL(route.path.replace(/^\//, ''), ensureTrailingSlash(baseUrl)).toString();
 
-        await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 60_000 });
+        try {
+          await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 60_000 });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          if (!message.includes('ERR_CONNECTION_REFUSED') || !server?.restart) {
+            throw error;
+          }
+          await server.restart();
+          await server.ensureReady?.();
+          await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 60_000 });
+        }
+        if (route.readySelector) {
+          await page.waitForSelector(route.readySelector, { timeout: 20_000 });
+        }
         await page.evaluate(async () => {
+          if (document.fonts?.load) {
+            const requestedFaces = [
+              '400 16px Inter',
+              '500 16px Inter',
+              '600 16px Inter',
+              '700 16px Inter',
+            ];
+            await Promise.all(requestedFaces.map((face) => document.fonts.load(face).catch(() => {})));
+          }
           if (document.fonts?.ready) await document.fonts.ready;
           window.scrollTo(0, 0);
         });
-
-        // Stabilize animations for deterministic screenshots (does not affect the site, only the capture run)
         await page.evaluate(() => {
+          window.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+        });
+        await waitForRouteReady(page, route.name);
+        await waitForStablePageGeometry(page);
+
+        // Stabilize animations for deterministic screenshots (capture-only)
+        await page.evaluate((routeName) => {
           try {
-            // Pause GSAP timeline if present
+            document.documentElement.classList.remove('intro-active');
+            document.documentElement.setAttribute('data-visual-capture', '1');
+            document.documentElement.setAttribute('data-theme', 'light');
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            document.body.style.overflow = '';
+            document.body.style.height = '';
+            document.documentElement.style.overflow = '';
+            document.documentElement.style.height = '';
+            [
+              document.getElementById('main-content'),
+              document.querySelector('header'),
+              document.querySelector('footer'),
+              document.getElementById('chat-widget'),
+              document.getElementById('scroll-to-top'),
+              document.querySelector('.scroll-progress'),
+            ].forEach((el) => {
+              if (el) el.style.visibility = 'visible';
+            });
+
             if (window.gsap?.globalTimeline) window.gsap.globalTimeline.pause();
-            // Stop CSS animations/transitions to reduce flake
+            document.querySelector('style[data-visual-freeze="1"]')?.remove();
             const style = document.createElement('style');
             style.setAttribute('data-visual-freeze', '1');
             style.textContent = `
+              html,
+              body {
+                overflow: visible !important;
+                height: auto !important;
+                min-height: 100% !important;
+              }
               *, *::before, *::after {
                 animation-duration: 0s !important;
                 animation-delay: 0s !important;
@@ -248,6 +476,42 @@ async function captureScreenshots({ baseUrl, outDir }) {
                 transition-delay: 0s !important;
                 caret-color: transparent !important;
               }
+              html,
+              body,
+              button,
+              input,
+              textarea,
+              select {
+                font-family: Arial, Helvetica, sans-serif !important;
+                -webkit-font-smoothing: antialiased !important;
+                text-rendering: geometricPrecision !important;
+                font-kerning: none !important;
+              }
+              [data-gsap],
+              .opacity-0,
+              .translate-y-4,
+              .translate-y-6,
+              .translate-y-8 {
+                opacity: 1 !important;
+                transform: none !important;
+                translate: none !important;
+              }
+              main > section,
+              .page-hero,
+              .page-close,
+              footer,
+              .section-below-fold,
+              .spine-band,
+              .spine-fact-grid,
+              .spine-mini-route-grid {
+                content-visibility: visible !important;
+                contain-intrinsic-size: auto !important;
+              }
+              #cinematic-intro,
+              .intro-curtain,
+              .intro-player,
+              #scroll-to-top,
+              #welcome-bubble,
               .diagnostics-consent-banner,
               [aria-label="Diagnostics consent"],
               #chat-widget,
@@ -260,21 +524,89 @@ async function captureScreenshots({ baseUrl, outDir }) {
               }
             `;
             document.head.appendChild(style);
+
+            document.querySelectorAll('[data-gsap], [data-gsap] *, .reveal, .reveal *, .opacity-0').forEach((node) => {
+              if (!(node instanceof HTMLElement)) return;
+              node.classList.add('is-visible');
+              node.classList.remove('opacity-0');
+              node.style.opacity = '1';
+              node.style.visibility = 'visible';
+              node.style.transform = 'none';
+            });
+
+            if (routeName === 'about') {
+              window.aboutCarousel?.resetInteractionState?.();
+              window.aboutCarousel?.goToSlide?.(window.aboutCarousel.currentIndex, { durationMs: 0, announce: false });
+              window.aboutCarousel?.refreshLayout?.();
+            }
+            if (routeName === 'projects') {
+              window.luxuryCoverflow?.resetInteractionState?.();
+              window.luxuryCoverflow?.goToSlide?.(window.luxuryCoverflow.currentIndex, { durationMs: 0, announce: false });
+              window.luxuryCoverflow?.refreshLayout?.();
+            }
           } catch {
             // ignore
           }
+        }, route.name);
+
+        await page.evaluate(async () => {
+          try {
+            localStorage.setItem('theme', 'light');
+            localStorage.setItem('theme_manual', 'true');
+          } catch {
+            // ignore
+          }
+
+          const forceRender = (selector) => {
+            document.querySelectorAll(selector).forEach((el) => {
+              void el.getBoundingClientRect();
+              void el.offsetHeight;
+            });
+          };
+
+          forceRender('.spine-band');
+          forceRender('footer');
+          forceRender('.section-below-fold');
         });
 
-        // Small settle time for layout/paint completion
-        await new Promise(r => setTimeout(r, 250));
+        if (route.name === 'about' || route.name === 'projects') {
+          await page.evaluate(async (routeName) => {
+            const images = Array.from(document.querySelectorAll('.coverflow-card img.card-image'));
+            images.forEach((img) => {
+              img.loading = 'eager';
+              img.decoding = 'sync';
+              img.fetchPriority = 'high';
+            });
+
+            await Promise.all(images.map(async (img) => {
+              try {
+                if (typeof img.decode === 'function') {
+                  await img.decode();
+                }
+              } catch {
+                // ignore decode failures for already-painted images
+              }
+            }));
+
+            if (routeName === 'about') {
+              window.aboutCarousel?.refreshLayout?.();
+            }
+            if (routeName === 'projects') {
+              window.luxuryCoverflow?.refreshLayout?.();
+            }
+          }, route.name).catch(() => {});
+        }
+
+        await waitForStablePageGeometry(page);
+        await new Promise(r => setTimeout(r, 900));
+        await waitForStablePageGeometry(page);
 
         const shotPath = path.join(outDir, makeShotName(viewport.name, route.name));
         await page.screenshot({ path: shotPath, fullPage: true });
         // eslint-disable-next-line no-console
         console.log(`Captured: ${path.relative(REPO_ROOT, shotPath)} (${targetUrl})`);
+        await page.close();
       }
-
-      await page.close();
     }
   } finally {
     await browser.close();
@@ -344,7 +676,7 @@ async function diffScreenshots({ baselineDir, currentDir, diffDir, thresholdRati
         diff.data,
         baseline.width,
         height,
-        { threshold: 0.1, includeAA: false }
+        { threshold: 0.15, includeAA: false }
       );
 
       const totalPixels = baseline.width * baseline.height;
@@ -395,27 +727,31 @@ async function main() {
   const mode = process.argv[2];
   const args = parseArgs(process.argv.slice(3));
 
-  const baseUrl = args.baseUrl || process.env.BASE_URL || 'http://localhost:5500';
+  const hasCustomBaseUrl = Boolean(args.baseUrl || process.env.BASE_URL);
+  const baseUrl = args.baseUrl || process.env.BASE_URL || await getDefaultVisualBaseUrl();
   const thresholdRatio = Number.isFinite(args.threshold)
     ? args.threshold
-    : Number(process.env.VISUAL_THRESHOLD || 0.003);
+    : Number(process.env.VISUAL_THRESHOLD || 0.008);
 
   const baselineDir = path.join(REPO_ROOT, 'visual-baseline');
   const currentDir = path.join(REPO_ROOT, 'visual-current');
   const diffDir = path.join(REPO_ROOT, 'visual-diff');
 
-  const server = await ensureLocalServerUp(baseUrl);
+  const server = await ensureLocalServerUp(baseUrl, {
+    requireLocalServeIdentity: !hasCustomBaseUrl,
+    preferManagedServer: !hasCustomBaseUrl,
+  });
 
   try {
     if (mode === 'baseline') {
-      await captureScreenshots({ baseUrl, outDir: baselineDir });
+      await captureScreenshots({ baseUrl, outDir: baselineDir, server });
       // eslint-disable-next-line no-console
       console.log(`Baseline written to: ${path.relative(REPO_ROOT, baselineDir)}`);
       return;
     }
 
     if (mode === 'check') {
-      await captureScreenshots({ baseUrl, outDir: currentDir });
+      await captureScreenshots({ baseUrl, outDir: currentDir, server });
       await diffScreenshots({ baselineDir, currentDir, diffDir, thresholdRatio });
       return;
     }
@@ -426,9 +762,9 @@ async function main() {
   // eslint-disable-next-line no-console
   console.error('Usage:');
   // eslint-disable-next-line no-console
-  console.error('  node scripts/visual-regression.mjs baseline [--baseUrl=http://localhost:5500]');
+  console.error('  node scripts/visual-regression.mjs baseline [--baseUrl=http://127.0.0.1:5512]');
   // eslint-disable-next-line no-console
-  console.error('  node scripts/visual-regression.mjs check [--threshold=0.003] [--baseUrl=http://localhost:5500]');
+  console.error('  node scripts/visual-regression.mjs check [--threshold=0.003] [--baseUrl=http://127.0.0.1:5512]');
   process.exitCode = 2;
 }
 

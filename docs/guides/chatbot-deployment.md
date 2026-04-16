@@ -1,6 +1,12 @@
 # Savonie Chat Reliability Upgrade
 
-This document outlines the deployment steps and verification procedures for the chat system reliability improvements.
+Current routing policy:
+
+- The public site uses same-origin `/chat` on production hosts.
+- Non-production hosts use `https://www.estivanayramia.com/chat` unless an explicit override is provided.
+- `https://portfolio-chat.eayramia.workers.dev` still exists as an operational worker endpoint, but it is not the normal frontend route.
+
+This document outlines the deployment steps and verification procedures for the current Savonie chat runtime.
 
 ## ✅ RESOLVED (Jan 12, 2026)
 
@@ -34,7 +40,7 @@ The upgrade addresses "AI service is busy" failures by:
 
 ## 📋 Changes Summary
 
-### Worker Changes (`worker/worker.js`)
+### Worker Changes (`worker/worker.mjs`)
 1. **Error Classification**: Returns proper HTTP status codes
    - `429` → `503` with `Retry-After: 30` for rate limiting
    - `401/403` → `503` with `AuthError` for authentication issues
@@ -68,7 +74,7 @@ The upgrade addresses "AI service is busy" failures by:
 
 ## 🚀 Deployment Steps
 
-### 1. Deploy Worker to Cloudflare
+### 1. Deploy chat worker to Cloudflare
 
 ```bash
 # Navigate to project root
@@ -85,19 +91,12 @@ npx wrangler deploy --config worker/wrangler.chat.toml
  https://portfolio-chat.eayramia.workers.dev
 ```
 
-### 2. Deploy Frontend to Netlify
+### 2. Deploy the Pages project
 
-Since `_headers` already has `no-cache` for JS/CSS, users will get the new version within minutes of deployment.
+The public site and Pages Functions are served by Cloudflare Pages.
+Production browser traffic should use same-origin `/chat`; the `workers.dev` URL remains an operational endpoint only if you intentionally keep it supported.
 
-```bash
-# If using Netlify CLI:
-netlify deploy --prod
-
-# Or via Git push (auto-deploy):
-git add .
-git commit -m "feat: improve chat reliability and error handling"
-git push origin main
-```
+Deploy the Pages project that serves this repo, then verify the chat route from the production hostname.
 
 ### 3. Verify Deployment
 
@@ -224,7 +223,8 @@ curl -X POST https://portfolio-chat.eayramia.workers.dev/chat \
 
 **Check:**
 
-1. Verify worker deployed: `curl https://portfolio-chat.eayramia.workers.dev/health`
+1. Verify the production route first: `curl https://www.estivanayramia.com/chat` with a POST body
+2. Optionally verify the worker endpoint: `curl https://portfolio-chat.eayramia.workers.dev/health`
 2. Check version header matches latest
 3. Enable debug mode: `?debug=1`
 4. Review Cloudflare worker logs
@@ -235,7 +235,7 @@ curl -X POST https://portfolio-chat.eayramia.workers.dev/chat \
 
 1. Hard refresh browser (Ctrl+Shift+R)
 2. Check network tab for `site.min.js` cache headers
-3. Verify Netlify deployment completed
+3. Verify the Pages deployment completed
 4. Wait 5 minutes for CDN propagation
 
 ### Issue: Rate limiting too aggressive
@@ -243,7 +243,7 @@ curl -X POST https://portfolio-chat.eayramia.workers.dev/chat \
 **Adjust:**
 
 ```javascript
-// In worker.js, line ~12
+// In worker.mjs
 const RATE_LIMIT_MAX = 20; // Increase this value
 const RATE_LIMIT_WINDOW = 60000; // Or increase window
 ```
@@ -253,7 +253,7 @@ const RATE_LIMIT_WINDOW = 60000; // Or increase window
 **Adjust:**
 
 ```javascript
-// In worker.js, line ~8
+// In worker.mjs
 const GEMINI_TIMEOUT = 35000; // Increase timeout (ms)
 ```
 
@@ -277,9 +277,9 @@ const GEMINI_TIMEOUT = 35000; // Increase timeout (ms)
 
 ## 🔗 Resources
 
-- Worker URL: <https://portfolio-chat.eayramia.workers.dev>
-- Health Check: <https://portfolio-chat.eayramia.workers.dev/health>
-- Frontend: <https://estivanayramia.com>
+- Production chat route: <https://www.estivanayramia.com/chat>
+- Optional worker health: <https://portfolio-chat.eayramia.workers.dev/health>
+- Frontend: <https://www.estivanayramia.com>
 - Test Script: `test-chat-errors.ps1`
 
 ## 📝 Version History
@@ -292,4 +292,3 @@ const GEMINI_TIMEOUT = 35000; // Increase timeout (ms)
 **Deployed by:** Estivan Ayramia  
 **Last Updated:** January 11, 2026  
 **Status:** ✅ Ready for Production
-

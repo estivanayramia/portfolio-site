@@ -2060,7 +2060,8 @@ html.js [data-gsap][data-gsap-state="fallback-visible"] {
     transition: none !important;
 }
 
-html.js [data-gsap] {
+html.js [data-gsap][data-gsap-state="animated"],
+html.js [data-gsap][data-gsap-state="restored"] {
     opacity: 1 !important;
     transform: none !important;
 }

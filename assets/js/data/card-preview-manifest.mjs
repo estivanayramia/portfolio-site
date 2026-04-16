@@ -1,4 +1,4 @@
-export const CARD_PREVIEW_VERSION = '2026-03-30-v6';
+export const CARD_PREVIEW_VERSION = '2026-04-12-v7';
 export const CARD_PREVIEW_OUTPUT_DIR = '/assets/img/generated/card-previews';
 
 export const PROJECT_CARD_PREVIEWS = [
@@ -6,12 +6,19 @@ export const PROJECT_CARD_PREVIEWS = [
     id: 'project-portfolio',
     category: 'Web Development',
     title: 'This Website',
-    description: 'Hand-coded with PWA support, service workers, Lighthouse 90+ scores.',
+    description: 'Hand-coded portfolio built for speed, clarity, and proof.',
     link: '/projects/portfolio',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/home-portrait-native-v3.jpg',
     presentation: {
       fit: 'cover',
-      position: '50% 20%'
+      position: '50% 20%',
+      contentPlacement: 'left',
+      contentWidth: '74%',
+      contentBottom: '1.1rem',
+      overlayMid: 0.14,
+      overlayBottom: 0.74,
+      overlayBottomStrong: 0.9,
+      descriptionLines: 2
     },
     generation: {
       type: 'image',
@@ -23,12 +30,19 @@ export const PROJECT_CARD_PREVIEWS = [
     id: 'project-isa-grimes',
     category: 'Interview Project',
     title: 'Isa Grimes Interview',
-    description: 'A real conversation about your 20s, people skills, leadership, favoritism, support systems, and why the fastest route is not always the right one.',
+    description: 'Interview on judgment, leadership, and when the fastest path is wrong.',
     link: '/projects/isa-grimes-interview',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/isa_grimes.jpg',
     presentation: {
       fit: 'cover',
-      position: '50% 18%'
+      position: '50% 18%',
+      contentPlacement: 'left',
+      contentWidth: '78%',
+      contentBottom: '1.08rem',
+      overlayMid: 0.2,
+      overlayBottom: 0.84,
+      overlayBottomStrong: 0.96,
+      descriptionLines: 3
     },
     generation: {
       type: 'image',
@@ -39,13 +53,20 @@ export const PROJECT_CARD_PREVIEWS = [
   {
     id: 'project-loreal-maps',
     category: 'Campaign Strategy',
-    title: "L'Oréal Cell BioPrint",
-    description: 'MAPS campaign deck mapping personas across the funnel.',
+    title: "L'Or?al Cell BioPrint",
+    description: 'MAPS campaign deck mapping three personas through the funnel.',
     link: '/projects/loreal-maps-campaign',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/06-project-loreal-maps.jpg',
     presentation: {
       fit: 'cover',
-      position: '50% 14%'
+      position: '50% 14%',
+      contentPlacement: 'right',
+      contentWidth: '68%',
+      contentBottom: '1.05rem',
+      overlayMid: 0.18,
+      overlayBottom: 0.8,
+      overlayBottomStrong: 0.94,
+      descriptionLines: 2
     },
     generation: {
       type: 'image',
@@ -57,12 +78,19 @@ export const PROJECT_CARD_PREVIEWS = [
     id: 'project-franklin-templeton',
     category: 'Content Strategy',
     title: 'Franklin Templeton',
-    description: 'Dual-language investment content strategy for English and Arabic audiences.',
+    description: 'Dual-language investment strategy for English and Arabic audiences.',
     link: '/projects/franklin-templeton-concept',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/05-project-franklin-templeton.jpg',
     presentation: {
       fit: 'cover',
-      position: '50% 12%'
+      position: '50% 12%',
+      contentPlacement: 'left',
+      contentWidth: '70%',
+      contentBottom: '1.08rem',
+      overlayMid: 0.16,
+      overlayBottom: 0.78,
+      overlayBottomStrong: 0.92,
+      descriptionLines: 2
     },
     generation: {
       type: 'image',
@@ -74,12 +102,19 @@ export const PROJECT_CARD_PREVIEWS = [
     id: 'project-endpoint-linkedin',
     category: 'Retargeting',
     title: 'EndPoint LinkedIn Campaign',
-    description: '15-page deck outlining Phase 2A and 2B retargeting strategy.',
+    description: 'Retargeting deck for the Phase 2A and 2B campaign.',
     link: '/projects/endpoint-linkedin-campaign',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/04-project-endpoint-linkedin.jpg',
     presentation: {
       fit: 'cover',
-      position: '50% 12%'
+      position: '50% 12%',
+      contentPlacement: 'left',
+      contentWidth: '73%',
+      contentBottom: '1.06rem',
+      overlayMid: 0.18,
+      overlayBottom: 0.8,
+      overlayBottomStrong: 0.94,
+      descriptionLines: 2
     },
     generation: {
       type: 'image',
@@ -91,12 +126,19 @@ export const PROJECT_CARD_PREVIEWS = [
     id: 'project-elosity-video',
     category: 'Video Concept',
     title: 'Endpoint Elosity Launch',
-    description: 'Motion storyboard and voiceover script for LinkedIn autoplay.',
+    description: 'Motion storyboard and voiceover for LinkedIn autoplay launch.',
     link: '/projects/endpoint-elosity-video',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/03-project-elosity-video.jpg',
     presentation: {
       fit: 'cover',
-      position: '50% 20%'
+      position: '50% 20%',
+      contentPlacement: 'right',
+      contentWidth: '66%',
+      contentBottom: '1.06rem',
+      overlayMid: 0.16,
+      overlayBottom: 0.78,
+      overlayBottomStrong: 0.92,
+      descriptionLines: 3
     },
     generation: {
       type: 'image',
@@ -113,7 +155,14 @@ export const PROJECT_CARD_PREVIEWS = [
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/02-project-competitive-playbook.jpg',
     presentation: {
       fit: 'cover',
-      position: '50% 10%'
+      position: '50% 10%',
+      contentPlacement: 'left',
+      contentWidth: '72%',
+      contentBottom: '1.08rem',
+      overlayMid: 0.18,
+      overlayBottom: 0.78,
+      overlayBottomStrong: 0.92,
+      descriptionLines: 3
     },
     generation: {
       type: 'image',
@@ -128,12 +177,19 @@ export const ABOUT_CARD_PREVIEWS = [
     id: 'about-values',
     category: 'Philosophy',
     title: 'Core Values',
-    description: 'Curiosity, execution, growth through discomfort. The principles that shape how I approach problems.',
+    description: 'Curiosity, execution, and growth through discomfort.',
     link: '/about/values',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/values-portrait-native-v3.jpg',
     presentation: {
       fit: 'cover',
-      position: '50% 16%'
+      position: '50% 16%',
+      contentPlacement: 'left',
+      contentWidth: '80%',
+      contentBottom: '1.15rem',
+      overlayMid: 0.12,
+      overlayBottom: 0.68,
+      overlayBottomStrong: 0.88,
+      descriptionLines: 3
     },
     generation: {
       type: 'image',
@@ -145,12 +201,19 @@ export const ABOUT_CARD_PREVIEWS = [
     id: 'about-background',
     category: 'Identity',
     title: 'Background',
-    description: 'Chaldean heritage, four languages, family history, and the context I come from.',
+    description: 'Chaldean roots, four languages, and the family context behind how I think.',
     link: '/about/background',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/01-about-background.jpg',
     presentation: {
       fit: 'cover',
-      position: '50% 30%'
+      position: '50% 30%',
+      contentPlacement: 'right',
+      contentWidth: '72%',
+      contentBottom: '1.12rem',
+      overlayMid: 0.14,
+      overlayBottom: 0.72,
+      overlayBottomStrong: 0.9,
+      descriptionLines: 3
     },
     generation: {
       type: 'image',
@@ -162,12 +225,19 @@ export const ABOUT_CARD_PREVIEWS = [
     id: 'about-working-with-me',
     category: 'Professional',
     title: 'Working With Me',
-    description: 'Clear communication, follow-through, and what people can expect if we work together.',
+    description: 'Direct communication, follow-through, and a low-theater way of working.',
     link: '/about/working-with-me',
     previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/working-portrait-native-v3.jpg',
     presentation: {
       fit: 'cover',
-      position: '50% 18%'
+      position: '50% 18%',
+      contentPlacement: 'left',
+      contentWidth: '82%',
+      contentBottom: '1.12rem',
+      overlayMid: 0.12,
+      overlayBottom: 0.7,
+      overlayBottomStrong: 0.88,
+      descriptionLines: 3
     },
     generation: {
       type: 'image',
@@ -179,9 +249,20 @@ export const ABOUT_CARD_PREVIEWS = [
     id: 'about-gym',
     category: 'Physical',
     title: 'Gym & Strength Training',
-    description: 'Building discipline through progressive overload. Tracking PRs, optimizing recovery.',
+    description: 'Discipline built through reps, recovery, and routine.',
     link: '/hobbies/gym',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-gym-collage.webp`,
+    presentation: {
+      fit: 'cover',
+      position: '50% 38%',
+      contentPlacement: 'left',
+      contentWidth: '74%',
+      contentBottom: '1.04rem',
+      overlayMid: 0.18,
+      overlayBottom: 0.8,
+      overlayBottomStrong: 0.94,
+      descriptionLines: 3
+    },
     generation: {
       type: 'collage',
       treatment: 'hero-detail-triptych',
@@ -196,9 +277,20 @@ export const ABOUT_CARD_PREVIEWS = [
     id: 'about-photography',
     category: 'Creative',
     title: 'Photography',
-    description: 'iPhone shots that tell stories. No DSLR needed, just good lighting and better timing.',
+    description: 'Phone shots, strong light, and better timing.',
     link: '/hobbies/photography',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-photography-collage.webp`,
+    presentation: {
+      fit: 'cover',
+      position: '50% 45%',
+      contentPlacement: 'left',
+      contentWidth: '70%',
+      contentBottom: '1.02rem',
+      overlayMid: 0.16,
+      overlayBottom: 0.78,
+      overlayBottomStrong: 0.92,
+      descriptionLines: 3
+    },
     generation: {
       type: 'collage',
       treatment: 'photography-contact-sheet',
@@ -214,9 +306,20 @@ export const ABOUT_CARD_PREVIEWS = [
     id: 'about-car',
     category: 'Mechanical',
     title: 'Car Enthusiasm',
-    description: 'First car, first freedom. About ownership, maintenance, pride of keeping something running clean.',
+    description: 'Ownership, maintenance, and keeping things sharp.',
     link: '/hobbies/car',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-car-collage.webp`,
+    presentation: {
+      fit: 'cover',
+      position: '50% 54%',
+      contentPlacement: 'left',
+      contentWidth: '78%',
+      contentBottom: '1.02rem',
+      overlayMid: 0.16,
+      overlayBottom: 0.78,
+      overlayBottomStrong: 0.92,
+      descriptionLines: 2
+    },
     generation: {
       type: 'collage',
       treatment: 'hero-detail-triptych',
@@ -232,9 +335,20 @@ export const ABOUT_CARD_PREVIEWS = [
     id: 'about-cooking',
     category: 'Culinary',
     title: 'Cooking',
-    description: 'Steak, pasta, everything in between. Not a chef; just someone who refuses to eat mediocre food.',
+    description: 'Steak, pasta, and no patience for mediocre food.',
     link: '/hobbies/cooking',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-cooking-collage.webp`,
+    presentation: {
+      fit: 'cover',
+      position: '50% 48%',
+      contentPlacement: 'left',
+      contentWidth: '82%',
+      contentBottom: '1.02rem',
+      overlayMid: 0.18,
+      overlayBottom: 0.8,
+      overlayBottomStrong: 0.94,
+      descriptionLines: 2
+    },
     generation: {
       type: 'collage',
       treatment: 'hero-detail-triptych',
@@ -250,9 +364,20 @@ export const ABOUT_CARD_PREVIEWS = [
     id: 'about-whispers',
     category: 'Reflective',
     title: 'Whispers (Sticky Notes)',
-    description: 'Random thoughts on sticky notes. Ideas, observations, reminders. Mental clutter organized.',
+    description: 'Sticky-note thoughts, observations, and mental overflow.',
     link: '/hobbies/whispers',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-whispers-collage.webp`,
+    presentation: {
+      fit: 'cover',
+      position: '50% 50%',
+      contentPlacement: 'center',
+      contentWidth: '78%',
+      contentBottom: '0.98rem',
+      overlayMid: 0.2,
+      overlayBottom: 0.82,
+      overlayBottomStrong: 0.95,
+      descriptionLines: 2
+    },
     generation: {
       type: 'collage',
       treatment: 'reflective-note-cover',
@@ -268,9 +393,20 @@ export const ABOUT_CARD_PREVIEWS = [
     id: 'about-reading',
     category: 'Intellectual',
     title: 'Reading',
-    description: 'Books are compressed experience. Cheapest way to access decades of wisdom.',
+    description: 'Wisdom from people who learned it firsthand.',
     link: '/hobbies/reading',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-reading-collage.webp`,
+    presentation: {
+      fit: 'cover',
+      position: '50% 46%',
+      contentPlacement: 'left',
+      contentWidth: '70%',
+      contentBottom: '1.02rem',
+      overlayMid: 0.18,
+      overlayBottom: 0.8,
+      overlayBottomStrong: 0.94,
+      descriptionLines: 2
+    },
     generation: {
       type: 'collage',
       treatment: 'reading-editorial',
@@ -286,9 +422,20 @@ export const ABOUT_CARD_PREVIEWS = [
     id: 'about-me',
     category: 'Personal',
     title: 'Me',
-    description: 'Personal snapshots that capture identity, growth, and the moments behind the work.',
+    description: 'Identity, growth, and life beyond work.',
     link: '/hobbies/me',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-me-collage.webp`,
+    presentation: {
+      fit: 'cover',
+      position: '50% 46%',
+      contentPlacement: 'right',
+      contentWidth: '66%',
+      contentBottom: '1.02rem',
+      overlayMid: 0.16,
+      overlayBottom: 0.78,
+      overlayBottomStrong: 0.92,
+      descriptionLines: 2
+    },
     generation: {
       type: 'collage',
       treatment: 'hero-detail-triptych',
@@ -304,12 +451,186 @@ export const ABOUT_CARD_PREVIEWS = [
     id: 'about-games',
     category: 'Strategy',
     title: 'Games',
-    description: 'Chess, strategy games, competitive thinking. Because even hobbies teach systems.',
+    description: 'Strategy, pattern recognition, and love of systems.',
     link: '/hobbies-games',
     previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-games-cover.webp`,
+    presentation: {
+      fit: 'cover',
+      position: '50% 50%',
+      contentPlacement: 'center',
+      contentWidth: '84%',
+      contentBottom: '0.98rem',
+      overlayMid: 0.18,
+      overlayBottom: 0.78,
+      overlayBottomStrong: 0.92,
+      descriptionLines: 2
+    },
     generation: {
       type: 'synthetic',
       treatment: 'arcade-cover-art-v2'
+    }
+  }
+];
+
+export const FEATURED_GAME_CARD_PREVIEWS = [
+  {
+    id: 'game-snake',
+    category: 'Arcade Classic',
+    title: 'Snake',
+    description: 'Classic reflex play with escalating speed and clean resets.',
+    link: '/hobbies-games/snake',
+    presentation: {
+      contentPlacement: 'left',
+      contentWidth: '72%',
+      contentBottom: '1.05rem',
+      overlayMid: 0.2,
+      overlayBottom: 0.84,
+      overlayBottomStrong: 0.96,
+      descriptionLines: 3
+    },
+    generation: {
+      type: 'synthetic',
+      treatment: 'gradient-emoji-arcade'
+    }
+  },
+  {
+    id: 'game-block-breaker',
+    category: 'Precision',
+    title: 'Block Breaker',
+    description: 'Momentum-heavy brick breaking with sharp rebounds and quick pacing.',
+    link: '/hobbies-games/block-breaker',
+    presentation: {
+      contentPlacement: 'right',
+      contentWidth: '72%',
+      contentBottom: '1.05rem',
+      overlayMid: 0.22,
+      overlayBottom: 0.86,
+      overlayBottomStrong: 0.96,
+      descriptionLines: 3
+    },
+    generation: {
+      type: 'synthetic',
+      treatment: 'gradient-emoji-arcade'
+    }
+  },
+  {
+    id: 'game-2048',
+    category: 'Strategy',
+    title: '2048',
+    description: 'Clean merge logic, smooth movement, and one-more-run tension.',
+    link: '/hobbies-games/2048',
+    presentation: {
+      contentPlacement: 'left',
+      contentWidth: '72%',
+      contentBottom: '1.05rem',
+      overlayMid: 0.2,
+      overlayBottom: 0.84,
+      overlayBottomStrong: 0.96,
+      descriptionLines: 3
+    },
+    generation: {
+      type: 'synthetic',
+      treatment: 'gradient-emoji-arcade'
+    }
+  },
+  {
+    id: 'game-space-invaders',
+    category: 'Survival',
+    title: 'Space Invaders',
+    description: 'Wave defense under pressure with tighter movement and arcade urgency.',
+    link: '/hobbies-games/space-invaders',
+    presentation: {
+      contentPlacement: 'left',
+      contentWidth: '74%',
+      contentBottom: '1.05rem',
+      overlayMid: 0.24,
+      overlayBottom: 0.88,
+      overlayBottomStrong: 0.98,
+      descriptionLines: 3
+    },
+    generation: {
+      type: 'synthetic',
+      treatment: 'gradient-emoji-arcade'
+    }
+  },
+  {
+    id: 'game-flappy-face',
+    category: 'Reflex',
+    title: 'Flappy Face',
+    description: 'Tap through golden pipes with faster pacing and cleaner recoveries.',
+    link: '/hobbies-games/flappy-face',
+    presentation: {
+      contentPlacement: 'right',
+      contentWidth: '74%',
+      contentBottom: '1.05rem',
+      overlayMid: 0.2,
+      overlayBottom: 0.84,
+      overlayBottomStrong: 0.96,
+      descriptionLines: 3
+    },
+    generation: {
+      type: 'synthetic',
+      treatment: 'gradient-emoji-arcade'
+    }
+  },
+  {
+    id: 'game-color-match',
+    category: 'Speed',
+    title: 'Color Match',
+    description: 'Stroop-style reaction play with combos and tight one-minute rounds.',
+    link: '/hobbies-games/color-match',
+    presentation: {
+      contentPlacement: 'left',
+      contentWidth: '74%',
+      contentBottom: '1.05rem',
+      overlayMid: 0.2,
+      overlayBottom: 0.84,
+      overlayBottomStrong: 0.96,
+      descriptionLines: 3
+    },
+    generation: {
+      type: 'synthetic',
+      treatment: 'gradient-emoji-arcade'
+    }
+  },
+  {
+    id: 'game-gravity-runner',
+    category: 'Endless Runner',
+    title: 'Gravity Runner',
+    description: 'Flip gravity, dodge both planes, and outrun the speed curve.',
+    link: '/hobbies-games/gravity-runner',
+    presentation: {
+      contentPlacement: 'left',
+      contentWidth: '73%',
+      contentBottom: '1.05rem',
+      overlayMid: 0.22,
+      overlayBottom: 0.86,
+      overlayBottomStrong: 0.96,
+      descriptionLines: 3
+    },
+    generation: {
+      type: 'synthetic',
+      treatment: 'gradient-emoji-arcade'
+    }
+  },
+  {
+    id: 'game-hex-memory',
+    category: 'Memory',
+    title: 'Hex Memory',
+    description: 'Hex-grid sequence memory with cleaner escalation and calmer rhythm.',
+    link: '/hobbies-games/hex-memory',
+    presentation: {
+      contentPlacement: 'center',
+      contentWidth: '80%',
+      contentBottom: '1.02rem',
+      overlayMid: 0.2,
+      overlayBottom: 0.84,
+      overlayBottomStrong: 0.96,
+      descriptionLines: 3
+    },
+    generation: {
+      type: 'synthetic',
+      treatment: 'gradient-emoji-arcade'
     }
   }
 ];
@@ -318,5 +639,6 @@ export const CARD_PREVIEW_MANIFEST = {
   version: CARD_PREVIEW_VERSION,
   outputDir: CARD_PREVIEW_OUTPUT_DIR,
   projectCards: PROJECT_CARD_PREVIEWS,
-  aboutCards: ABOUT_CARD_PREVIEWS
+  aboutCards: ABOUT_CARD_PREVIEWS,
+  featuredGameCards: FEATURED_GAME_CARD_PREVIEWS
 };
