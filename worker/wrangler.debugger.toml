@@ -3,22 +3,9 @@ main = "debugger-worker.js"
 compatibility_date = "2024-01-01"
 workers_dev = true
 
-# Debugger/ingestion worker owns ONLY these endpoints.
-# IMPORTANT: do not add broad patterns like /api/* here.
-routes = [
-  # bare domain
-  { pattern = "estivanayramia.com/api/error-report", zone_name = "estivanayramia.com" },
-  { pattern = "estivanayramia.com/api/errors*", zone_name = "estivanayramia.com" },
-  { pattern = "estivanayramia.com/api/auth", zone_name = "estivanayramia.com" },
-  { pattern = "estivanayramia.com/api/health", zone_name = "estivanayramia.com" },
-  { pattern = "estivanayramia.com/health", zone_name = "estivanayramia.com" },
-  # www (dashboard lives here)
-  { pattern = "www.estivanayramia.com/api/error-report*", zone_name = "estivanayramia.com" },
-  { pattern = "www.estivanayramia.com/api/errors*", zone_name = "estivanayramia.com" },
-  { pattern = "www.estivanayramia.com/api/auth*", zone_name = "estivanayramia.com" },
-  { pattern = "www.estivanayramia.com/api/health", zone_name = "estivanayramia.com" },
-  { pattern = "www.estivanayramia.com/health", zone_name = "estivanayramia.com" },
-]
+# Dashboard health/auth/error endpoints now live in Pages Functions.
+# Keep this worker detached from apex/www routes unless the dashboard API is
+# intentionally migrated back behind a Worker.
 
 # D1 Database for error monitoring
 [[d1_databases]]

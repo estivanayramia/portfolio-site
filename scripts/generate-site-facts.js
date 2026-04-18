@@ -92,8 +92,8 @@ function extractDescription(html) {
 
 // Extract title from card in index page
 function extractCardTitle(cardHtml) {
-  const match = cardHtml.match(/<h[23][^>]*>([^<]+)<\/h[23]>/);
-  return match ? cleanText(match[1]) : '';
+  const match = cardHtml.match(/<(?:h[23]|div|p)[^>]*class="[^"]*card-title[^"]*"[^>]*>([^<]+)<\/(?:h[23]|div|p)>|<h[23][^>]*>([^<]+)<\/h[23]>/);
+  return match ? cleanText(match[1] || match[2]) : '';
 }
 
 // Extract summary from card in index page

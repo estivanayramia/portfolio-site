@@ -27,6 +27,22 @@ body {
   line-height: 1.6;
 }
 
+.dashboard-skip:focus {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10000;
+  width: auto;
+  height: auto;
+  margin: 0;
+  clip: auto;
+  white-space: normal;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+}
+
 /* Login Screen */
 #login-screen {
   display: flex;
@@ -114,15 +130,99 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
 }
 
 .dashboard-header h1 {
   font-size: 24px;
+  margin: 0;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.header-subtitle {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: 0;
+}
+
+.header-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .header-actions {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mode-badge[data-tone="demo"] {
+  border-color: rgba(255, 152, 0, 0.4);
+  color: #ffd08a;
+}
+
+.mode-badge[data-tone="real"] {
+  border-color: rgba(76, 175, 80, 0.4);
+  color: #9fe0a2;
+}
+
+.mode-badge[data-tone="degraded"] {
+  border-color: rgba(244, 67, 54, 0.45);
+  color: #ffb1aa;
+}
+
+.mode-banner {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.mode-banner[data-tone="demo"] {
+  border-color: rgba(255, 152, 0, 0.35);
+  background: rgba(255, 152, 0, 0.08);
+  color: #ffd9a6;
+}
+
+.mode-banner[data-tone="real"] {
+  border-color: rgba(76, 175, 80, 0.28);
+  background: rgba(76, 175, 80, 0.08);
+  color: #c7f2cb;
+}
+
+.mode-banner[data-tone="degraded"] {
+  border-color: rgba(244, 67, 54, 0.35);
+  background: rgba(244, 67, 54, 0.08);
+  color: #ffc0ba;
 }
 
 .icon-btn {
@@ -130,9 +230,10 @@ body {
   border: 1px solid var(--border);
   color: var(--text-primary);
   padding: 8px 16px;
+  min-height: 44px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   transition: all 0.2s;
 }
 
@@ -181,6 +282,7 @@ body {
   background: transparent;
   color: var(--text-primary);
   padding: 10px 14px;
+  min-height: 44px;
   border-radius: 999px;
   cursor: pointer;
   font-size: 14px;
@@ -374,6 +476,7 @@ body {
 
 .redirect-controls button {
   padding: 10px 12px;
+  min-height: 44px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -506,6 +609,7 @@ body {
 
 .system-actions button {
   padding: 10px 12px;
+  min-height: 44px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -543,6 +647,7 @@ button.danger:hover,
 .filters input,
 .filters button {
   padding: 10px 16px;
+  min-height: 44px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -635,6 +740,8 @@ button.danger:hover,
   pointer-events: auto;
   position: relative;
   z-index: 999;
+  max-height: 70vh;
+  overflow: auto;
 }
 
 .diagnostics-mount * {
@@ -762,6 +869,7 @@ button.danger:hover,
 /* Action buttons */
 .view-btn {
   padding: 6px 12px;
+  min-height: 36px;
   background: var(--accent);
   color: white;
   border: none;
@@ -785,6 +893,7 @@ button.danger:hover,
 
 .pagination button {
   padding: 10px 20px;
+  min-height: 44px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -891,6 +1000,7 @@ button.danger:hover,
 
 .modal-actions button {
   padding: 10px 20px;
+  min-height: 44px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -916,7 +1026,46 @@ button.danger:hover,
 @media (max-width: 768px) {
   .dashboard-header {
     flex-direction: column;
-    gap: 15px;
+    align-items: stretch;
+    gap: 12px;
+    padding: 18px 16px;
+  }
+
+  .header-subtitle {
+    display: none;
+  }
+
+  .header-meta {
+    width: 100%;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .header-actions .icon-btn {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+
+  .dashboard-tabs {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    gap: 8px;
+  }
+
+  .dashboard-container {
+    padding: 20px 16px;
+  }
+
+  .tab-btn {
+    font-size: 13px;
+    padding: 8px 10px;
   }
 
   .table-container {
@@ -949,5 +1098,20 @@ button.danger:hover,
 
   .network-table td:nth-child(2) {
     max-width: 160px;
+  }
+
+  .diagnostics-mount {
+    max-height: 58vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .test-all-btn {
+    animation: none !important;
+  }
+
+  .icon-btn,
+  .tab-btn {
+    transition: none !important;
   }
 }

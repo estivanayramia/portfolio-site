@@ -62,10 +62,10 @@ function main() {
 
   for (const file of files) {
     const original = readFileSync(file, 'utf8');
-    const matches = original.match(/\?v=[a-f0-9]+/g) || [];
+    const matches = original.match(/\?v=([^"' >]+)/g) || [];
     if (matches.length === 0) continue;
 
-    const content = original.replace(/\?v=[a-f0-9]+/g, `?v=${sha}`);
+    const content = original.replace(/\?v=([^"' >]+)/g, `?v=${sha}`);
     if (content !== original) {
       writeFileSync(file, content, 'utf8');
       updatedFiles += 1;

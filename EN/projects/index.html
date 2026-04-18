@@ -28,17 +28,17 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=ee8a696f">
-    <link rel="preload" href="/assets/css/style.css?v=ee8a696f" as="style">
-    <script src="/assets/js/site.min.js?v=ee8a696final-gallery-pass" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=119d1f46">
+    <link rel="preload" href="/assets/css/style.css?v=119d1f46" as="style">
+    <script src="/assets/js/site.min.js?v=119d1f46" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
     <!-- Theme CSS - loads reliably for all viewports -->
-    <link rel="stylesheet" href="/theme.css?v=ee8a696f">
+    <link rel="stylesheet" href="/theme.css?v=119d1f46">
     
     <!-- Luxury Coverflow Carousel V4 -->
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=ee8a696f-v8">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=119d1f46">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -170,7 +170,7 @@
                 <div class="spine-section-head is-split mb-0">
                     <div>
                         <p class="spine-eyebrow">What ties these together</p>
-                        <h2 class="text-3xl font-bold text-indigodeep">Not everything I have done. The pages that matter most.</h2>
+                        <h1 class="text-3xl font-bold text-indigodeep">Not everything I have done. The pages that matter most.</h1>
                     </div>
                     <p class="text-sm text-chocolate/80 leading-relaxed">
                         Taken together, these pages tell you how I think faster
@@ -219,10 +219,9 @@
                     data-roulette-trigger="true"
                     data-no-drag
                     aria-haspopup="dialog"
-                    aria-label="Pick random project"
                     title="Feeling lucky? Let the roulette decide!"
                 >
-                    <svg class="roulette-icon" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <svg class="roulette-icon" aria-hidden="true" focusable="false" width="32" height="32" viewBox="0 0 32 32" fill="none">
                         <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
                         <circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="1" opacity="0.5"/>
                         <path d="M16 6 L16 10 M16 22 L16 26 M6 16 L10 16 M22 16 L26 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -233,10 +232,10 @@
                 </button>
                 
                 <div class="coverflow-perspective">
-                    <div class="coverflow-track" role="list">
+                    <div class="coverflow-track">
                         
                         <!-- Card 1: This Website -->
-                        <article class="coverflow-card" role="listitem" data-index="0" data-title="This Website">
+                        <article class="coverflow-card" data-index="0" data-title="This Website">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -259,7 +258,7 @@
                         </article>
                         
                         <!-- Card 2: Isa Grimes Interview -->
-                        <article class="coverflow-card" role="listitem" data-index="1" data-title="Isa Grimes Interview">
+                        <article class="coverflow-card" data-index="1" data-title="Isa Grimes Interview">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -282,7 +281,7 @@
                         </article>
                         
                         <!-- Card 3: L'Oréal Campaign -->
-                        <article class="coverflow-card" role="listitem" data-index="2" data-title="L'Oréal Campaign">
+                        <article class="coverflow-card" data-index="2" data-title="L'Oréal Campaign">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -305,7 +304,7 @@
                         </article>
                         
                         <!-- Card 4: Franklin Templeton -->
-                        <article class="coverflow-card" role="listitem" data-index="3" data-title="Franklin Templeton">
+                        <article class="coverflow-card" data-index="3" data-title="Franklin Templeton">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -328,7 +327,7 @@
                         </article>
                         
                         <!-- Card 5: EndPoint LinkedIn -->
-                        <article class="coverflow-card" role="listitem" data-index="4" data-title="EndPoint LinkedIn">
+                        <article class="coverflow-card" data-index="4" data-title="EndPoint LinkedIn">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -351,7 +350,7 @@
                         </article>
                         
                         <!-- Card 6: Elosity Launch Video -->
-                        <article class="coverflow-card" role="listitem" data-index="5" data-title="Elosity Launch Video">
+                        <article class="coverflow-card" data-index="5" data-title="Elosity Launch Video">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -374,7 +373,7 @@
                         </article>
                         
                         <!-- Card 7: Competitive Playbook -->
-                        <article class="coverflow-card" role="listitem" data-index="6" data-title="Competitive Playbook">
+                        <article class="coverflow-card" data-index="6" data-title="Competitive Playbook">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -631,19 +630,49 @@
     
     <!-- Luxury Coverflow Carousel V4 (GSAP-powered, Roulette-enabled) -->
     <script type="module">
-        import { LuxuryCoverflow } from '/assets/js/carousel/luxury-coverflow.min.js?v=ee8a696f-v8';
+        import { LuxuryCoverflow } from '/assets/js/carousel/luxury-coverflow.min.js?v=119d1f46';
         import { PROJECT_CARD_PREVIEWS } from '/assets/js/data/card-preview-manifest.mjs';
         import { hydrateDocumentCardPreviews } from '/assets/js/carousel/card-preview-sync.mjs';
 
         hydrateDocumentCardPreviews(PROJECT_CARD_PREVIEWS);
 
         const carouselEl = document.getElementById('luxury-portfolio-carousel');
+        const isVisualCapture = document.documentElement.dataset.visualCapture === '1' || window.__EA_VISUAL_CAPTURE__ === true;
 
         if (carouselEl) {
             let initScheduled = false;
             let initDone = false;
             let observer = null;
             let idleHandle = null;
+
+            const primeStaticCardLinks = () => {
+                const cards = Array.from(carouselEl.querySelectorAll('.coverflow-card'));
+                cards.forEach((card, index) => {
+                    const link = card.querySelector('.card-link');
+                    if (!link) return;
+
+                    if (!link.hasAttribute('data-prev-tabindex')) {
+                        link.setAttribute('data-prev-tabindex', link.hasAttribute('tabindex') ? link.getAttribute('tabindex') : '__none__');
+                    }
+                    if (!link.hasAttribute('data-prev-href') && link.hasAttribute('href')) {
+                        link.setAttribute('data-prev-href', link.getAttribute('href'));
+                    }
+
+                    const isPrimaryCard = index === 0;
+                    if (isPrimaryCard) {
+                        if (!link.hasAttribute('href') && link.hasAttribute('data-prev-href')) {
+                            link.setAttribute('href', link.getAttribute('data-prev-href'));
+                        }
+                        link.removeAttribute('tabindex');
+                        link.style.removeProperty('pointer-events');
+                        return;
+                    }
+
+                    link.removeAttribute('href');
+                    link.setAttribute('tabindex', '-1');
+                    link.style.setProperty('pointer-events', 'none');
+                });
+            };
 
             const destroyExisting = () => {
                 if (window.luxuryCoverflow?.destroy) {
@@ -667,6 +696,7 @@
                 });
 
                 carouselEl.dataset.coverflowReady = 'true';
+                requestAnimationFrame(() => window.luxuryCoverflow?.refreshLayout?.());
             };
 
             const scheduleInit = () => {
@@ -693,7 +723,11 @@
                 scheduleInit();
             };
 
-            if ('IntersectionObserver' in window) {
+            if (isVisualCapture) {
+                carouselEl.dataset.coverflowReady = 'false';
+                initCarousel();
+            } else if ('IntersectionObserver' in window) {
+                primeStaticCardLinks();
                 observer = new IntersectionObserver((entries) => {
                     entries.forEach((entry) => {
                         if (!entry.isIntersecting) return;
@@ -704,13 +738,16 @@
                 }, { rootMargin: '200px 0px' });
                 observer.observe(carouselEl);
             } else {
+                primeStaticCardLinks();
                 scheduleInit();
             }
 
-            window.addEventListener('pointerdown', fastStart, { once: true, passive: true });
-            window.addEventListener('touchstart', fastStart, { once: true, passive: true });
-            window.addEventListener('keydown', fastStart, { once: true });
-            window.addEventListener('wheel', fastStart, { once: true, passive: true });
+            if (!isVisualCapture) {
+                window.addEventListener('pointerdown', fastStart, { once: true, passive: true });
+                window.addEventListener('touchstart', fastStart, { once: true, passive: true });
+                window.addEventListener('keydown', fastStart, { once: true });
+                window.addEventListener('wheel', fastStart, { once: true, passive: true });
+            }
             window.addEventListener('pageshow', (event) => {
                 if (event.persisted && !window.luxuryCoverflow && !initDone) {
                     scheduleInit();

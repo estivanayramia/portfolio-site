@@ -24,14 +24,14 @@ const ROOT_TIER_CLASSES = [
 const MOTION_PROFILES = {
   premium: {
     tierClass: 'premium',
-    slideMs: 420,
-    settleMs: 240,
-    introMs: 260,
+    slideMs: 380,
+    settleMs: 200,
+    introMs: 240,
     spinMs: 4400,
     dialogMs: 260,
     scrollSensitivity: 0.0038,
-    scrollThreshold: 34,
-    dragPixelsPerSlide: 255,
+    scrollThreshold: 28,
+    dragPixelsPerSlide: 240,
     staggerDelay: 0.016,
     reflectionOpacity: 0.22,
     glowStrength: 1,
@@ -41,9 +41,9 @@ const MOTION_PROFILES = {
   },
   enhanced: {
     tierClass: 'enhanced',
-    slideMs: 400,
-    settleMs: 220,
-    introMs: 220,
+    slideMs: 360,
+    settleMs: 180,
+    introMs: 200,
     spinMs: 3900,
     dialogMs: 240,
     scrollSensitivity: 0.0034,
@@ -58,9 +58,9 @@ const MOTION_PROFILES = {
   },
   baseline: {
     tierClass: 'baseline',
-    slideMs: 340,
-    settleMs: 180,
-    introMs: 180,
+    slideMs: 320,
+    settleMs: 160,
+    introMs: 160,
     spinMs: 2900,
     dialogMs: 200,
     scrollSensitivity: 0.0028,
@@ -98,8 +98,8 @@ const CANONICAL_PREMIUM_POSITIONS = {
     rotateX: 0,
     translateZ: 0,
     translateX: 0,
-    translateY: -6,
-    scale: 1.28,
+    translateY: -4,
+    scale: 1.24,
     opacity: 1,
     zIndex: 100,
     blur: 0,
@@ -112,7 +112,7 @@ const CANONICAL_PREMIUM_POSITIONS = {
     translateZ: -340,
     translateX: 430,
     translateY: 4,
-    scale: 0.84,
+    scale: 0.82,
     opacity: 0.84,
     zIndex: 90,
     blur: 0.5,
@@ -125,7 +125,7 @@ const CANONICAL_PREMIUM_POSITIONS = {
     translateZ: -640,
     translateX: 700,
     translateY: 12,
-    scale: 0.68,
+    scale: 0.66,
     opacity: 0.62,
     zIndex: 80,
     blur: 1.2,
@@ -138,7 +138,7 @@ const CANONICAL_PREMIUM_POSITIONS = {
     translateZ: -880,
     translateX: 920,
     translateY: 20,
-    scale: 0.54,
+    scale: 0.52,
     opacity: 0.4,
     zIndex: 70,
     blur: 2,
@@ -151,7 +151,7 @@ const CANONICAL_PREMIUM_POSITIONS = {
     translateZ: -1120,
     translateX: 1080,
     translateY: 28,
-    scale: 0.42,
+    scale: 0.4,
     opacity: 0.12,
     zIndex: 60,
     blur: 2.8,
@@ -234,8 +234,8 @@ const MOBILE_POSITIONS = {
     rotateX: 0,
     translateZ: 0,
     translateX: 0,
-    translateY: -6,
-    scale: 1.28,
+    translateY: -4,
+    scale: 1.2,
     opacity: 1,
     zIndex: 100,
     blur: 0,
@@ -248,7 +248,7 @@ const MOBILE_POSITIONS = {
     translateZ: -280,
     translateX: 280,
     translateY: 4,
-    scale: 0.84,
+    scale: 0.82,
     opacity: 0.84,
     zIndex: 90,
     blur: 0.5,
@@ -261,7 +261,7 @@ const MOBILE_POSITIONS = {
     translateZ: -520,
     translateX: 470,
     translateY: 12,
-    scale: 0.66,
+    scale: 0.64,
     opacity: 0.62,
     zIndex: 80,
     blur: 1.2,
@@ -274,7 +274,7 @@ const MOBILE_POSITIONS = {
     translateZ: -760,
     translateX: 650,
     translateY: 20,
-    scale: 0.52,
+    scale: 0.5,
     opacity: 0.4,
     zIndex: 70,
     blur: 2,
@@ -295,6 +295,108 @@ const MOBILE_POSITIONS = {
     saturate: 0.8
   }
 };
+
+function buildCanonicalPositions(centerScale, centerTranslateY) {
+  if (!Number.isFinite(centerScale) && !Number.isFinite(centerTranslateY)) {
+    return CANONICAL_PREMIUM_POSITIONS;
+  }
+
+  const resolvedScale = Number.isFinite(centerScale)
+    ? centerScale
+    : CANONICAL_PREMIUM_POSITIONS.center.scale;
+  const resolvedTranslateY = Number.isFinite(centerTranslateY)
+    ? centerTranslateY
+    : CANONICAL_PREMIUM_POSITIONS.center.translateY;
+
+  return {
+    ...CANONICAL_PREMIUM_POSITIONS,
+    center: {
+      ...CANONICAL_PREMIUM_POSITIONS.center,
+      scale: resolvedScale,
+      translateY: resolvedTranslateY
+    }
+  };
+}
+
+function roundTo(value, digits = 2) {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+}
+
+function buildAboutNoHeaderBalancedPositions(centerScale, centerTranslateY, viewportWidth) {
+  const base = buildCanonicalPositions(centerScale, centerTranslateY);
+  const widthFactor = clamp((viewportWidth - 360) / 900, 0, 1);
+  const wideScreenFactor = clamp((viewportWidth - 1600) / 420, 0, 1);
+  const spreadFactor = 0.45 + (0.55 * widthFactor);
+  const depthFactor = 0.6 + (0.4 * widthFactor);
+  const angleFactor = 0.76 + (0.24 * widthFactor);
+  const compactScaleBoost = (1 - widthFactor) * 0.06;
+  const wideScaleBoost = 0.02 * wideScreenFactor;
+  const wideRotateFactor = 1 - (0.08 * wideScreenFactor);
+  const wideSpreadFactor = 1 - (0.06 * wideScreenFactor);
+  const wideDepthFactor = 1 - (0.1 * wideScreenFactor);
+
+  const tune = (position, options) => {
+    const {
+      baseScale,
+      scaleWeight = 1,
+      wideScaleWeight = 1,
+      opacity = position.opacity,
+      rotateFactor = 1,
+      spreadFactorWeight = 1,
+      depthFactorWeight = 1
+    } = options;
+
+    return {
+      ...position,
+      scale: roundTo(baseScale + compactScaleBoost * scaleWeight + wideScaleBoost * wideScaleWeight, 4),
+      opacity,
+      rotateY: roundTo(position.rotateY * rotateFactor * angleFactor * wideRotateFactor, 2),
+      translateX: roundTo(position.translateX * spreadFactorWeight * spreadFactor * wideSpreadFactor, 2),
+      translateZ: roundTo(position.translateZ * depthFactorWeight * depthFactor * wideDepthFactor, 2)
+    };
+  };
+
+  return {
+    ...base,
+    adjacent1: tune(base.adjacent1, {
+      baseScale: 0.94,
+      scaleWeight: 1,
+      wideScaleWeight: 1,
+      opacity: 0.9,
+      rotateFactor: 0.88,
+      spreadFactorWeight: 0.92,
+      depthFactorWeight: 0.88
+    }),
+    adjacent2: tune(base.adjacent2, {
+      baseScale: 0.78,
+      scaleWeight: 0.82,
+      wideScaleWeight: 0.72,
+      opacity: 0.68,
+      rotateFactor: 0.88,
+      spreadFactorWeight: 0.88,
+      depthFactorWeight: 0.82
+    }),
+    adjacent3: tune(base.adjacent3, {
+      baseScale: 0.64,
+      scaleWeight: 0.66,
+      wideScaleWeight: 0.54,
+      opacity: 0.45,
+      rotateFactor: 0.88,
+      spreadFactorWeight: 0.86,
+      depthFactorWeight: 0.79
+    }),
+    far: tune(base.far, {
+      baseScale: 0.5,
+      scaleWeight: 0.45,
+      wideScaleWeight: 0.28,
+      opacity: 0.16,
+      rotateFactor: 0.88,
+      spreadFactorWeight: 0.84,
+      depthFactorWeight: 0.76
+    })
+  };
+}
 
 function safeMatchMedia(query) {
   try {
@@ -1606,7 +1708,7 @@ export class LuxuryCoverflow {
       enableScroll: true,
       enableSmoothTracking: this.motion.enableSmoothTracking,
       performanceTier: resolvedTier,
-      animationEase: 'power3.inOut',
+      animationEase: 'power2.inOut',
       surface: 'default',
       geometryProfile: this.isLuxurySectionSurface
         ? 'about-premium'
@@ -1645,7 +1747,9 @@ export class LuxuryCoverflow {
     this.wheelState = {
       accumulator: 0,
       previewPosition: this.currentIndex,
-      settleTimeout: null
+      settleTimeout: null,
+      axisLock: null,
+      lastInputAt: 0
     };
     this.dragState = {
       isDragging: false,
@@ -1654,6 +1758,7 @@ export class LuxuryCoverflow {
       currentX: 0,
       currentY: 0,
       axisLocked: null,
+      startPosition: this.currentIndex,
       startIndex: this.currentIndex,
       previewPosition: this.currentIndex,
       rafPending: false,
@@ -1670,6 +1775,8 @@ export class LuxuryCoverflow {
       snapThreshold: 0.25,
       velocityMultiplier: 2.2
     });
+    this.viewportTuning = null;
+    this.applyViewportTuning();
     this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
     this.dots = [];
     this.dotTargets = [];
@@ -1769,6 +1876,7 @@ export class LuxuryCoverflow {
 
     this.buildDots();
     this.updateAllItems(this.currentIndex, 0);
+    this.resources.raf(() => this.syncStageBounds());
     this.setupKeyboardNavigation();
     this.setupPointerInteractions();
     this.setupTouchInteractions();
@@ -1787,6 +1895,50 @@ export class LuxuryCoverflow {
     this.announceCurrentSlide();
   }
 
+  resolveViewportTuning() {
+    const isNoHeaderSurface = this.container.classList.contains('coverflow-section--no-header');
+    if (!isNoHeaderSurface) return null;
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    let activeScale = CANONICAL_PREMIUM_POSITIONS.center.scale;
+
+    if (viewportHeight <= 940) activeScale = 1.23;
+    if (viewportHeight <= 860 || (viewportWidth <= 1200 && viewportHeight <= 920)) activeScale = 1.2;
+    if (viewportHeight <= 780 || (viewportWidth <= 1100 && viewportHeight <= 900)) activeScale = 1.16;
+    if (viewportHeight <= 760 || (viewportWidth <= 1180 && viewportHeight <= 820)) {
+      activeScale = Math.min(activeScale, 1.13);
+    }
+    if (viewportWidth <= 640) activeScale = viewportHeight <= 720 ? 1.11 : 1.14;
+    if (viewportWidth <= 430 && viewportHeight <= 700) {
+      activeScale = Math.min(activeScale, 1.1);
+    }
+
+    const clampedScale = clamp(activeScale, 1.1, CANONICAL_PREMIUM_POSITIONS.center.scale);
+    const scaleDelta = CANONICAL_PREMIUM_POSITIONS.center.scale - clampedScale;
+    let centerTranslateY = CANONICAL_PREMIUM_POSITIONS.center.translateY - Math.round(scaleDelta * 68);
+    if (viewportHeight <= 760) centerTranslateY += 4;
+    if (viewportWidth <= 430 && viewportHeight <= 700) centerTranslateY += 8;
+    centerTranslateY = clamp(centerTranslateY, -16, 8);
+
+    return {
+      activeScale: clampedScale,
+      centerTranslateY
+    };
+  }
+
+  applyViewportTuning() {
+    this.viewportTuning = this.resolveViewportTuning();
+
+    if (!this.viewportTuning) {
+      this.container.style.removeProperty('--coverflow-active-scale');
+      return;
+    }
+
+    const roundedScale = Math.round(this.viewportTuning.activeScale * 1000) / 1000;
+    this.container.style.setProperty('--coverflow-active-scale', String(roundedScale));
+  }
+
   getEngineConfig() {
     const isCompactViewport = window.innerWidth < 960;
     const isCanonicalGeometry = this.config.geometryProfile === 'about-premium'
@@ -1797,7 +1949,21 @@ export class LuxuryCoverflow {
     };
 
     if (isCanonicalGeometry) {
-      config.positions = CANONICAL_PREMIUM_POSITIONS;
+      const tuning = this.viewportTuning || this.resolveViewportTuning();
+      const isNoHeaderSurface = this.container.classList.contains('coverflow-section--no-header');
+      if (isNoHeaderSurface) {
+        const resolvedScale = tuning?.activeScale ?? CANONICAL_PREMIUM_POSITIONS.center.scale;
+        const resolvedTranslateY = tuning?.centerTranslateY ?? CANONICAL_PREMIUM_POSITIONS.center.translateY;
+        config.positions = buildAboutNoHeaderBalancedPositions(
+          resolvedScale,
+          resolvedTranslateY,
+          window.innerWidth
+        );
+      } else {
+        config.positions = tuning
+          ? buildCanonicalPositions(tuning.activeScale, tuning.centerTranslateY)
+          : CANONICAL_PREMIUM_POSITIONS;
+      }
       return config;
     }
 
@@ -1987,6 +2153,39 @@ export class LuxuryCoverflow {
     });
   }
 
+  syncItemDescendantInteractivity(item, enabled) {
+    const interactiveNodes = item.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]');
+
+    interactiveNodes.forEach((node) => {
+      if (!node.hasAttribute('data-prev-tabindex')) {
+        node.setAttribute('data-prev-tabindex', node.hasAttribute('tabindex') ? node.getAttribute('tabindex') : '__none__');
+      }
+
+      if (enabled) {
+        const previousTabIndex = node.getAttribute('data-prev-tabindex');
+        if (previousTabIndex === '__none__') {
+          node.removeAttribute('tabindex');
+        } else {
+          node.setAttribute('tabindex', previousTabIndex);
+        }
+        if (node.tagName === 'A' && !node.hasAttribute('href') && node.hasAttribute('data-prev-href')) {
+          node.setAttribute('href', node.getAttribute('data-prev-href'));
+        }
+        node.style.removeProperty('pointer-events');
+        return;
+      }
+
+      if (node.tagName === 'A' && node.hasAttribute('href')) {
+        if (!node.hasAttribute('data-prev-href')) {
+          node.setAttribute('data-prev-href', node.getAttribute('href'));
+        }
+        node.removeAttribute('href');
+      }
+      node.setAttribute('tabindex', '-1');
+      node.style.setProperty('pointer-events', 'none');
+    });
+  }
+
   applyItemState(item, index, centerIndex, transform) {
     const roundedCenter = normalizeIndex(Math.round(centerIndex), this.items.length, this.config.infiniteLoop);
     const distance = getDistance(index, centerIndex, this.items.length, this.config.infiniteLoop);
@@ -2001,6 +2200,7 @@ export class LuxuryCoverflow {
     item.setAttribute('aria-hidden', hidden ? 'true' : 'false');
     item.setAttribute('aria-label', `${this.resolveItemTitle(item, index)} (${index + 1} of ${this.items.length})`);
     item.tabIndex = isCenter ? 0 : -1;
+    this.syncItemDescendantInteractivity(item, isCenter);
 
     gsap.set(item, { zIndex: transform.zIndex });
   }
@@ -2035,11 +2235,13 @@ export class LuxuryCoverflow {
     };
 
     if (durationMs === 0) {
-      this.previewIndex = centerIndex;
-      this.wheelState.previewPosition = centerIndex;
-      applyTransforms(centerIndex);
-      this.updatePagination(centerIndex);
-      this.emitSlideChange(this.getNearestIndex(centerIndex));
+      const settledPosition = this.currentIndex;
+      this.previewIndex = settledPosition;
+      this.wheelState.previewPosition = settledPosition;
+      applyTransforms(settledPosition);
+      this.updatePagination(settledPosition);
+      this.emitSlideChange(this.getNearestIndex(settledPosition));
+      this.syncStageBounds();
       this.finishAnimation(cycleId);
       return;
     }
@@ -2060,14 +2262,17 @@ export class LuxuryCoverflow {
         this.updatePagination(tweenState.position);
       },
       onComplete: () => {
-        this.previewIndex = centerIndex;
-        this.wheelState.previewPosition = centerIndex;
-        applyTransforms(centerIndex);
-        this.updatePagination(centerIndex);
+        const settledPosition = this.currentIndex;
+        this.previewIndex = settledPosition;
+        this.wheelState.previewPosition = settledPosition;
+        applyTransforms(settledPosition);
+        this.updatePagination(settledPosition);
         this.emitSlideChange(this.currentIndex);
+        this.syncStageBounds();
         this.finishAnimation(cycleId);
       },
       onInterrupt: () => {
+        this.syncStageBounds();
         this.finishAnimation(cycleId);
       }
     });
@@ -2119,6 +2324,8 @@ export class LuxuryCoverflow {
     const currentNearest = this.getNearestIndex();
 
     if (normalizedTarget === currentNearest && durationMs !== 0 && Math.abs(continuousTarget - (this.previewIndex ?? this.currentIndex)) < 0.001) {
+      this.previewIndex = normalizedTarget;
+      this.wheelState.previewPosition = normalizedTarget;
       return;
     }
 
@@ -2133,7 +2340,7 @@ export class LuxuryCoverflow {
   getDiscreteNavigationDuration() {
     // Gallery carousels use the full slideMs for smooth cinematic transitions
     if (this.config.surface === 'luxury-coverflow') return this.motion.slideMs;
-    return 180;
+    return Math.min(220, this.motion.slideMs || 220);
   }
 
   next() {
@@ -2173,6 +2380,8 @@ export class LuxuryCoverflow {
     this.resources.clearTimeout(this.wheelState.settleTimeout);
     this.wheelState.accumulator = 0;
     this.wheelState.previewPosition = this.currentIndex;
+    this.wheelState.axisLock = null;
+    this.wheelState.lastInputAt = 0;
     this.previewIndex = this.currentIndex;
     this.pendingTarget = null;
     this.isAnimating = false;
@@ -2316,15 +2525,46 @@ export class LuxuryCoverflow {
   setupWheelNavigation() {
     if (!this.config.enableScroll) return;
 
+    const WHEEL_SEQUENCE_GAP_MS = 160;
+    const HORIZONTAL_INTENT_MIN_DELTA = 1;
+    const HORIZONTAL_INTENT_RATIO = 0.65;
+    const STRONG_HORIZONTAL_MIN_DELTA = 6;
+    const VERTICAL_RELEASE_MIN_DELTA = 10;
+    const VERTICAL_RELEASE_RATIO = 1.8;
+
     const handleWheel = (event) => {
       if (this.roulette?.isActive) return;
+      if (event.ctrlKey) return;
+
+      const now = performance.now();
+      if (now - this.wheelState.lastInputAt > WHEEL_SEQUENCE_GAP_MS) {
+        this.wheelState.axisLock = null;
+      }
+      this.wheelState.lastInputAt = now;
 
       const absX = Math.abs(event.deltaX);
       const absY = Math.abs(event.deltaY);
-      const isHorizontalIntent = absX >= 6 && absX > absY * 1.15;
-      if (!isHorizontalIntent || !event.cancelable) return;
 
-      event.preventDefault();
+      if (this.wheelState.axisLock !== 'horizontal') {
+        const hasHorizontalDelta = absX >= HORIZONTAL_INTENT_MIN_DELTA;
+        const horizontalBias = hasHorizontalDelta && absX >= absY * HORIZONTAL_INTENT_RATIO;
+        const strongHorizontalIntent = absX >= STRONG_HORIZONTAL_MIN_DELTA && absX >= absY * 1.05;
+
+        if (!(strongHorizontalIntent || horizontalBias) || !event.cancelable) {
+          return;
+        }
+
+        this.wheelState.axisLock = 'horizontal';
+      }
+
+      if (absY >= VERTICAL_RELEASE_MIN_DELTA && absY > absX * VERTICAL_RELEASE_RATIO) {
+        this.wheelState.axisLock = null;
+        return;
+      }
+
+      if (event.cancelable) {
+        event.preventDefault();
+      }
       event.stopPropagation();
       this.stopAutoplay();
       this.wheelState.accumulator += event.deltaX;
@@ -2348,6 +2588,8 @@ export class LuxuryCoverflow {
         }
 
         this.wheelState.accumulator = 0;
+        this.wheelState.axisLock = null;
+        this.wheelState.lastInputAt = 0;
         this.goToSlide(targetIndex, { durationMs: this.motion.settleMs });
       }, 110);
     };
@@ -2361,6 +2603,18 @@ export class LuxuryCoverflow {
     if (target?.closest('button, a, [data-no-drag]')) return;
 
     this.dragSequence += 1;
+    const startPosition = this.currentIndex;
+    const startIndex = this.getNearestIndex(startPosition);
+
+    this.pendingTarget = null;
+    this.clearPositionTween();
+    this.resources.clearTimeout(this.animationTimeout);
+    this.animationTimeout = null;
+    this.isAnimating = false;
+    this.positionTween = null;
+    this.previewIndex = startPosition;
+    this.wheelState.previewPosition = startPosition;
+    this.updateContinuousPosition(startPosition);
 
     this.dragState = {
       isDragging: true,
@@ -2369,8 +2623,9 @@ export class LuxuryCoverflow {
       currentX: clientX,
       currentY: clientY,
       axisLocked: null,
-      startIndex: this.currentIndex,
-      previewPosition: this.currentIndex,
+      startPosition,
+      startIndex,
+      previewPosition: startPosition,
       sequence: this.dragSequence,
       rafPending: false,
       sourceTarget: target
@@ -2381,14 +2636,86 @@ export class LuxuryCoverflow {
     this.container.classList.add('is-dragging');
   }
 
+  resolveDragPreviewPosition(currentX = this.dragState.currentX) {
+    const startPosition = Number.isFinite(this.dragState.startPosition)
+      ? this.dragState.startPosition
+      : (Number.isFinite(this.previewIndex) ? this.previewIndex : this.currentIndex);
+    const deltaSlides = (this.dragState.startX - currentX) / this.motion.dragPixelsPerSlide;
+    const previewPosition = startPosition + deltaSlides;
+    if (this.config.infiniteLoop) return previewPosition;
+    return clamp(previewPosition, 0, this.items.length - 1);
+  }
+
+  resolveDragReleaseTarget() {
+    const DEAD_ZONE_DISTANCE = 0.24;
+    const DEAD_ZONE_VELOCITY = 0.0018;
+    const COMMIT_DISTANCE = 0.45;
+    const COMMIT_VELOCITY = 0.003;
+    const VELOCITY_PROJECTION_MS = 120;
+    const STRONG_DISTANCE_MULTI_SKIP = 2.8;
+    const MAX_SKIP_STEPS = 2;
+
+    const startPosition = Number.isFinite(this.dragState.startPosition)
+      ? this.dragState.startPosition
+      : this.currentIndex;
+    const startIndex = Number.isFinite(this.dragState.startIndex)
+      ? this.dragState.startIndex
+      : this.getNearestIndex(startPosition);
+    const releasePreview = this.resolveDragPreviewPosition(this.dragState.currentX);
+    const dragDeltaSlides = releasePreview - startPosition;
+    const velocitySlides = -(this.physics.velocity / this.motion.dragPixelsPerSlide);
+    const projectedPosition = releasePreview + velocitySlides * VELOCITY_PROJECTION_MS;
+    const projectedDeltaSlides = projectedPosition - startPosition;
+
+    let direction = Math.sign(projectedDeltaSlides);
+    if (direction === 0) direction = Math.sign(dragDeltaSlides);
+    if (direction === 0) direction = Math.sign(velocitySlides);
+
+    if (direction === 0) {
+      return startIndex;
+    }
+
+    const dragDistance = Math.abs(dragDeltaSlides);
+    const dragVelocity = Math.abs(velocitySlides);
+
+    if (dragDistance < DEAD_ZONE_DISTANCE && dragVelocity < DEAD_ZONE_VELOCITY) {
+      return startIndex;
+    }
+
+    const projectedDistance = Math.abs(projectedDeltaSlides);
+    if (projectedDistance < COMMIT_DISTANCE && dragVelocity < COMMIT_VELOCITY) {
+      return startIndex;
+    }
+
+    let stepCount = 1;
+    const allowMultiSkip = dragDistance >= STRONG_DISTANCE_MULTI_SKIP;
+    if (allowMultiSkip) {
+      stepCount = MAX_SKIP_STEPS;
+    }
+
+    const rawTargetIndex = startIndex + direction * stepCount;
+    if (this.config.infiniteLoop) {
+      return normalizeIndex(rawTargetIndex, this.items.length, true);
+    }
+    return clamp(rawTargetIndex, 0, this.items.length - 1);
+  }
+
   updateDrag(clientX, clientY) {
     if (!this.dragState.isDragging) return;
+
+    const AXIS_DECISION_THRESHOLD = 10;
+    const AXIS_LOCK_RATIO = 1.18;
 
     const absX = Math.abs(clientX - this.dragState.startX);
     const absY = Math.abs(clientY - this.dragState.startY);
     if (this.dragState.axisLocked == null) {
-      if (absX < 8 && absY < 8) return;
-      this.dragState.axisLocked = absX >= absY ? 'horizontal' : 'vertical';
+      if (absX < AXIS_DECISION_THRESHOLD && absY < AXIS_DECISION_THRESHOLD) return;
+
+      const horizontalIntent = absX >= AXIS_DECISION_THRESHOLD && absX > absY * AXIS_LOCK_RATIO;
+      const verticalIntent = absY >= AXIS_DECISION_THRESHOLD && absY > absX * AXIS_LOCK_RATIO;
+      if (!horizontalIntent && !verticalIntent) return;
+
+      this.dragState.axisLocked = horizontalIntent ? 'horizontal' : 'vertical';
       if (this.dragState.axisLocked === 'vertical') {
         this.dragState.isDragging = false;
         this.container.classList.remove('is-dragging');
@@ -2411,8 +2738,7 @@ export class LuxuryCoverflow {
         return;
       }
 
-      const delta = (this.dragState.startX - this.dragState.currentX) / this.motion.dragPixelsPerSlide;
-      const previewPosition = normalizeIndex(this.currentIndex + delta, this.items.length, this.config.infiniteLoop);
+      const previewPosition = this.resolveDragPreviewPosition(this.dragState.currentX);
       this.dragState.previewPosition = previewPosition;
       this.previewIndex = previewPosition;
       this.updateContinuousPosition(previewPosition);
@@ -2421,28 +2747,30 @@ export class LuxuryCoverflow {
   }
 
   endDrag() {
-    const deltaX = this.dragState.currentX - this.dragState.startX;
-    const velocity = this.physics.velocity;
-    const hasMeaningfulMovement = Math.abs(deltaX) >= 24 || Math.abs(velocity) > 0.2;
-    const direction = deltaX < 0 ? 1 : -1;
+    const dragDistancePx = Math.abs(this.dragState.currentX - this.dragState.startX);
     const startIndex = Number.isFinite(this.dragState.startIndex)
       ? this.dragState.startIndex
       : this.currentIndex;
-    const settledIndex = this.getNearestIndex(this.previewIndex);
-    const targetIndex = hasMeaningfulMovement
-      ? (settledIndex !== startIndex ? settledIndex : startIndex + direction)
-      : settledIndex;
+    const releasePreview = this.resolveDragPreviewPosition(this.dragState.currentX);
+    this.dragState.previewPosition = releasePreview;
+    this.previewIndex = releasePreview;
+
+    const targetIndex = this.resolveDragReleaseTarget();
+    const didChangeCard = targetIndex !== startIndex;
+
+    if (didChangeCard || dragDistancePx >= 10) {
+      // Touch browsers may emit a trailing click after a drag; suppress it briefly.
+      this.suppressClickUntil = performance.now() + 420;
+    }
 
     this.dragState.isDragging = false;
     this.dragState.axisLocked = null;
     this.dragState.sequence = null;
     this.dragState.rafPending = false;
+    this.dragState.startPosition = this.currentIndex;
     this.dragState.startIndex = this.currentIndex;
+    this.dragState.previewPosition = this.currentIndex;
     this.container.classList.remove('is-dragging');
-    if (hasMeaningfulMovement) {
-      // Touch browsers may emit a trailing click after a drag; suppress it briefly.
-      this.suppressClickUntil = performance.now() + 420;
-    }
     this.goToSlide(targetIndex, { durationMs: this.motion.settleMs });
   }
 
@@ -2535,9 +2863,11 @@ export class LuxuryCoverflow {
 
   setupResizeHandling() {
     const refresh = () => {
+      this.applyViewportTuning();
       this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
       this.updateAllItems(this.currentIndex, 0);
       this.roulette.refreshLayout();
+      this.syncStageBounds();
     };
 
     let resizeTimeout = null;
@@ -2565,6 +2895,27 @@ export class LuxuryCoverflow {
     }
   }
 
+  syncStageBounds() {
+    const stage = this.container.querySelector('.coverflow-container');
+    const active = this.items[this.currentIndex];
+    if (!stage || !active) return;
+
+    const safePadding = this.viewportTuning ? 10 : 16;
+    stage.style.setProperty('--coverflow-dynamic-height', '0px');
+    stage.style.setProperty('--coverflow-dynamic-top', '0px');
+    stage.style.setProperty('--coverflow-dynamic-bottom', '0px');
+
+    const stageRect = stage.getBoundingClientRect();
+    const activeRect = active.getBoundingClientRect();
+    const topOverflow = Math.max(0, stageRect.top + safePadding - activeRect.top);
+    const bottomOverflow = Math.max(0, activeRect.bottom - (stageRect.bottom - safePadding));
+    const neededHeight = Math.ceil(stageRect.height + topOverflow + bottomOverflow);
+
+    stage.style.setProperty('--coverflow-dynamic-top', `${Math.ceil(topOverflow)}px`);
+    stage.style.setProperty('--coverflow-dynamic-bottom', `${Math.ceil(bottomOverflow)}px`);
+    stage.style.setProperty('--coverflow-dynamic-height', `${neededHeight}px`);
+  }
+
   startAutoplay() {
     if (!this.config.autoplay || this.autoplayInterval) return;
     this.autoplayInterval = this.resources.interval(() => this.next(), this.config.autoplayDelay);
@@ -2587,9 +2938,11 @@ export class LuxuryCoverflow {
   }
 
   refreshLayout() {
+    this.applyViewportTuning();
     this.engine3D = new Coverflow3DEngine(this.getEngineConfig());
     this.updateAllItems(this.currentIndex, 0);
     this.roulette.refreshLayout();
+    this.syncStageBounds();
   }
 
   destroy() {

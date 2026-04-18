@@ -2,7 +2,7 @@
   "version": "page-grounding-v1",
   "source": "repo-crawl",
   "baseUrl": "https://www.estivanayramia.com",
-  "buildVersion": "20260402-aec5d88e",
+  "buildVersion": "20260415-119d1f46",
   "pageCount": 26,
   "pages": [
     {
@@ -13,7 +13,7 @@
       "pageType": "home",
       "title": "Estivan Ayramia | Built to Show More Than a Resume",
       "description": "A direct look at my work, how I think, and what I follow through on.",
-      "buildVersion": "20260402-aec5d88e",
+      "buildVersion": "20260415-119d1f46",
       "summary": "A direct look at my work, how I think, and what I follow through on.",
       "headings": [
         "Estivan Ayramia | Built to Show More Than a Resume",
@@ -509,16 +509,6 @@
         "About | Estivan Ayramia",
         "About Me",
         "Background, values, and working style first.",
-        "Core Values",
-        "Background",
-        "Working With Me",
-        "Gym & Strength Training",
-        "Photography",
-        "Car Enthusiasm",
-        "Cooking",
-        "Whispers (Sticky Notes)",
-        "Reading",
-        "Games",
         "Take the personal context back into the work."
       ],
       "links": [
@@ -536,7 +526,7 @@
         "/overview",
         "/contact"
       ],
-      "checksum": "fnv1a-380fae57",
+      "checksum": "fnv1a-56e62b88",
       "keywords": [
         "/about",
         "estivan",
@@ -552,19 +542,6 @@
         "working",
         "style",
         "first",
-        "core",
-        "gym",
-        "strength",
-        "training",
-        "photography",
-        "car",
-        "enthusiasm",
-        "cooking",
-        "whispers",
-        "sticky",
-        "notes",
-        "reading",
-        "games",
         "take",
         "personal",
         "context",
@@ -623,7 +600,7 @@
         {
           "heading": "Background, values, and working style first.",
           "level": 2,
-          "text": "Start anywhere. Together they show what shaped me and how I show up.",
+          "text": "Start anywhere. Together they show what shaped me and how I show up.\nCuriosity, execution, growth through discomfort. The principles that shape how I approach problems.\nChaldean heritage, four languages, family history, and the context I come from.\nClear communication, follow-through, and what people can expect if we work together.\nBuilding discipline through progressive overload. Tracking PRs, optimizing recovery.\niPhone shots that tell stories. No DSLR needed, just good lighting and better timing.\nFirst car, first freedom. About ownership, maintenance, pride of keeping something running clean.\nSteak, pasta, everything in between. Not a chef; just someone who refuses to eat mediocre food.\nRandom thoughts on sticky notes. Ideas, observations, reminders. Mental clutter organized.\nBooks are compressed experience. Cheapest way to access decades of wisdom.\nPersonal snapshots that capture identity, growth, and the moments behind the work.\nChess, strategy games, competitive thinking. Because even hobbies teach systems.\nKeep going",
           "keywords": [
             "background",
             "values",
@@ -635,16 +612,7 @@
             "together",
             "show",
             "shaped",
-            "up"
-          ]
-        },
-        {
-          "heading": "Core Values",
-          "level": 3,
-          "text": "Curiosity, execution, growth through discomfort. The principles that shape how I approach problems.",
-          "keywords": [
-            "core",
-            "values",
+            "up",
             "curiosity",
             "execution",
             "growth",
@@ -653,178 +621,11 @@
             "principles",
             "shape",
             "approach",
-            "problems"
-          ]
-        },
-        {
-          "heading": "Background",
-          "level": 3,
-          "text": "Chaldean heritage, four languages, family history, and the context I come from.",
-          "keywords": [
-            "background",
+            "problems",
             "chaldean",
             "heritage",
             "four",
-            "languages",
-            "family",
-            "history",
-            "context",
-            "come"
-          ]
-        },
-        {
-          "heading": "Working With Me",
-          "level": 3,
-          "text": "Clear communication, follow-through, and what people can expect if we work together.",
-          "keywords": [
-            "working",
-            "clear",
-            "communication",
-            "follow-through",
-            "people",
-            "can",
-            "expect",
-            "we",
-            "work",
-            "together"
-          ]
-        },
-        {
-          "heading": "Gym & Strength Training",
-          "level": 3,
-          "text": "Building discipline through progressive overload. Tracking PRs, optimizing recovery.",
-          "keywords": [
-            "gym",
-            "strength",
-            "training",
-            "building",
-            "discipline",
-            "through",
-            "progressive",
-            "overload",
-            "tracking",
-            "prs",
-            "optimizing",
-            "recovery"
-          ]
-        },
-        {
-          "heading": "Photography",
-          "level": 3,
-          "text": "iPhone shots that tell stories. No DSLR needed, just good lighting and better timing.",
-          "keywords": [
-            "photography",
-            "iphone",
-            "shots",
-            "tell",
-            "stories",
-            "no",
-            "dslr",
-            "needed",
-            "just",
-            "good",
-            "lighting",
-            "better",
-            "timing"
-          ]
-        },
-        {
-          "heading": "Car Enthusiasm",
-          "level": 3,
-          "text": "First car, first freedom. About ownership, maintenance, pride of keeping something running clean.",
-          "keywords": [
-            "car",
-            "enthusiasm",
-            "first",
-            "freedom",
-            "ownership",
-            "maintenance",
-            "pride",
-            "keeping",
-            "something",
-            "running",
-            "clean"
-          ]
-        },
-        {
-          "heading": "Cooking",
-          "level": 3,
-          "text": "Steak, pasta, everything in between. Not a chef; just someone who refuses to eat mediocre food.",
-          "keywords": [
-            "cooking",
-            "steak",
-            "pasta",
-            "everything",
-            "between",
-            "not",
-            "chef",
-            "just",
-            "someone",
-            "refuses",
-            "eat",
-            "mediocre",
-            "food"
-          ]
-        },
-        {
-          "heading": "Whispers (Sticky Notes)",
-          "level": 3,
-          "text": "Random thoughts on sticky notes. Ideas, observations, reminders. Mental clutter organized.",
-          "keywords": [
-            "whispers",
-            "sticky",
-            "notes",
-            "random",
-            "thoughts",
-            "ideas",
-            "observations",
-            "reminders",
-            "mental",
-            "clutter",
-            "organized"
-          ]
-        },
-        {
-          "heading": "Reading",
-          "level": 3,
-          "text": "Books are compressed experience. Cheapest way to access decades of wisdom.\nPersonal snapshots that capture identity, growth, and the moments behind the work.",
-          "keywords": [
-            "reading",
-            "books",
-            "compressed",
-            "experience",
-            "cheapest",
-            "way",
-            "access",
-            "decades",
-            "wisdom",
-            "personal",
-            "snapshots",
-            "capture",
-            "identity",
-            "growth",
-            "moments",
-            "behind",
-            "work"
-          ]
-        },
-        {
-          "heading": "Games",
-          "level": 3,
-          "text": "Chess, strategy games, competitive thinking. Because even hobbies teach systems.\nKeep going",
-          "keywords": [
-            "games",
-            "chess",
-            "strategy",
-            "competitive",
-            "thinking",
-            "because",
-            "even",
-            "hobbies",
-            "teach",
-            "systems",
-            "keep",
-            "going"
+            "languages"
           ]
         },
         {
@@ -1840,7 +1641,7 @@
     },
     {
       "route": "/ar/",
-      "canonical": "/ar/index",
+      "canonical": "/ar/",
       "sourceFile": "ar/index.html",
       "language": "ar",
       "pageType": "arabic",
@@ -3034,7 +2835,7 @@
     },
     {
       "route": "/es/",
-      "canonical": "/es/index",
+      "canonical": "/es/",
       "sourceFile": "es/index.html",
       "language": "es",
       "pageType": "spanish",
@@ -5440,7 +5241,7 @@
         },
         {
           "heading": "Not everything I have done. The pages that matter most.",
-          "level": 2,
+          "level": 1,
           "text": "Taken together, these pages tell you how I think faster\n than a resume does.\nCurrent set\n7 projects\nThe strongest projects to open first, not every old file in one pile.\nBrowse your way\nCoverflow + roulette\nThe page supports browsing, direct picks, and a quick random entry point.\nWhat connects them\nThe Isa Grimes interview reinforced that people judgment and perspective matter more than titles and theater. The Endpoint playbook showed how structure and positioning can shift a market story. Building this website with AI proved the same mindset works in product direction too.",
           "keywords": [
             "not",

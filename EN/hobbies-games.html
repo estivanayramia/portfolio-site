@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
     <!-- Meta Tags -->
@@ -21,12 +21,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin>
     
     <!-- Stylesheets -->
-    <link rel="stylesheet" href="/assets/css/style.css?v=ee8a696f">
-    <link rel="stylesheet" href="/theme.css?v=v20260119-5">
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=ee8a696f-v4">
+    <link rel="stylesheet" href="/assets/css/style.css?v=119d1f46">
+    <link rel="stylesheet" href="/theme.css?v=119d1f46">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=119d1f46">
     
     <!-- Main Site Logic (Chat, Theme, etc.) -->
-    <script src="/assets/js/site.min.js?v=ee8a696final-gallery-pass" defer></script>
+    <script src="/assets/js/site.min.js?v=119d1f46" defer></script>
     <script type="module" src="/assets/js/arcade/arcade-core.js"></script>
     <script type="module" src="/assets/js/arcade/achievements-ui.js"></script>
     
@@ -630,8 +630,6 @@
         .touch-btn.left { grid-area: left; }
         .touch-btn.right { grid-area: right; }
 
-        .hidden { display: none !important; }
-        
         /* ============================================
            Particle Effects
            ============================================ */
@@ -939,14 +937,14 @@
                                 <article class="coverflow-card" role="listitem" data-index="0" data-title="Snake">
                                     <div class="card-inner">
                                         <div class="card-image-container">
-                                            <div class="card-bg" style="background: linear-gradient(135deg, #0f5132, #14532d); font-size: 4rem;">🐍</div>
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #0f5132, #14532d);">🐍</div>
                                             <div class="card-image-overlay"></div>
                                         </div>
                                         <div class="card-content">
                                             <div class="card-category">Arcade Classic</div>
                                             <h3 class="card-title">Snake</h3>
                                             <p class="card-description">Classic reflex play with escalating speed, clean controls, and fast restart loops.</p>
-                                            <div id="snake-progress" class="text-xs text-white/70 mb-3"></div>
+                                            <div id="snake-progress" class="card-progress"></div>
                                             <div class="card-actions">
                                                 <a href="/hobbies-games/snake" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
                                             </div>
@@ -957,14 +955,14 @@
                                 <article class="coverflow-card" role="listitem" data-index="1" data-title="Block Breaker">
                                     <div class="card-inner">
                                         <div class="card-image-container">
-                                            <div class="card-bg" style="background: linear-gradient(135deg, #4c1d95, #7c3aed); font-size: 4rem;">🧱</div>
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #4c1d95, #7c3aed);">🧱</div>
                                             <div class="card-image-overlay"></div>
                                         </div>
                                         <div class="card-content">
                                             <div class="card-category">Precision</div>
                                             <h3 class="card-title">Block Breaker</h3>
                                             <p class="card-description">Momentum-heavy brick breaking with speed ramps, rebounds, and quick session pacing.</p>
-                                            <div id="breaker-progress" class="text-xs text-white/70 mb-3"></div>
+                                            <div id="breaker-progress" class="card-progress"></div>
                                             <div class="card-actions">
                                                 <a href="/hobbies-games/block-breaker" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
                                             </div>
@@ -975,14 +973,14 @@
                                 <article class="coverflow-card" role="listitem" data-index="2" data-title="2048">
                                     <div class="card-inner">
                                         <div class="card-image-container">
-                                            <div class="card-bg" style="background: linear-gradient(135deg, #1d4ed8, #0ea5e9); font-size: 4rem;">🧩</div>
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #1d4ed8, #0ea5e9);">🧩</div>
                                             <div class="card-image-overlay"></div>
                                         </div>
                                         <div class="card-content">
                                             <div class="card-category">Strategy</div>
                                             <h3 class="card-title">2048</h3>
                                             <p class="card-description">Clean merge logic, smooth board movement, and just enough tension to keep pushing one more run.</p>
-                                            <div id="merge-progress" class="text-xs text-white/70 mb-3"></div>
+                                            <div id="merge-progress" class="card-progress"></div>
                                             <div class="card-actions">
                                                 <a href="/hobbies-games/2048" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
                                             </div>
@@ -993,14 +991,14 @@
                                 <article class="coverflow-card" role="listitem" data-index="3" data-title="Space Invaders">
                                     <div class="card-inner">
                                         <div class="card-image-container">
-                                            <div class="card-bg" style="background: linear-gradient(135deg, #7f1d1d, #ef4444); font-size: 4rem;">👾</div>
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #7f1d1d, #ef4444);">👾</div>
                                             <div class="card-image-overlay"></div>
                                         </div>
                                         <div class="card-content">
                                             <div class="card-category">Survival</div>
                                             <h3 class="card-title">Space Invaders</h3>
                                             <p class="card-description">Wave defense under pressure with tight movement windows and a sharper arcade feel.</p>
-                                            <div id="invaders-progress" class="text-xs text-white/70 mb-3"></div>
+                                            <div id="invaders-progress" class="card-progress"></div>
                                             <div class="card-actions">
                                                 <a href="/hobbies-games/space-invaders" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
                                             </div>
@@ -1011,14 +1009,14 @@
                                 <article class="coverflow-card" role="listitem" data-index="4" data-title="Flappy Face">
                                     <div class="card-inner">
                                         <div class="card-image-container">
-                                            <div class="card-bg" style="background: linear-gradient(135deg, #1e1b4b, #7c3aed); font-size: 4rem;">😄</div>
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #1e1b4b, #7c3aed);">😄</div>
                                             <div class="card-image-overlay"></div>
                                         </div>
                                         <div class="card-content">
                                             <div class="card-category">Reflex</div>
                                             <h3 class="card-title">Flappy Face</h3>
                                             <p class="card-description">Tap to fly a cartoon face through golden pipes. Parallax sky, particle trails, and escalating difficulty.</p>
-                                            <div id="flappy-progress" class="text-xs text-white/70 mb-3">🏆 0/6 achievements | 🎮 High: 0</div>
+                                            <div id="flappy-progress" class="card-progress">Achievements 0/6 | High 0</div>
                                             <div class="card-actions">
                                                 <a href="/hobbies-games/flappy-face" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
                                             </div>
@@ -1029,14 +1027,14 @@
                                 <article class="coverflow-card" role="listitem" data-index="5" data-title="Color Match">
                                     <div class="card-inner">
                                         <div class="card-image-container">
-                                            <div class="card-bg" style="background: linear-gradient(135deg, #0c4a6e, #06b6d4); font-size: 4rem;">🎨</div>
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #0c4a6e, #06b6d4);">🎨</div>
                                             <div class="card-image-overlay"></div>
                                         </div>
                                         <div class="card-content">
                                             <div class="card-category">Speed</div>
                                             <h3 class="card-title">Color Match</h3>
                                             <p class="card-description">Stroop-effect reaction game. Match the ink color, not the word. Combos, fire effects, and 60-second rounds.</p>
-                                            <div id="colormatch-progress" class="text-xs text-white/70 mb-3">🏆 0/6 achievements | 🎮 High: 0</div>
+                                            <div id="colormatch-progress" class="card-progress">Achievements 0/6 | High 0</div>
                                             <div class="card-actions">
                                                 <a href="/hobbies-games/color-match" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
                                             </div>
@@ -1047,14 +1045,14 @@
                                 <article class="coverflow-card" role="listitem" data-index="6" data-title="Gravity Runner">
                                     <div class="card-inner">
                                         <div class="card-image-container">
-                                            <div class="card-bg" style="background: linear-gradient(135deg, #064e3b, #10b981); font-size: 4rem;">🏃</div>
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #064e3b, #10b981);">🏃</div>
                                             <div class="card-image-overlay"></div>
                                         </div>
                                         <div class="card-content">
                                             <div class="card-category">Endless Runner</div>
                                             <h3 class="card-title">Gravity Runner</h3>
                                             <p class="card-description">Flip gravity to dodge obstacles on floor and ceiling. Cyberpunk visuals, power-ups, and rising speed.</p>
-                                            <div id="gravrunner-progress" class="text-xs text-white/70 mb-3">🏆 0/6 achievements | 🎮 High: 0</div>
+                                            <div id="gravrunner-progress" class="card-progress">Achievements 0/6 | High 0</div>
                                             <div class="card-actions">
                                                 <a href="/hobbies-games/gravity-runner" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
                                             </div>
@@ -1065,14 +1063,14 @@
                                 <article class="coverflow-card" role="listitem" data-index="7" data-title="Hex Memory">
                                     <div class="card-inner">
                                         <div class="card-image-container">
-                                            <div class="card-bg" style="background: linear-gradient(135deg, #312e81, #8b5cf6); font-size: 4rem;">⬡</div>
+                                            <div class="card-bg" style="background: linear-gradient(135deg, #312e81, #8b5cf6);">⬡</div>
                                             <div class="card-image-overlay"></div>
                                         </div>
                                         <div class="card-content">
                                             <div class="card-category">Memory</div>
                                             <h3 class="card-title">Hex Memory</h3>
                                             <p class="card-description">Simon-says on a hexagonal grid. Watch the sequence glow, then repeat it. Grid grows with each level.</p>
-                                            <div id="hexmemory-progress" class="text-xs text-white/70 mb-3">🏆 0/6 achievements | 🎮 High: 0</div>
+                                            <div id="hexmemory-progress" class="card-progress">Achievements 0/6 | High 0</div>
                                             <div class="card-actions">
                                                 <a href="/hobbies-games/hex-memory" class="card-link"><span>Play now</span><svg class="link-arrow" width="16" height="16" viewBox="0 0 16 16"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg></a>
                                             </div>
@@ -1083,9 +1081,17 @@
                         </div>
 
                         <div class="coverflow-controls" role="group" aria-label="Featured games navigation">
-                            <button class="coverflow-btn coverflow-btn-prev" type="button" aria-label="Previous featured game">←</button>
+                            <button class="coverflow-btn coverflow-btn-prev" type="button" aria-label="Previous featured game">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </button>
                             <div class="coverflow-pagination"><span class="pagination-current">1</span><span class="pagination-separator">/</span><span class="pagination-total">8</span></div>
-                            <button class="coverflow-btn coverflow-btn-next" type="button" aria-label="Next featured game">→</button>
+                            <button class="coverflow-btn coverflow-btn-next" type="button" aria-label="Next featured game">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                    <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </section>
@@ -4039,10 +4045,14 @@
         </button>
         <script type="module">
             import { LuxuryCoverflow } from '/assets/js/carousel/luxury-coverflow.min.js';
+            import { FEATURED_GAME_CARD_PREVIEWS } from '/assets/js/data/card-preview-manifest.mjs';
+            import { hydrateDocumentCardPreviews } from '/assets/js/carousel/card-preview-sync.mjs';
 
             const mountArcadeFeaturedCarousel = () => {
                 const carouselEl = document.getElementById('arcade-featured-carousel');
                 if (!carouselEl) return;
+
+                hydrateDocumentCardPreviews(FEATURED_GAME_CARD_PREVIEWS);
 
                 window.arcadeFeaturedCarousel = new LuxuryCoverflow('#arcade-featured-carousel', {
                     infiniteLoop: true,

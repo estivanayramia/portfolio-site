@@ -31,9 +31,12 @@ export function initDiagnosticsConsent() {
   try {
     const s = document.createElement("style");
     s.textContent = `
-      .diagnostics-consent-banner strong{color:#212842}
-      .diagnostics-consent-banner a.diagnostics-privacy-link{color:#3b82f6;text-decoration:underline;font-weight:600}
-      .diagnostics-consent-banner a.diagnostics-privacy-link:hover{color:#2563eb}
+      .diagnostics-consent-banner strong{color:#1b2338}
+      .diagnostics-consent-banner a.diagnostics-privacy-link{color:#1b2338;text-decoration:underline;font-weight:700;text-underline-offset:2px}
+      .diagnostics-consent-banner a.diagnostics-privacy-link:hover{color:#11182a}
+      [data-theme="dark"] .diagnostics-consent-banner strong{color:#0f1524}
+      [data-theme="dark"] .diagnostics-consent-banner a.diagnostics-privacy-link{color:#0f1524}
+      [data-theme="dark"] .diagnostics-consent-banner a.diagnostics-privacy-link:hover{color:#000}
     `;
     document.head.appendChild(s);
   } catch {}
@@ -185,13 +188,14 @@ export function initDiagnosticsConsent() {
 
     const title = document.createElement("div");
     title.style.fontWeight = "700";
-    title.style.color = "#212842";
+    title.style.color = "#1b2338";
     title.style.marginBottom = "4px";
     title.textContent = "Help Improve This Site?";
 
     const body = document.createElement("div");
     body.style.fontSize = "13px";
-    body.style.color = "rgba(54,32,23,0.85)";
+    body.style.lineHeight = "1.5";
+    body.style.color = "#2b2117";
     body.textContent = "Enable diagnostics to send error reports and performance metrics so I can fix bugs and improve reliability. Reports are used only to improve this site and are never sold. No passwords or payment details are collected. You can disable diagnostics at any time.";
 
     const links = document.createElement("div");
@@ -232,9 +236,9 @@ export function initDiagnosticsConsent() {
     btnNo.textContent = "No thanks";
     btnNo.style.padding = "10px 12px";
     btnNo.style.borderRadius = "10px";
-    btnNo.style.border = "1px solid rgba(54,32,23,0.20)";
-    btnNo.style.background = "transparent";
-    btnNo.style.color = "#362017";
+    btnNo.style.border = "1px solid rgba(27,35,56,0.45)";
+    btnNo.style.background = "rgba(255,255,255,0.72)";
+    btnNo.style.color = "#1b2338";
     btnNo.style.fontWeight = "600";
     btnNo.style.cursor = "pointer";
     btnNo.style.minHeight = "44px";
