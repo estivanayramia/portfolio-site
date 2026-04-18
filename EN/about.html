@@ -34,14 +34,14 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/headshot.webp" type="image/webp" fetchpriority="high">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=d1e7bc29">
+    <link rel="stylesheet" href="/assets/css/style.css?v=119d1f46">
     
-    <script src="/assets/js/site.min.js?v=d1e7bc29" defer></script>
+    <script src="/assets/js/site.min.js?v=119d1f46" defer></script>
     <!-- Theme CSS -->
     <noscript></noscript>
 
     <!-- Theme CSS - loads reliably for all viewports -->
-    <link rel="stylesheet" href="/theme.css?v=d1e7bc29">
+    <link rel="stylesheet" href="/theme.css?v=119d1f46">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -56,7 +56,7 @@
     
     <!-- Schema.org Person Markup -->
 <!-- Luxury Coverflow Carousel V4 -->
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=d1e7bc29">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=119d1f46">
                 <meta property="og:image" content="https://www.estivanayramia.com/assets/img/headshot.webp">
                 <meta name="twitter:image" content="https://www.estivanayramia.com/assets/img/headshot.webp">
 
@@ -195,8 +195,8 @@
                                 The projects matter. So does the person doing the work.
                             </p>
                             <div class="spine-inline-actions">
-                                <a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download class="resume-download-btn" aria-label="Download resume as PDF">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <a href="/assets/docs/Estivan-Ayramia-Resume.pdf" download class="resume-download-btn">
+                                    <svg class="w-5 h-5 mr-2" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                         <polyline points="7 10 12 15 17 10"></polyline>
                                         <line x1="12" y1="15" x2="12" y2="3"></line>
@@ -268,10 +268,9 @@
                     type="button" 
                     class="roulette-trigger-btn"
                     data-no-drag
-                    aria-label="Pick random card"
                     title="Feeling lucky? Let the roulette decide!"
                 >
-                    <svg class="roulette-icon" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <svg class="roulette-icon" aria-hidden="true" focusable="false" width="32" height="32" viewBox="0 0 32 32" fill="none">
                         <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
                         <circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="1" opacity="0.5"/>
                         <path d="M16 6 L16 10 M16 22 L16 26 M6 16 L10 16 M22 16 L26 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -282,10 +281,10 @@
                 </button>
                 
                 <div class="coverflow-perspective">
-                    <div class="coverflow-track" role="list">
+                    <div class="coverflow-track">
                         
                         <!-- Card 1: Core Values -->
-                        <article class="coverflow-card" role="listitem" data-index="0" data-title="Core Values">
+                        <article class="coverflow-card" data-index="0" data-title="Core Values">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -295,7 +294,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-category">Philosophy</div>
-                                    <h3 class="card-title">Core Values</h3>
+                                    <div class="card-title">Core Values</div>
                                     <p class="card-description">Curiosity, execution, growth through discomfort. The principles that shape how I approach problems.</p>
                                     <div class="card-actions">
                                         <a href="/about/values" class="card-link">
@@ -308,7 +307,7 @@
                         </article>
                         
                         <!-- Card 2: Background -->
-                        <article class="coverflow-card" role="listitem" data-index="1" data-title="Background">
+                        <article class="coverflow-card" data-index="1" data-title="Background">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -318,7 +317,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-category">Identity</div>
-                                    <h3 class="card-title">Background</h3>
+                                    <div class="card-title">Background</div>
                                     <p class="card-description">Chaldean heritage, four languages, family history, and the context I come from.</p>
                                     <div class="card-actions">
                                         <a href="/about/background" class="card-link">
@@ -331,7 +330,7 @@
                         </article>
                         
                         <!-- Card 3: Working With Me -->
-                        <article class="coverflow-card" role="listitem" data-index="2" data-title="Working With Me">
+                        <article class="coverflow-card" data-index="2" data-title="Working With Me">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -341,7 +340,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-category">Professional</div>
-                                    <h3 class="card-title">Working With Me</h3>
+                                    <div class="card-title">Working With Me</div>
                                     <p class="card-description">Clear communication, follow-through, and what people can expect if we work together.</p>
                                     <div class="card-actions">
                                         <a href="/about/working-with-me" class="card-link">
@@ -354,7 +353,7 @@
                         </article>
                         
                         <!-- Card 4: Gym -->
-                        <article class="coverflow-card" role="listitem" data-index="3" data-title="Gym & Strength Training">
+                        <article class="coverflow-card" data-index="3" data-title="Gym & Strength Training">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -364,7 +363,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-category">Physical</div>
-                                    <h3 class="card-title">Gym & Strength Training</h3>
+                                    <div class="card-title">Gym & Strength Training</div>
                                     <p class="card-description">Building discipline through progressive overload. Tracking PRs, optimizing recovery.</p>
                                     <div class="card-actions">
                                         <a href="/hobbies/gym" class="card-link">
@@ -377,7 +376,7 @@
                         </article>
                         
                         <!-- Card 5: Photography -->
-                        <article class="coverflow-card" role="listitem" data-index="4" data-title="Photography">
+                        <article class="coverflow-card" data-index="4" data-title="Photography">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -387,7 +386,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-category">Creative</div>
-                                    <h3 class="card-title">Photography</h3>
+                                    <div class="card-title">Photography</div>
                                     <p class="card-description">iPhone shots that tell stories. No DSLR needed, just good lighting and better timing.</p>
                                     <div class="card-actions">
                                         <a href="/hobbies/photography" class="card-link">
@@ -400,7 +399,7 @@
                         </article>
                         
                         <!-- Card 6: Car -->
-                        <article class="coverflow-card" role="listitem" data-index="5" data-title="Car Enthusiasm">
+                        <article class="coverflow-card" data-index="5" data-title="Car Enthusiasm">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -410,7 +409,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-category">Mechanical</div>
-                                    <h3 class="card-title">Car Enthusiasm</h3>
+                                    <div class="card-title">Car Enthusiasm</div>
                                     <p class="card-description">First car, first freedom. About ownership, maintenance, pride of keeping something running clean.</p>
                                     <div class="card-actions">
                                         <a href="/hobbies/car" class="card-link">
@@ -423,7 +422,7 @@
                         </article>
                         
                         <!-- Card 7: Cooking -->
-                        <article class="coverflow-card" role="listitem" data-index="6" data-title="Cooking">
+                        <article class="coverflow-card" data-index="6" data-title="Cooking">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -433,7 +432,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-category">Culinary</div>
-                                    <h3 class="card-title">Cooking</h3>
+                                    <div class="card-title">Cooking</div>
                                     <p class="card-description">Steak, pasta, everything in between. Not a chef; just someone who refuses to eat mediocre food.</p>
                                     <div class="card-actions">
                                         <a href="/hobbies/cooking" class="card-link">
@@ -446,7 +445,7 @@
                         </article>
                         
                         <!-- Card 8: Whispers -->
-                        <article class="coverflow-card" role="listitem" data-index="7" data-title="Whispers">
+                        <article class="coverflow-card" data-index="7" data-title="Whispers">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -456,7 +455,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-category">Reflective</div>
-                                    <h3 class="card-title">Whispers (Sticky Notes)</h3>
+                                    <div class="card-title">Whispers (Sticky Notes)</div>
                                     <p class="card-description">Random thoughts on sticky notes. Ideas, observations, reminders. Mental clutter organized.</p>
                                     <div class="card-actions">
                                         <a href="/hobbies/whispers" class="card-link">
@@ -469,7 +468,7 @@
                         </article>
                         
                         <!-- Card 9: Reading -->
-                        <article class="coverflow-card" role="listitem" data-index="8" data-title="Reading">
+                        <article class="coverflow-card" data-index="8" data-title="Reading">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -479,7 +478,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-category">Intellectual</div>
-                                    <h3 class="card-title">Reading</h3>
+                                    <div class="card-title">Reading</div>
                                     <p class="card-description">Books are compressed experience. Cheapest way to access decades of wisdom.</p>
                                     <div class="card-actions">
                                         <a href="/hobbies/reading" class="card-link">
@@ -492,7 +491,7 @@
                         </article>
                         
                         <!-- Card 10: Me -->
-                        <article class="coverflow-card" role="listitem" data-index="9" data-title="Me">
+                        <article class="coverflow-card" data-index="9" data-title="Me">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -502,7 +501,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-category">Personal</div>
-                                    <h3 class="card-title">Me</h3>
+                                    <div class="card-title">Me</div>
                                     <p class="card-description">Personal snapshots that capture identity, growth, and the moments behind the work.</p>
                                     <div class="card-actions">
                                         <a href="/hobbies/me" class="card-link">
@@ -515,7 +514,7 @@
                         </article>
 
                         <!-- Card 11: Games -->
-                        <article class="coverflow-card" role="listitem" data-index="10" data-title="Games">
+                        <article class="coverflow-card" data-index="10" data-title="Games">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -525,7 +524,7 @@
                                 </div>
                                 <div class="card-content">
                                     <div class="card-category">Strategy</div>
-                                    <h3 class="card-title">Games</h3>
+                                    <div class="card-title">Games</div>
                                     <p class="card-description">Chess, strategy games, competitive thinking. Because even hobbies teach systems.</p>
                                     <div class="card-actions">
                                         <a href="/hobbies-games" class="card-link">

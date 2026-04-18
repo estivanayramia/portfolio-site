@@ -2908,8 +2908,8 @@ const __ensureStandardEnglishChrome = () => {
 
     const buildHeaderMarkup = () => `
         <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-4 md:py-5 flex items-center justify-between gap-2">
-          <a href="/" id="brand-logo" class="text-base sm:text-lg font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to home page">
-            <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-7 w-7 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
+          <a href="/" id="brand-logo" class="text-base sm:text-lg font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0">
+            <img src="/assets/img/logo-ea.webp" alt="" aria-hidden="true" focusable="false" class="h-7 w-7 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
             <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
           </a>
 
@@ -3014,7 +3014,7 @@ const __ensureStandardEnglishChrome = () => {
             <div class="grid md:grid-cols-3 gap-12 mb-12">
                 <div class="space-y-4">
                     <a href="/" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
-                        <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
+                        <img src="/assets/img/logo-ea.webp" alt="" aria-hidden="true" focusable="false" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
                     <p class="text-sm text-beige/80 leading-relaxed">San Diego State University Alumni with a bachelors in Business Administration. . Aspiring to achieve the best version of me, always.</p>

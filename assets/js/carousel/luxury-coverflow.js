@@ -2153,6 +2153,39 @@ export class LuxuryCoverflow {
     });
   }
 
+  syncItemDescendantInteractivity(item, enabled) {
+    const interactiveNodes = item.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]');
+
+    interactiveNodes.forEach((node) => {
+      if (!node.hasAttribute('data-prev-tabindex')) {
+        node.setAttribute('data-prev-tabindex', node.hasAttribute('tabindex') ? node.getAttribute('tabindex') : '__none__');
+      }
+
+      if (enabled) {
+        const previousTabIndex = node.getAttribute('data-prev-tabindex');
+        if (previousTabIndex === '__none__') {
+          node.removeAttribute('tabindex');
+        } else {
+          node.setAttribute('tabindex', previousTabIndex);
+        }
+        if (node.tagName === 'A' && !node.hasAttribute('href') && node.hasAttribute('data-prev-href')) {
+          node.setAttribute('href', node.getAttribute('data-prev-href'));
+        }
+        node.style.removeProperty('pointer-events');
+        return;
+      }
+
+      if (node.tagName === 'A' && node.hasAttribute('href')) {
+        if (!node.hasAttribute('data-prev-href')) {
+          node.setAttribute('data-prev-href', node.getAttribute('href'));
+        }
+        node.removeAttribute('href');
+      }
+      node.setAttribute('tabindex', '-1');
+      node.style.setProperty('pointer-events', 'none');
+    });
+  }
+
   applyItemState(item, index, centerIndex, transform) {
     const roundedCenter = normalizeIndex(Math.round(centerIndex), this.items.length, this.config.infiniteLoop);
     const distance = getDistance(index, centerIndex, this.items.length, this.config.infiniteLoop);
@@ -2167,6 +2200,7 @@ export class LuxuryCoverflow {
     item.setAttribute('aria-hidden', hidden ? 'true' : 'false');
     item.setAttribute('aria-label', `${this.resolveItemTitle(item, index)} (${index + 1} of ${this.items.length})`);
     item.tabIndex = isCenter ? 0 : -1;
+    this.syncItemDescendantInteractivity(item, isCenter);
 
     gsap.set(item, { zIndex: transform.zIndex });
   }
