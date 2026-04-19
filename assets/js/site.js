@@ -1074,6 +1074,16 @@ const initFormValidation = () => {
     const endpointFromData = (form.getAttribute('data-form-endpoint') || '').trim();
     const endpointFromAction = (form.getAttribute('action') || '').trim();
     const submitEndpoint = endpointFromData || endpointFromAction;
+    const requiresRecordedReceipt = form.getAttribute('data-receipt-required') === 'true';
+    const honeypotInput = form.querySelector('input[name="website_url"]');
+    const resolvedEndpointUrl = (() => {
+        try {
+            return submitEndpoint ? new URL(submitEndpoint, window.location.origin) : null;
+        } catch (_) {
+            return null;
+        }
+    })();
+    const isSameOriginEndpoint = !!(resolvedEndpointUrl && resolvedEndpointUrl.origin === window.location.origin);
 
     // Keep native fallback aligned with configured endpoint.
     if (endpointFromData && endpointFromAction !== endpointFromData) {
@@ -1251,6 +1261,11 @@ const initFormValidation = () => {
         setStatus('Sending your message...', 'pending');
         try {
             const formData = new FormData(form);
+            if (honeypotInput && honeypotInput.value.trim()) {
+                setStatus('Unable to submit. Please use the email link below if this keeps happening.', 'error');
+                setSubmitting(false);
+                return;
+            }
             // Validate file if present
             if (fileInput && fileInput.files && fileInput.files[0]) {
                 const f = fileInput.files[0];
@@ -1276,8 +1291,8 @@ const initFormValidation = () => {
                 method: 'POST',
                 body: formData,
                 headers: { 'Accept': 'application/json' },
-                mode: 'cors',
-                credentials: 'omit'
+                mode: isSameOriginEndpoint ? 'same-origin' : 'cors',
+                credentials: isSameOriginEndpoint ? 'same-origin' : 'omit'
             });
             let responseData = null;
             const contentType = (res.headers.get('content-type') || '').toLowerCase();
@@ -1292,13 +1307,23 @@ const initFormValidation = () => {
             const responseErrors = Array.isArray(responseData && responseData.errors)
                 ? responseData.errors.map((error) => error && error.message).filter(Boolean)
                 : [];
+            const receiptConfirmed = !requiresRecordedReceipt || (
+                responseData
+                && responseData.success === true
+                && responseData.recorded === true
+                && typeof responseData.receiptId === 'string'
+                && responseData.receiptId.length > 0
+                && responseData.upstream
+                && responseData.upstream.ok === true
+            );
 
-            if (res.ok && responseErrors.length === 0) {
+            if (res.ok && responseErrors.length === 0 && receiptConfirmed) {
                 form.reset();
                 inputs.forEach((input) => clearError(input));
+                if (honeypotInput) honeypotInput.value = '';
 
                 if (isContactStatus) {
-                    setStatus('Message sent successfully. Thanks for reaching out.', 'success');
+                    setStatus('Message received and recorded. Thanks for reaching out.', 'success');
                 } else {
                     // Preserve the easter egg behavior for legacy forms.
                     const card = form.parentElement;
@@ -1314,7 +1339,11 @@ const initFormValidation = () => {
             } else {
                 const responseErrorMessage = responseErrors.join(' ');
                 setStatus(
-                    responseErrorMessage || 'Sorry, something went wrong. Please try again or email hello@estivanayramia.com.',
+                    responseErrorMessage
+                        || (responseData && typeof responseData.message === 'string' && responseData.message.trim())
+                        || (requiresRecordedReceipt
+                            ? 'Your message could not be confirmed as received. Please try again or email hello@estivanayramia.com.'
+                            : 'Sorry, something went wrong. Please try again or email hello@estivanayramia.com.'),
                     'error'
                 );
             }
@@ -2908,8 +2937,8 @@ const __ensureStandardEnglishChrome = () => {
 
     const buildHeaderMarkup = () => `
         <nav class="max-w-7xl mx-auto px-6 lg:px-12 py-4 md:py-5 flex items-center justify-between gap-2">
-          <a href="/" id="brand-logo" class="text-base sm:text-lg font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0">
-            <img src="/assets/img/logo-ea.webp" alt="" aria-hidden="true" focusable="false" class="h-7 w-7 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
+          <a href="/" id="brand-logo" class="text-base sm:text-lg font-semibold text-indigodeep hover:text-chocolate transition-colors focus:outline-none focus:ring-2 focus:ring-indigodeep focus:ring-offset-2 focus:ring-offset-beige rounded inline-flex items-center shrink min-w-0" aria-label="Go to home page">
+            <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-7 w-7 mr-2 object-contain shrink-0" width="300" height="264" fetchpriority="high">
             <span translate="no" class="notranslate truncate">Estivan Ayramia</span>
           </a>
 
@@ -3014,7 +3043,7 @@ const __ensureStandardEnglishChrome = () => {
             <div class="grid md:grid-cols-3 gap-12 mb-12">
                 <div class="space-y-4">
                     <a href="/" class="flex items-center space-x-3 mb-4 hover:opacity-80 transition-opacity">
-                        <img src="/assets/img/logo-ea.webp" alt="" aria-hidden="true" focusable="false" class="h-12 w-12 object-contain" width="300" height="264">
+                        <img src="/assets/img/logo-ea.webp" alt="Estivan Ayramia logo" class="h-12 w-12 object-contain" width="300" height="264">
                         <h3 class="text-xl font-semibold text-white">Estivan Ayramia</h3>
                     </a>
                     <p class="text-sm text-beige/80 leading-relaxed">San Diego State University Alumni with a bachelors in Business Administration. . Aspiring to achieve the best version of me, always.</p>

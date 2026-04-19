@@ -28,17 +28,17 @@
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=80df5f67">
-    <link rel="preload" href="/assets/css/style.css?v=80df5f67" as="style">
-    <script src="/assets/js/site.min.js?v=80df5f67" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=71043ad5">
+    <link rel="preload" href="/assets/css/style.css?v=71043ad5" as="style">
+    <script src="/assets/js/site.min.js?v=71043ad5" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
     <!-- Theme CSS - loads reliably for all viewports -->
-    <link rel="stylesheet" href="/theme.css?v=80df5f67">
+    <link rel="stylesheet" href="/theme.css?v=71043ad5">
     
     <!-- Luxury Coverflow Carousel V4 -->
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=80df5f67">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=71043ad5">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -219,9 +219,10 @@
                     data-roulette-trigger="true"
                     data-no-drag
                     aria-haspopup="dialog"
+                    aria-label="Pick random project"
                     title="Feeling lucky? Let the roulette decide!"
                 >
-                    <svg class="roulette-icon" aria-hidden="true" focusable="false" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <svg class="roulette-icon" width="32" height="32" viewBox="0 0 32 32" fill="none">
                         <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
                         <circle cx="16" cy="16" r="10" stroke="currentColor" stroke-width="1" opacity="0.5"/>
                         <path d="M16 6 L16 10 M16 22 L16 26 M6 16 L10 16 M22 16 L26 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -232,10 +233,10 @@
                 </button>
                 
                 <div class="coverflow-perspective">
-                    <div class="coverflow-track">
+                    <div class="coverflow-track" role="list">
                         
                         <!-- Card 1: This Website -->
-                        <article class="coverflow-card" data-index="0" data-title="This Website">
+                        <article class="coverflow-card" role="listitem" data-index="0" data-title="This Website">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -258,7 +259,7 @@
                         </article>
                         
                         <!-- Card 2: Isa Grimes Interview -->
-                        <article class="coverflow-card" data-index="1" data-title="Isa Grimes Interview">
+                        <article class="coverflow-card" role="listitem" data-index="1" data-title="Isa Grimes Interview">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -281,7 +282,7 @@
                         </article>
                         
                         <!-- Card 3: L'Oréal Campaign -->
-                        <article class="coverflow-card" data-index="2" data-title="L'Oréal Campaign">
+                        <article class="coverflow-card" role="listitem" data-index="2" data-title="L'Oréal Campaign">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -304,7 +305,7 @@
                         </article>
                         
                         <!-- Card 4: Franklin Templeton -->
-                        <article class="coverflow-card" data-index="3" data-title="Franklin Templeton">
+                        <article class="coverflow-card" role="listitem" data-index="3" data-title="Franklin Templeton">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -327,7 +328,7 @@
                         </article>
                         
                         <!-- Card 5: EndPoint LinkedIn -->
-                        <article class="coverflow-card" data-index="4" data-title="EndPoint LinkedIn">
+                        <article class="coverflow-card" role="listitem" data-index="4" data-title="EndPoint LinkedIn">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -350,7 +351,7 @@
                         </article>
                         
                         <!-- Card 6: Elosity Launch Video -->
-                        <article class="coverflow-card" data-index="5" data-title="Elosity Launch Video">
+                        <article class="coverflow-card" role="listitem" data-index="5" data-title="Elosity Launch Video">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -373,7 +374,7 @@
                         </article>
                         
                         <!-- Card 7: Competitive Playbook -->
-                        <article class="coverflow-card" data-index="6" data-title="Competitive Playbook">
+                        <article class="coverflow-card" role="listitem" data-index="6" data-title="Competitive Playbook">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
@@ -630,7 +631,7 @@
     
     <!-- Luxury Coverflow Carousel V4 (GSAP-powered, Roulette-enabled) -->
     <script type="module">
-        import { LuxuryCoverflow } from '/assets/js/carousel/luxury-coverflow.min.js?v=80df5f67';
+        import { LuxuryCoverflow } from '/assets/js/carousel/luxury-coverflow.min.js?v=71043ad5';
         import { PROJECT_CARD_PREVIEWS } from '/assets/js/data/card-preview-manifest.mjs';
         import { hydrateDocumentCardPreviews } from '/assets/js/carousel/card-preview-sync.mjs';
 

@@ -926,7 +926,11 @@ class RouletteOverlayController {
       const background = buildPreviewBackground(previewImage, fallbackBackground);
       const title = item.dataset.title || item.querySelector('.card-title')?.textContent?.trim() || 'Project';
       const category = item.querySelector('.card-category')?.textContent?.trim() || 'Selected Work';
-      const link = item.querySelector('.card-link, a[href]')?.getAttribute('href') || '';
+      const linkNode = item.querySelector('.card-link, a[href], a[data-prev-href]');
+      const link = item.dataset.link
+        || linkNode?.getAttribute('href')
+        || linkNode?.getAttribute('data-prev-href')
+        || '';
       return { background, previewImage, title, category, link };
     });
 

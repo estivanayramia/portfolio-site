@@ -339,7 +339,18 @@
      * @returns {Promise<boolean>} - Whether audio started successfully
      */
     start: function (elapsed) {
-      if (isStarted || isDestroyed) return Promise.resolve(false);
+      if (isDestroyed) return Promise.resolve(false);
+      if (isStarted) {
+        if (masterGain && ctx && ctx.state === 'running') {
+          try {
+            var now = ctx.currentTime;
+            masterGain.gain.cancelScheduledValues(now);
+            masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+            masterGain.gain.linearRampToValueAtTime(isMuted ? 0.0001 : targetVolume, now + 0.05);
+          } catch (e) {}
+        }
+        return Promise.resolve(true);
+      }
       return resumeContext().then(function (running) {
         if (!running) return false;
         isStarted = true;

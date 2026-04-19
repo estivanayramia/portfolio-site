@@ -107,19 +107,28 @@
     if (audioAttempted || isComplete || isSkipping) return;
     var a = audio();
     if (!a || !a.isAvailable()) return;
+    if (a.isActive()) {
+      if (soundBtn) updateSoundButtonState();
+      return;
+    }
     audioAttempted = true;
     var elapsed = getElapsedSeconds();
     a.start(elapsed).then(function (ok) {
       if (ok && soundBtn) {
         updateSoundButtonState();
       }
+      if (!ok) {
+        audioAttempted = false;
+      }
+    }).catch(function () {
+      audioAttempted = false;
     });
   }
 
   function updateSoundButtonState() {
     if (!soundBtn) return;
     var a = audio();
-    var muted = a && a.isMuted();
+    var muted = !a || a.isMuted();
     var icon = soundBtn.querySelector('.sound-icon');
     if (icon) {
       icon.innerHTML = muted ? ICON_MUTED : ICON_UNMUTED;
@@ -330,8 +339,8 @@
       soundBtn = document.createElement('button');
       soundBtn.className = 'intro-player-btn intro-btn-sound';
       soundBtn.setAttribute('type', 'button');
-      soundBtn.setAttribute('aria-label', 'Turn sound on');
-      soundBtn.innerHTML = '<span class="sound-icon">' + ICON_MUTED + '</span>';
+      soundBtn.setAttribute('aria-label', 'Turn sound off');
+      soundBtn.innerHTML = '<span class="sound-icon">' + ICON_UNMUTED + '</span>';
       playerBarEl.appendChild(soundBtn);
     }
 
@@ -656,7 +665,7 @@
         var a = audio();
         if (!a) return;
         // First click: start audio if not started
-        if (!audioAttempted) {
+        if (!a.isActive()) {
           tryStartAudio();
           // Don't toggle mute on first click — first click unmutes
           return;
@@ -756,6 +765,7 @@
         if (timeline) {
           timeline.timeScale(TIMELINE_SPEED);
           timeline.play();
+          tryStartAudio();
         }
       } else {
         gsapRetries++;
@@ -772,6 +782,7 @@
                 var waited = gsapRetries * 0.05;
                 timeline.play();
                 timeline.time(Math.min(waited, 0.6)); // Skip past darkness phase
+                tryStartAudio();
               }
             } else {
               completeIntro(); // Fallback: reveal site

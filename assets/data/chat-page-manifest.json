@@ -2,7 +2,7 @@
   "version": "page-grounding-v1",
   "source": "repo-crawl",
   "baseUrl": "https://www.estivanayramia.com",
-  "buildVersion": "20260418-80df5f67",
+  "buildVersion": "20260418-71043ad5",
   "pageCount": 26,
   "pages": [
     {
@@ -13,7 +13,7 @@
       "pageType": "home",
       "title": "Estivan Ayramia | Built to Show More Than a Resume",
       "description": "A direct look at my work, how I think, and what I follow through on.",
-      "buildVersion": "20260418-80df5f67",
+      "buildVersion": "20260418-71043ad5",
       "summary": "A direct look at my work, how I think, and what I follow through on.",
       "headings": [
         "Estivan Ayramia | Built to Show More Than a Resume",
