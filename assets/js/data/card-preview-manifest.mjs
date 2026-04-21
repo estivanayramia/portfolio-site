@@ -453,10 +453,10 @@ export const ABOUT_CARD_PREVIEWS = [
     title: 'Games',
     description: 'Strategy, pattern recognition, and love of systems.',
     link: '/hobbies-games',
-    previewImage: `${CARD_PREVIEW_OUTPUT_DIR}/hobbies-games-cover.webp`,
+    previewImage: '/assets/img/Portolio-Media/Portfolio-Media/projects-/Arcade_Games.png',
     presentation: {
       fit: 'cover',
-      position: '50% 50%',
+      position: '50% 56%',
       contentPlacement: 'center',
       contentWidth: '84%',
       contentBottom: '0.98rem',
