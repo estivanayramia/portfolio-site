@@ -8,7 +8,7 @@
 // Precache only real clean routes and real asset paths.
 // Do not let one failed precache request abort install.
 // ==========================================================================
-const CACHE_VERSION = 'v20260420-07483ce2-dashboard-bypass';
+const CACHE_VERSION = 'v20260422-fc943c76-dashboard-bypass';
 const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
