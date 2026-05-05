@@ -22,6 +22,16 @@ function normalizeOptionalUrl(value) {
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
 
+function normalizeSubjectPart(value) {
+  return normalizeText(value).replace(/[\r\n]+/g, " ").replace(/\s+/g, " ").slice(0, 120);
+}
+
+function buildSubject(name, inquiryType) {
+  const sender = normalizeSubjectPart(name) || "website visitor";
+  const type = normalizeSubjectPart(inquiryType);
+  return type ? `Portfolio contact (${type}) from ${sender}` : `Portfolio contact from ${sender}`;
+}
+
 function isSafeUrl(value) {
   if (!value) return true;
   try {
@@ -69,6 +79,15 @@ async function putReceipt(env, key, value) {
   });
 }
 
+async function tryPutReceipt(env, key, value) {
+  try {
+    await putReceipt(env, key, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export async function onRequest(context) {
   const { request, env } = context;
 
@@ -100,6 +119,7 @@ export async function onRequest(context) {
     const link = normalizeOptionalUrl(formData.get("link"));
     const file = formData.get("file");
     const fileMeta = extractFileMeta(file);
+    const subject = buildSubject(name, inquiryType);
 
     if (!name || !email || !message) {
       return jsonReply(
@@ -169,6 +189,7 @@ export async function onRequest(context) {
       state: "received",
       submittedAt: new Date().toISOString(),
       formId: "mblbnwoy",
+      subject,
       name,
       email,
       inquiryType,
@@ -179,9 +200,10 @@ export async function onRequest(context) {
       ip: request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || ""
     };
 
-    await putReceipt(env, receiptKey, baseReceipt);
+    let receiptRecorded = await tryPutReceipt(env, receiptKey, baseReceipt);
 
     const upstreamFormData = new FormData();
+    upstreamFormData.set("subject", subject);
     upstreamFormData.set("name", name);
     upstreamFormData.set("email", email);
     upstreamFormData.set("message", message);
@@ -206,20 +228,16 @@ export async function onRequest(context) {
       && typeof upstreamBody.next === "string";
 
     if (!upstreamOk) {
-      try {
-        await putReceipt(env, receiptKey, {
-          ...baseReceipt,
-          state: "upstream_failed",
-          upstream: {
-            endpoint: FORMSPREE_ENDPOINT,
-            status: upstreamResponse.status,
-            ok: upstreamResponse.ok,
-            body: upstreamBody
-          }
-        });
-      } catch {
-        // Keep the original local receipt if enrichment fails.
-      }
+      receiptRecorded = (await tryPutReceipt(env, receiptKey, {
+        ...baseReceipt,
+        state: "upstream_failed",
+        upstream: {
+          endpoint: FORMSPREE_ENDPOINT,
+          status: upstreamResponse.status,
+          ok: upstreamResponse.ok,
+          body: upstreamBody
+        }
+      })) || receiptRecorded;
 
       const messageText = Array.isArray(upstreamBody?.errors)
         ? upstreamBody.errors.map((entry) => entry?.message).filter(Boolean).join(" ")
@@ -231,7 +249,7 @@ export async function onRequest(context) {
           error: "upstream_rejected",
           message: messageText,
           receiptId,
-          recorded: true,
+          recorded: receiptRecorded,
           upstream: {
             endpoint: FORMSPREE_ENDPOINT,
             status: upstreamResponse.status,
@@ -243,26 +261,22 @@ export async function onRequest(context) {
       );
     }
 
-    try {
-      await putReceipt(env, receiptKey, {
-        ...baseReceipt,
-        state: "forwarded",
-        forwardedAt: new Date().toISOString(),
-        upstream: {
-          endpoint: FORMSPREE_ENDPOINT,
-          status: upstreamResponse.status,
-          ok: true,
-          next: upstreamBody.next
-        }
-      });
-    } catch {
-      // The initial receipt is already stored; do not convert a delivered submission into a false failure.
-    }
+    receiptRecorded = (await tryPutReceipt(env, receiptKey, {
+      ...baseReceipt,
+      state: "forwarded",
+      forwardedAt: new Date().toISOString(),
+      upstream: {
+        endpoint: FORMSPREE_ENDPOINT,
+        status: upstreamResponse.status,
+        ok: true,
+        next: upstreamBody.next
+      }
+    })) || receiptRecorded;
 
     return jsonReply(
       {
         success: true,
-        recorded: true,
+        recorded: receiptRecorded,
         receiptId,
         upstream: {
           endpoint: FORMSPREE_ENDPOINT,
