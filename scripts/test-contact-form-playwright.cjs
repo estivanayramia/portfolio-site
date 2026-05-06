@@ -7,6 +7,7 @@ const CONTACT_URL = process.env.CONTACT_URL || DEFAULT_CONTACT_URL;
 const CONTACT_API_PATH = '/api/contact';
 const FORMSPREE_URL_PART = 'formspree.io/f/mblbnwoy';
 const MOCK_FORMSPREE = process.env.MOCK_FORMSPREE === '1';
+const EXPECT_DIRECT_FORMSPREE = process.env.EXPECT_DIRECT_FORMSPREE === '1';
 
 function fail(msg) {
   console.error(`FAIL: ${msg}`);
@@ -22,8 +23,8 @@ function fail(msg) {
 
   const consoleErrors = [];
   const requestFailures = [];
-  const contactApiPosts = [];
-  let contactApiResponse = null;
+  const submissionPosts = [];
+  let submissionResponse = null;
 
   page.on('console', (msg) => {
     if (msg.type() === 'error') consoleErrors.push(msg.text());
@@ -42,8 +43,11 @@ function fail(msg) {
   });
 
   page.on('request', (req) => {
-    if (req.method() === 'POST' && req.url().includes(CONTACT_API_PATH)) {
-      contactApiPosts.push(req.url());
+    if (
+      req.method() === 'POST'
+      && (req.url().includes(CONTACT_API_PATH) || req.url().includes(FORMSPREE_URL_PART))
+    ) {
+      submissionPosts.push(req.url());
     }
   });
 
@@ -55,7 +59,7 @@ function fail(msg) {
       'Access-Control-Max-Age': '86400',
     };
 
-    await page.route(`**${CONTACT_API_PATH}`, async (route) => {
+    await page.route(`**${EXPECT_DIRECT_FORMSPREE ? FORMSPREE_URL_PART : CONTACT_API_PATH}`, async (route) => {
       const req = route.request();
 
       if (req.method() === 'OPTIONS') {
@@ -67,29 +71,35 @@ function fail(msg) {
         status: 200,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          success: true,
-          recorded: true,
-          receiptId: `mock-receipt-${Date.now()}`,
-          upstream: {
-            endpoint: `https://${FORMSPREE_URL_PART}`,
-            status: 200,
-            ok: true,
-            next: '/thanks'
-          }
+          ok: true,
+          next: '/thanks',
+          ...(EXPECT_DIRECT_FORMSPREE
+            ? {}
+            : {
+                success: true,
+                recorded: true,
+                receiptId: `mock-receipt-${Date.now()}`,
+                upstream: {
+                  endpoint: `https://${FORMSPREE_URL_PART}`,
+                  status: 200,
+                  ok: true,
+                  next: '/thanks'
+                }
+              })
         }),
       });
     });
   }
 
   page.on('response', async (res) => {
-    if (res.url().includes(CONTACT_API_PATH)) {
+    if (res.url().includes(CONTACT_API_PATH) || res.url().includes(FORMSPREE_URL_PART)) {
       let body = null;
       try {
         body = await res.json();
       } catch (_) {
         body = null;
       }
-      contactApiResponse = { url: res.url(), status: res.status(), ok: res.ok(), body };
+      submissionResponse = { url: res.url(), status: res.status(), ok: res.ok(), body };
     }
   });
 
@@ -151,18 +161,27 @@ function fail(msg) {
     });
     if (!modalVisible) fail('Contact success modal should open after inline success.');
 
-    if (contactApiPosts.length !== 1) {
-      fail(`Expected exactly 1 contact API POST, saw ${contactApiPosts.length}.`);
+    if (submissionPosts.length !== 1) {
+      fail(`Expected exactly 1 contact submission POST, saw ${submissionPosts.length}.`);
     }
 
-    if (!contactApiResponse) fail('No network response observed to contact API endpoint.');
-    else if (!contactApiResponse.ok) fail(`Contact API response not ok (status=${contactApiResponse.status}).`);
-    else if (!contactApiResponse.body || contactApiResponse.body.success !== true || contactApiResponse.body.recorded !== true || !contactApiResponse.body.receiptId) {
-      fail(`Contact API did not confirm a recorded receipt: ${JSON.stringify(contactApiResponse.body)}`);
-    } else if (!contactApiResponse.body.upstream || contactApiResponse.body.upstream.ok !== true || !String(contactApiResponse.body.upstream.endpoint || '').includes(FORMSPREE_URL_PART)) {
-      fail(`Contact API did not confirm the intended Formspree upstream: ${JSON.stringify(contactApiResponse.body)}`);
+    const postedToFormspree = submissionPosts[0] && submissionPosts[0].includes(FORMSPREE_URL_PART);
+    if (EXPECT_DIRECT_FORMSPREE && !postedToFormspree) {
+      fail(`Expected direct Formspree POST, saw ${submissionPosts[0]}`);
+    } else if (!EXPECT_DIRECT_FORMSPREE && postedToFormspree) {
+      fail(`Expected contact API POST, saw direct Formspree POST: ${submissionPosts[0]}`);
+    }
+
+    if (!submissionResponse) fail('No network response observed to contact submission endpoint.');
+    else if (!submissionResponse.ok) fail(`Contact submission response not ok (status=${submissionResponse.status}).`);
+    else if (EXPECT_DIRECT_FORMSPREE && (!submissionResponse.body || submissionResponse.body.ok !== true || typeof submissionResponse.body.next !== 'string')) {
+      fail(`Formspree did not confirm direct AJAX success: ${JSON.stringify(submissionResponse.body)}`);
+    } else if (!EXPECT_DIRECT_FORMSPREE && (!submissionResponse.body || submissionResponse.body.success !== true || submissionResponse.body.recorded !== true || !submissionResponse.body.receiptId)) {
+      fail(`Contact API did not confirm a recorded receipt: ${JSON.stringify(submissionResponse.body)}`);
+    } else if (!EXPECT_DIRECT_FORMSPREE && (!submissionResponse.body.upstream || submissionResponse.body.upstream.ok !== true || !String(submissionResponse.body.upstream.endpoint || '').includes(FORMSPREE_URL_PART))) {
+      fail(`Contact API did not confirm the intended Formspree upstream: ${JSON.stringify(submissionResponse.body)}`);
     } else {
-      console.log(`Contact API response: ${contactApiResponse.status} ok=${contactApiResponse.ok} receipt=${contactApiResponse.body.receiptId}`);
+      console.log(`Contact submission response: ${submissionResponse.status} ok=${submissionResponse.ok} endpoint=${submissionPosts[0]}`);
     }
   } catch (e) {
     try {
@@ -173,9 +192,9 @@ function fail(msg) {
       // ignore
     }
 
-    if (contactApiResponse) {
-      console.log(`Contact API response(at-fail): ${contactApiResponse.status} ok=${contactApiResponse.ok}`);
-      console.log(JSON.stringify(contactApiResponse.body));
+    if (submissionResponse) {
+      console.log(`Contact submission response(at-fail): ${submissionResponse.status} ok=${submissionResponse.ok}`);
+      console.log(JSON.stringify(submissionResponse.body));
     }
 
     fail(String(e));

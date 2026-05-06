@@ -1323,7 +1323,12 @@ const initFormValidation = () => {
                 if (honeypotInput) honeypotInput.value = '';
 
                 if (isContactStatus) {
-                    setStatus('Message received and recorded. Thanks for reaching out.', 'success');
+                    setStatus(
+                        requiresRecordedReceipt
+                            ? 'Message received and recorded. Thanks for reaching out.'
+                            : 'Message sent successfully. Thanks for reaching out.',
+                        'success'
+                    );
                 } else {
                     // Preserve the easter egg behavior for legacy forms.
                     const card = form.parentElement;
