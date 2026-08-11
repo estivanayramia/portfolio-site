@@ -8,8 +8,9 @@
 // Precache only real clean routes and real asset paths.
 // Do not let one failed precache request abort install.
 // ==========================================================================
-const CACHE_VERSION = 'v20260505-98faf63a-dashboard-bypass';
-const CACHE_NAME = `portfolio-${CACHE_VERSION}`;
+const CACHE_VERSION = 'v20260811-f33e874d-api-cache-isolation';
+const CACHE_PREFIX = 'portfolio-';
+const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 
 const PRECACHE_URLS = [
   '/',
@@ -66,7 +67,7 @@ self.addEventListener('activate', (event) => {
     caches.keys()
       .then((cacheNames) => Promise.all(
         cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
+          if (cache.startsWith(CACHE_PREFIX) && cache !== CACHE_NAME) {
             return caches.delete(cache);
           }
           return undefined;
@@ -78,7 +79,10 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-  if (!event.request.url.startsWith(self.location.origin)) return;
+
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname === '/api' || url.pathname.startsWith('/api/')) return;
 
   const request = event.request;
   const accept = request.headers.get('accept') || '';
@@ -90,13 +94,22 @@ self.addEventListener('fetch', (event) => {
     || request.destination === 'font';
 
   if (isHTML) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          return response;
+    const networkResult = fetch(request).then((response) => ({
+      cacheResponse: response.ok ? response.clone() : null,
+      response
+    }));
+    event.waitUntil(
+      networkResult
+        .then(async ({ cacheResponse }) => {
+          if (!cacheResponse) return;
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(request, cacheResponse);
         })
+        .catch(() => undefined)
+    );
+    event.respondWith(
+      networkResult
+        .then(({ response }) => response)
         .catch(async () => {
           const cached = await caches.match(request, { ignoreSearch: true });
           return cached || caches.match('/404.html');
@@ -105,24 +118,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  const networkResult = fetch(request)
+    .then((response) => ({
+      cacheResponse: response.status === 200 ? response.clone() : null,
+      response
+    }))
+    .catch(() => undefined);
+  event.waitUntil(
+    networkResult.then(async (result) => {
+      if (!result?.cacheResponse) return;
+      const cache = await caches.open(CACHE_NAME);
+      await cache.put(request, result.cacheResponse);
+    })
+  );
   event.respondWith(
     caches.match(request, { ignoreSearch: isStaticAsset })
-      .then((cachedResponse) => {
-        const networkFetch = fetch(request)
-          .then((response) => {
-            if (response && response.status === 200) {
-              const clone = response.clone();
-              caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-            }
-            return response;
-          })
-          .catch(() => undefined);
-
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        return networkFetch;
-      })
+      .then((cachedResponse) => cachedResponse || networkResult.then((result) => result?.response))
   );
 });
