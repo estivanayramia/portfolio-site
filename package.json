@@ -26,7 +26,7 @@
     "visual:baseline": "node scripts/visual-regression.mjs baseline",
     "visual:check": "node scripts/visual-regression.mjs check",
     "audit:lighthouse:gate": "node scripts/lighthouse-gate.mjs",
-    "build": "npm run build:version && npm run apply:versioning && npm run build:facts && npm run build:chat-grounding && npm run build:css && npm run build:js && npm run build:lazy && npm run build:telemetry && npm run build:hud && npm run build:luxury-coverflow && npm run upload:facts && npm run build:stage && npm run verify:pages && npm run verify:versioning",
+    "build": "npm run build:version && npm run apply:versioning && npm run build:facts && npm run build:chat-grounding && npm run build:css && npm run build:theme && npm run build:js && npm run build:lazy && npm run build:telemetry && npm run build:hud && npm run build:luxury-coverflow && npm run upload:facts && npm run build:stage && npm run verify:pages && npm run verify:versioning",
     "watch": "cross-env BROWSERSLIST_IGNORE_OLD_DATA=1 npx tailwindcss -i ./assets/css/input.css -o ./assets/css/style.css --watch",
     "start": "wrangler pages dev . --port 5500",
     "setup:hooks": "node tools/install-git-hooks.mjs",
