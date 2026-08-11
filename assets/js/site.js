@@ -535,6 +535,32 @@ window.tryGuardedReload = function(opts) {
  * - Uses [data-theme="dark"] selectors for dark mode styles
  * - Tailwind dark: variants work through theme.css overrides
  */
+const getSafeStorageItem = (storageName, key) => {
+    try {
+        return window[storageName]?.getItem(key) ?? null;
+    } catch (_) {
+        return null;
+    }
+};
+
+const setSafeStorageItem = (storageName, key, value) => {
+    try {
+        window[storageName]?.setItem(key, value);
+        return true;
+    } catch (_) {
+        return false;
+    }
+};
+
+const removeSafeStorageItem = (storageName, key) => {
+    try {
+        window[storageName]?.removeItem(key);
+        return true;
+    } catch (_) {
+        return false;
+    }
+};
+
 const initDarkMode = () => {
     const toggleButton = document.getElementById('theme-toggle');
     if (!toggleButton) return;
@@ -543,14 +569,14 @@ const initDarkMode = () => {
     const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
     // Check for saved theme preference or use system preference, fallback to light mode
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme = getSafeStorageItem('localStorage', 'theme');
     const currentTheme = savedTheme || (prefersDarkMode ? 'dark' : 'light');
     
     document.documentElement.setAttribute('data-theme', currentTheme);
     
     // Save the theme if it was auto-detected from system
     if (!savedTheme) {
-        localStorage.setItem('theme', currentTheme);
+        setSafeStorageItem('localStorage', 'theme', currentTheme);
     }
 
     // Set initial icon
@@ -562,7 +588,7 @@ const initDarkMode = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         
         document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
+        setSafeStorageItem('localStorage', 'theme', newTheme);
         
         // Update icon
         toggleButton.innerHTML = newTheme === 'dark' ? '<span style="color: #e1d4c2">☀️</span>' : '<span style="color: #212842">🌙</span>';
@@ -585,10 +611,10 @@ const initDarkMode = () => {
     // Listen for system theme changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
         // Only auto-switch if user hasn't manually set a preference
-        if (!localStorage.getItem('theme_manual')) {
+        if (!getSafeStorageItem('localStorage', 'theme_manual')) {
             const newTheme = e.matches ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+            setSafeStorageItem('localStorage', 'theme', newTheme);
             toggleButton.innerHTML = newTheme === 'dark' ? '<span style="color: #e1d4c2">☀️</span>' : '<span style="color: #212842">🌙</span>';
         }
     });
@@ -597,7 +623,7 @@ const initDarkMode = () => {
     toggleButton.addEventListener('click', () => {
         toggleTheme();
         // Mark that user has manually set theme preference
-        localStorage.setItem('theme_manual', 'true');
+        setSafeStorageItem('localStorage', 'theme_manual', 'true');
     });
 };
 
@@ -1394,10 +1420,10 @@ const initMiniGame = (rootId) => {
 
     const highKey = 'mgHighScore';
     const lbKey = 'mgLeaderboard';
-    const highScore = parseInt(localStorage.getItem(highKey) || '0', 10);
+    const highScore = parseInt(getSafeStorageItem('localStorage', highKey) || '0', 10);
     const loadLeaderboard = () => {
         try {
-            const raw = localStorage.getItem(lbKey);
+            const raw = getSafeStorageItem('localStorage', lbKey);
             if (!raw) return [];
             const parsed = JSON.parse(raw);
             if (!Array.isArray(parsed)) return [];
@@ -1405,7 +1431,7 @@ const initMiniGame = (rootId) => {
         } catch (_) { return []; }
     };
     const saveLeaderboard = (list) => {
-        try { localStorage.setItem(lbKey, JSON.stringify(list.slice(0,25))); } catch (_) {}
+        setSafeStorageItem('localStorage', lbKey, JSON.stringify(list.slice(0,25)));
     };
     let leaderboard = loadLeaderboard();
 
@@ -1605,7 +1631,7 @@ const initMiniGame = (rootId) => {
     const endGame = () => {
         state.running = false;
         if (state.score > state.best) {
-            state.best = state.score; localStorage.setItem(highKey, String(state.best));
+            state.best = state.score; setSafeStorageItem('localStorage', highKey, String(state.best));
             bestEl.textContent = state.best;
         }
         startBtn.textContent = 'Restart';
@@ -1923,11 +1949,15 @@ const initScrollToTop = () => {
 
         if (currentScroll > scrollThreshold) {
             scrollBtn.classList.add('show');
+            scrollBtn.tabIndex = 0;
+            scrollBtn.setAttribute('aria-hidden', 'false');
             scrollBtn.style.setProperty('opacity', '1', 'important');
             scrollBtn.style.setProperty('visibility', 'visible', 'important');
             scrollBtn.style.setProperty('pointer-events', 'auto', 'important');
         } else {
             scrollBtn.classList.remove('show');
+            scrollBtn.tabIndex = -1;
+            scrollBtn.setAttribute('aria-hidden', 'true');
             scrollBtn.style.setProperty('opacity', '0', 'important');
             scrollBtn.style.setProperty('visibility', 'hidden', 'important');
             scrollBtn.style.setProperty('pointer-events', 'none', 'important');
@@ -2169,7 +2199,7 @@ const initAchievements = () => {
     // Get achievements from storage
     const getAchievements = () => {
         try {
-            const stored = localStorage.getItem(STORAGE_KEY);
+            const stored = getSafeStorageItem('localStorage', STORAGE_KEY);
             return stored ? JSON.parse(stored) : {};
         } catch {
             return {};
@@ -2179,7 +2209,7 @@ const initAchievements = () => {
     // Save achievements to storage
     const saveAchievements = (unlocked) => {
         try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(unlocked));
+            setSafeStorageItem('localStorage', STORAGE_KEY, JSON.stringify(unlocked));
         } catch {}
     };
 
@@ -2206,10 +2236,10 @@ const initAchievements = () => {
         // can show site achievements consistently.
         try {
             const key = 'arcade_achievements';
-            const list = JSON.parse(localStorage.getItem(key) || '[]');
+            const list = JSON.parse(getSafeStorageItem('localStorage', key) || '[]');
             if (Array.isArray(list) && !list.includes(achievementId)) {
                 list.push(achievementId);
-                localStorage.setItem(key, JSON.stringify(list));
+                setSafeStorageItem('localStorage', key, JSON.stringify(list));
             }
             if (window.ArcadeAchievements && typeof window.ArcadeAchievements.updateUI === 'function') {
                 window.ArcadeAchievements.updateUI();
@@ -2305,12 +2335,12 @@ const initAchievements = () => {
     const trackPageVisit = () => {
         const visitedKey = 'portfolio_visited_pages';
         try {
-            const visited = JSON.parse(localStorage.getItem(visitedKey) || '[]');
+            const visited = JSON.parse(getSafeStorageItem('localStorage', visitedKey) || '[]');
             const currentPage = window.location.pathname.split('/').pop() || 'index.html';
             
             if (!visited.includes(currentPage)) {
                 visited.push(currentPage);
-                localStorage.setItem(visitedKey, JSON.stringify(visited));
+                setSafeStorageItem('localStorage', visitedKey, JSON.stringify(visited));
             }
 
             // Check if all main pages visited
@@ -2506,9 +2536,9 @@ const initPWA = () => {
                     try {
                         const key = 'sw_last_update_ts';
                         const now = Date.now();
-                        const last = parseInt(sessionStorage.getItem(key) || '0', 10);
+                        const last = parseInt(getSafeStorageItem('sessionStorage', key) || '0', 10);
                         if (!Number.isFinite(last) || now - last > 6 * 60 * 60 * 1000) {
-                            sessionStorage.setItem(key, String(now));
+                            setSafeStorageItem('sessionStorage', key, String(now));
                             registration.update().catch(() => {});
                         }
                     } catch (e) {}
@@ -3095,7 +3125,7 @@ const __safeJsonParse = (val, fallback) => {
 
 const __getPlayedGames = () => {
     try {
-        const raw = localStorage.getItem(__arcadeStorageKey);
+        const raw = getSafeStorageItem('localStorage', __arcadeStorageKey);
         const data = __safeJsonParse(raw, {});
         return (data && typeof data === 'object') ? data : {};
     } catch (e) {
@@ -3105,7 +3135,7 @@ const __getPlayedGames = () => {
 
 const __setPlayedGames = (obj) => {
     try {
-        localStorage.setItem(__arcadeStorageKey, JSON.stringify(obj || {}));
+        setSafeStorageItem('localStorage', __arcadeStorageKey, JSON.stringify(obj || {}));
     } catch (e) {}
 };
 
@@ -3207,8 +3237,8 @@ const __renderSuggestionGrid = (gridEl, opts) => {
 
     // Rotate / randomize: daily seed + per-page increment
     const day = Math.floor(now / 86400000);
-    const n = parseInt(sessionStorage.getItem('site_suggest_nonce') || '0', 10) || 0;
-    sessionStorage.setItem('site_suggest_nonce', String(n + 1));
+    const n = parseInt(getSafeStorageItem('sessionStorage', 'site_suggest_nonce') || '0', 10) || 0;
+    setSafeStorageItem('sessionStorage', 'site_suggest_nonce', String(n + 1));
     const seed = (day * 1000) + n + __hashString(String(window.location.pathname || '/'));
     const rnd = __mulberry32(seed);
 
@@ -3559,11 +3589,44 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSending = false; // Prevent duplicate sends
     let isInitialized = false;
     let lastChatFocusedEl = null;
+    const chatInertState = new Map();
 
     const historyStorageKey = `savonie_history:${pageLang}`;
     const legacySessionHistoryStorageKey = `savonie_history:${pageLang}:${window.location.pathname || '/'}`;
     const MAX_HISTORY_ITEMS = 50;
     const CHAT_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    function setChatBackgroundInert(shouldInert) {
+        if (!shouldInert) {
+            chatInertState.forEach((state, node) => {
+                node.inert = state.inert;
+                if (state.ariaHidden === null) {
+                    node.removeAttribute('aria-hidden');
+                } else {
+                    node.setAttribute('aria-hidden', state.ariaHidden);
+                }
+            });
+            chatInertState.clear();
+            return;
+        }
+
+        const makeInert = (node) => {
+            if (!node || chatInertState.has(node)) return;
+            chatInertState.set(node, {
+                inert: node.inert,
+                ariaHidden: node.getAttribute('aria-hidden')
+            });
+            node.inert = true;
+            node.setAttribute('aria-hidden', 'true');
+        };
+
+        Array.from(document.body.children).forEach((node) => {
+            if (node === els.widget || node.tagName === 'SCRIPT') return;
+            makeInert(node);
+        });
+        makeInert(els.toggleBtn);
+        makeInert(els.bubble);
+    }
 
     function syncChatA11yState(isOpen) {
         if (els.window) {
@@ -3573,6 +3636,7 @@ document.addEventListener('DOMContentLoaded', () => {
             els.toggleBtn.setAttribute('aria-controls', 'chat-window');
             els.toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         }
+        setChatBackgroundInert(isOpen);
     }
 
     function handleChatFocusTrap(e) {
@@ -3682,19 +3746,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 1. Initialize - restore shared session history across pages
     try { 
-        let saved = localStorage.getItem(historyStorageKey);
+        let saved = getSafeStorageItem('localStorage', historyStorageKey);
         if (!saved) {
-            saved = sessionStorage.getItem(historyStorageKey);
+            saved = getSafeStorageItem('sessionStorage', historyStorageKey);
             if (saved) {
-                localStorage.setItem(historyStorageKey, saved);
-                sessionStorage.removeItem(historyStorageKey);
+                setSafeStorageItem('localStorage', historyStorageKey, saved);
+                removeSafeStorageItem('sessionStorage', historyStorageKey);
             }
         }
         if (!saved) {
-            saved = sessionStorage.getItem(legacySessionHistoryStorageKey);
+            saved = getSafeStorageItem('sessionStorage', legacySessionHistoryStorageKey);
             if (saved) {
-                localStorage.setItem(historyStorageKey, saved);
-                sessionStorage.removeItem(legacySessionHistoryStorageKey);
+                setSafeStorageItem('localStorage', historyStorageKey, saved);
+                removeSafeStorageItem('sessionStorage', legacySessionHistoryStorageKey);
             }
         }
 
@@ -3751,14 +3815,14 @@ document.addEventListener('DOMContentLoaded', () => {
     isInitialized = true;
 
     // 2. Welcome Bubble Timer (only show twice max)
-    const bubbleShowCount = parseInt(sessionStorage.getItem('savonie_bubble_count') || '0');
+    const bubbleShowCount = parseInt(getSafeStorageItem('sessionStorage', 'savonie_bubble_count') || '0');
     if (bubbleShowCount < 2) {
         setTimeout(() => {
             if (els.window?.classList.contains('hidden') && chatHistory.length === 0) {
                 els.bubble?.classList.remove('opacity-0', 'translate-y-4');
                 els.bubble?.classList.add('opacity-100', 'translate-y-0');
                 positionWelcomeBubbleDeferred();
-                sessionStorage.setItem('savonie_bubble_count', (bubbleShowCount + 1).toString());
+                setSafeStorageItem('sessionStorage', 'savonie_bubble_count', (bubbleShowCount + 1).toString());
                 // Auto-dismiss bubble after 5 seconds
                 setTimeout(() => {
                     if (els.bubble) {
@@ -4194,6 +4258,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Opening: remove hidden, add flex
             els.window?.classList.remove('hidden');
             els.window?.classList.add('flex');
+            try { els.input?.focus({ preventScroll: true }); } catch (e) { els.input?.focus && els.input.focus(); }
             syncChatA11yState(true);
             document.addEventListener('keydown', handleChatFocusTrap, true);
 
@@ -4563,7 +4628,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (chatHistory.length > MAX_HISTORY_ITEMS) {
                 chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY_ITEMS);
             }
-            localStorage.setItem(historyStorageKey, JSON.stringify(chatHistory));
+            setSafeStorageItem('localStorage', historyStorageKey, JSON.stringify(chatHistory));
         }
         
         els.messages.scrollTop = els.messages.scrollHeight;
@@ -4620,7 +4685,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (chatHistory.length > MAX_HISTORY_ITEMS) {
                 chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY_ITEMS);
             }
-            localStorage.setItem(historyStorageKey, JSON.stringify(chatHistory));
+            setSafeStorageItem('localStorage', historyStorageKey, JSON.stringify(chatHistory));
         }
     }
 

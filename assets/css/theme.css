@@ -598,6 +598,19 @@ body {
     outline-offset: 2px;
 }
 
+#chat-toggle:focus-visible,
+#close-chat:focus-visible,
+#send-btn:focus-visible {
+    outline: 3px solid #e1d4c2 !important;
+    outline-offset: 3px;
+}
+
+#suggestions-btn:focus-visible,
+#chat-input:focus-visible {
+    outline: 3px solid #212842 !important;
+    outline-offset: 2px;
+}
+
 /* ==========================================================================
    GSAP Animation Initial States
    ========================================================================== */
@@ -1410,7 +1423,7 @@ select.border-red-500 {
 
 .achievement-notification {
     position: fixed;
-    bottom: 30px;
+    bottom: calc(var(--floating-ui-edge, 1.5rem) + var(--chat-fab-size, 4rem) + 1rem + env(safe-area-inset-bottom, 0px));
     right: 30px;
     background: var(--color-primary);
     color: white;
@@ -1422,6 +1435,7 @@ select.border-red-500 {
     gap: 12px;
     z-index: 10001;
     max-width: 350px;
+    pointer-events: none;
     opacity: 0;
     transform: translateX(400px);
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -1476,6 +1490,7 @@ select.border-red-500 {
     transition: background-color 0.2s ease;
     flex-shrink: 0;
     opacity: 0.7;
+    pointer-events: auto;
 }
 
 .achievement-close:hover {
@@ -1495,7 +1510,7 @@ select.border-red-500 {
 
 @media (max-width: 768px) {
     .achievement-notification {
-        bottom: 20px;
+        bottom: calc(var(--floating-ui-edge, 1rem) + var(--chat-fab-size, 3.5rem) + 1rem + env(safe-area-inset-bottom, 0px));
         right: 20px;
         left: 20px;
         max-width: none;
@@ -3584,10 +3599,18 @@ body[data-print-url*="/hobbies/"] .bg-white\/50 {
 #chat-toggle,
 #mobile-menu-toggle,
 #send-btn,
+#close-chat,
+#suggestions-btn,
 #mic-btn,
 #theme-toggle {
     min-width: 48px;
     min-height: 48px;
+}
+
+#close-chat {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Improved contrast for beige text on dark backgrounds (WCAG AA) */

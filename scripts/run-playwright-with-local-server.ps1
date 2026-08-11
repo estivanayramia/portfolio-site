@@ -47,7 +47,7 @@ try {
     $env:PORT = [string]$port
     $serverProcess = Start-Process -FilePath $node -ArgumentList @('scripts/local-serve.js') -WorkingDirectory $repoRoot -PassThru -WindowStyle Hidden -RedirectStandardOutput $logPath -RedirectStandardError $errorLogPath
     if ($null -eq $previousPort) { Remove-Item Env:PORT -ErrorAction SilentlyContinue } else { $env:PORT = $previousPort }
-    $deadline = (Get-Date).AddSeconds(15)
+    $deadline = (Get-Date).AddSeconds(60)
     do {
       Start-Sleep -Milliseconds 200
       if ($serverProcess.HasExited) { throw "Local server exited before becoming ready (see $logPath and $errorLogPath)." }

@@ -56,6 +56,18 @@
     // Interaction events that trigger script loading
     const INTERACTION_EVENTS = ['scroll', 'mousemove', 'touchstart', 'keydown', 'click'];
 
+    function isStorageAvailable(storageName) {
+        try {
+            const storage = window[storageName];
+            const probeKey = '__portfolio_analytics_storage_probe__';
+            storage.setItem(probeKey, '1');
+            storage.removeItem(probeKey);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
     /**
      * Inject a script element into the document
      * @param {string} src - Script source URL
@@ -147,6 +159,11 @@
         // Prevent duplicate initialization
         if (analyticsInitialized.clarity) {
             console.log('[LazyLoader] Microsoft Clarity already initialized, skipping');
+            return;
+        }
+
+        if (!isStorageAvailable('localStorage') || !isStorageAvailable('sessionStorage')) {
+            console.log('[LazyLoader] Microsoft Clarity skipped because storage is unavailable');
             return;
         }
         
