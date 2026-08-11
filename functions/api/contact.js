@@ -96,6 +96,8 @@ export async function onRequest(context) {
 
   const receiptId = buildReceiptId();
   const receiptKey = `contact:receipt:${receiptId}`;
+  let baseReceipt = null;
+  let receiptRecorded = false;
 
   try {
     const formData = await request.formData();
@@ -184,7 +186,7 @@ export async function onRequest(context) {
       }
     }
 
-    const baseReceipt = {
+    baseReceipt = {
       receiptId,
       state: "received",
       submittedAt: new Date().toISOString(),
@@ -200,7 +202,7 @@ export async function onRequest(context) {
       ip: request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || ""
     };
 
-    let receiptRecorded = await tryPutReceipt(env, receiptKey, baseReceipt);
+    receiptRecorded = await tryPutReceipt(env, receiptKey, baseReceipt);
 
     const upstreamFormData = new FormData();
     upstreamFormData.set("subject", subject);
@@ -292,11 +294,24 @@ export async function onRequest(context) {
       }
     );
   } catch {
+    if (baseReceipt) {
+      receiptRecorded = (await tryPutReceipt(env, receiptKey, {
+        ...baseReceipt,
+        state: "upstream_failed",
+        upstream: {
+          endpoint: FORMSPREE_ENDPOINT,
+          status: 0,
+          ok: false
+        }
+      })) || receiptRecorded;
+    }
+
     return jsonReply(
       {
         success: false,
         error: "internal_error",
-        message: "Contact submission could not be completed."
+        message: "Contact submission could not be completed.",
+        ...(baseReceipt ? { receiptId, recorded: receiptRecorded } : {})
       },
       500,
       request

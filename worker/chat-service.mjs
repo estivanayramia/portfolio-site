@@ -14,6 +14,7 @@ const PAGE_MANIFEST_KEY = "page-grounding:v1";
 const DEFAULT_BASE_URL = "https://www.estivanayramia.com";
 const IN_MEMORY_TTL_MS = 5 * 60 * 1000;
 const LIVE_REFRESH_TTL_MS = 6 * 60 * 60 * 1000;
+const DEFAULT_LIVE_REFRESH_TIMEOUT_MS = 8 * 1000;
 const MAX_CRAWL_PAGES = 48;
 const MAX_RETRIEVED_PAGES = 8;
 const MAX_RETRIEVED_SECTIONS = 12;
@@ -498,12 +499,27 @@ async function refreshManifestIfNeeded(env, request, requestedBuildVersion, mani
   }
 
   const baseUrl = inferBaseUrl(request, env);
+  const configuredTimeout = Number(env?.__CHAT_MANIFEST_REFRESH_TIMEOUT_MS);
+  const refreshTimeoutMs = Number.isFinite(configuredTimeout) && configuredTimeout >= 10
+    ? Math.min(configuredTimeout, 30 * 1000)
+    : DEFAULT_LIVE_REFRESH_TIMEOUT_MS;
+  const controller = new AbortController();
+  let timeoutId;
 
   try {
-    const liveManifest = await buildLivePageManifest({
-      baseUrl,
-      fetchImpl: fetch
+    const timeout = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => {
+        controller.abort();
+        reject(new Error("manifest_refresh_timeout"));
+      }, refreshTimeoutMs);
     });
+    const liveManifest = await Promise.race([
+      buildLivePageManifest({
+        baseUrl,
+        fetchImpl: (url, options) => fetch(url, { ...options, signal: controller.signal })
+      }),
+      timeout
+    ]);
     await putJsonToKv(env, PAGE_MANIFEST_KEY, liveManifest);
     setCacheEntry("manifest", liveManifest);
     return {
@@ -517,6 +533,9 @@ async function refreshManifestIfNeeded(env, request, requestedBuildVersion, mani
       source: manifest ? "stale_manifest" : "missing_manifest",
       refreshed: false
     };
+  } finally {
+    clearTimeout(timeoutId);
+    controller.abort();
   }
 }
 

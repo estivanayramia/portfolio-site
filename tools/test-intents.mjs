@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 
-const WORKER_FILE = 'worker/worker.js';
+const CHAT_SERVICE_FILE = 'worker/chat-service.mjs';
+const FACTS_GENERATOR_FILE = 'scripts/generate-site-facts.js';
 
 function assertOk(name, condition, details = '') {
   if (condition) {
@@ -13,19 +14,22 @@ function assertOk(name, condition, details = '') {
 }
 
 function main() {
-  if (!fs.existsSync(WORKER_FILE)) {
-    process.stderr.write(`FAIL: Missing ${WORKER_FILE}\n`);
-    process.exit(1);
+  for (const file of [CHAT_SERVICE_FILE, FACTS_GENERATOR_FILE]) {
+    if (!fs.existsSync(file)) {
+      process.stderr.write(`FAIL: Missing ${file}\n`);
+      process.exit(1);
+    }
   }
 
-  const worker = fs.readFileSync(WORKER_FILE, 'utf8');
+  const chatService = fs.readFileSync(CHAT_SERVICE_FILE, 'utf8');
+  const factsGenerator = fs.readFileSync(FACTS_GENERATOR_FILE, 'utf8');
 
-  assertOk('detectIntent function exists', /function\s+detectIntent\s*\(/.test(worker));
-  assertOk('projects intent keyword mapping exists', /project\|projects\|case study\|portfolio\|work samples/.test(worker));
-  assertOk('hobbies intent keyword mapping exists', /hobbies\|hobby\|gym\|workout\|fitness/.test(worker));
-  assertOk('contact intent keyword mapping exists', /(email|contact|reach|message|connect)/.test(worker));
-  assertOk('getWispers guard exists', /getwispers/i.test(worker));
-  assertOk('whispers is handled as hobby context', /whispers.*hobby|hobby.*whispers/is.test(worker));
+  assertOk('classifyQuestion function exists', /function\s+classifyQuestion\s*\(/.test(chatService));
+  assertOk('projects intent keyword mapping exists', /projects\|work samples\|what have you done\|what projects/.test(chatService));
+  assertOk('hobbies intent keyword mapping exists', /hobbies\|whispers/.test(chatService));
+  assertOk('contact intent keyword mapping exists', /contact\|email\|reach out\|reach him\|reach you\|linkedin/.test(chatService));
+  assertOk('getWispers guard exists', /getwispers/i.test(factsGenerator));
+  assertOk('whispers is handled as hobby context', /pageType\s*===\s*["']hobby_detail["']/.test(chatService) && /whispers/.test(chatService));
 
   if (process.exitCode && process.exitCode !== 0) {
     process.exit(process.exitCode);

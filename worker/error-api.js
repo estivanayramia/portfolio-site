@@ -251,8 +251,17 @@ export async function apiHandleGetErrors(request, env, allowedOrigins) {
   if (!auth.ok) return json({ error: "unauthorized" }, auth.status || 401);
 
   const u = new URL(request.url);
-  const limit = Math.min(Number(u.searchParams.get("limit") || "50"), 200);
-  const offset = Math.max(Number(u.searchParams.get("offset") || "0"), 0);
+  const rawLimit = u.searchParams.get("limit");
+  const rawOffset = u.searchParams.get("offset");
+  const parsedLimit = Number(rawLimit || "50");
+  const offset = Number(rawOffset || "0");
+
+  if (!Number.isInteger(parsedLimit) || parsedLimit <= 0 ||
+      !Number.isInteger(offset) || offset < 0) {
+    return json({ error: "invalid_pagination" }, 400);
+  }
+
+  const limit = Math.min(parsedLimit, 200);
 
   const rows = await env.DB.prepare(
     `SELECT id, type, message, url, stack, category, status, user_agent, is_bot, timestamp, version
