@@ -8,12 +8,8 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // Only allow chat endpoints for this worker.
-    // This prevents accidental exposure if someone hits the workers.dev URL directly.
-    if (!isChatPath(url.pathname)) {
-      // Allow preflight to succeed quietly (some browsers/extensions probe paths)
-      if (request.method === "OPTIONS") return new Response(null, { status: 204 });
-      return new Response("Not found", { status: 404 });
+    if (!isChatPath(url.pathname) || !["POST", "OPTIONS"].includes(request.method)) {
+      return new Response("Not found", { status: 404, headers: { "Vary": "Origin" } });
     }
 
     return CombinedWorker.fetch(request, env, ctx);

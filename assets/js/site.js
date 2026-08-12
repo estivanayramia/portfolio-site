@@ -713,6 +713,8 @@ const initMobileMenu = () => {
         if (icon) icon.style.transform = 'rotate(0deg)';
     };
 
+    window.__savonieCloseMobileMenu = closeMenu;
+
     const toggleMenu = () => {
         const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
         if (isExpanded) closeMenu();
@@ -1827,87 +1829,157 @@ const initLazyLoading = () => {
  * - Uses CSS transitions for smooth UX
  */
 const initPdfPreviews = () => {
-    try {
-        document.querySelectorAll('.preview-panel').forEach(panel => {
-            try {
-                const section = panel.closest('section') || panel.parentElement;
-                if (!section) return;
-                // find first PDF link within the same section
-                const pdfLink = section.querySelector('a[href$=".pdf"]');
-                if (!pdfLink) return;
-                const pdfUrl = pdfLink.href;
+    if (typeof document === 'undefined') return;
 
-                // Mark as loaded so other scripts don't try to load it again
-                panel.dataset.pdfLoaded = 'true';
+    const previewSections = Array.from(document.querySelectorAll('.project-preview-shell'));
+    if (!previewSections.length) return;
 
-                // helper to show fallback message
-                const showFallback = (reason) => {
-                    try {
-                        panel.innerHTML = '<div class="rounded-xl border border-chocolate/20 bg-white/40 overflow-hidden p-8 text-center"><p class="text-sm text-chocolate/70">Inline PDF preview may be blocked by hosting or browser settings. Use the buttons below to open or download the deck.</p></div>';
-                        __logCollect && __logCollect('pdf.preview.fallback', { url: pdfUrl, reason: reason });
-                    } catch (e) {}
-                };
+    const fallbackMarkup = (message, pdfUrl) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'rounded-xl border border-chocolate/20 bg-white/40 overflow-hidden p-8 text-center min-h-[480px] flex items-center justify-center';
+        const text = document.createElement('p');
+        text.className = 'text-sm text-chocolate/70';
+        text.textContent = message || 'Inline PDF preview may be blocked by hosting or browser settings. Use the buttons below to open or download the deck.';
+        wrapper.appendChild(text);
+        if (pdfUrl) {
+            const actions = document.createElement('div');
+            actions.className = 'flex flex-wrap justify-center gap-3 mt-4';
+            const openLink = document.createElement('a');
+            openLink.href = pdfUrl;
+            openLink.target = '_blank';
+            openLink.rel = 'noopener noreferrer';
+            openLink.className = 'inline-flex items-center justify-center px-5 py-2 text-sm font-semibold rounded-full text-beige bg-indigodeep hover:bg-chocolate';
+            openLink.textContent = 'Open full PDF';
+            const downloadLink = document.createElement('a');
+            downloadLink.href = pdfUrl;
+            downloadLink.download = '';
+            downloadLink.className = 'inline-flex items-center justify-center px-5 py-2 text-sm font-semibold rounded-full text-beige bg-indigodeep hover:bg-chocolate';
+            downloadLink.textContent = 'Download PDF';
+            actions.append(openLink, downloadLink);
+            wrapper.appendChild(actions);
+        }
+        return wrapper;
+    };
 
-                // prepare placeholder / spinner with stable background
-                panel.innerHTML = '<div class="py-12 bg-white/30 rounded-xl border border-chocolate/10 flex items-center justify-center min-h-[480px]">\n  <div class="text-sm text-chocolate/60 flex items-center gap-2"><svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Loading preview…</div>\n</div>';
+    const spinnerMarkup = () => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'pdf-preview-placeholder py-12 bg-white/30 rounded-xl border border-chocolate/10 flex items-center justify-center min-h-[480px]';
+        wrapper.innerHTML = '<div class="text-sm text-chocolate/60 flex items-center gap-2"><svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Loading preview…</div>';
+        return wrapper;
+    };
 
-                // create iframe but keep it hidden until load confirmed
-                const iframe = document.createElement('iframe');
-                iframe.setAttribute('aria-label', 'PDF preview');
-                iframe.style.cssText = 'width:100%;height:480px;border:0;border-radius:12px;background:#fff;opacity:0;position:absolute;top:0;left:0;';
-                iframe.referrerPolicy = 'strict-origin-when-cross-origin';
-                
-                // Set panel to relative positioning for absolute iframe
-                panel.style.position = 'relative';
-                panel.style.minHeight = '480px';
+    previewSections.forEach((section, sectionIndex) => {
+        const panel = section.querySelector('.preview-panel');
+        const toggle = section.querySelector('.preview-toggle');
+        const pdfLink = section.querySelector('a[href$=".pdf"], a[href*=".pdf?"]');
+        if (!panel || !pdfLink) return;
 
-                let loaded = false;
-                let settled = false;
-                
-                const finalize = (success) => {
-                    if (settled) return;
-                    settled = true;
-                    
-                    if (success) {
-                        // Smoothly fade in the iframe
-                        iframe.style.position = 'relative';
-                        iframe.style.opacity = '1';
-                        iframe.style.transition = 'opacity 0.3s ease';
-                        // Remove placeholder
-                        const placeholder = panel.querySelector('div');
-                        if (placeholder) placeholder.remove();
-                        __logCollect && __logCollect('pdf.preview.loaded', { url: pdfUrl });
-                    } else {
-                        try { iframe.remove(); } catch(_){}
-                        showFallback('load_failed');
-                    }
-                };
+        const pdfUrl = pdfLink.href;
+        const existingFrame = panel.querySelector('iframe.pdf-frame');
+        const frameTitle = existingFrame?.getAttribute('title') || 'PDF preview';
+        const state = panel.dataset.pdfState || 'idle';
+        panel.dataset.pdfState = state;
+        panel.dataset.pdfUrl = pdfUrl;
+        panel.classList.add('min-h-[480px]');
+        panel.id = panel.id || `pdf-preview-panel-${sectionIndex + 1}`;
 
-                iframe.addEventListener('load', () => {
-                    loaded = true;
-                    // Give it a moment to actually render content
-                    setTimeout(() => finalize(true), 100);
-                });
-                
-                iframe.addEventListener('error', () => finalize(false));
+        panel.classList.add('hidden');
+        panel.setAttribute('aria-hidden', 'true');
+        if (toggle) {
+            toggle.type = 'button';
+            toggle.setAttribute('aria-controls', panel.id);
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.textContent = 'Show preview';
+        }
 
-                // attempt to set src
-                try {
-                    iframe.src = pdfUrl;
-                    panel.appendChild(iframe);
-                    __logCollect && __logCollect('pdf.preview.attempt', { url: pdfUrl });
-                } catch (e) {
-                    finalize(false);
-                    return;
+        const showPanel = () => {
+            panel.classList.remove('hidden');
+            panel.setAttribute('aria-hidden', 'false');
+            if (toggle) {
+                toggle.setAttribute('aria-expanded', 'true');
+                toggle.textContent = 'Hide preview';
+            }
+        };
+
+        const showFallback = (reason) => {
+            panel.dataset.pdfState = 'failed';
+            panel.dataset.pdfLoaded = 'false';
+            panel.replaceChildren(fallbackMarkup(undefined, pdfUrl));
+            try { __logCollect && __logCollect('pdf.preview.fallback', { url: pdfUrl, reason }); } catch (e) {}
+        };
+
+        const activate = () => {
+            showPanel();
+            const currentState = panel.dataset.pdfState;
+            if (currentState === 'loading' || currentState === 'loaded' || currentState === 'failed') return;
+            panel.dataset.pdfState = 'loading';
+            panel.replaceChildren(spinnerMarkup());
+
+            const iframe = existingFrame || document.createElement('iframe');
+            iframe.className = 'pdf-frame w-full h-[600px] md:h-[700px] lg:h-[800px] border-0';
+            iframe.width = '1280';
+            iframe.height = '800';
+            iframe.title = frameTitle;
+            iframe.loading = 'lazy';
+            iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+            iframe.setAttribute('aria-label', frameTitle);
+            iframe.style.width = '100%';
+            iframe.style.minHeight = '480px';
+            iframe.style.aspectRatio = '16 / 10';
+            iframe.style.border = '0';
+            iframe.style.borderRadius = '12px';
+            iframe.style.background = '#fff';
+            iframe.style.opacity = '0';
+            iframe.style.transition = 'opacity 0.3s ease';
+
+            let settled = false;
+            let timeoutId = 0;
+            const finalize = (success) => {
+                if (settled) return;
+                settled = true;
+                if (timeoutId) window.clearTimeout(timeoutId);
+                if (success) {
+                    iframe.style.opacity = '1';
+                    panel.replaceChildren(iframe);
+                    panel.dataset.pdfState = 'loaded';
+                    panel.dataset.pdfLoaded = 'true';
+                    try { __logCollect && __logCollect('pdf.preview.loaded', { url: pdfUrl }); } catch (e) {}
+                } else {
+                    try { iframe.remove(); } catch (e) {}
+                    showFallback('load_failed');
                 }
+            };
 
-                // fallback timeout: if not loaded within 5s, assume success (browser swallowed load event)
-                setTimeout(() => {
-                    if (!loaded) finalize(true);
-                }, 5000);
-            } catch (e) {}
-        });
-    } catch (e) {}
+            iframe.addEventListener('load', () => setTimeout(() => finalize(true), 100), { once: true });
+            iframe.addEventListener('error', () => finalize(false), { once: true });
+            if (!iframe.getAttribute('src')) iframe.setAttribute('src', pdfUrl);
+            panel.appendChild(iframe);
+            try { __logCollect && __logCollect('pdf.preview.attempt', { url: pdfUrl }); } catch (e) {}
+            timeoutId = window.setTimeout(() => finalize(false), 5000);
+        };
+
+        if (toggle) {
+            toggle.addEventListener('click', () => {
+                const willShow = panel.classList.contains('hidden');
+                if (willShow) activate();
+                else {
+                    panel.classList.add('hidden');
+                    panel.setAttribute('aria-hidden', 'true');
+                    toggle.setAttribute('aria-expanded', 'false');
+                    toggle.textContent = 'Show preview';
+                }
+            });
+        }
+
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                if (!entries.some((entry) => entry.isIntersecting)) return;
+                observer.disconnect();
+                activate();
+            }, { rootMargin: '0px', threshold: 0.01 });
+            observer.observe(section);
+        }
+    });
 };
 
 // ==========================================================================
@@ -3406,41 +3478,61 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
     const RESUME_URL = '/assets/docs/Estivan-Ayramia-Resume.pdf';
     const LINKEDIN_URL = 'https://www.linkedin.com/in/estivanayramia';
-    const WELCOME_DELAY = 2500;
-
-    // Project Data Mapping
     const projectData = {
-        logistics: {
-            title: 'Logistics System',
-            summary: 'A systems-focused project centered on execution, coordination, and operational clarity.',
-            img: '/assets/img/project-logistics.jpg',
-            link: '/projects/logistics'
+        'project-portfolio': {
+            title: 'This Website',
+            summary: 'Personal build: I directed the hand-coded site and reviewed its content, performance, and accessibility.',
+            img: '/assets/img/generated/card-previews/projects-portfolio-editorial-v2.webp',
+            link: '/projects/portfolio',
+            action: 'Read the build'
         },
-        conflict: {
-            title: 'Conflict Playbook',
-            summary: 'A practical framework for navigating conflict with structure, empathy, and outcomes.',
-            img: '/assets/img/project-conflict.jpg',
-            link: '/deep-dive#conflict'
+        'project-isa-grimes': {
+            title: 'Isa Grimes Interview',
+            summary: 'Original interview: I shaped the questions and reflection around a direct conversation about judgment and leadership.',
+            img: '/assets/img/generated/card-previews/projects-isa-grimes-portrait-v2.webp',
+            link: '/projects/isa-grimes-interview',
+            action: 'Read the interview'
         },
-        discipline: {
-            title: 'Discipline Routine',
-            summary: 'A repeatable routine and mindset system for sustainable discipline and follow-through.',
-            img: '/assets/img/project-discipline.jpg',
-            link: '/projects/discipline'
+        'project-loreal-maps': {
+            title: "L'Oréal Cell BioPrint",
+            summary: 'Class project: I contributed to persona development, visual consistency, and slide layout.',
+            img: '/assets/img/generated/card-previews/projects-loreal-pdf-cover.webp',
+            link: '/projects/loreal-maps-campaign',
+            action: 'Open the campaign concept'
         },
-        website: {
-            title: 'Portfolio Website',
-            summary: 'The site you’re on—built for speed, clarity, and a clean browsing experience.',
-            img: '/assets/img/og-image.png',
-            link: '/'
+        'project-franklin-templeton': {
+            title: 'Franklin Templeton',
+            summary: 'Class project: I worked on the strategy and built the Arabic version of the deck.',
+            img: '/assets/img/generated/card-previews/projects-franklin-pdf-cover.webp',
+            link: '/projects/franklin-templeton-concept',
+            action: 'Read the bilingual concept'
+        },
+        'project-endpoint-linkedin': {
+            title: 'EndPoint LinkedIn Campaign',
+            summary: 'Class project: I contributed to the campaign plan and built the Ad 2 video concept.',
+            img: '/assets/img/generated/card-previews/projects-endpoint-linkedin-pdf-cover.webp',
+            link: '/projects/endpoint-linkedin-campaign',
+            action: 'Review the retargeting plan'
+        },
+        'project-elosity-video': {
+            title: 'Endpoint Elosity Launch',
+            summary: 'Class project: I made the concept, edit, and production on my own.',
+            img: '/assets/img/generated/card-previews/projects-endpoint-elosity-cover.webp',
+            link: '/projects/endpoint-elosity-video',
+            action: 'Watch the video concept'
+        },
+        'project-endpoint-competitive': {
+            title: 'Taking Down Endpoint',
+            summary: 'Class project: I led the social and display work and helped shape the strategy.',
+            img: '/assets/img/generated/card-previews/projects-endpoint-competitive-pdf-cover.webp',
+            link: '/projects/endpoint-competitive-playbook',
+            action: 'Open the strategy deck'
         }
     };
 
     // ======================================================================
     // DOM Element References
     // ======================================================================
-    // Note: Using 'domElements' (abbreviated as 'els' for brevity in this large function)
-    
     const els = {
         widget: document.getElementById('chat-widget'),
         window: document.getElementById('chat-window'),
@@ -3584,49 +3676,137 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    let mobileChatRevealTicking = false;
+
+    function syncMobileChatVisibility() {
+        mobileChatRevealTicking = false;
+        if (!els.widget || !els.toggleBtn) return;
+
+        const chatIsClosed = !els.window || els.window.classList.contains('hidden');
+        els.widget.classList.toggle('chat-widget--open', !chatIsClosed);
+        const footer = document.querySelector('footer');
+        const maxScrollY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        const reachedMobileChatArea = footer
+            ? footer.getBoundingClientRect().top <= window.innerHeight
+            : window.scrollY >= Math.max(0, maxScrollY - 96);
+        const deferAtTop = window.innerWidth <= 640
+            && !reachedMobileChatArea
+            && chatIsClosed
+            && !document.body.classList.contains('page-close-ui-guard');
+
+        els.widget.classList.toggle('chat-widget--deferred', deferAtTop);
+        if (deferAtTop) {
+            els.widget.setAttribute('aria-hidden', 'true');
+            els.toggleBtn.setAttribute('tabindex', '-1');
+        } else {
+            els.widget.removeAttribute('aria-hidden');
+            els.toggleBtn.removeAttribute('tabindex');
+        }
+    }
+
+    function scheduleMobileChatVisibility() {
+        if (mobileChatRevealTicking) return;
+        mobileChatRevealTicking = true;
+        requestAnimationFrame(syncMobileChatVisibility);
+    }
+
+    function initMobileChatVisibility() {
+        if (!els.widget || !els.toggleBtn) return;
+        window.addEventListener('scroll', scheduleMobileChatVisibility, { passive: true });
+        window.addEventListener('resize', scheduleMobileChatVisibility, { passive: true });
+        window.addEventListener('orientationchange', scheduleMobileChatVisibility, { passive: true });
+        syncMobileChatVisibility();
+    }
+
     // State
     let chatHistory = [];
-    let isSending = false; // Prevent duplicate sends
+    let isSending = false;
     let isInitialized = false;
     let lastChatFocusedEl = null;
-    const chatInertState = new Map();
+    let lastPrompt = '';
+    let retryButton = null;
+    let chatBackgroundState = [];
+    let pendingChipState = [];
 
-    const historyStorageKey = `savonie_history:${pageLang}`;
+    const currentChatLang = /^(es|ar)$/i.test(pageLang.slice(0, 2)) ? pageLang.slice(0, 2).toLowerCase() : 'en';
+    const historyStorageKey = `savonie_history:${currentChatLang}`;
+    const legacyHistoryStorageKey = `savonie_history:${pageLang}`;
     const legacySessionHistoryStorageKey = `savonie_history:${pageLang}:${window.location.pathname || '/'}`;
-    const MAX_HISTORY_ITEMS = 50;
+    const historyMigrationKey = `savonie_history:migrated:v2:${currentChatLang}`;
+    const CHAT_HISTORY_VERSION = 2;
+    const HISTORY_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+    const MAX_HISTORY_ITEMS = 20;
     const CHAT_FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-    function setChatBackgroundInert(shouldInert) {
-        if (!shouldInert) {
-            chatInertState.forEach((state, node) => {
-                node.inert = state.inert;
-                if (state.ariaHidden === null) {
-                    node.removeAttribute('aria-hidden');
-                } else {
-                    node.setAttribute('aria-hidden', state.ariaHidden);
-                }
+    const chatCopy = {
+        en: { close: 'Close chat', open: 'Open chat', toggle: 'Toggle suggestions', ideas: 'Ideas', grounding: "Answers use this site's content. Verify important details.", bubble: 'Ask about my work', suggestions: 'Suggested questions', hideSuggestions: 'Hide suggestions', clear: 'Clear conversation', clearConfirm: 'Clear this conversation?', input: 'Ask a question...', send: 'Send message', thinking: 'Thinking…', ready: 'Ready', retry: 'Try again', retryAfter: 'Try again in {seconds}s.', offline: 'You appear to be offline. Please check your connection and try again.', timeout: 'The request took too long. Please try again.', rateLimit: 'Too many requests. Please wait a moment before trying again.', server: 'The AI service is temporarily unavailable. Please try again.', client: 'The request was rejected. Please rephrase and try again.', network: 'I could not reach the AI service. Please try again.', ambiguous: 'The response was not understood. Please try again.', cleared: 'Conversation cleared.', shown: 'Suggestions shown.', hidden: 'Suggestions hidden.', fallback: 'Showing a fallback answer.', truncated: 'This answer was shortened.', continuation: 'Ask a follow-up to continue.' },
+        es: { close: 'Cerrar chat', open: 'Abrir chat', toggle: 'Alternar sugerencias', ideas: 'Ideas', grounding: 'Las respuestas usan el contenido de este sitio. Verifica los datos importantes.', bubble: 'Pregunta por mi trabajo', suggestions: 'Preguntas sugeridas', hideSuggestions: 'Ocultar sugerencias', clear: 'Borrar conversación', clearConfirm: '¿Borrar esta conversación?', input: 'Haz una pregunta...', send: 'Enviar mensaje', thinking: 'Pensando…', ready: 'Listo', retry: 'Intentar de nuevo', retryAfter: 'Inténtalo de nuevo en {seconds}s.', offline: 'Parece que estás sin conexión. Comprueba tu conexión e inténtalo de nuevo.', timeout: 'La solicitud tardó demasiado. Inténtalo de nuevo.', rateLimit: 'Demasiadas solicitudes. Espera un momento e inténtalo de nuevo.', server: 'El servicio de IA no está disponible temporalmente. Inténtalo de nuevo.', client: 'El servicio rechazó la solicitud. Reformula la pregunta.', network: 'No pude contactar con el servicio de IA. Inténtalo de nuevo.', ambiguous: 'No se entendió la respuesta. Inténtalo de nuevo.', cleared: 'Conversación borrada.', shown: 'Sugerencias mostradas.', hidden: 'Sugerencias ocultas.', fallback: 'Mostrando una respuesta alternativa.', truncated: 'Esta respuesta se acortó.', continuation: 'Haz una pregunta de seguimiento para continuar.' },
+        ar: { close: 'إغلاق الدردشة', open: 'فتح الدردشة', toggle: 'تبديل الاقتراحات', ideas: 'أفكار', grounding: 'تستخدم الإجابات محتوى هذا الموقع. تحقّق من التفاصيل المهمة.', bubble: 'اسأل عن عملي', suggestions: 'أسئلة مقترحة', hideSuggestions: 'إخفاء الاقتراحات', clear: 'مسح المحادثة', clearConfirm: 'هل تريد مسح هذه المحادثة؟', input: 'اطرح سؤالاً...', send: 'إرسال الرسالة', thinking: 'جارٍ التفكير…', ready: 'جاهز', retry: 'إعادة المحاولة', retryAfter: 'أعد المحاولة بعد {seconds} ثوانٍ.', offline: 'يبدو أنك غير متصل. تحقق من الاتصال وحاول مرة أخرى.', timeout: 'استغرقت العملية وقتاً طويلاً. حاول مرة أخرى.', rateLimit: 'طلبات كثيرة جداً. انتظر لحظة وحاول مرة أخرى.', server: 'خدمة الذكاء الاصطناعي غير متاحة مؤقتاً. حاول مرة أخرى.', client: 'رفضت الخدمة الطلب. أعد صياغة السؤال.', network: 'تعذر الوصول إلى خدمة الذكاء الاصطناعي. حاول مرة أخرى.', ambiguous: 'تعذر فهم الاستجابة. حاول مرة أخرى.', cleared: 'تم مسح المحادثة.', shown: 'تم إظهار الاقتراحات.', hidden: 'تم إخفاء الاقتراحات.', fallback: 'يتم عرض إجابة بديلة.', truncated: 'تم اختصار هذه الإجابة.', continuation: 'اطرح سؤالاً للمتابعة.' }
+    };
+    const t = chatCopy[currentChatLang] || chatCopy.en;
+
+    const safeStorage = (storage, method, ...args) => {
+        try {
+            if (!storage || typeof storage[method] !== 'function') return null;
+            return storage[method](...args);
+        } catch (_) {
+            return null;
+        }
+    };
+
+    const setChatBackgroundInert = (inert) => {
+        if (!inert) {
+            chatBackgroundState.forEach(({ el, inert: wasInert, ariaHidden }) => {
+                if (wasInert === null) el.removeAttribute('inert'); else el.inert = wasInert;
+                if (ariaHidden === null) el.removeAttribute('aria-hidden'); else el.setAttribute('aria-hidden', ariaHidden);
             });
-            chatInertState.clear();
+            chatBackgroundState = [];
             return;
         }
-
-        const makeInert = (node) => {
-            if (!node || chatInertState.has(node)) return;
-            chatInertState.set(node, {
-                inert: node.inert,
-                ariaHidden: node.getAttribute('aria-hidden')
+        chatBackgroundState = Array.from(document.body.children)
+            .filter((el) => el !== els.widget)
+            .map((el) => {
+                const state = { el, inert: el.hasAttribute('inert') ? el.inert : null, ariaHidden: el.hasAttribute('aria-hidden') ? el.getAttribute('aria-hidden') : null };
+                el.inert = true;
+                el.setAttribute('aria-hidden', 'true');
+                return state;
             });
-            node.inert = true;
-            node.setAttribute('aria-hidden', 'true');
-        };
+    };
 
-        Array.from(document.body.children).forEach((node) => {
-            if (node === els.widget || node.tagName === 'SCRIPT') return;
-            makeInert(node);
-        });
-        makeInert(els.toggleBtn);
-        makeInert(els.bubble);
-    }
+    const setChatPending = (pending) => {
+        isSending = pending;
+        if (els.input) els.input.disabled = pending;
+        if (els.sendBtn) {
+            els.sendBtn.disabled = pending;
+            els.sendBtn.setAttribute('aria-disabled', pending ? 'true' : 'false');
+        }
+        if (els.suggestionsBtn) els.suggestionsBtn.disabled = pending;
+        if (pending) {
+            pendingChipState = Array.from(els.chipsContainer?.querySelectorAll('button') || []).map((button) => ({
+                button,
+                disabled: button.disabled,
+                ariaDisabled: button.getAttribute('aria-disabled'),
+                tabIndex: button.getAttribute('tabindex')
+            }));
+            pendingChipState.forEach(({ button }) => {
+                button.disabled = true;
+                button.setAttribute('aria-disabled', 'true');
+                button.tabIndex = -1;
+            });
+        } else {
+            pendingChipState.forEach(({ button, disabled, ariaDisabled, tabIndex }) => {
+                if (!button.isConnected) return;
+                button.disabled = disabled;
+                if (ariaDisabled === null) button.removeAttribute('aria-disabled'); else button.setAttribute('aria-disabled', ariaDisabled);
+                if (tabIndex === null) button.removeAttribute('tabindex'); else button.setAttribute('tabindex', tabIndex);
+            });
+            pendingChipState = [];
+            Array.from(els.chipsContainer?.querySelectorAll('button') || []).forEach((button) => {
+                if (!button.disabled) button.removeAttribute('aria-disabled');
+            });
+        }
+        if (els.window) els.window.setAttribute('aria-busy', pending ? 'true' : 'false');
+    };
 
     function syncChatA11yState(isOpen) {
         if (els.window) {
@@ -3636,7 +3816,150 @@ document.addEventListener('DOMContentLoaded', () => {
             els.toggleBtn.setAttribute('aria-controls', 'chat-window');
             els.toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         }
-        setChatBackgroundInert(isOpen);
+    }
+
+    const ensureChatStatus = () => {
+        if (!els.window) return null;
+        let status = document.getElementById('chat-status');
+        if (!status) {
+            status = document.createElement('div');
+            status.id = 'chat-status';
+            status.className = 'sr-only';
+            status.setAttribute('role', 'status');
+            status.setAttribute('aria-live', 'polite');
+            status.setAttribute('aria-atomic', 'true');
+            status.setAttribute('aria-busy', 'false');
+            els.window.appendChild(status);
+        }
+        return status;
+    };
+
+    const announceChat = (message, busy = false) => {
+        const status = ensureChatStatus();
+        if (!status) return;
+        status.setAttribute('aria-busy', busy ? 'true' : 'false');
+        status.textContent = String(message || '');
+    };
+
+    const localizeChatUi = () => {
+        document.documentElement.setAttribute('dir', currentChatLang === 'ar' ? 'rtl' : 'ltr');
+        if (els.window) {
+            els.window.setAttribute('aria-label', currentChatLang === 'ar' ? 'مساعد الدردشة' : currentChatLang === 'es' ? 'Asistente de chat' : 'Chat assistant');
+        }
+        if (els.closeBtn) els.closeBtn.setAttribute('aria-label', t.close);
+        if (els.toggleBtn) els.toggleBtn.setAttribute('aria-label', t.open);
+        if (els.input) {
+            els.input.setAttribute('aria-label', t.input);
+            els.input.setAttribute('placeholder', t.input);
+        }
+        if (els.sendBtn) els.sendBtn.setAttribute('aria-label', t.send);
+        if (els.chipsContainer) {
+            els.chipsContainer.setAttribute('aria-label', t.suggestions);
+            els.chipsContainer.id = els.chipsContainer.id || 'chat-chips';
+        }
+        if (els.suggestionsToggle) {
+            els.suggestionsToggle.setAttribute('aria-label', t.toggle);
+            els.suggestionsToggle.setAttribute('title', t.toggle);
+            els.suggestionsToggle.setAttribute('aria-controls', els.chipsContainer?.id || 'chat-chips');
+            els.suggestionsToggle.textContent = t.ideas;
+        }
+        if (els.bubble) {
+            const bubbleCopy = els.bubble.querySelector('p');
+            if (bubbleCopy) bubbleCopy.textContent = t.bubble;
+            els.bubble.setAttribute('aria-hidden', 'true');
+        }
+        if (els.header && els.window && !els.window.querySelector('[data-chat-grounding]')) {
+            const grounding = document.createElement('p');
+            grounding.dataset.chatGrounding = 'true';
+            grounding.className = 'px-4 py-2 text-xs text-chocolate/70 bg-white/80 border-b border-chocolate/10';
+            grounding.textContent = t.grounding;
+            els.header.insertAdjacentElement('afterend', grounding);
+        } else {
+            const grounding = els.window?.querySelector('[data-chat-grounding]');
+            if (grounding) grounding.textContent = t.grounding;
+        }
+        if (els.header && !document.getElementById('chat-clear')) {
+            const clear = document.createElement('button');
+            clear.type = 'button';
+            clear.id = 'chat-clear';
+            clear.className = 'text-white/80 hover:text-white text-xs px-2 py-1 rounded';
+            clear.textContent = t.clear;
+            clear.setAttribute('aria-label', t.clear);
+            clear.addEventListener('click', clearConversation);
+            els.header.insertBefore(clear, els.closeBtn || null);
+            els.clearBtn = clear;
+        } else if (els.clearBtn) {
+            els.clearBtn.textContent = t.clear;
+            els.clearBtn.setAttribute('aria-label', t.clear);
+        }
+        const messages = els.messages;
+        if (messages) {
+            messages.setAttribute('aria-live', 'off');
+            messages.setAttribute('aria-atomic', 'false');
+            messages.setAttribute('aria-label', currentChatLang === 'ar' ? 'رسائل الدردشة' : currentChatLang === 'es' ? 'Mensajes del chat' : 'Chat messages');
+        }
+    };
+
+    const historyEnvelope = () => ({ version: CHAT_HISTORY_VERSION, language: currentChatLang, updatedAt: Date.now(), items: chatHistory.slice(-MAX_HISTORY_ITEMS) });
+    const saveChatHistory = () => safeStorage(window.localStorage, 'setItem', historyStorageKey, JSON.stringify(historyEnvelope()));
+    const clearHistoryStorage = () => {
+        safeStorage(window.localStorage, 'removeItem', historyStorageKey);
+        safeStorage(window.localStorage, 'removeItem', legacyHistoryStorageKey);
+        safeStorage(window.sessionStorage, 'removeItem', historyStorageKey);
+        safeStorage(window.sessionStorage, 'removeItem', legacyHistoryStorageKey);
+        safeStorage(window.sessionStorage, 'removeItem', legacySessionHistoryStorageKey);
+    };
+
+    const normalizeHistory = (value) => {
+        const now = Date.now();
+        let items = null;
+        let updatedAt = now;
+        if (Array.isArray(value)) {
+            items = value;
+        } else if (value && value.version === CHAT_HISTORY_VERSION && value.language === currentChatLang && Array.isArray(value.items)) {
+            items = value.items;
+            updatedAt = Number(value.updatedAt) || now;
+        }
+        if (!items || now - updatedAt > HISTORY_TTL_MS) return [];
+        return items.filter((item) => {
+            const timestamp = Number(item?.timestamp);
+            return item && (item.kind === 'text' || item.kind === 'card') && Number.isFinite(timestamp) && timestamp > 0 && timestamp + HISTORY_TTL_MS >= now;
+        }).slice(-MAX_HISTORY_ITEMS).map((item) => ({ ...item, timestamp: Number(item.timestamp) }));
+    };
+
+    const readChatHistory = () => {
+        let raw = safeStorage(window.localStorage, 'getItem', historyStorageKey);
+        let migrated = false;
+        if (!raw && safeStorage(window.sessionStorage, 'getItem', historyStorageKey)) {
+            raw = safeStorage(window.sessionStorage, 'getItem', historyStorageKey);
+            migrated = true;
+        }
+        if (!raw && safeStorage(window.localStorage, 'getItem', historyMigrationKey) !== '1' && safeStorage(window.sessionStorage, 'getItem', historyMigrationKey) !== '1') {
+            raw = safeStorage(window.localStorage, 'getItem', legacyHistoryStorageKey) || safeStorage(window.sessionStorage, 'getItem', legacyHistoryStorageKey) || safeStorage(window.sessionStorage, 'getItem', legacySessionHistoryStorageKey);
+            migrated = !!raw;
+            safeStorage(window.localStorage, 'setItem', historyMigrationKey, '1');
+        }
+        if (!raw) return [];
+        try {
+            const normalized = normalizeHistory(JSON.parse(raw));
+            if (migrated) safeStorage(window.localStorage, 'setItem', historyStorageKey, JSON.stringify({ version: CHAT_HISTORY_VERSION, language: currentChatLang, updatedAt: Date.now(), items: normalized }));
+            if (!normalized.length && raw) clearHistoryStorage();
+            return normalized;
+        } catch (_) {
+            clearHistoryStorage();
+            return [];
+        }
+    };
+
+    function clearConversation() {
+        if (!window.confirm(t.clearConfirm)) return;
+        chatHistory = [];
+        clearHistoryStorage();
+        if (els.messages) els.messages.replaceChildren();
+        addMessageToUI(translations.chat.welcome[currentChatLang] || translations.chat.welcome.en, 'bot', { persist: false });
+        renderChips(translations.chat.defaultChips[currentChatLang] || translations.chat.defaultChips.en);
+        announceChat(t.cleared);
+        try { els.input?.focus({ preventScroll: true }); } catch (_) { els.input?.focus(); }
     }
 
     function handleChatFocusTrap(e) {
@@ -3658,11 +3981,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function canonicalizeChatRoute(input) {
+        let route = String(input || '/').split('?')[0].split('#')[0].replace(/\\/g, '/').trim();
+        if (!route.startsWith('/')) route = `/${route}`;
+        route = route.replace(/\/{2,}/g, '/');
+        if (route.endsWith('index.html')) {
+            route = route.slice(0, -10) || '/';
+        } else if (route.endsWith('.html')) {
+            route = route.slice(0, -5);
+        }
+        if (route !== '/' && route.endsWith('/') && !route.startsWith('/projects/') && !route.startsWith('/hobbies/') && !route.startsWith('/about/')) {
+            route = route.slice(0, -1);
+        }
+        if (route === '/projects' || route === '/hobbies' || route === '/ar' || route === '/es') {
+            route = `${route}/`;
+        }
+        return route || '/';
+    }
+
     function buildSafePageContext() {
         try {
             const parts = [];
-            const path = window.location.pathname || '/';
-            parts.push(`path: ${path}`);
+            const route = canonicalizeChatRoute(window.location.pathname || '/');
+            parts.push(`path: ${route}`);
             parts.push(`title: ${document.title || ''}`);
             const metaDescription = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
             if (metaDescription) {
@@ -3683,7 +4024,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Cap to ~3.5k chars to avoid leaking too much content.
             return combined.length > 3500 ? combined.slice(0, 3500) : combined;
         } catch (e) {
-            return `${window.location.pathname || '/'} | ${document.title || ''}`;
+            return `${canonicalizeChatRoute(window.location.pathname || '/')} | ${document.title || ''}`;
         }
     }
 
@@ -3695,7 +4036,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .slice(0, 10);
 
             return {
-                route: window.location.pathname || '/',
+                route: canonicalizeChatRoute(window.location.pathname || '/'),
                 title: document.title || '',
                 buildVersion: document.querySelector('meta[name="build-version"]')?.getAttribute('content') || '',
                 description: document.querySelector('meta[name="description"]')?.getAttribute('content') || '',
@@ -3704,7 +4045,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         } catch (e) {
             return {
-                route: window.location.pathname || '/',
+                route: canonicalizeChatRoute(window.location.pathname || '/'),
                 title: document.title || '',
                 buildVersion: '',
                 description: '',
@@ -3744,27 +4085,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fix: Suggestions Toggle Button Logic - DEPRECATED (handled by main listener below)
     // if (els.suggestionsBtn) { ... }
     
-    // 1. Initialize - restore shared session history across pages
-    try { 
-        let saved = getSafeStorageItem('localStorage', historyStorageKey);
-        if (!saved) {
-            saved = getSafeStorageItem('sessionStorage', historyStorageKey);
-            if (saved) {
-                setSafeStorageItem('localStorage', historyStorageKey, saved);
-                removeSafeStorageItem('sessionStorage', historyStorageKey);
-            }
-        }
-        if (!saved) {
-            saved = getSafeStorageItem('sessionStorage', legacySessionHistoryStorageKey);
-            if (saved) {
-                setSafeStorageItem('localStorage', historyStorageKey, saved);
-                removeSafeStorageItem('sessionStorage', legacySessionHistoryStorageKey);
-            }
-        }
+    localizeChatUi();
+    ensureChatStatus();
 
-        if (saved) {
-            chatHistory = JSON.parse(saved);
-            chatHistory.forEach((item) => {
+    try {
+        chatHistory = readChatHistory();
+        chatHistory.forEach((item) => {
                 if (item && item.kind === 'card') {
                     addCardToUI(item.cardId);
                     return;
@@ -3783,20 +4109,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 els.messages?.appendChild(div);
             });
-            // Scroll to bottom after loading history (with delay to ensure DOM is ready)
             setTimeout(() => {
                 if (els.messages) {
                     els.messages.scrollTop = els.messages.scrollHeight;
                 }
             }, 100);
-        }
-    } catch(e) {}
+    } catch (_) {
+        chatHistory = [];
+    }
     
     // Add welcome message only if no history
     if (chatHistory.length === 0) {
         const currentLang = document.documentElement.lang || 'en';
         const welcomeMessage = translations.chat.welcome[currentLang] || "Hello! I am Savonie. Ask me anything about Estivan.";
-        addMessageToUI(welcomeMessage, 'bot', false);
+        addMessageToUI(welcomeMessage, 'bot');
     }
 
     // Always update chips based on current language, regardless of history
@@ -3809,30 +4135,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     syncHomeProofStats();
     initPageCloseFloatingUiGuard();
+    initMobileChatVisibility();
     attachWelcomeBubblePositioning();
     positionWelcomeBubbleDeferred();
     
     isInitialized = true;
-
-    // 2. Welcome Bubble Timer (only show twice max)
-    const bubbleShowCount = parseInt(getSafeStorageItem('sessionStorage', 'savonie_bubble_count') || '0');
-    if (bubbleShowCount < 2) {
-        setTimeout(() => {
-            if (els.window?.classList.contains('hidden') && chatHistory.length === 0) {
-                els.bubble?.classList.remove('opacity-0', 'translate-y-4');
-                els.bubble?.classList.add('opacity-100', 'translate-y-0');
-                positionWelcomeBubbleDeferred();
-                setSafeStorageItem('sessionStorage', 'savonie_bubble_count', (bubbleShowCount + 1).toString());
-                // Auto-dismiss bubble after 5 seconds
-                setTimeout(() => {
-                    if (els.bubble) {
-                        els.bubble.classList.add('opacity-0', 'translate-y-4');
-                        els.bubble.classList.remove('opacity-100', 'translate-y-0');
-                    }
-                }, 5000);
-            }
-        }, WELCOME_DELAY);
-    }
 
     window.addEventListener('resize', positionWelcomeBubbleDeferred, { passive: true });
 
@@ -3868,7 +4175,11 @@ document.addEventListener('DOMContentLoaded', () => {
             els.suggestionsContainer.setAttribute('hidden', 'true');
             els.suggestionsContainer.style.display = 'none';
         }
-
+        if (els.suggestionsToggle) {
+            els.suggestionsToggle.setAttribute('aria-controls', els.suggestionsContainer.id || 'chat-chips');
+            els.suggestionsToggle.setAttribute('aria-expanded', isVisible ? 'true' : 'false');
+        }
+        announceChat(isVisible ? t.shown : t.hidden);
     }
 
     function attachSuggestionHandlers() {
@@ -4035,12 +4346,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const input = String(rawUrl || '').trim();
         if (!input) return null;
 
-        if (input.startsWith('/')) {
-            return {
-                href: input,
-                external: false
-            };
-        }
+        if (input.includes('\\') || input.startsWith('//')) return null;
 
         try {
             const u = new URL(input, window.location.origin);
@@ -4216,6 +4522,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = document.createElement('button');
             btn.className = 'chip-btn text-xs bg-white border border-[#212842]/20 text-[#212842] px-3 py-1 rounded-full hover:bg-[#212842] hover:text-white transition-colors';
             btn.textContent = chipText;
+            btn.setAttribute('aria-label', String(chipText));
             btn.addEventListener('click', () => {
                 handleSend(chipText);
             });
@@ -4227,7 +4534,9 @@ document.addEventListener('DOMContentLoaded', () => {
         closeBtn.className = 'chip-close-btn text-xs text-[#362017]/60 hover:text-[#362017] px-2 py-1 ml-2 transition-colors';
         closeBtn.setAttribute('data-chat-suggestions-close', 'button');
         closeBtn.innerHTML = '×';
-        closeBtn.title = 'Hide suggestions';
+        closeBtn.textContent = '×';
+        closeBtn.title = t.hideSuggestions;
+        closeBtn.setAttribute('aria-label', t.hideSuggestions);
         closeBtn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -4250,36 +4559,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function closeChat({ restoreFocus = true } = {}) {
+        if (!els.window || els.window.classList.contains('hidden')) return;
+        const focusTarget = restoreFocus && lastChatFocusedEl && typeof lastChatFocusedEl.focus === 'function'
+            ? lastChatFocusedEl
+            : null;
+        els.window.classList.remove('flex');
+        els.window.classList.add('hidden');
+        syncChatA11yState(false);
+        setChatBackgroundInert(false);
+        document.removeEventListener('keydown', handleChatFocusTrap, true);
+        if (typeof clarity === 'function') clarity('event', 'chat_close');
+        if (typeof gtag === 'function') gtag('event', 'chat_close', {'event_category': 'Chatbot'});
+        lastChatFocusedEl = null;
+        syncMobileChatVisibility();
+        if (focusTarget) {
+            setTimeout(() => {
+                if (!focusTarget.isConnected || !els.window?.classList.contains('hidden')) return;
+                try { focusTarget.focus({ preventScroll: true }); } catch (_) { focusTarget.focus(); }
+            }, 0);
+        }
+    }
+
     function toggleChat() {
         const wasHidden = els.window?.classList.contains('hidden');
-        
         if (wasHidden) {
+            if (typeof window.__savonieCloseMobileMenu === 'function') {
+                window.__savonieCloseMobileMenu({ restoreFocus: true });
+            }
             lastChatFocusedEl = document.activeElement instanceof HTMLElement ? document.activeElement : els.toggleBtn;
-            // Opening: remove hidden, add flex
             els.window?.classList.remove('hidden');
             els.window?.classList.add('flex');
-            try { els.input?.focus({ preventScroll: true }); } catch (e) { els.input?.focus && els.input.focus(); }
             syncChatA11yState(true);
+            setChatBackgroundInert(true);
             document.addEventListener('keydown', handleChatFocusTrap, true);
+            syncMobileChatVisibility();
 
             // Track open event
             if (typeof clarity === 'function') clarity('event', 'chat_open');
             if (typeof gtag === 'function') gtag('event', 'chat_open', {'event_category': 'Chatbot'});
-        } else {
-            // Closing: remove flex, add hidden
-            els.window?.classList.remove('flex');
-            els.window?.classList.add('hidden');
-            syncChatA11yState(false);
-            document.removeEventListener('keydown', handleChatFocusTrap, true);
-
-            // Track close event
-            if (typeof clarity === 'function') clarity('event', 'chat_close');
-            if (typeof gtag === 'function') gtag('event', 'chat_close', {'event_category': 'Chatbot'});
-
-            if (lastChatFocusedEl && typeof lastChatFocusedEl.focus === 'function') {
-                try { lastChatFocusedEl.focus({ preventScroll: true }); } catch (e) { lastChatFocusedEl.focus(); }
-            }
-        }
+        } else closeChat();
         
         if (!els.window?.classList.contains('hidden')) {
             positionWelcomeBubbleDeferred();
@@ -4323,13 +4642,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             if(els.bubble) els.bubble.style.display = 'none';
-            setTimeout(() => {
-                try { els.input?.focus({ preventScroll: true }); } catch (e) { els.input?.focus && els.input.focus(); }
-                // Scroll to bottom when opening chat (only scroll the chat container)
-                if (els.messages) {
-                    els.messages.scrollTop = els.messages.scrollHeight;
-                }
-            }, 100);
+            requestAnimationFrame(() => {
+                if (!els.input || els.window?.classList.contains('hidden')) return;
+                try { els.input.focus({ preventScroll: true }); } catch (_) { els.input.focus(); }
+            });
+            if (els.messages) els.messages.scrollTop = els.messages.scrollHeight;
         }
 
         if (!els.window?.classList.contains('hidden')) {
@@ -4337,30 +4654,60 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    window.__savonieCloseChat = closeChat;
+
     // Enhanced network detection for mobile compatibility
     async function isActuallyOnline() {
-        // First check navigator.onLine
-        if (navigator.onLine) {
-            return true;
-        }
-        
-        // On mobile, navigator.onLine can be unreliable, so try a quick fetch
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
-            
-            const response = await fetch('/favicon.ico', { 
-                method: 'HEAD', 
-                cache: 'no-cache',
-                signal: controller.signal
-            });
-            
-            clearTimeout(timeoutId);
-            return response.ok;
-        } catch (error) {
-            return false;
-        }
+        return typeof navigator === 'undefined' || navigator.onLine !== false;
     }
+
+    let retryTimer = null;
+    const clearRetryControl = () => {
+        if (retryTimer) clearInterval(retryTimer);
+        retryTimer = null;
+        if (retryButton) retryButton.remove();
+        retryButton = null;
+    };
+
+    const addRetryControl = (delayMs = 0) => {
+        clearRetryControl();
+        if (!els.messages || !lastPrompt) return;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'chat-retry-btn text-xs underline font-medium';
+        button.setAttribute('aria-live', 'polite');
+        button.textContent = t.retry;
+        const update = () => {
+            const remaining = Math.max(0, Math.ceil(delayMs / 1000));
+            button.disabled = remaining > 0;
+            button.textContent = remaining > 0 ? t.retryAfter.replace('{seconds}', String(remaining)) : t.retry;
+            button.setAttribute('aria-label', button.textContent);
+            if (!remaining && retryTimer) { clearInterval(retryTimer); retryTimer = null; }
+            delayMs = Math.max(0, delayMs - 1000);
+        };
+        button.addEventListener('click', () => handleSend(lastPrompt));
+        els.messages.appendChild(button);
+        retryButton = button;
+        update();
+        if (delayMs > 0) retryTimer = setInterval(update, 1000);
+    };
+
+    const parseRetryAfter = (response) => {
+        const raw = response?.headers?.get?.('Retry-After');
+        if (!raw) return 0;
+        const seconds = Number(raw);
+        if (Number.isFinite(seconds)) return Math.min(120000, Math.max(0, seconds * 1000));
+        const date = Date.parse(raw);
+        return Number.isFinite(date) ? Math.min(120000, Math.max(0, date - Date.now())) : 0;
+    };
+
+    const isValidChatPayload = (payload) => {
+        if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false;
+        if (typeof payload.reply !== 'string' || !payload.reply.trim() || payload.reply.length > 12000) return false;
+        if (payload.chips !== undefined && (!Array.isArray(payload.chips) || payload.chips.length > 8 || payload.chips.some((chip) => typeof chip !== 'string' || chip.length > 240))) return false;
+        if (payload.metadata !== undefined && (!payload.metadata || typeof payload.metadata !== 'object' || Array.isArray(payload.metadata))) return false;
+        return true;
+    };
 
     async function handleSend(forcedText = '') {
         const rawText = typeof forcedText === 'string' && forcedText.length
@@ -4369,10 +4716,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const text = rawText.trim();
         if (!text || isSending) return;
 
-        isSending = true;
+        lastPrompt = text;
+        clearRetryControl();
+        setChatPending(true);
         if (els.input) {
             els.input.value = '';
         }
+        announceChat(t.thinking, true);
+
+        try {
 
         // Google Analytics event tracking
         if(typeof gtag === 'function') {
@@ -4390,26 +4742,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const online = await isActuallyOnline();
         if (!online) {
             addMessageToUI(text, 'user');
-            addMessageToUI("You appear to be offline. Please check your connection and try again.", 'bot');
-            isSending = false;
+            addMessageToUI(t.offline, 'bot');
+            setChatPending(false);
+            announceChat(t.offline);
+            addRetryControl();
             return;
         }
 
         addMessageToUI(text, 'user');
-        const loadingId = addMessageToUI('Thinking...', 'bot', true);
+        const loadingId = addMessageToUI(t.thinking, 'bot', { isLoading: true });
 
-        // Enhanced fetch with timeout and retry logic
-        const REQUEST_TIMEOUT = 30000; // 30 seconds
-        const MAX_RETRIES = 2;
+        const REQUEST_TIMEOUT = 30000;
         let lastError = null;
         let data = null;
-
-        for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-
-            try {
-                const response = await fetch(CHAT_ENDPOINT, {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+        try {
+            const response = await fetch(CHAT_ENDPOINT, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -4420,55 +4769,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         language: pageLang
                     }),
                     signal: controller.signal
-                });
-
-                clearTimeout(timeoutId);
-
-                // Handle HTTP error responses
-                if (!response.ok) {
-                    if (response.status >= 500) {
-                        // Server error - may be worth retrying
-                        lastError = { type: 'server', status: response.status };
-                        if (attempt < MAX_RETRIES) {
-                            await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); // Exponential backoff
-                            continue;
-                        }
-                    } else if (response.status === 429) {
-                        // Rate limited
-                        lastError = { type: 'rate_limit' };
-                        break; // Don't retry rate limits
-                    } else {
-                        // Other client errors
-                        lastError = { type: 'client', status: response.status };
-                        break;
-                    }
-                }
-
-                data = await response.json();
-                lastError = null; // Success!
-                break;
-
-            } catch (fetchError) {
-                clearTimeout(timeoutId);
-                
-                if (fetchError.name === 'AbortError') {
-                    lastError = { type: 'timeout' };
-                    if (attempt < MAX_RETRIES) {
-                        continue; // Retry on timeout
-                    }
-                } else {
-                    lastError = {
-                        type: 'network',
-                        message: fetchError.message,
-                        offline: (typeof navigator !== 'undefined') ? navigator.onLine === false : false,
-                        endpoint: CHAT_ENDPOINT
-                    };
-                    if (attempt < MAX_RETRIES) {
-                        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
-                        continue;
-                    }
+            });
+            if (!response.ok) {
+                lastError = { type: response.status === 429 ? 'rate_limit' : response.status >= 500 ? 'server' : 'client', status: response.status, retryAfterMs: parseRetryAfter(response) };
+            } else {
+                try {
+                    data = await response.json();
+                    if (!isValidChatPayload(data)) lastError = { type: 'ambiguous' };
+                } catch (_) {
+                    lastError = { type: 'ambiguous' };
                 }
             }
+        } catch (fetchError) {
+            lastError = fetchError?.name === 'AbortError' ? { type: 'timeout' } : { type: 'network', offline: typeof navigator !== 'undefined' && navigator.onLine === false };
+        } finally {
+            clearTimeout(timeoutId);
         }
 
         // Handle errors after all retries exhausted
@@ -4477,27 +4792,28 @@ document.addEventListener('DOMContentLoaded', () => {
             let errorMessage;
             switch (lastError.type) {
                 case 'timeout':
-                    errorMessage = "The request took too long. The AI service might be busy. Please try again in a moment.";
+                    errorMessage = t.timeout;
                     break;
                 case 'rate_limit':
-                    errorMessage = "Too many requests. Please wait a moment before sending another message.";
+                    errorMessage = t.rateLimit;
                     break;
                 case 'server':
-                    errorMessage = "The AI service is temporarily unavailable. Please try again in a few seconds.";
+                    errorMessage = t.server;
                     break;
                 case 'client':
-                    errorMessage = "The request was rejected by the AI service. Please rephrase and try again.";
+                    errorMessage = t.client;
                     break;
                 case 'network':
-                    errorMessage = lastError.offline
-                        ? "Connection appears offline. Please check your internet connection and try again."
-                        : "I could not reach the AI service endpoint from this page. Please refresh and try again.";
+                    errorMessage = lastError.offline ? t.offline : t.network;
                     break;
+                case 'ambiguous': errorMessage = t.ambiguous; break;
                 default:
-                    errorMessage = "Something went wrong. Please try again.";
+                    errorMessage = t.ambiguous;
             }
             addMessageToUI(errorMessage, 'bot');
-            isSending = false;
+            setChatPending(false);
+            announceChat(errorMessage);
+            addRetryControl(lastError.retryAfterMs || 0);
             return;
         }
 
@@ -4506,16 +4822,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Contract-level error types (may be absent)
         if (data && data.errorType) {
-            let friendly = 'Something went wrong. Please try again.';
+            let friendly = t.ambiguous;
             if (data.errorType === 'RateLimit') {
-                friendly = 'Too many requests. Please wait a moment before trying again.';
+                friendly = t.rateLimit;
             } else if (data.errorType === 'BadRequest') {
-                friendly = 'Please rephrase your question and try again.';
+                friendly = t.client;
             } else if (data.errorType === 'UpstreamError') {
+                friendly = t.server;
                 friendly = 'Service hiccup—please try again in a moment.';
             }
+            if (data.errorType === 'UpstreamError') friendly = t.server;
             addMessageToUI(friendly, 'bot');
-            isSending = false;
+            setChatPending(false);
+            announceChat(friendly);
+            addRetryControl();
             return;
         }
 
@@ -4523,6 +4843,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.reply) {
             addMessageToUI(data.reply, 'bot');
         }
+
+        const responseMeta = data.metadata || data;
+        const notices = [];
+        if (responseMeta.fallback_mode) notices.push(t.fallback);
+        if (responseMeta.truncated) notices.push(t.truncated);
+        if (responseMeta.continuation_hint) notices.push(typeof responseMeta.continuation_hint === 'string' ? responseMeta.continuation_hint : t.continuation);
+        if (notices.length) addMessageToUI(notices.join(' '), 'bot');
 
         // Handle chips (suggestion buttons)
         if (data.chips && Array.isArray(data.chips) && els.chipsContainer) {
@@ -4568,11 +4895,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        isSending = false;
+        setChatPending(false);
+        announceChat(notices.join(' ') || t.ready);
+        } finally {
+            if (isSending) setChatPending(false);
+        }
     }
 
-    function addMessageToUI(text, sender, isLoading = false) {
+    function addMessageToUI(text, sender, options = {}) {
         if (!els.messages) return;
+        const { isLoading = false, persist = true } = options;
         const div = document.createElement('div');
         div.id = isLoading ? 'loading-msg' : '';
         const userClass = 'bg-[#212842] text-white rounded-tr-none self-end ml-auto';
@@ -4623,12 +4955,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        if (!isLoading && isInitialized) {
-            chatHistory.push({ kind: 'text', text, sender });
+        if (persist && !isLoading && isInitialized) {
+            chatHistory.push({ kind: 'text', text, sender, timestamp: Date.now() });
             if (chatHistory.length > MAX_HISTORY_ITEMS) {
                 chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY_ITEMS);
             }
-            setSafeStorageItem('localStorage', historyStorageKey, JSON.stringify(chatHistory));
+            saveChatHistory();
         }
         
         els.messages.scrollTop = els.messages.scrollHeight;
@@ -4656,8 +4988,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const view = document.createElement('a');
         view.href = project.link;
-        view.className = 'inline-block bg-[#212842] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#362017] transition-colors';
-        view.textContent = 'View';
+        view.className = 'inline-block bg-[#212842] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#362017] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#212842] focus-visible:ring-offset-2 transition-colors';
+        view.textContent = project.action;
 
         body.appendChild(title);
         if (project.summary) body.appendChild(summary);
@@ -4667,7 +4999,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (project.img) {
             const img = document.createElement('img');
             img.src = project.img;
-            img.alt = project.title;
+            img.alt = `${project.title} preview`;
+            img.width = 960;
+            img.height = 1440;
+            img.loading = 'lazy';
+            img.decoding = 'async';
             img.className = 'w-full h-32 object-cover';
             img.addEventListener('error', () => {
                 try { img.remove(); } catch (e) {}
@@ -4681,11 +5017,11 @@ document.addEventListener('DOMContentLoaded', () => {
         els.messages.scrollTop = els.messages.scrollHeight;
 
         if (isInitialized) {
-            chatHistory.push({ kind: 'card', cardId });
+            chatHistory.push({ kind: 'card', cardId, timestamp: Date.now() });
             if (chatHistory.length > MAX_HISTORY_ITEMS) {
                 chatHistory = chatHistory.slice(chatHistory.length - MAX_HISTORY_ITEMS);
             }
-            setSafeStorageItem('localStorage', historyStorageKey, JSON.stringify(chatHistory));
+            saveChatHistory();
         }
     }
 
@@ -4776,7 +5112,7 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleChat();
         }
         // Ctrl/Cmd + K to toggle chat
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
             e.preventDefault();
             toggleChat();
         }
@@ -4786,112 +5122,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================================================
-// PDF Preview Toggle (for project pages)
 // ==========================================================================
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Helper: produce the default fallback markup (keeps existing copy consistent)
-    const defaultFallback = () => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'rounded-xl border border-chocolate/20 bg-white/40 overflow-hidden p-8 text-center';
-        const p = document.createElement('p');
-        p.className = 'text-sm text-chocolate/70';
-        p.textContent = 'Inline PDF preview may be blocked by hosting or browser settings. Use the buttons below to open or download the deck.';
-        wrapper.appendChild(p);
-        return wrapper;
-    };
-
-    // Try to load a PDF into an iframe; if it fails, show fallback
-    const tryLoadPdf = (panel, pdfUrl) => {
-        if (!panel || !pdfUrl) return;
-        if (panel.dataset.pdfLoaded) return; // already attempted
-
-        // Insert a lightweight loading state
-        panel.innerHTML = '';
-        const loading = document.createElement('div');
-        loading.className = 'py-12 text-sm text-chocolate/60';
-        loading.textContent = 'Attempting to load inline preview…';
-        panel.appendChild(loading);
-
-        const iframe = document.createElement('iframe');
-        iframe.src = pdfUrl;
-        iframe.title = 'PDF preview';
-        iframe.style.width = '100%';
-        iframe.style.height = '480px';
-        iframe.style.border = '0';
-        iframe.loading = 'lazy';
-
-        let timedOut = false;
-        const timeout = setTimeout(() => {
-            timedOut = true;
-            // Loading took too long - assume success (browser swallowed load event for PDF)
-
-            // Clean up loading state
-            try { loading.remove(); } catch(e) {}
-            if (!panel.contains(iframe)) panel.appendChild(iframe);
-            panel.dataset.pdfLoaded = 'true';
-        }, 5000);
-
-        const onFail = () => {
-            clearTimeout(timeout);
-            try { iframe.remove(); } catch (e) {}
-            panel.innerHTML = '';
-            panel.appendChild(defaultFallback());
-            panel.dataset.pdfLoaded = 'false';
-        };
-
-        iframe.addEventListener('load', () => {
-            clearTimeout(timeout);
-            // If iframe content is accessible, treat as success.
-            try {
-                try { loading.remove(); } catch(e) {}
-                if (!panel.contains(iframe)) panel.appendChild(iframe);
-                panel.dataset.pdfLoaded = 'true';
-            } catch (e) {
-                // If something goes wrong, fallback
-                onFail();
-            }
-        });
-
-        iframe.addEventListener('error', onFail);
-
-        // Append iframe so browser begins loading
-        panel.appendChild(iframe);
-    };
-
-    // Initialize toggles and progressive load for every preview-toggle on the page
-    document.querySelectorAll('.preview-toggle').forEach((btn) => {
-        // Find the preview panel within the same section
-        const section = btn.closest('section');
-        const panel = section && section.querySelector('.preview-panel');
-
-        // Attempt to find a PDF link within the same section (first match)
-        let pdfLink = null;
-        if (section) {
-            pdfLink = section.querySelector('a[href$=".pdf"]') || section.querySelector('a[href*=".pdf?"]');
-        }
-        const pdfUrl = pdfLink ? pdfLink.getAttribute('href') : null;
-
-        // If a PDF URL exists, try to progressively load the iframe now (so the preview is ready).
-        // This preserves the user's expectation that an inline preview appears when possible.
-        if (panel && pdfUrl) {
-            tryLoadPdf(panel, pdfUrl);
-        }
-
-        btn.addEventListener('click', () => {
-            if (!panel) return;
-            panel.classList.toggle('hidden');
-            const isVisible = !panel.classList.contains('hidden');
-            btn.textContent = isVisible ? 'Hide preview' : 'Show preview';
-
-            // Track PDF toggle
-            if (typeof clarity === 'function') clarity('event', isVisible ? 'pdf_preview_show' : 'pdf_preview_hide');
-            if (typeof gtag === 'function') gtag('event', isVisible ? 'pdf_preview_show' : 'pdf_preview_hide', {'event_category': 'PDF'});
-
-            // If the panel becomes visible and we haven't attempted loading yet, try again
-            if (isVisible && !panel.dataset.pdfLoaded && pdfUrl) {
-                tryLoadPdf(panel, pdfUrl);
-            }
-        });
-    });
-});

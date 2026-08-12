@@ -7,6 +7,8 @@ const ENTITY_MAP = {
   "&nbsp;": " "
 };
 
+export const MAX_GROUNDING_TEXT_LENGTH = 6000;
+
 const MOJIBAKE_MAP = {
   "\u00c3\u00a9": "\u00e9",
   "\u00c3\u00a1": "\u00e1",
@@ -84,7 +86,6 @@ const TAG_RE = /<[^>]+>/g;
 function safeLower(text) {
   return String(text || "").toLowerCase();
 }
-
 export function normalizeWhitespace(text) {
   return String(text || "")
     .replace(/\r/g, "\n")
@@ -93,6 +94,14 @@ export function normalizeWhitespace(text) {
     .replace(/[ ]{2,}/g, " ")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+function truncateGroundingText(text) {
+  const normalized = normalizeWhitespace(text);
+  if (normalized.length <= MAX_GROUNDING_TEXT_LENGTH) return normalized;
+  const clipped = normalized.slice(0, MAX_GROUNDING_TEXT_LENGTH - 3);
+  const lastSpace = clipped.lastIndexOf(" ");
+  return `${clipped.slice(0, lastSpace > 0 ? lastSpace : clipped.length)}...`;
 }
 
 export function decodeHtmlEntities(text) {
@@ -337,7 +346,7 @@ export function extractSectionsFromHtml(html, fallbackHeading = "Overview") {
         sections.push({
           heading: current.heading,
           level: current.level,
-          text: normalizeWhitespace(current.textParts.join("\n"))
+          text: truncateGroundingText(current.textParts.join("\n"))
         });
       }
 
@@ -357,7 +366,7 @@ export function extractSectionsFromHtml(html, fallbackHeading = "Overview") {
     sections.push({
       heading: current.heading,
       level: current.level,
-      text: normalizeWhitespace(current.textParts.join("\n"))
+      text: truncateGroundingText(current.textParts.join("\n"))
     });
   }
 

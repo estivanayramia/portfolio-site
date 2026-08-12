@@ -808,7 +808,12 @@ input[type="text"],
 input[type="email"],
 textarea,
 select {
-    transition: all 0.2s ease-in-out;
+    transition:
+        background-color 0.2s ease-in-out,
+        border-color 0.2s ease-in-out,
+        box-shadow 0.2s ease-in-out,
+        color 0.2s ease-in-out,
+        transform 0.2s ease-in-out;
 }
 
 input[type="text"]:focus,
@@ -3867,8 +3872,35 @@ footer, .section-below-fold {
 #chat-widget {
     z-index: 9999 !important;
     bottom: calc(var(--floating-ui-edge) + env(safe-area-inset-bottom, 0px)) !important;
-    transition: transform 0.3s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease;
     position: fixed !important;
+}
+
+@media (max-width: 640px) {
+    body #chat-widget.chat-widget--open {
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        transform: none !important;
+        transition: none !important;
+    }
+
+    body:not(.page-close-ui-guard) #chat-widget.chat-widget--deferred {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        transform: translateY(0.5rem) !important;
+    }
+
+    body:not(.page-close-ui-guard) footer {
+        padding-bottom: calc(var(--chat-fab-size) + var(--floating-ui-edge) + var(--floating-ui-edge) + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #chat-widget {
+        transition: none !important;
+    }
 }
 
 :not(:lang(ar)) #chat-widget {

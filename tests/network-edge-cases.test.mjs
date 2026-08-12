@@ -41,6 +41,9 @@ test('contact receipt becomes upstream_failed when Formspree fetch throws', { co
     });
     const env = {
       SAVONIE_KV: {
+        async get() {
+          return null;
+        },
         async put(key, value) {
           writes.push({ key, value: JSON.parse(value) });
         },
@@ -78,6 +81,9 @@ test('contact receipt still becomes forwarded after confirmed delivery', { concu
     });
     const env = {
       SAVONIE_KV: {
+        async get() {
+          return null;
+        },
         async put(key, value) {
           writes.push({ key, value: JSON.parse(value) });
         },
