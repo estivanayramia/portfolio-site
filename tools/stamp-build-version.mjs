@@ -58,6 +58,14 @@ function updateFile(path, updater) {
 }
 
 function listTrackedHtmlFiles() {
+  try {
+    const tracked = run('git ls-files -z -- "*.html"')
+      .split('\0')
+      .filter(Boolean)
+      .sort((left, right) => left.localeCompare(right));
+    if (tracked.length > 0) return tracked;
+  } catch {}
+
   const rootDir = process.cwd();
   const files = [];
 
@@ -83,7 +91,7 @@ function listTrackedHtmlFiles() {
     }
   };
 
-  for (const folder of ['EN', 'ar', 'es']) {
+  for (const folder of ['EN', 'ar', 'es', 'assets/MiniGames']) {
     const absoluteDir = path.join(rootDir, folder);
     if (existsSync(absoluteDir)) {
       walk(absoluteDir, folder);
@@ -99,9 +107,29 @@ function stampHtmlBuildVersion(files, version) {
   let changed = 0;
   for (const f of files) {
     const didChange = updateFile(f, (src) => {
-      if (!metaRe.test(src)) return src;
+      if (metaRe.test(src)) {
+        metaRe.lastIndex = 0;
+        return src.replace(metaRe, `$1${version}$3`);
+      }
+
       metaRe.lastIndex = 0;
-      return src.replace(metaRe, `$1${version}$3`);
+      const headMatch = /<head(?:\s[^>]*)?>/i.exec(src);
+      if (!headMatch) {
+        throw new Error(`[stamp-build-version] Missing <head> in ${f}`);
+      }
+
+      const insertAt = headMatch.index + headMatch[0].length;
+      const before = src.slice(0, insertAt);
+      const after = src.slice(insertAt);
+      const lineLayout = /^(\r?\n)([\t ]*)/.exec(after);
+      const lineBreak = lineLayout?.[1] || (src.includes('\r\n') ? '\r\n' : '\n');
+      const indent = lineLayout?.[2] || '  ';
+      const meta = `<meta name="build-version" content="${version}">`;
+
+      if (lineLayout) {
+        return `${before}${lineBreak}${indent}${meta}${after}`;
+      }
+      return `${before}${lineBreak}${indent}${meta}${lineBreak}${indent}${after}`;
     });
     if (didChange) changed++;
   }
@@ -113,7 +141,7 @@ function stampServiceWorker(version) {
   const cacheRe = /(const\s+CACHE_VERSION\s*=\s*['"])([^'"]+)(['"];)/;
   return updateFile(swPath, (src) => {
     if (!cacheRe.test(src)) return src;
-    const next = `v${version}-dashboard-bypass`;
+    const next = `v${version}`;
     return src.replace(cacheRe, `$1${next}$3`);
   });
 }

@@ -15,8 +15,6 @@ function resize() {
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   if (hexGrid.length) layoutGrid();
 }
-resize();
-window.addEventListener('resize', resize);
 
 // --- Hex colors ---
 const HEX_COLORS = [
@@ -51,6 +49,9 @@ let hexGrid = [];
 let gridCols = 3;
 let gridRows = 3;
 const HEX_RADIUS = 32;
+
+resize();
+window.addEventListener('resize', resize);
 
 // Ambient particles
 let ambientParticles = [];

@@ -733,9 +733,11 @@ class RouletteOverlayController {
     const actions = createElement('div', 'luxury-roulette-dialog__actions');
     const primaryButton = createElement('button', 'luxury-roulette-action luxury-roulette-action--primary');
     primaryButton.type = 'button';
+    primaryButton.textContent = 'Open selection';
     primaryButton.dataset.roulettePrimary = 'true';
     const secondaryButton = createElement('button', 'luxury-roulette-action luxury-roulette-action--secondary');
     secondaryButton.type = 'button';
+    secondaryButton.textContent = 'Close';
     secondaryButton.dataset.rouletteSecondary = 'true';
 
     actions.appendChild(primaryButton);
