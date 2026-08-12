@@ -102,27 +102,33 @@ function listTrackedHtmlFiles() {
 }
 
 function stampHtmlBuildVersion(files, version) {
-  const metaRe = /(<meta\s+[^>]*name=["']build-version["'][^>]*content=["'])([^"']*)(["'][^>]*>)/gi;
+  const metaTagPattern = "<meta\\s+[^>]*name=[\"']build-version[\"'][^>]*>";
+  const metaLineRe = new RegExp(`^[\\t ]*${metaTagPattern}[\\t ]*(?:\\r?\\n|$)`, 'gim');
+  const metaTagRe = new RegExp(metaTagPattern, 'gi');
 
   let changed = 0;
   for (const f of files) {
     const didChange = updateFile(f, (src) => {
-      if (metaRe.test(src)) {
-        metaRe.lastIndex = 0;
-        return src.replace(metaRe, `$1${version}$3`);
-      }
-
-      metaRe.lastIndex = 0;
-      const headMatch = /<head(?:\s[^>]*)?>/i.exec(src);
+      const withoutBuildMeta = src.replace(metaLineRe, '').replace(metaTagRe, '');
+      const headMatch = /<head(?:\s[^>]*)?>/i.exec(withoutBuildMeta);
       if (!headMatch) {
         throw new Error(`[stamp-build-version] Missing <head> in ${f}`);
       }
 
-      const insertAt = headMatch.index + headMatch[0].length;
-      const before = src.slice(0, insertAt);
-      const after = src.slice(insertAt);
+      const headContentStart = headMatch.index + headMatch[0].length;
+      const headCloseMatch = /<\/head\s*>/i.exec(withoutBuildMeta.slice(headContentStart));
+      const headContentEnd = headCloseMatch
+        ? headContentStart + headCloseMatch.index
+        : withoutBuildMeta.length;
+      const headContent = withoutBuildMeta.slice(headContentStart, headContentEnd);
+      const charsetMatch = /<meta\s+charset\s*=\s*["'][^"']+["'][^>]*>/i.exec(headContent);
+      const insertAt = charsetMatch
+        ? headContentStart + charsetMatch.index + charsetMatch[0].length
+        : headContentStart;
+      const before = withoutBuildMeta.slice(0, insertAt);
+      const after = withoutBuildMeta.slice(insertAt);
       const lineLayout = /^(\r?\n)([\t ]*)/.exec(after);
-      const lineBreak = lineLayout?.[1] || (src.includes('\r\n') ? '\r\n' : '\n');
+      const lineBreak = lineLayout?.[1] || (withoutBuildMeta.includes('\r\n') ? '\r\n' : '\n');
       const indent = lineLayout?.[2] || '  ';
       const meta = `<meta name="build-version" content="${version}">`;
 
