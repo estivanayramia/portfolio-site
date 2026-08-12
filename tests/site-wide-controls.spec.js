@@ -259,6 +259,15 @@ async function exerciseFrameControls(page, frame) {
           detachedControls += 1;
           break;
         }
+        if (!(await locator.isVisible().catch(() => false))) {
+          await locator.evaluate((element) => element.click()).then(() => {
+            hiddenActions += 1;
+          }).catch(() => {
+            detachedControls += 1;
+          });
+          transientCloseActions += await dismissTransientUi(page, frame);
+          continue;
+        }
         await locator.scrollIntoViewIfNeeded({ timeout: 1000 }).catch(() => {});
         let clicked = false;
         try {
