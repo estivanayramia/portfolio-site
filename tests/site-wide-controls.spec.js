@@ -322,7 +322,9 @@ async function exerciseFrameControls(page, frame) {
     if (!(await canvas.isVisible().catch(() => false))) continue;
     await canvas.scrollIntoViewIfNeeded({ timeout: 1000 }).catch(() => {});
     for (let attempt = 0; attempt < 2; attempt += 1) {
-      await canvas.click({ position: { x: 8, y: 8 }, timeout: 1000, force: true, noWaitAfter: true });
+      const box = await canvas.boundingBox();
+      if (!box) break;
+      await page.mouse.click(box.x + Math.min(8, box.width / 2), box.y + Math.min(8, box.height / 2));
       canvasActions += 1;
       await page.waitForTimeout(30);
     }
