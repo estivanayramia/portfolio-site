@@ -404,6 +404,54 @@ test('the narrow Off The Line canvas maps pointer input and starts twice', async
   await context.close();
 });
 
+for (const viewport of [{ width: 390, height: 844 }, { width: 768, height: 1024 }]) {
+  test(`the 1024 Moves start screen fits ${viewport.width}px without clipped text`, async ({ browser }) => {
+    const context = await browser.newContext({ serviceWorkers: 'block', viewport });
+    const page = await context.newPage();
+    await page.goto(surfaceUrl('assets/MiniGames/1024-moves/index.html'), { waitUntil: 'load' });
+    const hud = page.locator('#HUD');
+    await expect(hud).toBeVisible();
+    await expect.poll(() => hud.evaluate((canvas) => canvas.width)).toBe(viewport.width);
+
+    const inkBounds = await hud.evaluate((canvas) => {
+      const context2d = canvas.getContext('2d');
+      const { data, width, height } = context2d.getImageData(0, 0, canvas.width, canvas.height);
+      const background = [127, 64, 217];
+      let minX = width;
+      let maxX = -1;
+      for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+          const offset = ((y * width) + x) * 4;
+          if (data[offset] !== background[0] || data[offset + 1] !== background[1] || data[offset + 2] !== background[2]) {
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+          }
+        }
+      }
+      return { minX, maxX };
+    });
+    expect(inkBounds.minX).toBeGreaterThanOrEqual(12);
+    expect(inkBounds.maxX).toBeLessThanOrEqual(viewport.width - 13);
+    await context.close();
+  });
+}
+
+test('the Isa interview keeps a readable single-column narrative on mobile', async ({ browser }) => {
+  const context = await browser.newContext({ serviceWorkers: 'block', viewport: { width: 390, height: 844 } });
+  const page = await context.newPage();
+  await page.goto(surfaceUrl('EN/projects/isa-grimes-interview.html'), { waitUntil: 'domcontentloaded' });
+  const layout = await page.locator('.project-body-grid').evaluate((grid) => {
+    const article = grid.querySelector('article');
+    return {
+      columns: getComputedStyle(grid).gridTemplateColumns.split(' ').length,
+      articleWidth: article.getBoundingClientRect().width,
+    };
+  });
+  expect(layout.columns).toBe(1);
+  expect(layout.articleWidth).toBeGreaterThanOrEqual(275);
+  await context.close();
+});
+
 for (const source of sources) {
   test(`${source} loads and its controls work twice`, async ({ browser }) => {
     test.setTimeout(120000);

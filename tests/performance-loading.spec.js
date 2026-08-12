@@ -5,6 +5,7 @@ const { execFileSync } = require('node:child_process');
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5500';
 const projectPage = `${baseUrl}/EN/projects/endpoint-linkedin-campaign.html`;
 const projectsPage = `${baseUrl}/EN/projects/`;
+const carPage = `${baseUrl}/EN/hobbies/car.html`;
 const gymPage = `${baseUrl}/EN/hobbies/gym.html`;
 
 function isLocalRequest(url) {
@@ -116,7 +117,7 @@ test.describe('PDF and media loading budgets', () => {
     await context.close();
   });
 
-  test('project card images and gym video declare intrinsic dimensions', async ({ browser }) => {
+  test('project card images and hobby videos declare stable media placeholders', async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await useLocalOnly(context);
     const page = await context.newPage();
@@ -129,9 +130,17 @@ test.describe('PDF and media loading budgets', () => {
     expect(imageDimensions.length).toBeGreaterThan(0);
     expect(imageDimensions.every((image) => Number(image.width) > 0 && Number(image.height) > 0 && image.loading === 'lazy')).toBeTruthy();
 
+    await page.goto(carPage, { waitUntil: 'domcontentloaded' });
+    const carVideo = page.locator('video').first();
+    await expect(carVideo).toHaveAttribute('preload', 'none');
+    await expect(carVideo).toHaveAttribute('poster', /car_by_sunset\.webp$/);
+    await expect(carVideo).toHaveAttribute('aria-label', /BMW 540i driving video/i);
+
     await page.goto(gymPage, { waitUntil: 'domcontentloaded' });
     const video = page.locator('video').first();
     await expect(video).toHaveAttribute('preload', 'none');
+    await expect(video).toHaveAttribute('poster', /sitting_on_curling_bench\.webp$/);
+    await expect(video).toHaveAttribute('aria-label', /gym muscle-up attempt video/i);
     await expect(video).toHaveAttribute('width', '1080');
     await expect(video).toHaveAttribute('height', '1920');
     await expect(video).toHaveClass(/aspect-\[9\/16\]/);

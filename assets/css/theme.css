@@ -3085,8 +3085,10 @@ body[data-print-url*="/projects/"] .text-xs.uppercase {
     }
 }
 
-.project-page.project-editorial .project-body-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.72fr);
+@media (min-width: 1024px) {
+    .project-page.project-editorial .project-body-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(220px, 0.72fr);
+    }
 }
 
 .project-page.project-editorial .project-side-card {
