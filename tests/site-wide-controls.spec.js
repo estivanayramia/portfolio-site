@@ -316,10 +316,13 @@ async function exerciseFrameControls(page, frame) {
   }
 
   let canvasActions = 0;
-  const canvases = frame.locator('canvas');
-  for (let index = 0; index < await canvases.count(); index += 1) {
-    const canvas = canvases.nth(index);
-    if (!(await canvas.isVisible().catch(() => false))) continue;
+  const canvases = await frame.locator('canvas').elementHandles();
+  for (const canvas of canvases) {
+    const visible = await canvas.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return element.isConnected && style.display !== 'none' && style.visibility !== 'hidden' && element.getClientRects().length > 0;
+    }).catch(() => false);
+    if (!visible) continue;
     await canvas.scrollIntoViewIfNeeded({ timeout: 1000 }).catch(() => {});
     for (let attempt = 0; attempt < 2; attempt += 1) {
       const box = await canvas.boundingBox();
