@@ -3133,6 +3133,10 @@ body[data-print-url*="/projects/"] .text-xs.uppercase {
     overflow-x: clip;
 }
 
+.gallery-page {
+    overflow-x: clip;
+}
+
 [data-theme="dark"] .hobby-page {
     --hobby-line: rgba(225, 212, 194, 0.16);
     --hobby-panel: rgba(225, 212, 194, 0.08);
