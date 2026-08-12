@@ -245,11 +245,7 @@ function getTouchSwipeRegressionOptions(profileName) {
   return undefined;
 }
 
-const responsiveMiniPages = [
-  { name: 'Whispers', url: whispersUrl },
-  { name: 'Photography', url: photographyUrl },
-  { name: 'Me', url: meUrl }
-];
+const responsiveMiniPages = miniPages;
 
 async function prepareCarousel(page) {
   await gotoWithRetry(page, projectUrl);
@@ -482,13 +478,16 @@ async function expectSectionWithinViewport(page, selector) {
       left: rect.left,
       right: rect.right,
       width: rect.width,
-      viewportWidth: window.innerWidth
+      viewportWidth: window.innerWidth,
+      documentClientWidth: document.documentElement.clientWidth,
+      documentScrollWidth: document.documentElement.scrollWidth
     };
   });
 
   expect(state.left).toBeGreaterThanOrEqual(-4);
   expect(state.right).toBeLessThanOrEqual(state.viewportWidth + 4);
   expect(state.width).toBeLessThanOrEqual(state.viewportWidth + 4);
+  expect(state.documentScrollWidth).toBeLessThanOrEqual(state.documentClientWidth + 1);
 }
 
 async function expectPremiumLayoutStable(page, selector) {

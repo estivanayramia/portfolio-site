@@ -3130,6 +3130,7 @@ body[data-print-url*="/projects/"] .text-xs.uppercase {
     --hobby-panel: rgba(255, 255, 255, 0.62);
     --hobby-panel-soft: rgba(255, 255, 255, 0.34);
     --hobby-panel-strong: rgba(255, 255, 255, 0.78);
+    overflow-x: clip;
 }
 
 [data-theme="dark"] .hobby-page {
@@ -3206,6 +3207,10 @@ body[data-print-url*="/projects/"] .text-xs.uppercase {
 .hobby-page .hobby-narrative {
     display: grid;
     gap: clamp(2rem, 4vw, 3rem);
+}
+
+.hobby-page .hobby-narrative > * {
+    min-width: 0;
 }
 
 .hobby-page .hobby-side-stack {

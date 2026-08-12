@@ -254,29 +254,36 @@ async function exerciseFrameControls(page, frame) {
       continue;
     }
     if (await locator.isVisible().catch(() => false)) {
-      await locator.scrollIntoViewIfNeeded({ timeout: 1000 }).catch(() => {});
-      let clicked = false;
-      try {
-        await locator.click({ timeout: 1000, noWaitAfter: true });
-        clicked = true;
-      } catch {
-        await page.keyboard.press('Escape').catch(() => {});
+      for (let attempt = 0; attempt < 2; attempt += 1) {
         if (!(await locator.count())) {
           detachedControls += 1;
-          continue;
+          break;
         }
+        await locator.scrollIntoViewIfNeeded({ timeout: 1000 }).catch(() => {});
+        let clicked = false;
         try {
-          await locator.click({ timeout: 1000, force: true, noWaitAfter: true });
+          await locator.click({ timeout: 1000, noWaitAfter: true });
           clicked = true;
-        } catch (error) {
+        } catch {
+          await page.keyboard.press('Escape').catch(() => {});
           if (!(await locator.count())) {
             detachedControls += 1;
-            continue;
+            break;
           }
-          throw error;
+          try {
+            await locator.click({ timeout: 1000, force: true, noWaitAfter: true });
+            clicked = true;
+          } catch (error) {
+            if (!(await locator.count())) {
+              detachedControls += 1;
+              break;
+            }
+            throw error;
+          }
         }
+        if (clicked) visibleActions += 1;
+        transientCloseActions += await dismissTransientUi(page, frame);
       }
-      if (clicked) visibleActions += 1;
     } else {
       await locator.evaluate((element) => {
         element.click();
@@ -286,10 +293,31 @@ async function exerciseFrameControls(page, frame) {
       }).catch(() => {
         detachedControls += 1;
       });
+      transientCloseActions += await dismissTransientUi(page, frame);
     }
-    transientCloseActions += await dismissTransientUi(page, frame);
   }
-  return { total: audit.length, visibleActions, hiddenActions, detachedControls, transientCloseActions };
+
+  let canvasActions = 0;
+  const canvases = frame.locator('canvas');
+  for (let index = 0; index < await canvases.count(); index += 1) {
+    const canvas = canvases.nth(index);
+    if (!(await canvas.isVisible().catch(() => false))) continue;
+    await canvas.scrollIntoViewIfNeeded({ timeout: 1000 }).catch(() => {});
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      await canvas.click({ position: { x: 8, y: 8 }, timeout: 1000, force: true, noWaitAfter: true });
+      canvasActions += 1;
+      await page.waitForTimeout(30);
+    }
+  }
+
+  return {
+    total: audit.length,
+    visibleActions,
+    hiddenActions,
+    canvasActions,
+    detachedControls,
+    transientCloseActions,
+  };
 }
 
 test.beforeAll(() => {
@@ -322,6 +350,38 @@ test('an open achievements panel accepts repeated live updates', async ({ page }
   }
 
   expect(pageErrors).toEqual([]);
+});
+
+test('the narrow Off The Line canvas maps pointer input and starts twice', async ({ browser }) => {
+  const context = await browser.newContext({
+    serviceWorkers: 'block',
+    viewport: { width: 390, height: 844 },
+  });
+  const page = await context.newPage();
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await page.goto(surfaceUrl('assets/MiniGames/off-the-line/index.html'), { waitUntil: 'load' });
+    const canvas = page.locator('#game canvas');
+    await expect(canvas).toBeVisible();
+    const box = await canvas.boundingBox();
+    expect(box.width).toBeLessThanOrEqual(390);
+
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    const pointer = await page.evaluate(() => ({ x: window.p.aa.x, y: window.p.aa.y }));
+    expect(pointer.x).toBeCloseTo(320, 0);
+    expect(pointer.y).toBeCloseTo(240, 0);
+
+    const introState = await page.evaluate(() => window.p.state.name);
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await expect.poll(() => page.evaluate(() => window.p.state.name)).not.toBe(introState);
+
+    await page.mouse.move(box.x + (box.width * 100 / 640), box.y + (box.height * 370 / 480));
+    const menuState = await page.evaluate(() => window.p.state.name);
+    await page.mouse.click(box.x + (box.width * 100 / 640), box.y + (box.height * 370 / 480));
+    await expect.poll(() => page.evaluate(() => window.p.state.name)).not.toBe(menuState);
+  }
+
+  await context.close();
 });
 
 for (const source of sources) {
@@ -370,6 +430,14 @@ for (const source of sources) {
       await expect(page.locator('meta[name="build-version"]')).toHaveCount(1);
 
       await page.waitForTimeout(100);
+      const pageWidth = await page.evaluate(() => ({
+        clientWidth: document.documentElement.clientWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+      }));
+      expect(
+        pageWidth.scrollWidth,
+        `${source} ${viewport.name} document-level horizontal overflow`,
+      ).toBeLessThanOrEqual(pageWidth.clientWidth + 1);
       const baselineConsoleErrors = consoleErrors.filter((message) =>
         !/favicon\.ico|Failed to load resource.*(?:google|clarity|doubleclick)/i.test(message)
       );
