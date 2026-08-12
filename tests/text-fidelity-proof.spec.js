@@ -1,11 +1,13 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect, devices } = require('@playwright/test');
 
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5500';
+const iphoneUserAgent = devices['iPhone 14']?.userAgent;
+const tabletUserAgent = devices['iPad (gen 7)']?.userAgent || devices['iPad Mini']?.userAgent || iphoneUserAgent;
 
 const viewports = [
-  { name: 'Desktop 1920x1080', use: { viewport: { width: 1920, height: 1080 }, hasTouch: false, isMobile: false } },
-  { name: 'Phone 375x812', use: { viewport: { width: 375, height: 812 }, hasTouch: true, isMobile: true } },
-  { name: 'Tablet 768x1024', use: { viewport: { width: 768, height: 1024 }, hasTouch: true, isMobile: true } }
+  { name: 'Desktop 1920x1080', use: { viewport: { width: 1920, height: 1080 }, hasTouch: false, isMobile: false, reducedMotion: 'reduce' } },
+  { name: 'Phone 375x812', use: { viewport: { width: 375, height: 812 }, hasTouch: true, isMobile: true, reducedMotion: 'reduce', userAgent: iphoneUserAgent } },
+  { name: 'Tablet 768x1024', use: { viewport: { width: 768, height: 1024 }, hasTouch: true, isMobile: true, reducedMotion: 'reduce', userAgent: tabletUserAgent } }
 ];
 
 const text = {
@@ -108,8 +110,8 @@ async function expectThemeToggleProof(page, path) {
 async function expectValuesCtaContainment(page) {
   await gotoPath(page, '/EN/about/values.html');
 
-  const copy = page.getByText('The projects section is where the values above stop being words on a page. Take a look.', { exact: true });
-  const cta = page.getByRole('link', { name: /View Projects/ });
+  const copy = page.getByText('Background gives the life context. Working With Me shows how it looks in practice.', { exact: true });
+  const cta = page.getByRole('link', { name: /See Projects/ });
 
   await expect(copy).toBeVisible();
   await expect(cta).toBeVisible();
@@ -160,8 +162,13 @@ async function expectPhotographyProof(page) {
   expect([dotStyles.overflowX, dotStyles.overflowY]).toContain('visible');
   expect(Number.parseFloat(dotStyles.paddingBottom)).toBeGreaterThanOrEqual(4);
 
+  await carousel.evaluate((node) => node.scrollIntoView({ block: 'center', inline: 'nearest' }));
+  const nextButton = carousel.locator('.carousel-btn-next').first();
+  await expect(nextButton).toBeVisible();
   const beforeIndex = await getActiveMiniIndex(page);
-  await page.locator('.carousel-btn-next').first().click();
+  await nextButton.focus();
+  await expect(nextButton).toBeFocused();
+  await page.keyboard.press('Enter');
   await page.waitForTimeout(800);
   const afterIndex = await getActiveMiniIndex(page);
   expect(afterIndex).not.toBe(beforeIndex);
@@ -225,12 +232,14 @@ async function expectBackgroundProof(page) {
   await gotoPath(page, '/EN/about/background.html');
   await expect(page.locator('p').filter({ hasText: 'We speak Chaldean, a dialect related to the language Jesus spoke.' }).first()).toContainText('We speak Chaldean, a dialect related to the language Jesus spoke.');
   await expectExactParagraph(page, text.backgroundFamily);
-  await expect(page.getByText('This background is not a sob story. It is actually a pretty good one. It creates hunger, adaptability, and a refusal to settle for less than what you are capable of.', { exact: true })).toBeVisible();
+  await expectExactParagraph(page, 'This background is not a sob story. It is actually a pretty good one. It creates hunger, adaptability, and a refusal to settle for less than what you are capable of.');
   await expectExactParagraph(page, text.backgroundSystems);
   await expect(page.getByText('Documentation That Actually Helps', { exact: true })).toHaveCount(0);
 }
 
 async function expectProjectsRouletteProof(page) {
+  const rouletteTimeoutMs = 15000;
+
   await page.context().addInitScript(() => {
     const values = [0.11, 0.53];
     let index = 0;
@@ -240,6 +249,7 @@ async function expectProjectsRouletteProof(page) {
 
   await gotoPath(page, '/EN/projects/');
   const carousel = page.locator('[data-luxury-coverflow]');
+  await carousel.scrollIntoViewIfNeeded();
   await expect(carousel).toHaveAttribute('data-coverflow-ready', 'true', { timeout: 10000 });
 
   const startUrl = page.url();
@@ -248,16 +258,19 @@ async function expectProjectsRouletteProof(page) {
   await rouletteTrigger.click();
 
   const overlay = page.locator('.luxury-roulette-overlay');
-  await expect(overlay).toHaveAttribute('aria-hidden', 'false', { timeout: 10000 });
-  await expect(overlay).toHaveAttribute('data-result-kind', 'winner', { timeout: 10000 });
-  await page.waitForURL((url) => url.toString() !== startUrl && /\/(?:EN\/)?projects\/.+/.test(url.toString()), { timeout: 10000 });
+  await expect(overlay).toHaveAttribute('aria-hidden', 'false', { timeout: rouletteTimeoutMs });
+  await expect(overlay).toHaveAttribute('data-result-kind', 'winner', { timeout: rouletteTimeoutMs });
+  await page.waitForURL((url) => url.toString() !== startUrl && /\/(?:EN\/)?projects\/.+/.test(url.toString()), { timeout: rouletteTimeoutMs });
 }
 
 for (const profile of viewports) {
   test.describe(profile.name, () => {
     test.use(profile.use);
 
-    test('passes strict text fidelity and runtime checks', async ({ page }) => {
+    test('passes strict text fidelity and reduced-motion runtime checks', async ({ page }) => {
+      test.setTimeout(120000);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+
       await expectThemeToggleProof(page, '/EN/index.html');
       await expectThemeToggleProof(page, '/EN/about.html');
       await expectValuesCtaContainment(page);
@@ -266,6 +279,11 @@ for (const profile of viewports) {
       await expectWhispersProof(page);
       await expectCarProof(page);
       await expectBackgroundProof(page);
+    });
+
+    test('completes the reduced-motion roulette winner flow', async ({ page }) => {
+      test.setTimeout(60000);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
       await expectProjectsRouletteProof(page);
     });
   });

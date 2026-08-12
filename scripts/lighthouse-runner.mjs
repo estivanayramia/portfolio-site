@@ -80,24 +80,26 @@ async function runAudit() {
   
   // Launch Chrome via Puppeteer to ensure we use the correct binary
   const launchConfig = getBrowserLaunchConfig();
-  const PORT = 9222;
   
   const browser = await puppeteer.launch({
     headless: 'new',
     executablePath: launchConfig.executablePath,
     args: [
         ...launchConfig.args, 
-        `--remote-debugging-port=${PORT}`,
         '--no-sandbox', 
         '--disable-setuid-sandbox'
     ]
   });
-
   console.log(`Lighthouse audit targeting: ${BASE_URL}`);
 
   try {
+    const debuggingPort = Number(new URL(browser.wsEndpoint()).port);
+    if (!Number.isInteger(debuggingPort) || debuggingPort <= 0) {
+      throw new Error('Chrome did not expose a valid remote debugging port.');
+    }
+
     const options = {
-        port: PORT,
+        port: debuggingPort,
         output: 'json',
         logLevel: 'error',
         onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'],

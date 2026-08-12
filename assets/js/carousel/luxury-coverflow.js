@@ -733,9 +733,11 @@ class RouletteOverlayController {
     const actions = createElement('div', 'luxury-roulette-dialog__actions');
     const primaryButton = createElement('button', 'luxury-roulette-action luxury-roulette-action--primary');
     primaryButton.type = 'button';
+    primaryButton.textContent = 'Open selection';
     primaryButton.dataset.roulettePrimary = 'true';
     const secondaryButton = createElement('button', 'luxury-roulette-action luxury-roulette-action--secondary');
     secondaryButton.type = 'button';
+    secondaryButton.textContent = 'Close';
     secondaryButton.dataset.rouletteSecondary = 'true';
 
     actions.appendChild(primaryButton);
@@ -2172,19 +2174,10 @@ export class LuxuryCoverflow {
         } else {
           node.setAttribute('tabindex', previousTabIndex);
         }
-        if (node.tagName === 'A' && !node.hasAttribute('href') && node.hasAttribute('data-prev-href')) {
-          node.setAttribute('href', node.getAttribute('data-prev-href'));
-        }
         node.style.removeProperty('pointer-events');
         return;
       }
 
-      if (node.tagName === 'A' && node.hasAttribute('href')) {
-        if (!node.hasAttribute('data-prev-href')) {
-          node.setAttribute('data-prev-href', node.getAttribute('href'));
-        }
-        node.removeAttribute('href');
-      }
       node.setAttribute('tabindex', '-1');
       node.style.setProperty('pointer-events', 'none');
     });

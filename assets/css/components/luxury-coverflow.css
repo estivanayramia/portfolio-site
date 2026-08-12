@@ -1013,6 +1013,15 @@
 }
 
 @media (max-width: 767px) {
+  .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-dots {
+    justify-content: flex-start;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding: 0.25rem 0.25rem 0.75rem;
+    scrollbar-width: thin;
+  }
+
   .gallery-carousel[data-gallery-surface="luxury-coverflow"].is-luxury-gallery-coverflow .carousel-dot {
     min-width: 3rem;
     min-height: 3rem;

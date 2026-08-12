@@ -1,25 +1,114 @@
 /* eslint-disable no-console */
+const { spawn } = require('child_process');
+const http = require('http');
 const { chromium } = require('playwright');
 
-const DEFAULT_CONTACT_URL = `https://www.estivanayramia.com/contact?cb=${Date.now()}`;
+const DEFAULT_CONTACT_URL = `http://127.0.0.1:5512/contact?cb=${Date.now()}`;
 const CONTACT_URL = process.env.CONTACT_URL || DEFAULT_CONTACT_URL;
 
 const CONTACT_API_PATH = '/api/contact';
 const FORMSPREE_URL_PART = 'formspree.io/f/mblbnwoy';
-const MOCK_FORMSPREE = process.env.MOCK_FORMSPREE === '1';
-const EXPECT_DIRECT_FORMSPREE = process.env.EXPECT_DIRECT_FORMSPREE === '1';
+const MOCK_FORMSPREE = process.env.MOCK_FORMSPREE !== '0';
+const EXPECT_DIRECT_FORMSPREE = process.env.EXPECT_DIRECT_FORMSPREE !== '0';
+const AUTO_START_SERVER = process.env.START_SERVER !== '0';
 
 function fail(msg) {
   console.error(`FAIL: ${msg}`);
   process.exitCode = 1;
 }
 
+function isLocalhostUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
+  } catch {
+    return false;
+  }
+}
+
+async function isPortServingHttp(port, timeoutMs = 750) {
+  return await new Promise((resolve) => {
+    const req = http.request(
+      {
+        host: '127.0.0.1',
+        port,
+        method: 'GET',
+        path: '/',
+        timeout: timeoutMs,
+      },
+      (res) => {
+        res.resume();
+        resolve(true);
+      }
+    );
+
+    req.on('timeout', () => {
+      try { req.destroy(); } catch {}
+      resolve(false);
+    });
+    req.on('error', () => resolve(false));
+    req.end();
+  });
+}
+
+async function startLocalServer(port) {
+  return await new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, ['scripts/local-serve.js'], {
+      cwd: process.cwd(),
+      env: { ...process.env, PORT: String(port) },
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
+    });
+    let settled = false;
+    const timeout = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      try { child.kill(); } catch {}
+      reject(new Error(`Local server did not become ready within 10s (port=${port}).`));
+    }, 10000);
+    const onData = (buf) => {
+      if (!String(buf || '').includes('Serving on http://localhost:') || settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve(child);
+    };
+    child.stdout.on('data', onData);
+    child.stderr.on('data', onData);
+    child.on('error', (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      reject(error);
+    });
+    child.on('exit', (code) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      reject(new Error(`Local server exited early (code=${code}).`));
+    });
+  });
+}
+
 (async () => {
+  let serverProc = null;
+  if (AUTO_START_SERVER && isLocalhostUrl(CONTACT_URL)) {
+    const parsed = new URL(CONTACT_URL);
+    const port = Number(parsed.port || 80);
+    if (!(await isPortServingHttp(port))) {
+      serverProc = await startLocalServer(port);
+    }
+  }
+
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     serviceWorkers: 'block',
   });
   const page = await context.newPage();
+
+  await page.route(
+    /https:\/\/(?:www\.googletagmanager\.com|analytics\.google\.com|www\.clarity\.ms|scripts\.clarity\.ms)\//,
+    (route) => route.fulfill({ status: 204, body: '' })
+  );
 
   const consoleErrors = [];
   const requestFailures = [];
@@ -211,6 +300,9 @@ function fail(msg) {
 
     await context.close();
     await browser.close();
+    if (serverProc) {
+      try { serverProc.kill(); } catch {}
+    }
   }
 
   if (process.exitCode === 1) process.exit(1);

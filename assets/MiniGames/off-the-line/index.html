@@ -2,8 +2,15 @@
 <html>
     <head>
         <meta charset="UTF-8" />
+        <meta name="build-version" content="20260812-47e32ca7">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script>document.documentElement.classList.add('js')</script>
         <title>Super Micro Fun - Off The Line</title>
+        <style>
+            html, body { margin: 0; min-height: 100%; background: #000; }
+            #game { display: flex; justify-content: center; width: 100%; overflow: hidden; }
+            #game canvas { display: block; width: min(100vw, 640px) !important; height: auto !important; touch-action: none; }
+        </style>
     </head>
     <body>
         <center>
@@ -12,6 +19,19 @@
         </center>
 
         <script src="concat.min.js"></script>
+        <script>
+            (() => {
+                const canvas = document.querySelector('#game canvas');
+                if (!canvas) return;
+                window.addEventListener('mousemove', () => {
+                    const game = window.p;
+                    const rect = canvas.getBoundingClientRect();
+                    if (!game || !game.aa || rect.width <= 0 || rect.height <= 0) return;
+                    game.aa.x *= canvas.width / rect.width;
+                    game.aa.y *= canvas.height / rect.height;
+                });
+            })();
+        </script>
 
     
 
@@ -19,6 +39,5 @@
 
 </body>
 </html>
-
 
 

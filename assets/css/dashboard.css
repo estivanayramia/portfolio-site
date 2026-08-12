@@ -692,7 +692,7 @@ button.danger:hover,
   padding: 20px;
   margin-bottom: 30px;
   position: relative;
-  z-index: 2147483647 !important; /* MAX integer to defeat Chatbase overlay */
+  z-index: 10;
 }
 
 .diagnostics-header {
@@ -943,6 +943,15 @@ button.danger:hover,
   position: absolute;
   top: 15px;
   right: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  line-height: 1;
   font-size: 28px;
   font-weight: bold;
   color: var(--text-secondary);

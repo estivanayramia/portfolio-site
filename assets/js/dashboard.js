@@ -496,6 +496,7 @@ let currentFilters = { status: '', category: '', bot: '', search: '' };
 let currentErrorId = null;
 let latestFilteredErrors = [];
 let searchDebounceTimer = null;
+let paginationLoadInFlight = false;
 
 // Unified dashboard tab state
 const dashboardTabs = {
@@ -2062,8 +2063,8 @@ function updatePagination(total) {
   const currentPageNum = currentPage + 1;
   
   document.getElementById('page-info').textContent = `Page ${currentPageNum} of ${totalPages}`;
-  document.getElementById('prev-page').disabled = currentPage === 0;
-  document.getElementById('next-page').disabled = currentPageNum >= totalPages;
+  document.getElementById('prev-page').disabled = paginationLoadInFlight || currentPage === 0;
+  document.getElementById('next-page').disabled = paginationLoadInFlight || currentPageNum >= totalPages;
 }
 
 // View error details
@@ -2230,16 +2231,31 @@ document.getElementById('clear-filters').addEventListener('click', () => {
 });
 
 // Pagination
-document.getElementById('prev-page').addEventListener('click', () => {
-  if (currentPage > 0) {
-    currentPage--;
-    loadErrors();
+async function changePage(delta) {
+  if (paginationLoadInFlight) return;
+
+  const totalPages = Math.max(1, Math.ceil(latestFilteredErrors.length / pageSize));
+  const targetPage = currentPage + delta;
+  if (targetPage < 0 || targetPage >= totalPages) return;
+
+  paginationLoadInFlight = true;
+  currentPage = targetPage;
+  updatePagination(latestFilteredErrors.length);
+
+  try {
+    await loadErrors();
+  } finally {
+    paginationLoadInFlight = false;
+    updatePagination(latestFilteredErrors.length);
   }
+}
+
+document.getElementById('prev-page').addEventListener('click', () => {
+  void changePage(-1);
 });
 
 document.getElementById('next-page').addEventListener('click', () => {
-  currentPage++;
-  loadErrors();
+  void changePage(1);
 });
 
 // Refresh

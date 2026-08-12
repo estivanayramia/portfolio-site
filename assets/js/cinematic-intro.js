@@ -1,24 +1,22 @@
 /**
  * ============================================================================
- * CINEMATIC FIRST-VISIT INTRO — CONTROLLER
+ * CINEMATIC OPT-IN INTRO — CONTROLLER
  * ============================================================================
  *
- * Orchestrates a premium motion-driven intro for first-time visitors.
+ * Orchestrates a premium motion-driven intro that visitors opt into.
  * Uses GSAP (already bundled in site.min.js) for timeline animation.
  * Uses cinematic-audio.js for procedural Web Audio synthesis.
  *
  * Features:
- * - First-visit only (localStorage persistence)
+ * - Homepage-only, explicit activation
  * - Skippable at any point
  * - Reduced-motion aware (instant fade fallback)
- * - Keyboard accessible (Escape / Enter / Space to skip)
+ * - Keyboard accessible (Escape / Enter skip; Space toggles playback)
  * - Clean body scroll lock/unlock
  * - Seamless reveal transition into live homepage
- * - Replay affordance via footer link
+ * - Replay affordance via the persistent homepage CTA
  * - Integrated audio with mute toggle
  * - Autoplay-safe: audio starts on first user interaction
- *
- * Storage key: 'ea_intro_seen' (value: '1')
  *
  * @version 2.0.0
  */
@@ -27,7 +25,6 @@
   'use strict';
 
   // ── Constants ──────────────────────────────────────────────────────────
-  var STORAGE_KEY = 'ea_intro_seen';
   var INTRO_ID = 'cinematic-intro';
   var CURTAIN_CLASS = 'intro-curtain';
 
@@ -43,12 +40,18 @@
   var playerBarEl = null;
   var progressFill = null;
   var progressDot = null;
+  var progressWrap = null;
   var timeDisplay = null;
   var playPauseBtn = null;
   var startTime = 0;       // Performance.now() when intro began
   var audioAttempted = false;
   var TOTAL_DURATION = 14;  // intro duration in seconds
-  var TIMELINE_SPEED = 1.4; // Shorten first-visit blocking time without changing composition order.
+  var TIMELINE_SPEED = 1.4;
+  var previouslyFocusedElement = null;
+  var backgroundState = [];
+  var reducedMotionQuery = null;
+  var reducedMotionListener = null;
+  var introKeydownListener = null;
 
   // ── Audio handle (loaded from cinematic-audio.js) ─────────────────────
   function audio() {
@@ -57,26 +60,64 @@
 
   // ── Utility ────────────────────────────────────────────────────────────
 
-  function hasSeenIntro() {
-    try {
-      return localStorage.getItem(STORAGE_KEY) === '1';
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function markIntroSeen() {
-    try {
-      localStorage.setItem(STORAGE_KEY, '1');
-    } catch (e) {}
-  }
-
   function prefersReducedMotion() {
     try {
       return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch (e) {
       return false;
     }
+  }
+
+  function focusableWithin(root) {
+    if (!root) return [];
+    return Array.from(root.querySelectorAll(
+      'a[href], area[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(function (el) {
+      if (el.hidden || el.getAttribute('aria-hidden') === 'true') return false;
+      var style = window.getComputedStyle(el);
+      return style.display !== 'none' && style.visibility !== 'hidden';
+    });
+  }
+
+  function setControlsTabbable(enabled) {
+    if (!playerBarEl) return;
+    var controls = playerBarEl.querySelectorAll('button, [role="slider"]');
+    controls.forEach(function (control) {
+      control.tabIndex = enabled ? 0 : -1;
+    });
+  }
+
+  function setControlsVisible(visible) {
+    if (!playerBarEl) return;
+    playerBarEl.setAttribute('aria-hidden', visible ? 'false' : 'true');
+    setControlsTabbable(visible);
+  }
+
+  function setPageInert(inert) {
+    if (!inert) {
+      backgroundState.forEach(function (entry) {
+        var el = entry.el;
+        if (!el) return;
+        if (entry.inert === null) el.removeAttribute('inert');
+        else el.inert = entry.inert;
+        if (entry.ariaHidden === null) el.removeAttribute('aria-hidden');
+        else el.setAttribute('aria-hidden', entry.ariaHidden);
+      });
+      backgroundState = [];
+      return;
+    }
+
+    backgroundState = [];
+    Array.from(document.body.children).forEach(function (el) {
+      if (el === introEl || el === curtainEl) return;
+      backgroundState.push({
+        el: el,
+        inert: el.hasAttribute('inert') ? el.inert : null,
+        ariaHidden: el.hasAttribute('aria-hidden') ? el.getAttribute('aria-hidden') : null
+      });
+      el.inert = true;
+      el.setAttribute('aria-hidden', 'true');
+    });
   }
 
   function isHomepage() {
@@ -157,9 +198,14 @@
     if (!timeline || !progressFill || !timeDisplay) return;
     var t = timeline.time();
     var dur = timeline.duration();
-    var pct = Math.min(100, (t / dur) * 100);
+    var pct = dur > 0 ? Math.min(100, (t / dur) * 100) : 0;
     progressFill.style.width = pct + '%';
     timeDisplay.textContent = fmt(t) + ' / ' + fmt(dur);
+    if (progressWrap) {
+      progressWrap.setAttribute('aria-valuenow', String(Math.round(Math.max(0, Math.min(dur, t)))));
+      progressWrap.setAttribute('aria-valuemax', String(Math.max(1, Math.round(dur))));
+      progressWrap.setAttribute('aria-valuetext', fmt(t) + ' of ' + fmt(dur));
+    }
   }
 
   function togglePlayPause() {
@@ -279,6 +325,7 @@
     // ── Player bar (bottom center) ────────────────────────────────────
     playerBarEl = document.createElement('div');
     playerBarEl.className = 'intro-player';
+    playerBarEl.setAttribute('role', 'group');
     playerBarEl.setAttribute('aria-label', 'Playback controls');
 
     // Rewind button
@@ -309,8 +356,16 @@
     playerBarEl.appendChild(fwBtn);
 
     // Progress bar
-    var progWrap = document.createElement('div');
+    progressWrap = document.createElement('div');
+    var progWrap = progressWrap;
     progWrap.className = 'intro-progress-wrap';
+    progWrap.setAttribute('role', 'slider');
+    progWrap.setAttribute('tabindex', '-1');
+    progWrap.setAttribute('aria-label', 'Intro playback position');
+    progWrap.setAttribute('aria-valuemin', '0');
+    progWrap.setAttribute('aria-valuemax', String(TOTAL_DURATION));
+    progWrap.setAttribute('aria-valuenow', '0');
+    progWrap.setAttribute('aria-valuetext', '0:00 of 0:14');
     var progTrack = document.createElement('div');
     progTrack.className = 'intro-progress-track';
     progressFill = document.createElement('div');
@@ -324,6 +379,35 @@
       var rect = progWrap.getBoundingClientRect();
       var pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
       seekTo(pct * TOTAL_DURATION);
+    });
+    progWrap.addEventListener('keydown', function (e) {
+      if (!timeline) return;
+      var step = e.shiftKey ? 10 : 5;
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        e.stopPropagation();
+        seekBy(-step);
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        e.stopPropagation();
+        seekBy(step);
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        e.stopPropagation();
+        seekTo(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        e.stopPropagation();
+        seekTo(timeline.duration());
+      } else if (e.key === 'PageDown') {
+        e.preventDefault();
+        e.stopPropagation();
+        seekBy(-15);
+      } else if (e.key === 'PageUp') {
+        e.preventDefault();
+        e.stopPropagation();
+        seekBy(15);
+      }
     });
     playerBarEl.appendChild(progWrap);
 
@@ -357,9 +441,10 @@
     curtainEl.className = CURTAIN_CLASS;
 
     // Insert into DOM
+    introEl.appendChild(playerBarEl);
     document.body.insertBefore(curtainEl, document.body.firstChild);
     document.body.insertBefore(introEl, document.body.firstChild);
-    document.body.appendChild(playerBarEl);
+    setControlsVisible(false);
 
     return {
       scene: scene,
@@ -406,7 +491,10 @@
     tl.to(els.controls, {
       opacity: 1,
       duration: 0.6,
-      ease: 'power2.out'
+      ease: 'power2.out',
+      onStart: function () {
+        setControlsVisible(true);
+      }
     }, 1.2);
 
     // ── Phase 2: Text fragments appear ── [2.2s → 5.0s]
@@ -509,10 +597,30 @@
 
   // ── Complete / Exit ───────────────────────────────────────────────────
 
+  function removeIntroKeydown() {
+    if (introKeydownListener) {
+      document.removeEventListener('keydown', introKeydownListener, true);
+      introKeydownListener = null;
+    }
+  }
+
+  function restoreFocus() {
+    var target = previouslyFocusedElement;
+    previouslyFocusedElement = null;
+    if (!target || !target.isConnected || target.closest('[inert]')) return;
+    try { target.focus({ preventScroll: true }); } catch (e) { try { target.focus(); } catch (ignore) {} }
+  }
+
   function completeIntro() {
     if (isComplete) return;
     isComplete = true;
-    markIntroSeen();
+    removeIntroKeydown();
+    if (reducedMotionQuery && reducedMotionListener) {
+      if (reducedMotionQuery.removeEventListener) reducedMotionQuery.removeEventListener('change', reducedMotionListener);
+      else if (reducedMotionQuery.removeListener) reducedMotionQuery.removeListener(reducedMotionListener);
+      reducedMotionQuery = null;
+      reducedMotionListener = null;
+    }
 
     // Stop audio gracefully
     var a = audio();
@@ -524,6 +632,7 @@
 
     // Unlock body
     document.documentElement.classList.remove('intro-active');
+    setPageInert(false);
 
     // Make site visible
     var mainContent = document.getElementById('main-content');
@@ -537,8 +646,7 @@
       if (el) el.style.visibility = '';
     });
 
-    // Animate site elements in
-    if (typeof gsap !== 'undefined') {
+    if (!prefersReducedMotion() && typeof gsap !== 'undefined') {
       if (header) {
         gsap.fromTo(header, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.1 });
       }
@@ -547,9 +655,7 @@
       }
     }
 
-    // Clean up DOM
-    requestAnimationFrame(function () {
-      setTimeout(function () {
+    var cleanup = function () {
         if (introEl && introEl.parentNode) {
           introEl.setAttribute('data-state', 'done');
           introEl.parentNode.removeChild(introEl);
@@ -562,33 +668,118 @@
         if (playerBarEl && playerBarEl.parentNode) {
           playerBarEl.parentNode.removeChild(playerBarEl);
         }
+        introEl = null;
+        curtainEl = null;
         playerBarEl = null;
+        progressFill = null;
+        progressDot = null;
+        progressWrap = null;
+        timeDisplay = null;
+        playPauseBtn = null;
         skipBtn = null;
         soundBtn = null;
         if (timeline) {
           timeline.kill();
           timeline = null;
         }
-      }, 500);
-    });
+      restoreFocus();
+    };
+    if (prefersReducedMotion()) cleanup();
+    else requestAnimationFrame(function () { setTimeout(cleanup, 500); });
 
     // Re-trigger ScrollTrigger refresh
-    if (typeof ScrollTrigger !== 'undefined' && ScrollTrigger.refresh) {
+    if (!prefersReducedMotion() && typeof ScrollTrigger !== 'undefined' && ScrollTrigger.refresh) {
       setTimeout(function () { ScrollTrigger.refresh(); }, 600);
     }
 
-    addReplayLink();
     showWatchBtn();
   }
 
   function showWatchBtn() {
+    if (!isHomepage()) return;
     var btns = document.querySelectorAll('.watch-trailer-btn');
     btns.forEach(function (b) {
       b.style.display = '';
+      if (b.getAttribute('data-intro-bound') === 'true') return;
+      b.setAttribute('data-intro-bound', 'true');
       b.addEventListener('click', function () {
-        try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-        window.location.reload();
+        launchIntro(b, true);
       });
+    });
+  }
+
+  function launchIntro(trigger, startAudio) {
+    if (!isHomepage() || isVisualCaptureMode() || prefersReducedMotion() || introEl) return;
+
+    isComplete = false;
+    isSkipping = false;
+    isPaused = false;
+    audioAttempted = false;
+    previouslyFocusedElement = trigger instanceof HTMLElement ? trigger : document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    document.documentElement.classList.add('intro-active');
+    startTime = performance.now();
+
+    var els = buildIntroDOM();
+    setPageInert(true);
+    introEl.tabIndex = -1;
+    try { introEl.focus({ preventScroll: true }); } catch (e) { introEl.focus(); }
+
+    reducedMotionQuery = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+    reducedMotionListener = function (event) {
+      if (event.matches && !isComplete) completeIntro();
+    };
+    if (reducedMotionQuery) {
+      if (reducedMotionQuery.addEventListener) reducedMotionQuery.addEventListener('change', reducedMotionListener);
+      else if (reducedMotionQuery.addListener) reducedMotionQuery.addListener(reducedMotionListener);
+    }
+
+    bindEvents();
+    if (startAudio) tryStartAudio();
+
+    var gsapRetries = 0;
+    var MAX_GSAP_RETRIES = 40;
+
+    function loadGsapCDN(cb) {
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
+      s.onload = function () { cb(); };
+      s.onerror = function () { completeIntro(); };
+      document.head.appendChild(s);
+    }
+
+    function tryStart() {
+      if (isComplete) return;
+      if (typeof gsap !== 'undefined') {
+        timeline = createTimeline(els);
+        if (timeline) {
+          timeline.timeScale(TIMELINE_SPEED);
+          timeline.play();
+        }
+      } else {
+        gsapRetries++;
+        if (gsapRetries < MAX_GSAP_RETRIES) {
+          setTimeout(tryStart, 50);
+        } else {
+          loadGsapCDN(function () {
+            if (isComplete) return;
+            if (typeof gsap !== 'undefined') {
+              timeline = createTimeline(els);
+              if (timeline) {
+                timeline.timeScale(TIMELINE_SPEED);
+                var waited = gsapRetries * 0.05;
+                timeline.play();
+                timeline.time(Math.min(waited, 0.6));
+              }
+            } else {
+              completeIntro();
+            }
+          });
+        }
+      }
+    }
+
+    requestAnimationFrame(function () {
+      setTimeout(tryStart, 80);
     });
   }
 
@@ -606,7 +797,12 @@
       timeline.pause();
     }
 
-    if (typeof gsap !== 'undefined') {
+    if (prefersReducedMotion()) {
+      completeIntro();
+      return;
+    }
+
+    if (!prefersReducedMotion() && typeof gsap !== 'undefined') {
       gsap.to(introEl, {
         opacity: 0,
         duration: 0.6,
@@ -626,25 +822,6 @@
     }
   }
 
-  // ── Replay affordance ─────────────────────────────────────────────────
-
-  function addReplayLink() {
-    var footer = document.querySelector('footer .border-t');
-    if (!footer || footer.querySelector('.intro-replay-link')) return;
-
-    var link = document.createElement('button');
-    link.type = 'button';
-    link.className = 'intro-replay-link';
-    link.style.cssText = 'display:block;margin:1rem auto 0;font-size:0.75rem;color:inherit;background:none;border:none;font-family:inherit;padding:0.25rem 0.5rem;';
-    link.textContent = 'Replay intro';
-    link.setAttribute('aria-label', 'Replay the site intro sequence');
-    link.addEventListener('click', function () {
-      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-      window.location.reload();
-    });
-    footer.appendChild(link);
-  }
-
   // ── Reduced-motion path ───────────────────────────────────────────────
 
   // ── Event Bindings ────────────────────────────────────────────────────
@@ -653,7 +830,6 @@
     // Skip button
     if (skipBtn) {
       skipBtn.addEventListener('click', function () {
-        tryStartAudio(); // User gesture — try audio
         skipIntro();
       });
     }
@@ -681,12 +857,38 @@
     });
 
     // Keyboard shortcuts
-    function onKeyDown(e) {
+    introKeydownListener = function (e) {
       if (isComplete) {
-        document.removeEventListener('keydown', onKeyDown);
+        removeIntroKeydown();
         return;
       }
-      tryStartAudio();
+      if (e.key === 'Tab') {
+        var focusable = focusableWithin(introEl);
+        if (!focusable.length) {
+          e.preventDefault();
+          introEl.focus();
+          return;
+        }
+        var first = focusable[0];
+        var last = focusable[focusable.length - 1];
+        if (e.shiftKey && (document.activeElement === first || !introEl.contains(document.activeElement))) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && (document.activeElement === last || !introEl.contains(document.activeElement))) {
+          e.preventDefault();
+          first.focus();
+        }
+        return;
+      }
+      if (e.key === 'Enter') {
+        var target = e.target;
+        var nativeControl = target && target.closest && target.closest('button, a, input, select, textarea, [role="button"]');
+        if (!nativeControl) {
+          e.preventDefault();
+          skipIntro();
+        }
+        return;
+      }
       if (e.key === 'Escape') {
         e.preventDefault();
         skipIntro();
@@ -700,101 +902,18 @@
         e.preventDefault();
         seekBy(5);
       }
-    }
-    document.addEventListener('keydown', onKeyDown);
+    };
+    document.addEventListener('keydown', introKeydownListener, true);
   }
 
   // ── Init ──────────────────────────────────────────────────────────────
 
   function init() {
-    // Gate: only show on homepage
-    if (!isHomepage()) {
-      addReplayLink();
-      return;
-    }
-
-    // Gate: already seen
-    if (hasSeenIntro()) {
-      addReplayLink();
-      showWatchBtn();
-      return;
-    }
-
-    if (isVisualCaptureMode()) {
-      markIntroSeen();
-      addReplayLink();
-      showWatchBtn();
-      return;
-    }
-
-    // Reduced motion path (no audio)
-    if (prefersReducedMotion()) {
-      markIntroSeen();
-      addReplayLink();
-      showWatchBtn();
-      return;
-    }
-
-    // Lock the body
-    document.documentElement.classList.add('intro-active');
-
-    // Record start time
-    startTime = performance.now();
-
-    // Build DOM
-    var els = buildIntroDOM();
-
-    // Bind events
-    bindEvents();
-
-    // Wait for GSAP, then start (load from CDN if mobile deferred it)
-    var gsapRetries = 0;
-    var MAX_GSAP_RETRIES = 40; // ~2s of polling
-
-    function loadGsapCDN(cb) {
-      var s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js';
-      s.onload = function () { cb(); };
-      s.onerror = function () { completeIntro(); }; // Can't load GSAP — reveal site
-      document.head.appendChild(s);
-    }
-
-    function tryStart() {
-      if (typeof gsap !== 'undefined') {
-        timeline = createTimeline(els);
-        if (timeline) {
-          timeline.timeScale(TIMELINE_SPEED);
-          timeline.play();
-          tryStartAudio();
-        }
-      } else {
-        gsapRetries++;
-        if (gsapRetries < MAX_GSAP_RETRIES) {
-          setTimeout(tryStart, 50);
-        } else {
-          // GSAP not loaded (mobile deferred load) — load from CDN
-          loadGsapCDN(function () {
-            if (typeof gsap !== 'undefined') {
-              timeline = createTimeline(els);
-              if (timeline) {
-                timeline.timeScale(TIMELINE_SPEED);
-                // Adjust start position to account for wait time
-                var waited = gsapRetries * 0.05;
-                timeline.play();
-                timeline.time(Math.min(waited, 0.6)); // Skip past darkness phase
-                tryStartAudio();
-              }
-            } else {
-              completeIntro(); // Fallback: reveal site
-            }
-          });
-        }
-      }
-    }
-
-    requestAnimationFrame(function () {
-      setTimeout(tryStart, 80);
-    });
+    if (!isHomepage()) return;
+    showWatchBtn();
+    window.__replayIntro = function () {
+      launchIntro(null, false);
+    };
   }
 
   // ── Boot ──────────────────────────────────────────────────────────────
@@ -804,10 +923,5 @@
   } else {
     init();
   }
-
-  window.__replayIntro = function () {
-    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
-    window.location.reload();
-  };
 
 })();

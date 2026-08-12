@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="build-version" content="20260812-47e32ca7">
     <script>document.documentElement.classList.add('js')</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <meta name="description" content="Selected work: what it was, what I made, and why it mattered.">
@@ -18,27 +19,23 @@
                     <meta name="twitter:title" content="Projects | Estivan Ayramia">
                     <meta name="twitter:description" content="Selected work: what it was, what I made, and why it mattered.">
     
-    <!-- Google Fonts: Inter (non-render-blocking) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="(max-width: 768px)">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin media="print" data-media="(min-width: 769px)">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" crossorigin></noscript>
+    <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/inter/inter-latin.woff2" crossorigin>
+    <style>@font-face{font-family:'Inter';font-style:normal;font-weight:300 700;font-display:swap;src:url('/assets/fonts/inter/inter-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;}</style>
     
     <!-- Preload Critical LCP Image -->
     <link rel="preload" as="image" href="/assets/img/logo-ea.webp" type="image/webp">
     
-    <link rel="stylesheet" href="/assets/css/style.css?v=98faf63a">
-    <link rel="preload" href="/assets/css/style.css?v=98faf63a" as="style">
-    <script src="/assets/js/site.min.js?v=98faf63a" defer></script>
+    <link rel="stylesheet" href="/assets/css/style.css?v=47e32ca7">
+    <link rel="preload" href="/assets/css/style.css?v=47e32ca7" as="style">
+    <script src="/assets/js/site.min.js?v=47e32ca7" defer></script>
     <!-- Custom Theme CSS -->
     <!-- Analytics loaded via lazy-loader.js for better PageSpeed -->
 
     <!-- Theme CSS - loads reliably for all viewports -->
-    <link rel="stylesheet" href="/theme.css?v=98faf63a">
+    <link rel="stylesheet" href="/theme.css?v=47e32ca7">
     
     <!-- Luxury Coverflow Carousel V4 -->
-    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=98faf63a">
+    <link rel="stylesheet" href="/assets/css/components/luxury-coverflow.min.css?v=47e32ca7">
 
     <!-- PWA Manifest -->
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32x32.png">
@@ -236,11 +233,11 @@
                     <div class="coverflow-track" role="list">
                         
                         <!-- Card 1: This Website -->
-                        <article class="coverflow-card" role="listitem" data-index="0" data-title="This Website">
+                        <div class="coverflow-card" role="listitem" data-index="0" data-title="This Website">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
-                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/home-portrait-native-v3.jpg" alt="This Website preview" loading="lazy" decoding="async">
+                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/home-portrait-native-v3.jpg" alt="This Website preview" loading="lazy" decoding="async" width="800" height="1200">
                                     </div>
                                     <div class="card-image-overlay"></div>
                                 </div>
@@ -256,14 +253,14 @@
                                     </div>
                                 </div>
                             </div>
-                        </article>
+                        </div>
                         
                         <!-- Card 2: Isa Grimes Interview -->
-                        <article class="coverflow-card" role="listitem" data-index="1" data-title="Isa Grimes Interview">
+                        <div class="coverflow-card" role="listitem" data-index="1" data-title="Isa Grimes Interview">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
-                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/isa_grimes.jpg" alt="Isa Grimes Interview preview" loading="lazy" decoding="async">
+                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/isa_grimes.jpg" alt="Isa Grimes Interview preview" loading="lazy" decoding="async" width="7500" height="5003">
                                     </div>
                                     <div class="card-image-overlay"></div>
                                 </div>
@@ -279,14 +276,14 @@
                                     </div>
                                 </div>
                             </div>
-                        </article>
+                        </div>
                         
                         <!-- Card 3: L'Oréal Campaign -->
-                        <article class="coverflow-card" role="listitem" data-index="2" data-title="L'Oréal Campaign">
+                        <div class="coverflow-card" role="listitem" data-index="2" data-title="L'Oréal Campaign">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
-                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/06-project-loreal-maps.jpg" alt="L'Oréal Cell BioPrint preview" loading="lazy" decoding="async">
+                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/06-project-loreal-maps.jpg" alt="L'Oréal Cell BioPrint preview" loading="lazy" decoding="async" width="800" height="1200">
                                     </div>
                                     <div class="card-image-overlay"></div>
                                 </div>
@@ -302,14 +299,14 @@
                                     </div>
                                 </div>
                             </div>
-                        </article>
+                        </div>
                         
                         <!-- Card 4: Franklin Templeton -->
-                        <article class="coverflow-card" role="listitem" data-index="3" data-title="Franklin Templeton">
+                        <div class="coverflow-card" role="listitem" data-index="3" data-title="Franklin Templeton">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
-                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/05-project-franklin-templeton.jpg" alt="Franklin Templeton preview" loading="lazy" decoding="async">
+                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/05-project-franklin-templeton.jpg" alt="Franklin Templeton preview" loading="lazy" decoding="async" width="800" height="1200">
                                     </div>
                                     <div class="card-image-overlay"></div>
                                 </div>
@@ -325,14 +322,14 @@
                                     </div>
                                 </div>
                             </div>
-                        </article>
+                        </div>
                         
                         <!-- Card 5: EndPoint LinkedIn -->
-                        <article class="coverflow-card" role="listitem" data-index="4" data-title="EndPoint LinkedIn">
+                        <div class="coverflow-card" role="listitem" data-index="4" data-title="EndPoint LinkedIn">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
-                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/04-project-endpoint-linkedin.jpg" alt="EndPoint LinkedIn Campaign preview" loading="lazy" decoding="async">
+                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/04-project-endpoint-linkedin.jpg" alt="EndPoint LinkedIn Campaign preview" loading="lazy" decoding="async" width="800" height="1200">
                                     </div>
                                     <div class="card-image-overlay"></div>
                                 </div>
@@ -348,14 +345,14 @@
                                     </div>
                                 </div>
                             </div>
-                        </article>
+                        </div>
                         
                         <!-- Card 6: Elosity Launch Video -->
-                        <article class="coverflow-card" role="listitem" data-index="5" data-title="Elosity Launch Video">
+                        <div class="coverflow-card" role="listitem" data-index="5" data-title="Elosity Launch Video">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
-                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/03-project-elosity-video.jpg" alt="Endpoint Elosity Launch preview" loading="lazy" decoding="async">
+                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/03-project-elosity-video.jpg" alt="Endpoint Elosity Launch preview" loading="lazy" decoding="async" width="800" height="1200">
                                     </div>
                                     <div class="card-image-overlay"></div>
                                 </div>
@@ -371,14 +368,14 @@
                                     </div>
                                 </div>
                             </div>
-                        </article>
+                        </div>
                         
                         <!-- Card 7: Competitive Playbook -->
-                        <article class="coverflow-card" role="listitem" data-index="6" data-title="Competitive Playbook">
+                        <div class="coverflow-card" role="listitem" data-index="6" data-title="Competitive Playbook">
                             <div class="card-inner">
                                 <div class="card-image-container">
                                     <div class="card-bg">
-                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/02-project-competitive-playbook.jpg" alt="Taking Down Endpoint preview" loading="lazy" decoding="async">
+                                        <img class="card-image" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/02-project-competitive-playbook.jpg" alt="Taking Down Endpoint preview" loading="lazy" decoding="async" width="800" height="1200">
                                     </div>
                                     <div class="card-image-overlay"></div>
                                 </div>
@@ -394,7 +391,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </article>
+                        </div>
                         
                     </div>
                 </div>
@@ -429,7 +426,7 @@
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up">
                     <div class="aspect-video overflow-hidden">
-                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/home-portrait-native-v3.jpg" alt="This Website preview" loading="lazy" decoding="async">
+                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/home-portrait-native-v3.jpg" alt="This Website preview" loading="lazy" decoding="async" width="800" height="1200">
                     </div>
                     <div class="p-6 space-y-3">
                         <div class="flex items-center space-x-2">
@@ -448,7 +445,7 @@
 
                 <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.05">
                     <div class="aspect-video overflow-hidden">
-                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/isa_grimes.jpg" alt="Isa Grimes Interview preview" loading="lazy" decoding="async">
+                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/isa_grimes.jpg" alt="Isa Grimes Interview preview" loading="lazy" decoding="async" width="7500" height="5003">
                     </div>
                     <div class="p-6 space-y-3">
                         <div class="flex items-center space-x-2">
@@ -467,7 +464,7 @@
 
                 <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.1">
                     <div class="aspect-video overflow-hidden">
-                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/06-project-loreal-maps.jpg" alt="L'Oréal Cell BioPrint preview" loading="lazy" decoding="async">
+                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/06-project-loreal-maps.jpg" alt="L'Oréal Cell BioPrint preview" loading="lazy" decoding="async" width="800" height="1200">
                     </div>
                     <div class="p-6 space-y-3">
                         <div class="flex items-center space-x-2">
@@ -486,7 +483,7 @@
 
                 <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.15">
                     <div class="aspect-video overflow-hidden">
-                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/05-project-franklin-templeton.jpg" alt="Franklin Templeton preview" loading="lazy" decoding="async">
+                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/05-project-franklin-templeton.jpg" alt="Franklin Templeton preview" loading="lazy" decoding="async" width="800" height="1200">
                     </div>
                     <div class="p-6 space-y-3">
                         <div class="flex items-center space-x-2">
@@ -505,7 +502,7 @@
 
                 <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.2">
                     <div class="aspect-video overflow-hidden">
-                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/04-project-endpoint-linkedin.jpg" alt="EndPoint LinkedIn Campaign preview" loading="lazy" decoding="async">
+                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/04-project-endpoint-linkedin.jpg" alt="EndPoint LinkedIn Campaign preview" loading="lazy" decoding="async" width="800" height="1200">
                     </div>
                     <div class="p-6 space-y-3">
                         <div class="flex items-center space-x-2">
@@ -524,7 +521,7 @@
 
                 <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.25">
                     <div class="aspect-video overflow-hidden">
-                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/03-project-elosity-video.jpg" alt="Endpoint Elosity Launch preview" loading="lazy" decoding="async">
+                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/03-project-elosity-video.jpg" alt="Endpoint Elosity Launch preview" loading="lazy" decoding="async" width="800" height="1200">
                     </div>
                     <div class="p-6 space-y-3">
                         <div class="flex items-center space-x-2">
@@ -543,7 +540,7 @@
 
                 <article class="bg-white/50 backdrop-blur-sm border border-chocolate/10 rounded-2xl overflow-hidden opacity-0" data-gsap="fade-up" data-gsap-delay="0.3">
                     <div class="aspect-video overflow-hidden">
-                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/02-project-competitive-playbook.jpg" alt="Taking Down Endpoint preview" loading="lazy" decoding="async">
+                        <img class="card-image w-full h-full object-cover" src="/assets/img/Portolio-Media/Portfolio-Media/projects-/02-project-competitive-playbook.jpg" alt="Taking Down Endpoint preview" loading="lazy" decoding="async" width="800" height="1200">
                     </div>
                     <div class="p-6 space-y-3">
                         <div class="flex items-center space-x-2">
@@ -631,7 +628,7 @@
     
     <!-- Luxury Coverflow Carousel V4 (GSAP-powered, Roulette-enabled) -->
     <script type="module">
-        import { LuxuryCoverflow } from '/assets/js/carousel/luxury-coverflow.min.js?v=98faf63a';
+        import { LuxuryCoverflow } from '/assets/js/carousel/luxury-coverflow.min.js?v=47e32ca7';
         import { PROJECT_CARD_PREVIEWS } from '/assets/js/data/card-preview-manifest.mjs';
         import { hydrateDocumentCardPreviews } from '/assets/js/carousel/card-preview-sync.mjs';
 
@@ -655,21 +652,13 @@
                     if (!link.hasAttribute('data-prev-tabindex')) {
                         link.setAttribute('data-prev-tabindex', link.hasAttribute('tabindex') ? link.getAttribute('tabindex') : '__none__');
                     }
-                    if (!link.hasAttribute('data-prev-href') && link.hasAttribute('href')) {
-                        link.setAttribute('data-prev-href', link.getAttribute('href'));
-                    }
-
                     const isPrimaryCard = index === 0;
                     if (isPrimaryCard) {
-                        if (!link.hasAttribute('href') && link.hasAttribute('data-prev-href')) {
-                            link.setAttribute('href', link.getAttribute('data-prev-href'));
-                        }
                         link.removeAttribute('tabindex');
                         link.style.removeProperty('pointer-events');
                         return;
                     }
 
-                    link.removeAttribute('href');
                     link.setAttribute('tabindex', '-1');
                     link.style.setProperty('pointer-events', 'none');
                 });

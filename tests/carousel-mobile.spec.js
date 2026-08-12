@@ -245,11 +245,7 @@ function getTouchSwipeRegressionOptions(profileName) {
   return undefined;
 }
 
-const responsiveMiniPages = [
-  { name: 'Whispers', url: whispersUrl },
-  { name: 'Photography', url: photographyUrl },
-  { name: 'Me', url: meUrl }
-];
+const responsiveMiniPages = miniPages;
 
 async function prepareCarousel(page) {
   await gotoWithRetry(page, projectUrl);
@@ -482,13 +478,16 @@ async function expectSectionWithinViewport(page, selector) {
       left: rect.left,
       right: rect.right,
       width: rect.width,
-      viewportWidth: window.innerWidth
+      viewportWidth: window.innerWidth,
+      documentClientWidth: document.documentElement.clientWidth,
+      documentScrollWidth: document.documentElement.scrollWidth
     };
   });
 
   expect(state.left).toBeGreaterThanOrEqual(-4);
   expect(state.right).toBeLessThanOrEqual(state.viewportWidth + 4);
   expect(state.width).toBeLessThanOrEqual(state.viewportWidth + 4);
+  expect(state.documentScrollWidth).toBeLessThanOrEqual(state.documentClientWidth + 1);
 }
 
 async function expectPremiumLayoutStable(page, selector) {
@@ -934,6 +933,26 @@ test.describe('Reduced Motion Tier', () => {
 });
 
 test.describe('Shared Premium Pages', () => {
+  test('project carousel keeps crawlable links and valid list semantics', async ({ page }) => {
+    await prepareCarousel(page);
+
+    const cardLinks = page.locator('.coverflow-card .card-link');
+    const linkCount = await cardLinks.count();
+    expect(linkCount).toBeGreaterThan(1);
+
+    for (let index = 0; index < linkCount; index += 1) {
+      await expect(cardLinks.nth(index)).toHaveAttribute('href', /^\/projects\//);
+    }
+
+    const inactiveLink = page.locator('.coverflow-card:not(.is-center) .card-link').first();
+    await expect(inactiveLink).toHaveAttribute('tabindex', '-1');
+    await expect(page.locator('.coverflow-track')).toHaveAttribute('role', 'list');
+    expect(await page.locator('.coverflow-card').evaluateAll((cards) => (
+      cards.every((card) => card.getAttribute('role') === 'listitem')
+    ))).toBeTruthy();
+    await expect(page.locator('article[role="listitem"]')).toHaveCount(0);
+  });
+
   test('about page ignores pure vertical wheel gestures', async ({ page }) => {
     await prepareCarouselAt(page, aboutUrl, '#about-carousel-section');
 

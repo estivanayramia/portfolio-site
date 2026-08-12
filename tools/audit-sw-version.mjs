@@ -1,5 +1,6 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
+import { pathToFileURL } from 'node:url';
 
 function sh(cmd) {
   return execSync(cmd, { stdio: ['ignore', 'pipe', 'pipe'] }).toString('utf8');
@@ -15,12 +16,13 @@ function getChangedFiles() {
   return out.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
 }
 
-function isCritical(path) {
-  if (path === 'sw.js') return false;
-  if (path.endsWith('.html')) return true;
-  if (path.endsWith('.js')) return true;
-  if (path === '_redirects') return true;
-  if (path === '_headers') return true;
+export function isCritical(filePath) {
+  const normalized = filePath.replace(/\\/g, '/');
+  if (normalized === 'sw.js') return false;
+  if (/^(?:tests|scripts|tools|docs|\.github)\//u.test(normalized)) return false;
+  if (/\.(?:html|css|js|mjs|json|webmanifest|png|jpe?g|webp|svg|ico|woff2?|ttf|otf)$/iu.test(normalized)) return true;
+  if (normalized === '_redirects') return true;
+  if (normalized === '_headers') return true;
   return false;
 }
 
@@ -76,4 +78,6 @@ function main() {
   process.exit(0);
 }
 
-main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
+}

@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="build-version" content="20260812-47e32ca7">
   <script>document.documentElement.classList.add('js')</script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="build-version" content="20260505-98faf63a">
   <meta name="description" content="Operational dashboard for diagnostics, issue triage, and runtime verification on estivanayramia.com.">
   <title>Error Dashboard - Estivan Ayramia</title>
-  <link rel="stylesheet" href="/assets/css/dashboard.css?v=98faf63a">
+  <link rel="stylesheet" href="/assets/css/dashboard.css?v=47e32ca7">
   <script src="/assets/js/hud-debug-patch.js"></script>
   <style>
     /* Critical CSS for fast initial render */
@@ -51,6 +51,7 @@
         <input 
           type="password" 
           id="password-input" 
+          aria-label="Password"
           placeholder="Enter password" 
           autocomplete="current-password"
           required
@@ -200,8 +201,8 @@
       <div class="tab-panel" id="tab-console">
         <div class="console-controls">
           <button id="console-clear">Clear</button>
-          <input type="text" id="console-filter" placeholder="Filter logs...">
-          <select id="console-level">
+          <input type="text" id="console-filter" aria-label="Filter console logs" placeholder="Filter logs...">
+          <select id="console-level" aria-label="Console level">
             <option value="">All Levels</option>
             <option value="log">Log</option>
             <option value="info">Info</option>
@@ -218,14 +219,14 @@
         <div class="network-controls">
           <button id="network-clear">Clear</button>
           <button id="network-export-har">Export HAR</button>
-          <select id="network-method">
+          <select id="network-method" aria-label="Network method">
             <option value="">All Methods</option>
             <option value="GET">GET</option>
             <option value="POST">POST</option>
             <option value="PUT">PUT</option>
             <option value="DELETE">DELETE</option>
           </select>
-          <select id="network-status">
+          <select id="network-status" aria-label="Network status">
             <option value="">All Status</option>
             <option value="2xx">2xx Success</option>
             <option value="4xx">4xx Client Error</option>
@@ -333,11 +334,11 @@
   <!-- Error Detail Modal -->
   <div id="error-modal" class="modal" style="display: none;">
     <div class="modal-content">
-      <span class="close" id="close-modal">&times;</span>
+      <button type="button" class="close" id="close-modal" aria-label="Close error details">&times;</button>
       <h2>Error Details</h2>
       <div id="error-details"></div>
       <div class="modal-actions">
-        <select id="modal-category">
+        <select id="modal-category" aria-label="Error category">
           <option value="code_bug">Code Bug</option>
           <option value="async_bug">Async Bug</option>
           <option value="navigation">Navigation</option>
@@ -345,7 +346,7 @@
           <option value="telemetry">Telemetry</option>
           <option value="uncategorized">Uncategorized</option>
         </select>
-        <select id="modal-status">
+        <select id="modal-status" aria-label="Error status">
           <option value="new">New</option>
           <option value="investigating">Investigating</option>
           <option value="resolved">Resolved</option>
@@ -356,9 +357,8 @@
       </div>
     </div>
   </div>
-  <script src="/assets/js/dashboard.js?v=98faf63a"></script>
+  <script src="/assets/js/dashboard.js?v=47e32ca7"></script>
 </body>
 </html>
-
 
 

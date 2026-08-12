@@ -19,11 +19,20 @@
   if (!buildVersion) return;
 
   const storageKey = 'siteVersion';
-  const previousVersion = localStorage.getItem(storageKey);
+  let previousVersion = null;
+  try {
+    previousVersion = localStorage.getItem(storageKey);
+  } catch (_) {
+    return;
+  }
 
   if (previousVersion === buildVersion) return;
 
-  localStorage.setItem(storageKey, buildVersion);
+  try {
+    localStorage.setItem(storageKey, buildVersion);
+  } catch (_) {
+    return;
+  }
 
   // If this is the first time we set the version, don't do anything disruptive.
   if (!previousVersion) return;

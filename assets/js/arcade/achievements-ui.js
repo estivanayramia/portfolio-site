@@ -10,7 +10,8 @@ function ensureModalExists() {
         // replace it with the compact scrollable panel so the UX is consistent.
         if (!(existing.dataset && existing.dataset.arcadeAchievementsUi === '1')) {
             existing.id = 'achievements-modal';
-            existing.className = 'relative z-[9999] hidden';
+            existing.className = 'fixed inset-0 pointer-events-none hidden';
+            existing.style.zIndex = '12000';
             existing.setAttribute('aria-labelledby', 'slide-over-title');
             existing.setAttribute('role', 'dialog');
             existing.setAttribute('aria-modal', 'true');
@@ -44,7 +45,8 @@ function ensureModalExists() {
 
     const modal = document.createElement('div');
     modal.id = 'achievements-modal';
-    modal.className = 'relative z-[9999] hidden';
+    modal.className = 'fixed inset-0 pointer-events-none hidden';
+    modal.style.zIndex = '12000';
     modal.setAttribute('aria-labelledby', 'slide-over-title');
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-modal', 'true');
@@ -140,14 +142,6 @@ function bindHandlers() {
     // Do NOT close on backdrop click (per request)
     // No backdrop for the compact panel.
 
-    // Live refresh if unlocked while drawer is open
-    window.addEventListener('arcade-achievements-update', () => {
-        const modal = document.getElementById('achievements-modal');
-        if (!modal || modal.classList.contains('hidden')) return;
-        if (window.ArcadeAchievements && typeof window.ArcadeAchievements.updateUI === 'function') {
-            window.ArcadeAchievements.updateUI();
-        }
-    });
 }
 
 function autoUnlockMiniGameVisitAchievements() {

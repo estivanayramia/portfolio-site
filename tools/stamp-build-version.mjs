@@ -58,6 +58,14 @@ function updateFile(path, updater) {
 }
 
 function listTrackedHtmlFiles() {
+  try {
+    const tracked = run('git ls-files -z -- "*.html"')
+      .split('\0')
+      .filter(Boolean)
+      .sort((left, right) => left.localeCompare(right));
+    if (tracked.length > 0) return tracked;
+  } catch {}
+
   const rootDir = process.cwd();
   const files = [];
 
@@ -83,7 +91,7 @@ function listTrackedHtmlFiles() {
     }
   };
 
-  for (const folder of ['EN', 'ar', 'es']) {
+  for (const folder of ['EN', 'ar', 'es', 'assets/MiniGames']) {
     const absoluteDir = path.join(rootDir, folder);
     if (existsSync(absoluteDir)) {
       walk(absoluteDir, folder);
@@ -94,14 +102,40 @@ function listTrackedHtmlFiles() {
 }
 
 function stampHtmlBuildVersion(files, version) {
-  const metaRe = /(<meta\s+[^>]*name=["']build-version["'][^>]*content=["'])([^"']*)(["'][^>]*>)/gi;
+  const metaTagPattern = "<meta\\s+[^>]*name=[\"']build-version[\"'][^>]*>";
+  const metaLineRe = new RegExp(`^[\\t ]*${metaTagPattern}[\\t ]*(?:\\r?\\n|$)`, 'gim');
+  const metaTagRe = new RegExp(metaTagPattern, 'gi');
 
   let changed = 0;
   for (const f of files) {
     const didChange = updateFile(f, (src) => {
-      if (!metaRe.test(src)) return src;
-      metaRe.lastIndex = 0;
-      return src.replace(metaRe, `$1${version}$3`);
+      const withoutBuildMeta = src.replace(metaLineRe, '').replace(metaTagRe, '');
+      const headMatch = /<head(?:\s[^>]*)?>/i.exec(withoutBuildMeta);
+      if (!headMatch) {
+        throw new Error(`[stamp-build-version] Missing <head> in ${f}`);
+      }
+
+      const headContentStart = headMatch.index + headMatch[0].length;
+      const headCloseMatch = /<\/head\s*>/i.exec(withoutBuildMeta.slice(headContentStart));
+      const headContentEnd = headCloseMatch
+        ? headContentStart + headCloseMatch.index
+        : withoutBuildMeta.length;
+      const headContent = withoutBuildMeta.slice(headContentStart, headContentEnd);
+      const charsetMatch = /<meta\s+charset\s*=\s*["'][^"']+["'][^>]*>/i.exec(headContent);
+      const insertAt = charsetMatch
+        ? headContentStart + charsetMatch.index + charsetMatch[0].length
+        : headContentStart;
+      const before = withoutBuildMeta.slice(0, insertAt);
+      const after = withoutBuildMeta.slice(insertAt);
+      const lineLayout = /^(\r?\n)([\t ]*)/.exec(after);
+      const lineBreak = lineLayout?.[1] || (withoutBuildMeta.includes('\r\n') ? '\r\n' : '\n');
+      const indent = lineLayout?.[2] || '  ';
+      const meta = `<meta name="build-version" content="${version}">`;
+
+      if (lineLayout) {
+        return `${before}${lineBreak}${indent}${meta}${after}`;
+      }
+      return `${before}${lineBreak}${indent}${meta}${lineBreak}${indent}${after}`;
     });
     if (didChange) changed++;
   }
@@ -113,7 +147,7 @@ function stampServiceWorker(version) {
   const cacheRe = /(const\s+CACHE_VERSION\s*=\s*['"])([^'"]+)(['"];)/;
   return updateFile(swPath, (src) => {
     if (!cacheRe.test(src)) return src;
-    const next = `v${version}-dashboard-bypass`;
+    const next = `v${version}`;
     return src.replace(cacheRe, `$1${next}$3`);
   });
 }

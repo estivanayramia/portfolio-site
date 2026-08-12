@@ -39,11 +39,11 @@
 ---
 
 ## §CSS
-- **NEVER** edit `theme.css` manually — use `input.css` + `npm run build:css`
+- **NEVER** edit generated `theme.css` or `assets/css/theme.min.css` manually — edit `assets/css/theme.css` and run `npm run build:theme`
 - **NEVER** use inline `style=""` without `<!-- inline-css: reason -->`
 - **NEVER** rename CSS without grep-searching HTML refs
 - **WHEN** touching CSS: run `audit:css-sync` + `audit:inline-css`
-- **WHEN** visual drift: regenerate `theme.css`
+- **WHEN** visual drift: run `npm run build:theme` and verify source/output parity
 
 ---
 

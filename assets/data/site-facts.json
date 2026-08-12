@@ -3,40 +3,48 @@
   "baseUrl": "https://www.estivanayramia.com",
   "projects": [
     {
-      "id": "taking-down-endpoint",
-      "title": "Taking Down Endpoint",
-      "summary": "Almac + 4G Clinical positioning strategy against Endpoint.",
+      "id": "taking-down-endpoint-almac-group-4g-clinical",
+      "title": "Taking Down Endpoint (Almac Group + 4G Clinical)",
+      "summary": "Marketing strategy deck proposing how Almac Group and 4G Clinical could position together against Endpoint Clinical.",
       "url": "/projects/endpoint-competitive-playbook",
       "fullUrl": "https://www.estivanayramia.com/projects/endpoint-competitive-playbook",
       "filePath": "/projects/endpoint-competitive-playbook.html",
-      "tags": []
+      "tags": [
+        "Strategy"
+      ]
     },
     {
-      "id": "endpoint-elosity-launch",
-      "title": "Endpoint Elosity Launch",
-      "summary": "Motion storyboard and voiceover script for LinkedIn autoplay.",
+      "id": "endpoint-elosity-launch-video",
+      "title": "Endpoint Elosity Launch Video",
+      "summary": "Motion storyboard and full voiceover script showing bottlenecks shattering into a clean trial timeline.",
       "url": "/projects/endpoint-elosity-video",
       "fullUrl": "https://www.estivanayramia.com/projects/endpoint-elosity-video",
       "filePath": "/projects/endpoint-elosity-video.html",
-      "tags": []
+      "tags": [
+        "Video Concept"
+      ]
     },
     {
       "id": "endpoint-linkedin-campaign",
       "title": "EndPoint LinkedIn Campaign",
-      "summary": "15-page deck outlining Phase 2A and 2B retargeting strategy.",
+      "summary": "15-page deck outlining Phase 2A and Phase 2B of an EndPoint LinkedIn retargeting campaign.",
       "url": "/projects/endpoint-linkedin-campaign",
       "fullUrl": "https://www.estivanayramia.com/projects/endpoint-linkedin-campaign",
       "filePath": "/projects/endpoint-linkedin-campaign.html",
-      "tags": []
+      "tags": [
+        "Retargeting"
+      ]
     },
     {
-      "id": "franklin-templeton",
-      "title": "Franklin Templeton",
-      "summary": "Dual-language investment content strategy for English and Arabic audiences.",
+      "id": "franklin-templeton-class-concept",
+      "title": "Franklin Templeton Class Concept",
+      "summary": "17-page class concept deck for a Franklin Templeton 'Voice of Progress' campaign.",
       "url": "/projects/franklin-templeton-concept",
       "fullUrl": "https://www.estivanayramia.com/projects/franklin-templeton-concept",
       "filePath": "/projects/franklin-templeton-concept.html",
-      "tags": []
+      "tags": [
+        "Content Strategy"
+      ]
     },
     {
       "id": "isa-grimes-interview",
@@ -45,25 +53,31 @@
       "url": "/projects/isa-grimes-interview",
       "fullUrl": "https://www.estivanayramia.com/projects/isa-grimes-interview",
       "filePath": "/projects/isa-grimes-interview.html",
-      "tags": []
+      "tags": [
+        "Interview"
+      ]
     },
     {
-      "id": "loral-cell-bioprint",
-      "title": "L'Oréal Cell BioPrint",
-      "summary": "MAPS campaign deck mapping personas across the funnel.",
+      "id": "loral-cell-bioprint-maps-campaign",
+      "title": "L'Oréal Cell BioPrint MAPS Campaign",
+      "summary": "Class concept campaign deck mapping three personas and their touchpoints across the funnel.",
       "url": "/projects/loreal-maps-campaign",
       "fullUrl": "https://www.estivanayramia.com/projects/loreal-maps-campaign",
       "filePath": "/projects/loreal-maps-campaign.html",
-      "tags": []
+      "tags": [
+        "Campaign Strategy"
+      ]
     },
     {
       "id": "this-website",
       "title": "This Website",
-      "summary": "Hand-coded with PWA support, service workers, Lighthouse 90+ scores.",
+      "summary": "Hand-coded portfolio build with performance work, PWA support, and a clear content system.",
       "url": "/projects/portfolio",
       "fullUrl": "https://www.estivanayramia.com/projects/portfolio",
       "filePath": "/projects/portfolio.html",
-      "tags": []
+      "tags": [
+        "Build"
+      ]
     }
   ],
   "hobbies": [
