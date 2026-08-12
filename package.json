@@ -48,6 +48,7 @@
     "test:build-metadata": "node --test tests/build-version-metadata.test.mjs",
     "test:site-wide": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-playwright-with-local-server.ps1 tests/site-wide-controls.spec.js --workers=1 --reporter=line",
     "test:chat-widget": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-playwright-with-local-server.ps1 tests/chat-widget.spec.js",
+    "test:cinematic-intro": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-playwright-with-local-server.ps1 tests/cinematic-intro.spec.js",
     "test:performance-loading": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-playwright-with-local-server.ps1 tests/performance-loading.spec.js",
     "test:carousel": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-playwright-with-local-server.ps1 tests/carousel-mobile.spec.js",
     "test:about-swipe": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-playwright-with-local-server.ps1 tests/carousel-mobile.spec.js -g \"About Swipe Snap Mechanics\"",
