@@ -8,7 +8,7 @@
 // Precache only real clean routes and real asset paths.
 // Do not let one failed precache request abort install.
 // ==========================================================================
-const CACHE_VERSION = 'v20260811-4f44b9e9';
+const CACHE_VERSION = 'v20260812-1b650a46';
 const CACHE_PREFIX = 'portfolio-';
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 

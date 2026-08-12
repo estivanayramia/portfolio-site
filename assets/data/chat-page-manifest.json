@@ -2,7 +2,7 @@
   "version": "page-grounding-v1",
   "source": "repo-crawl",
   "baseUrl": "https://www.estivanayramia.com",
-  "buildVersion": "20260811-4f44b9e9",
+  "buildVersion": "20260812-1b650a46",
   "pageCount": 26,
   "pages": [
     {
@@ -13,7 +13,7 @@
       "pageType": "home",
       "title": "Estivan Ayramia | Built to Show More Than a Resume",
       "description": "A direct look at my work, how I think, and what I follow through on.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "A direct look at my work, how I think, and what I follow through on.",
       "headings": [
         "Estivan Ayramia | Built to Show More Than a Resume",
@@ -503,7 +503,7 @@
       "pageType": "about",
       "title": "About | Estivan Ayramia",
       "description": "Who I am, how I work, and what shaped the way I show up.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Who I am, how I work, and what shaped the way I show up.",
       "headings": [
         "About | Estivan Ayramia",
@@ -665,7 +665,7 @@
       "pageType": "about_detail",
       "title": "Background | Estivan Ayramia",
       "description": "Explore Estivan Ayramia",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Explore Estivan Ayramia",
       "headings": [
         "Background | Estivan Ayramia",
@@ -940,7 +940,7 @@
       "pageType": "about_detail",
       "title": "Values | Estivan Ayramia",
       "description": "How I make decisions, work with people, and keep improving without the fluff.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "How I make decisions, work with people, and keep improving without the fluff.",
       "headings": [
         "Values | Estivan Ayramia",
@@ -1257,7 +1257,7 @@
       "pageType": "about_detail",
       "title": "Working With Me | Estivan Ayramia",
       "description": "How Estivan Ayramia works with people: communication, follow-through, and what it feels like to work together.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "How Estivan Ayramia works with people: communication, follow-through, and what it feels like to work together.",
       "headings": [
         "Working With Me | Estivan Ayramia",
@@ -1647,7 +1647,7 @@
       "pageType": "arabic",
       "title": "Portfolio | الرئيسية",
       "description": "طالب أعمال عامة. أنظمة، أشخاص، تنفيذ نظيف.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "طالب أعمال عامة. أنظمة، أشخاص، تنفيذ نظيف.",
       "headings": [
         "طالب أعمال عامة. أنظمة، أشخاص، تنفيذ نظيف.",
@@ -1724,7 +1724,7 @@
       "pageType": "contact",
       "title": "Contact | Estivan Ayramia",
       "description": "Contact Estivan Ayramia for collaboration, project discussion, or professional opportunities through the official contact page and preferred channels.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Contact Estivan Ayramia for collaboration, project discussion, or professional opportunities through the official contact page and preferred channels.",
       "headings": [
         "Contact | Estivan Ayramia",
@@ -1943,7 +1943,7 @@
       "pageType": "deep_dive",
       "title": "How I Think and Work | Estivan Ayramia",
       "description": "Background, habits, work, and the choices that shaped how I think.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Background, habits, work, and the choices that shaped how I think.",
       "headings": [
         "How I Think and Work | Estivan Ayramia",
@@ -2841,7 +2841,7 @@
       "pageType": "spanish",
       "title": "Portfolio | Inicio",
       "description": "Estudiante de Negocios Generales. Sistemas, personas, ejecución limpia.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Estudiante de Negocios Generales. Sistemas, personas, ejecución limpia.",
       "headings": [
         "Estudiante de Negocios Generales. Sistemas, personas, ejecución limpia.",
@@ -3038,7 +3038,7 @@
       "pageType": "hobby_detail",
       "title": "Car Enthusiasm | Estivan Ayramia",
       "description": "Read about Estivan Ayramia",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Read about Estivan Ayramia",
       "headings": [
         "Car Enthusiasm | Estivan Ayramia",
@@ -3231,7 +3231,7 @@
       "pageType": "hobby_detail",
       "title": "Cooking | Estivan Ayramia",
       "description": "See how cooking fits into Estivan Ayramia",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "See how cooking fits into Estivan Ayramia",
       "headings": [
         "Cooking | Estivan Ayramia",
@@ -3421,7 +3421,7 @@
       "pageType": "hobby_detail",
       "title": "Gym Training | Estivan Ayramia",
       "description": "Learn about Estivan Ayramia",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Learn about Estivan Ayramia",
       "headings": [
         "Gym Training | Estivan Ayramia",
@@ -3627,7 +3627,7 @@
       "pageType": "hobby_detail",
       "title": "Me | Estivan Ayramia",
       "description": "Get a personal snapshot from Estivan Ayramia, highlighting interests and reflections that complement professional work with authenticity and grounded perspective.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Get a personal snapshot from Estivan Ayramia, highlighting interests and reflections that complement professional work with authenticity and grounded perspective.",
       "headings": [
         "Me | Estivan Ayramia",
@@ -3795,7 +3795,7 @@
       "pageType": "hobby_detail",
       "title": "Photography | Estivan Ayramia",
       "description": "Photos Estivan Ayramia has taken and the kind of frames he likes to catch.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Photos Estivan Ayramia has taken and the kind of frames he likes to catch.",
       "headings": [
         "Photography | Estivan Ayramia",
@@ -3988,7 +3988,7 @@
       "pageType": "hobby_detail",
       "title": "Reading | Estivan Ayramia",
       "description": "What Estivan Ayramia reads, what sticks, and the kinds of ideas he keeps coming back to.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "What Estivan Ayramia reads, what sticks, and the kinds of ideas he keeps coming back to.",
       "headings": [
         "Reading | Estivan Ayramia",
@@ -4231,7 +4231,7 @@
       "pageType": "hobby_detail",
       "title": "Whispers Notes | Estivan Ayramia",
       "description": "Browse Whispers, a collection of concise notes and reflections by Estivan Ayramia that capture ideas, lessons, and perspective across everyday life.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Browse Whispers, a collection of concise notes and reflections by Estivan Ayramia that capture ideas, lessons, and perspective across everyday life.",
       "headings": [
         "Whispers Notes | Estivan Ayramia",
@@ -4393,7 +4393,7 @@
       "pageType": "overview",
       "title": "Overview | Estivan Ayramia",
       "description": "The short read on how Estivan Ayramia works and what people can usually count on from him.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "The short read on how Estivan Ayramia works and what people can usually count on from him.",
       "headings": [
         "Overview | Estivan Ayramia",
@@ -4741,7 +4741,7 @@
       "pageType": "page",
       "title": "Privacy Policy | Estivan Ayramia",
       "description": "Review the privacy policy for estivanayramia.com, including data handling, analytics context, and the principles used to protect visitor information.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Review the privacy policy for estivanayramia.com, including data handling, analytics context, and the principles used to protect visitor information.",
       "headings": [
         "Privacy Policy",
@@ -5139,7 +5139,7 @@
       "pageType": "projects_index",
       "title": "Projects | Estivan Ayramia",
       "description": "Selected work: what it was, what I made, and why it mattered.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Selected work: what it was, what I made, and why it mattered.",
       "headings": [
         "Projects | Estivan Ayramia",
@@ -5578,7 +5578,7 @@
       "pageType": "project_detail",
       "title": "Endpoint Competitive Playbook | Estivan Ayramia",
       "description": "Review the Endpoint Competitive Playbook project: positioning strategy, account planning, and messaging structure designed to improve win probability in enterprise sales.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Review the Endpoint Competitive Playbook project: positioning strategy, account planning, and messaging structure designed to improve win probability in enterprise sales.",
       "headings": [
         "Endpoint Competitive Playbook | Estivan Ayramia",
@@ -5937,7 +5937,7 @@
       "pageType": "project_detail",
       "title": "Endpoint Elosity Video | Estivan Ayramia",
       "description": "Discover the Endpoint Elosity Video project by Estivan Ayramia, including creative direction, narrative structure, and production choices tied to campaign intent.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Discover the Endpoint Elosity Video project by Estivan Ayramia, including creative direction, narrative structure, and production choices tied to campaign intent.",
       "headings": [
         "Endpoint Elosity Video | Estivan Ayramia",
@@ -6255,7 +6255,7 @@
       "pageType": "project_detail",
       "title": "Endpoint LinkedIn Campaign | Estivan Ayramia",
       "description": "Analyze the Endpoint LinkedIn Campaign project: audience targeting, campaign structure, and messaging decisions used to support measurable engagement outcomes.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Analyze the Endpoint LinkedIn Campaign project: audience targeting, campaign structure, and messaging decisions used to support measurable engagement outcomes.",
       "headings": [
         "Endpoint LinkedIn Campaign | Estivan Ayramia",
@@ -6540,7 +6540,7 @@
       "pageType": "project_detail",
       "title": "Franklin Templeton Concept | Estivan Ayramia",
       "description": "See the Franklin Templeton concept project by Estivan Ayramia, focused on strategic communication, concept development, and practical business storytelling.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "See the Franklin Templeton concept project by Estivan Ayramia, focused on strategic communication, concept development, and practical business storytelling.",
       "headings": [
         "Franklin Templeton Concept | Estivan Ayramia",
@@ -6916,7 +6916,7 @@
       "pageType": "project_detail",
       "title": "Isa Grimes Interview | Estivan Ayramia",
       "description": "A direct conversation with Isa Grimes about your 20s, leadership, people skills, support systems, favoritism, and the kind of perspective that only matters once you have actually lived something.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "A direct conversation with Isa Grimes about your 20s, leadership, people skills, support systems, favoritism, and the kind of perspective that only matters once you have actually lived something.",
       "headings": [
         "Isa Grimes Interview | Estivan Ayramia",
@@ -6931,7 +6931,7 @@
         "/",
         "/projects/"
       ],
-      "checksum": "fnv1a-839261f7",
+      "checksum": "fnv1a-68441f24",
       "keywords": [
         "/projects/isa-grimes-interview",
         "isa",
@@ -7045,7 +7045,7 @@
         {
           "heading": "What Actually Hit",
           "level": 2,
-          "text": "Your 20s are for exposure, not certainty\nWhen I asked him what he would tell a person uncertain about the future, he did not give me some polished five-step plan. He said the first five years after graduation should be full of different roles, industries, and people.\nIt kills the lie that you are supposed to know everything at 22.\nHis point was clear: most people in their 20s do not know yet, so stop pretending certainty is the goal. Get exposure instead. Put yourself in different rooms. Learn different industries. Learn different communication styles. Figure out what actually fits you by living more of life, not less of it.\n&ldquo;The first 5 years of graduation, you have to be in as many different roles and industries and around people as possible.&rdquo;\nDo not rush the route just because you are scared of falling behind\nWhen I pushed him on what advice he would give his younger self to become who he is now, but quicker, I expected some answer about efficiency.\nThat is not what he gave me.\nHe said he would not change the route just to get there faster. He talked about enjoying his 20s, living through things, making mistakes, and becoming the kind of person who could actually carry the role later.\nThat was one of the strongest answers in the whole interview for me, because it rejected the fake obsession with speed. He did not talk like someone desperate to erase the years that formed him. He talked like someone who understood that the route mattered because it made him ready.\n&ldquo;During your 20s, have fun. That&rsquo;s what it&rsquo;s for. But at the same time, expose yourself to different opportunities that are out there.&rdquo;\nPeople beat process\nWhen I asked him what mattered more in his growth &mdash; understanding the organization or knowing how to manage people &mdash; he answered quickly: people.\nThat answer carried the whole page.\nHe made it clear that a lot of organizational knowledge can be learned. What is harder to fake is knowing how to deal with people well. Knowing what makes someone tick. Knowing how to read strengths, weaknesses, timing, ego, confidence, communication style, and what someone actually needs from you.\nThat is what separates a title from actual leadership.\n&ldquo;Most people don&rsquo;t know how to manage people.&rdquo;\nFavoritism ruins leadership\nOne of the cleanest answers in the interview came when I asked what he learned from people by watching how not to be.\nHe did not dodge. He said favoritism.\nI liked that because it was concrete. Not some vague answer about &ldquo;poor leadership.&rdquo; Favoritism. Giving people room, credit, or movement because you like them, not because they are right for the moment. Once you do that, you poison the room. You make trust thinner. You make standards weaker. You make people feel the hierarchy before they feel the purpose.\n&ldquo;I see a lot of people have favoritism.&rdquo;\nBuild a round table, not a throne\nThe best leadership image he gave me was not corporate at all. It was a round table.\nHe talked about leadership like King Arthur, the Justice League, a room where everybody brings a different angle and different value. The leader still has to make the final call, but the room is not supposed to revolve around one ego.\nIt matched the way he talked the whole time. He did not sound like someone obsessed with status. He sounded like someone who actually believes that people matter, no matter where they sit.\n&ldquo;Everyone is equal. I don&rsquo;t care if you&rsquo;re the garbage man. I don&rsquo;t care if you&rsquo;re a CMO.&rdquo;\nThe most human answer had nothing to do with work\nWhen I asked him what experience taught him something real about leadership, he did not go straight to a job. He went to marriage, growing up, and realizing life was not just about him.\nThat was probably the most human answer in the interview.\nLeadership is shallow if it only exists at work. If you still move through life like your choices only affect you, then the title does not mean much. The real shift came when he started asking a harder question: not &ldquo;am I technically wrong?&rdquo; but &ldquo;what does this do to the other person?&rdquo;\nThat answer had more leadership in it than most leadership answers do.\nLeadership starts before the title does\nI also liked what he said about who he used to be as an employee.\nHe admitted that earlier in his career he was more of a blind doer. He was getting tasks done without really understanding the bigger meaning behind them. Then he started changing the way he carried himself. He started dressing like he wanted to lead. Looking for stretch work. Shadowing other functions. Reading more. Asking bigger questions. Acting like the next role before he had it.\nThat answer mattered because too many people talk about leadership like it begins the day they get authority. It does not. It starts way earlier than that &mdash; in how you learn, how you carry yourself, what extra weight you take on, and whether people can trust you before you are in charge of anything.\nRoots. Trees. Forest.\n&ldquo;There&rsquo;s three levels in life: roots, trees, and forest.&rdquo;\nThis was one of the best frameworks in the entire conversation.\nHe said life has three levels: roots, trees, and forest.\nSometimes you are down in the roots doing the immediate work. Sometimes you are in the trees looking at the next level up. Sometimes you are in the forest asking where all of this is going. What I liked is that he did not present those like fixed ranks. He treated them like positions you move through depending on the situation.\nThat made the idea useful instead of decorative.\nNo one is omnipresent\nThe introspection part of the interview was strong because it was honest about trade-offs.\nHe said you cannot be everywhere for everyone. You are going to give time to one thing and take time from another. You are going to disappoint somebody. You are going to make choices that help one responsibility and cost another one.\nThat is real life.\nWhat mattered was not pretending balance is easy. What mattered was knowing that trade-offs are unavoidable and still trying to make the right call for the people and responsibilities that matter most in that moment.\n&ldquo;No one is omnipresent.&rdquo;\n&ldquo;Spend time with the ones you love.&rdquo;",
+          "text": "Your 20s are for exposure, not certainty\nWhen I asked him what he would tell a person uncertain about the future, he did not give me some polished five-step plan. He said the first five years after graduation should be full of different roles, industries, and people.\nIt kills the lie that you are supposed to know everything at 22.\nHis point was clear: most people in their 20s do not know yet, so stop pretending certainty is the goal. Get exposure instead. Put yourself in different rooms. Learn different industries. Learn different communication styles. Figure out what actually fits you by living more of life, not less of it.\n&ldquo;The first 5 years of graduation, you have to be in as many different roles and industries and around people as possible.&rdquo;\nDo not rush the route just because you are scared of falling behind\nWhen I pushed him on what advice he would give his younger self to become who he is now, but quicker, I expected some answer about efficiency.\nThat is not what he gave me.\nHe said he would not change the route just to get there faster. He talked about enjoying his 20s, living through things, making mistakes, and becoming the kind of person who could actually carry the role later.\nThat was one of the strongest answers in the whole interview for me, because it rejected the fake obsession with speed. He did not talk like someone desperate to erase the years that formed him. He talked like someone who understood that the route mattered because it made him ready.\n&ldquo;During your 20s, have fun. That&rsquo;s what it&rsquo;s for. But at the same time, expose yourself to different opportunities that are out there.&rdquo;\nPeople beat process\nWhen I asked him what mattered more in his growth &mdash; understanding the organization or knowing how to manage people &mdash; he answered quickly: people.\nThat answer carried the whole page.\nHe made it clear that a lot of organizational knowledge can be learned. What is harder to fake is knowing how to deal with people well. Knowing what makes someone tick. Knowing how to read strengths, weaknesses, timing, ego, confidence, communication style, and what someone actually needs from you.\nThat is what separates a title from actual leadership.\n&ldquo;Most people don&rsquo;t know how to manage people.&rdquo;\nFavoritism ruins leadership\nOne of the cleanest answers in the interview came when I asked what he learned from people by watching how not to be.\nHe did not dodge. He said favoritism.\nI liked that because it was concrete. Not some vague answer about &ldquo;poor leadership.&rdquo; Favoritism. Giving people room, credit, or movement because you like them, not because they are right for the moment. Once you do that, you poison the room. You make trust thinner. You make standards weaker. You make people feel the hierarchy before they feel the purpose.\n&ldquo;I see a lot of people have favoritism.&rdquo;\nBuild a round table, not a throne\nThe best leadership image he gave me was not corporate at all. It was a round table.\nHe talked about leadership like King Arthur, the Justice League, a room where everybody brings a different angle and different value. The leader still has to make the final call, but the room is not supposed to revolve around one ego.\nIt matched the way he talked the whole time. He did not sound like someone obsessed with status. He sounded like someone who actually believes that people matter, no matter where they sit.\n&ldquo;Everyone is equal. I don&rsquo;t care if you&rsquo;re the garbage man. I don&rsquo;t care if you&rsquo;re a CMO.&rdquo;\nThe most human answer had nothing to do with work\nWhen I asked him what experience taught him something real about leadership, he did not go straight to a job. He went to marriage, growing up, and realizing life was not just about him.\nThat was probably the most human answer in the interview.\nLeadership is shallow if it only exists at work. If you still move through life like your choices only affect you, then the title does not mean much. The real shift came when he started asking a harder question: not &ldquo;am I technically wrong?&rdquo; but &ldquo;what does this do to the other person?&rdquo;\nThat answer had more leadership in it than most leadership answers do.\nLeadership starts before the title does\nI also liked what he said about who he used to be as an employee.\nHe admitted that earlier in his career he was more of a blind doer. He was getting tasks done without really understanding the bigger meaning behind them. Then he started changing the way he carried himself. He started dressing like he wanted to lead. Looking for stretch work. Shadowing other functions. Reading more. Asking bigger questions. Acting like the next role before he had it.\nThat answer mattered because too many people talk about leadership like it begins the day they get authority. It does not. It starts way earlier than that &mdash; in how you learn, how you carry yourself, what extra weight you take on, and whether people can trust you before you are in charge of anything.\nRoots. Trees. Forest.\n&ldquo;There&rsquo;s three levels in life: roots, trees, and forest.&rdquo;\nThis was one of the best frameworks in the entire conversation.\nHe said life has three levels: roots, trees, and forest.\nSometimes you are down in the roots doing the immediate work. Sometimes you are in the trees looking at the next level up. Sometimes you are in the forest asking where all of this is going. What I liked is that he did not present those like fixed ranks. He treated them like positions you move through depending on the situation.\nThat made the idea useful instead of decorative.\nNo one is omnipresent\nThe introspection part of the interview was strong because it was honest about trade-offs.\nHe said you cannot be everywhere for everyone. You are going to give time to one thing and take time from another. You are going to disappoint somebody. You are going to make choices that help one responsibility and cost another...",
           "keywords": [
             "actually",
             "hit",
@@ -7176,7 +7176,7 @@
       "pageType": "project_detail",
       "title": "Loreal Maps Campaign | Estivan Ayramia",
       "description": "Read the Loreal MAPS campaign case by Estivan Ayramia, covering strategic mapping, positioning choices, and how campaign planning aligned with brand goals.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "Read the Loreal MAPS campaign case by Estivan Ayramia, covering strategic mapping, positioning choices, and how campaign planning aligned with brand goals.",
       "headings": [
         "Loreal Maps Campaign | Estivan Ayramia",
@@ -7512,7 +7512,7 @@
       "pageType": "project_detail",
       "title": "Portfolio Build | Estivan Ayramia",
       "description": "How Estivan built this site, what changed along the way, and what was worth figuring out to make it work.",
-      "buildVersion": "20260811-4f44b9e9",
+      "buildVersion": "20260812-1b650a46",
       "summary": "How Estivan built this site, what changed along the way, and what was worth figuring out to make it work.",
       "headings": [
         "Portfolio Build | Estivan Ayramia",
