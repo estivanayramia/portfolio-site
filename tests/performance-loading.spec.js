@@ -147,4 +147,15 @@ test.describe('PDF and media loading budgets', () => {
     await expect(video.locator('..')).toHaveClass(/aspect-\[9\/16\]/);
     await context.close();
   });
+
+  test('the footer remains paintable when a full page is rendered from the top', async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await useLocalOnly(context);
+    const page = await context.newPage();
+    await page.goto(carPage, { waitUntil: 'domcontentloaded' });
+    const footer = page.locator('footer');
+    await expect(footer).toContainText('Quick Links');
+    expect(await footer.evaluate((element) => getComputedStyle(element).contentVisibility)).toBe('visible');
+    await context.close();
+  });
 });
