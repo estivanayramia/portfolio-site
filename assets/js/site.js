@@ -3695,10 +3695,19 @@ document.addEventListener('DOMContentLoaded', () => {
             && !document.body.classList.contains('page-close-ui-guard');
 
         els.widget.classList.toggle('chat-widget--deferred', deferAtTop);
-        if (deferAtTop) {
+        if (!chatIsClosed) {
+            els.widget.removeAttribute('aria-hidden');
+            els.toggleBtn.inert = true;
+            els.toggleBtn.setAttribute('aria-hidden', 'true');
+            els.toggleBtn.setAttribute('tabindex', '-1');
+        } else if (deferAtTop) {
+            els.toggleBtn.inert = false;
+            els.toggleBtn.removeAttribute('aria-hidden');
             els.widget.setAttribute('aria-hidden', 'true');
             els.toggleBtn.setAttribute('tabindex', '-1');
         } else {
+            els.toggleBtn.inert = false;
+            els.toggleBtn.removeAttribute('aria-hidden');
             els.widget.removeAttribute('aria-hidden');
             els.toggleBtn.removeAttribute('tabindex');
         }

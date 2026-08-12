@@ -81,7 +81,7 @@ test('storage denial does not stop theme, menu, or chat controls', async ({ page
   await menuToggle.click();
   await expect(menuToggle).toHaveAttribute('aria-expanded', 'false');
 
-  await page.locator('#chat-toggle').click();
+  await page.keyboard.press('Control+K');
   await expect(page.locator('#chat-window')).toHaveAttribute('aria-hidden', 'false');
   await expect(page.locator('#chat-input')).toBeFocused();
   expect(pageErrors).toEqual([]);
@@ -177,6 +177,10 @@ for (const viewport of [
     await removeCinematicIntro(page);
 
     const toggle = page.locator('#chat-toggle');
+    if (viewport.name === 'mobile') {
+      await page.locator('footer').scrollIntoViewIfNeeded();
+      await expect(toggle).toBeVisible();
+    }
     await focusWithKeyboard(page, '#chat-toggle');
     expect(await toggle.evaluate((element) => element.matches(':focus-visible'))).toBe(true);
     await expect(toggle).toHaveCSS('outline-color', 'rgb(225, 212, 194)');
