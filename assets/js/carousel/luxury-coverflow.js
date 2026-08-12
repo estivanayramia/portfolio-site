@@ -2174,19 +2174,10 @@ export class LuxuryCoverflow {
         } else {
           node.setAttribute('tabindex', previousTabIndex);
         }
-        if (node.tagName === 'A' && !node.hasAttribute('href') && node.hasAttribute('data-prev-href')) {
-          node.setAttribute('href', node.getAttribute('data-prev-href'));
-        }
         node.style.removeProperty('pointer-events');
         return;
       }
 
-      if (node.tagName === 'A' && node.hasAttribute('href')) {
-        if (!node.hasAttribute('data-prev-href')) {
-          node.setAttribute('data-prev-href', node.getAttribute('href'));
-        }
-        node.removeAttribute('href');
-      }
       node.setAttribute('tabindex', '-1');
       node.style.setProperty('pointer-events', 'none');
     });

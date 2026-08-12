@@ -934,6 +934,26 @@ test.describe('Reduced Motion Tier', () => {
 });
 
 test.describe('Shared Premium Pages', () => {
+  test('project carousel keeps crawlable links and valid list semantics', async ({ page }) => {
+    await prepareCarousel(page);
+
+    const cardLinks = page.locator('.coverflow-card .card-link');
+    const linkCount = await cardLinks.count();
+    expect(linkCount).toBeGreaterThan(1);
+
+    for (let index = 0; index < linkCount; index += 1) {
+      await expect(cardLinks.nth(index)).toHaveAttribute('href', /^\/projects\//);
+    }
+
+    const inactiveLink = page.locator('.coverflow-card:not(.is-center) .card-link').first();
+    await expect(inactiveLink).toHaveAttribute('tabindex', '-1');
+    await expect(page.locator('.coverflow-track')).toHaveAttribute('role', 'list');
+    expect(await page.locator('.coverflow-card').evaluateAll((cards) => (
+      cards.every((card) => card.getAttribute('role') === 'listitem')
+    ))).toBeTruthy();
+    await expect(page.locator('article[role="listitem"]')).toHaveCount(0);
+  });
+
   test('about page ignores pure vertical wheel gestures', async ({ page }) => {
     await prepareCarouselAt(page, aboutUrl, '#about-carousel-section');
 

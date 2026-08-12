@@ -1,4 +1,6 @@
 const { test, expect } = require('@playwright/test');
+const fs = require('node:fs');
+const { execFileSync } = require('node:child_process');
 
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:5500';
 const projectPage = `${baseUrl}/EN/projects/endpoint-linkedin-campaign.html`;
@@ -33,6 +35,21 @@ async function pdfRequestsFor(page) {
 }
 
 test.describe('PDF and media loading budgets', () => {
+  test('Latin pages use the local Inter font instead of Google Fonts', () => {
+    const trackedHtmlFiles = execFileSync('git', ['ls-files', '--', '*.html'], { encoding: 'utf8' })
+      .trim()
+      .split(/\r?\n/)
+      .filter((file) => file && file !== 'ar/index.html');
+    const externalFontPages = trackedHtmlFiles.filter((file) => (
+      /fonts\.(?:googleapis|gstatic)\.com/.test(fs.readFileSync(file, 'utf8'))
+    ));
+
+    expect(externalFontPages).toEqual([]);
+    for (const file of ['EN/overview.html', 'EN/projects/index.html']) {
+      expect(fs.readFileSync(file, 'utf8')).toContain('/assets/fonts/inter/inter-latin.woff2');
+    }
+  });
+
   test('does not fetch a below-fold PDF until intersection', async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     await useLocalOnly(context);
@@ -81,6 +98,7 @@ test.describe('PDF and media loading budgets', () => {
     await expect(frame).not.toHaveAttribute('src');
     const toggle = page.locator('.project-preview-shell .preview-toggle').first();
     await toggle.scrollIntoViewIfNeeded();
+    await page.bringToFront();
     await toggle.focus();
     await expect(toggle).toBeFocused();
     await toggle.press('Enter');
