@@ -2,7 +2,7 @@
   "version": "page-grounding-v1",
   "source": "repo-crawl",
   "baseUrl": "https://www.estivanayramia.com",
-  "buildVersion": "20260812-3114cf21",
+  "buildVersion": "20260812-6b76d5f2",
   "pageCount": 26,
   "pages": [
     {
@@ -13,7 +13,7 @@
       "pageType": "home",
       "title": "Estivan Ayramia | Built to Show More Than a Resume",
       "description": "A direct look at my work, how I think, and what I follow through on.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "A direct look at my work, how I think, and what I follow through on.",
       "headings": [
         "Estivan Ayramia | Built to Show More Than a Resume",
@@ -503,7 +503,7 @@
       "pageType": "about",
       "title": "About | Estivan Ayramia",
       "description": "Who I am, how I work, and what shaped the way I show up.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Who I am, how I work, and what shaped the way I show up.",
       "headings": [
         "About | Estivan Ayramia",
@@ -665,7 +665,7 @@
       "pageType": "about_detail",
       "title": "Background | Estivan Ayramia",
       "description": "Explore Estivan Ayramia",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Explore Estivan Ayramia",
       "headings": [
         "Background | Estivan Ayramia",
@@ -940,7 +940,7 @@
       "pageType": "about_detail",
       "title": "Values | Estivan Ayramia",
       "description": "How I make decisions, work with people, and keep improving without the fluff.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "How I make decisions, work with people, and keep improving without the fluff.",
       "headings": [
         "Values | Estivan Ayramia",
@@ -1257,7 +1257,7 @@
       "pageType": "about_detail",
       "title": "Working With Me | Estivan Ayramia",
       "description": "How Estivan Ayramia works with people: communication, follow-through, and what it feels like to work together.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "How Estivan Ayramia works with people: communication, follow-through, and what it feels like to work together.",
       "headings": [
         "Working With Me | Estivan Ayramia",
@@ -1647,7 +1647,7 @@
       "pageType": "arabic",
       "title": "Portfolio | الرئيسية",
       "description": "طالب أعمال عامة. أنظمة، أشخاص، تنفيذ نظيف.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "طالب أعمال عامة. أنظمة، أشخاص، تنفيذ نظيف.",
       "headings": [
         "طالب أعمال عامة. أنظمة، أشخاص، تنفيذ نظيف.",
@@ -1724,7 +1724,7 @@
       "pageType": "contact",
       "title": "Contact | Estivan Ayramia",
       "description": "Contact Estivan Ayramia for collaboration, project discussion, or professional opportunities through the official contact page and preferred channels.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Contact Estivan Ayramia for collaboration, project discussion, or professional opportunities through the official contact page and preferred channels.",
       "headings": [
         "Contact | Estivan Ayramia",
@@ -1943,7 +1943,7 @@
       "pageType": "deep_dive",
       "title": "How I Think and Work | Estivan Ayramia",
       "description": "Background, habits, work, and the choices that shaped how I think.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Background, habits, work, and the choices that shaped how I think.",
       "headings": [
         "How I Think and Work | Estivan Ayramia",
@@ -2841,7 +2841,7 @@
       "pageType": "spanish",
       "title": "Portfolio | Inicio",
       "description": "Estudiante de Negocios Generales. Sistemas, personas, ejecución limpia.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Estudiante de Negocios Generales. Sistemas, personas, ejecución limpia.",
       "headings": [
         "Estudiante de Negocios Generales. Sistemas, personas, ejecución limpia.",
@@ -3038,7 +3038,7 @@
       "pageType": "hobby_detail",
       "title": "Car Enthusiasm | Estivan Ayramia",
       "description": "Read about Estivan Ayramia",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Read about Estivan Ayramia",
       "headings": [
         "Car Enthusiasm | Estivan Ayramia",
@@ -3231,7 +3231,7 @@
       "pageType": "hobby_detail",
       "title": "Cooking | Estivan Ayramia",
       "description": "See how cooking fits into Estivan Ayramia",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "See how cooking fits into Estivan Ayramia",
       "headings": [
         "Cooking | Estivan Ayramia",
@@ -3421,7 +3421,7 @@
       "pageType": "hobby_detail",
       "title": "Gym Training | Estivan Ayramia",
       "description": "Learn about Estivan Ayramia",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Learn about Estivan Ayramia",
       "headings": [
         "Gym Training | Estivan Ayramia",
@@ -3627,7 +3627,7 @@
       "pageType": "hobby_detail",
       "title": "Me | Estivan Ayramia",
       "description": "Get a personal snapshot from Estivan Ayramia, highlighting interests and reflections that complement professional work with authenticity and grounded perspective.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Get a personal snapshot from Estivan Ayramia, highlighting interests and reflections that complement professional work with authenticity and grounded perspective.",
       "headings": [
         "Me | Estivan Ayramia",
@@ -3795,7 +3795,7 @@
       "pageType": "hobby_detail",
       "title": "Photography | Estivan Ayramia",
       "description": "Photos Estivan Ayramia has taken and the kind of frames he likes to catch.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Photos Estivan Ayramia has taken and the kind of frames he likes to catch.",
       "headings": [
         "Photography | Estivan Ayramia",
@@ -3988,7 +3988,7 @@
       "pageType": "hobby_detail",
       "title": "Reading | Estivan Ayramia",
       "description": "What Estivan Ayramia reads, what sticks, and the kinds of ideas he keeps coming back to.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "What Estivan Ayramia reads, what sticks, and the kinds of ideas he keeps coming back to.",
       "headings": [
         "Reading | Estivan Ayramia",
@@ -4231,7 +4231,7 @@
       "pageType": "hobby_detail",
       "title": "Whispers Notes | Estivan Ayramia",
       "description": "Browse Whispers, a collection of concise notes and reflections by Estivan Ayramia that capture ideas, lessons, and perspective across everyday life.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Browse Whispers, a collection of concise notes and reflections by Estivan Ayramia that capture ideas, lessons, and perspective across everyday life.",
       "headings": [
         "Whispers Notes | Estivan Ayramia",
@@ -4393,7 +4393,7 @@
       "pageType": "overview",
       "title": "Overview | Estivan Ayramia",
       "description": "The short read on how Estivan Ayramia works and what people can usually count on from him.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "The short read on how Estivan Ayramia works and what people can usually count on from him.",
       "headings": [
         "Overview | Estivan Ayramia",
@@ -4741,7 +4741,7 @@
       "pageType": "page",
       "title": "Privacy Policy | Estivan Ayramia",
       "description": "Review the privacy policy for estivanayramia.com, including data handling, analytics context, and the principles used to protect visitor information.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Review the privacy policy for estivanayramia.com, including data handling, analytics context, and the principles used to protect visitor information.",
       "headings": [
         "Privacy Policy",
@@ -5139,7 +5139,7 @@
       "pageType": "projects_index",
       "title": "Projects | Estivan Ayramia",
       "description": "Selected work: what it was, what I made, and why it mattered.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Selected work: what it was, what I made, and why it mattered.",
       "headings": [
         "Projects | Estivan Ayramia",
@@ -5578,7 +5578,7 @@
       "pageType": "project_detail",
       "title": "Endpoint Competitive Playbook | Estivan Ayramia",
       "description": "Review the Endpoint Competitive Playbook project: positioning strategy, account planning, and messaging structure designed to improve win probability in enterprise sales.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Review the Endpoint Competitive Playbook project: positioning strategy, account planning, and messaging structure designed to improve win probability in enterprise sales.",
       "headings": [
         "Endpoint Competitive Playbook | Estivan Ayramia",
@@ -5937,7 +5937,7 @@
       "pageType": "project_detail",
       "title": "Endpoint Elosity Video | Estivan Ayramia",
       "description": "Discover the Endpoint Elosity Video project by Estivan Ayramia, including creative direction, narrative structure, and production choices tied to campaign intent.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Discover the Endpoint Elosity Video project by Estivan Ayramia, including creative direction, narrative structure, and production choices tied to campaign intent.",
       "headings": [
         "Endpoint Elosity Video | Estivan Ayramia",
@@ -6255,7 +6255,7 @@
       "pageType": "project_detail",
       "title": "Endpoint LinkedIn Campaign | Estivan Ayramia",
       "description": "Analyze the Endpoint LinkedIn Campaign project: audience targeting, campaign structure, and messaging decisions used to support measurable engagement outcomes.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Analyze the Endpoint LinkedIn Campaign project: audience targeting, campaign structure, and messaging decisions used to support measurable engagement outcomes.",
       "headings": [
         "Endpoint LinkedIn Campaign | Estivan Ayramia",
@@ -6540,7 +6540,7 @@
       "pageType": "project_detail",
       "title": "Franklin Templeton Concept | Estivan Ayramia",
       "description": "See the Franklin Templeton concept project by Estivan Ayramia, focused on strategic communication, concept development, and practical business storytelling.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "See the Franklin Templeton concept project by Estivan Ayramia, focused on strategic communication, concept development, and practical business storytelling.",
       "headings": [
         "Franklin Templeton Concept | Estivan Ayramia",
@@ -6916,7 +6916,7 @@
       "pageType": "project_detail",
       "title": "Isa Grimes Interview | Estivan Ayramia",
       "description": "A direct conversation with Isa Grimes about your 20s, leadership, people skills, support systems, favoritism, and the kind of perspective that only matters once you have actually lived something.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "A direct conversation with Isa Grimes about your 20s, leadership, people skills, support systems, favoritism, and the kind of perspective that only matters once you have actually lived something.",
       "headings": [
         "Isa Grimes Interview | Estivan Ayramia",
@@ -7176,7 +7176,7 @@
       "pageType": "project_detail",
       "title": "Loreal Maps Campaign | Estivan Ayramia",
       "description": "Read the Loreal MAPS campaign case by Estivan Ayramia, covering strategic mapping, positioning choices, and how campaign planning aligned with brand goals.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "Read the Loreal MAPS campaign case by Estivan Ayramia, covering strategic mapping, positioning choices, and how campaign planning aligned with brand goals.",
       "headings": [
         "Loreal Maps Campaign | Estivan Ayramia",
@@ -7512,7 +7512,7 @@
       "pageType": "project_detail",
       "title": "Portfolio Build | Estivan Ayramia",
       "description": "How Estivan built this site, what changed along the way, and what was worth figuring out to make it work.",
-      "buildVersion": "20260812-3114cf21",
+      "buildVersion": "20260812-6b76d5f2",
       "summary": "How Estivan built this site, what changed along the way, and what was worth figuring out to make it work.",
       "headings": [
         "Portfolio Build | Estivan Ayramia",
