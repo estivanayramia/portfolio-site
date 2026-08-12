@@ -163,6 +163,9 @@ test('rapid dashboard pagination cannot skip a page', async ({ page }) => {
   });
 
   await expect(page.locator('#page-info')).toHaveText('Page 2 of 3');
+  await expect.poll(() => requestCount).toBe(2);
+  await expect(next).toBeEnabled();
+  await page.waitForTimeout(100);
   expect(requestCount).toBe(2);
 });
 
