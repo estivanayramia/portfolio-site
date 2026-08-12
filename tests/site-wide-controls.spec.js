@@ -222,6 +222,21 @@ async function auditFrameControls(frame) {
   return { controls, audit };
 }
 
+async function dismissTransientUi(page, frame) {
+  await page.keyboard.press('Escape').catch(() => {});
+  return frame.locator('button[aria-label^="Close "]').evaluateAll((buttons) => {
+    let closed = 0;
+    for (const button of buttons) {
+      const style = getComputedStyle(button);
+      const visible = style.display !== 'none' && style.visibility !== 'hidden' && button.getClientRects().length > 0;
+      if (!visible || button.id === 'close-chat') continue;
+      button.click();
+      closed += 1;
+    }
+    return closed;
+  }).catch(() => 0);
+}
+
 async function exerciseFrameControls(page, frame) {
   const { audit } = await auditFrameControls(frame);
   const unnamed = audit.filter((control) => !control.name);
@@ -230,6 +245,7 @@ async function exerciseFrameControls(page, frame) {
   let visibleActions = 0;
   let hiddenActions = 0;
   let detachedControls = 0;
+  let transientCloseActions = 0;
   for (const control of audit) {
     if (control.disabled || sharedControlIds.has(control.id)) continue;
     const locator = frame.locator(`[data-edge-control-id="${control.key}"]`);
@@ -241,7 +257,7 @@ async function exerciseFrameControls(page, frame) {
       await locator.scrollIntoViewIfNeeded({ timeout: 1000 }).catch(() => {});
       let clicked = false;
       try {
-        await locator.click({ timeout: 1000 });
+        await locator.click({ timeout: 1000, noWaitAfter: true });
         clicked = true;
       } catch {
         await page.keyboard.press('Escape').catch(() => {});
@@ -250,7 +266,7 @@ async function exerciseFrameControls(page, frame) {
           continue;
         }
         try {
-          await locator.click({ timeout: 1000, force: true });
+          await locator.click({ timeout: 1000, force: true, noWaitAfter: true });
           clicked = true;
         } catch (error) {
           if (!(await locator.count())) {
@@ -261,7 +277,6 @@ async function exerciseFrameControls(page, frame) {
         }
       }
       if (clicked) visibleActions += 1;
-      await page.keyboard.press('Escape').catch(() => {});
     } else {
       await locator.evaluate((element) => {
         element.click();
@@ -272,8 +287,9 @@ async function exerciseFrameControls(page, frame) {
         detachedControls += 1;
       });
     }
+    transientCloseActions += await dismissTransientUi(page, frame);
   }
-  return { total: audit.length, visibleActions, hiddenActions, detachedControls };
+  return { total: audit.length, visibleActions, hiddenActions, detachedControls, transientCloseActions };
 }
 
 test.beforeAll(() => {
